@@ -42,6 +42,7 @@ import { NoteAccidentalMode } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
+import { BarreShape } from '@src/model/BarreShape';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1639,6 +1640,29 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'wahc') {
             this._sy = this.newSy();
             beat.wahPedal = WahPedal.Closed;
+            return true;
+        } else if (syData === 'barre') {
+            this._sy = this.newSy();
+
+            if (this._sy !== AlphaTexSymbols.Number) {
+                this.error('beat-barre', AlphaTexSymbols.Number, true);
+            }
+            beat.barreFret = this._syData as number;
+            this._sy = this.newSy();
+
+            if (this._sy === AlphaTexSymbols.String) {
+                switch ((this._syData as string).toLowerCase()) {
+                    case 'full':
+                        beat.barreShape = BarreShape.Full;
+                        this._sy = this.newSy();
+                        break;
+                    case 'half':
+                        beat.barreShape = BarreShape.Half;
+                        this._sy = this.newSy();
+                        break;
+                }
+            }
+            
             return true;
         } else {
             // string didn't match any beat effect syntax

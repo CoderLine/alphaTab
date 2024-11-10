@@ -311,7 +311,12 @@ export enum NotationElement {
     /**
      * The Wah effect signs above and below the staff.
      */
-    EffectWahPedal
+    EffectWahPedal,
+
+    /**
+     * The Beat barre effect signs above and below the staff "1/2B IV ─────┐"
+     */
+    BeatBarre
 }
 
 /**

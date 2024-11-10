@@ -25,6 +25,7 @@ import { GraceGroup } from '@src/model/GraceGroup';
 import { GolpeType } from './GolpeType';
 import { FadeType } from './FadeType';
 import { WahPedal } from './WahPedal';
+import { BarreShape } from './BarreShape';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -476,7 +477,24 @@ export class Beat {
     /**
      * Whether the wah pedal should be used when playing the beat.
      */
-    public wahPedal:WahPedal = WahPedal.None;
+    public wahPedal: WahPedal = WahPedal.None;
+
+    /**
+     * The fret of a barré being played on this beat.
+     */
+    public barreFret: number = -1;
+
+    /**
+     * The shape how the barre should be played on this beat.
+     */
+    public barreShape: BarreShape = BarreShape.None;
+
+    /**
+     * Gets a value indicating whether the beat should be played as Barré
+     */
+    public get isBarre() {
+        return this.barreShape !== BarreShape.None && this.barreFret >= 0;
+    }
 
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;

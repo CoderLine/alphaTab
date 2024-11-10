@@ -65,6 +65,8 @@ export class BeatCloner {
         clone.isEffectSlurOrigin = original.isEffectSlurOrigin;
         clone.beamingMode = original.beamingMode;
         clone.wahPedal = original.wahPedal;
+        clone.barreFret = original.barreFret;
+        clone.barreShape = original.barreShape;
         return clone;
     }
 }
