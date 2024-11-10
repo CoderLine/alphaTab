@@ -13,6 +13,7 @@ import { BendStyle } from "@src/model/BendStyle";
 import { Ottavia } from "@src/model/Ottavia";
 import { Duration } from "@src/model/Duration";
 import { Automation } from "@src/model/Automation";
+import { FadeType } from "@src/model/FadeType";
 import { BrushType } from "@src/model/BrushType";
 import { WhammyType } from "@src/model/WhammyType";
 import { BendPoint } from "@src/model/BendPoint";
@@ -45,7 +46,7 @@ export class BeatSerializer {
         o.set("duration", obj.duration as number);
         o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i)));
         o.set("dots", obj.dots);
-        o.set("fadein", obj.fadeIn);
+        o.set("fade", obj.fade as number);
         o.set("lyrics", obj.lyrics);
         o.set("hasrasgueado", obj.hasRasgueado);
         o.set("pop", obj.pop);
@@ -119,8 +120,8 @@ export class BeatSerializer {
             case "dots":
                 obj.dots = v! as number;
                 return true;
-            case "fadein":
-                obj.fadeIn = v! as boolean;
+            case "fade":
+                obj.fade = JsonHelper.parseEnum<FadeType>(v, FadeType)!;
                 return true;
             case "lyrics":
                 obj.lyrics = v as string[] | null;

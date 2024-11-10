@@ -36,6 +36,7 @@ import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { DynamicValue } from '@src/model';
+import { FadeType } from '@src/model/FadeType';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -350,6 +351,11 @@ export class MidiFileGenerator {
                 this.generateNote(n, barStartTick + beatStart, audioDuration, tempoOnBeatStart, brushInfo);
             }
         }
+
+        if (beat.fade !== FadeType.None) {
+            this.generateFade(beat, barStartTick + beatStart, audioDuration);
+        }
+
         if (beat.vibrato !== VibratoType.None) {
             let phaseLength: number = 240;
             let bendAmplitude: number = 3;
@@ -518,12 +524,6 @@ export class MidiFileGenerator {
 
         if (initialBend >= 0) {
             this._handler.addNoteBend(track.index, noteStart, channel, noteKey, initialBend);
-        }
-
-        //
-        // Fade in
-        if (note.beat.fadeIn) {
-            this.generateFadeIn(note, noteStart, noteDuration);
         }
 
         //
@@ -699,32 +699,70 @@ export class MidiFileGenerator {
         return MidiUtils.dynamicToVelocity(dynamicValue);
     }
 
-    private generateFadeIn(note: Note, noteStart: number, noteDuration: MidiNoteDuration): void {
-        const track: Track = note.beat.voice.bar.staff.track;
-        const endVolume: number = MidiFileGenerator.toChannelShort(track.playbackInfo.volume);
-        const volumeFactor: number = endVolume / noteDuration.noteOnly;
+    private generateFade(beat: Beat, beatStart: number, beatDuration: number): void {
+        const track: Track = beat.voice.bar.staff.track;
+        switch (beat.fade) {
+            case FadeType.FadeIn:
+                this.generateFadeSteps(
+                    track,
+                    beatStart,
+                    beatDuration,
+                    0,
+                    MidiFileGenerator.toChannelShort(track.playbackInfo.volume)
+                );
+                break;
+            case FadeType.FadeOut:
+                this.generateFadeSteps(
+                    track,
+                    beatStart,
+                    beatDuration,
+                    MidiFileGenerator.toChannelShort(track.playbackInfo.volume),
+                    0
+                );
+                break;
+            case FadeType.VolumeSwell:
+                const half = (beatDuration / 2) | 0;
+                this.generateFadeSteps(
+                    track,
+                    beatStart,
+                    half,
+                    0,
+                    MidiFileGenerator.toChannelShort(track.playbackInfo.volume)
+                );
+                this.generateFadeSteps(
+                    track,
+                    beatStart + half,
+                    half,
+                    MidiFileGenerator.toChannelShort(track.playbackInfo.volume),
+                    0
+                );
+
+                break;
+        }
+    }
+
+    private generateFadeSteps(
+        track: Track,
+        start: number,
+        duration: number,
+        startVolume: number,
+        endVolume: number
+    ): void {
         const tickStep: number = 120;
-        const steps: number = (noteDuration.noteOnly / tickStep) | 0;
-        const endTick: number = noteStart + noteDuration.noteOnly;
-        for (let i: number = steps - 1; i >= 0; i--) {
-            const tick: number = endTick - i * tickStep;
-            const volume: number = (tick - noteStart) * volumeFactor;
-            if (i === steps - 1) {
-                this._handler.addControlChange(
-                    track.index,
-                    noteStart,
-                    track.playbackInfo.primaryChannel,
-                    ControllerType.VolumeCoarse,
-                    volume
-                );
-                this._handler.addControlChange(
-                    track.index,
-                    noteStart,
-                    track.playbackInfo.secondaryChannel,
-                    ControllerType.VolumeCoarse,
-                    volume
-                );
-            }
+        // we want to reach the target volume a bit earlier than the end of the note
+        duration = (duration * 0.8) | 0;
+
+        const volumeFactor: number = (endVolume - startVolume) / duration;
+
+        const steps: number = (duration / tickStep + 1) | 0;
+        const endTick: number = start + duration;
+
+        for (let i = 0; i < steps; i++) {
+            // ensure final value at end depending on rounding we might not reach it exactly
+            const isLast = i === steps - 1;
+            const tick: number = isLast ? endTick : start + i * tickStep;
+            const volume: number = isLast ? endVolume : Math.round(startVolume + (tick - start) * volumeFactor);
+
             this._handler.addControlChange(
                 track.index,
                 tick,

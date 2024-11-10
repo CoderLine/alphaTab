@@ -42,9 +42,11 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('fade-in', async () => {
-        // quadratic curve rendering in SkiaSharp is edgy with m80,
-        // tolerance compensates this
-        await VisualTestHelper.runVisualTest('effects-and-annotations/fade-in.gp', undefined, undefined, undefined, 2);
+        await VisualTestHelper.runVisualTest('effects-and-annotations/fade-in.gp');
+    });
+
+    it('fade', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/fade.gp');
     });
 
     it('let-ring', async () => {

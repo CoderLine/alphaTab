@@ -151,6 +151,9 @@ export enum MusicFontSymbol {
     GuitarString9 = 0xe83c,
 
     GuitarGolpe = 0xe842,
+    GuitarFadeIn = 0xe843,
+    GuitarFadeOut = 0xe844,
+    GuitarVolumeSwell = 0xe845,
 
     FretboardX = 0xe859,
     FretboardO = 0xe85a,

@@ -27,7 +27,7 @@ export class BeatCloner {
             clone.automations.push(AutomationCloner.clone(i));
         }
         clone.dots = original.dots;
-        clone.fadeIn = original.fadeIn;
+        clone.fade = original.fade;
         clone.lyrics = original.lyrics ? original.lyrics.slice() : null;
         clone.hasRasgueado = original.hasRasgueado;
         clone.pop = original.pop;

@@ -117,9 +117,10 @@ export class EffectBand extends Glyph {
                             let previousRenderer: EffectBarRenderer = this.renderer
                                 .previousRenderer as EffectBarRenderer;
                             let previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
-                            // it can happen that we have an empty voice and then we don't have an effect band 
-                            if(previousBand) {
-                                let voiceGlyphs: Map<number, EffectGlyph> = previousBand._effectGlyphs[prevBeat.voice.index];
+                            // it can happen that we have an empty voice and then we don't have an effect band
+                            if (previousBand) {
+                                let voiceGlyphs: Map<number, EffectGlyph> =
+                                    previousBand._effectGlyphs[prevBeat.voice.index];
                                 if (voiceGlyphs.has(prevBeat.index)) {
                                     prevEffect = voiceGlyphs.get(prevBeat.index)!;
                                 }
@@ -150,9 +151,12 @@ export class EffectBand extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        // canvas.LineWidth = 1;
-        // canvas.StrokeRect(cx + X, cy + Y, Renderer.Width, Slot.Shared.Height);
-        // canvas.LineWidth = 1.5f;
+
+        // const c = canvas.color;
+        // canvas.color = Color.random();
+        // canvas.fillRect(cx + this.x, cy + this.y, this.renderer.width, this.slot!.shared.height);
+        // canvas.color = c;
+
         for (let i: number = 0, j: number = this._uniqueEffectGlyphs.length; i < j; i++) {
             let v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {

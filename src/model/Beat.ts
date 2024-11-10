@@ -23,6 +23,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
 import { GolpeType } from './GolpeType';
+import { FadeType } from './FadeType';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -208,9 +209,25 @@ export class Beat {
     public dots: number = 0;
 
     /**
+     * Gets a value indicating whether this beat is fade-in.
+     * @deprecated Use `fade`
+     */
+    public get fadeIn(): boolean {
+        return this.fade === FadeType.FadeIn;
+    }
+
+    /**
+     * Sets a value indicating whether this beat is fade-in.
+     * @deprecated Use `fade`
+     */
+    public set fadeIn(value: boolean) {
+        this.fade = value ? FadeType.FadeIn : FadeType.None;
+    }
+
+    /**
      * Gets or sets a value indicating whether this beat is fade-in.
      */
-    public fadeIn: boolean = false;
+    public fade: FadeType = FadeType.None;
 
     /**
      * Gets or sets the lyrics shown on this beat.

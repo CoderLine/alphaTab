@@ -10,6 +10,7 @@ import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
+import { FadeType } from '@src/model/FadeType';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
 import { GolpeType } from '@src/model/GolpeType';
@@ -672,8 +673,8 @@ export class GpifWriter {
         beatNode.attributes.set('id', beat.id.toString());
 
         beatNode.addElement('Dynamic').innerText = DynamicValue[beat.dynamics];
-        if (beat.fadeIn) {
-            beatNode.addElement('Fadding').innerText = 'FadeIn';
+        if (beat.fade !== FadeType.None) {
+            beatNode.addElement('Fadding').innerText = FadeType[beat.fade];
         }
         if (beat.isTremolo) {
             switch (beat.tremoloSpeed) {
@@ -748,7 +749,7 @@ export class GpifWriter {
             beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
         }
 
-        if(beat.golpe !== GolpeType.None) {
+        if (beat.golpe !== GolpeType.None) {
             beatNode.addElement('Golpe').innerText = GolpeType[beat.golpe];
         }
 
