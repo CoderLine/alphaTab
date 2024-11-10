@@ -23,6 +23,7 @@ import { MasterBar } from '@src/model/MasterBar';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
@@ -381,6 +382,10 @@ export class GpifWriter {
             noteNode.addElement('InstrumentArticulation').innerText = note.percussionArticulation.toString();
         } else {
             noteNode.addElement('InstrumentArticulation').innerText = '0';
+        }
+
+        if(note.ornament !== NoteOrnament.None){
+            noteNode.addElement('Ornament').innerText = NoteOrnament[note.ornament];
         }
     }
 

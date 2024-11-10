@@ -50,6 +50,7 @@ import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
 import { BarreShape } from '@src/model/BarreShape';
+import { NoteOrnament } from '@src/model/NoteOrnament';
 
 /**
  * This structure represents a duration within a gpif
@@ -1974,6 +1975,22 @@ export class GpifParser {
                         break;
                     case 'InstrumentArticulation':
                         note.percussionArticulation = parseInt(c.innerText);
+                        break;
+                    case 'Ornament':
+                        switch (c.innerText) {
+                            case 'Turn':
+                                note.ornament = NoteOrnament.Turn;
+                                break;
+                            case 'InvertedTurn':
+                                note.ornament = NoteOrnament.InvertedTurn;
+                                break;
+                            case 'UpperMordent':
+                                note.ornament = NoteOrnament.UpperMordent;
+                                break;
+                            case 'LowerMordent':
+                                note.ornament = NoteOrnament.LowerMordent;
+                                break;
+                        }
                         break;
                 }
             }

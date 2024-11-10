@@ -43,6 +43,7 @@ import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
 import { BarreShape } from '@src/model/BarreShape';
+import { NoteOrnament } from '@src/model/NoteOrnament';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1648,6 +1649,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this.error('beat-barre', AlphaTexSymbols.Number, true);
             }
             beat.barreFret = this._syData as number;
+            beat.barreShape = BarreShape.Full;
             this._sy = this.newSy();
 
             if (this._sy === AlphaTexSymbols.String) {
@@ -1662,7 +1664,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         break;
                 }
             }
-            
+
             return true;
         } else {
             // string didn't match any beat effect syntax
@@ -2007,6 +2009,18 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 note.accidentalMode = ModelUtils.parseAccidentalMode(this._syData as string);
                 this._sy = this.newSy();
+            } else if (syData === 'turn') {
+                this._sy = this.newSy();
+                note.ornament = NoteOrnament.Turn;
+            } else if (syData === 'iturn') {
+                this._sy = this.newSy();
+                note.ornament = NoteOrnament.InvertedTurn;
+            } else if (syData === 'umordent') {
+                this._sy = this.newSy();
+                note.ornament = NoteOrnament.UpperMordent;
+            } else if (syData === 'lmordent') {
+                this._sy = this.newSy();
+                note.ornament = NoteOrnament.LowerMordent;
             } else if (this.applyBeatEffect(note.beat)) {
                 // Success
             } else {

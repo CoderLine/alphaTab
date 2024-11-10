@@ -24,6 +24,9 @@ import { Settings } from '@src/Settings';
 import { assert, expect } from 'chai';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { GolpeType } from '@src/model/GolpeType';
+import { FadeType } from '@src/model/FadeType';
+import { BarreShape } from '@src/model/BarreShape';
+import { NoteOrnament } from '@src/model/NoteOrnament';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1311,5 +1314,29 @@ describe('AlphaTexImporterTest', () => {
         let score = parseTex('3.3 { glpf } 3.3 { glpt }');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].golpe).to.equal(GolpeType.Finger);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].golpe).to.equal(GolpeType.Thumb);
+    });
+    
+    it('fade', () => {
+        let score = parseTex('3.3 { f } 3.3 { fo } 3.3 { vs } ');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].fade).to.equal(FadeType.FadeIn);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].fade).to.equal(FadeType.FadeOut);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fade).to.equal(FadeType.VolumeSwell);
+    });
+
+    it('barre', () => {
+        let score = parseTex('3.3 { barre 5 } 3.3 { barre 14 half }');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreFret).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreShape).to.equal(BarreShape.Full);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreFret).to.equal(14);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreShape).to.equal(BarreShape.Half);
+    });
+
+    it('ornaments', () => {
+        let score = parseTex('3.3 { turn } 3.3 { iturn } 3.3 { umordent } 3.3 { lmordent }');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].ornament).to.equal(NoteOrnament.Turn);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].ornament).to.equal(NoteOrnament.InvertedTurn);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].ornament).to.equal(NoteOrnament.UpperMordent);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].ornament).to.equal(NoteOrnament.LowerMordent);
     });
 });

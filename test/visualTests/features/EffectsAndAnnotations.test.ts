@@ -230,4 +230,8 @@ describe('EffectsAndAnnotationsTests', () => {
     it('barre', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/barre.gp');
     });
+
+    it('ornaments', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/ornaments.gp');
+    });
 });

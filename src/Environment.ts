@@ -69,6 +69,7 @@ import { GolpeEffectInfo } from './rendering/effects/GolpeEffectInfo';
 import { GolpeType } from './model/GolpeType';
 import { WahPedalEffectInfo } from './rendering/effects/WahPedalEffectInfo';
 import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
+import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -511,6 +512,7 @@ export class Environment {
             new EffectBarRendererFactory(Environment.StaffIdBeforeScoreAlways, [
                 new FermataEffectInfo(),
                 new BeatBarreEffectInfo(),
+                new NoteOrnamentEffectInfo(),
                 new WahPedalEffectInfo(),
             ]),
             new EffectBarRendererFactory(
