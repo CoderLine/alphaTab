@@ -60,7 +60,7 @@ namespace AlphaTab.Core.EcmaScript
 
         public static double Round(double d)
         {
-            return System.Math.Round(d);
+            return System.Math.Round(d, MidpointRounding.AwayFromZero);
         }
 
         public static double Sin(double a)
