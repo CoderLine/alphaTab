@@ -36,7 +36,7 @@ export class TabBarRenderer extends LineBarRenderer {
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
 
-        if(!bar.staff.showStandardNotation) {
+        if (!bar.staff.showStandardNotation) {
             this.showTimeSignature = true;
             this.showRests = true;
             this.showTiedNotes = true;
@@ -51,8 +51,16 @@ export class TabBarRenderer extends LineBarRenderer {
         return this.bar.staff.tuning.length;
     }
 
-    public override get drawnLineCount(): number {
+    public override get drawnLineCount(): number {  
         return this.bar.staff.tuning.length;
+    }
+
+    public get rhythmMode() {
+        let mode = this.settings.notation.rhythmMode;
+        if (mode === TabRhythmMode.Automatic) {
+            mode = this.bar.staff.showStandardNotation ? TabRhythmMode.Hidden : TabRhythmMode.ShowWithBars;
+        }
+        return mode;
     }
 
     /**
@@ -95,7 +103,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override adjustSizes(): void {
-        if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
+        if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this.height += this.settings.notation.rhythmHeight * this.settings.display.scale;
             this.bottomPadding += this.settings.notation.rhythmHeight * this.settings.display.scale;
         }
@@ -103,7 +111,7 @@ export class TabBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
-        if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
+        if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this._hasTuplets = false;
             for (let voice of this.bar.voices) {
                 if (this.hasVoiceContainer(voice)) {
@@ -156,8 +164,7 @@ export class TabBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.timeSignatureNumerator,
                 this.bar.masterBar.timeSignatureDenominator,
                 this.bar.masterBar.timeSignatureCommon,
-                this.bar.masterBar.isFreeTime,
-                
+                this.bar.masterBar.isFreeTime
             )
         );
     }
@@ -173,17 +180,17 @@ export class TabBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        if (this.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
+        if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this.paintBeams(cx, cy, canvas);
             this.paintTuplets(cx, cy, canvas);
         }
     }
 
     public override drawBeamHelperAsFlags(h: BeamingHelper): boolean {
-        return super.drawBeamHelperAsFlags(h) || this.settings.notation.rhythmMode === TabRhythmMode.ShowWithBeams;
+        return super.drawBeamHelperAsFlags(h) || this.rhythmMode === TabRhythmMode.ShowWithBeams;
     }
 
-    protected override getFlagTopY(beat: Beat, _direction:BeamDirection): number {
+    protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
         const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this.tupletSize;
@@ -192,7 +199,7 @@ export class TabBarRenderer extends LineBarRenderer {
         }
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
+    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
         return this.getFlagAndBarPos();
     }
 

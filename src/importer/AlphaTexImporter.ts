@@ -39,6 +39,7 @@ import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteAccidentalMode } from '@src/model';
+import { GolpeType } from '@src/model/GolpeType';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1616,6 +1617,14 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'ds') {
             beat.deadSlapped = true;
             this._sy = this.newSy();
+            return true;
+        } else if (syData === 'glpf') {
+            this._sy = this.newSy();
+            beat.golpe = GolpeType.Finger;
+            return true;
+        } else if (syData === 'glpt') {
+            this._sy = this.newSy();
+            beat.golpe = GolpeType.Thumb;
             return true;
         } else {
             // string didn't match any beat effect syntax

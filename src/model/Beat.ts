@@ -22,6 +22,7 @@ import { Settings } from '@src/Settings';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
+import { GolpeType } from './GolpeType';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -399,6 +400,11 @@ export class Beat {
      * Gets or sets the duration that the note is played during the audio generation.
      */
     public playbackDuration: number = 0;
+
+    /**
+     * The type of golpe to play.
+     */
+    public golpe: GolpeType = GolpeType.None;
 
     public get absoluteDisplayStart(): number {
         return this.voice.bar.masterBar.start + this.displayStart;
