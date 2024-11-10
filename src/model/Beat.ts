@@ -174,7 +174,7 @@ export class Beat {
     public duration: Duration = Duration.Quarter;
 
     public get isRest(): boolean {
-        return this.isEmpty || this.notes.length === 0;
+        return this.isEmpty || (!this.deadSlapped && this.notes.length === 0);
     }
 
     /**
@@ -245,6 +245,11 @@ export class Beat {
      * Gets or sets whether this beat should be rendered as slashed note.
      */
     public slashed: boolean = false;
+
+    /**
+     * Whether this beat should rendered and played as "dead slapped".
+     */
+    public deadSlapped: boolean = false;
 
     /**
      * Gets or sets the brush type applied to the notes of this beat.

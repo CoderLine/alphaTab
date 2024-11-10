@@ -29,7 +29,7 @@ import {
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { AccentuationType, VibratoType } from '@src/model';
+import { AccentuationType, Duration, VibratoType } from '@src/model';
 import { expect } from 'chai';
 import { ScoreLoader } from '@src/importer';
 import { MidiTickLookup } from '@src/midi';
@@ -983,8 +983,13 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(handler.midiEvents, expectedEvents);
     });
 
-    
-    function expectBeat(tickLookup:MidiTickLookup, tick: number, fret: number, tickDuration: number, millisDuration: number) {
+    function expectBeat(
+        tickLookup: MidiTickLookup,
+        tick: number,
+        fret: number,
+        tickDuration: number,
+        millisDuration: number
+    ) {
         const res = tickLookup.findBeat(new Set<number>([0]), tick);
         expect(res).to.be.ok;
         expect(res!.beat.notes[0].fret).to.equal(fret);
@@ -1044,13 +1049,53 @@ describe('MidiFileGeneratorTest', () => {
 
         const beatStart = MidiUtils.QuarterTime * 6;
         const beatEnd = MidiUtils.QuarterTime * 7;
-        const tempoChangeTick = score.masterBars[1].start + score.masterBars[1].calculateDuration() * score.masterBars[1].tempoAutomations[1].ratioPosition;
+        const tempoChangeTick =
+            score.masterBars[1].start +
+            score.masterBars[1].calculateDuration() * score.masterBars[1].tempoAutomations[1].ratioPosition;
         expect(tempoChangeTick - beatStart).to.equal(528);
         expect(beatEnd - tempoChangeTick).to.equal(432);
-        
+
         const firstPartMillis = MidiUtils.ticksToMillis(tempoChangeTick - beatStart, 100);
         const secondPartMillis = MidiUtils.ticksToMillis(beatEnd - tempoChangeTick, 120);
 
         expectBeat(tickLookup, beatStart, 6, MidiUtils.QuarterTime, firstPartMillis + secondPartMillis);
+    });
+
+    it('dead-slap', async () => {
+        const tex: string = 'r.4 { ds } r.2 { ds } r.4 { ds }';
+        const score: Score = parseTex(tex);
+
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const sixtyFourth = MidiUtils.toTicks(Duration.SixtyFourth);
+        const forte = MidiUtils.dynamicToVelocity(DynamicValue.F as number);
+        const expectedEvents: FlatMidiEvent[] = [
+            new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[0], forte),
+            new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[1], forte),
+            new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[2], forte),
+            new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[3], forte),
+            new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[4], forte),
+            new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[5], forte),
+            
+            new FlatNoteEvent(960, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[0], forte),
+            new FlatNoteEvent(960, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[1], forte),
+            new FlatNoteEvent(960, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[2], forte),
+            new FlatNoteEvent(960, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[3], forte),
+            new FlatNoteEvent(960, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[4], forte),
+            new FlatNoteEvent(960, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[5], forte),
+
+            new FlatNoteEvent(2880, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[0], forte),
+            new FlatNoteEvent(2880, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[1], forte),
+            new FlatNoteEvent(2880, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[2], forte),
+            new FlatNoteEvent(2880, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[3], forte),
+            new FlatNoteEvent(2880, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[4], forte),
+            new FlatNoteEvent(2880, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[5], forte),
+        ];
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+        const actualNoteEvents : FlatMidiEvent[] = handler.midiEvents.filter(e => e instanceof FlatNoteEvent);
+
+        assertEvents(actualNoteEvents, expectedEvents);
     });
 });

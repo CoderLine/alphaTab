@@ -210,7 +210,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._score.tracks[track].applyLyrics(lyrics);
             }
             for (const [sustainPedal, beat] of this._sustainPedalToBeat) {
-                if(sustainPedal.ratioPosition === 0) {
+                if (sustainPedal.ratioPosition === 0) {
                     const duration = beat.voice.bar.masterBar.calculateDuration();
                     sustainPedal.ratioPosition = beat.playbackStart / duration;
                 }
@@ -1601,7 +1601,7 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
             return true;
-        }  else if (syData === 'spe') {
+        } else if (syData === 'spe') {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
             sustainPedal.ratioPosition = 1;
@@ -1611,6 +1611,10 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'slashed') {
             beat.slashed = true;
+            this._sy = this.newSy();
+            return true;
+        } else if (syData === 'ds') {
+            beat.deadSlapped = true;
             this._sy = this.newSy();
             return true;
         } else {

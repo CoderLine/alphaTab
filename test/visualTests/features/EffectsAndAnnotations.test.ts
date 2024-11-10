@@ -137,19 +137,22 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('sustain-pedal', async () => {
-        await VisualTestHelper.runVisualTestWithResize('effects-and-annotations/sustain.gp', [1200, 850, 600], 
+        await VisualTestHelper.runVisualTestWithResize(
+            'effects-and-annotations/sustain.gp',
+            [1200, 850, 600],
             [
                 'effects-and-annotations/sustain-1200.png',
                 'effects-and-annotations/sustain-850.png',
                 'effects-and-annotations/sustain-600.png'
-            ],
+            ]
         );
     });
 
     it('sustain-pedal-alphatex', async () => {
         const importer = new AlphaTexImporter();
         const settings = new Settings();
-        importer.initFromString(`
+        importer.initFromString(
+            `
         .
         \\track "pno."
         :8 G4 { spd } G4 G4 { spu } G4 G4 { spd } G4 {spu} G4 G4 {spd} |
@@ -158,18 +161,24 @@ describe('EffectsAndAnnotationsTests', () => {
         F5.4 F5.4 { spu } F5 F5 |
         G4.8 { spd } G4 G4 { spu } G4 G4 { spd } G4 G4 G4 {spu} |
         G4.4 G4.4 G4.4 {spd} G4.4 {spe}
-        `, settings);
+        `,
+            settings
+        );
         const score = importer.readScore();
         score.stylesheet.hideDynamics = true;
-        
-        await VisualTestHelper.runVisualTestScoreWithResize(score, [1200, 850, 600], 
+
+        await VisualTestHelper.runVisualTestScoreWithResize(
+            score,
+            [1200, 850, 600],
             [
                 'effects-and-annotations/sustain-1200.png',
                 'effects-and-annotations/sustain-850.png',
                 'effects-and-annotations/sustain-600.png'
-            ],
+            ]
         );
     });
 
-
+    it('dead-slap', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/dead-slap.gp');
+    });
 });

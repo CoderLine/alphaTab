@@ -17,11 +17,13 @@ import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { SpacingGlyph } from './SpacingGlyph';
 import { CircleGlyph } from './CircleGlyph';
 import { NumberedDashGlyph } from './NumberedDashGlyph';
+import { Glyph } from './Glyph';
+import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
-    
+
     public override doLayout(): void {
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
             let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
@@ -86,20 +88,28 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
 
 export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: NumberedNoteHeadGlyph | null = null;
+    public deadSlapped: DeadSlappedBeatGlyph | null = null;
 
-    public octaveDots:number = 0;
+    public octaveDots: number = 0;
 
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
+        let g: Glyph | null = null;
         if (this.noteHeads) {
-            let pos = this.noteHeads.x;
+            g = this.noteHeads;
+        } else if (this.deadSlapped) {
+            g = this.deadSlapped;
+        }
+
+        if (g) {
+            let pos = g.x;
             switch (requestedPosition) {
                 case NoteXPosition.Left:
                     break;
                 case NoteXPosition.Center:
-                    pos += this.noteHeads.width / 2;
+                    pos += g.width / 2;
                     break;
                 case NoteXPosition.Right:
-                    pos += this.noteHeads.width;
+                    pos += g.width;
                     break;
             }
             return pos;
@@ -121,19 +131,26 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+        let g: Glyph | null = null;
         if (this.noteHeads) {
-            let pos = this.y + this.noteHeads.y;
+            g = this.noteHeads;
+        } else if (this.deadSlapped) {
+            g = this.deadSlapped;
+        }
+
+        if (g) {
+            let pos = this.y + g.y;
 
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= this.noteHeads.height / 2 + 2 * this.scale;
+                    pos -= g.height / 2 + 2 * this.scale;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
                 case NoteYPosition.BottomWithStem:
-                    pos += this.noteHeads.height / 2;
+                    pos += g.height / 2;
                     break;
             }
 
@@ -143,13 +160,22 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override updateBeamingHelper(): void {
-        if (this.beamingHelper && this.noteHeads) {
-            this.beamingHelper.registerBeatLineX(
-                'numbered',
-                this.container.beat,
-                this.container.x + this.x + this.noteHeads.x,
-                this.container.x + this.x + this.noteHeads.x + this.noteHeads.width
-            );
+        if (this.beamingHelper) {
+            let g: Glyph | null = null;
+            if (this.noteHeads) {
+                g = this.noteHeads;
+            } else if (this.deadSlapped) {
+                g = this.deadSlapped;
+            }
+
+            if (g) {
+                this.beamingHelper.registerBeatLineX(
+                    'numbered',
+                    this.container.beat,
+                    this.container.x + this.x + g.x,
+                    this.container.x + this.x + g.x + g.width
+                );
+            }
         }
     }
 
@@ -233,16 +259,19 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 }
             }
 
-            const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
-            const noteHeadGlyph = new NumberedNoteHeadGlyph(
-                0,
-                glyphY,
-                numberWithinOctave,
-                isGrace
-            );
-            this.noteHeads = noteHeadGlyph;
+            if (this.container.beat.deadSlapped) {
+                const deadSlapped = new DeadSlappedBeatGlyph();
+                deadSlapped.renderer = this.renderer;
+                deadSlapped.doLayout();
+                this.deadSlapped = deadSlapped;
+                this.addGlyph(deadSlapped);
+            } else {
+                const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+                const noteHeadGlyph = new NumberedNoteHeadGlyph(0, glyphY, numberWithinOctave, isGrace);
+                this.noteHeads = noteHeadGlyph;
 
-            this.addGlyph(noteHeadGlyph);
+                this.addGlyph(noteHeadGlyph);
+            }
 
             //
             // Note dots
@@ -272,13 +301,13 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                     numberOfQuarterNotes = 2;
                     break;
             }
-            
+
             let numberOfAddedQuarters = numberOfQuarterNotes;
-            for(let i = 0; i < this.container.beat.dots; i++) {
-                numberOfAddedQuarters = (numberOfAddedQuarters / 2) | 0
-                numberOfQuarterNotes += numberOfAddedQuarters
+            for (let i = 0; i < this.container.beat.dots; i++) {
+                numberOfAddedQuarters = (numberOfAddedQuarters / 2) | 0;
+                numberOfQuarterNotes += numberOfAddedQuarters;
             }
-            for(let i = 0; i < numberOfQuarterNotes - 1; i++) {
+            for (let i = 0; i < numberOfQuarterNotes - 1; i++) {
                 const dash = new NumberedDashGlyph(0, sr.getLineY(0));
                 dash.renderer = this.renderer;
                 this.addGlyph(dash);
@@ -289,8 +318,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
         if (this.container.beat.isEmpty) {
             this.centerX = this.width / 2;
-        } else {
-            this.centerX = this.noteHeads!.x + this.noteHeads!.width / 2;
+        } else if (this.noteHeads) {
+            this.centerX = this.noteHeads.x + this.noteHeads.width / 2;
+        } else if (this.deadSlapped) {
+            this.centerX = this.deadSlapped.x + this.deadSlapped.width / 2;
         }
     }
 }

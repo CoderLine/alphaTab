@@ -1285,4 +1285,11 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
     });
+
+    it('dead-slap', () => {
+        // song level
+        let score = parseTex('r { ds }')
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isRest).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
+    });
 });

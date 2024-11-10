@@ -380,6 +380,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             return false;
         }
 
+        if(beat.deadSlapped) {
+            return false;
+        }
+
         // we don't have an X-position: cannot paint a flag
         if (!h.hasBeatLineX(beat)) {
             return false;
@@ -540,7 +544,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
-            if (!h.hasBeatLineX(beat)) {
+            if (!h.hasBeatLineX(beat) || beat.deadSlapped) {
                 continue;
             }
 
