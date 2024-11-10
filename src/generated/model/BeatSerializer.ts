@@ -27,6 +27,7 @@ import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
 import { WahPedal } from "@src/model/WahPedal";
 import { BarreShape } from "@src/model/BarreShape";
+import { Rasgueado } from "@src/model/Rasgueado";
 export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {
@@ -50,7 +51,6 @@ export class BeatSerializer {
         o.set("dots", obj.dots);
         o.set("fade", obj.fade as number);
         o.set("lyrics", obj.lyrics);
-        o.set("hasrasgueado", obj.hasRasgueado);
         o.set("pop", obj.pop);
         o.set("slap", obj.slap);
         o.set("tap", obj.tap);
@@ -84,6 +84,7 @@ export class BeatSerializer {
         o.set("wahpedal", obj.wahPedal as number);
         o.set("barrefret", obj.barreFret);
         o.set("barreshape", obj.barreShape as number);
+        o.set("rasgueado", obj.rasgueado as number);
         return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -130,9 +131,6 @@ export class BeatSerializer {
                 return true;
             case "lyrics":
                 obj.lyrics = v as string[] | null;
-                return true;
-            case "hasrasgueado":
-                obj.hasRasgueado = v! as boolean;
                 return true;
             case "pop":
                 obj.pop = v! as boolean;
@@ -233,6 +231,9 @@ export class BeatSerializer {
                 return true;
             case "barreshape":
                 obj.barreShape = JsonHelper.parseEnum<BarreShape>(v, BarreShape)!;
+                return true;
+            case "rasgueado":
+                obj.rasgueado = JsonHelper.parseEnum<Rasgueado>(v, Rasgueado)!;
                 return true;
         }
         return false;

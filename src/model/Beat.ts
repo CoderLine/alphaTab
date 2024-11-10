@@ -26,6 +26,7 @@ import { GolpeType } from './GolpeType';
 import { FadeType } from './FadeType';
 import { WahPedal } from './WahPedal';
 import { BarreShape } from './BarreShape';
+import { Rasgueado } from './Rasgueado';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -239,7 +240,9 @@ export class Beat {
     /**
      * Gets or sets a value indicating whether the beat is played in rasgueado style.
      */
-    public hasRasgueado: boolean = false;
+    public get hasRasgueado(): boolean {
+        return this.rasgueado !== Rasgueado.None;
+    }
 
     /**
      * Gets or sets a value indicating whether the notes on this beat are played with a pop-style (bass).
@@ -495,6 +498,11 @@ export class Beat {
     public get isBarre() {
         return this.barreShape !== BarreShape.None && this.barreFret >= 0;
     }
+
+    /**
+     * The Rasgueado pattern to play with this beat.
+     */
+    public rasgueado: Rasgueado = Rasgueado.None;
 
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;

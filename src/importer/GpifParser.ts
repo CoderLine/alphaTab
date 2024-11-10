@@ -51,6 +51,7 @@ import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
 import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Rasgueado } from '@src/model/Rasgueado';
 
 /**
  * This structure represents a duration within a gpif
@@ -1838,6 +1839,64 @@ export class GpifParser {
                                         break;
                                     case '1':
                                         beat.barreShape = BarreShape.Half;
+                                        break;
+                                }
+                                break;
+                            case 'Rasgueado':
+                                switch (c.findChildElement('Rasgueado')!.innerText) {
+                                    case 'ii_1':
+                                        beat.rasgueado = Rasgueado.Ii;
+                                        break;
+                                    case 'mi_1':
+                                        beat.rasgueado = Rasgueado.Mi;
+                                        break;
+                                    case 'mii_1':
+                                        beat.rasgueado = Rasgueado.MiiTriplet;
+                                        break;
+                                    case 'mii_2':
+                                        beat.rasgueado = Rasgueado.MiiAnapaest;
+                                        break;
+                                    case 'pmp_1':
+                                        beat.rasgueado = Rasgueado.PmpTriplet;
+                                        break;
+                                    case 'pmp_2':
+                                        beat.rasgueado = Rasgueado.PmpAnapaest;
+                                        break;
+                                    case 'pei_1':
+                                        beat.rasgueado = Rasgueado.PeiTriplet;
+                                        break;
+                                    case 'pei_2':
+                                        beat.rasgueado = Rasgueado.PeiAnapaest;
+                                        break;
+                                    case 'pai_1':
+                                        beat.rasgueado = Rasgueado.PaiTriplet;
+                                        break;
+                                    case 'pai_2':
+                                        beat.rasgueado = Rasgueado.PaiAnapaest;
+                                        break;
+                                    case 'ami_1':
+                                        beat.rasgueado = Rasgueado.AmiTriplet;
+                                        break;
+                                    case 'ami_2':
+                                        beat.rasgueado = Rasgueado.AmiAnapaest;
+                                        break;
+                                    case 'ppp_1':
+                                        beat.rasgueado = Rasgueado.Ppp;
+                                        break;
+                                    case 'amii_1':
+                                        beat.rasgueado = Rasgueado.Amii;
+                                        break;
+                                    case 'amip_1':
+                                        beat.rasgueado = Rasgueado.Amip;
+                                        break;
+                                    case 'eami_1':
+                                        beat.rasgueado = Rasgueado.Eami;
+                                        break;
+                                    case 'eamii_1':
+                                        beat.rasgueado = Rasgueado.Eamii;
+                                        break;
+                                    case 'peami_1':
+                                        beat.rasgueado = Rasgueado.Peami;
                                         break;
                                 }
                                 break;

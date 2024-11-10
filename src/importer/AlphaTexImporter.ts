@@ -44,6 +44,7 @@ import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
 import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Rasgueado } from '@src/model/Rasgueado';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1664,6 +1665,72 @@ export class AlphaTexImporter extends ScoreImporter {
                         break;
                 }
             }
+
+            return true;
+        } else if (syData === 'rasg') {
+            this._sy = this.newSy();
+
+            if (this._sy !== AlphaTexSymbols.String) {
+                this.error('rasgueado', AlphaTexSymbols.String, true);
+            }
+
+            switch ((this._syData as string).toLowerCase()) {
+                case 'ii':
+                    beat.rasgueado = Rasgueado.Ii;
+                    break;
+                case 'mi':
+                    beat.rasgueado = Rasgueado.Mi;
+                    break;
+                case 'miitriplet':
+                    beat.rasgueado = Rasgueado.MiiTriplet;
+                    break;
+                case 'miianapaest':
+                    beat.rasgueado = Rasgueado.MiiAnapaest;
+                    break;
+                case 'pmptriplet':
+                    beat.rasgueado = Rasgueado.PmpTriplet;
+                    break;
+                case 'pmpanapaest':
+                    beat.rasgueado = Rasgueado.PmpAnapaest;
+                    break;
+                case 'peitriplet':
+                    beat.rasgueado = Rasgueado.PeiTriplet;
+                    break;
+                case 'peianapaest':
+                    beat.rasgueado = Rasgueado.PeiAnapaest;
+                    break;
+                case 'paitriplet':
+                    beat.rasgueado = Rasgueado.PaiTriplet;
+                    break;
+                case 'paianapaest':
+                    beat.rasgueado = Rasgueado.PaiAnapaest;
+                    break;
+                case 'amitriplet':
+                    beat.rasgueado = Rasgueado.AmiTriplet;
+                    break;
+                case 'amianapaest':
+                    beat.rasgueado = Rasgueado.AmiAnapaest;
+                    break;
+                case 'ppp':
+                    beat.rasgueado = Rasgueado.Ppp;
+                    break;
+                case 'amii':
+                    beat.rasgueado = Rasgueado.Amii;
+                    break;
+                case 'amip':
+                    beat.rasgueado = Rasgueado.Amip;
+                    break;
+                case 'eami':
+                    beat.rasgueado = Rasgueado.Eami;
+                    break;
+                case 'eamii':
+                    beat.rasgueado = Rasgueado.Eamii;
+                    break;
+                case 'peami':
+                    beat.rasgueado = Rasgueado.Peami;
+                    break;
+            }
+            this._sy = this.newSy();
 
             return true;
         } else {

@@ -70,6 +70,7 @@ import { GolpeType } from './model/GolpeType';
 import { WahPedalEffectInfo } from './rendering/effects/WahPedalEffectInfo';
 import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
 import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
+import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -513,6 +514,7 @@ export class Environment {
                 new FermataEffectInfo(),
                 new BeatBarreEffectInfo(),
                 new NoteOrnamentEffectInfo(),
+                new RasgueadoEffectInfo(),
                 new WahPedalEffectInfo(),
             ]),
             new EffectBarRendererFactory(

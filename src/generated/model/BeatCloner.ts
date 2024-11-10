@@ -29,7 +29,6 @@ export class BeatCloner {
         clone.dots = original.dots;
         clone.fade = original.fade;
         clone.lyrics = original.lyrics ? original.lyrics.slice() : null;
-        clone.hasRasgueado = original.hasRasgueado;
         clone.pop = original.pop;
         clone.slap = original.slap;
         clone.tap = original.tap;
@@ -67,6 +66,7 @@ export class BeatCloner {
         clone.wahPedal = original.wahPedal;
         clone.barreFret = original.barreFret;
         clone.barreShape = original.barreShape;
+        clone.rasgueado = original.rasgueado;
         return clone;
     }
 }

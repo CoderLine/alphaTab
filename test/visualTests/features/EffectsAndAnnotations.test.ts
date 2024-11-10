@@ -1,3 +1,4 @@
+import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
@@ -233,5 +234,11 @@ describe('EffectsAndAnnotationsTests', () => {
 
     it('ornaments', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/ornaments.gp');
+    });
+
+    it('rasgueado', async () => {
+        const settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('effects-and-annotations/rasgueado.gp', settings);
     });
 });

@@ -27,6 +27,7 @@ import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Rasgueado } from '@src/model/Rasgueado';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1338,5 +1339,16 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].ornament).to.equal(NoteOrnament.InvertedTurn);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].ornament).to.equal(NoteOrnament.UpperMordent);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].ornament).to.equal(NoteOrnament.LowerMordent);
+    });
+
+    
+    it('rasgueado', () => {
+        let score = parseTex('3.3 { rasg mi } 3.3 { rasg pmptriplet } 3.3 { rasg amianapaest }');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].rasgueado).to.equal(Rasgueado.Mi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].hasRasgueado).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].rasgueado).to.equal(Rasgueado.PmpTriplet);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].hasRasgueado).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].rasgueado).to.equal(Rasgueado.AmiAnapaest);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].hasRasgueado).to.be.true;
     });
 });
