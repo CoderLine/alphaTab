@@ -300,8 +300,7 @@ export class BarLayoutingInfo {
     //     cy -= height;
 
     //     canvas.color = settings.display.resources.mainGlyphColor;
-    //     const font = settings.display.resources.effectFont.clone();
-    //     font.size *= 0.8;
+    //     const font = settings.display.resources.effectFont.withSize(settings.display.resources.effectFont.size * 0.8);
     //     canvas.font = font;
     //     canvas.fillText(force.toFixed(2), cx, cy);
 

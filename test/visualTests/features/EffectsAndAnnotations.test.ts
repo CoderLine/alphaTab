@@ -25,7 +25,7 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('chords-duplicates', async () => {
-        // This file was manually modified to contain 2 separate chords with the same details. 
+        // This file was manually modified to contain 2 separate chords with the same details.
         await VisualTestHelper.runVisualTest('effects-and-annotations/chords-duplicates.gp');
     });
 
@@ -44,8 +44,7 @@ describe('EffectsAndAnnotationsTests', () => {
     it('fade-in', async () => {
         // quadratic curve rendering in SkiaSharp is edgy with m80,
         // tolerance compensates this
-        await VisualTestHelper.runVisualTest('effects-and-annotations/fade-in.gp', 
-        undefined, undefined, undefined, 2);
+        await VisualTestHelper.runVisualTest('effects-and-annotations/fade-in.gp', undefined, undefined, undefined, 2);
     });
 
     it('let-ring', async () => {
@@ -85,8 +84,9 @@ describe('EffectsAndAnnotationsTests', () => {
         importer.init(ByteBuffer.fromString(tex), settings);
         let score = importer.readScore();
 
-        await VisualTestHelper.runVisualTestScoreWithResize(score,
-            [400], 
+        await VisualTestHelper.runVisualTestScoreWithResize(
+            score,
+            [400],
             ['effects-and-annotations/slides-line-break.png'],
             settings
         );
@@ -105,7 +105,7 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('tuplets-advanced', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets-advanced.gp', undefined, [0,1,2]);
+        await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets-advanced.gp', undefined, [0, 1, 2]);
     });
 
     it('fingering', async () => {
@@ -135,4 +135,41 @@ describe('EffectsAndAnnotationsTests', () => {
     it('beat-slash', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/beat-slash.gp');
     });
+
+    it('sustain-pedal', async () => {
+        await VisualTestHelper.runVisualTestWithResize('effects-and-annotations/sustain.gp', [1200, 850, 600], 
+            [
+                'effects-and-annotations/sustain-1200.png',
+                'effects-and-annotations/sustain-850.png',
+                'effects-and-annotations/sustain-600.png'
+            ],
+        );
+    });
+
+    it('sustain-pedal-alphatex', async () => {
+        const importer = new AlphaTexImporter();
+        const settings = new Settings();
+        importer.initFromString(`
+        .
+        \\track "pno."
+        :8 G4 { spd } G4 G4 { spu } G4 G4 { spd } G4 {spu} G4 G4 {spd} |
+        G4 { spu } G4 G4 G4 G4 G4 G4 G4 |
+        F5.1 { spd } | F5 | F5 |
+        F5.4 F5.4 { spu } F5 F5 |
+        G4.8 { spd } G4 G4 { spu } G4 G4 { spd } G4 G4 G4 {spu} |
+        G4.4 G4.4 G4.4 {spd} G4.4 {spe}
+        `, settings);
+        const score = importer.readScore();
+        score.stylesheet.hideDynamics = true;
+        
+        await VisualTestHelper.runVisualTestScoreWithResize(score, [1200, 850, 600], 
+            [
+                'effects-and-annotations/sustain-1200.png',
+                'effects-and-annotations/sustain-850.png',
+                'effects-and-annotations/sustain-600.png'
+            ],
+        );
+    });
+
+
 });

@@ -1,7 +1,7 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
+import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -91,6 +91,7 @@ export class GpifParser {
 
     private _masterTrackAutomations!: Map<number, Automation[]>;
     private _automationsPerTrackIdAndBarIndex!: Map<string, Map<number, Automation[]>>;
+    private _sustainPedalsPerTrackIdAndBarIndex!: Map<string, Map<number, SustainPedalMarker[]>>;
     private _tracksMapping!: string[];
     private _tracksById!: Map<string, Track>;
     private _masterBars!: MasterBar[];
@@ -114,6 +115,7 @@ export class GpifParser {
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<number, Automation[]>();
         this._automationsPerTrackIdAndBarIndex = new Map<string, Map<number, Automation[]>>();
+        this._sustainPedalsPerTrackIdAndBarIndex = new Map<string, Map<number, SustainPedalMarker[]>>();
         this._tracksMapping = [];
         this._tracksById = new Map<string, Track>();
         this._masterBars = [];
@@ -254,7 +256,6 @@ export class GpifParser {
                     case 'ScoreSystemsLayout':
                         this.score.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
                         break;
-
                 }
             }
         }
@@ -268,7 +269,7 @@ export class GpifParser {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automations':
-                        this.parseAutomations(c, this._masterTrackAutomations, null);
+                        this.parseAutomations(c, this._masterTrackAutomations, null, null);
                         break;
                     case 'Tracks':
                         this._tracksMapping = c.innerText.split(' ');
@@ -281,19 +282,29 @@ export class GpifParser {
         }
     }
 
-    private parseAutomations(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
+    private parseAutomations(
+        node: XmlNode,
+        automations: Map<number, Automation[]>,
+        sounds: Map<string, GpifSound> | null,
+        sustainPedals: Map<number, SustainPedalMarker[]> | null
+    ): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automation':
-                        this.parseAutomation(c, automations, sounds);
+                        this.parseAutomation(c, automations, sounds, sustainPedals);
                         break;
                 }
             }
         }
     }
 
-    private parseAutomation(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
+    private parseAutomation(
+        node: XmlNode,
+        automations: Map<number, Automation[]>,
+        sounds: Map<string, GpifSound> | null,
+        sustainPedals: Map<number, SustainPedalMarker[]> | null
+    ): void {
         let type: string | null = null;
         let isLinear: boolean = false;
         let barIndex: number = -1;
@@ -349,8 +360,38 @@ export class GpifParser {
                 break;
             case 'Sound':
                 if (textValue && sounds && sounds.has(textValue)) {
-                    automation = Automation.buildInstrumentAutomation(isLinear, ratioPosition, sounds.get(textValue)!.program);
+                    automation = Automation.buildInstrumentAutomation(
+                        isLinear,
+                        ratioPosition,
+                        sounds.get(textValue)!.program
+                    );
                 }
+                break;
+            case 'SustainPedal':
+                // we expect sustain pedals only on track automations
+                if (sustainPedals) {
+                    let v: SustainPedalMarker[];
+                    if (sustainPedals.has(barIndex)) {
+                        v = sustainPedals.get(barIndex)!;
+                    } else {
+                        v = [];
+                        sustainPedals.set(barIndex, v);
+                    }
+
+                    const sustain = new SustainPedalMarker();
+                    sustain.ratioPosition = ratioPosition;
+                    switch (reference) {
+                        case 1:
+                            sustain.pedalType = SustainPedalMarkerType.Down;
+                            break;
+                        case 3:
+                            sustain.pedalType = SustainPedalMarkerType.Up;
+                            break;
+                    }
+
+                    v.push(sustain);
+                }
+
                 break;
         }
         if (automation) {
@@ -469,9 +510,13 @@ export class GpifParser {
     }
 
     private parseTrackAutomations(trackId: string, c: XmlNode) {
-        const trackAutomations = new Map<number, Automation[]>()
-        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations)
-        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!);
+        const trackAutomations = new Map<number, Automation[]>();
+        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations);
+
+        const sustainPedals = new Map<number, SustainPedalMarker[]>();
+        this._sustainPedalsPerTrackIdAndBarIndex.set(trackId, sustainPedals);
+
+        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!, sustainPedals);
     }
 
     private parseNotationPatch(track: Track, node: XmlNode) {
@@ -537,7 +582,7 @@ export class GpifParser {
 
     private parseElement(track: Track, node: XmlNode) {
         const typeElement = node.findChildElement('Type');
-        const type = typeElement ? typeElement.innerText : "";
+        const type = typeElement ? typeElement.innerText : '';
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -861,9 +906,9 @@ export class GpifParser {
 
     private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
-        
+
         let diagram = node.findChildElement('Diagram');
-        if(!diagram) {
+        if (!diagram) {
             chord.showDiagram = false;
             chord.showFingering = false;
             return;
@@ -1231,10 +1276,9 @@ export class GpifParser {
                     case 'Fermatas':
                         this.parseFermatas(masterBar, c);
                         break;
-                    case "XProperties":
+                    case 'XProperties':
                         this.parseMasterBarXProperties(c, masterBar);
                         break;
-    
                 }
             }
         }
@@ -1361,7 +1405,7 @@ export class GpifParser {
                                 break;
                         }
                         break;
-                    case "XProperties":
+                    case 'XProperties':
                         this.parseBarXProperties(c, bar);
                         break;
                 }
@@ -1612,7 +1656,6 @@ export class GpifParser {
             }
         }
     }
-
 
     private parseBarXProperties(node: XmlNode, bar: Bar) {
         for (let c of node.childNodes) {
@@ -2130,7 +2173,7 @@ export class GpifParser {
     }
 
     private toBendOffset(gpxOffset: number): number {
-        return (gpxOffset * GpifParser.BendPointPositionFactor);
+        return gpxOffset * GpifParser.BendPointPositionFactor;
     }
 
     private parseRhythms(node: XmlNode): void {
@@ -2299,7 +2342,7 @@ export class GpifParser {
             }
         }
 
-        // clear out percussion articulations where not needed 
+        // clear out percussion articulations where not needed
         // and add automations
         for (let trackId of this._tracksMapping) {
             if (!trackId) {
@@ -2320,15 +2363,29 @@ export class GpifParser {
 
             if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
                 const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
+
                 for (const [barNumber, automations] of trackAutomations) {
                     if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
                         const bar = track.staves[0].bars[barNumber];
                         if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
                             const beat = bar.voices[0].beats[0];
                             for (const a of automations) {
+                                // NOTE: currently the automations of a bar are applied to the
+                                // first beat of a bar
                                 beat.automations.push(a);
                             }
+                        } else {
                         }
+                    }
+                }
+            }
+
+            if (this._sustainPedalsPerTrackIdAndBarIndex.has(trackId)) {
+                const sustainPedals = this._sustainPedalsPerTrackIdAndBarIndex.get(trackId)!;
+                for (const [barNumber, markers] of sustainPedals) {
+                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                        const bar = track.staves[0].bars[barNumber];
+                        bar.sustainPedals = markers;
                     }
                 }
             }

@@ -3,7 +3,7 @@ import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
+import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -153,6 +153,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _staffHasExplicitTuning: boolean = false;
     private _staffTuningApplied: boolean = false;
     private _percussionArticulationNames = new Map<string, number>();
+    private _sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
 
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
 
@@ -179,6 +180,8 @@ export class AlphaTexImporter extends ScoreImporter {
             }
             this._allowTuning = true;
             this._lyrics = new Map<number, Lyrics[]>();
+            this._sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
+
             this.createDefaultScore();
             this._curChPos = 0;
             this._line = 1;
@@ -205,6 +208,12 @@ export class AlphaTexImporter extends ScoreImporter {
             this._score.rebuildRepeatGroups();
             for (const [track, lyrics] of this._lyrics) {
                 this._score.tracks[track].applyLyrics(lyrics);
+            }
+            for (const [sustainPedal, beat] of this._sustainPedalToBeat) {
+                if(sustainPedal.ratioPosition === 0) {
+                    const duration = beat.voice.bar.masterBar.calculateDuration();
+                    sustainPedal.ratioPosition = beat.playbackStart / duration;
+                }
             }
             return this._score;
         } catch (e) {
@@ -1575,6 +1584,30 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this._sy = this.newSy();
             }
+            return true;
+        } else if (syData === 'spd') {
+            const sustainPedal = new SustainPedalMarker();
+            sustainPedal.pedalType = SustainPedalMarkerType.Down;
+            // exact ratio position will be applied after .finish() when times are known
+            this._sustainPedalToBeat.set(sustainPedal, beat);
+            beat.voice.bar.sustainPedals.push(sustainPedal);
+            this._sy = this.newSy();
+            return true;
+        } else if (syData === 'spu') {
+            const sustainPedal = new SustainPedalMarker();
+            sustainPedal.pedalType = SustainPedalMarkerType.Up;
+            // exact ratio position will be applied after .finish() when times are known
+            this._sustainPedalToBeat.set(sustainPedal, beat);
+            beat.voice.bar.sustainPedals.push(sustainPedal);
+            this._sy = this.newSy();
+            return true;
+        }  else if (syData === 'spe') {
+            const sustainPedal = new SustainPedalMarker();
+            sustainPedal.pedalType = SustainPedalMarkerType.Up;
+            sustainPedal.ratioPosition = 1;
+            this._sustainPedalToBeat.set(sustainPedal, beat);
+            beat.voice.bar.sustainPedals.push(sustainPedal);
+            this._sy = this.newSy();
             return true;
         } else if (syData === 'slashed') {
             beat.slashed = true;
