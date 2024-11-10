@@ -64,6 +64,7 @@ export class BeatCloner {
         clone.preferredBeamDirection = original.preferredBeamDirection;
         clone.isEffectSlurOrigin = original.isEffectSlurOrigin;
         clone.beamingMode = original.beamingMode;
+        clone.wahPedal = original.wahPedal;
         return clone;
     }
 }

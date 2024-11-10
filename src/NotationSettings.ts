@@ -304,9 +304,14 @@ export enum NotationElement {
     EffectSustainPedal,
 
     /**
-     * The Golpe effect signs above and below the saff.
+     * The Golpe effect signs above and below the staff.
      */
-    EffectGolpe
+    EffectGolpe,
+
+    /**
+     * The Wah effect signs above and below the staff.
+     */
+    EffectWahPedal
 }
 
 /**
