@@ -35,6 +35,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { PercussionMapper } from '@src/model/PercussionMapper';
+import { DynamicValue } from '@src/model';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -206,7 +207,12 @@ export class MidiFileGenerator {
         return Math.max(value, -1) + 1;
     }
 
-    private generateMasterBar(masterBar: MasterBar, previousMasterBar: MasterBar | null, currentTick: number, currentTempo: number): void {
+    private generateMasterBar(
+        masterBar: MasterBar,
+        previousMasterBar: MasterBar | null,
+        currentTick: number,
+        currentTempo: number
+    ): void {
         // time signature
         if (
             !previousMasterBar ||
@@ -225,20 +231,20 @@ export class MidiFileGenerator {
 
         // tempo
         if (masterBar.tempoAutomations.length > 0) {
-            if(masterBar.tempoAutomations[0].ratioPosition > 0) {
-                masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, currentTempo))
+            if (masterBar.tempoAutomations[0].ratioPosition > 0) {
+                masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, currentTempo));
             }
-            
+
             for (const automation of masterBar.tempoAutomations) {
                 const tick = currentTick + masterBarDuration * automation.ratioPosition;
                 this._handler.addTempo(tick, automation.value);
-                masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(tick, automation.value))
+                masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(tick, automation.value));
             }
         } else if (!previousMasterBar) {
             this._handler.addTempo(currentTick, masterBar.score.tempo);
-            masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, masterBar.score.tempo))
+            masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, masterBar.score.tempo));
         } else {
-            masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, currentTempo))
+            masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, currentTempo));
         }
 
         masterBarLookup.masterBar = masterBar;
@@ -299,12 +305,7 @@ export class MidiFileGenerator {
 
     private _currentTripletFeel: TripletFeelDurations | null = null;
 
-    private generateBeat(
-        beat: Beat,
-        barStartTick: number,
-        realBar: Bar,
-        tempoOnBeatStart: number
-    ): void {
+    private generateBeat(beat: Beat, barStartTick: number, realBar: Bar, tempoOnBeatStart: number): void {
         let beatStart: number = beat.playbackStart;
         let audioDuration: number = beat.playbackDuration;
         const masterBarDuration = beat.voice.bar.masterBar.calculateDuration();
@@ -331,7 +332,7 @@ export class MidiFileGenerator {
         if (realBar === beat.voice.bar) {
             this.tickLookup.addBeat(beat, beatStart, audioDuration);
         } else {
-            // in case of simile marks where we repeat we also register 
+            // in case of simile marks where we repeat we also register
             this.tickLookup.addBeat(beat, 0, audioDuration);
         }
 
@@ -341,6 +342,8 @@ export class MidiFileGenerator {
         }
         if (beat.isRest) {
             this._handler.addRest(track.index, barStartTick + beatStart, track.playbackInfo.primaryChannel);
+        } else if (beat.deadSlapped) {
+            this.generateDeadSlap(beat, barStartTick + beatStart);
         } else {
             let brushInfo = this.getBrushInfo(beat);
             for (const n of beat.notes) {
@@ -451,6 +454,24 @@ export class MidiFileGenerator {
         // calculate the number of ticks the second beat can start earlier
         durations.secondBeatStartOffset = audioDuration - durations.firstBeatDuration;
         return durations;
+    }
+
+    private generateDeadSlap(beat: Beat, beatStart: number): void {
+        // we generate dead-slap as 64th note on all strings (0 fret)
+        const deadSlapDuration = MidiUtils.toTicks(Duration.SixtyFourth);
+        const staff = beat.voice.bar.staff;
+        if (staff.tuning.length > 0) {
+            for (const t of staff.tuning) {
+                this._handler.addNote(
+                    staff.track.index,
+                    beatStart,
+                    deadSlapDuration,
+                    t,
+                    MidiUtils.dynamicToVelocity(DynamicValue.F as number),
+                    staff.track.playbackInfo.primaryChannel
+                );
+            }
+        }
     }
 
     private generateNote(

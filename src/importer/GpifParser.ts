@@ -1612,6 +1612,9 @@ export class GpifParser {
                     case 'Slashed':
                         beat.slashed = true;
                         break;
+                    case 'DeadSlapped':
+                        beat.deadSlapped = true;
+                        break;
                 }
             }
         }

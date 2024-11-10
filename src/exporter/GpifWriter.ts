@@ -740,7 +740,10 @@ export class GpifWriter {
         if (beat.slashed) {
             beatNode.addElement('Slashed');
         }
-        if (!beat.isRest) {
+        if (beat.deadSlapped) {
+            beatNode.addElement('DeadSlapped');
+        }
+        if (beat.notes.length > 0) {
             beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
         }
 

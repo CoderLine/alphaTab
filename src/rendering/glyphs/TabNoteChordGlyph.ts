@@ -7,9 +7,11 @@ import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { RenderingResources } from '@src/RenderingResources';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];
+    private _deadSlapped:DeadSlappedBeatGlyph|null = null;
     private _isGrace: boolean;
 
     public beat!: Beat;
@@ -75,30 +77,39 @@ export class TabNoteChordGlyph extends Glyph {
 
     public override doLayout(): void {
         let w: number = 0;
-        let noteStringWidth: number = 0;
-        for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
-            let g: NoteNumberGlyph = this._notes[i];
-            g.renderer = this.renderer;
-            g.doLayout();
-            if (g.width > w) {
-                w = g.width;
+
+        if (this.beat.deadSlapped) {
+            this._deadSlapped = new DeadSlappedBeatGlyph();
+            this._deadSlapped.renderer = this.renderer;
+            this._deadSlapped.doLayout();
+            w = this._deadSlapped.width;
+        } else {
+            let noteStringWidth: number = 0;
+            for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
+                let g: NoteNumberGlyph = this._notes[i];
+                g.renderer = this.renderer;
+                g.doLayout();
+                if (g.width > w) {
+                    w = g.width;
+                }
+                if (g.noteStringWidth > noteStringWidth) {
+                    noteStringWidth = g.noteStringWidth;
+                }
             }
-            if (g.noteStringWidth > noteStringWidth) {
-                noteStringWidth = g.noteStringWidth;
+            this.noteStringWidth = noteStringWidth;
+            let tabHeight: number = this.renderer.resources.tablatureFont.size;
+            let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
+            // TODO: take care of actual glyph height
+            let effectSpacing: number = 7 * this.scale;
+            for (const g of this.beatEffects.values()) {
+                g.y += effectY;
+                g.x += this.width / 2;
+                g.renderer = this.renderer;
+                effectY += effectSpacing;
+                g.doLayout();
             }
         }
-        this.noteStringWidth = noteStringWidth;
-        let tabHeight: number = this.renderer.resources.tablatureFont.size;
-        let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
-        // TODO: take care of actual glyph height
-        let effectSpacing: number = 7 * this.scale;
-        for (const g of this.beatEffects.values()) {
-            g.y += effectY;
-            g.x += this.width / 2;
-            g.renderer = this.renderer;
-            effectY += effectSpacing;
-            g.doLayout();
-        }
+
         this.width = w;
     }
 
@@ -113,27 +124,34 @@ export class TabNoteChordGlyph extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
-        let res: RenderingResources = this.renderer.resources;
-        let oldBaseLine: TextBaseline = canvas.textBaseline;
-        canvas.textBaseline = TextBaseline.Middle;
-        canvas.font = this._isGrace ? res.graceFont : res.tablatureFont;
 
-        let notes: NoteNumberGlyph[] = this._notes;
-        let w: number = this.width;
-        for (let g of notes) {
-            g.renderer = this.renderer;
-            g.width = w;
-            g.paint(cx, cy, canvas);
-        }
-        canvas.textBaseline = oldBaseLine;
-        for(const g of this.beatEffects.values()) {
-            g.paint(cx, cy, canvas);
+        if (this.beat.deadSlapped) {
+            this._deadSlapped?.paint(cx, cy, canvas);
+        } else{
+            let res: RenderingResources = this.renderer.resources;
+            let oldBaseLine: TextBaseline = canvas.textBaseline;
+            canvas.textBaseline = TextBaseline.Middle;
+            canvas.font = this._isGrace ? res.graceFont : res.tablatureFont;
+    
+            let notes: NoteNumberGlyph[] = this._notes;
+            let w: number = this.width;
+            for (let g of notes) {
+                g.renderer = this.renderer;
+                g.width = w;
+                g.paint(cx, cy, canvas);
+            }
+            canvas.textBaseline = oldBaseLine;
+            for (const g of this.beatEffects.values()) {
+                g.paint(cx, cy, canvas);
+            }
         }
     }
 
     public updateBeamingHelper(cx: number): void {
         if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat)) {
-            this.beamingHelper.registerBeatLineX('tab', this.beat,
+            this.beamingHelper.registerBeatLineX(
+                'tab',
+                this.beat,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2
             );

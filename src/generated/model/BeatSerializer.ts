@@ -52,6 +52,7 @@ export class BeatSerializer {
         o.set("tap", obj.tap);
         o.set("text", obj.text);
         o.set("slashed", obj.slashed);
+        o.set("deadslapped", obj.deadSlapped);
         o.set("brushtype", obj.brushType as number);
         o.set("brushduration", obj.brushDuration);
         o.set("tupletdenominator", obj.tupletDenominator);
@@ -139,6 +140,9 @@ export class BeatSerializer {
                 return true;
             case "slashed":
                 obj.slashed = v! as boolean;
+                return true;
+            case "deadslapped":
+                obj.deadSlapped = v! as boolean;
                 return true;
             case "brushtype":
                 obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;

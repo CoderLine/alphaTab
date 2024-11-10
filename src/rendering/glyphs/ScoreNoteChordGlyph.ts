@@ -14,10 +14,12 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
     private _notes: Note[] = [];
+    private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: Glyph | null = null;
 
     public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
@@ -101,20 +103,32 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         super.doLayout();
         let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
+        if (this.beat.deadSlapped) {
+            this._deadSlapped = new DeadSlappedBeatGlyph();
+            this._deadSlapped.renderer = this.renderer;
+            this._deadSlapped.doLayout();
+            this.width = this._deadSlapped.width;
+        }
+
         let direction: BeamDirection = this.direction;
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
         let belowEffectSpacing = 1;
         let aboveEffectSpacing = -belowEffectSpacing;
 
-        if (this.direction === BeamDirection.Up) {
-            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
-            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
+        if (this.beat.deadSlapped) {
+            belowBeatEffectsY = scoreRenderer.getScoreY(0);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
-            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line - 1);
-            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 1);
-            aboveEffectSpacing *= -1;
-            belowEffectSpacing *= -1;
+            if (this.direction === BeamDirection.Up) {
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
+                aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
+            } else {
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line - 1);
+                aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 1);
+                aboveEffectSpacing *= -1;
+                belowEffectSpacing *= -1;
+            }
         }
 
         let minEffectY: number | null = null;
@@ -149,12 +163,11 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             }
         }
 
-        if(minEffectY !== null) {
+        if (minEffectY !== null) {
             scoreRenderer.registerBeatEffectOverflows(minEffectY, maxEffectY ?? 0);
         }
 
-
-        if (this.beat.isTremolo) {
+        if (this.beat.isTremolo && !this.beat.deadSlapped) {
             let offset: number = 0;
             let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
             let tremoloX: number = direction === BeamDirection.Up ? this.displacedX : 0;
@@ -174,7 +187,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     break;
             }
 
-            if(this.beat.duration < Duration.Half) {
+            if (this.beat.duration < Duration.Half) {
                 tremoloX = this.width / 2;
             }
 
@@ -210,6 +223,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {
             this._tremoloPicking.paint(cx, cy, canvas);
+        }
+        if (this._deadSlapped) {
+            this._deadSlapped.paint(cx, cy, canvas);
         }
     }
 }

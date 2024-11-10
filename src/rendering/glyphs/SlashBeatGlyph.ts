@@ -10,26 +10,37 @@ import { SlashBarRenderer } from '../SlashBarRenderer';
 import { NoteBounds } from '../utils/NoteBounds';
 import { Bounds } from '../utils/Bounds';
 import { SlashRestGlyph } from './SlashRestGlyph';
+import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
+import { Glyph } from './Glyph';
 
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: SlashNoteHeadGlyph | null = null;
+    public deadSlapped: DeadSlappedBeatGlyph | null = null;
     public restGlyph: SlashRestGlyph | null = null;
 
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
+        let g: Glyph | null = null;
         if (this.noteHeads) {
-            let pos = this.noteHeads.x;
+            g = this.noteHeads;
+        } else if (this.deadSlapped) {
+            g = this.deadSlapped;
+        }
+
+        if (g) {
+            let pos = g.x;
             switch (requestedPosition) {
                 case NoteXPosition.Left:
                     break;
                 case NoteXPosition.Center:
-                    pos += this.noteHeads.width / 2;
+                    pos += g.width / 2;
                     break;
                 case NoteXPosition.Right:
-                    pos += this.noteHeads.width;
+                    pos += g.width;
                     break;
             }
             return pos;
         }
+
         return 0;
     }
 
@@ -47,19 +58,26 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+        let g: Glyph | null = null;
         if (this.noteHeads) {
-            let pos = this.y + this.noteHeads.y;
+            g = this.noteHeads;
+        } else if (this.deadSlapped) {
+            g = this.deadSlapped;
+        }
+
+        if (g) {
+            let pos = this.y + g.y;
 
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= this.noteHeads.height / 2 + 2 * this.scale;
+                    pos -= g.height / 2 + 2 * this.scale;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
                 case NoteYPosition.BottomWithStem:
-                    pos += this.noteHeads.height / 2;
+                    pos += g.height / 2;
                     break;
             }
 
@@ -71,6 +89,15 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public override updateBeamingHelper(): void {
         if (this.noteHeads) {
             this.noteHeads.updateBeamingHelper(this.container.x + this.x);
+        } else if (this.deadSlapped) {
+            if (this.beamingHelper) {
+                this.beamingHelper.registerBeatLineX(
+                    'slash',
+                    this.container.beat,
+                    this.container.x + this.x + this.deadSlapped.x + this.width,
+                    this.container.x + this.x + this.deadSlapped.x
+                );
+            }
         } else if (this.restGlyph) {
             this.restGlyph.updateBeamingHelper(this.container.x + this.x);
         }
@@ -82,7 +109,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
         const line: number = sr.getNoteLine();
         const glyphY = sr.getLineY(line);
-        if (!this.container.beat.isEmpty) {
+        if (this.container.beat.deadSlapped) {
+            const deadSlapped = new DeadSlappedBeatGlyph();
+            deadSlapped.renderer = this.renderer;
+            deadSlapped.doLayout();
+            this.deadSlapped = deadSlapped;
+            this.addGlyph(deadSlapped);
+        } else if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
                 const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
                 const noteHeadGlyph = new SlashNoteHeadGlyph(0, glyphY, this.container.beat.duration, isGrace);
@@ -119,10 +152,12 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
         if (this.container.beat.isEmpty) {
             this.centerX = this.width / 2;
-        } else if (this.container.beat.isRest) {
-            this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
-        } else {
-            this.centerX = this.noteHeads!.x + this.noteHeads!.width / 2;
+        } else if (this.restGlyph) {
+            this.centerX = this.restGlyph.x + this.restGlyph.width / 2;
+        } else if (this.noteHeads) {
+            this.centerX = this.noteHeads.x + this.noteHeads.width / 2;
+        } else if(this.deadSlapped) {
+            this.centerX = this.deadSlapped.x + this.deadSlapped.width / 2;
         }
     }
 }
