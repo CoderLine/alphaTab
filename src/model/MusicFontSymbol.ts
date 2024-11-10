@@ -134,6 +134,9 @@ export enum MusicFontSymbol {
     StringsDownBow = 0xe610,
     StringsUpBow = 0xe612,
 
+    KeyboardPedalPed = 0xE650,
+    KeyboardPedalUp = 0xE655,
+
     PictEdgeOfCymbal = 0xe729,
 
     GuitarString0 = 0xe833,

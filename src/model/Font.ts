@@ -450,6 +450,10 @@ export class Font {
         this._css = this.toCssString();
     }
 
+    public withSize(newSize:number) : Font {
+        return Font.withFamilyList(this._families, newSize, this._style, this._weight);
+    }
+
     /**
      * Initializes a new instance of the {@link Font} class.
      * @param families The families.

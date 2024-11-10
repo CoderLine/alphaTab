@@ -64,6 +64,7 @@ import { NumberedBarRendererFactory } from './rendering/NumberedBarRendererFacto
 import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
 import { ScoreBarRenderer } from './rendering/ScoreBarRenderer';
 import { TabBarRenderer } from './rendering/TabBarRenderer';
+import { SustainPedalEffectInfo } from './rendering/effects/SustainPedalEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -525,7 +526,8 @@ export class Environment {
             new EffectBarRendererFactory(Environment.StaffIdBeforeNumberedAlways, [
                 new CrescendoEffectInfo(),
                 new OttaviaEffectInfo(false),
-                new DynamicsEffectInfo()
+                new DynamicsEffectInfo(),
+                new SustainPedalEffectInfo()
             ]),
             // no before-numbered-hideable
             new NumberedBarRendererFactory(),

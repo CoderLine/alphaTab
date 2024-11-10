@@ -256,7 +256,13 @@ export class SkiaCanvas implements ICanvas {
      */
     private static readonly FontSizeToLineHeight = 1.2;
 
+    private _initialMeasure = true;
     public measureText(text: string) {
+        // BUG: for some reason the very initial measure text in alphaSkia delivers wrong results, so we it twice
+        if(this._initialMeasure) {
+            this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale);
+            this._initialMeasure = false;
+        }
         return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale), this.font.size * SkiaCanvas.FontSizeToLineHeight);
     }
 

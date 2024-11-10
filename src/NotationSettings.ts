@@ -292,7 +292,12 @@ export enum NotationElement {
     /**
      * The "Free time" text shown above the staff.
      */
-    EffectFreeTime
+    EffectFreeTime,
+
+    /**
+     * The Sustain pedal effect shown above the staff "Ped.____*"
+     */
+    EffectSustainPedal
 }
 
 /**

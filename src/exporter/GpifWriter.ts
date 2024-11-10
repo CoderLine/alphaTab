@@ -2,7 +2,7 @@ import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
+import { Bar, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -390,7 +390,7 @@ export class GpifWriter {
             this.writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
             this.writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
             this.writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
-            if(note.showStringNumber) {
+            if (note.showStringNumber) {
                 this.writeSimplePropertyNode(properties, 'ShowStringNumber', 'Enable', null);
             }
         }
@@ -737,7 +737,7 @@ export class GpifWriter {
         }
 
         beatNode.addElement('ConcertPitchStemOrientation').innerText = 'Undefined';
-        if(beat.slashed) {
+        if (beat.slashed) {
             beatNode.addElement('Slashed');
         }
         if (!beat.isRest) {
@@ -953,7 +953,7 @@ export class GpifWriter {
             masterTrackNode.addElement('Anacrusis');
         }
 
-        if(score.masterBars[0].tempoAutomations.length === 0){
+        if (score.masterBars[0].tempoAutomations.length === 0) {
             const initialTempoAutomation = automations.addElement('Automation');
             initialTempoAutomation.addElement('Type').innerText = 'Tempo';
             initialTempoAutomation.addElement('Linear').innerText = 'false';
@@ -965,7 +965,7 @@ export class GpifWriter {
                 initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
             }
         }
-      
+
         for (const mb of score.masterBars) {
             for (const automation of mb.tempoAutomations) {
                 const tempoAutomation = automations.addElement('Automation');
@@ -1130,6 +1130,29 @@ export class GpifWriter {
                                     trackSoundWritten = true;
                                 }
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        for (const s of track.staves) {
+            for (const b of s.bars) {
+                for (const sustainPedal of b.sustainPedals) {
+                    if (sustainPedal.pedalType !== SustainPedalMarkerType.Hold) {
+                        const automation = automationsNode.addElement('Automation');
+                        automation.addElement('Type').innerText = 'SustainPedal';
+                        automation.addElement('Linear').innerText = 'false';
+                        automation.addElement('Bar').innerText = b.index.toString();
+                        automation.addElement('Position').innerText = sustainPedal.ratioPosition.toString();
+                        automation.addElement('Visible').innerText = 'true';
+                        switch (sustainPedal.pedalType) {
+                            case SustainPedalMarkerType.Down:
+                                automation.addElement('Value').innerText = `0 1`;
+                                break;
+                            case SustainPedalMarkerType.Up:
+                                automation.addElement('Value').innerText = `0 3`;
+                                break;
                         }
                     }
                 }
@@ -1557,10 +1580,8 @@ export class GpifWriter {
             'Time'
         ).innerText = `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
 
-        if(masterBar.isFreeTime) {
-            masterBarNode.addElement(
-                'FreeTime'
-            );
+        if (masterBar.isFreeTime) {
+            masterBarNode.addElement('FreeTime');
         }
 
         let bars: string[] = [];

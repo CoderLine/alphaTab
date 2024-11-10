@@ -7,6 +7,60 @@ import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 
 /**
+ * The different pedal marker types.
+ */
+export enum SustainPedalMarkerType {
+    /**
+     * Indicates that the pedal should be pressed from this time on.
+     */
+    Down,
+    /**
+     * Indicates that the pedal should be held on this marker (used when the pedal is held for the whole bar)
+     */
+    Hold,
+    /**
+     * indicates that the pedal should be lifted up at this time.
+     */
+    Up
+}
+
+/**
+ * A marker on whether a sustain pedal starts or ends.
+ * @json
+ * @json_strict
+ */
+export class SustainPedalMarker {
+    /**
+     * The relative position of pedal markers within the bar.
+     */
+    public ratioPosition: number = 0;
+    /**
+     * Whether what should be done with the pedal at this point
+     */
+    public pedalType: SustainPedalMarkerType = SustainPedalMarkerType.Down;
+
+    /**
+     * THe bar to which this marker belongs to.
+     * @json_ignore
+     */
+    public bar!: Bar;
+
+    /**
+     * The next pedal marker for linking the related markers together to a "down -> hold -> up" or "down -> up" sequence.
+     * Always null for "up" markers.
+     * @json_ignore
+     */
+    public nextPedalMarker: SustainPedalMarker | null = null;
+
+    /**
+     * The previous pedal marker for linking the related markers together to a "down -> hold -> up" or "down -> up" sequence.
+     * Always null for "down" markers.
+     * @json_ignore
+     */
+    public previousPedalMarker: SustainPedalMarker | null = null;
+}
+
+/**
  * A bar is a single block within a track, also known as Measure.
  * @json
  * @json_strict
@@ -71,16 +125,21 @@ export class Bar {
     public isMultiVoice: boolean = false;
 
     /**
-     * A relative scale for the size of the bar when displayed. The scale is relative 
+     * A relative scale for the size of the bar when displayed. The scale is relative
      * within a single line (system). The sum of all scales in one line make the total width,
      * and then this individual scale gives the relative size.
      */
-    public displayScale:number = 1;
+    public displayScale: number = 1;
 
     /**
      * An absolute width of the bar to use when displaying in single track display scenarios.
      */
-    public displayWidth:number = -1;
+    public displayWidth: number = -1;
+
+    /**
+     * The sustain pedal markers within this bar.
+     */
+    public sustainPedals: SustainPedalMarker[] = [];
 
     public get masterBar(): MasterBar {
         return this.staff.track.score.masterBars[this.index];
@@ -106,8 +165,40 @@ export class Bar {
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             let voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
-            if(i > 0 && !voice.isEmpty) {
+            if (i > 0 && !voice.isEmpty) {
                 this.isMultiVoice = true;
+            }
+        }
+
+        // chain sustain pedal markers
+        if (this.sustainPedals.length > 0) {
+            let previousMarker: SustainPedalMarker | null = null;
+
+            if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
+                previousMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
+            }
+
+            for (const marker of this.sustainPedals) {
+                if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
+                    previousMarker.nextPedalMarker = marker;
+                    marker.previousPedalMarker = previousMarker;
+                }
+
+                marker.bar = this;
+                previousMarker = marker;
+            }
+        } else if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
+            const lastMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
+            if (lastMarker.pedalType !== SustainPedalMarkerType.Up) {
+                // create hold marker if the last marker on the previous bar is not "up"
+                const holdMarker = new SustainPedalMarker();
+                holdMarker.ratioPosition = 0;
+                holdMarker.bar = this;
+                holdMarker.pedalType = SustainPedalMarkerType.Hold;
+                this.sustainPedals.push(holdMarker);
+
+                lastMarker.nextPedalMarker = holdMarker;
+                holdMarker.previousPedalMarker = lastMarker;
             }
         }
     }
