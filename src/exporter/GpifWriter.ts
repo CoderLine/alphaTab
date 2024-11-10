@@ -28,6 +28,7 @@ import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
+import { Rasgueado } from '@src/model/Rasgueado';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
@@ -384,7 +385,7 @@ export class GpifWriter {
             noteNode.addElement('InstrumentArticulation').innerText = '0';
         }
 
-        if(note.ornament !== NoteOrnament.None){
+        if (note.ornament !== NoteOrnament.None) {
             noteNode.addElement('Ornament').innerText = NoteOrnament[note.ornament];
         }
     }
@@ -836,6 +837,68 @@ export class GpifWriter {
                     this.writeSimplePropertyNode(beatProperties, 'BarreString', 'String', '1');
                     break;
             }
+        }
+
+        if (beat.rasgueado != Rasgueado.None) {
+            let rasgueado = '';
+            switch (beat.rasgueado) {
+                case Rasgueado.Ii:
+                    rasgueado = 'ii_1';
+                    break;
+                case Rasgueado.Mi:
+                    rasgueado = 'mi_1';
+                    break;
+                case Rasgueado.MiiTriplet:
+                    rasgueado = 'mii_1';
+                    break;
+                case Rasgueado.MiiAnapaest:
+                    rasgueado = 'mii_2';
+                    break;
+                case Rasgueado.PmpTriplet:
+                    rasgueado = 'pmp_1';
+                    break;
+                case Rasgueado.PmpAnapaest:
+                    rasgueado = 'pmp_2';
+                    break;
+                case Rasgueado.PeiTriplet:
+                    rasgueado = 'pei_1';
+                    break;
+                case Rasgueado.PeiAnapaest:
+                    rasgueado = 'pei_2';
+                    break;
+                case Rasgueado.PaiTriplet:
+                    rasgueado = 'pai_1';
+                    break;
+                case Rasgueado.PaiAnapaest:
+                    rasgueado = 'pai_2';
+                    break;
+                case Rasgueado.AmiTriplet:
+                    rasgueado = 'ami_1';
+                    break;
+                case Rasgueado.AmiAnapaest:
+                    rasgueado = 'ami_2';
+                    break;
+                case Rasgueado.Ppp:
+                    rasgueado = 'ppp_1';
+                    break;
+                case Rasgueado.Amii:
+                    rasgueado = 'amii_1';
+                    break;
+                case Rasgueado.Amip:
+                    rasgueado = 'amip_1';
+                    break;
+                case Rasgueado.Eami:
+                    rasgueado = 'eami_1';
+                    break;
+                case Rasgueado.Eamii:
+                    rasgueado = 'eamii_1';
+                    break;
+                case Rasgueado.Peami:
+                    rasgueado = 'peami_1';
+                    break;
+            }
+
+            this.writeSimplePropertyNode(beatProperties, 'Rasgueado', 'Rasgueado', rasgueado);
         }
     }
 

@@ -322,6 +322,11 @@ export enum NotationElement {
      * The note ornaments like turns and mordents.
      */
     EffectNoteOrnament,
+
+    /**
+     * The Rasgueado indicator above the staff Rasg. ----|"
+     */
+    EffectRasgueado,
 }
 
 /**

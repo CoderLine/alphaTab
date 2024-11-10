@@ -42,6 +42,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { IWriteable } from '@src/io/IWriteable';
 import { Tuning } from '@src/model/Tuning';
 import { FadeType } from '@src/model/FadeType';
+import { Rasgueado } from '@src/model/Rasgueado';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -690,7 +691,9 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((this._versionNumber < 400 && (flags & 0x01) !== 0) || (flags & 0x02) !== 0) {
             beat.vibrato = VibratoType.Slight;
         }
-        beat.hasRasgueado = (flags2 & 0x01) !== 0;
+        if( (flags2 & 0x01) !== 0) {
+            beat.rasgueado = Rasgueado.Ii;
+        }
         if ((flags & 0x20) !== 0 && this._versionNumber >= 400) {
             let slapPop: number = IOHelper.readSInt8(this.data);
             switch (slapPop) {
