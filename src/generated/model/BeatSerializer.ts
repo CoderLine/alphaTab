@@ -25,6 +25,7 @@ import { GolpeType } from "@src/model/GolpeType";
 import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
+import { WahPedal } from "@src/model/WahPedal";
 export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {
@@ -79,6 +80,7 @@ export class BeatSerializer {
         o.set("invertbeamdirection", obj.invertBeamDirection);
         o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
         o.set("beamingmode", obj.beamingMode as number);
+        o.set("wahpedal", obj.wahPedal as number);
         return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -219,6 +221,9 @@ export class BeatSerializer {
                 return true;
             case "beamingmode":
                 obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!;
+                return true;
+            case "wahpedal":
+                obj.wahPedal = JsonHelper.parseEnum<WahPedal>(v, WahPedal)!;
                 return true;
         }
         return false;

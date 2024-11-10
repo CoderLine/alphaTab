@@ -48,6 +48,7 @@ import { NoteCloner } from '@src/generated/model/NoteCloner';
 import { Logger } from '@src/Logger';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
+import { WahPedal } from '@src/model/WahPedal';
 
 /**
  * This structure represents a duration within a gpif
@@ -1632,6 +1633,16 @@ export class GpifParser {
                                 break;
                             case 'Thumb':
                                 beat.golpe = GolpeType.Thumb;
+                                break;
+                        }
+                        break;
+                    case 'Wah':
+                        switch (c.innerText) {
+                            case 'Open':
+                                beat.wahPedal = WahPedal.Open;
+                                break;
+                            case 'Closed':
+                                beat.wahPedal = WahPedal.Closed;
                                 break;
                         }
                         break;

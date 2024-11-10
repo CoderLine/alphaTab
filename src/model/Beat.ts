@@ -24,6 +24,7 @@ import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
 import { GolpeType } from './GolpeType';
 import { FadeType } from './FadeType';
+import { WahPedal } from './WahPedal';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -471,6 +472,11 @@ export class Beat {
      * Gets or sets how the beaming should be done for this beat.
      */
     public beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
+
+    /**
+     * Whether the wah pedal should be used when playing the beat.
+     */
+    public wahPedal:WahPedal = WahPedal.None;
 
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;

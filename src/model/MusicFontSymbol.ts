@@ -150,6 +150,9 @@ export enum MusicFontSymbol {
     GuitarString8 = 0xe83b,
     GuitarString9 = 0xe83c,
 
+    GuitarOpenPedal = 0xe83d,
+    GuitarClosePedal = 0xe83f,
+
     GuitarGolpe = 0xe842,
     GuitarFadeIn = 0xe843,
     GuitarFadeOut = 0xe844,

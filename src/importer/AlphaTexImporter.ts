@@ -41,6 +41,7 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteAccidentalMode } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
+import { WahPedal } from '@src/model/WahPedal';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1630,6 +1631,14 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'glpt') {
             this._sy = this.newSy();
             beat.golpe = GolpeType.Thumb;
+            return true;
+        } else if (syData === 'waho') {
+            this._sy = this.newSy();
+            beat.wahPedal = WahPedal.Open;
+            return true;
+        } else if (syData === 'wahc') {
+            this._sy = this.newSy();
+            beat.wahPedal = WahPedal.Closed;
             return true;
         } else {
             // string didn't match any beat effect syntax

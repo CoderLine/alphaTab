@@ -36,6 +36,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
+import { WahPedal } from '@src/model/WahPedal';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { XmlDocument } from '@src/xml/XmlDocument';
@@ -751,6 +752,10 @@ export class GpifWriter {
 
         if (beat.golpe !== GolpeType.None) {
             beatNode.addElement('Golpe').innerText = GolpeType[beat.golpe];
+        }
+
+        if (beat.wahPedal !== WahPedal.None) {
+            beatNode.addElement('Wah').innerText = WahPedal[beat.wahPedal];
         }
 
         this.writeBeatProperties(beatNode, beat);
