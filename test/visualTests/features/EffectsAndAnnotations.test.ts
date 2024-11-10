@@ -181,4 +181,12 @@ describe('EffectsAndAnnotationsTests', () => {
     it('dead-slap', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/dead-slap.gp');
     });
+
+    it('golpe', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/golpe.gp');
+    });
+
+    it('golpe-tab', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/golpe-tab.gp');
+    });
 });

@@ -23,6 +23,7 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { assert, expect } from 'chai';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { GolpeType } from '@src/model/GolpeType';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1267,29 +1268,48 @@ describe('AlphaTexImporterTest', () => {
 
     it('accidental-mode', () => {
         // song level
-        let score = parseTex('\\accidentals auto . F##4')
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+        let score = parseTex('\\accidentals auto . F##4');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.Default
+        );
 
         // track level
-        score = parseTex('\\track "T1" F##4 | \\track "T2" \\accidentals auto F##4')
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
-        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+        score = parseTex('\\track "T1" F##4 | \\track "T2" \\accidentals auto F##4');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.ForceDoubleSharp
+        );
+        expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.Default
+        );
 
         // staff level
-        score = parseTex('\\track "T1" \\staff F##4 \\staff \\accidentals auto F##4')
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
-        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+        score = parseTex('\\track "T1" \\staff F##4 \\staff \\accidentals auto F##4');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.ForceDoubleSharp
+        );
+        expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.Default
+        );
 
         // bar level
-        score = parseTex('F##4 | \\accidentals auto F##4')
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.ForceDoubleSharp);
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).to.equal(NoteAccidentalMode.Default);
+        score = parseTex('F##4 | \\accidentals auto F##4');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.ForceDoubleSharp
+        );
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).to.equal(
+            NoteAccidentalMode.Default
+        );
     });
 
     it('dead-slap', () => {
-        // song level
-        let score = parseTex('r { ds }')
+        let score = parseTex('r { ds }');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isRest).to.be.false;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
+    });
+
+    it('golpe', () => {
+        let score = parseTex('3.3 { glpf } 3.3 { glpt }');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].golpe).to.equal(GolpeType.Finger);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].golpe).to.equal(GolpeType.Thumb);
     });
 });

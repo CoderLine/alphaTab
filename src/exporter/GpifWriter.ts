@@ -12,6 +12,7 @@ import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
+import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignatureType } from '@src/model/KeySignatureType';
@@ -745,6 +746,10 @@ export class GpifWriter {
         }
         if (beat.notes.length > 0) {
             beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
+        }
+
+        if(beat.golpe !== GolpeType.None) {
+            beatNode.addElement('Golpe').innerText = GolpeType[beat.golpe];
         }
 
         this.writeBeatProperties(beatNode, beat);

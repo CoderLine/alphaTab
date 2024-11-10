@@ -13,7 +13,11 @@ export enum TabRhythmMode {
     /**
      * Rhythm notation is shown and behaves like normal score notation with connected bars.
      */
-    ShowWithBars
+    ShowWithBars,
+    /**
+     * Automatic detection whether the tabs should show rhythm based on hidden standard notation.
+     */
+    Automatic,
 }
 
 /**
@@ -297,7 +301,12 @@ export enum NotationElement {
     /**
      * The Sustain pedal effect shown above the staff "Ped.____*"
      */
-    EffectSustainPedal
+    EffectSustainPedal,
+
+    /**
+     * The Golpe effect signs above and below the saff.
+     */
+    EffectGolpe
 }
 
 /**
@@ -334,7 +343,7 @@ export class NotationSettings {
     /**
      * Whether to show rhythm notation in the guitar tablature.
      */
-    public rhythmMode: TabRhythmMode = TabRhythmMode.Hidden;
+    public rhythmMode: TabRhythmMode = TabRhythmMode.Automatic;
 
     /**
      * The height of the rythm bars.

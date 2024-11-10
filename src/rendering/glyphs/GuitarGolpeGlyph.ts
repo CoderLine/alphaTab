@@ -1,11 +1,13 @@
 import { ICanvas } from '@src/platform/ICanvas';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { EffectGlyph } from './EffectGlyph';
 
-export class GuitarGolpeGlyph extends MusicFontGlyph {
-    public constructor(x: number, y: number) {
-        super(x, y, NoteHeadGlyph.GraceScale, MusicFontSymbol.GuitarGolpe);
+export class GuitarGolpeGlyph extends EffectGlyph {
+    private _center: boolean;
+    public constructor(x: number, y: number, center: boolean = false) {
+        super(x, y);
+        this._center = center;
     }
 
     public override doLayout(): void {
@@ -14,6 +16,12 @@ export class GuitarGolpeGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height, canvas);
+        canvas.fillMusicFontSymbol(
+            cx + this.x,
+            cy + this.y + this.height,
+            NoteHeadGlyph.GraceScale * this.scale,
+            MusicFontSymbol.GuitarGolpe,
+            this._center
+        );
     }
 }

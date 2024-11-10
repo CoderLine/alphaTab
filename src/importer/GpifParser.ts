@@ -46,6 +46,7 @@ import { TextBaseline } from '@src/platform/ICanvas';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
 import { Logger } from '@src/Logger';
+import { GolpeType } from '@src/model/GolpeType';
 
 /**
  * This structure represents a duration within a gpif
@@ -1614,6 +1615,16 @@ export class GpifParser {
                         break;
                     case 'DeadSlapped':
                         beat.deadSlapped = true;
+                        break;
+                    case 'Golpe':
+                        switch (c.innerText) {
+                            case 'Finger':
+                                beat.golpe = GolpeType.Finger;
+                                break;
+                            case 'Thumb':
+                                beat.golpe = GolpeType.Thumb;
+                                break;
+                        }
                         break;
                 }
             }

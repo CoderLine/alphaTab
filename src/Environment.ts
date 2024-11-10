@@ -65,6 +65,8 @@ import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
 import { ScoreBarRenderer } from './rendering/ScoreBarRenderer';
 import { TabBarRenderer } from './rendering/TabBarRenderer';
 import { SustainPedalEffectInfo } from './rendering/effects/SustainPedalEffectInfo';
+import { GolpeEffectInfo } from './rendering/effects/GolpeEffectInfo';
+import { GolpeType } from './model/GolpeType';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -102,7 +104,7 @@ export class Environment {
     private static readonly StaffIdBeforeNumberedAlways = 'before-numbered-always';
     private static readonly StaffIdBeforeTabAlways = 'before-tab-always';
     private static readonly StaffIdBeforeTabHideable = 'before-tab-hideable';
-
+    private static readonly StaffIdBeforeEndAlways = 'before-end-always';
 
     /**
      * The font size of the music font in pixel.
@@ -515,7 +517,8 @@ export class Environment {
                     new SlightBeatVibratoEffectInfo(),
                     new WideNoteVibratoEffectInfo(),
                     new SlightNoteVibratoEffectInfo(),
-                    new LeftHandTapEffectInfo()
+                    new LeftHandTapEffectInfo(),
+                    new GolpeEffectInfo(GolpeType.Finger)
                 ],
                 (_, staff) => staff.showStandardNotation
             ),
@@ -527,6 +530,7 @@ export class Environment {
                 new CrescendoEffectInfo(),
                 new OttaviaEffectInfo(false),
                 new DynamicsEffectInfo(),
+                new GolpeEffectInfo(GolpeType.Thumb, (s, b) => b.voice.bar.staff.showStandardNotation),
                 new SustainPedalEffectInfo()
             ]),
             // no before-numbered-hideable
@@ -558,11 +562,15 @@ export class Environment {
                     new PalmMuteEffectInfo(),
                     new PickStrokeEffectInfo(),
                     new PickSlideEffectInfo(),
-                    new LeftHandTapEffectInfo()
+                    new LeftHandTapEffectInfo(),
+                    new GolpeEffectInfo(GolpeType.Finger, (s, b) => !b.voice.bar.staff.showStandardNotation)
                 ],
                 (_, staff) => staff.showTablature
             ),
-            new TabBarRendererFactory()
+            new TabBarRendererFactory(),
+            new EffectBarRendererFactory(Environment.StaffIdBeforeEndAlways, [
+                new GolpeEffectInfo(GolpeType.Thumb, (s, b) => !b.voice.bar.staff.showStandardNotation)
+            ])
         ];
     }
 
@@ -583,7 +591,8 @@ export class Environment {
             Environment.StaffIdBeforeScoreAlways,
             Environment.StaffIdBeforeNumberedAlways,
             Environment.StaffIdBeforeTabAlways,
-            ScoreBarRenderer.StaffId
+            ScoreBarRenderer.StaffId,
+            Environment.StaffIdBeforeEndAlways
         ]);
         staveProfiles.set(
             StaveProfile.Score,
@@ -595,7 +604,8 @@ export class Environment {
             Environment.StaffIdBeforeScoreAlways,
             Environment.StaffIdBeforeNumberedAlways,
             Environment.StaffIdBeforeTabAlways,
-            TabBarRenderer.StaffId
+            TabBarRenderer.StaffId,
+            Environment.StaffIdBeforeEndAlways
         ]);
         staveProfiles.set(
             StaveProfile.Tab,

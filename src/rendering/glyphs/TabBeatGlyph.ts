@@ -104,7 +104,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Note dots
             //
-            if (this.container.beat.dots > 0 && tabRenderer.settings.notation.rhythmMode !== TabRhythmMode.Hidden) {
+            if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
                 this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     this.addGlyph(

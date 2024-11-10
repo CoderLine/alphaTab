@@ -20,6 +20,7 @@ import { VibratoType } from "@src/model/VibratoType";
 import { GraceType } from "@src/model/GraceType";
 import { PickStroke } from "@src/model/PickStroke";
 import { CrescendoType } from "@src/model/CrescendoType";
+import { GolpeType } from "@src/model/GolpeType";
 import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
@@ -72,6 +73,7 @@ export class BeatSerializer {
         o.set("playbackstart", obj.playbackStart);
         o.set("displayduration", obj.displayDuration);
         o.set("playbackduration", obj.playbackDuration);
+        o.set("golpe", obj.golpe as number);
         o.set("dynamics", obj.dynamics as number);
         o.set("invertbeamdirection", obj.invertBeamDirection);
         o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
@@ -201,6 +203,9 @@ export class BeatSerializer {
                 return true;
             case "playbackduration":
                 obj.playbackDuration = v! as number;
+                return true;
+            case "golpe":
+                obj.golpe = JsonHelper.parseEnum<GolpeType>(v, GolpeType)!;
                 return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;

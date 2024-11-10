@@ -58,6 +58,7 @@ export class BeatCloner {
         clone.playbackStart = original.playbackStart;
         clone.displayDuration = original.displayDuration;
         clone.playbackDuration = original.playbackDuration;
+        clone.golpe = original.golpe;
         clone.dynamics = original.dynamics;
         clone.invertBeamDirection = original.invertBeamDirection;
         clone.preferredBeamDirection = original.preferredBeamDirection;
