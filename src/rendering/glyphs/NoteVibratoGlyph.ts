@@ -57,7 +57,7 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
             canvas.fillMusicFontSymbol(
                 cx + this.x + loopX,
                 cy + this.y + this.height * 2,
-                this._scale * this.scale,
+                this._scale,
                 this._symbol,
                 false
             );

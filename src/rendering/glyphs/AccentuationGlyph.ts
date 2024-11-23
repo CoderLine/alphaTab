@@ -38,6 +38,6 @@ export class AccentuationGlyph extends EffectGlyph {
         
         const padding = 2 * this.scale;
         const y = dir == BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
-        canvas.fillMusicFontSymbol(cx + this.x - 2 * this.scale, y, this.scale, symbol, false);
+        canvas.fillMusicFontSymbol(cx + this.x - 2 * this.scale, y, 1, symbol, false);
     }
 }

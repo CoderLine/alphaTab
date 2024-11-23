@@ -30,7 +30,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let offset: number = this._isGrace ? this.scale : 0;
         const glyphScale = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, glyphScale * this.scale, this._symbol, false);
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, glyphScale, this._symbol, false);
         for (const g of this.beatEffects.values()) {
             g.paint(cx + this.x, cy + this.y, canvas);
         }

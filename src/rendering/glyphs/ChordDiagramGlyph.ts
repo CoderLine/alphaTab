@@ -70,9 +70,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
             let y: number = cy + this._fretRow / 2;
             let fret: number = this._chord.strings[this._chord.staff.tuning.length - i - 1];
             if (fret < 0) {
-                canvas.fillMusicFontSymbol(x, y, this.scale, MusicFontSymbol.FretboardX, true);
+                canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardX, true);
             } else if (fret === 0) {
-                canvas.fillMusicFontSymbol(x, y, this.scale, MusicFontSymbol.FretboardO, true);
+                canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardO, true);
             } else {
                 fret -= this._chord.firstFret - 1;
                 canvas.fillText(fret.toString(), x, y);

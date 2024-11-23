@@ -18,7 +18,7 @@ export class TabClefGlyph extends Glyph {
         canvas.fillMusicFontSymbol(
             cx + this.x + 5 * this.scale,
             cy + this.y,
-            scale * this.scale,
+            scale,
             symbol,
             false
         );

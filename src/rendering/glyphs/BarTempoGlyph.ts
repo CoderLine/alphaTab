@@ -31,7 +31,7 @@ export class BarTempoGlyph extends EffectGlyph {
             canvas.fillMusicFontSymbol(
                 x,
                 cy + this.y + this.height * 0.8,
-                this.scale * NoteHeadGlyph.GraceScale,
+                NoteHeadGlyph.GraceScale,
                 MusicFontSymbol.NoteQuarterUp,
                 false
             );

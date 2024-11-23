@@ -19,7 +19,7 @@ export class GuitarGolpeGlyph extends EffectGlyph {
         canvas.fillMusicFontSymbol(
             cx + this.x,
             cy + this.y + this.height,
-            NoteHeadGlyph.GraceScale * this.scale,
+            NoteHeadGlyph.GraceScale,
             MusicFontSymbol.GuitarGolpe,
             this._center
         );

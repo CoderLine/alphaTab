@@ -269,20 +269,20 @@ export class SkiaCanvas implements ICanvas {
     public fillMusicFontSymbol(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol,
         centerAtPosition?: boolean
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), centerAtPosition);
     }
 
     public fillMusicFontSymbols(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: MusicFontSymbol[],
         centerAtPosition?: boolean
     ): void {
@@ -292,20 +292,20 @@ export class SkiaCanvas implements ICanvas {
                 s += String.fromCharCode(symbol);
             }
         }
-        this.fillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
     private fillMusicFontSymbolText(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: string,
         centerAtPosition?: boolean
     ): void {
         this._canvas.fillText(
             symbols,
             SkiaCanvas.musicFont!,
-            Environment.MusicFontSize * this.settings.display.scale * scale,
+            Environment.MusicFontSize * this.settings.display.scale * relativeScale,
             x, y,
             centerAtPosition ? SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Center : SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Left,
             SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic

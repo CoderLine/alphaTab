@@ -17,10 +17,10 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let offset: number = this._isGrace ? this.scale : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false);
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
 
         if (this._articulation.techniqueSymbol !== MusicFontSymbol.None && this._articulation.techniqueSymbolPlacement === TextBaseline.Middle) {
-            canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this._articulation.techniqueSymbol, false);
+            canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this._articulation.techniqueSymbol, false);
         }
     }
 

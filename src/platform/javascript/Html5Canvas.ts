@@ -230,33 +230,33 @@ export class Html5Canvas implements ICanvas {
     public fillMusicFontSymbol(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol,
         centerAtPosition: boolean = false
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), centerAtPosition);
     }
 
     public fillMusicFontSymbolFit(
         x: number,
         y: number,
         maxWidth: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), false, maxWidth);
+        this.fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), false, maxWidth);
     }
 
     public fillMusicFontSymbols(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: MusicFontSymbol[],
         centerAtPosition: boolean = false
     ): void {
@@ -266,13 +266,13 @@ export class Html5Canvas implements ICanvas {
                 s += String.fromCharCode(symbol);
             }
         }
-        this.fillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
     private fillMusicFontSymbolText(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: string,
         centerAtPosition: boolean,
         maxWidth: number = 0
@@ -280,7 +280,7 @@ export class Html5Canvas implements ICanvas {
         let textAlign = this._context.textAlign;
         let baseLine = this._context.textBaseline;
         let font: string = this._context.font;
-        this._context.font = this._musicFont.toCssString(scale);
+        this._context.font = this._musicFont.toCssString(this.settings.display.scale * relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
