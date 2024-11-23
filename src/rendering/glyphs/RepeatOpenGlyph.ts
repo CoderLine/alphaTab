@@ -14,11 +14,11 @@ export class RepeatOpenGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 13 * this.scale;
+        this.width = 13;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let blockWidth: number = 4 * this.scale;
+        let blockWidth: number = 4;
         let top: number = cy + this.y + this.renderer.topPadding;
         let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
         let left: number = cx + this.x + 0.5;
@@ -32,8 +32,8 @@ export class RepeatOpenGlyph extends Glyph {
         canvas.lineTo(left, bottom);
         canvas.stroke();
         // circles
-        left += 3 * this.scale;
-        let circleSize: number = this._circleSize * this.scale;
+        left += 3;
+        let circleSize: number = this._circleSize;
         let middle: number = (top + bottom) / 2;
         canvas.fillCircle(left, middle - circleSize * this._dotOffset, circleSize);
         canvas.fillCircle(left, middle + circleSize * this._dotOffset, circleSize);

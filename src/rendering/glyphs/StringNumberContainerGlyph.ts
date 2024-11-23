@@ -12,7 +12,7 @@ export class StringNumberContainerGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        const circleHeight = TuningGlyph.CircleNumberHeight * TuningGlyph.CircleNumberScale * this.scale;
+        const circleHeight = TuningGlyph.CircleNumberHeight * TuningGlyph.CircleNumberScale;
         this.height = (circleHeight + 3) * this._strings.size;
         this.width = circleHeight;
     }
@@ -21,7 +21,7 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         const tuningLength = this.renderer.bar.staff.tuning.length;
 
         let y = 0;
-        const circleHeight = TuningGlyph.CircleNumberHeight * TuningGlyph.CircleNumberScale * this.scale;
+        const circleHeight = TuningGlyph.CircleNumberHeight * TuningGlyph.CircleNumberScale;
         for (const s of this._strings) {
             const stringValue = tuningLength - s;
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
@@ -32,7 +32,7 @@ export class StringNumberContainerGlyph extends EffectGlyph {
                 symbol,
                 true
             );
-            y += circleHeight + 3 * this.scale;
+            y += circleHeight + 3;
         }
     }
 }

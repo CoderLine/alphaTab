@@ -63,7 +63,7 @@ export class ScoreRestGlyph extends MusicFontGlyph {
     }
 
     public override doLayout(): void {
-        this.width = ScoreRestGlyph.getSize(this._duration) * this.scale;
+        this.width = ScoreRestGlyph.getSize(this._duration);
     }
 
     public updateBeamingHelper(cx: number): void {

@@ -17,7 +17,7 @@ export class RowContainerGlyph extends GlyphGroup {
     public override doLayout(): void {
         let x: number = 0;
         let y: number = 0;
-        let padding: number = RowContainerGlyph.Padding * this.scale;
+        let padding: number = RowContainerGlyph.Padding;
         this._rows = [];
         let row: RowGlyphContainer = new RowGlyphContainer(x, y, this._align);
         row.width = this.width;

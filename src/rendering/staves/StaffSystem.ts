@@ -271,9 +271,8 @@ export class StaffSystem {
                 for (let t of tracks) {
                     this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, canvas.measureText(t.shortName).width));
                 }
-                this.accoladeWidth *= this.layout.scale;
-                this.accoladeWidth += settings.display.systemLabelPaddingLeft * this.layout.scale;
-                this.accoladeWidth += settings.display.systemLabelPaddingRight * this.layout.scale;
+                this.accoladeWidth += settings.display.systemLabelPaddingLeft;
+                this.accoladeWidth += settings.display.systemLabelPaddingRight;
             } else {
                 this.accoladeWidth = 0;
             }
@@ -301,7 +300,7 @@ export class StaffSystem {
             let braceWidth = 0;
             for (const b of this._brackets) {
                 b.finalizeBracket();
-                braceWidth = Math.max(braceWidth, b.width * this.layout.scale);
+                braceWidth = Math.max(braceWidth, b.width);
             }
 
             this.accoladeWidth += braceWidth;
@@ -402,14 +401,14 @@ export class StaffSystem {
         if (this._hasSystemSeparator) {
             canvas.fillMusicFontSymbol(
                 cx + this.x,
-                cy + this.y + this.height - 10 * this.layout.scale,
+                cy + this.y + this.height - 10,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
             );
             canvas.fillMusicFontSymbol(
-                cx + this.x + this.width - StaffSystem.SystemSignSeparatorWidth * this.layout.scale,
-                cy + this.y + this.height - StaffSystem.SystemSignSeparatorPadding * this.layout.scale,
+                cx + this.x + this.width - StaffSystem.SystemSignSeparatorWidth,
+                cy + this.y + this.height - StaffSystem.SystemSignSeparatorPadding,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
@@ -464,10 +463,10 @@ export class StaffSystem {
                             cx +
                             g.firstStaffInBracket.x -
                             // left side of the bracket
-                            settings.display.accoladeBarPaddingRight * this.layout.scale -
-                            (g.bracket?.width ?? 0) * this.layout.scale -
+                            settings.display.accoladeBarPaddingRight -
+                            (g.bracket?.width ?? 0) -
                             // padding between label and bracket
-                            settings.display.systemLabelPaddingRight * this.layout.scale;
+                            settings.display.systemLabelPaddingRight;
                         canvas.textBaseline = TextBaseline.Middle;
                         canvas.textAlign = TextAlign.Right;
                         canvas.fillText(g.track.shortName, textX, (firstStart + lastEnd) / 2);
@@ -482,8 +481,8 @@ export class StaffSystem {
             for (const bracket of this._brackets!) {
                 if (bracket.firstStaffInBracket && bracket.lastStaffInBracket) {
                     const barStartX: number = cx + bracket.firstStaffInBracket.x;
-                    const barSize: number = bracket.width * this.layout.scale;
-                    const barOffset: number = settings.display.accoladeBarPaddingRight * this.layout.scale;
+                    const barSize: number = bracket.width;
+                    const barOffset: number = settings.display.accoladeBarPaddingRight;
                     const firstStart: number = cy + bracket.firstStaffInBracket.contentTop;
                     const lastEnd: number = cy + bracket.lastStaffInBracket.contentBottom;
                     let accoladeStart: number = firstStart;
@@ -507,7 +506,7 @@ export class StaffSystem {
                             Math.ceil(accoladeEnd - accoladeStart)
                         );
 
-                        let spikeX: number = barStartX - barOffset - barSize - 0.5 * this.layout.scale;
+                        let spikeX: number = barStartX - barOffset - barSize - 0.5;
                         canvas.fillMusicFontSymbol(spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
                         canvas.fillMusicFontSymbol(spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
                     }
@@ -523,16 +522,16 @@ export class StaffSystem {
     public finalizeSystem(): void {
         const settings = this.layout.renderer.settings;
         if (this.index === 0) {
-            this.topPadding = settings.display.firstSystemPaddingTop * settings.display.scale;
+            this.topPadding = settings.display.firstSystemPaddingTop;
         }
 
         if (this.isLast) {
-            this.bottomPadding = settings.display.lastSystemPaddingBottom * settings.display.scale;
+            this.bottomPadding = settings.display.lastSystemPaddingBottom;
         } else if (
             this.layout.renderer.score!.stylesheet.useSystemSignSeparator &&
             this.layout.renderer.tracks!.length > 1
         ) {
-            this.bottomPadding += StaffSystem.SystemSignSeparatorHeight * settings.display.scale;
+            this.bottomPadding += StaffSystem.SystemSignSeparatorHeight;
             this._hasSystemSeparator = true;
         }
 

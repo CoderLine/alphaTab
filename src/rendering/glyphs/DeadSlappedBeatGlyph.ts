@@ -8,7 +8,7 @@ export class DeadSlappedBeatGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 26 * this.scale;
+        this.width = 26;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -23,7 +23,7 @@ export class DeadSlappedBeatGlyph extends Glyph {
 
 
         const lw = canvas.lineWidth;
-        canvas.lineWidth = this.scale * 2;
+        canvas.lineWidth = 2;
         canvas.moveTo(cx + this.x, cy + centerY);
         canvas.lineTo(cx + this.x + this.width, cy + centerY + crossHeight);
 

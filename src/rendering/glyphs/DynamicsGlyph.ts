@@ -9,7 +9,7 @@ export class DynamicsGlyph extends MusicFontGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = 17 * this.scale;
+        this.height = 17;
         this.y += this.height / 2;
     }
 

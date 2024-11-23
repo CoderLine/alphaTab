@@ -17,9 +17,9 @@ export class TabRestGlyph extends MusicFontGlyph {
 
     public override doLayout(): void {
         if (this._isVisibleRest) {
-            this.width = ScoreRestGlyph.getSize(this._duration) * this.scale;
+            this.width = ScoreRestGlyph.getSize(this._duration);
         } else {
-            this.width = 10 * this.scale;
+            this.width = 10;
         }
     }
 

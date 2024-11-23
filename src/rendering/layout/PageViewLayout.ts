@@ -176,7 +176,6 @@ export class PageViewLayout extends ScoreLayout {
 
         let infoHeight = 0;
 
-        let scale: number = this.scale;
         let res: RenderingResources = this.renderer.settings.display.resources;
         let centeredGlyphs: NotationElement[] = [
             NotationElement.ScoreTitle,
@@ -191,7 +190,7 @@ export class PageViewLayout extends ScoreLayout {
                 glyph.x = this.width / 2;
                 glyph.y = infoHeight;
                 glyph.textAlign = TextAlign.Center;
-                infoHeight += glyph.font.size * scale;
+                infoHeight += glyph.font.size;
             }
         }
         let musicOrWords: boolean = false;
@@ -202,7 +201,7 @@ export class PageViewLayout extends ScoreLayout {
             glyph.y = infoHeight;
             glyph.textAlign = TextAlign.Right;
             musicOrWords = true;
-            musicOrWordsHeight = glyph.font.size * scale;
+            musicOrWordsHeight = glyph.font.size;
         }
         if (this.scoreInfoGlyphs.has(NotationElement.ScoreWords)) {
             let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreWords)!;
@@ -210,14 +209,14 @@ export class PageViewLayout extends ScoreLayout {
             glyph.y = infoHeight;
             glyph.textAlign = TextAlign.Left;
             musicOrWords = true;
-            musicOrWordsHeight = glyph.font.size * scale;
+            musicOrWordsHeight = glyph.font.size;
         }
         if (musicOrWords) {
             infoHeight += musicOrWordsHeight;
         }
 
         if (this.scoreInfoGlyphs.size > 0) {
-            infoHeight = Math.floor(infoHeight + 17 * this.scale);
+            infoHeight = Math.floor(infoHeight + 17);
             e.width = this.width;
             e.height = infoHeight;
             e.totalWidth = this.width;

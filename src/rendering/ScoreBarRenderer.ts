@@ -308,7 +308,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // 2. ensure max height
             // we use the min/max notes to place the beam along their real position
             // we only want a maximum of 10 offset for their gradient
-            let maxDistance: number = 10 * this.scale;
+            let maxDistance: number = 10;
             if (
                 direction === BeamDirection.Down &&
                 drawingInfo.startY > drawingInfo.endY &&
@@ -370,7 +370,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     let barSpacing: number =
                         barCount *
                         (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) *
-                        this.scale *
                         scaleMod;
                     barSpacing += BarRendererBase.BeamSpacing;
 
@@ -558,7 +557,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
@@ -618,11 +617,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
+        canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);
         canvas.lineTo(x, bottomY);
         canvas.stroke();
-        canvas.lineWidth = this.scale;
+        canvas.lineWidth = 1;
     }
 }

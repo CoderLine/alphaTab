@@ -76,11 +76,11 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
+        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
+        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -100,7 +100,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
+        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -124,7 +124,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const masterBar = this.bar.masterBar;
         this.addPreBeatGlyph(
@@ -158,11 +158,11 @@ export class SlashBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
+        canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);
         canvas.lineTo(x, bottomY);
         canvas.stroke();
-        canvas.lineWidth = this.scale;
+        canvas.lineWidth = 1;
     }
 }

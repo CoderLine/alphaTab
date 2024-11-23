@@ -39,7 +39,7 @@ export class SlashTieGlyph extends TieGlyph {
 
     protected override getStartX(): number {
         if(this.startNote === this.endNote) {
-            return this.getEndX() - 20 * this.scale;
+            return this.getEndX() - 20;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Right);
     }

@@ -78,7 +78,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
-        const padding: number = this.scale;
+        const padding: number = 1;
         for (let voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 let vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -104,8 +104,8 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override adjustSizes(): void {
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            this.height += this.settings.notation.rhythmHeight * this.settings.display.scale;
-            this.bottomPadding += this.settings.notation.rhythmHeight * this.settings.display.scale;
+            this.height += this.settings.notation.rhythmHeight;
+            this.bottomPadding += this.settings.notation.rhythmHeight;
         }
     }
 
@@ -132,7 +132,7 @@ export class TabBarRenderer extends LineBarRenderer {
         // Clef
         if (this.isFirstOfLine) {
             let center: number = (this.bar.staff.tuning.length - 1) / 2;
-            this.addPreBeatGlyph(new TabClefGlyph(5 * this.scale, this.getTabY(center)));
+            this.addPreBeatGlyph(new TabClefGlyph(5, this.getTabY(center)));
         }
         // Time Signature
         if (
@@ -154,7 +154,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
         this.addPreBeatGlyph(
@@ -193,7 +193,7 @@ export class TabBarRenderer extends LineBarRenderer {
     protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
         const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
-            return this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this.tupletSize;
+            return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
         } else {
             return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
         }
@@ -210,7 +210,7 @@ export class TabBarRenderer extends LineBarRenderer {
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
         let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
-            return this.height - this.settings.notation.rhythmHeight * this.settings.display.scale - this.tupletSize;
+            return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
         } else {
             return (
                 startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
@@ -258,7 +258,7 @@ export class TabBarRenderer extends LineBarRenderer {
             topY = t;
         }
 
-        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
+        canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
 
         let holes: ReservedLayoutAreaSlot[] = [];
@@ -285,6 +285,6 @@ export class TabBarRenderer extends LineBarRenderer {
         }
         canvas.stroke();
 
-        canvas.lineWidth = this.scale;
+        canvas.lineWidth = 1;
     }
 }

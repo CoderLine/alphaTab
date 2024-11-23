@@ -37,8 +37,8 @@ export class ScoreSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let sizeX: number = 12 * this.scale;
-        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2 * this.scale;
+        let sizeX: number = 12;
+        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2;
         let endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
         let startX = endX - sizeX;
         let startY: number = cy + startNoteRenderer.y;
@@ -70,9 +70,9 @@ export class ScoreSlideLineGlyph extends Glyph {
 
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let sizeX: number = 12 * this.scale;
-        let endOffsetX: number = 1 * this.scale;
-        let offsetY: number = 2 * this.scale;
+        let sizeX: number = 12;
+        let endOffsetX: number = 1;
+        let offsetY: number = 2;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;

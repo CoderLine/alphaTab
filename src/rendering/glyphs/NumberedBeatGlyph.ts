@@ -78,7 +78,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
                     this.addGlyph(accidentals);
-                    this.addGlyph(new SpacingGlyph(0, 0, 4 * this.scale));
+                    this.addGlyph(new SpacingGlyph(0, 0, 4));
                 }
             }
         }
@@ -144,7 +144,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= g.height / 2 + 2 * this.scale;
+                    pos -= g.height / 2 + 2;
                     break;
                 case NoteYPosition.Center:
                     break;
@@ -276,9 +276,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Note dots
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
-                this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+                this.addGlyph(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    const dot = new CircleGlyph(0, sr.getLineY(0), 1.5 * this.scale);
+                    const dot = new CircleGlyph(0, sr.getLineY(0), 1.5);
                     dot.renderer = this.renderer;
                     this.addGlyph(dot);
                 }

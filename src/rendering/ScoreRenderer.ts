@@ -136,7 +136,7 @@ export class ScoreRenderer implements IScoreRenderer {
         }
         this.boundsLookup = new BoundsLookup();
         this.recreateCanvas();
-        this.canvas!.lineWidth = this.settings.display.scale;
+        this.canvas!.lineWidth = 1;
         this.canvas!.settings = this.settings;
 
         if (!this.tracks || this.tracks.length === 0 || !this.score) {

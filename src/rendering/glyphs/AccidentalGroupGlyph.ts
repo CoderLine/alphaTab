@@ -34,7 +34,7 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         // defines the reserved y position of the columns
         let columns: AccidentalColumnInfo[] = [];
         columns.push(new AccidentalColumnInfo());
-        let accidentalHeight: number = 21 * this.scale;
+        let accidentalHeight: number = 21;
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
             let g = this.glyphs[i] as AccidentalGlyph;
             g.renderer = this.renderer;

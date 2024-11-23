@@ -17,10 +17,6 @@ export class Glyph {
         this.y = y;
     }
 
-    public get scale(): number {
-        return this.renderer.scale;
-    }
-
     public doLayout(): void {
         // to be implemented in subclass
     }

@@ -125,8 +125,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                                 0,
                                 0,
                                 4 *
-                                    (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                                    this.scale
+                                    (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                             )
                         );
                         this.addGlyph(ghost);
@@ -145,7 +144,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Note dots
                 //
                 if (this.container.beat.dots > 0) {
-                    this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+                    this.addGlyph(new SpacingGlyph(0, 0, 5));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
@@ -194,7 +193,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Note dots
                 //
                 if (this.container.beat.dots > 0) {
-                    this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+                    this.addGlyph(new SpacingGlyph(0, 0, 5));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
@@ -218,7 +217,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private createBeatDot(line: number, group: GlyphGroup): void {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line), 1.5 * this.scale));
+        group.addGlyph(new CircleGlyph(0, sr.getScoreY(line), 1.5));
     }
 
     private createNoteHeadGlyph(n: Note): EffectGlyph {

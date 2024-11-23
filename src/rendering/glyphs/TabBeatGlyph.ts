@@ -82,7 +82,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
                 let offset: number = 0;
                 let speed = this.container.beat.tremoloSpeed!;
-                let tremoloX = 5 * this.scale;
+                let tremoloX = 5;
                 switch (speed) {
                     case Duration.ThirtySecond:
                         offset = 10;
@@ -99,20 +99,20 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                     tremoloX = 0;
                 }
 
-                beatEffects.set('tremolo', new TremoloPickingGlyph(tremoloX, offset * this.scale, speed));
+                beatEffects.set('tremolo', new TremoloPickingGlyph(tremoloX, offset, speed));
             }
             //
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
-                this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+                this.addGlyph(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     this.addGlyph(
                         new CircleGlyph(
                             0,
                             tabRenderer.lineOffset * tabRenderer.bar.staff.tuning.length +
-                                tabRenderer.settings.notation.rhythmHeight * tabRenderer.scale,
-                            1.5 * this.scale
+                                tabRenderer.settings.notation.rhythmHeight,
+                            1.5
                         )
                     );
                 }
@@ -129,9 +129,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.showRests) {
-                this.addGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+                this.addGlyph(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    this.addGlyph(new CircleGlyph(0, y, 1.5 * this.scale));
+                    this.addGlyph(new CircleGlyph(0, y, 1.5));
                 }
             }
         }

@@ -10,8 +10,8 @@ export class NoteOrnamentGlyph extends MusicFontGlyph {
     }
 
     public override doLayout(): void {
-        this.width = 26 * this.scale;
-        this.height = 18 * this.scale;
+        this.width = 26;
+        this.height = 18;
     }
 
     private static getSymbol(ornament: NoteOrnament): MusicFontSymbol {
@@ -29,6 +29,6 @@ export class NoteOrnamentGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height - 4 * this.scale, canvas);
+        super.paint(cx, cy + this.height - 4, canvas);
     }
 }

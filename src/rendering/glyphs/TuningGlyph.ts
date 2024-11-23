@@ -39,11 +39,10 @@ export class TuningGlyph extends GlyphGroup {
     public static readonly CircleNumberScale: number = 0.7;
 
     private createGlyphs(tuning: Tuning): void {
-        const scale = this.renderer.scale;
         const res = this.renderer.resources;
         this.height = 0;
 
-        const rowHeight = 15 * scale;
+        const rowHeight = 15;
 
         // Track name
         if (this._trackLabel.length > 0) {
@@ -63,18 +62,18 @@ export class TuningGlyph extends GlyphGroup {
         tuningName.y += tuningName.height / 2;
         this.addGlyph(tuningName);
 
-        const stringColumnWidth = 64 * scale;
+        const stringColumnWidth = 64;
 
         this.renderer.scoreRenderer.canvas!.font = res.effectFont;
         this.width = Math.max(
-            this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width * scale,
-            Math.max(this.renderer.scoreRenderer.canvas!.measureText(tuning.name).width * scale, 2 * stringColumnWidth)
+            this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width,
+            Math.max(this.renderer.scoreRenderer.canvas!.measureText(tuning.name).width, 2 * stringColumnWidth)
         );
 
         if (!tuning.isStandard) {
             this.height += rowHeight;
             const circleScale = TuningGlyph.CircleNumberScale;
-            const circleHeight = TuningGlyph.CircleNumberHeight * circleScale * scale;
+            const circleHeight = TuningGlyph.CircleNumberHeight * circleScale;
 
             // Strings
             let stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
@@ -86,7 +85,7 @@ export class TuningGlyph extends GlyphGroup {
 
                 const str: string = '= ' + Tuning.getTextForTuning(tuning.tunings[i], false);
                 this.addGlyph(
-                    new TextGlyph(currentX + circleHeight + 1 * scale, currentY, str, res.effectFont, TextAlign.Left)
+                    new TextGlyph(currentX + circleHeight + 1, currentY, str, res.effectFont, TextAlign.Left)
                 );
                 currentY += rowHeight;
                 if (i === stringsPerColumn - 1) {
@@ -97,6 +96,6 @@ export class TuningGlyph extends GlyphGroup {
             this.height += stringsPerColumn * rowHeight;
         }
 
-        this.width += 15 * scale;
+        this.width += 15;
     }
 }

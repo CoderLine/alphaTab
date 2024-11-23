@@ -7,7 +7,7 @@ export class TabBeatPreNotesGlyph extends BeatGlyphBase {
     public override doLayout(): void {
         if (this.container.beat.brushType !== BrushType.None && !this.container.beat.isRest) {
             this.addGlyph(new TabBrushGlyph(this.container.beat));
-            this.addGlyph(new SpacingGlyph(0, 0, 4 * this.scale));
+            this.addGlyph(new SpacingGlyph(0, 0, 4));
         }
         super.doLayout();
     }

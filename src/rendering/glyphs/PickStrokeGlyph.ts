@@ -11,8 +11,8 @@ export class PickStrokeGlyph extends MusicFontGlyph {
     }
 
     public override doLayout(): void {
-        this.width = 9 * this.scale;
-        this.height = 13 * this.scale;
+        this.width = 9;
+        this.height = 13;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

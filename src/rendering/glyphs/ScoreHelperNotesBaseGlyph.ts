@@ -28,7 +28,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         this.width = 0;
         for (let noteHeads of this.BendNoteHeads) {
             noteHeads.doLayout();
-            this.width += noteHeads.width + 10 * this.scale;
+            this.width += noteHeads.width + 10;
         }
     }
 

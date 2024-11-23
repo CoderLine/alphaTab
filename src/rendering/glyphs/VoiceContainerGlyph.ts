@@ -26,14 +26,12 @@ export class VoiceContainerGlyph extends GlyphGroup {
     }
 
     public scaleToWidth(width: number): void {
-        const scale = this.renderer.scale;
-        let force: number = this.renderer.layoutingInfo.spaceToForce(width / scale);
+        let force: number = this.renderer.layoutingInfo.spaceToForce(width);
         this.scaleToForce(force);
     }
 
     private scaleToForce(force: number): void {
-        const scale = this.renderer.scale;
-        this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force) * scale;
+        this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
         let positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
         let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
 
@@ -43,14 +41,14 @@ export class VoiceContainerGlyph extends GlyphGroup {
             switch (currentBeatGlyph.beat.graceType) {
                 case GraceType.None:
                     currentBeatGlyph.x =
-                        positions.get(currentBeatGlyph.beat.absoluteDisplayStart)! * scale - currentBeatGlyph.onTimeX;
+                        positions.get(currentBeatGlyph.beat.absoluteDisplayStart)! - currentBeatGlyph.onTimeX;
                     break;
                 default:
                     const graceDisplayStart = currentBeatGlyph.beat.graceGroup!.beats[0].absoluteDisplayStart;
                     const graceGroupId = currentBeatGlyph.beat.graceGroup!.id;
                     // placement for proper grace notes which have a following note
                     if (currentBeatGlyph.beat.graceGroup!.isComplete && positions.has(graceDisplayStart)) {
-                        currentBeatGlyph.x = positions.get(graceDisplayStart)! * scale - currentBeatGlyph.onTimeX;
+                        currentBeatGlyph.x = positions.get(graceDisplayStart)! - currentBeatGlyph.onTimeX;
 
                         let graceSprings = this.renderer.layoutingInfo.allGraceRods.get(graceGroupId)!;
 
@@ -61,7 +59,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                                 .nextBeat;
                         const preBeatStretch = afterGraceBeat
                             ? this.renderer.layoutingInfo.getPreBeatSize(afterGraceBeat) +
-                              BeatContainerGlyph.GraceBeatPadding * this.renderer.scale
+                              BeatContainerGlyph.GraceBeatPadding
                             : 0;
 
                         // move right in front to the note

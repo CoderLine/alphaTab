@@ -238,10 +238,6 @@ export abstract class ScoreLayout {
         }
     }
 
-    public get scale(): number {
-        return this.renderer.settings.display.scale;
-    }
-
     public firstBarIndex: number = 0;
 
     public lastBarIndex: number = 0;
@@ -289,7 +285,7 @@ export abstract class ScoreLayout {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         let msg: string = 'rendered by alphaTab';
         let resources: RenderingResources = this.renderer.settings.display.resources;
-        let size: number = 12 * this.renderer.settings.display.scale;
+        let size: number = 12;
         let height: number = Math.floor(size);
 
         const e = new RenderFinishedEventArgs();

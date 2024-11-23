@@ -20,7 +20,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.resources.wordsFont.size + (AlternateEndingsGlyph.Padding * this.scale + 2);
+        this.height = this.renderer.resources.wordsFont.size + (AlternateEndingsGlyph.Padding + 2);
         let endingsStrings: string = '';
         for (let i: number = 0, j: number = this._endings.length; i < j; i++) {
             endingsStrings += this._endings[i] + 1;
@@ -40,7 +40,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
             canvas.lineTo(cx + this.x, cy + this.y);
             canvas.lineTo(cx + this.x + this.width, cy + this.y);
             canvas.stroke();
-            canvas.fillText(this._endingsString, cx + this.x + AlternateEndingsGlyph.Padding * this.scale, cy + this.y * this.scale);
+            canvas.fillText(this._endingsString, cx + this.x + AlternateEndingsGlyph.Padding, cy + this.y);
         }
         canvas.textBaseline = baseline;
     }

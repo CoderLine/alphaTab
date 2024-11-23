@@ -9,11 +9,11 @@ export class ArticStaccatoAboveGlyph extends MusicFontGlyph {
     }
 
     public override doLayout(): void {
-        this.width = NoteHeadGlyph.QuarterNoteHeadWidth * this.scale;
-        this.height = 7 * this.scale;
+        this.width = NoteHeadGlyph.QuarterNoteHeadWidth;
+        this.height = 7;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx + 3 * this.scale, cy + 5 * this.scale, canvas);
+        super.paint(cx + 3, cy + 5, canvas);
     }
 }
