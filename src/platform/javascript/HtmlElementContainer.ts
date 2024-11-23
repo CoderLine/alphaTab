@@ -40,7 +40,7 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public get scrollTop(): number {
-        return this.element.scrollLeft;
+        return this.element.scrollTop;
     }
 
     public set scrollTop(value: number) {
