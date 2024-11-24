@@ -309,9 +309,9 @@ export abstract class ScoreLayout {
         this.renderer.canvas!.font = font;
 
         const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
-        e.width = this.renderer.canvas!.measureText(msg).width;
+        e.width = this.renderer.canvas!.measureText(msg).width / this.renderer.settings.display.scale;
         e.height = height;
-        e.x = centered ? (this.width - e.width) / 2 : this.firstBarX;
+        e.x = centered ? (this.scaledWidth - e.width) / 2 : this.firstBarX;
         e.y = y;
 
         e.totalWidth = this.scaledWidth;

@@ -37,7 +37,7 @@ export class PageViewLayout extends ScoreLayout {
                 break;
         }
 
-        this._pagePadding = this.renderer.settings.display.padding;
+        this._pagePadding = this.renderer.settings.display.padding.map(p => p / this.renderer.settings.display.scale);
         if (!this._pagePadding) {
             this._pagePadding = [0, 0, 0, 0];
         }
@@ -74,7 +74,7 @@ export class PageViewLayout extends ScoreLayout {
 
         y = this.layoutAndRenderAnnotation(y);
 
-        this.height = y + this._pagePadding[3];
+        this.height = (y + this._pagePadding[3]) * this.renderer.settings.display.scale;
     }
 
     public get supportsResize(): boolean {
@@ -425,7 +425,6 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private get maxWidth(): number {
-        const scaledPadding = (this._pagePadding![0] + this._pagePadding![2]) * this.renderer.settings.display.scale;
-        return (this.scaledWidth - scaledPadding) 
+        return (this.scaledWidth - this._pagePadding![0] - this._pagePadding![2]) 
     }
 }

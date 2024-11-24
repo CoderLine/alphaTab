@@ -73,11 +73,12 @@ export class SkiaCanvas implements ICanvas {
     private _typeFaceCache: string = "";
     private _typeFaceIsSystem: boolean = false;
     private _typeFace: alphaSkia.AlphaSkiaTypeface | null = null;
+    private _scale = 1;
 
     public settings!: Settings;
 
     private getTypeFace(): alphaSkia.AlphaSkiaTypeface {
-        if (this._typeFaceCache != this.font.toCssString(this.settings.display.scale)) {
+        if (this._typeFaceCache != this.font.toCssString(this._scale)) {
             if (this._typeFaceIsSystem) {
                 using _ = this._typeFace!;
             }
@@ -98,7 +99,7 @@ export class SkiaCanvas implements ICanvas {
 
             }
 
-            this._typeFaceCache = this.font.toCssString(this.settings.display.scale);
+            this._typeFaceCache = this.font.toCssString(this._scale);
         }
 
         return this._typeFace!;
@@ -118,8 +119,8 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
-        const scale = this.settings.display.scale;
-        this._canvas.beginRender(width, height, Environment.HighDpiFactor * scale);
+        this._scale = this.settings.display.scale;
+        this._canvas.beginRender(width, height, Environment.HighDpiFactor);
     }
 
     public endRender(): unknown {
@@ -149,12 +150,12 @@ export class SkiaCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._canvas.fillRect((x | 0), (y | 0), w, h);
+            this._canvas.fillRect(((x * this._scale) | 0), ((y * this._scale) | 0), w * this._scale, h * this._scale);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this._canvas.strokeRect((x | 0), (y | 0), w, h);
+        this._canvas.strokeRect(((x * this._scale) | 0), ((y * this._scale) | 0), w * this._scale, h * this._scale);
     }
 
     public beginPath(): void {
@@ -166,34 +167,34 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public moveTo(x: number, y: number): void {
-        this._canvas.moveTo(x, y);
+        this._canvas.moveTo(x * this._scale, y * this._scale);
     }
 
     public lineTo(x: number, y: number): void {
-        this._canvas.lineTo(x, y);
+        this._canvas.lineTo(x * this._scale, y * this._scale);
     }
 
     public quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
-        this._canvas.quadraticCurveTo(cpx, cpy, x, y);
+        this._canvas.quadraticCurveTo(cpx * this._scale, cpy * this._scale, x * this._scale, y * this._scale);
     }
 
     public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
-        this._canvas.bezierCurveTo(cp1X, cp1Y, cp2X, cp2Y, x, y);
+        this._canvas.bezierCurveTo(cp1X * this._scale, cp1Y * this._scale, cp2X * this._scale, cp2Y * this._scale, x * this._scale, y * this._scale);
     }
 
     public fillCircle(x: number, y: number, radius: number): void {
         this._canvas.fillCircle(
-            x,
-            y,
-            radius,
+            x * this._scale,
+            y * this._scale,
+            radius * this._scale,
         );
     }
 
     public strokeCircle(x: number, y: number, radius: number): void {
         this._canvas.strokeCircle(
-            x,
-            y,
-            radius,
+            x * this._scale,
+            y * this._scale,
+            radius * this._scale,
         );
     }
 
@@ -249,7 +250,7 @@ export class SkiaCanvas implements ICanvas {
         }
 
 
-        this._canvas.fillText(text, this.getTypeFace(), this.font.size * this.settings.display.scale, x, y, textAlign, textBaseline);
+        this._canvas.fillText(text, this.getTypeFace(), this.font.size * this._scale, x * this._scale, y * this._scale, textAlign, textBaseline);
     }
 
     /**
@@ -261,10 +262,10 @@ export class SkiaCanvas implements ICanvas {
     public measureText(text: string) {
         // BUG: for some reason the very initial measure text in alphaSkia delivers wrong results, so we it twice
         if(this._initialMeasure) {
-            this._canvas.measureText(text, this.getTypeFace(), this.font.size);
+            this._canvas.measureText(text, this.getTypeFace(), this.font.size * this._scale);
             this._initialMeasure = false;
         }
-        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size), this.font.size * SkiaCanvas.FontSizeToLineHeight);
+        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this._scale), this.font.size * this._scale * SkiaCanvas.FontSizeToLineHeight);
     }
 
     public fillMusicFontSymbol(
@@ -306,15 +307,15 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.fillText(
             symbols,
             SkiaCanvas.musicFont!,
-            Environment.MusicFontSize * this.settings.display.scale * relativeScale,
-            x, y,
+            Environment.MusicFontSize * this._scale * relativeScale,
+            x * this._scale, y * this._scale,
             centerAtPosition ? SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Center : SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Left,
             SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic
         );
     }
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
-        this._canvas.beginRotate(centerX, centerY, angle);
+        this._canvas.beginRotate(centerX * this._scale, centerY * this._scale, angle);
     }
 
     public endRotate(): void {

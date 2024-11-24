@@ -3,9 +3,10 @@ import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
+import { Color } from '@src/model';
 
 export class ChordDiagramGlyph extends EffectGlyph {
-    private static readonly Padding: number = 5;
+    private static readonly Padding: number[] = [5, 2];
     private static readonly Frets: number = 5;
     private static readonly CircleRadius: number = 2.5;
     private static readonly StringSpacing: number = 10;
@@ -34,18 +35,17 @@ export class ChordDiagramGlyph extends EffectGlyph {
         this.height =
             this._textRow +
             this._fretRow +
-            (ChordDiagramGlyph.Frets - 1) * ChordDiagramGlyph.FretSpacing +
-            2 * ChordDiagramGlyph.Padding;
+            ChordDiagramGlyph.Frets * ChordDiagramGlyph.FretSpacing +
+            2 * ChordDiagramGlyph.Padding[1];
         this.width =
             this._firstFretSpacing +
             (this._chord.staff.tuning.length - 1) * ChordDiagramGlyph.StringSpacing +
-            2 * ChordDiagramGlyph.Padding;
+            2 * ChordDiagramGlyph.Padding[0];
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        cx += this.x + ChordDiagramGlyph.Padding + this._firstFretSpacing;
+        cx += this.x;
         cy += this.y;
-        let w: number = this.width - 2 * ChordDiagramGlyph.Padding + 1 - this._firstFretSpacing;
         let stringSpacing: number = ChordDiagramGlyph.StringSpacing;
         let fretSpacing: number = ChordDiagramGlyph.FretSpacing;
         let res: RenderingResources = this.renderer.resources;
@@ -60,8 +60,8 @@ export class ChordDiagramGlyph extends EffectGlyph {
             canvas.fillText(this._chord.name, cx + this.width / 2, cy + res.effectFont.size / 2);
         }
 
+        cx += ChordDiagramGlyph.Padding[0] + this._firstFretSpacing;
         cy += this._textRow;
-        cx += stringSpacing / 2;
         canvas.font = res.fretboardNumberFont;
         canvas.textBaseline = TextBaseline.Middle;
         for (let i: number = 0; i < this._chord.staff.tuning.length; i++) {
@@ -89,6 +89,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             canvas.fillText(this._chord.firstFret.toString(), cx - this._firstFretSpacing, cy + fretSpacing / 2);
         }
 
+        let w: number = this.width - 2 * ChordDiagramGlyph.Padding[0] - this._firstFretSpacing;
         canvas.fillRect(cx, cy - 1, w, 2);
         for (let i: number = 0; i <= ChordDiagramGlyph.Frets; i++) {
             let y: number = cy + i * fretSpacing;
@@ -120,7 +121,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             }
         }
 
-        for(const [fret, strings] of barreLookup) {
+        for (const [fret, strings] of barreLookup) {
             let y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
             let xLeft: number = cx + (this._chord.strings.length - strings[1] - 1) * stringSpacing;
             let xRight: number = cx + (this._chord.strings.length - strings[0] - 1) * stringSpacing;
