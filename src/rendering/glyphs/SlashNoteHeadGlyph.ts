@@ -28,16 +28,16 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let offset: number = this._isGrace ? this.scale : 0;
+        let offset: number = this._isGrace ? 1 : 0;
         const glyphScale = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, glyphScale * this.scale, this._symbol, false);
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, glyphScale, this._symbol, false);
         for (const g of this.beatEffects.values()) {
             g.paint(cx + this.x, cy + this.y, canvas);
         }
     }
 
     public override doLayout(): void {
-        const scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        const scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
         switch (this._duration) {
             case Duration.QuadrupleWhole:
             case Duration.DoubleWhole:
@@ -53,8 +53,8 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
         }
         this.height = SlashNoteHeadGlyph.NoteHeadHeight * scale;
 
-        let effectSpacing: number = 7 * this.scale;
-        let effectY = SlashNoteHeadGlyph.NoteHeadHeight * this.scale;
+        let effectSpacing: number = 7;
+        let effectY = SlashNoteHeadGlyph.NoteHeadHeight;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;

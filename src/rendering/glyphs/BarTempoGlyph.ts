@@ -17,7 +17,7 @@ export class BarTempoGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = 25 * this.scale;
+        this.height = 25;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -31,7 +31,7 @@ export class BarTempoGlyph extends EffectGlyph {
             canvas.fillMusicFontSymbol(
                 x,
                 cy + this.y + this.height * 0.8,
-                this.scale * NoteHeadGlyph.GraceScale,
+                NoteHeadGlyph.GraceScale,
                 MusicFontSymbol.NoteQuarterUp,
                 false
             );

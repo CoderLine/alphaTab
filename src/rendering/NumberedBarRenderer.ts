@@ -93,16 +93,15 @@ export class NumberedBarRenderer extends LineBarRenderer {
         if (!this.bar.isEmpty) {
             let barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
             if (barCount > 0) {
-                let barSpacing: number = NumberedBarRenderer.BarSpacing * this.scale;
-                let barSize: number = NumberedBarRenderer.BarSize * this.scale;
+                let barSpacing: number = NumberedBarRenderer.BarSpacing;
+                let barSize: number = NumberedBarRenderer.BarSize;
                 let barOverflow = (barCount - 1) * barSpacing + barSize;
 
                 let dotOverflow = 0;
                 const lowestOctave = this.lowestOctave;
                 if (lowestOctave  !== null) {
                     dotOverflow =
-                        (Math.abs(lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
-                        this.scale;
+                        (Math.abs(lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize);
                 }
 
                 this.registerOverflowBottom(barOverflow + dotOverflow);
@@ -111,8 +110,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             const highestOctave = this.highestOctave;
             if (highestOctave !== null) {
                 const dotOverflow =
-                    (Math.abs(highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize) *
-                    this.scale;
+                    (Math.abs(highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize);
                 this.registerOverflowTop(dotOverflow);
             }
         }
@@ -136,8 +134,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
             //
             // draw line
             //
-            let barSpacing: number = NumberedBarRenderer.BarSpacing * this.scale;
-            let barSize: number = NumberedBarRenderer.BarSize * this.scale;
+            let barSpacing: number = NumberedBarRenderer.BarSpacing;
+            let barSize: number = NumberedBarRenderer.BarSize;
             let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             let barStart: number = cy + this.y;
 
@@ -175,17 +173,17 @@ export class NumberedBarRenderer extends LineBarRenderer {
             let dotsOffset = 0;
             if (dotCount > 0) {
                 dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
-                dotsOffset = NumberedBarRenderer.DotSpacing * (-1) * this.scale;
+                dotsOffset = NumberedBarRenderer.DotSpacing * (-1);
             } else if (dotCount < 0) {
                 dotsY = barStart + beamY + barCount * barSpacing;
-                dotsOffset = NumberedBarRenderer.DotSpacing * this.scale;
+                dotsOffset = NumberedBarRenderer.DotSpacing;
             }
-            let dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + 4 * this.scale - this.beatGlyphsStart;
+            let dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + 4 - this.beatGlyphsStart;
 
             dotCount = Math.abs(dotCount);
 
             for (let d = 0; d < dotCount; d++) {
-                canvas.fillCircle(cx + this.x + dotX, dotsY, NumberedBarRenderer.DotSize * this.scale);
+                canvas.fillCircle(cx + this.x + dotX, dotsY, NumberedBarRenderer.DotSize);
                 dotsY += dotsOffset;
             }
         }
@@ -196,15 +194,15 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get tupletOffset(): number {
-        return super.tupletOffset + this.resources.numberedNotationFont.size * this.scale; 
+        return super.tupletOffset + this.resources.numberedNotationFont.size; 
     }
 
     protected override getFlagTopY(_beat: Beat, _direction:BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
+        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
+        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -225,11 +223,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override calculateBeamYWithDirection(_h: BeamingHelper, _x: number, _direction: BeamDirection): number {
         const res = this.resources.numberedNotationFont;
-        return this.getLineY(0) + res.size * this.scale;
+        return this.getLineY(0) + res.size;
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2) * this.scale;
+        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -271,7 +269,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5 * this.scale));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const masterBar = this.bar.masterBar;
         this.addPreBeatGlyph(
@@ -309,11 +307,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        canvas.lineWidth = BarRendererBase.StemWidth * this.scale;
+        canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);
         canvas.lineTo(x, bottomY);
         canvas.stroke();
-        canvas.lineWidth = this.scale;
+        canvas.lineWidth = 1;
     }
 }

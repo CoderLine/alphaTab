@@ -60,6 +60,10 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
+    public get scaledWidth() {
+        return this.width / this.renderer.settings.display.scale;
+    }
+
     protected scoreInfoGlyphs: Map<NotationElement, TextGlyph> = new Map();
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
     protected tuningGlyph: TuningContainerGlyph | null = null;
@@ -103,9 +107,18 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        if(args.height == 0){
+        if (args.height == 0) {
             return;
         }
+
+        const scale = this.renderer.settings.display.scale;
+        args.x *= scale;
+        args.y *= scale;
+        args.width *= scale;
+        args.height *= scale;
+        args.totalWidth *= scale;
+        args.totalHeight *= scale;
+
         if (!this.renderer.settings.core.enableLazyLoading) {
             // in case of no lazy loading -> first notify about layout, then directly render
             (this.renderer.partialLayoutFinished as EventEmitterOfT<RenderFinishedEventArgs>).trigger(args);
@@ -190,7 +203,7 @@ export abstract class ScoreLayout {
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
 
-        for(const [_e, glyph] of this.scoreInfoGlyphs) {
+        for (const [_e, glyph] of this.scoreInfoGlyphs) {
             glyph.renderer = fakeBarRenderer;
             glyph.doLayout();
         }
@@ -238,10 +251,6 @@ export abstract class ScoreLayout {
         }
     }
 
-    public get scale(): number {
-        return this.renderer.settings.display.scale;
-    }
-
     public firstBarIndex: number = 0;
 
     public lastBarIndex: number = 0;
@@ -252,7 +261,9 @@ export abstract class ScoreLayout {
             let track: Track = this.renderer.tracks![trackIndex];
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
                 let staff: Staff = track.staves[staffIndex];
-                let profile: BarRendererFactory[] = Environment.staveProfiles.get(this.renderer.settings.display.staveProfile)!;
+                let profile: BarRendererFactory[] = Environment.staveProfiles.get(
+                    this.renderer.settings.display.staveProfile
+                )!;
                 for (let factory of profile) {
                     if (factory.canCreate(track, staff)) {
                         system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
@@ -289,7 +300,7 @@ export abstract class ScoreLayout {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         let msg: string = 'rendered by alphaTab';
         let resources: RenderingResources = this.renderer.settings.display.resources;
-        let size: number = 12 * this.renderer.settings.display.scale;
+        let size: number = 12;
         let height: number = Math.floor(size);
 
         const e = new RenderFinishedEventArgs();
@@ -298,14 +309,12 @@ export abstract class ScoreLayout {
         this.renderer.canvas!.font = font;
 
         const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
-        e.width = this.renderer.canvas!.measureText(msg).width;
+        e.width = this.renderer.canvas!.measureText(msg).width / this.renderer.settings.display.scale;
         e.height = height;
-        e.x = centered
-            ? (this.width - e.width) / 2
-            : this.firstBarX;
+        e.x = centered ? (this.scaledWidth - e.width) / 2 : this.firstBarX;
         e.y = y;
 
-        e.totalWidth = this.width;
+        e.totalWidth = this.scaledWidth;
         e.totalHeight = y + height;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;

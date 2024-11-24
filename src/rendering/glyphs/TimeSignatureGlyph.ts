@@ -31,7 +31,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
 
     public override doLayout(): void {
         let x = 0;
-        const numberHeight = NumberGlyph.numberHeight * this.scale;
+        const numberHeight = NumberGlyph.numberHeight;
         if (this._isFreeTime) {
             const g = new GhostParenthesisGlyph(true);
             g.renderer = this.renderer;
@@ -39,17 +39,17 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             g.height = numberHeight * 2;
             g.doLayout();
             this.addGlyph(g);
-            x += g.width + 10 * this.scale;
+            x += g.width + 10 * 1;
         }
 
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
             let common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
-            common.width = 14 * this.scale;
+            common.width = 14;
             this.addGlyph(common);
             super.doLayout();
         } else if (this._isCommon && this._numerator === 4 && this._denominator === 4) {
             let common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
-            common.width = 14 * this.scale;
+            common.width = 14;
             this.addGlyph(common);
             super.doLayout();
         } else {
@@ -67,7 +67,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         if (this._isFreeTime) {
             const g = new GhostParenthesisGlyph(false);
             g.renderer = this.renderer;
-            g.x = this.width + 13 * this.scale;
+            g.x = this.width + 13;
             g.y = -numberHeight;
             g.height = numberHeight * 2;
             g.doLayout();

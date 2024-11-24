@@ -83,23 +83,23 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             this._preNoteParenthesis!.x = x;
             this._preNoteParenthesis!.renderer = this.renderer;
             this._preNoteParenthesis!.doLayout();
-            x += this._preNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
+            x += this._preNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding;
         }
         if (!this._accidentals.isEmpty) {
-            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
+            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding;
             this._accidentals.x = x;
             this._accidentals.renderer = this.renderer;
             this._accidentals.doLayout();
-            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
+            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding;
         }
         this.noteStartX = x;
         super.doLayout();
         this.noteHeadOffset = this.noteStartX + (this.width - this.noteStartX) / 2;
         if (this._showParenthesis) {
-            this._postNoteParenthesis!.x = this.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
+            this._postNoteParenthesis!.x = this.width + BendNoteHeadGroupGlyph.ElementPadding;
             this._postNoteParenthesis!.renderer = this.renderer;
             this._postNoteParenthesis!.doLayout();
-            this.width += this._postNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding * this.scale;
+            this.width += this._postNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding;
         }
     }
 

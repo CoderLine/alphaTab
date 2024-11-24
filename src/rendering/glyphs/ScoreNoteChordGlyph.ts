@@ -191,7 +191,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 tremoloX = this.width / 2;
             }
 
-            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + offset * this.scale, speed);
+            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + offset, speed);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();
         }
@@ -215,10 +215,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         for (const g of this.aboveBeatEffects.values()) {
-            g.paint(cx + this.x + 2 * this.scale, cy + this.y, canvas);
+            g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
         for (const g of this.belowBeatEffects.values()) {
-            g.paint(cx + this.x + 2 * this.scale, cy + this.y, canvas);
+            g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {

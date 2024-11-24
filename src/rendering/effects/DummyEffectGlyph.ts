@@ -13,8 +13,8 @@ export class DummyEffectGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = this._w * this.scale;
-        this.height = this._h * this.scale;
+        this.width = this._w;
+        this.height = this._h;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

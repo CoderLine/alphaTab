@@ -73,26 +73,26 @@ export class BoundsLookup {
         let staffSystems: StaffSystemBounds[] = (json as any)['staffSystems'];
         for (let staffSystem of staffSystems) {
             let sg: StaffSystemBounds = new StaffSystemBounds();
-            sg.visualBounds = staffSystem.visualBounds;
-            sg.realBounds = staffSystem.realBounds;
+            sg.visualBounds = BoundsLookup.boundsFromJson(staffSystem.visualBounds);
+            sg.realBounds = BoundsLookup.boundsFromJson(staffSystem.realBounds);
             lookup.addStaffSystem(sg);
             for (let masterBar of staffSystem.bars) {
                 let mb: MasterBarBounds = new MasterBarBounds();
                 mb.index = masterBar.index;
                 mb.isFirstOfLine = masterBar.isFirstOfLine;
-                mb.lineAlignedBounds = masterBar.lineAlignedBounds;
-                mb.visualBounds = masterBar.visualBounds;
-                mb.realBounds = masterBar.realBounds;
+                mb.lineAlignedBounds = BoundsLookup.boundsFromJson(masterBar.lineAlignedBounds);
+                mb.visualBounds = BoundsLookup.boundsFromJson(masterBar.visualBounds);
+                mb.realBounds = BoundsLookup.boundsFromJson(masterBar.realBounds);
                 sg.addBar(mb);
                 for (let bar of masterBar.bars) {
                     let b: BarBounds = new BarBounds();
-                    b.visualBounds = bar.visualBounds;
-                    b.realBounds = bar.realBounds;
+                    b.visualBounds = BoundsLookup.boundsFromJson(bar.visualBounds);
+                    b.realBounds = BoundsLookup.boundsFromJson(bar.realBounds);
                     mb.addBar(b);
                     for (let beat of bar.beats) {
                         let bb: BeatBounds = new BeatBounds();
-                        bb.visualBounds = beat.visualBounds;
-                        bb.realBounds = beat.realBounds;
+                        bb.visualBounds = BoundsLookup.boundsFromJson(beat.visualBounds);
+                        bb.realBounds = BoundsLookup.boundsFromJson(beat.realBounds);
                         let bd: any = beat;
                         bb.beat =
                             score.tracks[bd.trackIndex].staves[bd.staffIndex].bars[bd.barIndex].voices[
@@ -114,6 +114,20 @@ export class BoundsLookup {
             }
         }
         return lookup;
+    }
+
+    /**
+     * @target web
+     */
+    private static boundsFromJson(boundsRaw: Bounds): Bounds {
+        // TODO: can we just set the right prototype here?
+        // Object.setPrototypeOf(...)
+        const b = new Bounds();
+        b.x = boundsRaw.x;
+        b.y = boundsRaw.y;
+        b.w = boundsRaw.w;
+        b.h = boundsRaw.h;
+        return b;
     }
 
     /**
@@ -144,9 +158,9 @@ export class BoundsLookup {
     /**
      * Finishes the lookup for optimized access.
      */
-    public finish(): void {
+    public finish(scale: number = 1): void {
         for (let t of this.staffSystems) {
-            t.finish();
+            t.finish(scale);
         }
         this.isFinished = true;
     }

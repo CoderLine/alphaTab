@@ -13,20 +13,20 @@ export class CssFontSvgCanvas extends SvgCanvas {
     public fillMusicFontSymbol(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol,
         centerAtPosition?: boolean
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, scale, `&#${symbol};`, centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, `&#${symbol};`, centerAtPosition);
     }
 
     public fillMusicFontSymbols(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: MusicFontSymbol[],
         centerAtPosition?: boolean
     ): void {
@@ -36,17 +36,21 @@ export class CssFontSvgCanvas extends SvgCanvas {
                 s += `&#${symbol};`;
             }
         }
-        this.fillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
     private fillMusicFontSymbolText(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: string,
         centerAtPosition?: boolean
     ): void {
+        x *= this.scale;
+        y *= this.scale;
+
         this.buffer += `<g transform="translate(${x} ${y})" class="at" ><text`;
+        const scale = this.scale * relativeScale;
         if (scale !== 1) {
             this.buffer += ` style="font-size: ${scale * 100}%; stroke:none"`;
         } else {

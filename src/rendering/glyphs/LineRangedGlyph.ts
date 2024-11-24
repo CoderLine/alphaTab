@@ -37,11 +37,11 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         this.paintNonGrouped(cx, cy, canvas);
-        let lineSpacing: number = 3 * this.scale;
+        let lineSpacing: number = 3;
         let textWidth: number = canvas.measureText(this._label).width;
         let startX: number = cx + this.x + textWidth / 2 + lineSpacing;
-        let lineY: number = cy + this.y + 4 * this.scale;
-        let lineSize: number = 8 * this.scale;
+        let lineY: number = cy + this.y + 4;
+        let lineSize: number = 8;
         if (this._dashed) {
             if (endX > startX) {
                 let lineX: number = startX;
@@ -53,15 +53,15 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
                     canvas.stroke();
                 }
                 canvas.beginPath();
-                canvas.moveTo(endX, (lineY - 5 * this.scale) | 0);
-                canvas.lineTo(endX, (lineY + 5 * this.scale) | 0);
+                canvas.moveTo(endX, (lineY - 5) | 0);
+                canvas.lineTo(endX, (lineY + 5) | 0);
                 canvas.stroke();
             }
         } else {
             canvas.beginPath();
             canvas.moveTo(startX, lineY | 0);
             canvas.lineTo(endX, lineY | 0);
-            canvas.lineTo(endX, (lineY + 5 * this.scale) | 0);
+            canvas.lineTo(endX, (lineY + 5) | 0);
             canvas.stroke();
         }
     }

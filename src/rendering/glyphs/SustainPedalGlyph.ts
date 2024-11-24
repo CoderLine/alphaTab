@@ -18,7 +18,7 @@ export class SustainPedalGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = SustainPedalGlyph.TextHeight * this.scale;
+        this.height = SustainPedalGlyph.TextHeight;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -46,11 +46,11 @@ export class SustainPedalGlyph extends EffectGlyph {
                 if (marker.pedalType === SustainPedalMarkerType.Down) {
                     canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalPed, true);
                     linePadding =
-                        (SustainPedalGlyph.TextWidth / 2) * this.scale + SustainPedalGlyph.TextLinePadding * this.scale;
+                        (SustainPedalGlyph.TextWidth / 2) + SustainPedalGlyph.TextLinePadding;
                 } else if (marker.pedalType === SustainPedalMarkerType.Up) {
                     canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
                     linePadding =
-                        (SustainPedalGlyph.StarSize / 2) * this.scale + SustainPedalGlyph.StarLinePadding * this.scale;
+                        (SustainPedalGlyph.StarSize / 2) + SustainPedalGlyph.StarLinePadding;
                 }
 
                 // line to next marker or end-of-bar
@@ -60,24 +60,24 @@ export class SustainPedalGlyph extends EffectGlyph {
 
                         switch (marker.nextPedalMarker.pedalType) {
                             case SustainPedalMarkerType.Down:
-                                nextX -= (SustainPedalGlyph.TextWidth / 2) * this.scale;
+                                nextX -= (SustainPedalGlyph.TextWidth / 2);
                                 break;
                             case SustainPedalMarkerType.Hold:
                                 // no offset on hold
                                 break;
                             case SustainPedalMarkerType.Up:
-                                nextX -= (SustainPedalGlyph.StarSize / 2) * this.scale;
+                                nextX -= (SustainPedalGlyph.StarSize / 2);
                                 break;
                         }
 
                         const startX = markerX + linePadding;
                         if (nextX > startX) {
-                            canvas.fillRect(startX, y + h - this.scale, nextX - startX, this.scale);
+                            canvas.fillRect(startX, y + h - 1, nextX - startX, 1);
                         }
                     } else {
                         const nextX = cx + this.x + this.width;
                         const startX = markerX + linePadding;
-                        canvas.fillRect(startX, y + h - this.scale, nextX - startX, this.scale);
+                        canvas.fillRect(startX, y + h - 1, nextX - startX, 1);
                     }
                 }
 
@@ -85,7 +85,7 @@ export class SustainPedalGlyph extends EffectGlyph {
                 if (markerIndex === 0 && marker.previousPedalMarker) {
                     const startX = cx + this.x;
                     const endX = markerX - linePadding;
-                    canvas.fillRect(startX, y + h - this.scale, endX - startX, this.scale);
+                    canvas.fillRect(startX, y + h - 1, endX - startX, 1);
                 }
 
                 markerIndex++;

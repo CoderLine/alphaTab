@@ -33,7 +33,7 @@ export class TextGlyph extends EffectGlyph {
         for (const line of this._lines) {
             c.font = this.font;
             const size = c!.measureText(line);
-            const h = size.height * this.scale;
+            const h = size.height;
             this._lineHeights.push(h);
             this.height += h;
             this.width = Math.max(this.width, size.width);

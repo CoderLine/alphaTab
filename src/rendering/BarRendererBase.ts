@@ -178,10 +178,6 @@ export class BarRendererBase {
         return this.scoreRenderer.settings;
     }
 
-    public get scale(): number {
-        return this.settings.display.scale;
-    }
-
     /**
      * Gets the scale with which the bar should be displayed in case the model
      * scale should be respected.
@@ -366,7 +362,7 @@ export class BarRendererBase {
         }
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
-        this.height += this.layoutingInfo.height * this.scale;
+        this.height += this.layoutingInfo.height;
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -544,7 +540,7 @@ export class BarRendererBase {
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
                 canvas.fillMusicFontSymbol(
-                    cx + this.x + (this.width - 20 * this.scale) / 2,
+                    cx + this.x + (this.width - 20) / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat1Bar,
@@ -553,7 +549,7 @@ export class BarRendererBase {
                 break;
             case SimileMark.SecondOfDouble:
                 canvas.fillMusicFontSymbol(
-                    cx + this.x - (28 * this.scale) / 2,
+                    cx + this.x - 28 / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat2Bars,

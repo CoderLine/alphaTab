@@ -5,12 +5,12 @@ import { NumberedBarRenderer } from '../NumberedBarRenderer';
 export class NumberedDashGlyph extends Glyph {
     private static Padding = 3;
     public override doLayout(): void {
-        this.width = (14 + NumberedDashGlyph.Padding) * this.scale;
-        this.height = NumberedBarRenderer.BarSize * this.scale;
+        this.width = (14 + NumberedDashGlyph.Padding);
+        this.height = NumberedBarRenderer.BarSize;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const padding = NumberedDashGlyph.Padding * this.scale;
+        const padding = NumberedDashGlyph.Padding;
         canvas.fillRect(cx + this.x, cy + this.y, this.width - padding, this.height);
     }
 }

@@ -41,6 +41,6 @@ export class AccidentalGlyph extends MusicFontGlyph {
                 this.width = 8;
                 break;
         }
-        this.width = this.width * this.glyphScale * this.scale;
+        this.width = this.width * this.glyphScale;
     }
 }

@@ -189,7 +189,7 @@ export class VisualTestHelper {
                 }
             });
             api.error.on(e => {
-                reject(new AlphaTabError(AlphaTabErrorType.General, 'Failed to render image', e));
+                reject(new AlphaTabError(AlphaTabErrorType.General, `Failed to render image (${e.message} ${e.stack})`, e));
             });
 
             // NOTE: on some platforms we serialize/deserialize the score objects

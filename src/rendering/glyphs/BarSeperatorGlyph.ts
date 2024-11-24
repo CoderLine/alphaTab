@@ -10,30 +10,30 @@ export class BarSeperatorGlyph extends Glyph {
 
     public override doLayout(): void {
         if (this.renderer.isLast) {
-            this.width = 15 * this.scale;
+            this.width = 15;
         } else if (
             !this.renderer.nextRenderer ||
             this.renderer.nextRenderer.staff !== this.renderer.staff ||
             !this.renderer.nextRenderer.bar.masterBar.isRepeatStart
         ) {
-            this.width = 2 * this.scale;
+            this.width = 2;
             if (this.renderer.bar.masterBar.isDoubleBar) {
-                this.width += 2 * this.scale;
+                this.width += 2;
             }
         } else {
-            this.width = 2 * this.scale;
+            this.width = 2;
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let blockWidth: number = 4 * this.scale;
+        let blockWidth: number = 4;
         let top: number = cy + this.y + this.renderer.topPadding;
         let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
         let left: number = cx + this.x;
         let h: number = bottom - top;
         if (this.renderer.isLast) {
             // small bar
-            canvas.fillRect(left + this.width - blockWidth - blockWidth, top, this.scale, h);
+            canvas.fillRect(left + this.width - blockWidth - blockWidth, top, 1, h);
             // big bar
             canvas.fillRect(left + this.width - blockWidth, top, blockWidth, h);
         } else if (
@@ -43,8 +43,8 @@ export class BarSeperatorGlyph extends Glyph {
         ) {
             // small bar
             if (this.renderer.bar.masterBar.isFreeTime) {
-                const dashSize: number = BarSeperatorGlyph.DashSize * this.scale;
-                const x = ((left + this.width - this.scale) | 0) + 0.5;
+                const dashSize: number = BarSeperatorGlyph.DashSize;
+                const x = ((left + this.width - 1) | 0) + 0.5;
                 const dashes: number = Math.ceil(h / 2 / dashSize);
 
                 canvas.beginPath();
@@ -66,9 +66,9 @@ export class BarSeperatorGlyph extends Glyph {
                 }
                 canvas.stroke();
             } else {
-                canvas.fillRect(left + this.width - this.scale, top, this.scale, h);
+                canvas.fillRect(left + this.width - 1, top, 1, h);
                 if (this.renderer.bar.masterBar.isDoubleBar) {
-                    canvas.fillRect(left + this.width - 5 * this.scale, top, this.scale, h);
+                    canvas.fillRect(left + this.width - 5, top, 1, h);
                 }
             }
         }

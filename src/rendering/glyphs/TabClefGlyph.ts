@@ -8,7 +8,7 @@ export class TabClefGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 28 * this.scale;
+        this.width = 28;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -16,9 +16,9 @@ export class TabClefGlyph extends Glyph {
         let symbol: MusicFontSymbol = strings <= 4 ? MusicFontSymbol.FourStringTabClef : MusicFontSymbol.SixStringTabClef;
         let scale: number = strings <= 4 ? strings / 4.5 : strings / 6.5;
         canvas.fillMusicFontSymbol(
-            cx + this.x + 5 * this.scale,
+            cx + this.x + 5,
             cy + this.y,
-            scale * this.scale,
+            scale,
             symbol,
             false
         );

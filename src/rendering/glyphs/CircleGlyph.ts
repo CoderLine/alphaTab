@@ -10,7 +10,7 @@ export class CircleGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = this._size + 3 * this.scale;
+        this.width = this._size + 3;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

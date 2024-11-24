@@ -47,6 +47,8 @@ export class Html5Canvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
+        const scale = this.settings.display.scale;
+
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
         this._canvas.height = (height * Environment.HighDpiFactor) | 0;
@@ -54,7 +56,7 @@ export class Html5Canvas implements ICanvas {
         this._canvas.style.height = height + 'px';
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
-        this._context.scale(Environment.HighDpiFactor, Environment.HighDpiFactor);
+        this._context.scale(Environment.HighDpiFactor * scale, Environment.HighDpiFactor * scale);
         this._context.lineWidth = this._lineWidth;
     }
 
@@ -151,9 +153,9 @@ export class Html5Canvas implements ICanvas {
     public set font(value: Font) {
         this._font = value;
         if (this._context) {
-            this._context.font = value.toCssString(this.settings.display.scale);
+            this._context.font = value.toCssString(1);
         }
-        this._measureContext.font = value.toCssString(this.settings.display.scale);
+        this._measureContext.font = value.toCssString(1);
     }
 
     public get textAlign(): TextAlign {
@@ -230,33 +232,20 @@ export class Html5Canvas implements ICanvas {
     public fillMusicFontSymbol(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol,
         centerAtPosition: boolean = false
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), centerAtPosition);
-    }
-
-    public fillMusicFontSymbolFit(
-        x: number,
-        y: number,
-        maxWidth: number,
-        scale: number,
-        symbol: MusicFontSymbol
-    ): void {
-        if (symbol === MusicFontSymbol.None) {
-            return;
-        }
-        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), false, maxWidth);
+        this.fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), centerAtPosition);
     }
 
     public fillMusicFontSymbols(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: MusicFontSymbol[],
         centerAtPosition: boolean = false
     ): void {
@@ -266,28 +255,27 @@ export class Html5Canvas implements ICanvas {
                 s += String.fromCharCode(symbol);
             }
         }
-        this.fillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
     private fillMusicFontSymbolText(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: string,
-        centerAtPosition: boolean,
-        maxWidth: number = 0
+        centerAtPosition: boolean
     ): void {
         let textAlign = this._context.textAlign;
         let baseLine = this._context.textBaseline;
         let font: string = this._context.font;
-        this._context.font = this._musicFont.toCssString(scale);
+        this._context.font = this._musicFont.toCssString(relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
         } else {
             this._context.textAlign = 'left';
         }
-        this._context.fillText(symbols, x, y, maxWidth);
+        this._context.fillText(symbols, x, y);
         this._context.textBaseline = baseLine;
         this._context.font = font;
         this._context.textAlign = textAlign;

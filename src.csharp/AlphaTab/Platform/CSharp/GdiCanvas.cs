@@ -70,7 +70,7 @@ namespace AlphaTab.Platform.CSharp
             var type = typeof(GdiCanvas).GetTypeInfo();
             using var bravura =
                 type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
-            var dataPtr = Marshal.AllocCoTaskMem((int) bravura.Length);
+            var dataPtr = Marshal.AllocCoTaskMem((int)bravura.Length);
             try
             {
                 var fontData = new byte[bravura.Length];
@@ -93,7 +93,7 @@ namespace AlphaTab.Platform.CSharp
             if (!FontLookup.TryGetValue(scale, out var font))
             {
                 FontLookup[scale] = font =
-                    new GdiFont(MusicFontCollection.Families[0], (float) (34 * scale),
+                    new GdiFont(MusicFontCollection.Families[0], (float)(34 * scale),
                         GdiFontStyle.Regular,
                         GraphicsUnit.Pixel);
             }
@@ -123,6 +123,8 @@ namespace AlphaTab.Platform.CSharp
         private Pen _pen;
         private GdiColor _color;
 
+        private double _scale;
+
         public Settings Settings { get; set; }
 
         public Model.Color Color
@@ -135,8 +137,8 @@ namespace AlphaTab.Platform.CSharp
                     throw new ArgumentNullException(nameof(value));
                 }
 
-                _color = GdiColor.FromArgb((byte) value.A, (byte) value.R, (byte) value.G,
-                    (byte) value.B);
+                _color = GdiColor.FromArgb((byte)value.A, (byte)value.R, (byte)value.G,
+                    (byte)value.B);
                 RecreateBrush();
                 RecreatePen();
             }
@@ -178,14 +180,14 @@ namespace AlphaTab.Platform.CSharp
 
                 if (CustomFontFamilies.TryGetValue(value.Family, out var gdiFamily))
                 {
-                    _font = new GdiFont(gdiFamily, (float) (value.Size * Settings.Display.Scale),
+                    _font = new GdiFont(gdiFamily, (float)(value.Size * Settings.Display.Scale),
                         fontStyle,
                         GraphicsUnit.Pixel);
 
                 }
                 else
                 {
-                    _font = new GdiFont(value.Family, (float) (value.Size * Settings.Display.Scale),
+                    _font = new GdiFont(value.Family, (float)(value.Size * Settings.Display.Scale),
                         fontStyle,
                         GraphicsUnit.Pixel);
                 }
@@ -275,6 +277,7 @@ namespace AlphaTab.Platform.CSharp
 
         public void BeginRender(double width, double height)
         {
+            _scale = Settings.Display.Scale;
             _width = width;
             _height = height;
             RecreateImage();
@@ -302,7 +305,7 @@ namespace AlphaTab.Platform.CSharp
 
         private void RecreateImage()
         {
-            var newImage = new Bitmap((int) _width, (int) _height, PixelFormat.Format32bppPArgb);
+            var newImage = new Bitmap((int)_width, (int)_height, PixelFormat.Format32bppPArgb);
             var newGraphics = Graphics.FromImage(newImage);
             newGraphics.CompositingMode = CompositingMode.SourceOver;
             newGraphics.SmoothingMode = SmoothingMode.HighQuality;
@@ -316,7 +319,7 @@ namespace AlphaTab.Platform.CSharp
 
         private void RecreatePen()
         {
-            var newPen = new Pen(_color, (float) _lineWidth);
+            var newPen = new Pen(_color, (float)_lineWidth);
             _pen?.Dispose();
 
             _pen = newPen;
@@ -332,12 +335,22 @@ namespace AlphaTab.Platform.CSharp
 
         public void FillRect(double x, double y, double w, double h)
         {
-            _graphics.FillRectangle(_brush, (float) x, (float) y, (float) w, (float) h);
+            x *= _scale;
+            y *= _scale;
+            w *= _scale;
+            h *= _scale;
+
+            _graphics.FillRectangle(_brush, (float)x, (float)y, (float)w, (float)h);
         }
 
         public void StrokeRect(double x, double y, double w, double h)
         {
-            _graphics.DrawRectangle(_pen, (float) x, (float) y, (float) w, (float) h);
+            x *= _scale;
+            y *= _scale;
+            w *= _scale;
+            h *= _scale;
+
+            _graphics.DrawRectangle(_pen, (float)x, (float)y, (float)w, (float)h);
         }
 
         public void BeginPath()
@@ -352,21 +365,32 @@ namespace AlphaTab.Platform.CSharp
 
         public void MoveTo(double x, double y)
         {
+            x *= _scale;
+            y *= _scale;
+
             _currentX = x;
             _currentY = y;
         }
 
         public void LineTo(double x, double y)
         {
-            _currentPath.AddLine((float) _currentX, (float) _currentY, (float) x, (float) y);
+            x *= _scale;
+            y *= _scale;
+
+            _currentPath.AddLine((float)_currentX, (float)_currentY, (float)x, (float)y);
             _currentX = x;
             _currentY = y;
         }
 
         public void QuadraticCurveTo(double cpx, double cpy, double x, double y)
         {
-            _currentPath.AddBezier((float) _currentX, (float) _currentY, (float) cpx, (float) cpy,
-                (float) cpx, (float) cpy, (float) x, (float) y);
+            cpx *= _scale;
+            cpy *= _scale;
+            x *= _scale;
+            y *= _scale;
+
+            _currentPath.AddBezier((float)_currentX, (float)_currentY, (float)cpx, (float)cpy,
+                (float)cpx, (float)cpy, (float)x, (float)y);
             _currentX = x;
             _currentY = y;
         }
@@ -374,17 +398,28 @@ namespace AlphaTab.Platform.CSharp
         public void BezierCurveTo(double cp1x, double cp1y, double cp2x, double cp2y, double x,
             double y)
         {
-            _currentPath.AddBezier((float) _currentX, (float) _currentY, (float) cp1x, (float) cp1y,
-                (float) cp2x, (float) cp2y, (float) x, (float) y);
+            cp1x *= _scale;
+            cp1y *= _scale;
+            cp2x *= _scale;
+            cp2y *= _scale;
+            x *= _scale;
+            y *= _scale;
+
+            _currentPath.AddBezier((float)_currentX, (float)_currentY, (float)cp1x, (float)cp1y,
+                (float)cp2x, (float)cp2y, (float)x, (float)y);
             _currentX = x;
             _currentY = y;
         }
 
         public void FillCircle(double x, double y, double radius)
         {
+            x *= _scale;
+            y *= _scale;
+            radius *= _scale;
+
             _currentPath.StartFigure();
-            _currentPath.AddEllipse((float) (x - radius), (float) (y - radius), (float) radius * 2,
-                (float) radius * 2);
+            _currentPath.AddEllipse((float)(x - radius), (float)(y - radius), (float)radius * 2,
+                (float)radius * 2);
             _currentPath.CloseFigure();
             _currentX = x;
             _currentY = y;
@@ -393,9 +428,13 @@ namespace AlphaTab.Platform.CSharp
 
         public void StrokeCircle(double x, double y, double radius)
         {
+            x *= _scale;
+            y *= _scale;
+            radius *= _scale;
+
             _currentPath.StartFigure();
-            _currentPath.AddEllipse((float) (x - radius), (float) (y - radius), (float) radius * 2,
-                (float) radius * 2);
+            _currentPath.AddEllipse((float)(x - radius), (float)(y - radius), (float)radius * 2,
+                (float)radius * 2);
             _currentPath.CloseFigure();
             _currentX = x;
             _currentY = y;
@@ -418,14 +457,17 @@ namespace AlphaTab.Platform.CSharp
 
         public void FillText(string text, double x, double y)
         {
-            _graphics.DrawString(text, _font, _brush, new PointF((float) x, (float) y), _stringFormat);
+            x *= _scale;
+            y *= _scale;
+
+            _graphics.DrawString(text, _font, _brush, new PointF((float)x, (float)y), _stringFormat);
         }
 
         public TextMetrics MeasureText(string text)
         {
             lock (MeasurementGraphics)
             {
-                var measured = MeasurementGraphics.MeasureString(text, _font, new PointF(0,0), _stringFormat);
+                var measured = MeasurementGraphics.MeasureString(text, _font, new PointF(0, 0), _stringFormat);
                 return new TextMetrics(measured.Width, measured.Height);
             }
         }
@@ -439,11 +481,14 @@ namespace AlphaTab.Platform.CSharp
                 return;
             }
 
+            x *= _scale;
+            y *= _scale;
+
             // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
             x += scale;
 
-            _graphics.DrawString(String.FromCharCode((int) symbol), GetMusicFont(scale),
-                _brush, (float) x, (float) y,
+            _graphics.DrawString(String.FromCharCode((int)symbol), GetMusicFont(scale),
+                _brush, (float)x, (float)y,
                 centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
         }
 
@@ -457,21 +502,27 @@ namespace AlphaTab.Platform.CSharp
             {
                 if (symbol != MusicFontSymbol.None)
                 {
-                    s += String.FromCharCode((int) symbol);
+                    s += String.FromCharCode((int)symbol);
                 }
             }
+
+            x *= _scale;
+            y *= _scale;
 
             // for whatever reason the padding on GDI font rendering is a bit messed up, there is 1px padding on the left
             x += scale;
 
-            _graphics.DrawString(s, GetMusicFont(scale), _brush, (float) x, (float) y,
+            _graphics.DrawString(s, GetMusicFont(scale), _brush, (float)x, (float)y,
                 centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
         }
 
         public void BeginRotate(double centerX, double centerY, double angle)
         {
-            _graphics.TranslateTransform((float) centerX, (float) centerY);
-            _graphics.RotateTransform((float) angle);
+            centerX *= _scale;
+            centerY *= _scale;
+            
+            _graphics.TranslateTransform((float)centerX, (float)centerY);
+            _graphics.RotateTransform((float)angle);
         }
 
         public void EndRotate()

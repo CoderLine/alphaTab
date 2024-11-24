@@ -77,7 +77,9 @@ export enum SyntaxKind {
     ToDoExpression,
     TypeOfExpression,
 
-    Attribute
+    Attribute,
+
+    SpreadExpression
 }
 
 export interface Node {
@@ -338,6 +340,9 @@ export interface IsExpression extends Node {
     newName?: string;
 }
 export interface ParenthesizedExpression extends Node {
+    expression: Expression;
+}
+export interface SpreadExpression extends Node {
     expression: Expression;
 }
 export interface DefaultExpression extends Node {
@@ -734,4 +739,8 @@ export function isTypeOfExpression(node: Node): node is TypeOfExpression {
 
 export function isAttribute(node: Node): node is Attribute {
     return node.nodeType === SyntaxKind.Attribute;
+}
+
+export function isSpreadExpression(node: Node): node is SpreadExpression {
+    return node.nodeType === SyntaxKind.SpreadExpression;
 }

@@ -13,14 +13,14 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.width = GhostParenthesisGlyph.Size * this.scale;
+        this.width = GhostParenthesisGlyph.Size;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isOpen) {
             TieGlyph.paintTie(
                 canvas,
-                this.scale,
+                1,
                 cx + this.x + this.width,
                 cy + this.y + this.height,
                 cx + this.x + this.width,
@@ -32,7 +32,7 @@ export class GhostParenthesisGlyph extends Glyph {
         } else {
             TieGlyph.paintTie(
                 canvas,
-                this.scale,
+                1,
                 cx + this.x,
                 cy + this.y,
                 cx + this.x,

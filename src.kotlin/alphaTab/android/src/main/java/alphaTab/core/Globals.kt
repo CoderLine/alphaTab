@@ -281,3 +281,11 @@ internal fun String.repeat(count:Double): String {
     return this.repeat(count.toInt())
 }
 
+internal val Throwable.stack: String
+    get() = this.stackTraceToString()
+
+internal inline fun <reified T> List<T>.spread(): Array<T> {
+    return _data.toTypedArray();
+}
+
+

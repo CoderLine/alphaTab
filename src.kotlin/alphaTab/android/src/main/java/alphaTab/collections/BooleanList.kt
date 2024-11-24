@@ -16,5 +16,9 @@ internal class BooleanList(vararg elements: Boolean) : IBooleanIterable {
 
     public override fun iterator(): BooleanIterator {
         return _data.iterator()
+    }   
+
+    public inline fun spread(): BooleanArray {
+        return _data;
     }
 }

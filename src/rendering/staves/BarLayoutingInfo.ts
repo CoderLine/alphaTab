@@ -296,7 +296,7 @@ export class BarLayoutingInfo {
     //     const settings = canvas.settings;
     //     const force = Math.max(settings.display.stretchForce, this.minStretchForce);
 
-    //     const height = this.height * settings.display.scale;
+    //     const height = this.height;
     //     cy -= height;
 
     //     canvas.color = settings.display.resources.mainGlyphColor;

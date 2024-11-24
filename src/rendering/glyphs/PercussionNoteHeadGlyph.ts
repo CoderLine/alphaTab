@@ -16,16 +16,16 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let offset: number = this._isGrace ? this.scale : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false);
+        let offset: number = this._isGrace ? 1 : 0;
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
 
         if (this._articulation.techniqueSymbol !== MusicFontSymbol.None && this._articulation.techniqueSymbolPlacement === TextBaseline.Middle) {
-            canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this._articulation.techniqueSymbol, false);
+            canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this._articulation.techniqueSymbol, false);
         }
     }
 
     public override doLayout(): void {
-        let scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        const scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
         switch (this.symbol) {
             case MusicFontSymbol.NoteheadWhole:
                 this.width = 14;
@@ -43,7 +43,7 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
                 break;
         }
 
-        this.width = this.width * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        this.width = this.width * scale;
         this.height = NoteHeadGlyph.NoteHeadHeight * scale;
     }
 }

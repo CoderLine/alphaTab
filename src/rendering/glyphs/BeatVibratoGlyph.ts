@@ -16,13 +16,13 @@ export class BeatVibratoGlyph extends GroupedEffectGlyph {
         super.doLayout();
         switch (this._type) {
             case VibratoType.Slight:
-                this._stepSize = 12 * this.scale;
+                this._stepSize = 12;
                 break;
             case VibratoType.Wide:
-                this._stepSize = 23 * this.scale;
+                this._stepSize = 23;
                 break;
         }
-        this.height = 18 * this.scale;
+        this.height = 18;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {

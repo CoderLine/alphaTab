@@ -28,16 +28,16 @@ export class AccentuationGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = 9 * this.scale;
-        this.height = 9 * this.scale;
+        this.width = 9;
+        this.height = 9;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const dir = this.renderer.getBeatDirection(this._note.beat);
         const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir == BeamDirection.Down);
         
-        const padding = 2 * this.scale;
+        const padding = 2;
         const y = dir == BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
-        canvas.fillMusicFontSymbol(cx + this.x - 2 * this.scale, y, this.scale, symbol, false);
+        canvas.fillMusicFontSymbol(cx + this.x - 2, y, 1, symbol, false);
     }
 }

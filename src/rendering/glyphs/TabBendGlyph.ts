@@ -124,7 +124,7 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight * this.scale;
+        let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight;
         this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (let note of this._notes) {
@@ -273,7 +273,7 @@ export class TabBendGlyph extends Glyph {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
             }
             if (!isMultiBeatBend) {
-                endX -= TabBendGlyph.ArrowSize * this.scale;
+                endX -= TabBendGlyph.ArrowSize;
             }
             // we need some pixels for the arrow. otherwise we might draw into the next
             // note
@@ -290,7 +290,7 @@ export class TabBendGlyph extends Glyph {
                 }
                 if (note.bendType !== BendType.Prebend) {
                     if (i === 0) {
-                        startX += 2 * this.scale;
+                        startX += 2;
                     }
                     this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
@@ -327,7 +327,7 @@ export class TabBendGlyph extends Glyph {
         let res: RenderingResources = this.renderer.resources;
         let overflowOffset: number = r.lineOffset / 2;
         let x1: number = cx + dX * firstPt.offset;
-        let bendValueHeight: number = TabBendGlyph.BendValueHeight * this.scale;
+        let bendValueHeight: number = TabBendGlyph.BendValueHeight;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
@@ -347,7 +347,7 @@ export class TabBendGlyph extends Glyph {
         }
         // what type of arrow? (up/down)
         let arrowOffset: number = 0;
-        let arrowSize: number = TabBendGlyph.ArrowSize * this.scale;
+        let arrowSize: number = TabBendGlyph.ArrowSize;
         if (secondPt.value > firstPt.value) {
             if (y2 + arrowSize > y1) {
                 y2 = y1 - arrowSize;
@@ -378,7 +378,7 @@ export class TabBendGlyph extends Glyph {
             // we draw from right to left. it's okay if the space is at the beginning
             if (firstPt.lineValue > 0) {
                 let dashX: number = x2;
-                let dashSize: number = TabBendGlyph.DashSize * this.scale;
+                let dashSize: number = TabBendGlyph.DashSize;
                 let end: number = x1 + dashSize;
                 let dashes: number = (dashX - x1) / (dashSize * 2);
                 if (dashes < 1) {
@@ -448,7 +448,7 @@ export class TabBendGlyph extends Glyph {
                 // draw label
                 canvas.font = res.tablatureFont;
                 let size: number = canvas.measureText(s).width;
-                let y: number = startY - res.tablatureFont.size * 0.5 - 2 * this.scale;
+                let y: number = startY - res.tablatureFont.size * 0.5 - 2;
                 let x: number = x2 - size / 2;
                 canvas.fillText(s, x, y);
             }

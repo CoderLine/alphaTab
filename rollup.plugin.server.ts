@@ -24,7 +24,7 @@ export default function server(options: ServerOptions) {
     app.use(cors());
     app.use(express.json());
 
-    const exposedFolders = ['dist', 'src', 'font', 'img', 'playground', 'playground-template', 'test-data'];
+    const exposedFolders = ['dist', 'src', 'font', 'img', 'playground', 'playground-template', 'test-data', 'node_modules'];
 
     for (const exposedFolder of exposedFolders) {
         app.use('/' + exposedFolder, express.static(exposedFolder));

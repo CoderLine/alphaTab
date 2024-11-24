@@ -254,6 +254,10 @@ export default abstract class AstPrinterBase {
         this.write(')');
     }
 
+    protected writeSpreadExpression(expr: cs.SpreadExpression) {
+        this.writeExpression(expr.expression);
+    }
+
     protected writeTypeParameter(p: cs.TypeParameterDeclaration) {
         this.writeIdentifier(p.name);
     }
@@ -334,6 +338,9 @@ export default abstract class AstPrinterBase {
                 break;
             case cs.SyntaxKind.ParenthesizedExpression:
                 this.writeParenthesizedExpression(expr as cs.ParenthesizedExpression);
+                break;
+            case cs.SyntaxKind.SpreadExpression:
+                this.writeSpreadExpression(expr as cs.SpreadExpression);
                 break;
             case cs.SyntaxKind.ArrayCreationExpression:
                 this.writeArrayCreationExpression(expr as cs.ArrayCreationExpression);

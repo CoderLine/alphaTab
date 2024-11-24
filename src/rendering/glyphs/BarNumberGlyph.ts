@@ -13,7 +13,7 @@ export class BarNumberGlyph extends Glyph {
 
     public override doLayout(): void {
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
-        this.width = this.renderer.scoreRenderer.canvas!.measureText(this._number.toString()).width + 5 * this.scale;
+        this.width = this.renderer.scoreRenderer.canvas!.measureText(this._number.toString()).width + 5;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

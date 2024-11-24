@@ -228,9 +228,8 @@ export class RenderStaff {
      * and we can do an early placement of the render staffs.
      */
     public calculateHeightForAccolade() {
-        const settings = this.system.layout.renderer.settings;
-        this.topSpacing = this._factory.getStaffPaddingTop(this) * settings.display.scale;
-        this.bottomSpacing = this._factory.getStaffPaddingBottom(this) * settings.display.scale;
+        this.topSpacing = this._factory.getStaffPaddingTop(this);
+        this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
 
         this.height = (this.barRenderers.length > 0) ? this.barRenderers[0].height : 0;
 
@@ -240,9 +239,8 @@ export class RenderStaff {
     }
 
     public finalizeStaff(): void {
-        const settings = this.system.layout.renderer.settings;
-        this.topSpacing = this._factory.getStaffPaddingTop(this) * settings.display.scale;
-        this.bottomSpacing = this._factory.getStaffPaddingBottom(this) * settings.display.scale;
+        this.topSpacing = this._factory.getStaffPaddingTop(this);
+        this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
 
         this.height = 0;
 

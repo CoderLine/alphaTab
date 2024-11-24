@@ -14,6 +14,6 @@ export class MusicFontGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, this.glyphScale * this.scale, this.symbol, this.center);
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, this.glyphScale, this.symbol, this.center);
     }
 }

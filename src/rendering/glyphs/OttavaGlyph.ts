@@ -16,7 +16,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = 13 * this.scale;
+        this.height = 13;
     }
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
@@ -27,7 +27,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
         let size: number = 0;
         switch (this._ottava) {
             case Ottavia._15ma:
-                size = 37 * this.scale;
+                size = 37;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
@@ -37,7 +37,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 );
                 break;
             case Ottavia._8va:
-                size = 26 * this.scale;
+                size = 26;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
@@ -47,7 +47,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 );
                 break;
             case Ottavia._8vb:
-                size = 23 * this.scale;
+                size = 23;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
@@ -57,7 +57,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 );
                 break;
             case Ottavia._15mb:
-                size = 36 * this.scale;
+                size = 36;
                 // NOTE: SMUFL does not have a glyph for 15mb so we build it
                 canvas.fillMusicFontSymbols(
                     cx + this.x - size / 2,
@@ -73,11 +73,11 @@ export class OttavaGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         let size: number = this.paintOttava(cx, cy, canvas);
-        let lineSpacing: number = 3 * this.scale;
+        let lineSpacing: number = 3;
         let startX: number = cx + this.x + size + lineSpacing;
         let lineY: number = cy + this.y;
-        lineY += this._aboveStaff ? 2 * this.scale : this.height - 2 * this.scale;
-        let lineSize: number = 8 * this.scale;
+        lineY += this._aboveStaff ? 2 : this.height - 2;
+        let lineSize: number = 8;
         if (endX > startX) {
             let lineX: number = startX;
             while (lineX < endX) {

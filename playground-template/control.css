@@ -224,6 +224,11 @@ input[type='range']::-moz-range-thumb {
     display: flex;
     justify-content: space-between;
 }
+
+.at-player a {
+    text-decoration: none;
+}
+
 .at-player > div {
     padding: 3px;
     display: flex;

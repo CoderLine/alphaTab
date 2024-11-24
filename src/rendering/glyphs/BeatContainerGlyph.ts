@@ -47,7 +47,7 @@ export class BeatContainerGlyph extends Glyph {
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
         if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
-            preBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
+            preBeatStretch += BeatContainerGlyph.GraceBeatPadding;
         }
 
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
@@ -56,7 +56,6 @@ export class BeatContainerGlyph extends Glyph {
         if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
             postBeatStretch +=
                 FlagGlyph.FlagWidth *
-                this.scale *
                 (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
         }
         for (const tie of this.ties) {
@@ -65,7 +64,7 @@ export class BeatContainerGlyph extends Glyph {
 
         // Add some further spacing to grace notes
         if (this.beat.graceType !== GraceType.None) {
-            postBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
+            postBeatStretch += BeatContainerGlyph.GraceBeatPadding;
         }
 
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
@@ -78,7 +77,7 @@ export class BeatContainerGlyph extends Glyph {
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
         let offset: number = info.getBeatCenterX(this.beat) - this.onNotes.centerX;
         if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
-            offset += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
+            offset += BeatContainerGlyph.GraceBeatPadding;
         }
 
         this.preNotes.x = offset;
@@ -112,14 +111,14 @@ export class BeatContainerGlyph extends Glyph {
             if (this.onNotes.beamingHelper.beats.length === 1) {
                 // make space for flag
                 if (this.beat.duration >= Duration.Eighth) {
-                    this.minWidth += 20 * this.scale;
+                    this.minWidth += 20;
                 }
             } else {
                 // ensure some space for small notes
                 switch (this.beat.duration) {
                     case Duration.OneHundredTwentyEighth:
                     case Duration.TwoHundredFiftySixth:
-                        this.minWidth += 10 * this.scale;
+                        this.minWidth += 10;
                         break;
                 }
             }

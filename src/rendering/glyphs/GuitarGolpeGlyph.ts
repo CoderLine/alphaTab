@@ -11,15 +11,15 @@ export class GuitarGolpeGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = 9 * this.scale;
-        this.height = 10 * this.scale;
+        this.width = 9;
+        this.height = 10;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.fillMusicFontSymbol(
             cx + this.x,
             cy + this.y + this.height,
-            NoteHeadGlyph.GraceScale * this.scale,
+            NoteHeadGlyph.GraceScale,
             MusicFontSymbol.GuitarGolpe,
             this._center
         );

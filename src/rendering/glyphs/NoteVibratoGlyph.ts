@@ -35,13 +35,13 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
                 symbolHeight = 10 * this._scale;
                 break;
         }
-        this.height = symbolHeight * this.scale;
+        this.height = symbolHeight;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         let startX: number = cx + this.x;
         let width: number = endX - startX;
-        let step: number = this._symbolSize * this.scale;
+        let step: number = this._symbolSize;
 
         let loops: number = width / step;
         if (!this._partialWaves) {
@@ -57,7 +57,7 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
             canvas.fillMusicFontSymbol(
                 cx + this.x + loopX,
                 cy + this.y + this.height * 2,
-                this._scale * this.scale,
+                this._scale,
                 this._symbol,
                 false
             );

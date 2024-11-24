@@ -35,9 +35,12 @@ export class StaffSystemBounds {
     /**
      * Finished the lookup for optimized access.
      */
-    public finish(): void {
+    public finish(scale: number = 1): void {
+        this.realBounds.scaleWith(scale);
+        this.visualBounds.scaleWith(scale);
+
         for (let t of this.bars) {
-            t.finish();
+            t.finish(scale);
         }
     }
 

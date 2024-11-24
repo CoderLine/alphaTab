@@ -71,14 +71,13 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         4 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
             if (this.container.beat.brushType !== BrushType.None) {
                 this.addGlyph(new ScoreBrushGlyph(this.container.beat));
-                this.addGlyph(new SpacingGlyph(0, 0, 4 * this.scale));
+                this.addGlyph(new SpacingGlyph(0, 0, 4));
             }
             if (!fingering.isEmpty) {
                 this.addGlyph(
@@ -86,8 +85,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
                 this.addGlyph(fingering);
@@ -96,8 +94,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
@@ -109,8 +106,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         4 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
@@ -121,8 +117,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
                 this.addGlyph(accidentals);
@@ -131,8 +126,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         0,
                         0,
                         2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1) *
-                            this.scale
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }

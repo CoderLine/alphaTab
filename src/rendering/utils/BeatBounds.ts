@@ -68,4 +68,18 @@ export class BeatBounds {
         }
         return null;
     }
+
+    /**
+     * Finishes the lookup object and optimizes itself for fast access.
+     */
+    public finish(scale: number = 1) {
+        this.realBounds.scaleWith(scale);
+        this.visualBounds.scaleWith(scale);
+
+        if(this.notes){
+            for(const n of this.notes!){
+                n.finish(scale);
+            }
+        }
+    }
 }

@@ -35,8 +35,8 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let sizeX: number = 12 * this.scale;
-        let sizeY: number = 3 * this.scale;
+        let sizeX: number = 12;
+        let sizeY: number = 3;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -62,15 +62,15 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let sizeX: number = 12 * this.scale;
-        let sizeY: number = 3 * this.scale;
+        let sizeX: number = 12;
+        let sizeY: number = 3;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
         let waves: boolean = false;
 
-        const endXOffset = 2 * this.scale;
+        const endXOffset = 2;
 
         switch (this._outType) {
             case SlideOutType.Shift:

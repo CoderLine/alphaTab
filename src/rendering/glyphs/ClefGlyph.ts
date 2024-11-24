@@ -18,13 +18,13 @@ export class ClefGlyph extends MusicFontGlyph {
     public override doLayout(): void {
         switch (this._clef) {
             case Clef.Neutral:
-                this.width = 15 * this.scale;
+                this.width = 15;
                 break;
             case Clef.C3:
             case Clef.C4:
             case Clef.F4:
             case Clef.G2:
-                this.width = 28 * this.scale;
+                this.width = 28;
                 break;
         }
     }
@@ -52,18 +52,18 @@ export class ClefGlyph extends MusicFontGlyph {
         let top: boolean = false;
         switch (this._clefOttava) {
             case Ottavia._15ma:
-                numberGlyph = new MusicFontGlyph(-4 * this.scale, 0, 0.5, MusicFontSymbol.Quindicesima);
+                numberGlyph = new MusicFontGlyph(-4, 0, 0.5, MusicFontSymbol.Quindicesima);
                 top = true;
                 break;
             case Ottavia._8va:
-                numberGlyph = new MusicFontGlyph(-2 * this.scale, 0, 0.5, MusicFontSymbol.Ottava);
+                numberGlyph = new MusicFontGlyph(-2, 0, 0.5, MusicFontSymbol.Ottava);
                 top = true;
                 break;
             case Ottavia._8vb:
-                numberGlyph = new MusicFontGlyph(-6 * this.scale, 0, 0.5, MusicFontSymbol.Ottava);
+                numberGlyph = new MusicFontGlyph(-6, 0, 0.5, MusicFontSymbol.Ottava);
                 break;
             case Ottavia._15mb:
-                numberGlyph = new MusicFontGlyph(-8 * this.scale, 0, 0.5, MusicFontSymbol.Quindicesima);
+                numberGlyph = new MusicFontGlyph(-8, 0, 0.5, MusicFontSymbol.Quindicesima);
                 break;
             default:
                 return;
@@ -97,6 +97,6 @@ export class ClefGlyph extends MusicFontGlyph {
         numberGlyph.renderer = this.renderer;
         numberGlyph.doLayout();
         let x: number = this.width / 2;
-        numberGlyph.paint(cx + this.x + x + offsetX * this.scale, cy + this.y + offsetY * this.scale, canvas);
+        numberGlyph.paint(cx + this.x + x + offsetX, cy + this.y + offsetY, canvas);
     }
 }
