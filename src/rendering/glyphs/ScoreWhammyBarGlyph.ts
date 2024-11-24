@@ -140,7 +140,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                     this.renderer.staff.staveId,
                     note.tieDestination!.beat.voice.bar
-                ) as ScoreBarRenderer;
+                ) as ScoreBarRenderer | null;
                 if (endNoteRenderer && endNoteRenderer.staff === startNoteRenderer.staff) {
                     endX =
                         cx +
