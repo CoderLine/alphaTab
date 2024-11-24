@@ -43,12 +43,13 @@ export class ChordDiagramGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        cx += this.x;
+        cx += this.x + ChordDiagramGlyph.Padding[0] + this._firstFretSpacing;
         cy += this.y;
         let stringSpacing: number = ChordDiagramGlyph.StringSpacing;
         let fretSpacing: number = ChordDiagramGlyph.FretSpacing;
         let res: RenderingResources = this.renderer.resources;
         let circleRadius: number = ChordDiagramGlyph.CircleRadius;
+        let w: number = this.width - 2 * ChordDiagramGlyph.Padding[0] - this._firstFretSpacing;
 
         let align: TextAlign = canvas.textAlign;
         let baseline: TextBaseline = canvas.textBaseline;
@@ -56,10 +57,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Top;
         if (this._chord.showName) {
-            canvas.fillText(this._chord.name, cx + this.width / 2, cy + res.effectFont.size / 2);
+            canvas.fillText(this._chord.name, cx + w / 2, cy + res.effectFont.size / 2);
         }
 
-        cx += ChordDiagramGlyph.Padding[0] + this._firstFretSpacing;
         cy += this._textRow;
         canvas.font = res.fretboardNumberFont;
         canvas.textBaseline = TextBaseline.Middle;
@@ -88,7 +88,6 @@ export class ChordDiagramGlyph extends EffectGlyph {
             canvas.fillText(this._chord.firstFret.toString(), cx - this._firstFretSpacing, cy + fretSpacing / 2);
         }
 
-        let w: number = this.width - 2 * ChordDiagramGlyph.Padding[0] - this._firstFretSpacing;
         canvas.fillRect(cx, cy - 1, w, 2);
         for (let i: number = 0; i <= ChordDiagramGlyph.Frets; i++) {
             let y: number = cy + i * fretSpacing;
