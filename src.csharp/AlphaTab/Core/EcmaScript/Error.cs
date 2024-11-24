@@ -16,5 +16,7 @@
         public Error(string message, System.Exception inner) : base(message, inner)
         {
         }
+
+        public string Stack => StackTrace;
     }
 }

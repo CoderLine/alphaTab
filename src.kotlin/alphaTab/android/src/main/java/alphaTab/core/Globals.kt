@@ -281,3 +281,8 @@ internal fun String.repeat(count:Double): String {
     return this.repeat(count.toInt())
 }
 
+internal val Throwable.stack: String
+    get() = this.stackTraceToString()
+
+
+
