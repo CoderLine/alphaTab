@@ -308,7 +308,10 @@ export function setupControl(selector, settings) {
         };
     });
 
-    $(control).find('[data-toggle="tooltip"]').tooltip();
+    for(const t of control.querySelectorAll('[data-toggle="tooltip"]'))
+    {
+        new bootstrap.Tooltip(t);
+    }
 
     return at;
 }
