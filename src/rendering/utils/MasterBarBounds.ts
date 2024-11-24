@@ -84,7 +84,11 @@ export class MasterBarBounds {
     /**
      * Finishes the lookup object and optimizes itself for fast access.
      */
-    public finish(): void {
+    public finish(scale: number = 1): void {
+        this.realBounds.scaleWith(scale);
+        this.visualBounds.scaleWith(scale);
+        this.lineAlignedBounds.scaleWith(scale);
+
         this.bars.sort((a, b) => {
             if (a.realBounds.y < b.realBounds.y) {
                 return -1;
@@ -101,7 +105,7 @@ export class MasterBarBounds {
             return 0;
         });
         for (const bar of this.bars) {
-            bar.finish();
+            bar.finish(scale);
         }
     }
 

@@ -46,8 +46,11 @@ export class CssFontSvgCanvas extends SvgCanvas {
         symbols: string,
         centerAtPosition?: boolean
     ): void {
+        x *= this.scale;
+        y *= this.scale;
+
         this.buffer += `<g transform="translate(${x} ${y})" class="at" ><text`;
-        const scale = (this.settings.display.scale * relativeScale);
+        const scale = this.scale * relativeScale;
         if (scale !== 1) {
             this.buffer += ` style="font-size: ${scale * 100}%; stroke:none"`;
         } else {

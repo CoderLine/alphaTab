@@ -108,7 +108,7 @@ export class PageViewLayout extends ScoreLayout {
 
         y = this.layoutAndRenderAnnotation(y);
 
-        this.height = y + this._pagePadding![3];
+        this.height = (y + this._pagePadding![3]) * this.renderer.settings.display.scale;
     }
 
     private layoutAndRenderTunings(y: number, totalHeight: number = -1): number {
@@ -118,7 +118,7 @@ export class PageViewLayout extends ScoreLayout {
 
         let res: RenderingResources = this.renderer.settings.display.resources;
         this.tuningGlyph.x = this._pagePadding![0];
-        this.tuningGlyph.width = this.width;
+        this.tuningGlyph.width = this.scaledWidth;
         this.tuningGlyph.doLayout();
 
         let tuningHeight = this.tuningGlyph.height;
@@ -126,9 +126,9 @@ export class PageViewLayout extends ScoreLayout {
         const e = new RenderFinishedEventArgs();
         e.x = 0;
         e.y = y;
-        e.width = this.width;
+        e.width = this.scaledWidth;
         e.height = tuningHeight;
-        e.totalWidth = this.width;
+        e.totalWidth = this.scaledWidth;
         e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
 
         this.registerPartial(e, (canvas: ICanvas) => {
@@ -145,7 +145,7 @@ export class PageViewLayout extends ScoreLayout {
             return y;
         }
         const res: RenderingResources = this.renderer.settings.display.resources;
-        this.chordDiagrams.width = this.width;
+        this.chordDiagrams.width = this.scaledWidth;
         this.chordDiagrams.doLayout();
 
         const diagramHeight = Math.floor(this.chordDiagrams.height);
@@ -153,9 +153,9 @@ export class PageViewLayout extends ScoreLayout {
         const e = new RenderFinishedEventArgs();
         e.x = 0;
         e.y = y;
-        e.width = this.width;
+        e.width = this.scaledWidth;
         e.height = diagramHeight;
-        e.totalWidth = this.width;
+        e.totalWidth = this.scaledWidth;
         e.totalHeight = totalHeight < 0 ? y + diagramHeight : totalHeight;
 
         this.registerPartial(e, (canvas: ICanvas) => {
@@ -163,7 +163,7 @@ export class PageViewLayout extends ScoreLayout {
             canvas.textAlign = TextAlign.Center;
             this.chordDiagrams!.paint(0, 0, canvas);
         });
-       
+
         return y + diagramHeight;
     }
 
@@ -187,7 +187,7 @@ export class PageViewLayout extends ScoreLayout {
         for (let i: number = 0; i < centeredGlyphs.length; i++) {
             if (this.scoreInfoGlyphs.has(centeredGlyphs[i])) {
                 let glyph: TextGlyph = this.scoreInfoGlyphs.get(centeredGlyphs[i])!;
-                glyph.x = this.width / 2;
+                glyph.x = this.scaledWidth / 2;
                 glyph.y = infoHeight;
                 glyph.textAlign = TextAlign.Center;
                 infoHeight += glyph.font.size;
@@ -197,7 +197,7 @@ export class PageViewLayout extends ScoreLayout {
         let musicOrWordsHeight: number = 0;
         if (this.scoreInfoGlyphs.has(NotationElement.ScoreMusic)) {
             let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreMusic)!;
-            glyph.x = this.width - this._pagePadding![2];
+            glyph.x = this.scaledWidth - this._pagePadding![2];
             glyph.y = infoHeight;
             glyph.textAlign = TextAlign.Right;
             musicOrWords = true;
@@ -217,9 +217,9 @@ export class PageViewLayout extends ScoreLayout {
 
         if (this.scoreInfoGlyphs.size > 0) {
             infoHeight = Math.floor(infoHeight + 17);
-            e.width = this.width;
+            e.width = this.scaledWidth;
             e.height = infoHeight;
-            e.totalWidth = this.width;
+            e.totalWidth = this.scaledWidth;
             e.totalHeight = totalHeight < 0 ? y + e.height : totalHeight;
             this.registerPartial(e, (canvas: ICanvas) => {
                 canvas.color = res.scoreInfoColor;
@@ -320,9 +320,9 @@ export class PageViewLayout extends ScoreLayout {
         const args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
         args.x = 0;
         args.y = system.y;
-        args.totalWidth = this.width;
+        args.totalWidth = this.scaledWidth;
         args.totalHeight = totalHeight;
-        args.width = this.width;
+        args.width = this.scaledWidth;
         args.height = height;
         args.firstMasterBarIndex = system.firstBarIndex;
         args.lastMasterBarIndex = system.lastBarIndex;
@@ -333,12 +333,10 @@ export class PageViewLayout extends ScoreLayout {
             this.renderer.canvas!.textAlign = TextAlign.Left;
             // NOTE: we use this negation trick to make the system paint itself to 0/0 coordinates
             // since we use partial drawing
-            system.paint(0, -args.y, canvas);
+            system.paint(0, -(args.y / this.renderer.settings.display.scale), canvas);
         });
 
         // calculate coordinates for next system
-        totalHeight += height;
-
         return height;
     }
 
@@ -427,6 +425,7 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private get maxWidth(): number {
-        return this.renderer.width - this._pagePadding![0] - this._pagePadding![2];
+        const scaledPadding = (this._pagePadding![0] + this._pagePadding![2]) * this.renderer.settings.display.scale;
+        return (this.scaledWidth - scaledPadding) 
     }
 }

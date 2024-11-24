@@ -47,6 +47,8 @@ export class Html5Canvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
+        const scale = this.settings.display.scale;
+
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
         this._canvas.height = (height * Environment.HighDpiFactor) | 0;
@@ -54,7 +56,7 @@ export class Html5Canvas implements ICanvas {
         this._canvas.style.height = height + 'px';
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
-        this._context.scale(Environment.HighDpiFactor, Environment.HighDpiFactor);
+        this._context.scale(Environment.HighDpiFactor * scale, Environment.HighDpiFactor * scale);
         this._context.lineWidth = this._lineWidth;
     }
 
@@ -151,9 +153,9 @@ export class Html5Canvas implements ICanvas {
     public set font(value: Font) {
         this._font = value;
         if (this._context) {
-            this._context.font = value.toCssString(this.settings.display.scale);
+            this._context.font = value.toCssString(1);
         }
-        this._measureContext.font = value.toCssString(this.settings.display.scale);
+        this._measureContext.font = value.toCssString(1);
     }
 
     public get textAlign(): TextAlign {
@@ -280,7 +282,7 @@ export class Html5Canvas implements ICanvas {
         let textAlign = this._context.textAlign;
         let baseLine = this._context.textBaseline;
         let font: string = this._context.font;
-        this._context.font = this._musicFont.toCssString(this.settings.display.scale * relativeScale);
+        this._context.font = this._musicFont.toCssString(relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';

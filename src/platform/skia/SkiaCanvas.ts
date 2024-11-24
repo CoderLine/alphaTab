@@ -118,7 +118,8 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
-        this._canvas.beginRender(width, height, Environment.HighDpiFactor);
+        const scale = this.settings.display.scale;
+        this._canvas.beginRender(width, height, Environment.HighDpiFactor * scale);
     }
 
     public endRender(): unknown {
@@ -260,10 +261,10 @@ export class SkiaCanvas implements ICanvas {
     public measureText(text: string) {
         // BUG: for some reason the very initial measure text in alphaSkia delivers wrong results, so we it twice
         if(this._initialMeasure) {
-            this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale);
+            this._canvas.measureText(text, this.getTypeFace(), this.font.size);
             this._initialMeasure = false;
         }
-        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this.settings.display.scale), this.font.size * SkiaCanvas.FontSizeToLineHeight);
+        return new TextMetrics(this._canvas.measureText(text, this.getTypeFace(), this.font.size), this.font.size * SkiaCanvas.FontSizeToLineHeight);
     }
 
     public fillMusicFontSymbol(

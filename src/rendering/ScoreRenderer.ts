@@ -200,7 +200,7 @@ export class ScoreRenderer implements IScoreRenderer {
     public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 
     private onRenderFinished() {
-        this.boundsLookup?.finish();
+        this.boundsLookup?.finish(this.settings.display.scale);
         const e = new RenderFinishedEventArgs();
         e.totalHeight = this.layout!.height;
         e.totalWidth = this.layout!.width;

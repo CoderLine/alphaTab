@@ -135,6 +135,7 @@ export class Environment {
             styleElement.id = 'alphaTabStyle';
             let css: string = `
             @font-face {
+                font-display: block;
                 font-family: 'alphaTab';
                  src: url('${fontDirectory}Bravura.eot');
                  src: url('${fontDirectory}Bravura.eot?#iefix') format('embedded-opentype')

@@ -151,8 +151,10 @@ export class HorizontalScreenLayout extends ScoreLayout {
             );
         }
         this.finalizeStaffSystem();
-        this.height = Math.floor(this._system.y + this._system.height);
-        this.width = this._system.x + this._system.width + this._pagePadding[2];
+
+        this.height = Math.floor(this._system.y + this._system.height) * this.renderer.settings.display.scale;
+        this.width =
+            (this._system.x + this._system.width + this._pagePadding[2]) * this.renderer.settings.display.scale;
         currentBarIndex = 0;
 
         let x = 0;
