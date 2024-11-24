@@ -1692,4 +1692,15 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.write(')');
         }
     }
+
+    protected override writeSpreadExpression(expr: cs.SpreadExpression) {
+        this.write('*');
+        this.writeExpression(expr.expression);
+        if(expr.expression.tsSymbol?.valueDeclaration?.kind !== ts.SyntaxKind.Parameter ||
+            (expr.expression.tsSymbol?.valueDeclaration as ts.ParameterDeclaration).dotDotDotToken === undefined
+        ) {
+            this.write('.spread()')
+        }
+    }
+
 }

@@ -1,7 +1,7 @@
 package alphaTab.collections
 
 public class List<T> : Iterable<T> {
-    private val _data: MutableList<T>
+    internal val _data: MutableList<T>
 
     val length: Double
         get() = _data.size.toDouble()
@@ -43,8 +43,8 @@ public class List<T> : Iterable<T> {
         _data.fill(item)
     }
 
-    public fun push(items: List<T>) {
-        _data.addAll(items._data)
+    public fun push(vararg items: T) {
+        _data.addAll(items)
     }
 
     public operator fun get(index: Int): T {

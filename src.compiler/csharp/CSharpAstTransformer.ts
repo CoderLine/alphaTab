@@ -582,7 +582,8 @@ export default class CSharpAstTransformer {
             returnType: this.createUnresolvedTypeNode(null, d.type ?? d, returnType),
             visibility: this.mapVisibility(d, cs.Visibility.Private),
             tsNode: d,
-            skipEmit: this.shouldSkip(d, true)
+            skipEmit: this.shouldSkip(d, true),
+            isTestMethod: false
         };
         csMethod.isAsync = !!d.modifiers && !!d.modifiers.find(m => m.kind === ts.SyntaxKind.AsyncKeyword);
 
@@ -2117,8 +2118,11 @@ export default class CSharpAstTransformer {
             tsNode: expression
         } as cs.Expression;
     }
-    protected visitSpreadElement(parent: cs.Node, expression: ts.SpreadElement) {
-        return this.visitExpression(parent, expression.expression);
+    protected visitSpreadElement(parent: cs.Node, expression: ts.SpreadElement): cs.SpreadExpression {
+        return {
+           nodeType: cs.SyntaxKind.SpreadExpression,
+           expression: this.visitExpression(parent, expression.expression)
+        } as cs.SpreadExpression;
     }
 
     protected visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {

@@ -126,6 +126,10 @@ public class DoubleList : IDoubleIterable {
         return d
     }
 
+    public fun spread(): DoubleArray {
+        return _items;
+    }
+
     public override fun iterator(): DoubleIterator {
         return Iterator(this)
     }
