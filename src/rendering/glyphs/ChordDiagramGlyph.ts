@@ -3,7 +3,6 @@ import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
-import { Color } from '@src/model';
 
 export class ChordDiagramGlyph extends EffectGlyph {
     private static readonly Padding: number[] = [5, 2];
