@@ -5,12 +5,16 @@
 export class SynthConstants {
     public static readonly DefaultChannelCount: number = 16 + 1;
     public static readonly MetronomeChannel: number = SynthConstants.DefaultChannelCount - 1;
+    public static readonly MetronomeKey: number = 33;
     public static readonly AudioChannels: number = 2;
     public static readonly MinVolume: number = 0;
     public static readonly MinProgram: number = 0;
     public static readonly MaxProgram: number = 127;
     public static readonly MinPlaybackSpeed: number = 0.125;
     public static readonly MaxPlaybackSpeed: number = 8;
+    public static readonly PercussionChannel: number = 9;
+    public static readonly PercussionBank: number = 128;
+
 
     /**
      * The Midi Pitch bend message is a 15-bit value

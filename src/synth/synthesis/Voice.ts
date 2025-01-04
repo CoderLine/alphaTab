@@ -109,8 +109,7 @@ export class Voice {
         }
 
         let region: Region = this.region;
-        const preset = f.presets![this.playingPreset];
-        let input: Float32Array = preset.fontSamples!;
+        let input: Float32Array = region.samples;
         let outL: number = 0;
         let outR: number = f.outputMode === OutputMode.StereoUnweaved ? numSamples : -1;
 

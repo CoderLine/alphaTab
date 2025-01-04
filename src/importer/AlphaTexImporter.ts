@@ -45,6 +45,7 @@ import { WahPedal } from '@src/model/WahPedal';
 import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -845,8 +846,8 @@ export class AlphaTexImporter extends ScoreImporter {
                         for (const staff of this._currentTrack.staves) {
                             this.applyPercussionStaff(staff);
                         }
-                        this._currentTrack.playbackInfo.primaryChannel = 9;
-                        this._currentTrack.playbackInfo.secondaryChannel = 9;
+                        this._currentTrack.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
+                        this._currentTrack.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
                     } else {
                         this._currentTrack.playbackInfo.program = GeneralMidi.getValue(instrumentName);
                     }

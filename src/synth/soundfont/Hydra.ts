@@ -22,7 +22,47 @@ export class Hydra {
     public igens: HydraIgen[] = [];
     public sHdrs: HydraShdr[] = [];
 
-    public fontSamples: Float32Array = new Float32Array(0);
+    public sampleData: Uint8Array = new Uint8Array(0);
+
+    private _sampleCache: Map<string, Float32Array> = new Map<string, Float32Array>();
+
+    public decodeSamples(startByte: number, endByte: number, decompressVorbis: boolean): Float32Array {
+        const key = `${startByte}_${endByte}_${decompressVorbis}`;
+        if (!this._sampleCache.has(key)) {
+            let samples: Float32Array;
+            const sampleBytes = this.sampleData.slice(
+                // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
+                // field to the first data point of this sample
+                startByte,
+                // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
+                // field to the first of the set of 46 zero valued data points following this sample.
+                endByte
+            );
+
+            if (decompressVorbis) {
+                // TODO: decode vorbis
+                samples = new Float32Array(0);
+            } else {
+                const sampleLength = sampleBytes.length / 2;
+
+                samples = new Float32Array(sampleLength);
+                let samplesPos: number = 0;
+
+                // 6.1 Sample Data Format in the smpl Sub-chunk
+                // The smpl sub-chunk, if present, contains one or more "samples" of digital audio information in the form
+                // of linearly coded sixteen bit, signed, little endian (least significant byte first) words.
+                const shorts = new Int16Array(sampleBytes.buffer);
+                for (let i: number = 0; i < sampleLength; i++) {
+                    samples[samplesPos + i] = shorts[i] / 32767;
+                }
+            }
+
+            this._sampleCache.set(key, samples);
+            return samples;
+        }
+
+        return this._sampleCache.get(key)!;
+    }
 
     public load(readable: IReadable): void {
         const chunkHead: RiffChunk = new RiffChunk();
@@ -126,7 +166,8 @@ export class Hydra {
                 while (RiffChunk.load(chunkFastList, chunk, readable)) {
                     switch (chunk.id) {
                         case 'smpl':
-                            this.fontSamples = Hydra.loadSamples(chunk, readable);
+                            this.sampleData = new Uint8Array(chunk.size);
+                            readable.read(this.sampleData, 0, chunk.size);
                             break;
                         default:
                             readable.position += chunk.size;
@@ -137,25 +178,6 @@ export class Hydra {
                 readable.position += chunkFastList.size;
             }
         }
-    }
-
-    private static loadSamples(chunk: RiffChunk, reader: IReadable): Float32Array {
-        let samplesLeft: number = (chunk.size / 2) | 0;
-        const samples: Float32Array = new Float32Array(samplesLeft);
-        let samplesPos: number = 0;
-        
-        const sampleBuffer: Uint8Array = new Uint8Array(16 * 1024);
-        while (samplesLeft > 0) {
-            let samplesToRead: number = Math.min(samplesLeft, (sampleBuffer.length / 2) | 0);
-            reader.read(sampleBuffer, 0, samplesToRead * 2);
-            for (let i: number = 0; i < samplesToRead; i++) {
-                const shortSample = TypeConversions.int32ToInt16((sampleBuffer[i * 2 + 1] << 8) | sampleBuffer[i * 2]);
-                samples[samplesPos + i] = shortSample / 32767;
-            }
-            samplesLeft -= samplesToRead;
-            samplesPos += samplesToRead;
-        }
-        return samples;
     }
 }
 

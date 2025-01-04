@@ -7,6 +7,8 @@ import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestOutput } from '@test/audio/TestOutput';
 import { TestPlatform } from '@test/TestPlatform';
+import { expect } from 'chai';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
@@ -36,4 +38,38 @@ describe('AlphaSynthTests', () => {
             testOutput.next();
         }
     });
+
+    it('only-used-instruments-decoded', async () => {
+        const data = await TestPlatform.loadFile('test-data/audio/default.sf2');
+        const tex: string =
+            `
+            \\tempo 120
+            .
+            \\track "T01"
+            \\ts 1 4
+            \\instrument 24
+            4.4.4*4
+            \\track "T02"
+            \\instrument 30
+            4.4.4*4`;
+        let importer: AlphaTexImporter = new AlphaTexImporter();
+        importer.initFromString(tex, new Settings());
+        let score: Score = importer.readScore();
+        let midi: MidiFile = new MidiFile();
+        let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        gen.generate();
+        let testOutput: TestOutput = new TestOutput();
+        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
+        synth.loadSoundFont(data, false);
+        synth.loadMidiFile(midi);
+
+
+        expect(synth.isReadyForPlayback).to.be.true;
+        expect(synth.hasSamplesForProgram(24)).to.be.true;
+        expect(synth.hasSamplesForProgram(30)).to.be.true;
+        expect(synth.hasSamplesForProgram(1)).to.be.false;
+        expect(synth.hasSamplesForProgram(35)).to.be.false;
+        expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
+    });
+
 });
