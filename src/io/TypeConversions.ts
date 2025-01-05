@@ -12,6 +12,15 @@ export class TypeConversions {
         return this._conversionByteArray;
     }
     
+    public static bytesToInt64LE(bytes: Uint8Array): number {
+        TypeConversions._conversionByteArray.set(bytes, 0);
+        const int64 = TypeConversions._dataView.getBigInt64(0, true);
+        if(int64 <= Number.MAX_SAFE_INTEGER && int64 >= Number.MIN_SAFE_INTEGER ) {
+            return Number(int64);
+        }
+        return Number.MAX_SAFE_INTEGER;
+    }
+    
     public static bytesToFloat64(bytes: Uint8Array): number {
         TypeConversions._conversionByteArray.set(bytes, 0);
         throw TypeConversions._dataView.getFloat64(0, true);

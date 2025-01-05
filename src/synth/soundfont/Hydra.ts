@@ -10,6 +10,8 @@ import { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 
 import { FormatError } from '@src/FormatError';
+import { VorbisFile } from '../vorbis/VorbisFile';
+import { ByteBuffer } from '@src/io/ByteBuffer';
 
 export class Hydra {
     public phdrs: HydraPhdr[] = [];
@@ -40,20 +42,16 @@ export class Hydra {
             );
 
             if (decompressVorbis) {
-                // TODO: decode vorbis
-                samples = new Float32Array(0);
+                const vorbis = new VorbisFile(ByteBuffer.fromBuffer(sampleBytes));
+                samples = vorbis.streams[0].samples;
             } else {
-                const sampleLength = sampleBytes.length / 2;
-
-                samples = new Float32Array(sampleLength);
-                let samplesPos: number = 0;
-
                 // 6.1 Sample Data Format in the smpl Sub-chunk
                 // The smpl sub-chunk, if present, contains one or more "samples" of digital audio information in the form
                 // of linearly coded sixteen bit, signed, little endian (least significant byte first) words.
-                const shorts = new Int16Array(sampleBytes.buffer);
-                for (let i: number = 0; i < sampleLength; i++) {
-                    samples[samplesPos + i] = shorts[i] / 32767;
+                let shorts = new Int16Array(sampleBytes.buffer);
+                samples = new Float32Array(shorts.length);
+                for (let i: number = 0; i < shorts.length; i++) {
+                    samples[i] = shorts[i] / 32767;
                 }
             }
 
@@ -178,6 +176,8 @@ export class Hydra {
                 readable.position += chunkFastList.size;
             }
         }
+
+        //
     }
 }
 
@@ -307,6 +307,7 @@ export class HydraShdr {
     public static readonly SizeInFile: number = 46;
 
     public sampleName: string;
+
     public start: number;
     public end: number;
     public startLoop: number;

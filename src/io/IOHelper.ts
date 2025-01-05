@@ -19,6 +19,12 @@ export class IOHelper {
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
     }
 
+    public static readInt64LE(input: IReadable): number {
+        const b = new Uint8Array(8);
+        input.read(b, 0, b.length);
+        return TypeConversions.bytesToInt64LE(b);
+    }
+
     public static readUInt32LE(input: IReadable): number {
         let ch1: number = input.readByte();
         let ch2: number = input.readByte();
@@ -132,7 +138,7 @@ export class IOHelper {
             encoding = 'utf-8';
         }
         let decoder: TextDecoder = new TextDecoder(encoding);
-        return decoder.decode(data.buffer);
+        return decoder.decode(data.buffer as ArrayBuffer);
     }
 
     private static detectEncoding(data: Uint8Array): string | null {

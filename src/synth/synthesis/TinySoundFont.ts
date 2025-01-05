@@ -1409,21 +1409,29 @@ export class TinySoundFont {
 
                                         // Mono Sample
                                         const decompressVorbis = (shdr.sampleType & 0x10) !== 0;
-                                        zoneRegion.samples = hydra.decodeSamples(
-                                            // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
-                                            // field to the first data point of this sample
-                                            zoneRegion.offset * 2,
-                                            // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
-                                            // field to the first of the set of 46 zero valued data points following this sample.
-                                            zoneRegion.end * 2,
-                                            decompressVorbis
-                                        );
-
                                         if (decompressVorbis) {
-                                            // TODO: for SF3 the offsets are handled differently,
+                                            // for SF3 the shdr contains the byte offsets within the overall buffer holding the OGG container
+                                            zoneRegion.samples = hydra.decodeSamples(
+                                                shdr.start,
+                                                shdr.end,
+                                                true
+                                            );
+                                            // play whole sample
+                                            zoneRegion.offset = 0;
+                                            zoneRegion.end = zoneRegion.samples.length;
+                                            // loop points are already relative within the individual samples.
                                         } else {
+                                            zoneRegion.samples = hydra.decodeSamples(
+                                                // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
+                                                // field to the first data point of this sample
+                                                zoneRegion.offset * 2,
+                                                // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
+                                                // field to the first of the set of 46 zero valued data points following this sample.
+                                                zoneRegion.end * 2,
+                                                false
+                                            );
+
                                             // reset offsets relative to sub-buffer
-                                            zoneRegion.end -= zoneRegion.offset;
                                             if (zoneRegion.loopStart > 0) {
                                                 zoneRegion.loopStart -= zoneRegion.offset;
                                             }
@@ -1431,6 +1439,7 @@ export class TinySoundFont {
                                                 zoneRegion.loopEnd -= zoneRegion.offset;
                                             }
                                             zoneRegion.offset = 0;
+                                            zoneRegion.end -= zoneRegion.offset;
                                         }
                                     } else {
                                         // unsupported

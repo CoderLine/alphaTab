@@ -9,6 +9,9 @@ import { TestOutput } from '@test/audio/TestOutput';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
+import { ByteBuffer } from '@src/io/ByteBuffer';
+import { Hydra } from '@src/synth/soundfont/Hydra';
 
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
@@ -39,10 +42,41 @@ describe('AlphaSynthTests', () => {
         }
     });
 
-    it('only-used-instruments-decoded', async () => {
+    it('only-used-instruments-decoded-sf2', async () => {
         const data = await TestPlatform.loadFile('test-data/audio/default.sf2');
-        const tex: string =
-            `
+        const tex: string = `
+            \\tempo 120
+            .
+            \\track "T01"
+            \\ts 1 4
+            \\instrument 24
+            4.4.4*4
+            \\track "T02"
+            \\instrument 30
+            4.4.4*4`;
+        let importer: AlphaTexImporter = new AlphaTexImporter();
+        importer.initFromString(tex, new Settings());
+        let score: Score = importer.readScore();
+        let midi: MidiFile = new MidiFile();
+        let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        gen.generate();
+        let testOutput: TestOutput = new TestOutput();
+        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
+        synth.loadSoundFont(data, false);
+        synth.loadMidiFile(midi);
+
+        expect(synth.isReadyForPlayback).to.be.true;
+        expect(synth.hasSamplesForProgram(24)).to.be.true;
+        expect(synth.hasSamplesForProgram(30)).to.be.true;
+        expect(synth.hasSamplesForProgram(1)).to.be.false;
+        expect(synth.hasSamplesForProgram(35)).to.be.false;
+        expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
+    });
+
+    it('only-used-instruments-decoded-sf3', async () => {
+        const data = await TestPlatform.loadFile('test-data/audio/default.sf3');
+
+        const tex: string = `
             \\tempo 120
             .
             \\track "T01"
@@ -72,4 +106,58 @@ describe('AlphaSynthTests', () => {
         expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
     });
 
+   async function testVorbisFile(name:string) {
+        const data = await TestPlatform.loadFile(`test-data/audio/${name}.ogg`);
+        const vorbis = new VorbisFile(ByteBuffer.fromBuffer(data));
+
+        expect(vorbis.streams.length).to.equal(1);
+        expect(vorbis.streams[0].audioChannels).to.equal(2);
+        expect(vorbis.streams[0].audioSampleRate).to.equal(44100);
+        expect(vorbis.streams[0].samples.length).to.be.greaterThan(44100 * 0.05);
+
+        const generated = new Uint8Array(
+            vorbis.streams[0].samples.buffer,
+            vorbis.streams[0].samples.byteOffset,
+            vorbis.streams[0].samples.byteLength
+        );
+        const reference = await TestPlatform.loadFile(`test-data/audio/${name}_alphaTab.pcm`);
+        try {
+            expect(generated.length).to.equal(reference.length);
+
+            for (let i = 0; i < generated.length; i++) {
+                expect(generated[i]).to.equal(reference[i], `Difference at index ${i}`);
+            }
+        } catch (e) {
+            await TestPlatform.saveFile(
+                `test-data/audio/${name}_alphaTab_new.pcm`,
+                new Uint8Array(
+                    vorbis.streams[0].samples.buffer,
+                    vorbis.streams[0].samples.byteOffset,
+                    vorbis.streams[0].samples.byteLength
+                )
+            );
+
+            throw e;
+        }
+    }
+
+    it('ogg-vorbis-short', async () => {
+        testVorbisFile('Short');
+    });
+
+    it('ogg-vorbis-example', async () => {
+        testVorbisFile('Example');
+    });
+
+    it('sf3', async () => {
+        const data = await TestPlatform.loadFile('font/musescore/MuseScore_General.sf3');
+        let soundFont: Hydra = new Hydra();
+        soundFont.load(ByteBuffer.fromBuffer(data));
+
+        await TestPlatform.saveFile(
+            `test-data/audio/MuseScore_General_Steel_Gtr_E3.pcm`,
+            await soundFont.sampleData.slice(2763270, 2819873)
+
+        );
+    });
 });
