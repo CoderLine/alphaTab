@@ -1234,22 +1234,11 @@ export class Gp3To5Importer extends ScoreImporter {
 
 export class GpBinaryHelpers {
     public static gpReadDouble(data: IReadable): number {
-        let bytes: Uint8Array = new Uint8Array(8);
-        data.read(bytes, 0, bytes.length);
-
-        let array: Float64Array = new Float64Array(bytes.buffer);
-        return array[0];
+        return IOHelper.readFloat64LE(data);
     }
 
     public static gpReadFloat(data: IReadable): number {
-        let bytes: Uint8Array = new Uint8Array(4);
-        bytes[3] = data.readByte();
-        bytes[2] = data.readByte();
-        bytes[2] = data.readByte();
-        bytes[1] = data.readByte();
-
-        let array: Float32Array = new Float32Array(bytes.buffer);
-        return array[0];
+        return IOHelper.readFloat32LE(data);
     }
 
     public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {

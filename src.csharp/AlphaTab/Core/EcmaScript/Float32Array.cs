@@ -8,58 +8,55 @@ namespace AlphaTab.Core.EcmaScript
 {
     public class Float32Array : IEnumerable<float>
     {
-        public readonly float[] Data;
-        public double Length => Data.Length;
-
-
-        public Float32Array(ArrayBuffer buffer)
-            : this(buffer.Raw.Count / sizeof(float))
-        {
-            Buffer.BlockCopy(buffer.Raw.Array, buffer.Raw.Offset, Data, 0, buffer.Raw.Count);
-        }
+        public readonly ArraySegment<float> Data;
+        public double Length => Data.Count;
 
         private Float32Array(float[] data)
         {
-            Data = data;
+            Data = new ArraySegment<float>(data);
         }
 
         public Float32Array(double size)
         {
-            Data = new float[(int) size];
+            Data = new ArraySegment<float>(new float[(int)size]);
         }
 
         public Float32Array(IEnumerable<double> values)
         {
-            Data = values.Select(d => (float) d).ToArray();
+            Data = new ArraySegment<float>(values.Select(d => (float)d).ToArray());
         }
 
         public Float32Array(IEnumerable<int> values)
         {
-            Data = values.Select(d => (float) d).ToArray();
+            Data = new ArraySegment<float>(values.Select(d => (float)d).ToArray());
+        }
+
+        private Float32Array(ArraySegment<float> data)
+        {
+            Data = data;
         }
 
         public double this[double index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Data[(int) index];
+            get => Data.Array![Data.Offset + (int)index];
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => Data[(int) index] = (float) value;
+            set => Data.Array![Data.Offset + (int)index] = (float)value;
         }
 
         public Float32Array Subarray(double start, double end)
         {
-            var sub = new float[(int)(end - start)];
-            Buffer.BlockCopy(Data, (int) start * sizeof(float), sub, 0, sub.Length * sizeof(float));
-            return new Float32Array(sub);
+            return new Float32Array(new ArraySegment<float>(Data.Array!, Data.Offset + (int)start,
+                (int)end - (int)start));
         }
 
         public void Set(Float32Array subarray, double offset)
         {
-            Buffer.BlockCopy(subarray.Data,
-                    0,
-                Data,
-                (int) offset * sizeof(float),
-                subarray.Data.Length * sizeof(float));
+            Buffer.BlockCopy(subarray.Data.Array!,
+                subarray.Data.Offset * sizeof(float),
+                Data.Array!,
+                Data.Offset + (int)offset * sizeof(float),
+                subarray.Data.Count * sizeof(float));
         }
 
         public IEnumerator<float> GetEnumerator()
@@ -70,6 +67,22 @@ namespace AlphaTab.Core.EcmaScript
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        public void Fill(double value, double start, double end)
+        {
+            var count = (int)end - (int)start;
+            if (value == 0)
+            {
+                System.Array.Clear(Data.Array!, Data.Offset + (int)start, count);
+            }
+            else
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    Data.Array![Data.Offset + i] = i;
+                }
+            }
         }
     }
 }

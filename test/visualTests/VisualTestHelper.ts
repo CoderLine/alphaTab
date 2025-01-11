@@ -250,7 +250,7 @@ export class VisualTestHelper {
             return;
         }
 
-        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer;
+        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer as ArrayBuffer;
         VisualTestHelper.enableAlphaSkia(bravura);
 
         const fonts = [
@@ -323,7 +323,7 @@ export class VisualTestHelper {
 
         // convert reference image to canvas
         if(referenceFileData.length > 0) {
-            using expected = AlphaSkiaImage.decode(referenceFileData.buffer);
+            using expected = AlphaSkiaImage.decode(referenceFileData.buffer as ArrayBuffer);
             await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, referenceFileName, expected, message, tolerancePercent);
         } else {
             await VisualTestHelper.expectToEqualVisuallyAsync(actual.endRender()!, referenceFileName, undefined, message, tolerancePercent);

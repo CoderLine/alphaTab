@@ -91,5 +91,14 @@ namespace AlphaTab.Core.EcmaScript
         {
             return GetEnumerator();
         }
+
+        public Uint8Array Slice(double startByte, double endByte)
+        {
+            return new Uint8Array(new ArraySegment<byte>(
+                _data.Array!,
+                _data.Offset + (int)startByte,
+                (int)endByte - (int)startByte
+            ));
+        }
     }
 }

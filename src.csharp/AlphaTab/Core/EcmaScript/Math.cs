@@ -68,6 +68,16 @@ namespace AlphaTab.Core.EcmaScript
             return System.Math.Sin(a);
         }
 
+        public static double Cos(double a)
+        {
+            return System.Math.Cos(a);
+        }
+
+        public static double Atan(double a)
+        {
+            return System.Math.Atan(a);
+        }
+
         public static double Log2(double d)
         {
             return System.Math.Log(d, 2);

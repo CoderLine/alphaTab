@@ -88,7 +88,7 @@ class FastListArray implements IFastList {
         return this._data[index];
     }
 }
-class FastRange {
+class FastRange implements IFastList {
     public static readonly instance = new FastRange();
     public get(index: number) {
         return index;
@@ -788,7 +788,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         }
     }
 
-    public unpack(packet: IntBitReader, blockSize: number, channel: number) {
+    public unpack(packet: IntBitReader, blockSize: number, channel: number): IVorbisFloorData {
         var data = new VorbisFloor1Data();
 
         // hoist ReadPosts to here since that's all we're doing...
@@ -812,7 +812,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                 }
                 for (let j = 0; j < cdim; j++) {
                     const book = this._subclassBooks[clsNum][cval & csub];
-                    cval >>= cbits;
+                    cval = cval >> cbits;
                     if (book != null) {
                         if ((data.posts[postCount] = book.decodeScalar(packet)) == -1) {
                             // we read a bad value... bail
@@ -1723,7 +1723,7 @@ class MdctImpl {
 
         let k: number;
         let k2: number;
-        for (let k = (k2 = 0); k < this._n4; ++k, k2 += 2) {
+        for (k = (k2 = 0); k < this._n4; ++k, k2 += 2) {
             this._a[k2] = Math.cos((4 * k * MdctImpl.M_PI) / n);
             this._a[k2 + 1] = -Math.sin((4 * k * MdctImpl.M_PI) / n);
             this._b[k2] = Math.cos(((k2 + 1) * MdctImpl.M_PI) / n / 2) * 0.5;
@@ -2372,7 +2372,7 @@ export class VorbisStreamDecoder {
     private readNextPacket(bufferedSamples: number): VorbisReadNextPacketResult | null {
         // decode the next packet now so we can start overlapping with it
         const res = this.decodeNextPacket();
-        this._eosFound ||= res.isEndOfStream;
+        this._eosFound = this._eosFound || res.isEndOfStream;
         if (res.curPacket == null) {
             return null;
         }
@@ -2380,7 +2380,7 @@ export class VorbisStreamDecoder {
         // if we get a max sample position, back off our valid length to match
         if (res.samplePosition !== null && res.isEndOfStream) {
             const actualEnd = this._currentPosition + bufferedSamples + res.validLen - res.startIndex;
-            const diff = res.samplePosition - actualEnd;
+            const diff = res.samplePosition! - actualEnd;
             if (diff < 0) {
                 res.validLen += diff;
                 if (res.validLen < 0) {

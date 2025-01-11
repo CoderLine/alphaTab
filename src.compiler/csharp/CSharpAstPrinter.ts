@@ -541,6 +541,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                         case cs.PrimitiveType.Var:
                             this.write('var');
                             break;
+                        case cs.PrimitiveType.Long:
+                            this.write('long');
+                            break;
                     }
                 }
 

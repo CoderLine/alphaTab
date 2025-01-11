@@ -11,6 +11,18 @@ export class IOHelper {
         return (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4;
     }
 
+    public static readFloat32LE(readable: IReadable): number {
+        const bits = new Uint8Array(4);
+        readable.read(bits, 0, bits.length);
+        return TypeConversions.bytesToFloat32LE(bits);
+    }
+
+    public static readFloat64LE(readable: IReadable): number {
+        const bits = new Uint8Array(8);
+        readable.read(bits, 0, bits.length);
+        return TypeConversions.bytesToFloat64LE(bits);
+    }
+
     public static readInt32LE(input: IReadable): number {
         let ch1: number = input.readByte();
         let ch2: number = input.readByte();
@@ -185,7 +197,7 @@ export class IOHelper {
         o.writeByte((v >> 0) & 0xff);
         o.writeByte((v >> 8) & 0xff);
     }
-    
+
     public static writeInt16BE(o: IWriteable, v: number) {
         o.writeByte((v >> 8) & 0xff);
         o.writeByte((v >> 0) & 0xff);

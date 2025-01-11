@@ -120,11 +120,11 @@ export class IntBitReader {
             if (count > 31) {
                 this._bitBucket = 0n;
             } else {
-                this._bitBucket >>= bigCount;
+                this._bitBucket = this._bitBucket >> bigCount;
             }
             if (this._bitCount > 32) {
                 const overflowCount = this._bitCount - 32n;
-                this._bitBucket |= this._overflowBits << (this._bitCount - bigCount - overflowCount);
+                this._bitBucket = this._bitBucket | (this._overflowBits << (this._bitCount - bigCount - overflowCount));
 
                 if (overflowCount > count) {
                     // ugh, we have to keep bits in overflow

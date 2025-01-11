@@ -710,6 +710,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                         case cs.PrimitiveType.Var:
                             this.write('var');
                             break;
+                        case cs.PrimitiveType.Long:
+                            this.write('Long');
+                            break;
                     }
                 }
 

@@ -21,6 +21,11 @@ namespace AlphaTab.Core.EcmaScript
             _data = new HashSet<T>(values);
         }
 
+        public void Clear()
+        {
+            _data.Clear();
+        }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Add(T item)
         {
