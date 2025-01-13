@@ -273,7 +273,8 @@ export enum PrimitiveType {
     Object,
     Dynamic,
     Var,
-    Long
+    Long,
+    UInt
 }
 
 export interface PrimitiveTypeNode extends TypeNode {

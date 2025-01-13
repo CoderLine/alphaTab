@@ -14,6 +14,14 @@ export class IOHelper {
     public static readFloat32LE(readable: IReadable): number {
         const bits = new Uint8Array(4);
         readable.read(bits, 0, bits.length);
+
+        return TypeConversions.bytesToFloat32LE(bits);
+    }
+
+    public static readFloat32BE(readable: IReadable): number {
+        const bits = new Uint8Array(4);
+        readable.read(bits, 0, bits.length);
+        bits.reverse();
         return TypeConversions.bytesToFloat32LE(bits);
     }
 

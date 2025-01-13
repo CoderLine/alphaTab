@@ -11,7 +11,6 @@ import { expect } from 'chai';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Hydra } from '@src/synth/soundfont/Hydra';
 
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
@@ -115,26 +114,18 @@ describe('AlphaSynthTests', () => {
         expect(vorbis.streams[0].audioSampleRate).to.equal(44100);
         expect(vorbis.streams[0].samples.length).to.be.greaterThan(44100 * 0.05);
 
-        const generated = new Uint8Array(
-            vorbis.streams[0].samples.buffer,
-            vorbis.streams[0].samples.byteOffset,
-            vorbis.streams[0].samples.byteLength
-        );
-        const reference = await TestPlatform.loadFile(`test-data/audio/${name}_alphaTab.pcm`);
+        const generated = vorbis.streams[0].samples;
+        const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${name}_alphaTab.pcm`)).buffer);
         try {
-            expect(generated.length).to.equal(reference.length);
+            expect(generated.length).to.equal(reference.buffer.byteLength / 4);
 
             for (let i = 0; i < generated.length; i++) {
-                expect(generated[i]).to.equal(reference[i], `Difference at index ${i}`);
+                expect(generated[i]).to.equal(reference.getFloat32(i * 4, true), `Difference at index ${i}`);
             }
         } catch (e) {
             await TestPlatform.saveFile(
                 `test-data/audio/${name}_alphaTab_new.pcm`,
-                new Uint8Array(
-                    vorbis.streams[0].samples.buffer,
-                    vorbis.streams[0].samples.byteOffset,
-                    vorbis.streams[0].samples.byteLength
-                )
+                new Uint8Array(vorbis.streams[0].samples.buffer)
             );
 
             throw e;
@@ -142,22 +133,10 @@ describe('AlphaSynthTests', () => {
     }
 
     it('ogg-vorbis-short', async () => {
-        testVorbisFile('Short');
+        await testVorbisFile('Short');
     });
 
     it('ogg-vorbis-example', async () => {
-        testVorbisFile('Example');
-    });
-
-    it('sf3', async () => {
-        const data = await TestPlatform.loadFile('font/musescore/MuseScore_General.sf3');
-        let soundFont: Hydra = new Hydra();
-        soundFont.load(ByteBuffer.fromBuffer(data));
-
-        await TestPlatform.saveFile(
-            `test-data/audio/MuseScore_General_Steel_Gtr_E3.pcm`,
-            await soundFont.sampleData.slice(2763270, 2819873)
-
-        );
+        await testVorbisFile('Example');
     });
 });

@@ -4,89 +4,88 @@ import CSharpEmitterContext from './CSharpEmitterContext';
 import AstPrinterBase from '../AstPrinterBase';
 
 export default class CSharpAstPrinter extends AstPrinterBase {
-
     public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
         super(sourceFile, context);
     }
 
     private keywords: Set<string> = new Set<string>([
-        "abstract",
-        "as",
-        "base",
-        "bool",
-        "break",
-        "byte",
-        "case",
-        "catch",
-        "char",
-        "checked",
-        "class",
-        "const",
-        "continue",
-        "decimal",
-        "default",
-        "delegate",
-        "do",
-        "double",
-        "else",
-        "enum",
-        "event",
-        "explicit",
-        "extern",
-        "false",
-        "finally",
-        "fixed",
-        "float",
-        "for",
-        "foreach",
-        "goto",
-        "if",
-        "implicit",
-        "in",
-        "int",
-        "interface",
-        "internal",
-        "is",
-        "lock",
-        "long",
-        "namespace",
-        "new",
-        "null",
-        "object",
-        "operator",
-        "out",
-        "override",
-        "params",
-        "private",
-        "protected",
-        "public",
-        "readonly",
-        "ref",
-        "return",
-        "sbyte",
-        "sealed",
-        "short",
-        "sizeof",
-        "stackalloc",
-        "static",
-        "string",
-        "struct",
-        "switch",
-        "this",
-        "throw",
-        "true",
-        "try",
-        "typeof",
-        "uint",
-        "ulong",
-        "unchecked",
-        "unsafe",
-        "ushort",
-        "using",
-        "virtual",
-        "void",
-        "volatile",
-        "while"
+        'abstract',
+        'as',
+        'base',
+        'bool',
+        'break',
+        'byte',
+        'case',
+        'catch',
+        'char',
+        'checked',
+        'class',
+        'const',
+        'continue',
+        'decimal',
+        'default',
+        'delegate',
+        'do',
+        'double',
+        'else',
+        'enum',
+        'event',
+        'explicit',
+        'extern',
+        'false',
+        'finally',
+        'fixed',
+        'float',
+        'for',
+        'foreach',
+        'goto',
+        'if',
+        'implicit',
+        'in',
+        'int',
+        'interface',
+        'internal',
+        'is',
+        'lock',
+        'long',
+        'namespace',
+        'new',
+        'null',
+        'object',
+        'operator',
+        'out',
+        'override',
+        'params',
+        'private',
+        'protected',
+        'public',
+        'readonly',
+        'ref',
+        'return',
+        'sbyte',
+        'sealed',
+        'short',
+        'sizeof',
+        'stackalloc',
+        'static',
+        'string',
+        'struct',
+        'switch',
+        'this',
+        'throw',
+        'true',
+        'try',
+        'typeof',
+        'uint',
+        'ulong',
+        'unchecked',
+        'unsafe',
+        'ushort',
+        'using',
+        'virtual',
+        'void',
+        'volatile',
+        'while'
     ]);
 
     protected override escapeIdentifier(identifier: string): string {
@@ -304,12 +303,12 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 defaultConstructor.parameters = constructorDeclaration.parameters;
                 defaultConstructor.baseConstructorArguments = constructorDeclaration.parameters.map(
                     p =>
-                    ({
-                        parent: defaultConstructor,
-                        nodeType: cs.SyntaxKind.Identifier,
-                        text: p.name,
-                        tsNode: defaultConstructor.tsNode
-                    } as cs.Identifier)
+                        ({
+                            parent: defaultConstructor,
+                            nodeType: cs.SyntaxKind.Identifier,
+                            text: p.name,
+                            tsNode: defaultConstructor.tsNode
+                        } as cs.Identifier)
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -346,11 +345,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
         if (d.isAbstract) {
             this.write('abstract ');
-        }
-        else if (d.isVirtual) {
+        } else if (d.isVirtual) {
             this.write('virtual ');
-        }
-        else if (d.isOverride) {
+        } else if (d.isOverride) {
             this.write('override ');
         }
 
@@ -427,11 +424,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
             if (d.isAbstract) {
                 this.write('abstract ');
-            }
-            else if (d.isVirtual) {
+            } else if (d.isVirtual) {
                 this.write('virtual ');
-            }
-            else if (d.isOverride) {
+            } else if (d.isOverride) {
                 this.write('override ');
             }
         }
@@ -544,6 +539,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                         case cs.PrimitiveType.Long:
                             this.write('long');
                             break;
+                        case cs.PrimitiveType.UInt:
+                            this.write('uint');
+                            break;
                     }
                 }
 
@@ -625,11 +623,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                     this.write(targetType);
                 } else {
                     if (typeReference.isAsync) {
-                        this.write("System.Threading.Tasks.Task");
+                        this.write('System.Threading.Tasks.Task');
                         if (!cs.isPrimitiveTypeNode(targetType) || targetType.type != cs.PrimitiveType.Void) {
                             this.write('<');
                             this.writeType(targetType, forNew);
-
                         } else {
                             isAsyncVoid = true;
                         }
@@ -646,7 +643,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                     }
 
                     if (typeReference.isAsync) {
-                        this.write(">");
+                        this.write('>');
                     }
                 }
 
@@ -730,10 +727,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         let exprs: cs.Expression[] = [];
         expr.chunks.forEach(c => {
             if (cs.isStringLiteral(c)) {
-                const escapedText = c.text
-                .replaceAll('"', '""')
-                .replaceAll('{', '{{')
-                .replaceAll('}', '}}');
+                const escapedText = c.text.replaceAll('"', '""').replaceAll('{', '{{').replaceAll('}', '}}');
                 this.write(escapedText);
             } else {
                 this.write(`{${exprs.length}}`);
@@ -938,7 +932,6 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     }
 
     protected writeVariableDeclarationList(declarationList: cs.VariableDeclarationList) {
-
         this.writeType(declarationList.declarations[0].type);
 
         declarationList.declarations.forEach((d, i) => {

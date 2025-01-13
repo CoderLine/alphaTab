@@ -1,7 +1,6 @@
 import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
 import { Color } from '@src/model/Color';
 import { TestPlatform } from '@test/TestPlatform';
-import { ModelUtils } from '@src/model/ModelUtils';
 import { expect } from 'chai';
 
 describe('BinaryStylesheetParserTest', () => {
@@ -34,7 +33,7 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Global/DrawChords')).to.equal(true);
 
         expect(stylesheet.raw.has('System/codaSplitWidth')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/codaSplitWidth') as number, 2.0)).to.be.true;
+        expect(stylesheet.raw.get('System/codaSplitWidth') as number).to.be.closeTo(6.0, 0.0001);
 
         expect(stylesheet.raw.has('Global/HarmonicPriority')).to.be.true;
         expect(stylesheet.raw.get('Global/HarmonicPriority')).to.equal(2200);
@@ -43,10 +42,10 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Global/LetRingThroughoutPriority')).to.equal(2500);
 
         expect(stylesheet.raw.has('Global/stretchFactor')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/stretchFactor') as number, 0.5)).to.be.true;
+        expect(stylesheet.raw.get('Global/stretchFactor') as number).to.be.closeTo(1, 0.0001);
 
         expect(stylesheet.raw.has('StandardNotation/bendHeight')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/bendHeight') as number, 2.0)).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/bendHeight') as number).to.be.closeTo(2.0, 0.0001);
 
         expect(stylesheet.raw.has('Global/ChordDiagramPriority')).to.be.true;
         expect(stylesheet.raw.get('Global/ChordDiagramPriority')).to.equal(3000);
@@ -55,7 +54,7 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Global/AlternateEndingPriority')).to.equal(2800);
 
         expect(stylesheet.raw.has('StandardNotation/tieOffsetX')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/tieOffsetX') as number, 0.105)).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/tieOffsetX') as number).to.be.closeTo(0.07999999, 0.0001);
 
         expect(stylesheet.raw.has('Global/PalmMutePriority')).to.be.true;
         expect(stylesheet.raw.get('Global/PalmMutePriority')).to.equal(1200);
@@ -70,15 +69,13 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Global/HoPoPriority')).to.equal(800);
 
         expect(stylesheet.raw.has('Staff/repeatWidth')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Staff/repeatWidth') as number, 0.5)).to.be.true;
+        expect(stylesheet.raw.get('Staff/repeatWidth') as number).to.be.closeTo(0.5, 0.0001);
 
         expect(stylesheet.raw.has('System/bracketWidth')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/bracketWidth') as number, 0.5)).to.be.true;
+        expect(stylesheet.raw.get('System/bracketWidth') as number).to.be.closeTo(0.5, 0.0001);
 
         expect(stylesheet.raw.has('Global/TuningSpaceInFrontOfStaff')).to.be.true;
-        expect(
-            ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/TuningSpaceInFrontOfStaff') as number, 2.0)
-        ).to.be.true;
+        expect(stylesheet.raw.get('Global/TuningSpaceInFrontOfStaff') as number).to.be.closeTo(2.0, 0.0001);
 
         expect(stylesheet.raw.has('StandardNotation/drawWholeRestOnEmptyBars')).to.be.true;
         expect(stylesheet.raw.get('StandardNotation/drawWholeRestOnEmptyBars')).to.equal(false);
@@ -105,9 +102,7 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Footer/PageNumberAlignment')).to.equal(2);
 
         expect(stylesheet.raw.has('Global/graceFlatScaleFactor')).to.be.true;
-        expect(
-            ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/graceFlatScaleFactor') as number, 0.8333282)
-        ).to.be.true;
+        expect(stylesheet.raw.get('Global/graceFlatScaleFactor') as number).to.be.closeTo(0.58333, 0.0001);
 
         expect(stylesheet.raw.has('Global/shadowColorEnd')).to.be.true;
         expect((stylesheet.raw.get('Global/shadowColorEnd') as Color).r).to.equal(90);
@@ -122,7 +117,7 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Global/GolpePriority')).to.equal(350);
 
         expect(stylesheet.raw.has('Global/spaceSizeMM')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/spaceSizeMM') as number, 0.5)).to.be.true;
+        expect(stylesheet.raw.get('Global/spaceSizeMM') as number).to.be.closeTo(1.5, 0.0001);
 
         expect(stylesheet.raw.has('TablatureNotation/drawSecondNoteTrill')).to.be.true;
         expect(stylesheet.raw.get('TablatureNotation/drawSecondNoteTrill')).to.equal(true);
@@ -134,12 +129,10 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('TablatureNotation/minimalInformationForHarmonic')).to.equal(true);
 
         expect(stylesheet.raw.has('PageSetup/pageTopMargin')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('PageSetup/pageTopMargin') as number, 8.0)).to.be.true;
+        expect(stylesheet.raw.get('PageSetup/pageTopMargin') as number).to.be.closeTo(15, 0.0001);
 
         expect(stylesheet.raw.has('StandardNotation/augmentationDotRadius')).to.be.true;
-        expect(
-            ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/augmentationDotRadius') as number, 0.125)
-        ).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/augmentationDotRadius') as number).to.be.closeTo(0.25, 0.0001);
 
         expect(stylesheet.raw.has('Odd/drawOddCopyright')).to.be.true;
         expect(stylesheet.raw.get('Odd/drawOddCopyright')).to.equal(false);
@@ -151,7 +144,7 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('System/codaSplit')).to.equal(true);
 
         expect(stylesheet.raw.has('StandardNotation/tieMaxHeight')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('StandardNotation/tieMaxHeight') as number, 2.0)).to.be.true;
+        expect(stylesheet.raw.get('StandardNotation/tieMaxHeight') as number).to.be.closeTo(2.5, 0.0001);
 
         expect(stylesheet.raw.has('Header/WordsAndMusicAlignment')).to.be.true;
         expect(stylesheet.raw.get('Header/WordsAndMusicAlignment')).to.equal(2);
@@ -163,15 +156,13 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('StandardNotation/rightFingeringPositionSN')).to.equal(1);
 
         expect(stylesheet.raw.has('System/bracketCurveHeight')).to.be.true;
-        expect(
-            ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/bracketCurveHeight') as number, 1.600006)
-        ).to.be.true;
+        expect(stylesheet.raw.get('System/bracketCurveHeight') as number).to.be.closeTo(0.8, 0.0001);
 
         expect(stylesheet.raw.has('Global/FreeTimePriority')).to.be.true;
         expect(stylesheet.raw.get('Global/FreeTimePriority')).to.equal(2700);
 
         expect(stylesheet.raw.has('Global/ChordSpacingMillimeter')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/ChordSpacingMillimeter') as number, 2.0)).to.be.true;
+        expect(stylesheet.raw.get('Global/ChordSpacingMillimeter') as number).to.be.closeTo(3.0, 0.0001);
 
         expect(stylesheet.raw.has('Header/drawAlbum')).to.be.true;
         expect(stylesheet.raw.get('Header/drawAlbum')).to.equal(true);
@@ -183,15 +174,13 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('System/insertSizeSameTrack')).to.equal(1);
 
         expect(stylesheet.raw.has('System/marginMinimalBeforeFirstNote')).to.be.true;
-        expect(
-            ModelUtils.isAlmostEqualTo(stylesheet.raw.get('System/marginMinimalBeforeFirstNote') as number, 0.5)
-        ).to.be.true;
+        expect(stylesheet.raw.get('System/marginMinimalBeforeFirstNote') as number).to.be.closeTo(1.5, 0.0001);
 
         expect(stylesheet.raw.has('Header/Subtitle')).to.be.true;
         expect(stylesheet.raw.get('Header/Subtitle')).to.equal('%SUBTITLE%');
 
         expect(stylesheet.raw.has('Global/alphaSuggested')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/alphaSuggested') as number, 0.5)).to.be.true;
+        expect(stylesheet.raw.get('Global/alphaSuggested') as number).to.be.closeTo(0.5, 0.0001);
 
         expect(stylesheet.raw.has('Even/EvenHeaderAlignment')).to.be.true;
         expect(stylesheet.raw.get('Even/EvenHeaderAlignment')).to.equal(0);
@@ -209,12 +198,10 @@ describe('BinaryStylesheetParserTest', () => {
         expect(stylesheet.raw.get('Global/mouseClickMaxTime')).to.equal(200);
 
         expect(stylesheet.raw.has('Global/graceSharpScaleFactor')).to.be.true;
-        expect(
-            ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/graceSharpScaleFactor') as number, 1.333344)
-        ).to.be.true;
+        expect(stylesheet.raw.get('Global/graceSharpScaleFactor') as number).to.be.closeTo(0.6666, 0.0001);
 
         expect(stylesheet.raw.has('Global/GrayedOpacity')).to.be.true;
-        expect(ModelUtils.isAlmostEqualTo(stylesheet.raw.get('Global/GrayedOpacity') as number, 0.4000015)).to.be.true;
+        expect(stylesheet.raw.get('Global/GrayedOpacity') as number).to.be.closeTo(0.2, 0.0001);
 
         expect(stylesheet.raw.has('Global/WhammyBarVibratoPriority')).to.be.true;
         expect(stylesheet.raw.get('Global/WhammyBarVibratoPriority')).to.equal(1400);

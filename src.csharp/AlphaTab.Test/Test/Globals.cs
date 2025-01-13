@@ -83,6 +83,18 @@ namespace AlphaTab.Test
             Assert.AreEqual(expected, _actual, message);
         }
 
+        public void GreaterThan(double expected)
+        {
+            if (_actual is int i)
+            {
+                Assert.IsTrue(i.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+            }
+            if (_actual is double d)
+            {
+                Assert.IsTrue(d.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+            }
+        }
+
         public void CloseTo(double expected, double delta, string? message = null)
         {
             if (_actual is IConvertible c)
@@ -112,7 +124,7 @@ namespace AlphaTab.Test
         }
         public void Length(int length)
         {
-            if(_actual is ICollection collection) 
+            if(_actual is ICollection collection)
             {
                 Assert.AreEqual(length, collection.Count);
             }

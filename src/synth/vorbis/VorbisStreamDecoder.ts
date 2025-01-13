@@ -51,27 +51,28 @@ class VorbisUtils {
         return cnt;
     }
 
-    static bitReverse(n: number, bits: number = 32) {
-        n = ((n & 0xaaaaaaaa) >>> 1) | ((n & 0x55555555) << 1);
-        n = ((n & 0xcccccccc) >>> 2) | ((n & 0x33333333) << 2);
-        n = ((n & 0xf0f0f0f0) >>> 4) | ((n & 0x0f0f0f0f) << 4);
-        n = ((n & 0xff00ff00) >>> 8) | ((n & 0x00ff00ff) << 8);
-        return ((n >>> 16) | (n << 16)) >>> (32 - bits);
+    static bitReverse(on: number, bits: number = 32) {
+        let bn = BigInt(on);
+        bn = ((bn & BigInt(0xaaaaaaaa)) >> 1n) | ((bn & BigInt(0x55555555)) << 1n);
+        bn = ((bn & BigInt(0xcccccccc)) >> 2n) | ((bn & BigInt(0x33333333)) << 2n);
+        bn = ((bn & BigInt(0xf0f0f0f0)) >> 4n) | ((bn & BigInt(0x0f0f0f0f)) << 4n);
+        bn = ((bn & BigInt(0xff00ff00)) >> 8n) | ((bn & BigInt(0x00ff00ff)) << 8n);
+
+        bn = ((bn >> 16n) | (bn << 16n)) >> (32n - BigInt(bits));
+        const x = Number(BigInt.asUintN(32, bn));
+        return x;
     }
 
     static convertFromVorbisFloat32(bits: number): number {
-        // do as much as possible with bit tricks in integer math
-        const sign = (bits | 0) >> 31; // sign-extend to the full 32-bits
-        const exponent = (((bits & 0x7fe00000) >> 21) | 0) - 788; // grab the exponent, remove the bias, store as double (for the call to Math.pow(...))
-        const mantissa = ((bits & 0x1fffff) ^ sign) + (sign & 1); // grab the mantissa and apply the sign bit.  store as float
-
-        // NB: We could use bit tricks to calc the exponent, but it can't be more than 63 in either direction.
-        //     This creates an issue, since the exponent field allows for a *lot* more than that.
-        //     On the flip side, larger exponent values don't seem to be used by the Vorbis codebooks...
-        //     Either way, we'll play it safe and let the BCL calculate it.
-
-        // now switch to single-precision and calc the return value
-        return mantissa * Math.pow(2.0, exponent);
+        // https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-1200009.2.2
+        const big = BigInt(bits);
+        let bmantissa = big & BigInt(0x1fffff);
+        const bsign = big & BigInt(0x80000000); 
+        const bexponent = (big & BigInt(0x7fe00000)) >> 21n;
+        if(bsign !== 0n) {
+            bmantissa = -bmantissa;
+        }
+        return Number(bmantissa) * Math.pow(2.0, Number(bexponent) - 788);
     }
 }
 
@@ -1723,7 +1724,7 @@ class MdctImpl {
 
         let k: number;
         let k2: number;
-        for (k = (k2 = 0); k < this._n4; ++k, k2 += 2) {
+        for (k = k2 = 0; k < this._n4; ++k, k2 += 2) {
             this._a[k2] = Math.cos((4 * k * MdctImpl.M_PI) / n);
             this._a[k2 + 1] = -Math.sin((4 * k * MdctImpl.M_PI) / n);
             this._b[k2] = Math.cos(((k2 + 1) * MdctImpl.M_PI) / n / 2) * 0.5;

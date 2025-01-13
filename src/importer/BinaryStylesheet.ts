@@ -78,7 +78,7 @@ export class BinaryStylesheet {
                     this.addValue(key, ivalue);
                     break;
                 case DataType.Float:
-                    let fvalue: number = IOHelper.readFloat32LE(readable);
+                    let fvalue: number = IOHelper.readFloat32BE(readable);
                     this.addValue(key, fvalue);
                     break;
                 case DataType.String:

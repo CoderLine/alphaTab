@@ -104,6 +104,19 @@ namespace AlphaTab.Core.EcmaScript
             return BitConverter.ToUInt16(bytes, 0);
         }
 
+        public double GetFloat32(double offset, bool littleEndian = true)
+        {
+            var bytes = new byte[sizeof(float)];
+            System.Buffer.BlockCopy(Buffer.Raw.Array!, Buffer.Raw.Offset + (int) offset, bytes, 0,
+                bytes.Length);
+            if (littleEndian != BitConverter.IsLittleEndian)
+            {
+                System.Array.Reverse(bytes);
+            }
+
+            return BitConverter.ToSingle(bytes, 0);
+        }
+
         public void SetUint8(double offset, double value)
         {
             Buffer.Raw.Array![Buffer.Raw.Offset + (int) offset] = (byte) value;

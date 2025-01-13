@@ -136,7 +136,7 @@ namespace AlphaTab
             var samplesFromBuffer = (int)_circularBuffer.Read(read, 0,
                 System.Math.Min(read.Length, _circularBuffer.Count));
 
-            Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
+            Buffer.BlockCopy(read.Data.Array!, read.Data.Offset, buffer, offset * sizeof(float),
                 samplesFromBuffer * sizeof(float));
 
             ((EventEmitterOfT<double>)SamplesPlayed).Trigger(samplesFromBuffer /

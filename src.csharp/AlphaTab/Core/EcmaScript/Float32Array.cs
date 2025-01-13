@@ -10,6 +10,15 @@ namespace AlphaTab.Core.EcmaScript
     {
         public readonly ArraySegment<float> Data;
         public double Length => Data.Count;
+        internal ArrayBuffer Buffer
+        {
+            get
+            {
+                var bytes = new byte[Data.Count * sizeof(float)];
+                System.Buffer.BlockCopy(Data.Array!, Data.Offset, bytes, 0, bytes.Length);
+                return new ArrayBuffer(bytes);
+            }
+        }
 
         private Float32Array(float[] data)
         {
@@ -52,7 +61,7 @@ namespace AlphaTab.Core.EcmaScript
 
         public void Set(Float32Array subarray, double offset)
         {
-            Buffer.BlockCopy(subarray.Data.Array!,
+            System.Buffer.BlockCopy(subarray.Data.Array!,
                 subarray.Data.Offset * sizeof(float),
                 Data.Array!,
                 Data.Offset + (int)offset * sizeof(float),

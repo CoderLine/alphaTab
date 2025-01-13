@@ -100,5 +100,14 @@ namespace AlphaTab.Core.EcmaScript
                 (int)endByte - (int)startByte
             ));
         }
+
+        public void Reverse()
+        {
+            System.Array.Reverse(
+                _data.Array!,
+                _data.Offset,
+                _data.Count
+            );
+        }
     }
 }

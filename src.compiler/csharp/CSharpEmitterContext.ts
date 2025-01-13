@@ -414,6 +414,7 @@ export default class CSharpEmitterContext {
                     case 'Uint32Array':
                     case 'Float32Array':
                     case 'Float64Array':
+                    case 'DataView':
                         typeArguments = [];
                         break;
                 }

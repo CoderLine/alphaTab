@@ -22,12 +22,12 @@ export class TypeConversions {
 
     public static bytesToFloat64LE(bytes: Uint8Array): number {
         TypeConversions._conversionByteArray.set(bytes, 0);
-        throw TypeConversions._dataView.getFloat64(0, true);
+        return TypeConversions._dataView.getFloat64(0, true);
     }
 
     public static bytesToFloat32LE(bytes: Uint8Array): number {
         TypeConversions._conversionByteArray.set(bytes, 0);
-        throw TypeConversions._dataView.getFloat32(0, true);
+        return TypeConversions._dataView.getFloat32(0, true);
     }
 
     public static uint16ToInt16(v: number): number {

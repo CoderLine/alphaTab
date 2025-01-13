@@ -2516,6 +2516,7 @@ export default class CSharpAstTransformer {
                         if (!this.hasBinaryOperationMakeInt(binaryExpression.left)) {
                             binaryExpression.left = this.makeInt(binaryExpression.left, true);
                         }
+
                         if (!this.hasBinaryOperationMakeInt(binaryExpression.right)) {
                             let allowLongOnRight = false;
                             switch (expression.operatorToken.kind) {
@@ -2523,6 +2524,9 @@ export default class CSharpAstTransformer {
                                 case ts.SyntaxKind.BarToken:
                                 case ts.SyntaxKind.CaretToken:
                                     allowLongOnRight = true;
+                                    break;
+                                default:
+                                    allowLongOnRight = false;
                                     break;
                             }
 
@@ -2568,6 +2572,7 @@ export default class CSharpAstTransformer {
         switch ((left as cs.BinaryExpression).operator) {
             case '&':
             case '>>':
+            case '>>>':
             case '<<':
             case '^':
             case '|':
@@ -2622,7 +2627,11 @@ export default class CSharpAstTransformer {
     protected makeInt(expression: cs.Expression, bigIntToLong: boolean): cs.Expression {
         switch (expression.nodeType) {
             case cs.SyntaxKind.NumericLiteral:
-                if ((expression as cs.NumericLiteral).value.indexOf('.') === -1) {
+                const value = (expression as cs.NumericLiteral).value;
+                if (value.indexOf('.') === -1) {
+                    if (value.includes('L') && !bigIntToLong) {
+                        (expression as cs.NumericLiteral).value = value.substring(0, value.length - 1);
+                    }
                     return expression;
                 }
                 break;
@@ -2631,15 +2640,30 @@ export default class CSharpAstTransformer {
 
         // use longs when required
         let targetType = cs.PrimitiveType.Int;
-        if (bigIntToLong && expression.tsNode) {
+        if (expression.tsNode) {
             const nodeType = this._context.getType(expression.tsNode);
-            // no casting on bools
-            if ((nodeType.flags & ts.TypeFlags.Boolean) !== 0 || (nodeType.flags & ts.TypeFlags.BooleanLike) !== 0) {
-                return expression;
-            }
+            if (bigIntToLong) {
+                // no casting on bools
+                if (
+                    (nodeType.flags & ts.TypeFlags.Boolean) !== 0 ||
+                    (nodeType.flags & ts.TypeFlags.BooleanLike) !== 0
+                ) {
+                    return expression;
+                }
 
-            if ((nodeType.flags & ts.TypeFlags.BigInt) !== 0 || (nodeType.flags & ts.TypeFlags.BigIntLiteral) !== 0) {
-                targetType = cs.PrimitiveType.Long;
+                if (
+                    (nodeType.flags & ts.TypeFlags.BigInt) !== 0 ||
+                    (nodeType.flags & ts.TypeFlags.BigIntLiteral) !== 0
+                ) {
+                    targetType = cs.PrimitiveType.Long;
+                }
+            } else {
+                if (
+                    (nodeType.flags & ts.TypeFlags.BigInt) !== 0 ||
+                    (nodeType.flags & ts.TypeFlags.BigIntLiteral) !== 0
+                ) {
+                    targetType = cs.PrimitiveType.Int;
+                }
             }
         }
 
