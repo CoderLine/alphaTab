@@ -35,31 +35,32 @@ public class Uint8Array : Iterable<UByte> {
     }
 
     public inline operator fun get(idx: Int): Double {
-        return this.buffer[idx].toDouble()
+        return this.buffer[this.byteOffset.toInt() + idx].toDouble()
     }
 
     public inline operator fun get(idx: Double): Double {
-        return this.buffer[idx.toInt()].toDouble()
+        return this[idx.toInt()]
     }
 
     public inline operator fun set(idx: Int, value: Double) {
-        this.buffer[idx] = value.toInt().toUByte()
+        this.buffer[this.byteOffset.toInt() + idx] = value.toInt().toUByte()
     }
 
-    public inline fun set(subarray: Uint8Array, pos: Double) {
-        subarray.buffer.copyInto(buffer, pos.toInt(), 0, subarray.buffer.size)
+    internal inline fun set(subarray: Uint8Array, pos: Double) {
+        subarray.buffer.copyInto(buffer, pos.toInt(), this.byteOffset.toInt(), subarray.buffer.size)
     }
 
     override fun iterator(): Iterator<UByte> {
-        return buffer.iterator()
+        val offset = this.byteOffset.toInt()
+        return (0 until length.toInt()).map { buffer[offset + it] }.iterator()
     }
 
     internal fun subarray(begin: Double, end: Double): Uint8Array {
-        return Uint8Array(buffer.copyOfRange(begin.toInt(), end.toInt()))
+        return Uint8Array(buffer.copyOfRange((this.byteOffset + begin).toInt(), (this.byteOffset + end).toInt()))
     }
 
     internal fun reverse() {
-        buffer.reverse()
+        buffer.reverse(this.byteOffset.toInt(), this.byteOffset.toInt() + this.length.toInt())
     }
 
     internal fun slice(startByte: Double, endByte: Double): Uint8Array {
