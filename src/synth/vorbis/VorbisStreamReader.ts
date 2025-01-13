@@ -46,7 +46,12 @@ export class VorbisStreamReader {
 
     public read(): VorbisStream | null {
         let packet: OggPacket | null;
-        while ((packet = this.nextPacket()) != null) {
+        while (true) {
+            packet = this.nextPacket();
+            if (packet == null) {
+                return null;
+            }
+
             if (packet.isBeginningOfStream) {
                 var stream = this.readStream(packet);
                 if (stream != null) {
@@ -54,7 +59,6 @@ export class VorbisStreamReader {
                 }
             }
         }
-        return null;
     }
 
     private nextPacket(): OggPacket | null {
@@ -82,7 +86,11 @@ export class VorbisStreamReader {
         // collect data packets for stream
         const streamDataPackets: OggPacket[] = [];
         let packet: OggPacket | null;
-        while ((packet = this.nextPacket()) != null) {
+        while (true) {
+            packet = this.nextPacket();
+            if (packet == null) {
+                break;
+            }
             streamDataPackets.push(packet);
             if (packet.isEndOfStream) {
                 break;
@@ -119,13 +127,13 @@ export class VorbisStreamReader {
         return true;
     }
 
-     /**
+    /**
      * https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-610004.2
      * @param packetType
      * @param reader
      * @returns
      */
-     private comonHeaderDecodeBit(packetType: VorbisPacketTypes, reader: IntBitReader) {
+    private comonHeaderDecodeBit(packetType: VorbisPacketTypes, reader: IntBitReader) {
         const data = reader.readBytes(7);
 
         if (data[0] !== packetType) {
@@ -148,10 +156,6 @@ export class VorbisStreamReader {
      * @returns
      */
     private readIdentificationHeader(stream: VorbisStream, packet: OggPacket) {
-        if (packet == null) {
-            return false;
-        }
-
         const reader = ByteBuffer.fromBuffer(packet.packetData);
 
         if (!this.comonHeaderDecode(VorbisPacketTypes.IdentificationHeader, reader)) {

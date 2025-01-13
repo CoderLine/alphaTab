@@ -2,16 +2,15 @@
 using AlphaTab.Collections;
 using AlphaTab.Test;
 
-namespace AlphaTab.Model
+namespace AlphaTab.Model;
+
+internal partial class ComparisonHelpers
 {
-    internal partial class ComparisonHelpers
+    private static bool CompareObjects(object? expected, object? actual, string path,
+        IList<string> ignoreKeys)
     {
-        private static bool CompareObjects(object? expected, object? actual, string path,
-            IList<string> ignoreKeys)
-        {
-            TestGlobals.Fail(
-                $"cannot compare unknown object types expected[{actual?.GetType().FullName}] expected[${expected?.GetType().FullName}]");
-            return false;
-        }
+        TestGlobals.Fail(
+            $"cannot compare unknown object types expected[{actual?.GetType().FullName}] expected[${expected?.GetType().FullName}]");
+        return false;
     }
 }

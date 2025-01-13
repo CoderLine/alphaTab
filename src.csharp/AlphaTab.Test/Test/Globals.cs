@@ -2,187 +2,185 @@ using System;
 using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace AlphaTab.Test
-{
+namespace AlphaTab.Test;
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
-    public static class assert
+public static class assert
 #pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+{
+    public static void Fail(string message)
     {
-        public static void Fail(string message)
+        Assert.Fail(message);
+    }
+}
+
+public static class TestGlobals
+{
+    public static Expector<T> Expect<T>(T actual)
+    {
+        return new Expector<T>(actual);
+    }
+
+    public static Expector<Action> Expect(Action actual)
+    {
+        return new Expector<Action>(actual);
+    }
+
+    public static void Fail(object? message)
+    {
+        Assert.Fail(Convert.ToString(message));
+    }
+}
+
+public class NotExpector<T>
+{
+    private readonly T _actual;
+    public NotExpector<T> Be => this;
+
+    public NotExpector(T actual)
+    {
+        _actual = actual;
+    }
+
+    public void Ok()
+    {
+        if (_actual is string s)
         {
-            Assert.Fail(message);
+            Assert.IsTrue(string.IsNullOrEmpty(s));
+        }
+        else
+        {
+            Assert.AreEqual(default!, _actual);
+        }
+    }
+}
+
+public class Expector<T>
+{
+    private readonly T _actual;
+
+    public Expector(T actual)
+    {
+        _actual = actual;
+    }
+
+    public Expector<T> To => this;
+    public NotExpector<T> Not => new(_actual);
+    public Expector<T> Be => this;
+    public Expector<T> Have => this;
+
+    public void Equal(object? expected, string? message = null)
+    {
+        if (expected is int i && _actual is double)
+        {
+            expected = (double)i;
+        }
+        if (expected is double d && _actual is int)
+        {
+            expected = (int)d;
+        }
+
+        Assert.AreEqual(expected, _actual, message);
+    }
+
+    public void GreaterThan(double expected)
+    {
+        if (_actual is int i)
+        {
+            Assert.IsTrue(i.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+        }
+        if (_actual is double d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
         }
     }
 
-    public static class TestGlobals
+    public void CloseTo(double expected, double delta, string? message = null)
     {
-        public static Expector<T> Expect<T>(T actual)
+        if (_actual is IConvertible c)
         {
-            return new Expector<T>(actual);
+            Assert.AreEqual(expected,
+                c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), delta, message);
         }
-
-        public static Expector<Action> Expect(Action actual)
+        else
         {
-            return new Expector<Action>(actual);
-        }
-
-        public static void Fail(object? message)
-        {
-            Assert.Fail(Convert.ToString(message));
+            Assert.Fail("ToBeCloseTo can only be used with numeric operands");
         }
     }
 
-    public class NotExpector<T>
+    public void ToBe(object expected)
     {
-        private readonly T _actual;
-        public NotExpector<T> Be => this;
-
-        public NotExpector(T actual)
+        if (expected is int i && _actual is double)
         {
-            _actual = actual;
+            expected = (double)i;
         }
 
-        public void Ok()
+        Assert.AreEqual(expected, _actual);
+    }
+
+    public void Ok()
+    {
+        Assert.AreNotEqual(default!, _actual);
+    }
+    public void Length(int length)
+    {
+        if(_actual is ICollection collection)
         {
-            if (_actual is string s)
-            {
-                Assert.IsTrue(string.IsNullOrEmpty(s));
-            }
-            else
-            {
-                Assert.AreEqual(default!, _actual);
-            }
+            Assert.AreEqual(length, collection.Count);
+        }
+        else
+        {
+            Assert.Fail("Length can only be used with collection operands");
         }
     }
 
-    public class Expector<T>
+    public void True()
     {
-        private readonly T _actual;
-
-        public Expector(T actual)
+        if (_actual is bool b)
         {
-            _actual = actual;
+            Assert.IsTrue(b);
         }
-
-        public Expector<T> To => this;
-        public NotExpector<T> Not => new(_actual);
-        public Expector<T> Be => this;
-        public Expector<T> Have => this;
-
-        public void Equal(object? expected, string? message = null)
+        else
         {
-            if (expected is int i && _actual is double)
-            {
-                expected = (double)i;
-            }
-            if (expected is double d && _actual is int)
-            {
-                expected = (int)d;
-            }
-
-            Assert.AreEqual(expected, _actual, message);
+            Assert.Fail("ToBeTrue can only be used on bools:");
         }
+    }
 
-        public void GreaterThan(double expected)
+    public void False()
+    {
+        if (_actual is bool b)
         {
-            if (_actual is int i)
-            {
-                Assert.IsTrue(i.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
-            }
-            if (_actual is double d)
-            {
-                Assert.IsTrue(d.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
-            }
+            Assert.IsFalse(b);
         }
-
-        public void CloseTo(double expected, double delta, string? message = null)
+        else
         {
-            if (_actual is IConvertible c)
-            {
-                Assert.AreEqual(expected,
-                    c.ToDouble(System.Globalization.CultureInfo.InvariantCulture), delta, message);
-            }
-            else
-            {
-                Assert.Fail("ToBeCloseTo can only be used with numeric operands");
-            }
+            Assert.Fail("ToBeFalse can only be used on bools:");
         }
+    }
 
-        public void ToBe(object expected)
+
+
+    public void Throw(Type expected)
+    {
+        if (_actual is Action d)
         {
-            if (expected is int i && _actual is double)
+            try
             {
-                expected = (double)i;
+                d();
+                Assert.Fail("Did not throw error");
             }
-
-            Assert.AreEqual(expected, _actual);
-        }
-
-        public void Ok()
-        {
-            Assert.AreNotEqual(default!, _actual);
-        }
-        public void Length(int length)
-        {
-            if(_actual is ICollection collection)
+            catch (Exception e)
             {
-                Assert.AreEqual(length, collection.Count);
-            }
-            else
-            {
-                Assert.Fail("Length can only be used with collection operands");
-            }
-        }
-
-        public void True()
-        {
-            if (_actual is bool b)
-            {
-                Assert.IsTrue(b);
-            }
-            else
-            {
-                Assert.Fail("ToBeTrue can only be used on bools:");
-            }
-        }
-
-        public void False()
-        {
-            if (_actual is bool b)
-            {
-                Assert.IsFalse(b);
-            }
-            else
-            {
-                Assert.Fail("ToBeFalse can only be used on bools:");
-            }
-        }
-
-
-
-        public void Throw(Type expected)
-        {
-            if (_actual is Action d)
-            {
-                try
+                if (expected.IsInstanceOfType(e))
                 {
-                    d();
-                    Assert.Fail("Did not throw error");
+                    return;
                 }
-                catch (Exception e)
-                {
-                    if (expected.IsInstanceOfType(e))
-                    {
-                        return;
-                    }
-                }
+            }
 
-                Assert.Fail("Exception type didn't match");
-            }
-            else
-            {
-                Assert.Fail("ToThrowError can only be used with an exception");
-            }
+            Assert.Fail("Exception type didn't match");
+        }
+        else
+        {
+            Assert.Fail("ToThrowError can only be used with an exception");
         }
     }
 }

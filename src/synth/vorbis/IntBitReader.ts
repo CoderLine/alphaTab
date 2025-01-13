@@ -102,7 +102,7 @@ export class IntBitReader {
 
         let bitBucket = this._bitBucket;
         if (count < 64) {
-            bitBucket &= (1n << BigInt(count)) - 1n;
+            bitBucket = bitBucket & (1n << BigInt(count)) - 1n;
         }
 
         result.value = Number(bitBucket);

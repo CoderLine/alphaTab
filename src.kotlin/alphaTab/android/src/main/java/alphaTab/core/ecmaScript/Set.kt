@@ -35,4 +35,8 @@ public class Set<T> : Iterable<T> {
     override fun iterator(): Iterator<T> {
         return _set.iterator()
     }
+
+    fun clear() {
+        _set.clear()
+    }
 }

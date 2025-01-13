@@ -67,9 +67,9 @@ class VorbisUtils {
         // https://xiph.org/vorbis/doc/Vorbis_I_spec.html#x1-1200009.2.2
         const big = BigInt(bits);
         let bmantissa = big & BigInt(0x1fffff);
-        const bsign = big & BigInt(0x80000000); 
+        const bsign = big & BigInt(0x80000000);
         const bexponent = (big & BigInt(0x7fe00000)) >> 21n;
-        if(bsign !== 0n) {
+        if (bsign !== 0n) {
             bmantissa = -bmantissa;
         }
         return Number(bmantissa) * Math.pow(2.0, Number(bexponent) - 788);
@@ -148,7 +148,8 @@ export class VorbisCodebook {
         if (this._overflowList !== null) {
             for (let i = 0; i < this._overflowList.length; i++) {
                 node = this._overflowList[i]!;
-                if (node.bits == (data.value & node.mask)) {
+                const bits = data.value & node.mask;
+                if (node.bits == bits) {
                     packet.skipBits(node.length);
                     return node.value;
                 }
@@ -247,7 +248,7 @@ export class VorbisCodebook {
     ): boolean {
         const available = new Uint32Array(32);
 
-        let k: number;
+        let k: number = 0;
         let m: number = 0;
 
         for (k = 0; k < n; ++k) {
@@ -625,7 +626,7 @@ export class VorbisFloor0 implements IVorbisFloor {
 
             i = 0;
             while (i < n) {
-                let j: number;
+                let j: number = 0;
                 const k = barkMap[i];
                 let p = 0.5;
                 let q = 0.5;
@@ -691,7 +692,7 @@ export class VorbisFloor1 implements IVorbisFloor {
     private _yBits: number;
 
     private _classMasterbooks: VorbisCodebook[];
-    private _subclassBooks: VorbisCodebook[][];
+    private _subclassBooks: (VorbisCodebook|null)[][];
     private _subclassBookIndex: Int32Array[];
 
     public constructor(packet: IntBitReader, codebooks: VorbisCodebook[]) {
@@ -710,7 +711,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         this._classSubclasses = new Int32Array(maximum_class);
         this._classMasterbooks = new Array<VorbisCodebook>(maximum_class);
         this._classMasterBookIndex = new Int32Array(maximum_class);
-        this._subclassBooks = new Array<VorbisCodebook[]>(maximum_class);
+        this._subclassBooks = new Array<(VorbisCodebook|null)[]>(maximum_class);
         this._subclassBookIndex = new Array<Int32Array>(maximum_class);
         for (let i = 0; i < maximum_class; i++) {
             this._classDimensions[i] = packet.readBits(3) + 1;
@@ -720,7 +721,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                 this._classMasterbooks[i] = codebooks[this._classMasterBookIndex[i]];
             }
 
-            this._subclassBooks[i] = new Array<VorbisCodebook>(1 << this._classSubclasses[i]);
+            this._subclassBooks[i] = new Array<VorbisCodebook|null>(1 << this._classSubclasses[i]);
             this._subclassBookIndex[i] = new Int32Array(this._subclassBooks[i].length);
             for (let j = 0; j < this._subclassBooks[i].length; j++) {
                 const bookNum = packet.readBits(8) - 1;
@@ -805,7 +806,8 @@ export class VorbisFloor1 implements IVorbisFloor {
                 const csub = (1 << cbits) - 1;
                 let cval = 0;
                 if (cbits > 0) {
-                    if ((cval = this._classMasterbooks[clsNum].decodeScalar(packet)) == -1) {
+                    cval = this._classMasterbooks[clsNum].decodeScalar(packet);
+                    if (cval == -1) {
                         // we read a bad value...  bail
                         postCount = 0;
                         break;
@@ -815,7 +817,8 @@ export class VorbisFloor1 implements IVorbisFloor {
                     const book = this._subclassBooks[clsNum][cval & csub];
                     cval = cval >> cbits;
                     if (book != null) {
-                        if ((data.posts[postCount] = book.decodeScalar(packet)) == -1) {
+                        data.posts[postCount] = book.decodeScalar(packet);
+                        if (data.posts[postCount] == -1) {
                             // we read a bad value... bail
                             postCount = 0;
                             i = this._partitionClass.length;
@@ -1235,7 +1238,8 @@ export class VorbisResidue0 implements IVorbisResidue {
         const entryCache = new Int32Array(steps);
 
         for (let i = 0; i < steps; i++) {
-            if ((entryCache[i] = codebook.decodeScalar(packet)) == -1) {
+            entryCache[i] = codebook.decodeScalar(packet);
+            if (entryCache[i] == -1) {
                 return true;
             }
         }
@@ -1722,15 +1726,18 @@ class MdctImpl {
         this._b = new Float32Array(this._n2);
         this._c = new Float32Array(this._n4);
 
-        let k: number;
-        let k2: number;
-        for (k = k2 = 0; k < this._n4; ++k, k2 += 2) {
+        let k: number = 0;
+        let k2: number = 0;
+        for (; k < this._n4; ++k, k2 += 2) {
             this._a[k2] = Math.cos((4 * k * MdctImpl.M_PI) / n);
             this._a[k2 + 1] = -Math.sin((4 * k * MdctImpl.M_PI) / n);
             this._b[k2] = Math.cos(((k2 + 1) * MdctImpl.M_PI) / n / 2) * 0.5;
             this._b[k2 + 1] = Math.sin(((k2 + 1) * MdctImpl.M_PI) / n / 2) * 0.5;
         }
-        for (k = k2 = 0; k < this._n8; ++k, k2 += 2) {
+
+        k = 0;
+        k2 = 0;
+        for (; k < this._n8; ++k, k2 += 2) {
             this._c[k2] = Math.cos((2 * (k2 + 1) * MdctImpl.M_PI) / n);
             this._c[k2 + 1] = -Math.sin((2 * (k2 + 1) * MdctImpl.M_PI) / n);
         }
@@ -2286,7 +2293,11 @@ export class VorbisStreamDecoder {
 
         let cnt: number = 0;
         let pos = 0;
-        while ((cnt = this.read(buffer, 0, buffer.length)) > 0) {
+        while (true) {
+            cnt = this.read(buffer, 0, buffer.length);
+            if (cnt === 0) {
+                break;
+            }
             // not enough space in buffer -> grow by 1 buffer size
             if (pos + cnt >= allSamples.length) {
                 const newAllSamples = new Float32Array(allSamples.length + buffer.length);
@@ -2458,16 +2469,14 @@ export class VorbisStreamDecoder {
                 }
 
                 const decodeRes = mode.decode(reader, this._nextPacketBuf);
-                if (decodeRes != null) {
-                    res.startIndex = decodeRes.packetStartIndex;
-                    res.validLen = decodeRes.packetValidLength;
-                    res.totalLen = decodeRes.packetTotalLength;
+                res.startIndex = decodeRes.packetStartIndex;
+                res.validLen = decodeRes.packetValidLength;
+                res.totalLen = decodeRes.packetTotalLength;
 
-                    // per the spec, do not decode more samples than the last granulePosition
-                    res.samplePosition = packet.granulePosition;
-                    res.curPacket = this._nextPacketBuf;
-                    return res;
-                }
+                // per the spec, do not decode more samples than the last granulePosition
+                res.samplePosition = packet.granulePosition;
+                res.curPacket = this._nextPacketBuf;
+                return res;
             }
         }
 

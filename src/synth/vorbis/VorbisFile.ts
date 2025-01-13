@@ -11,9 +11,14 @@ export class VorbisFile {
         var packets = oggContainer.read();
 
         var decoder = new VorbisStreamReader(packets);
-        let stream: VorbisStream | null;
-        while ((stream = decoder.read()) != null) {
-            this.streams.push(stream);
+        while(true){
+            let stream = decoder.read();
+            if(stream == null){
+                break;
+            }
+            else{
+                this.streams.push(stream);
+            }
         }
     }
 }

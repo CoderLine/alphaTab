@@ -74,7 +74,7 @@ export class OggReader {
             return false;
         }
 
-        const pageFlags = this._readable.readByte() as PageFlags;
+        const pageFlags = this._readable.readByte();
         const pageGranulePosition = IOHelper.readInt64LE(this._readable); // GranulePosition
         this._readable.skip(4); // StreamSerial
         this._readable.skip(4); // SequenceNumber

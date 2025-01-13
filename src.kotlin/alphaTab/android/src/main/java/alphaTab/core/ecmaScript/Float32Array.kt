@@ -7,6 +7,13 @@ import alphaTab.core.decodeToFloatArray
 public class Float32Array : Iterable<Float> {
     public val data: FloatArray
 
+    internal val buffer: ArrayBuffer
+        get() {
+            val buffer = java.nio.ByteBuffer.allocate(data.size * Float.SIZE_BYTES)
+            buffer.asFloatBuffer().put(data)
+            return buffer.array().asUByteArray()
+        }
+
     public inline val length: Double
         get() {
             return data.size.toDouble()
@@ -16,15 +23,15 @@ public class Float32Array : Iterable<Float> {
         data = FloatArray(size.toInt())
     }
 
-    public constructor(x: ArrayBuffer) {
-        data = x.decodeToFloatArray()
-    }
-
-    internal constructor(x: FloatArray) {
+    public constructor(x: FloatArray) {
         data = x
     }
 
-    public constructor(x: Iterable<Double>) {
+    internal constructor(x: ArrayBuffer) {
+        data = x.decodeToFloatArray()
+    }
+
+    internal constructor(x: Iterable<Double>) {
         this.data = x.map { d -> d.toFloat() }.toFloatArray()
     }
 
@@ -40,11 +47,15 @@ public class Float32Array : Iterable<Float> {
         return data.iterator()
     }
 
-    public inline fun set(subarray: Float32Array, pos: Double) {
+    internal inline fun set(subarray: Float32Array, pos: Double) {
         subarray.data.copyInto(data, pos.toInt(), 0, subarray.data.size)
     }
 
-    public fun subarray(begin: Double, end: Double): Float32Array {
+    internal fun subarray(begin: Double, end: Double): Float32Array {
         return Float32Array(data.copyOfRange(begin.toInt(), end.toInt()))
+    }
+
+    internal fun fill(value: Double, start: Double, end: Double) {
+        data.fill(value.toFloat(), start.toInt(), end.toInt())
     }
 }

@@ -2,71 +2,70 @@
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace AlphaTab.Core
+namespace AlphaTab.Core;
+
+internal static class Globals
 {
-    public static class Globals
+    public const double NaN = double.NaN;
+    public static Console Console { get; } = new Console();
+
+    public static double ParseInt(char c)
     {
-        public const double NaN = double.NaN;
-        public static Console Console { get; } = new Console();
+        return ParseInt(c.ToString());
+    }
+    public static void SetImmediate(Action action)
+    {
+        action();
+    }
 
-        public static double ParseInt(char c)
+    public static double ParseInt(string s)
+    {
+        if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
         {
-            return ParseInt(c.ToString());
-        }
-        public static void SetImmediate(Action action)
-        {
-            action();
-        }
-
-        public static double ParseInt(string s)
-        {
-            if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
-            {
-                return (int) d;
-            }
-
-            return double.NaN;
+            return (int) d;
         }
 
-        public static double ParseInt(char c, int radix)
-        {
-            return ParseInt(c.ToString(), radix);
-        }
+        return double.NaN;
+    }
 
-        public static double ParseInt(string s, int radix)
-        {
-            if (radix == 16 && int.TryParse(s, NumberStyles.HexNumber,
+    public static double ParseInt(char c, int radix)
+    {
+        return ParseInt(c.ToString(), radix);
+    }
+
+    public static double ParseInt(string s, int radix)
+    {
+        if (radix == 16 && int.TryParse(s, NumberStyles.HexNumber,
                 CultureInfo.InvariantCulture,
                 out var d))
-            {
-                return d;
-            }
-
-            return double.NaN;
-        }
-
-        public static double ParseFloat(string s)
         {
-            if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
-            {
-                return d;
-            }
-
-            return double.NaN;
+            return d;
         }
 
-        public static bool IsNaN(double d)
+        return double.NaN;
+    }
+
+    public static double ParseFloat(string s)
+    {
+        if (double.TryParse(s, NumberStyles.Number, CultureInfo.InvariantCulture, out var d))
         {
-            return double.IsNaN(d);
+            return d;
         }
 
-        public static void SetTimeout(Action action, double timeout)
+        return double.NaN;
+    }
+
+    public static bool IsNaN(double d)
+    {
+        return double.IsNaN(d);
+    }
+
+    public static void SetTimeout(Action action, double timeout)
+    {
+        Task.Run(async () =>
         {
-            Task.Run(async () =>
-            {
-                await Task.Delay((int)timeout);
-                action();
-            });
-        }
+            await Task.Delay((int)timeout);
+            action();
+        });
     }
 }

@@ -77,5 +77,13 @@ internal class Math {
         public fun random(): Double {
             return kotlin.random.Random.nextDouble()
         }
+
+        public fun cos(d: Double): Double {
+            return kotlin.math.cos(d);
+        }
+
+        public fun atan(d: Double): Double {
+            return kotlin.math.atan(d);
+        }
     }
 }

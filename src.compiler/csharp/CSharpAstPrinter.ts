@@ -539,9 +539,6 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                         case cs.PrimitiveType.Long:
                             this.write('long');
                             break;
-                        case cs.PrimitiveType.UInt:
-                            this.write('uint');
-                            break;
                     }
                 }
 

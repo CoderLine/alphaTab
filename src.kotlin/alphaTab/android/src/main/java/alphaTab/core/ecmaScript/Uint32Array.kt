@@ -18,7 +18,7 @@ internal class Uint32Array : Iterable<UInt> {
     }
 
     public operator fun set(index: Double, value: Double) {
-        _data[index.toInt()] = value.toInt().toUInt()
+        _data[index.toInt()] = value.toLong().toUInt()
     }
 
     public operator fun get(index: Int): Double {
@@ -26,7 +26,7 @@ internal class Uint32Array : Iterable<UInt> {
     }
 
     public operator fun set(index: Int, value: Double) {
-        _data[index] = value.toInt().toUInt()
+        _data[index] = value.toLong().toUInt()
     }
 
     public fun fill(i: UInt) {

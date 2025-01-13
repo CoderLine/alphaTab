@@ -4,45 +4,44 @@ using System.Linq;
 using System.Threading.Tasks;
 using AlphaTab.Core.EcmaScript;
 
-namespace AlphaTab
+namespace AlphaTab;
+
+static partial class TestPlatform
 {
-    static partial class TestPlatform
+    public static async Task<Uint8Array> LoadFile(string path)
     {
-        public static async Task<Uint8Array> LoadFile(string path)
-        {
-            await using var fs = new FileStream(path, FileMode.Open);
-            await using var ms = new MemoryStream();
-            await fs.CopyToAsync(ms);
-            return new Uint8Array(ms.ToArray());
-        }
+        await using var fs = new FileStream(path, FileMode.Open);
+        await using var ms = new MemoryStream();
+        await fs.CopyToAsync(ms);
+        return new Uint8Array(ms.ToArray());
+    }
 
-        public static async Task SaveFile(string name, Uint8Array data)
-        {
-            var path = Path.Combine("test-results", name);
-            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-            await using var fs = new FileStream(Path.Combine("test-results", name), FileMode.Create);
-            await fs.WriteAsync(data.Data.Array!, data.Data.Offset, data.Data.Count);
-        }
+    public static async Task SaveFile(string name, Uint8Array data)
+    {
+        var path = Path.Combine("test-results", name);
+        Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+        await using var fs = new FileStream(Path.Combine("test-results", name), FileMode.Create);
+        await fs.WriteAsync(data.Data.Array!, data.Data.Offset, data.Data.Count);
+    }
 
-        public static Task<IList<string>> ListDirectory(string path)
-        {
-            return Task.FromResult((IList<string>) Directory.EnumerateFiles(path)
-                .Select(Path.GetFileName)
-                .ToList());
-        }
+    public static Task<IList<string>> ListDirectory(string path)
+    {
+        return Task.FromResult((IList<string>) Directory.EnumerateFiles(path)
+            .Select(Path.GetFileName)
+            .ToList());
+    }
 
-        public static string JoinPath(string path1, string path2, string path3)
-        {
-            return Path.Join(path1, path2, path3);
-        }
+    public static string JoinPath(string path1, string path2, string path3)
+    {
+        return Path.Join(path1, path2, path3);
+    }
 
-        public static Task DeleteFile(string path)
+    public static Task DeleteFile(string path)
+    {
+        if (File.Exists(path))
         {
-            if (File.Exists(path))
-            {
-                File.Delete(path);
-            }
-            return Task.CompletedTask;
+            File.Delete(path);
         }
+        return Task.CompletedTask;
     }
 }

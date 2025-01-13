@@ -1,6 +1,6 @@
 ﻿namespace AlphaTab.Core.EcmaScript;
 
-public static class BigInt
+internal static class BigInt
 {
     public static long AsUintN(int bits, long value)
     {
