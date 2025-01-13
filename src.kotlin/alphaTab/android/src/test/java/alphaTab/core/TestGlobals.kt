@@ -1,6 +1,7 @@
 package alphaTab.core
 
 import org.junit.Assert
+import kotlin.math.exp
 import kotlin.reflect.KClass
 
 typealias Test = org.junit.Test
@@ -63,6 +64,13 @@ class Expector<T>(private val actual: T) {
         Assert.assertEquals(message, expectedTyped, actual as Any?)
     }
 
+    fun greaterThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertTrue("Expected $actual to be greater than $expected", actual.toDouble() > expected)
+        } else {
+            Assert.fail("toBeCloseTo can only be used with numeric operands");
+        }
+    }
     fun closeTo(expected: Double, delta: Double, message: String? = null) {
         if (actual is Number) {
             Assert.assertEquals(message, expected, actual.toDouble(), delta)

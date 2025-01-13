@@ -2,7 +2,6 @@
  * @target web
  */
 export class TypeConversions {
-
     private static _conversionBuffer: ArrayBuffer = new ArrayBuffer(8);
     private static _conversionByteArray: Uint8Array = new Uint8Array(TypeConversions._conversionBuffer);
     private static _dataView = new DataView(TypeConversions._conversionBuffer);
@@ -11,10 +10,24 @@ export class TypeConversions {
         TypeConversions._dataView.setFloat64(0, v, true);
         return this._conversionByteArray;
     }
-    
-    public static bytesToFloat64(bytes: Uint8Array): number {
+
+    public static bytesToInt64LE(bytes: Uint8Array): number {
         TypeConversions._conversionByteArray.set(bytes, 0);
-        throw TypeConversions._dataView.getFloat64(0, true);
+        const int64 = TypeConversions._dataView.getBigInt64(0, true);
+        if (int64 <= Number.MAX_SAFE_INTEGER && int64 >= Number.MIN_SAFE_INTEGER) {
+            return Number(int64);
+        }
+        return Number.MAX_SAFE_INTEGER;
+    }
+
+    public static bytesToFloat64LE(bytes: Uint8Array): number {
+        TypeConversions._conversionByteArray.set(bytes, 0);
+        return TypeConversions._dataView.getFloat64(0, true);
+    }
+
+    public static bytesToFloat32LE(bytes: Uint8Array): number {
+        TypeConversions._conversionByteArray.set(bytes, 0);
+        return TypeConversions._dataView.getFloat32(0, true);
     }
 
     public static uint16ToInt16(v: number): number {

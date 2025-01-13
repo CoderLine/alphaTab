@@ -1061,7 +1061,7 @@ describe('MidiFileGeneratorTest', () => {
         expectBeat(tickLookup, beatStart, 6, MidiUtils.QuarterTime, firstPartMillis + secondPartMillis);
     });
 
-    it('dead-slap', async () => {
+    it('dead-slap', () => {
         const tex: string = 'r.4 { ds } r.2 { ds } r.4 { ds }';
         const score: Score = parseTex(tex);
 
@@ -1099,7 +1099,7 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
-    it('fade-in', async () => {
+    it('fade-in', () => {
         const tex: string = '3.3.4 3.3.4 { f }';
         const score: Score = parseTex(tex);
 
@@ -1140,7 +1140,7 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
-    it('fade-out', async () => {
+    it('fade-out', () => {
         const tex: string = '3.3.4 3.3.4 { fo }';
         const score: Score = parseTex(tex);
 
@@ -1182,7 +1182,7 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     
-    it('volume-swell', async () => {
+    it('volume-swell', () => {
         const tex: string = '3.3.4 3.3.4 { vs }';
         const score: Score = parseTex(tex);
 

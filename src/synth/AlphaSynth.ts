@@ -326,9 +326,12 @@ export class AlphaSynth implements IAlphaSynth {
     public resetSoundFonts(): void {
         this.stop();
         this._synthesizer.resetPresets();
+        this._loadedSoundFonts = [];
         this._isSoundFontLoaded = false;
         (this.soundFontLoaded as EventEmitter).trigger();
     }
+
+    private _loadedSoundFonts: Hydra[] = [];
 
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
@@ -338,7 +341,11 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Loading soundfont from bytes');
             let soundFont: Hydra = new Hydra();
             soundFont.load(input);
-            this._synthesizer.loadPresets(soundFont, append);
+            if (!append) {
+                this._loadedSoundFonts = [];
+            }
+            this._loadedSoundFonts.push(soundFont);
+
             this._isSoundFontLoaded = true;
             (this.soundFontLoaded as EventEmitter).trigger();
 
@@ -353,6 +360,13 @@ export class AlphaSynth implements IAlphaSynth {
     private checkReadyForPlayback(): void {
         if (this.isReadyForPlayback) {
             this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
+            const programs = this._sequencer.instrumentPrograms;
+            const percussionKeys = this._sequencer.percussionKeys;
+            let append = false;
+            for (const soundFont of this._loadedSoundFonts) {
+                this._synthesizer.loadPresets(soundFont, programs, percussionKeys, append);
+                append = true;
+            }
             (this.readyForPlayback as EventEmitter).trigger();
         }
     }
@@ -537,4 +551,19 @@ export class AlphaSynth implements IAlphaSynth {
         new EventEmitterOfT<MidiEventsPlayedEventArgs>();
     readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
         new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+
+    /**
+     * @internal
+     */
+    public hasSamplesForProgram(program: number): boolean {
+        return this._synthesizer.hasSamplesForProgram(program);
+    }
+
+    
+    /**
+     * @internal
+     */
+    public hasSamplesForPercussion(key: number): boolean {
+        return this._synthesizer.hasSamplesForPercussion(key);
+    }
 }

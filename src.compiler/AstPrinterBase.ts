@@ -494,9 +494,9 @@ export default abstract class AstPrinterBase {
         if (cs.isBlock(s.statement)) {
             this.writeStatement(s.statement);
         } else {
-            this._indent++;
+            this.beginBlock();
             this.writeStatement(s.statement);
-            this._indent--;
+            this.endBlock();
         }
     }
 
@@ -516,9 +516,9 @@ export default abstract class AstPrinterBase {
         if (cs.isBlock(s.thenStatement)) {
             this.writeStatement(s.thenStatement);
         } else {
-            this._indent++;
+            this.beginBlock();
             this.writeStatement(s.thenStatement);
-            this._indent--;
+            this.endBlock();
         }
 
         if (s.elseStatement) {
@@ -530,9 +530,9 @@ export default abstract class AstPrinterBase {
                 this.writeStatement(s.elseStatement);
             } else {
                 this.writeLine();
-                this._indent++;
+                this.beginBlock();
                 this.writeStatement(s.elseStatement);
-                this._indent--;
+                this.endBlock();
             }
         }
     }

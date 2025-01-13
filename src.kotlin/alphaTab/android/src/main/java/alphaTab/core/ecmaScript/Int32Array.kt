@@ -2,34 +2,45 @@ package alphaTab.core.ecmaScript
 
 internal class Int32Array : Iterable<Int> {
     private val _data: IntArray
-
+    private val _offset: Int
     public val length: Double
-        get() {
-            return _data.size.toDouble()
-        }
 
     public constructor(size: Double) {
         _data = IntArray(size.toInt())
+        length = size
+        _offset = 0
+    }
+
+    public constructor(values: Iterable<Double>) {
+        _data = values.map { it.toInt() }.toIntArray();
+        length = _data.size.toDouble()
+        _offset = 0
+    }
+
+    private constructor(values: IntArray, offset: Int, length: Int) {
+        _data = values
+        this.length = length.toDouble()
+        _offset = offset
     }
 
     public operator fun get(index: Double): Double {
-        return _data[index.toInt()].toDouble()
+        return get(index.toInt())
     }
 
     public operator fun get(index: Int): Double {
-        return _data[index].toDouble()
+        return _data[_offset + index].toDouble()
     }
 
     public operator fun set(index: Double, value: Double) {
-        _data[index.toInt()] = value.toInt()
+        set(index.toInt(), value)
     }
 
     public operator fun set(index: Int, value: Double) {
-        _data[index] = value.toInt()
+        _data[_offset + index] = value.toInt()
     }
 
     public operator fun set(index: Int, value: Int) {
-        _data[index] = value
+        _data[_offset + index] = value
     }
 
     public fun fill(i: Int) {
@@ -37,7 +48,24 @@ internal class Int32Array : Iterable<Int> {
     }
 
     override fun iterator(): Iterator<Int> {
-        return _data.iterator()
+        return (0 until length.toInt()).map { _data[_offset + it] }.iterator()
+    }
+
+    fun subarray(start: Double, end: Double): Int32Array {
+        return Int32Array(
+            _data,
+            _offset + start.toInt(),
+            (end - start).toInt()
+        )
+    }
+
+    fun set(values: Int32Array, offset: Double) {
+        values._data.copyInto(
+            _data,
+            _offset + offset.toInt(),
+            values._offset,
+            values._offset + values._data.size
+        )
     }
 
 }

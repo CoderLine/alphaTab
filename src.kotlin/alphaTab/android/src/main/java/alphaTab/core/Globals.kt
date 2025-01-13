@@ -149,6 +149,14 @@ internal fun IAlphaTabEnum?.toDouble(): Double? {
     return this?.value.toDouble()
 }
 
+internal fun IAlphaTabEnum.toInt(): Int {
+    return this.value
+}
+
+internal fun IAlphaTabEnum?.toInt(): Int? {
+    return this?.value
+}
+
 internal inline fun Double.toTemplate(): String {
     return this.toInvariantString()
 }

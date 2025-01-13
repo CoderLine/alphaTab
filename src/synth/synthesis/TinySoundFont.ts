@@ -118,7 +118,7 @@ export class TinySoundFont {
 
     public setChannelTranspositionPitch(channel: number, semitones: number): void {
         let previousTransposition = 0;
-        if(this._liveTranspositionPitches.has(channel)) {
+        if (this._liveTranspositionPitches.has(channel)) {
             previousTransposition = this._liveTranspositionPitches.get(channel)!;
         }
 
@@ -186,8 +186,8 @@ export class TinySoundFont {
         while (!this._midiEventQueue.isEmpty) {
             let m: SynthEvent = this._midiEventQueue.dequeue();
             if (m.isMetronome && this.metronomeVolume > 0) {
-                this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
-                this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
+                this.channelNoteOff(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey);
+                this.channelNoteOn(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey, 95 / 127);
             } else if (m.event) {
                 this.processMidiMessage(m.event);
             }
@@ -216,7 +216,7 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('MIdi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick);
+        Logger.debug('Midi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick);
         const command: MidiEventType = e.type;
         switch (command) {
             case MidiEventType.TimeSignature:
@@ -658,7 +658,7 @@ export class TinySoundFont {
             key += this._transpositionPitches.get(channel)!;
         }
 
-        if(this._liveTranspositionPitches.has(channel)) {
+        if (this._liveTranspositionPitches.has(channel)) {
             key += this._liveTranspositionPitches.get(channel)!;
         }
 
@@ -1131,7 +1131,12 @@ export class TinySoundFont {
         this.presets = [];
     }
 
-    public loadPresets(hydra: Hydra, append: boolean): void {
+    public loadPresets(
+        hydra: Hydra,
+        instrumentPrograms: Set<number>,
+        percussionKeys: Set<number>,
+        append: boolean
+    ): void {
         const newPresets: Preset[] = [];
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
@@ -1142,7 +1147,6 @@ export class TinySoundFont {
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;
-            preset.fontSamples = hydra.fontSamples;
             let regionNum: number = 0;
 
             for (
@@ -1379,10 +1383,78 @@ export class TinySoundFont {
 
                                     zoneRegion.tune += shdr.pitchCorrection;
                                     zoneRegion.sampleRate = shdr.sampleRate;
-                                    if (zoneRegion.end !== 0 && zoneRegion.end < preset.fontSamples.length) {
-                                        zoneRegion.end++;
+
+                                    const isPercussion = phdr.bank == SynthConstants.PercussionBank;
+
+                                    const shouldLoadSamples =
+                                        (isPercussion &&
+                                            TinySoundFont.setContainsRange(
+                                                percussionKeys,
+                                                zoneRegion.loKey,
+                                                zoneRegion.hiKey
+                                            )) ||
+                                        (!isPercussion && instrumentPrograms.has(phdr.preset));
+
+                                    if (!shouldLoadSamples) {
+                                        Logger.debug(
+                                            'AlphaSynth',
+                                            `Skipping load of unused sample ${shdr.sampleName} for preset ${phdr.presetName} (bank ${preset.bank} program ${preset.presetNumber})`
+                                        );
+                                        zoneRegion.samples = new Float32Array(0);
+                                    } else if ((shdr.sampleType & 0x01) !== 0) {
+                                        Logger.debug(
+                                            'AlphaSynth',
+                                            `Loading of used sample ${shdr.sampleName} for preset ${phdr.presetName} (bank ${preset.bank} program ${preset.presetNumber})`
+                                        );
+
+                                        // Mono Sample
+                                        const decompressVorbis = (shdr.sampleType & 0x10) !== 0;
+                                        if (decompressVorbis) {
+                                            // for SF3 the shdr contains the byte offsets within the overall buffer holding the OGG container
+                                            zoneRegion.samples = hydra.decodeSamples(
+                                                shdr.start,
+                                                shdr.end,
+                                                true
+                                            );
+                                            // play whole sample
+                                            zoneRegion.offset = 0;
+                                            zoneRegion.end = zoneRegion.samples.length;
+                                            // loop points are already relative within the individual samples.
+                                        } else {
+                                            zoneRegion.samples = hydra.decodeSamples(
+                                                // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
+                                                // field to the first data point of this sample
+                                                zoneRegion.offset * 2,
+                                                // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
+                                                // field to the first of the set of 46 zero valued data points following this sample.
+                                                zoneRegion.end * 2,
+                                                false
+                                            );
+
+                                            // reset offsets relative to sub-buffer
+                                            if (zoneRegion.loopStart > 0) {
+                                                zoneRegion.loopStart -= zoneRegion.offset;
+                                            }
+                                            if (zoneRegion.loopEnd > 0) {
+                                                zoneRegion.loopEnd -= zoneRegion.offset;
+                                            }
+                                            zoneRegion.offset = 0;
+                                            zoneRegion.end -= zoneRegion.offset;
+                                        }
                                     } else {
-                                        zoneRegion.end = preset.fontSamples.length;
+                                        // unsupported
+                                        //  0x02: // Right Sample
+                                        //  0x04: // Left Sample
+                                        //  0x08: // Linked Sample
+                                        //  0x8001: // RomMonoSample
+                                        //  0x8002: // RomRightSample
+                                        //  0x8004: // RomLeftSample
+                                        //  0x8008: // RomLinkedSample
+                                        Logger.warning(
+                                            'AlphaSynth',
+                                            `Skipping load of unsupported sample ${shdr.sampleName} for preset ${phdr.presetName}, sample type ${shdr.sampleType} is not supported (bank ${preset.bank} program ${preset.presetNumber})`
+                                        );
+                                        zoneRegion.samples = new Float32Array(0);
                                     }
 
                                     preset.regions[regionIndex] = new Region(zoneRegion);
@@ -1426,5 +1498,52 @@ export class TinySoundFont {
                 this.presets.push(preset);
             }
         }
+    }
+
+    private static setContainsRange(x: Set<number>, lo: number, hi: number) {
+        for (let i = lo; i <= hi; i++) {
+            if (x.has(i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public hasSamplesForProgram(program: number): boolean {
+        const presets = this.presets;
+        if (!presets) {
+            return false;
+        }
+
+        for (const preset of presets) {
+            if (preset.presetNumber === program) {
+                for (const region of preset.regions!) {
+                    if (region.samples.length > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public hasSamplesForPercussion(key: number): boolean {
+        const presets = this.presets;
+        if (!presets) {
+            return false;
+        }
+
+        for (const preset of presets) {
+            if (preset.bank == SynthConstants.PercussionBank) {
+                for (const region of preset.regions!) {
+                    if (region.loKey >= key && region.hiKey <= key && region.samples.length > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

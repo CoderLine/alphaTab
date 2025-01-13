@@ -114,7 +114,7 @@ export default class CSharpEmitterContext {
         return undefined;
     }
     private isTestFunction(tsSymbol: ts.Symbol): boolean {
-        return tsSymbol.valueDeclaration?.getSourceFile().fileName.indexOf('jasmine') !== -1 ?? false;
+        return tsSymbol.valueDeclaration?.getSourceFile().fileName.indexOf('jasmine') !== -1;
     }
     private isKnownModule(tsSymbol: ts.Symbol): boolean {
         switch (tsSymbol.name) {
@@ -190,7 +190,7 @@ export default class CSharpEmitterContext {
         const end = node.getEnd();
         this.addDiagnostic({
             category: category,
-            code: 1,
+            code: 4000,
             file: file,
             messageText: message,
             start: start,
@@ -402,6 +402,21 @@ export default class CSharpEmitterContext {
                 let externalModule = this.resolveExternalModuleOfType(tsSymbol);
                 if (!externalModule) {
                     externalModule = this.buildCoreNamespace(tsSymbol);
+                }
+
+                // remove ArrayBuffer type arguments
+                switch (tsSymbol.name) {
+                    case 'Int8Array':
+                    case 'Uint8Array':
+                    case 'Int16Array':
+                    case 'Uint16Array':
+                    case 'Int32Array':
+                    case 'Uint32Array':
+                    case 'Float32Array':
+                    case 'Float64Array':
+                    case 'DataView':
+                        typeArguments = [];
+                        break;
                 }
 
                 return {
@@ -751,6 +766,11 @@ export default class CSharpEmitterContext {
             const unknown = handleNullablePrimitive(cs.PrimitiveType.Object);
             unknown.isNullable = true;
             return unknown;
+        }
+
+        // bigint -> long
+        if ((tsType.flags & ts.TypeFlags.BigInt) !== 0 || (tsType.flags & ts.TypeFlags.BigIntLiteral) !== 0) {
+            return handleNullablePrimitive(cs.PrimitiveType.Long);
         }
 
         // number or number literal -> double

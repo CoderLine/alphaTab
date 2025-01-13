@@ -72,7 +72,10 @@ export enum GenOperators {
 }
 
 export class Region {
+    private static readonly NoSamples = new Float32Array(0);
+
     public loopMode: LoopMode = LoopMode.None;
+    public samples: Float32Array = Region.NoSamples;
     public sampleRate: number = 0;
     public loKey: number = 0;
     public hiKey: number = 0;
@@ -107,6 +110,7 @@ export class Region {
     public constructor(other?: Region) {
         if (other) {
             this.loopMode = other.loopMode;
+            this.samples = other.samples;
             this.sampleRate = other.sampleRate;
             this.loKey = other.loKey;
             this.hiKey = other.hiKey;
@@ -142,6 +146,7 @@ export class Region {
 
     public clear(forRelative: boolean): void {
         this.loopMode = LoopMode.None;
+        this.samples = Region.NoSamples;
         this.sampleRate = 0;
         this.loKey = 0;
         this.hiKey = 0;
@@ -182,9 +187,9 @@ export class Region {
         }
 
         this.pitchKeyTrack = 100;
-        
+
         this.pitchKeyCenter = -1;
-        
+
         // SF2 defaults in timecents.
         this.ampEnv.delay = -12000.0;
         this.ampEnv.attack = -12000.0;
@@ -196,9 +201,9 @@ export class Region {
         this.modEnv.hold = -12000.0;
         this.modEnv.decay = -12000.0;
         this.modEnv.release = -12000.0;
-        
+
         this.initialFilterFc = 13500;
-        
+
         this.delayModLFO = -12000.0;
         this.delayVibLFO = -12000.0;
     }

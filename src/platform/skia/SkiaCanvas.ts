@@ -50,7 +50,7 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public static registerFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
-        const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData.buffer)!;
+        const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData.buffer as ArrayBuffer)!;
         if (!fontInfo) {
             fontInfo = Font.withFamilyList([typeface.familyName], 12, typeface.isItalic ? FontStyle.Italic : FontStyle.Plain,
                 typeface.isBold ? FontWeight.Bold : FontWeight.Regular);

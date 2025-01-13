@@ -1,22 +1,20 @@
-﻿namespace AlphaTab.Core.EcmaScript
+﻿namespace AlphaTab.Core.EcmaScript;
 
+public class Error : System.Exception
 {
-    public class Error : System.Exception
+    public Error? Cause 
     {
-        public Error? Cause 
+        get
         {
-            get
-            {
-                return InnerException is Error e ? e : null;
-            }
+            return InnerException is Error e ? e : null;
         }
-        public Error(string message) : base(message)
-        {
-        }
-        public Error(string message, System.Exception inner) : base(message, inner)
-        {
-        }
-
-        public string Stack => StackTrace;
     }
+    public Error(string message) : base(message)
+    {
+    }
+    public Error(string message, System.Exception inner) : base(message, inner)
+    {
+    }
+
+    public string Stack => StackTrace;
 }
