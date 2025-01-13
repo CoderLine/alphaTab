@@ -111,6 +111,7 @@
         "/dist/font/Bravura*.txt",
         "/dist/font/*.txt",
         "/dist/soundfont/*",
+        "LICENSE",
         "LICENSE.header"
     ],
     "dependencies": {
