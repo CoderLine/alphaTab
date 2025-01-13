@@ -10,7 +10,6 @@
       "ES2021",
       "es2022.regexp",
       "es2022.error",
-      "ES2024.ArrayBuffer",
       "dom"
     ],
     "strict": true,

@@ -930,7 +930,7 @@ export class Gp3To5Importer extends ScoreImporter {
         let swapAccidentals = false;
         if (this._versionNumber >= 500) {
             if ((flags & 0x01) !== 0) {
-                newNote.durationPercent = GpBinaryHelpers.gpReadDouble(this.data);
+                newNote.durationPercent = IOHelper.readFloat64BE(this.data);
             }
             let flags2: number = this.data.readByte();
             swapAccidentals = (flags2 & 0x02) !== 0;
@@ -1233,14 +1233,6 @@ export class Gp3To5Importer extends ScoreImporter {
 }
 
 export class GpBinaryHelpers {
-    public static gpReadDouble(data: IReadable): number {
-        return IOHelper.readFloat64LE(data);
-    }
-
-    public static gpReadFloat(data: IReadable): number {
-        return IOHelper.readFloat32LE(data);
-    }
-
     public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {
         let r: number = data.readByte();
         let g: number = data.readByte();
