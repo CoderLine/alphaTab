@@ -1416,9 +1416,6 @@ export class TinySoundFont {
                                                 shdr.end,
                                                 true
                                             );
-                                            // play whole sample
-                                            zoneRegion.offset = 0;
-                                            zoneRegion.end = zoneRegion.samples.length;
                                             // loop points are already relative within the individual samples.
                                         } else {
                                             zoneRegion.samples = hydra.decodeSamples(
@@ -1431,6 +1428,14 @@ export class TinySoundFont {
                                                 false
                                             );
 
+                                            // The DWORD dwStartloop contains the index, in sample data points, from the beginning of the sample data field to the first
+                                            // data point in the loop of this sample
+
+                                            // The DWORD dwEndloop contains the index, in sample data points, from the beginning of the sample data field to the first
+                                            // data point following the loop of this sample. Note that this is the data point “equivalent to” the first loop data point, and that
+                                            // to produce portable artifact free loops, the eight proximal data points surrounding both the Startloop and Endloop points
+                                            // should be identical. 
+
                                             // reset offsets relative to sub-buffer
                                             if (zoneRegion.loopStart > 0) {
                                                 zoneRegion.loopStart -= zoneRegion.offset;
@@ -1438,9 +1443,11 @@ export class TinySoundFont {
                                             if (zoneRegion.loopEnd > 0) {
                                                 zoneRegion.loopEnd -= zoneRegion.offset;
                                             }
-                                            zoneRegion.offset = 0;
-                                            zoneRegion.end -= zoneRegion.offset;
                                         }
+
+                                        // play whole sample
+                                        zoneRegion.offset = 0;
+                                        zoneRegion.end = zoneRegion.samples.length - 1;
                                     } else {
                                         // unsupported
                                         //  0x02: // Right Sample
