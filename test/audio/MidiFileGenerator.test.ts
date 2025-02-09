@@ -807,7 +807,7 @@ describe('MidiFileGeneratorTest', () => {
             new FlatNoteBendEvent(120, 0, info.primaryChannel, note1.realValue, 8704),
             new FlatNoteBendEvent(240, 0, info.primaryChannel, note1.realValue, 8192),
             new FlatNoteBendEvent(360, 0, info.primaryChannel, note1.realValue, 7680),
-            new FlatNoteBendEvent(480, 0, info.primaryChannel, note1.realValue, 8192), 
+            new FlatNoteBendEvent(480, 0, info.primaryChannel, note1.realValue, 8192),
             new FlatNoteBendEvent(600, 0, info.primaryChannel, note1.realValue, 8704),
             new FlatNoteBendEvent(720, 0, info.primaryChannel, note1.realValue, 8192),
             new FlatNoteBendEvent(840, 0, info.primaryChannel, note1.realValue, 7680),
@@ -904,6 +904,168 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(handler.midiEvents, expectedEvents);
     });
 
+    it('tied-bend', () => {
+        let tex: string = '3.3.4 -.3.8 -.3{b (0 4)}.8';
+        let score: Score = parseTex(tex);
+
+        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const settings = new Settings();
+        settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
+        generator.generate();
+        let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        let expectedEvents: FlatMidiEvent[] = [
+            // channel init
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+
+            new FlatTimeSignatureEvent(0, 4, 4),
+            new FlatTempoEvent(0, 120),
+
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192), // no bend
+            new FlatNoteEvent(
+                0,
+                0,
+                info.secondaryChannel,
+                1920,
+                note1.realValue,
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+            ),
+
+            // tied note (no bend)
+
+            // tied note (with bend)
+            new FlatNoteBendEvent(1440, 0, info.secondaryChannel, note1.realValue, 8192), // reset to start
+            new FlatNoteBendEvent(1440, 0, info.secondaryChannel, note1.realValue, 8192), // begin bend
+            new FlatNoteBendEvent(1480, 0, info.secondaryChannel, note1.realValue, 8277),
+            new FlatNoteBendEvent(1520, 0, info.secondaryChannel, note1.realValue, 8363),
+            new FlatNoteBendEvent(1560, 0, info.secondaryChannel, note1.realValue, 8448),
+            new FlatNoteBendEvent(1600, 0, info.secondaryChannel, note1.realValue, 8533),
+            new FlatNoteBendEvent(1640, 0, info.secondaryChannel, note1.realValue, 8619),
+            new FlatNoteBendEvent(1680, 0, info.secondaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(1720, 0, info.secondaryChannel, note1.realValue, 8789),
+            new FlatNoteBendEvent(1760, 0, info.secondaryChannel, note1.realValue, 8875),
+            new FlatNoteBendEvent(1800, 0, info.secondaryChannel, note1.realValue, 8960),
+            new FlatNoteBendEvent(1840, 0, info.secondaryChannel, note1.realValue, 9045),
+            new FlatNoteBendEvent(1880, 0, info.secondaryChannel, note1.realValue, 9131),
+            new FlatNoteBendEvent(1920, 0, info.secondaryChannel, note1.realValue, 9216),
+
+            // end of track
+            new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
+        ];
+
+        assertEvents(handler.midiEvents, expectedEvents);
+    });
+
+    it('tied-bend-hammer', async () => {
+        let score: Score = ScoreLoader.loadScoreFromBytes(
+            await TestPlatform.loadFile('test-data/audio/tied-bend-hammer.gp')
+        );
+
+        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const settings = new Settings();
+        settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
+        generator.generate();
+        let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0];
+        let expectedEvents: FlatMidiEvent[] = [
+            // channel init
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
+
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 96),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.PanCoarse, 64),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.ExpressionControllerCoarse, 127),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
+
+            new FlatTimeSignatureEvent(0, 6, 4),
+            new FlatTempoEvent(0, 120),
+
+            new FlatNoteBendEvent(0, 0, info.secondaryChannel, note1.realValue, 8192), // no bend
+            new FlatNoteEvent(
+                0,
+                0,
+                info.secondaryChannel,
+                2880,
+                note1.realValue,
+                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+            ),
+
+            // tied note (with bend)
+            new FlatNoteBendEvent(1920, 0, info.secondaryChannel, note1.realValue, 8192), // reset to start
+            new FlatNoteBendEvent(1920, 0, info.secondaryChannel, note1.realValue, 8192), // begin bend
+            new FlatNoteBendEvent(1927, 0, info.secondaryChannel, note1.realValue, 8277),
+            new FlatNoteBendEvent(1934, 0, info.secondaryChannel, note1.realValue, 8363),
+            new FlatNoteBendEvent(1942, 0, info.secondaryChannel, note1.realValue, 8448),
+            new FlatNoteBendEvent(1949, 0, info.secondaryChannel, note1.realValue, 8533),
+            new FlatNoteBendEvent(1957, 0, info.secondaryChannel, note1.realValue, 8619),
+            new FlatNoteBendEvent(1964, 0, info.secondaryChannel, note1.realValue, 8704),
+            new FlatNoteBendEvent(1972, 0, info.secondaryChannel, note1.realValue, 8789),
+            new FlatNoteBendEvent(1979, 0, info.secondaryChannel, note1.realValue, 8875),
+            new FlatNoteBendEvent(1987, 0, info.secondaryChannel, note1.realValue, 8960), // end
+
+            new FlatNoteBendEvent(1987, 0, info.secondaryChannel, note1.realValue, 8960), // begin hold
+            new FlatNoteBendEvent(2112, 0, info.secondaryChannel, note1.realValue, 8960), // end hold
+
+            new FlatNoteBendEvent(2112, 0, info.secondaryChannel, note1.realValue, 8960), // begin release
+            new FlatNoteBendEvent(2120, 0, info.secondaryChannel, note1.realValue, 8875), //
+            new FlatNoteBendEvent(2129, 0, info.secondaryChannel, note1.realValue, 8789), //
+            new FlatNoteBendEvent(2137, 0, info.secondaryChannel, note1.realValue, 8704), //
+            new FlatNoteBendEvent(2146, 0, info.secondaryChannel, note1.realValue, 8619), //
+            new FlatNoteBendEvent(2154, 0, info.secondaryChannel, note1.realValue, 8533), //
+            new FlatNoteBendEvent(2163, 0, info.secondaryChannel, note1.realValue, 8448), //
+            new FlatNoteBendEvent(2171, 0, info.secondaryChannel, note1.realValue, 8363), //
+            new FlatNoteBendEvent(2180, 0, info.secondaryChannel, note1.realValue, 8277), //
+            new FlatNoteBendEvent(2188, 0, info.secondaryChannel, note1.realValue, 8192), // end release
+
+            // last note
+            new FlatNoteBendEvent(2880, 0, info.primaryChannel, note2.realValue, 8192),
+            new FlatNoteEvent(
+                2880,
+                0,
+                info.primaryChannel,
+                1920,
+                note2.realValue,
+                MidiUtils.dynamicToVelocity((note2.dynamics as number) - 1) // -1 on velocity because of pull-off
+            ),
+
+            // end of track
+            new FlatTrackEndEvent(5760, 0) // 3840 = end of bar
+        ];
+
+        assertEvents(handler.midiEvents, expectedEvents);
+    });
+
     it('bend-tied-vibrato', () => {
         let tex: string = '3.3{b (0 4)}.4 -.3{v}.4';
         let score: Score = parseTex(tex);
@@ -963,7 +1125,7 @@ describe('MidiFileGeneratorTest', () => {
                 MidiUtils.dynamicToVelocity(note1.dynamics as number)
             ),
 
-            // vibrato starts on tied note on height of the bend-end 
+            // vibrato starts on tied note on height of the bend-end
             new FlatNoteBendEvent(960, 0, info.secondaryChannel, note1.realValue, 9216),
             new FlatNoteBendEvent(1080, 0, info.secondaryChannel, note1.realValue, 9728),
             new FlatNoteBendEvent(1200, 0, info.secondaryChannel, note1.realValue, 9216),
@@ -1275,7 +1437,7 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(1560, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 94),
 
             new FlatControlChangeEvent(1728, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
-            new FlatControlChangeEvent(1728, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
+            new FlatControlChangeEvent(1728, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120)
         ];
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
@@ -1284,7 +1446,7 @@ describe('MidiFileGeneratorTest', () => {
         const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
             e =>
                 e instanceof FlatControlChangeEvent &&
-                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse && 
+                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse &&
                 e.tick >= MidiUtils.QuarterTime
         );
 
@@ -1325,14 +1487,13 @@ describe('MidiFileGeneratorTest', () => {
         const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
             e =>
                 e instanceof FlatControlChangeEvent &&
-                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse && 
+                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse &&
                 e.tick >= MidiUtils.QuarterTime
         );
 
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
-    
     it('volume-swell', () => {
         const tex: string = '3.3.4 3.3.4 { vs }';
         const score: Score = parseTex(tex);
@@ -1372,7 +1533,7 @@ describe('MidiFileGeneratorTest', () => {
         const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
             e =>
                 e instanceof FlatControlChangeEvent &&
-                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse && 
+                (e as FlatControlChangeEvent).controller === ControllerType.VolumeCoarse &&
                 e.tick >= MidiUtils.QuarterTime
         );
 

@@ -481,17 +481,35 @@ export class MidiFileGenerator {
         }
     }
 
+    private needsSecondaryChannel(note: Note): boolean {
+        return note.hasBend || note.beat.hasWhammyBar || note.beat.vibrato !== VibratoType.None;
+    }
     private determineChannel(track: Track, note: Note): number {
-        // on tied notes use the same channel as the previous note
-        if(note.isTieDestination) {
-            return this.determineChannel(track, note.tieOrigin!);
-        }
-
         // on certain effects we use the secondary channel to avoid interference with other notes
-        if(note.hasBend || note.beat.hasWhammyBar || note.beat.vibrato !== VibratoType.None) {
+        if (this.needsSecondaryChannel(note)) {
             return track.playbackInfo.secondaryChannel;
         }
-        
+
+        // walk back to tie chain to see if any note needs the secondary channel
+        let currentNote = note;
+        while(currentNote.isTieDestination) {
+            currentNote = currentNote.tieOrigin!;
+            if (this.needsSecondaryChannel(currentNote)) {
+                return track.playbackInfo.secondaryChannel;
+            }
+        }
+
+
+        // walk forward to tie chain to see if any note needs the secondary channel
+        currentNote = note;
+        while(currentNote.isTieOrigin) {
+            currentNote = currentNote.tieDestination!;
+            if (this.needsSecondaryChannel(currentNote)) {
+                return track.playbackInfo.secondaryChannel;
+            }
+        }
+
+        // can stay on primary channel
         return track.playbackInfo.primaryChannel;
     }
 
@@ -863,7 +881,7 @@ export class MidiFileGenerator {
         }
 
         // reset at end
-        addBend((noteEnd) | 0, MidiFileGenerator.getPitchWheel(bendBase));
+        addBend(noteEnd | 0, MidiFileGenerator.getPitchWheel(bendBase));
     }
 
     /**
@@ -1341,13 +1359,15 @@ export class MidiFileGenerator {
         const ticksPerBreakpoint: number = ticksBetweenPoints / numberOfSteps;
         const pitchPerBreakpoint = (nextBendValue - currentBendValue) / numberOfSteps;
 
+        const endTick = currentTick + ticksBetweenPoints;
+
         for (let i = 0; i < numberOfSteps; i++) {
             addBend(currentTick | 0, Math.round(currentBendValue));
             currentBendValue += pitchPerBreakpoint;
             currentTick += ticksPerBreakpoint;
         }
 
-        addBend(currentTick | 0, nextBendValue);
+        addBend(endTick | 0, nextBendValue);
     }
 
     private generateTrill(
