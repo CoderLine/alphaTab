@@ -1,8 +1,10 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
+import { ScoreLoader } from '@src/importer';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@src/Settings';
+import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { expect } from 'chai';
 
@@ -240,5 +242,22 @@ describe('EffectsAndAnnotationsTests', () => {
         const settings = new Settings();
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
         await VisualTestHelper.runVisualTest('effects-and-annotations/rasgueado.gp', settings);
+    });
+
+    it('bend-vibrato-default', async () => {
+        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`);
+        const referenceFileName = 'effects-and-annotations/bend-vibrato-default.png';
+        const settings = new Settings();
+        const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+        await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
+    });
+
+    it('bend-vibrato-songbook', async () => {
+        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`);
+        const referenceFileName = 'effects-and-annotations/bend-vibrato-songbook.png';
+        const settings = new Settings();
+        settings.setSongBookModeSettings();
+        const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+        await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
     });
 });

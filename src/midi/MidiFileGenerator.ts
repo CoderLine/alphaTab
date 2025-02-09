@@ -373,6 +373,7 @@ export class MidiFileGenerator {
                 barStartTick + beatStart,
                 beat.playbackDuration,
                 phaseLength,
+                0,
                 bendAmplitude,
                 (tick, value) => {
                     this._handler.addBend(
@@ -480,6 +481,20 @@ export class MidiFileGenerator {
         }
     }
 
+    private determineChannel(track: Track, note: Note): number {
+        // on tied notes use the same channel as the previous note
+        if(note.isTieDestination) {
+            return this.determineChannel(track, note.tieOrigin!);
+        }
+
+        // on certain effects we use the secondary channel to avoid interference with other notes
+        if(note.hasBend || note.beat.hasWhammyBar || note.beat.vibrato !== VibratoType.None) {
+            return track.playbackInfo.secondaryChannel;
+        }
+        
+        return track.playbackInfo.primaryChannel;
+    }
+
     private generateNote(
         note: Note,
         beatStart: number,
@@ -503,10 +518,7 @@ export class MidiFileGenerator {
         noteDuration.noteOnly -= brushOffset;
         noteDuration.letRingEnd -= brushOffset;
         const velocity: number = MidiFileGenerator.getNoteVelocity(note);
-        const channel: number =
-            note.hasBend || note.beat.hasWhammyBar || note.beat.vibrato !== VibratoType.None
-                ? track.playbackInfo.secondaryChannel
-                : track.playbackInfo.primaryChannel;
+        const channel: number = this.determineChannel(track, note);
         let initialBend: number = 0;
 
         if (note.hasBend) {
@@ -808,9 +820,22 @@ export class MidiFileGenerator {
                 return;
         }
         const track: Track = note.beat.voice.bar.staff.track;
-        this.generateVibratorWithParams(noteStart, noteDuration.noteOnly, phaseLength, bendAmplitude, (tick, value) => {
-            this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
-        });
+        let bendBase = 0;
+        // if this is a vibrato at the end of a bend, the vibrato wave needs to start at the pitch where the bend ends
+        if (note.isTieDestination && note.tieOrigin!.hasBend) {
+            const bendPoints = note.tieOrigin!.bendPoints!;
+            bendBase = bendPoints[bendPoints.length - 1].value;
+        }
+        this.generateVibratorWithParams(
+            noteStart,
+            noteDuration.noteOnly,
+            phaseLength,
+            bendBase,
+            bendAmplitude,
+            (tick, value) => {
+                this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
+            }
+        );
     }
 
     public vibratoResolution: number = 16;
@@ -818,25 +843,27 @@ export class MidiFileGenerator {
         noteStart: number,
         noteDuration: number,
         phaseLength: number,
+        bendBase: number,
         bendAmplitude: number,
         addBend: (tick: number, value: number) => void
     ): void {
         const resolution: number = this.vibratoResolution;
         const phaseHalf: number = (phaseLength / 2) | 0;
-        // 1st Phase stays at bend 0,
-        // then we have a sine wave with the given amplitude and phase length
-        noteStart += phaseLength;
+        // vibrato is a sine wave with the given amplitude and phase length
         const noteEnd: number = noteStart + noteDuration;
         while (noteStart < noteEnd) {
             let phase: number = 0;
             const phaseDuration: number = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
             while (phase < phaseDuration) {
-                let bend: number = bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
+                let bend: number = bendBase + bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
                 addBend((noteStart + phase) | 0, MidiFileGenerator.getPitchWheel(bend));
                 phase += resolution;
             }
             noteStart += phaseLength;
         }
+
+        // reset at end
+        addBend((noteEnd) | 0, MidiFileGenerator.getPitchWheel(bendBase));
     }
 
     /**
@@ -955,7 +982,11 @@ export class MidiFileGenerator {
         let duration: number;
         if (note.isTieOrigin && this._settings.notation.extendBendArrowsOnTiedNotes) {
             let endNote: Note = note;
-            while (endNote.isTieOrigin && !endNote.tieDestination!.hasBend) {
+            while (
+                endNote.isTieOrigin &&
+                !endNote.tieDestination!.hasBend &&
+                endNote.tieDestination!.vibrato == VibratoType.None
+            ) {
                 endNote = endNote.tieDestination!;
             }
             duration =
@@ -1316,10 +1347,7 @@ export class MidiFileGenerator {
             currentTick += ticksPerBreakpoint;
         }
 
-        // final bend value if needed
-        if (currentBendValue < nextBendValue) {
-            addBend(currentTick | 0, nextBendValue);
-        }
+        addBend(currentTick | 0, nextBendValue);
     }
 
     private generateTrill(

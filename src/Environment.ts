@@ -527,7 +527,7 @@ export class Environment {
                     new WideBeatVibratoEffectInfo(),
                     new SlightBeatVibratoEffectInfo(),
                     new WideNoteVibratoEffectInfo(),
-                    new SlightNoteVibratoEffectInfo(),
+                    new SlightNoteVibratoEffectInfo(false),
                     new LeftHandTapEffectInfo(),
                     new GolpeEffectInfo(GolpeType.Finger)
                 ],
@@ -558,7 +558,7 @@ export class Environment {
                     new WideBeatVibratoEffectInfo(),
                     new SlightBeatVibratoEffectInfo(),
                     new WideNoteVibratoEffectInfo(),
-                    new SlightNoteVibratoEffectInfo(),
+                    new SlightNoteVibratoEffectInfo(true),
                     new TapEffectInfo(),
                     new FadeEffectInfo(),
                     new HarmonicsEffectInfo(HarmonicType.Natural),
