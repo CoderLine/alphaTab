@@ -53,7 +53,7 @@ class TripletFeelDurations {
 }
 
 class RasgueadoInfo {
-    public durations: Duration[] = [];
+    public durations: number[] = [];
     public brushInfos: Int32Array[] = [];
 }
 
@@ -533,7 +533,7 @@ export class MidiFileGenerator {
         beatDuration: number,
         tempoOnBeatStart: number,
         brushInfo: Int32Array,
-        rasgueadoInfo: RasgueadoInfo|null
+        rasgueadoInfo: RasgueadoInfo | null
     ): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
@@ -544,7 +544,10 @@ export class MidiFileGenerator {
                 noteKey = articulation.outputMidiNumber;
             }
         }
-        const brushOffset: number = rasgueadoInfo == null && note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
+        const brushOffset: number =
+            rasgueadoInfo == null && note.isStringed && note.string <= brushInfo.length
+                ? brushInfo[note.string - 1]
+                : 0;
         const noteStart: number = beatStart + brushOffset;
         const noteDuration: MidiNoteDuration = this.getNoteDuration(note, beatDuration, tempoOnBeatStart);
         noteDuration.untilTieOrSlideEnd -= brushOffset;
@@ -1549,8 +1552,6 @@ export class MidiFileGenerator {
         addBend(endTick | 0, nextBendValue);
     }
 
-    
-
     private generateRasgueado(
         track: Track,
         note: Note,
@@ -1562,10 +1563,11 @@ export class MidiFileGenerator {
     ) {
         let tick: number = noteStart;
 
-        for(let i = 0; i < rasgueadoInfo.durations.length; i++) {
+        for (let i = 0; i < rasgueadoInfo.durations.length; i++) {
             const brushInfo = rasgueadoInfo.brushInfos[i];
-            const brushOffset: number = note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
-            const duration = rasgueadoInfo.durations[i];
+            const brushOffset: number =
+                note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
+            const duration = rasgueadoInfo.durations[i] as number;
 
             this._handler.addNote(track.index, tick + brushOffset, duration - brushOffset, noteKey, velocity, channel);
 
@@ -1804,9 +1806,9 @@ export class MidiFileGenerator {
             v => (beatDuration * v) / patternDuration
         );
         info.brushInfos = new Array<Int32Array>(info.durations.length);
-        
+
         // precalculate the values needed for all brush infos
-        const sixteenthBrush =  MidiUtils.toTicks(Duration.Sixteenth);
+        const sixteenthBrush = MidiUtils.toTicks(Duration.Sixteenth);
         let stringUsed: number = 0;
         let stringCount: number = 0;
         for (const n of beat.notes) {
@@ -1828,7 +1830,7 @@ export class MidiFileGenerator {
             info.brushInfos[i] = brushInfo;
 
             const brushType = rasgueadoDirections[i];
-            if(brushType !== BrushType.None){
+            if (brushType !== BrushType.None) {
                 this.fillBrushInfo(
                     beat,
                     brushInfo,
@@ -1839,7 +1841,6 @@ export class MidiFileGenerator {
                 );
             }
         }
-
 
         return info;
     }

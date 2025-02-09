@@ -309,6 +309,11 @@ namespace AlphaTab.Core
             return new KeyValuePair<TKey, TValue>(key, value);
         }
 
+        public static KeyValuePair<TKey, IList<TListItem>> CreateMapEntry<TKey, TListItem>(TKey key, AlphaTab.Collections.List<TListItem> value)
+        {
+            return new KeyValuePair<TKey, IList<TListItem>>(key, value);
+        }
+
         public static string ToInvariantString(this double num, int radix)
         {
             if (radix == 16)
