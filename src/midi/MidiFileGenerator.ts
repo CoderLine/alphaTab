@@ -1359,13 +1359,15 @@ export class MidiFileGenerator {
         const ticksPerBreakpoint: number = ticksBetweenPoints / numberOfSteps;
         const pitchPerBreakpoint = (nextBendValue - currentBendValue) / numberOfSteps;
 
+        const endTick = currentTick + ticksBetweenPoints;
+
         for (let i = 0; i < numberOfSteps; i++) {
             addBend(currentTick | 0, Math.round(currentBendValue));
             currentBendValue += pitchPerBreakpoint;
             currentTick += ticksPerBreakpoint;
         }
 
-        addBend(currentTick | 0, nextBendValue);
+        addBend(endTick | 0, nextBendValue);
     }
 
     private generateTrill(
