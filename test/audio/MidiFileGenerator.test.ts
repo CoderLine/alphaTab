@@ -1539,4 +1539,94 @@ describe('MidiFileGeneratorTest', () => {
 
         assertEvents(actualNoteEvents, expectedEvents);
     });
+
+        
+    it('ornaments', async () => {
+        const buffer = await TestPlatform.loadFile(
+            'test-data/audio/ornaments.gp'
+        );
+        const score = ScoreLoader.loadScoreFromBytes(buffer);
+
+        const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const noteKey = note.realValue;
+        const noteVelocity = MidiUtils.dynamicToVelocity((note.dynamics as number) - 1);
+        const expectedEvents: FlatMidiEvent[] = [
+            // Upper Mordent (shortened)
+            new FlatNoteEvent(0, 0, 0, 60, noteKey, noteVelocity),
+            new FlatNoteEvent(60, 0, 0, 60, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(120, 0, 0, 360, noteKey, noteVelocity),
+
+            // Upper Mordent (quarter)
+            new FlatNoteEvent(3840, 0, 0, 120, noteKey, noteVelocity),
+            new FlatNoteEvent(3960, 0, 0, 120, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(4080, 0, 0, 720, noteKey, noteVelocity),
+
+            // Upper Mordent (longer)
+            new FlatNoteEvent(7680, 0, 0, 120, noteKey, noteVelocity),
+            new FlatNoteEvent(7800, 0, 0, 120, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(7920, 0, 0, 1680, noteKey, noteVelocity),
+
+            // Lower Mordent (shortened)
+            new FlatNoteEvent(11520, 0, 0, 60, noteKey, noteVelocity),
+            new FlatNoteEvent(11580, 0, 0, 60, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(11640, 0, 0, 360, noteKey, noteVelocity),
+
+            // Lower Mordent (quarter)
+            new FlatNoteEvent(15360, 0, 0, 120, noteKey, noteVelocity),
+            new FlatNoteEvent(15480, 0, 0, 120, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(15600, 0, 0, 720, noteKey, noteVelocity),
+
+            // Lower Mordent (longer)
+            new FlatNoteEvent(19200, 0, 0, 120, noteKey, noteVelocity),
+            new FlatNoteEvent(19320, 0, 0, 120, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(19440, 0, 0, 1680, noteKey, noteVelocity),
+
+            // Turn (shortened)
+            new FlatNoteEvent(23040, 0, 0, 40, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(23080, 0, 0, 40, noteKey, noteVelocity),
+            new FlatNoteEvent(23120, 0, 0, 40, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(23160, 0, 0, 360, noteKey, noteVelocity),
+
+            // Turn (quarter)
+            new FlatNoteEvent(26880, 0, 0, 80, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(26960, 0, 0, 80, noteKey, noteVelocity),
+            new FlatNoteEvent(27040, 0, 0, 80, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(27120, 0, 0, 720, noteKey, noteVelocity),
+
+            // Turn (longer)
+            new FlatNoteEvent(30720, 0, 0, 80, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(30800, 0, 0, 80, noteKey, noteVelocity),
+            new FlatNoteEvent(30880, 0, 0, 80, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(30960, 0, 0, 1680, noteKey, noteVelocity),
+
+            // Inverted Turn (shortened)
+            new FlatNoteEvent(34560, 0, 0, 40, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(34600, 0, 0, 40, noteKey, noteVelocity),
+            new FlatNoteEvent(34640, 0, 0, 40, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(34680, 0, 0, 360, noteKey, noteVelocity),
+
+            // Inverted Turn (quarter)
+            new FlatNoteEvent(38400, 0, 0, 80, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(38480, 0, 0, 80, noteKey, noteVelocity),
+            new FlatNoteEvent(38560, 0, 0, 80, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(38640, 0, 0, 720, noteKey, noteVelocity),
+
+            // Inverted Turn (longer)
+            new FlatNoteEvent(42240, 0, 0, 80, noteKey + 2, noteVelocity),
+            new FlatNoteEvent(42320, 0, 0, 80, noteKey, noteVelocity),
+            new FlatNoteEvent(42400, 0, 0, 80, noteKey - 1, noteVelocity),
+            new FlatNoteEvent(42480, 0, 0, 1680, noteKey, noteVelocity),
+        ];
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
+            e => e instanceof FlatNoteEvent
+        );
+
+        assertEvents(actualNoteEvents, expectedEvents);
+    });
+
+
 });
