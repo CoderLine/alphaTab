@@ -52,6 +52,7 @@ import { WahPedal } from '@src/model/WahPedal';
 import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
+import { Direction } from '@src/model/Direction';
 
 /**
  * This structure represents a duration within a gpif
@@ -1283,12 +1284,93 @@ export class GpifParser {
                         this.parseFermatas(masterBar, c);
                         break;
                     case 'XProperties':
-                        this.parseMasterBarXProperties(c, masterBar);
+                        this.parseMasterBarXProperties(masterBar, c);
+                        break;
+                    case 'Directions':
+                        this.parseDirections(masterBar, c);
                         break;
                 }
             }
         }
         this._masterBars.push(masterBar);
+    }
+
+    private parseDirections(masterBar: MasterBar, node: XmlNode) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Target':
+                        switch (c.innerText) {
+                            case 'Coda':
+                                masterBar.addDirection(Direction.TargetCoda);
+                                break;
+                            case 'DoubleCoda':
+                                masterBar.addDirection(Direction.TargetDoubleCoda);
+                                break;
+                            case 'Segno':
+                                masterBar.addDirection(Direction.TargetSegno);
+                                break;
+                            case 'SegnoSegno':
+                                masterBar.addDirection(Direction.TargetSegnoSegno);
+                                break;
+                            case 'Fine':
+                                masterBar.addDirection(Direction.TargetFine);
+                                break;
+                        }
+                        break;
+                    case 'Jump':
+                        switch (c.innerText) {
+                            case 'DaCapo':
+                                masterBar.addDirection(Direction.JumpDaCapo);
+                                break;
+                            case 'DaCapoAlCoda':
+                                masterBar.addDirection(Direction.JumpDaCapoAlCoda);
+                                break;
+                            case 'DaCapoAlDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDaCapoAlDoubleCoda);
+                                break;
+                            case 'DaCapoAlFine':
+                                masterBar.addDirection(Direction.JumpDaCapoAlFine);
+                                break;
+
+                            // Note: no typo on our side, GPIF has wrongly "DaSegno" instead of "DalSegno"
+                            case 'DaSegno':
+                                masterBar.addDirection(Direction.JumpDalSegno);
+                                break;
+                            case 'DaSegnoAlCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoAlCoda);
+                                break;
+                            case 'DaSegnoAlDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoAlDoubleCoda);
+                                break;
+                            case 'DaSegnoAlFine':
+                                masterBar.addDirection(Direction.JumpDalSegnoAlFine);
+                                break;
+
+                            case 'DaSegnoSegno':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegno);
+                                break;
+                            case 'DaSegnoSegnoAlCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegnoAlCoda);
+                                break;
+                            case 'DaSegnoSegnoAlDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+                                break;
+                            case 'DaSegnoSegnoAlFine':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegnoAlFine);
+                                break;
+
+                            case 'DaCoda':
+                                masterBar.addDirection(Direction.JumpDaCoda);
+                                break;
+                            case 'DaDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDaDoubleCoda);
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
     }
 
     private parseFermatas(masterBar: MasterBar, node: XmlNode): void {
@@ -1712,7 +1794,7 @@ export class GpifParser {
         }
     }
 
-    private parseMasterBarXProperties(node: XmlNode, masterBar: MasterBar) {
+    private parseMasterBarXProperties(masterBar: MasterBar, node: XmlNode) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {

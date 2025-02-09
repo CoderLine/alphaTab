@@ -1,5 +1,6 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { Direction } from '@src/model/Direction';
 import { BracketExtendMode } from '@src/model/RenderStylesheet';
 import { Settings } from '@src/Settings';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
@@ -70,5 +71,41 @@ describe('Gp8ImporterTest', () => {
     it('system-separator', async () => {
         const noBrackets = (await prepareImporterWithFile('visual-tests/layout/system-divider.gp')).readScore();
         expect(noBrackets.stylesheet.useSystemSignSeparator).to.be.true;
+    });
+
+    it('directions', async () => {
+        const directions = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
+
+        expect(directions.masterBars[0].directions).to.be.ok;
+        expect(directions.masterBars[0].directions).to.contain(Direction.TargetFine);
+        expect(directions.masterBars[0].directions).to.contain(Direction.TargetSegno);
+        expect(directions.masterBars[0].directions).to.contain(Direction.TargetSegnoSegno);
+        expect(directions.masterBars[0].directions).to.contain(Direction.TargetCoda);
+        expect(directions.masterBars[0].directions).to.contain(Direction.TargetDoubleCoda);
+
+        expect(directions.masterBars[1]).to.be.ok;
+        expect(directions.masterBars[1].directions).to.contain(Direction.JumpDaCapo);
+        expect(directions.masterBars[1].directions).to.contain(Direction.JumpDalSegno);
+        expect(directions.masterBars[1].directions).to.contain(Direction.JumpDalSegnoSegno);
+        expect(directions.masterBars[1].directions).to.contain(Direction.JumpDaCoda);
+        expect(directions.masterBars[1].directions).to.contain(Direction.JumpDaDoubleCoda);
+
+
+        expect(directions.masterBars[2].directions).to.be.ok;
+        expect(directions.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
+        expect(directions.masterBars[2].directions).to.contain(Direction.JumpDalSegnoAlCoda);
+        expect(directions.masterBars[2].directions).to.contain(Direction.JumpDalSegnoSegnoAlCoda);
+
+        expect(directions.masterBars[3].directions).to.be.ok;
+        expect(directions.masterBars[3].directions).to.contain(Direction.JumpDaCapoAlDoubleCoda);
+        expect(directions.masterBars[3].directions).to.contain(Direction.JumpDalSegnoAlDoubleCoda);
+        expect(directions.masterBars[3].directions).to.contain(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+
+        expect(directions.masterBars[4].directions).to.be.ok;
+        expect(directions.masterBars[4].directions).to.contain(Direction.JumpDaCapoAlFine);
+        expect(directions.masterBars[4].directions).to.contain(Direction.JumpDalSegnoAlFine);
+        expect(directions.masterBars[4].directions).to.contain(Direction.JumpDalSegnoSegnoAlFine);
+
+        expect(directions.masterBars[5].directions).to.not.be.ok;
     });
 });

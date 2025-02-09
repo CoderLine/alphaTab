@@ -133,6 +133,18 @@ public class Expector<T>
         }
     }
 
+    public void Contain(object element)
+    {
+        if(_actual is ICollection collection)
+        {
+            CollectionAssert.Contains(collection, element);
+        }
+        else
+        {
+            Assert.Fail("Contain can only be used with collection operands");
+        }
+    }
+
     public void True()
     {
         if (_actual is bool b)
