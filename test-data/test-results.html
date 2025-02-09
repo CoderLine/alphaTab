@@ -193,7 +193,12 @@
                 img.src = '/' + result.diffFile;
             })
 
-            await Promise.all([expected, actual, diff]);
+            try {
+                await Promise.all([expected, actual, diff]);
+            }
+            catch(e) {
+                // ignore potentially missing images
+            }
 
             setupComparer(comparer, result);
 
