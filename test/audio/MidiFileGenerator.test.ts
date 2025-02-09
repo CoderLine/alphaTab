@@ -1628,5 +1628,70 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
+    it('rasgueado', async () => {
+        const buffer = await TestPlatform.loadFile(
+            'test-data/audio/rasgueado.gp'
+        );
+        const score = ScoreLoader.loadScoreFromBytes(buffer);
+
+        const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const noteVelocity = MidiUtils.dynamicToVelocity((note.dynamics as number));
+        const expectedEvents: FlatMidiEvent[] = [
+            // ii - A string
+            new FlatNoteEvent(0, 0, 0, 480, 48, noteVelocity), // down - no brush offset
+            new FlatNoteEvent(600, 0, 0, 360, 48, noteVelocity), // up - with brush offset
+
+            // ii - D string
+            new FlatNoteEvent(30, 0, 0, 450, 52, noteVelocity),
+            new FlatNoteEvent(570, 0, 0, 390, 52, noteVelocity),
+
+            // ii - G string
+            new FlatNoteEvent(60, 0, 0, 420, 55, noteVelocity),
+            new FlatNoteEvent(540, 0, 0, 420, 55, noteVelocity),
+
+            // ii - B string
+            new FlatNoteEvent(90, 0, 0, 390, 60, noteVelocity),
+            new FlatNoteEvent(510, 0, 0, 450, 60, noteVelocity),
+
+            // ii - E string
+            new FlatNoteEvent(120, 0, 0, 360, 64, noteVelocity),
+            new FlatNoteEvent(480, 0, 0, 480, 64, noteVelocity),
+
+            // pmp (anapaest) - A string
+            new FlatNoteEvent(1980, 0, 0, 180, 48, noteVelocity),
+            new FlatNoteEvent(2160, 0, 0, 240, 48, noteVelocity),
+            new FlatNoteEvent(2400, 0, 0, 480, 48, noteVelocity),
+
+            // pmp (anapaest) - D string
+            new FlatNoteEvent(1965, 0, 0, 195, 52, noteVelocity),
+            new FlatNoteEvent(2175, 0, 0, 225, 52, noteVelocity),
+            new FlatNoteEvent(2430, 0, 0, 450, 52, noteVelocity),
+
+            // pmp (anapaest) - G string
+            new FlatNoteEvent(1950, 0, 0, 210, 55, noteVelocity),
+            new FlatNoteEvent(2190, 0, 0, 210, 55, noteVelocity),
+            new FlatNoteEvent(2460, 0, 0, 420, 55, noteVelocity),
+
+            // pmp (anapaest) - B string
+            new FlatNoteEvent(1935, 0, 0, 225, 60, noteVelocity),
+            new FlatNoteEvent(2205, 0, 0, 195, 60, noteVelocity),
+            new FlatNoteEvent(2490, 0, 0, 390, 60, noteVelocity),
+
+            // pmp (anapaest) - E string
+            new FlatNoteEvent(1920, 0, 0, 240, 64, noteVelocity),
+            new FlatNoteEvent(2220, 0, 0, 180, 64, noteVelocity),
+            new FlatNoteEvent(2520, 0, 0, 360, 64, noteVelocity),
+        ];
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
+            e => e instanceof FlatNoteEvent
+        );
+
+        assertEvents(actualNoteEvents, expectedEvents);
+    });
+
 
 });
