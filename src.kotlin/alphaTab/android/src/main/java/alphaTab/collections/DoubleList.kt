@@ -149,4 +149,11 @@ public class DoubleList : IDoubleIterable {
             return value
         }
     }
+
+    
+    internal fun reduce(operation: (acc: Double, v: Double) -> Double, initial:Double): Double {
+        var accumulator = initial
+        for (element in _items) accumulator = operation(accumulator, element)
+        return accumulator
+    }
 }

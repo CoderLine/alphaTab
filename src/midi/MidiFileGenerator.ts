@@ -38,6 +38,7 @@ import { PercussionMapper } from '@src/model/PercussionMapper';
 import { DynamicValue } from '@src/model';
 import { FadeType } from '@src/model/FadeType';
 import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Rasgueado } from '@src/model/Rasgueado';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -49,6 +50,11 @@ class TripletFeelDurations {
     public firstBeatDuration: number = 0;
     public secondBeatStartOffset: number = 0;
     public secondBeatDuration: number = 0;
+}
+
+class RasgueadoInfo {
+    public durations: number[] = [];
+    public brushInfos: Int32Array[] = [];
 }
 
 /**
@@ -348,8 +354,16 @@ export class MidiFileGenerator {
             this.generateDeadSlap(beat, barStartTick + beatStart);
         } else {
             let brushInfo = this.getBrushInfo(beat);
+            let rasgueadoInfo = this.getRasgueadoInfo(beat, audioDuration);
             for (const n of beat.notes) {
-                this.generateNote(n, barStartTick + beatStart, audioDuration, tempoOnBeatStart, brushInfo);
+                this.generateNote(
+                    n,
+                    barStartTick + beatStart,
+                    audioDuration,
+                    tempoOnBeatStart,
+                    brushInfo,
+                    rasgueadoInfo
+                );
             }
         }
 
@@ -493,17 +507,16 @@ export class MidiFileGenerator {
 
         // walk back to tie chain to see if any note needs the secondary channel
         let currentNote = note;
-        while(currentNote.isTieDestination) {
+        while (currentNote.isTieDestination) {
             currentNote = currentNote.tieOrigin!;
             if (this.needsSecondaryChannel(currentNote)) {
                 return track.playbackInfo.secondaryChannel;
             }
         }
 
-
         // walk forward to tie chain to see if any note needs the secondary channel
         currentNote = note;
-        while(currentNote.isTieOrigin) {
+        while (currentNote.isTieOrigin) {
             currentNote = currentNote.tieDestination!;
             if (this.needsSecondaryChannel(currentNote)) {
                 return track.playbackInfo.secondaryChannel;
@@ -519,7 +532,8 @@ export class MidiFileGenerator {
         beatStart: number,
         beatDuration: number,
         tempoOnBeatStart: number,
-        brushInfo: Int32Array
+        brushInfo: Int32Array,
+        rasgueadoInfo: RasgueadoInfo | null
     ): void {
         const track: Track = note.beat.voice.bar.staff.track;
         const staff: Staff = note.beat.voice.bar.staff;
@@ -530,7 +544,10 @@ export class MidiFileGenerator {
                 noteKey = articulation.outputMidiNumber;
             }
         }
-        const brushOffset: number = note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
+        const brushOffset: number =
+            rasgueadoInfo == null && note.isStringed && note.string <= brushInfo.length
+                ? brushInfo[note.string - 1]
+                : 0;
         const noteStart: number = beatStart + brushOffset;
         const noteDuration: MidiNoteDuration = this.getNoteDuration(note, beatDuration, tempoOnBeatStart);
         noteDuration.untilTieOrSlideEnd -= brushOffset;
@@ -557,6 +574,13 @@ export class MidiFileGenerator {
 
         if (initialBend >= 0) {
             this._handler.addNoteBend(track.index, noteStart, channel, noteKey, initialBend);
+        }
+
+        // Rasgueado
+        if (note.beat.hasRasgueado) {
+            this.generateRasgueado(track, note, noteStart, noteKey, velocity, channel, rasgueadoInfo!);
+            // no further generation needed / supported
+            return;
         }
 
         // Ornaments
@@ -1528,6 +1552,29 @@ export class MidiFileGenerator {
         addBend(endTick | 0, nextBendValue);
     }
 
+    private generateRasgueado(
+        track: Track,
+        note: Note,
+        noteStart: number,
+        noteKey: number,
+        velocity: number,
+        channel: number,
+        rasgueadoInfo: RasgueadoInfo
+    ) {
+        let tick: number = noteStart;
+
+        for (let i = 0; i < rasgueadoInfo.durations.length; i++) {
+            const brushInfo = rasgueadoInfo.brushInfos[i];
+            const brushOffset: number =
+                note.isStringed && note.string <= brushInfo.length ? brushInfo[note.string - 1] : 0;
+            const duration = rasgueadoInfo.durations[i] as number;
+
+            this._handler.addNote(track.index, tick + brushOffset, duration - brushOffset, noteKey, velocity, channel);
+
+            tick += duration;
+        }
+    }
+
     private generateTrill(
         note: Note,
         noteStart: number,
@@ -1575,9 +1622,233 @@ export class MidiFileGenerator {
         }
     }
 
+    private static readonly RasgueadoDirections = new Map<Rasgueado, BrushType[]>([
+        [Rasgueado.Ii, [BrushType.BrushDown, BrushType.BrushUp]],
+        [Rasgueado.Mi, [BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.MiiTriplet, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushUp]],
+        [Rasgueado.MiiAnapaest, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushUp]],
+        [Rasgueado.PmpTriplet, [BrushType.BrushUp, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.PmpAnapaest, [BrushType.BrushUp, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.PeiTriplet, [BrushType.BrushUp, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.PeiAnapaest, [BrushType.BrushUp, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.PaiTriplet, [BrushType.BrushUp, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.PaiAnapaest, [BrushType.BrushUp, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.AmiTriplet, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.AmiAnapaest, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown]],
+        [Rasgueado.Ppp, [BrushType.None, BrushType.BrushDown, BrushType.BrushUp]],
+        [Rasgueado.Amii, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushUp]],
+        [Rasgueado.Amip, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushUp]],
+        [Rasgueado.Eami, [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown]],
+        [
+            Rasgueado.Eamii,
+            [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushUp]
+        ],
+        [
+            Rasgueado.Peami,
+            [BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushDown, BrushType.BrushUp]
+        ]
+    ]);
+
+    // these are the durations of the rasgueados assuming we have a quarter note
+    // the patterns are then relatively scaled to the actual beat duration
+    private static readonly RasgueadoDurations = new Map<Rasgueado, number[]>([
+        [Rasgueado.Ii, [MidiUtils.toTicks(Duration.Eighth), MidiUtils.toTicks(Duration.Eighth)]],
+        [Rasgueado.Mi, [MidiUtils.toTicks(Duration.Eighth), MidiUtils.toTicks(Duration.Eighth)]],
+        [
+            Rasgueado.MiiTriplet,
+            [
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.MiiAnapaest,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Eighth)
+            ]
+        ],
+        [
+            Rasgueado.PmpTriplet,
+            [
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.PmpAnapaest,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.PeiTriplet,
+            [
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.PeiAnapaest,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Eighth)
+            ]
+        ],
+        [
+            Rasgueado.PaiTriplet,
+            [
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.PaiAnapaest,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Eighth)
+            ]
+        ],
+        [
+            Rasgueado.AmiTriplet,
+            [
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.AmiAnapaest,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.Ppp,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Eighth) / 3
+            ]
+        ],
+        [
+            Rasgueado.Amii,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Eighth)
+            ]
+        ],
+        [
+            Rasgueado.Amip,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Sixteenth) / 3,
+                MidiUtils.toTicks(Duration.Eighth)
+            ]
+        ],
+        [
+            Rasgueado.Eami,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Sixteenth),
+                MidiUtils.toTicks(Duration.Sixteenth)
+            ]
+        ],
+        [
+            Rasgueado.Eamii,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5
+            ]
+        ],
+        [
+            Rasgueado.Peami,
+            [
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5,
+                MidiUtils.toTicks(Duration.Sixteenth) / 5
+            ]
+        ]
+    ]);
+
+    private getRasgueadoInfo(beat: Beat, beatDuration: number): RasgueadoInfo | null {
+        if (!beat.hasRasgueado) {
+            return null;
+        }
+
+        const info = new RasgueadoInfo();
+
+        // stretch pattern from absolute definition to needed beat duration
+        const rasgueadoPattern = MidiFileGenerator.RasgueadoDurations.get(beat.rasgueado)!;
+        const patternDuration = rasgueadoPattern.reduce((p, v) => p + v, 0);
+
+        info.durations = MidiFileGenerator.RasgueadoDurations.get(beat.rasgueado)!.map(
+            v => (beatDuration * v) / patternDuration
+        );
+        info.brushInfos = new Array<Int32Array>(info.durations.length);
+
+        // precalculate the values needed for all brush infos
+        const sixteenthBrush = MidiUtils.toTicks(Duration.Sixteenth);
+        let stringUsed: number = 0;
+        let stringCount: number = 0;
+        for (const n of beat.notes) {
+            if (n.isTieDestination) {
+                continue;
+            }
+            stringUsed |= 0x01 << (n.string - 1);
+            stringCount++;
+        }
+
+        // compute brush info for all slots matching the duration
+        const rasgueadoDirections = MidiFileGenerator.RasgueadoDirections.get(beat.rasgueado)!;
+        for (let i = 0; i < info.durations.length; i++) {
+            // QuarterTime -> 16th note brush
+            // real duration -> ?
+            const brushDuration = (info.durations[i] * sixteenthBrush) / MidiUtils.QuarterTime;
+
+            const brushInfo = new Int32Array(beat.voice.bar.staff.tuning.length);
+            info.brushInfos[i] = brushInfo;
+
+            const brushType = rasgueadoDirections[i];
+            if (brushType !== BrushType.None) {
+                this.fillBrushInfo(
+                    beat,
+                    brushInfo,
+                    brushType === BrushType.ArpeggioDown || brushType === BrushType.BrushDown,
+                    stringUsed,
+                    stringCount,
+                    brushDuration
+                );
+            }
+        }
+
+        return info;
+    }
+
     private getBrushInfo(beat: Beat): Int32Array {
         const brushInfo = new Int32Array(beat.voice.bar.staff.tuning.length);
-        if (beat.brushType !== BrushType.None) {
+
+        if (beat.brushType) {
             //
             // calculate the number of
             // a mask where the single bits indicate the strings used
@@ -1590,23 +1861,42 @@ export class MidiFileGenerator {
                 stringUsed |= 0x01 << (n.string - 1);
                 stringCount++;
             }
-            //
-            // calculate time offset for all strings
-            if (beat.notes.length > 0) {
-                let brushMove: number = 0;
-                const brushIncrement: number = (beat.brushDuration / (stringCount - 1)) | 0;
-                for (let i: number = 0; i < beat.voice.bar.staff.tuning.length; i++) {
-                    let index: number =
-                        beat.brushType === BrushType.ArpeggioDown || beat.brushType === BrushType.BrushDown
-                            ? i
-                            : brushInfo.length - 1 - i;
-                    if ((stringUsed & (0x01 << index)) !== 0) {
-                        brushInfo[index] = brushMove;
-                        brushMove += brushIncrement;
-                    }
+
+            this.fillBrushInfo(
+                beat,
+                brushInfo,
+                beat.brushType === BrushType.ArpeggioDown || beat.brushType === BrushType.BrushDown,
+                stringUsed,
+                stringCount,
+                beat.brushDuration
+            );
+        }
+
+        return brushInfo;
+    }
+
+    private fillBrushInfo(
+        beat: Beat,
+        brushInfo: Int32Array,
+        down: boolean,
+        stringUsed: number,
+        stringCount: number,
+        brushDuration: number
+    ) {
+        //
+        // calculate time offset for all strings
+        if (beat.notes.length > 0) {
+            let brushMove: number = 0;
+            const brushIncrement: number = (brushDuration / (stringCount - 1)) | 0;
+            for (let i: number = 0; i < beat.voice.bar.staff.tuning.length; i++) {
+                let index: number = down ? i : brushInfo.length - 1 - i;
+                if ((stringUsed & (0x01 << index)) !== 0) {
+                    brushInfo[index] = brushMove;
+                    brushMove += brushIncrement;
                 }
             }
         }
+
         return brushInfo;
     }
 
@@ -1741,7 +2031,8 @@ export class MidiFileGenerator {
             0,
             note.beat.playbackDuration,
             tempo,
-            new Int32Array(note.beat.voice.bar.staff.tuning.length)
+            new Int32Array(note.beat.voice.bar.staff.tuning.length),
+            null
         );
     }
 }
