@@ -8,57 +8,12 @@ import {
     isTypedArray,
     unwrapArrayItemType,
     isMap,
-    isEnumType
+    isEnumType,
+    isSet,
+    isPrimitiveToJson
 } from '../BuilderHelpers';
 import { findModule, findSerializerModule, isImmutable, JsonProperty, JsonSerializable } from './Serializer.common';
 
-function isPrimitiveToJson(type: ts.Type, typeChecker: ts.TypeChecker) {
-    if (!type) {
-        return false;
-    }
-
-    const isArray = isTypedArray(type);
-    const arrayItemType = unwrapArrayItemType(type, typeChecker);
-
-    if (hasFlag(type, ts.TypeFlags.Unknown)) {
-        return true;
-    }
-    if (hasFlag(type, ts.TypeFlags.Number)) {
-        return true;
-    }
-    if (hasFlag(type, ts.TypeFlags.String)) {
-        return true;
-    }
-    if (hasFlag(type, ts.TypeFlags.Boolean)) {
-        return true;
-    }
-
-    if (arrayItemType) {
-        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Number)) {
-            return true;
-        }
-        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.String)) {
-            return true;
-        }
-        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Boolean)) {
-            return true;
-        }
-    } else if (type.symbol) {
-        switch (type.symbol.name) {
-            case 'Uint8Array':
-            case 'Uint16Array':
-            case 'Uint32Array':
-            case 'Int8Array':
-            case 'Int16Array':
-            case 'Int32Array':
-            case 'Float32Array':
-            case 'Float64Array':
-                return true;
-        }
-    }
-
-    return false;
-}
 
 function generateToJsonBody(
     program: ts.Program,
@@ -96,7 +51,6 @@ function generateToJsonBody(
         }
 
         let propertyStatements: ts.Statement[] = [];
-        
 
         const typeChecker = program.getTypeChecker();
         const type = getTypeWithNullableInfo(typeChecker, prop.property.type!, prop.asRaw);
@@ -154,7 +108,6 @@ function generateToJsonBody(
                     )
                 );
             }
-
         } else if (isMap(type.type)) {
             const mapType = type.type as ts.TypeReference;
             if (!isPrimitiveType(mapType.typeArguments![0])) {
@@ -170,7 +123,9 @@ function generateToJsonBody(
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), v);
                     }
-                }`, ts.SyntaxKind.Block);
+                }`,
+                    ts.SyntaxKind.Block
+                );
             } else if (isEnumType(mapType.typeArguments![1])) {
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
@@ -179,7 +134,9 @@ function generateToJsonBody(
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), v as number);
                     }
-                }`, ts.SyntaxKind.Block);
+                }`,
+                    ts.SyntaxKind.Block
+                );
             } else {
                 const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
                 importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
@@ -191,20 +148,68 @@ function generateToJsonBody(
                     for(const [k, v] of obj.${fieldName}!) {
                         m.set(k.toString(), ${itemSerializer}.toJson(v));
                     }
-                }`, ts.SyntaxKind.Block);
+                }`,
+                    ts.SyntaxKind.Block
+                );
             }
 
             if (type.isNullable) {
-                propertyStatements.push(ts.factory.createIfStatement(
-                    ts.factory.createBinaryExpression(
-                        ts.factory.createPropertyAccessExpression(
-                            ts.factory.createIdentifier('obj'),
-                            fieldName
+                propertyStatements.push(
+                    ts.factory.createIfStatement(
+                        ts.factory.createBinaryExpression(
+                            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
+                            ts.SyntaxKind.ExclamationEqualsEqualsToken,
+                            ts.factory.createNull()
                         ),
-                        ts.SyntaxKind.ExclamationEqualsEqualsToken,
-                        ts.factory.createNull()
-                    ),
-                    serializeBlock)
+                        serializeBlock
+                    )
+                );
+            } else {
+                propertyStatements.push(serializeBlock);
+            }
+        } else if (isSet(type.type)) {
+            const setType = type.type as ts.TypeReference;
+            if (!isPrimitiveType(setType.typeArguments![0])) {
+                throw new Error('only Set<Primitive> maps are supported, extend if needed!');
+            }
+
+            let serializeBlock: ts.Block;
+            if (isPrimitiveToJson(setType.typeArguments![1], typeChecker)) {
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                        const a:unknown[] = [];
+                        o.set(${JSON.stringify(jsonName)}, a);
+                        for(const v of obj.${fieldName}!) {
+                            a.push(v);
+                        }
+                    }`,
+                    ts.SyntaxKind.Block
+                );
+            } else if (isEnumType(setType.typeArguments![0])) {
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                        const a:number[] = [];
+                        o.set(${JSON.stringify(jsonName)}, a);
+                        for(const v of obj.${fieldName}!) {
+                            a.push(v as number);
+                        }
+                    }`,
+                    ts.SyntaxKind.Block
+                );
+            } else {
+                throw new Error('only Set<Primitive> maps are supported, extend if needed!');
+            }
+
+            if (type.isNullable) {
+                propertyStatements.push(
+                    ts.factory.createIfStatement(
+                        ts.factory.createBinaryExpression(
+                            ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
+                            ts.SyntaxKind.ExclamationEqualsEqualsToken,
+                            ts.factory.createNull()
+                        ),
+                        serializeBlock
+                    )
                 );
             } else {
                 propertyStatements.push(serializeBlock);
@@ -242,13 +247,12 @@ function generateToJsonBody(
         statements.push(...propertyStatements);
     }
 
-    if(serializable.hasToJsonExtension) {
-        statements.push( createNodeFromSource<ts.ExpressionStatement>(
-            `obj.toJson(o);`,
-            ts.SyntaxKind.ExpressionStatement
-        ));
+    if (serializable.hasToJsonExtension) {
+        statements.push(
+            createNodeFromSource<ts.ExpressionStatement>(`obj.toJson(o);`, ts.SyntaxKind.ExpressionStatement)
+        );
     }
-    
+
     statements.push(ts.factory.createReturnStatement(ts.factory.createIdentifier('o')));
 
     return ts.factory.createBlock(statements, true);
