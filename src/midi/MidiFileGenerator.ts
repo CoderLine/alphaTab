@@ -37,6 +37,7 @@ import { SynthConstants } from '@src/synth/SynthConstants';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { DynamicValue } from '@src/model';
 import { FadeType } from '@src/model/FadeType';
+import { NoteOrnament } from '@src/model/NoteOrnament';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -539,6 +540,8 @@ export class MidiFileGenerator {
         const channel: number = this.determineChannel(track, note);
         let initialBend: number = 0;
 
+        let noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
+
         if (note.hasBend) {
             initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints![0].value);
         } else if (note.beat.hasWhammyBar) {
@@ -554,6 +557,13 @@ export class MidiFileGenerator {
 
         if (initialBend >= 0) {
             this._handler.addNoteBend(track.index, noteStart, channel, noteKey, initialBend);
+        }
+
+        // Ornaments
+        if (note.ornament !== NoteOrnament.None) {
+            this.generateOrnament(track, note, noteStart, noteSoundDuration, noteKey, velocity, channel);
+            // no further generation needed / supported
+            return;
         }
 
         //
@@ -590,9 +600,157 @@ export class MidiFileGenerator {
         // for tied notes, and target notes of legato slides we do not pick the note
         // the previous one is extended
         if (!note.isTieDestination && (!note.slideOrigin || note.slideOrigin.slideOutType !== SlideOutType.Legato)) {
-            let noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
             this._handler.addNote(track.index, noteStart, noteSoundDuration, noteKey, velocity, channel);
         }
+    }
+
+    /**
+     * For every note within the octave, the number of keys to go up when playing ornaments.
+     * For white keys this is the next white key,
+     * For black keys it is either the next black or white key depending on the distance.
+     *
+     * Ornaments are not really a strictly defined element, alphaTab is using shipping some default.
+     */
+    // prettier-ignore
+    private static readonly OrnamentKeysUp = [
+        /* C -> D */ 2,
+        /* C# -> D# */ 2,
+        /* D -> E */ 2,
+        /* D# -> E */ 1,
+        /* E -> F */ 1, 
+        /* F -> G */ 2,
+        /* F# -> G# */ 2,
+        /* G -> A */ 2,
+        /* G# -> A# */ 2,
+        /* A -> B */ 2,
+        /* A# -> B */ 1,
+        /* B -> C */ 1
+    ];
+
+    /**
+     * For every note within the octave, the number of keys to go down when playing ornaments.
+     * This is typically only a key down.
+     *
+     * Ornaments are not really a strictly defined element, alphaTab is using shipping some default.
+     */
+    // prettier-ignore
+    private static readonly OrnamentKeysDown = [
+        /* C -> B */ -1,
+        /* C# -> C */ -1,
+        /* D -> C# */ -1,
+        /* D# -> D */ -1,
+        /* E -> D# */ -1, 
+        /* F -> E */ -1,
+        /* F# -> F */ -1,
+        /* G -> F# */ -1,
+        /* G# -> G */ -1,
+        /* A -> G# */ -1,
+        /* A# -> A */ -1,
+        /* B -> A# */ -1
+    ];
+
+    private generateOrnament(
+        track: Track,
+        note: Note,
+        noteStart: number,
+        noteDuration: number,
+        noteKey: number,
+        velocity: number,
+        channel: number
+    ) {
+        // the duration of the ornament notes preceeding the main note
+        // is rather short and fixed.
+        // additionally the velocity for the notes is reduced to be softer (like a hammer-on/pull-off)
+
+        let ornamentNoteKeys: number[];
+        let ornamentNoteDurations: number[];
+
+        const index = noteKey % 12;
+
+        const triplet = 1 / 3;
+        switch (note.ornament) {
+            case NoteOrnament.Turn:
+                // 1 note -> 4 notes
+                // 1. One note above
+                // 2. Main note
+                // 3. One note below
+                // 4. Main note (remaining duration)
+                ornamentNoteKeys = [
+                    noteKey + MidiFileGenerator.OrnamentKeysUp[index],
+                    noteKey,
+                    noteKey + MidiFileGenerator.OrnamentKeysDown[index]
+                ];
+                ornamentNoteDurations = [
+                    MidiUtils.toTicks(Duration.Sixteenth) * triplet,
+                    MidiUtils.toTicks(Duration.Sixteenth) * triplet,
+                    MidiUtils.toTicks(Duration.Sixteenth) * triplet
+                ];
+                break;
+            case NoteOrnament.InvertedTurn:
+                // 1 note -> 4 notes
+                // 1. One note below
+                // 2. Main note
+                // 3. One note above
+                // 4. Main note  (remaining duration)
+                ornamentNoteKeys = [
+                    noteKey + MidiFileGenerator.OrnamentKeysDown[index],
+                    noteKey,
+                    noteKey + MidiFileGenerator.OrnamentKeysUp[index]
+                ];
+                ornamentNoteDurations = [
+                    MidiUtils.toTicks(Duration.Sixteenth) * triplet,
+                    MidiUtils.toTicks(Duration.Sixteenth) * triplet,
+                    MidiUtils.toTicks(Duration.Sixteenth) * triplet
+                ];
+
+                break;
+            case NoteOrnament.UpperMordent:
+                // 1 note -> 3 notes
+                // 1. Main Note
+                // 2. One note above
+                // 3. Main Note  (remaining duration)
+                ornamentNoteKeys = [noteKey, noteKey + MidiFileGenerator.OrnamentKeysUp[index]];
+                ornamentNoteDurations = [
+                    MidiUtils.toTicks(Duration.ThirtySecond),
+                    MidiUtils.toTicks(Duration.ThirtySecond)
+                ];
+
+                break;
+            case NoteOrnament.LowerMordent:
+                // 1 note -> 3 notes
+                // 1. Main Note
+                // 2. One note below
+                // 3. Main Note  (remaining duration)
+                ornamentNoteKeys = [noteKey, noteKey + MidiFileGenerator.OrnamentKeysDown[index]];
+                ornamentNoteDurations = [
+                    MidiUtils.toTicks(Duration.ThirtySecond),
+                    MidiUtils.toTicks(Duration.ThirtySecond)
+                ];
+
+                break;
+            default:
+                return;
+        }
+
+        // for already short notes we have to further shorten them to fit into the note duration.
+        let ornamentDurationFactor = 1;
+        if (noteDuration < MidiUtils.QuarterTime) {
+            ornamentDurationFactor = noteDuration / MidiUtils.QuarterTime;
+        }
+
+        velocity -= MidiUtils.VelocityIncrement;
+
+        let totalOrnamentDuration = 0;
+        for (let i = 0; i < ornamentNoteKeys.length; i++) {
+            const realDuration = ornamentNoteDurations[i] * ornamentDurationFactor;
+            this._handler.addNote(track.index, noteStart, realDuration, ornamentNoteKeys[i], velocity, channel);
+
+            noteStart += realDuration;
+            totalOrnamentDuration += realDuration;
+        }
+
+        const remaining = noteDuration - totalOrnamentDuration;
+        this._handler.addNote(track.index, noteStart, remaining, noteKey, velocity, channel);
     }
 
     private getNoteDuration(note: Note, duration: number, tempoOnBeatStart: number): MidiNoteDuration {
