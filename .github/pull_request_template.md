@@ -8,8 +8,7 @@ Fixes #
 ### Checklist
 - [ ] I consent that this change becomes part of alphaTab under it's current or any future open source license
 - [ ] Changes are implemented
-- [ ] Existing builds tests pass
-- [ ] New tests were added
+- [ ] New tests were added <!-- if not test were added explain why, we typically expect new tests for PRs -->
 
 ## Further details
 - [ ] This is a breaking change
