@@ -127,7 +127,7 @@ export class TabBendGlyph extends Glyph {
     public override doLayout(): void {
         super.doLayout();
         let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight;
-        this.renderer.registerOverflowTop(bendHeight + this.renderer.resources.tablatureFont.size / 2);
+        this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (let note of this._notes) {
             let renderPoints: TabBendRenderPoint[] = this._renderPoints.get(note.id)!;
