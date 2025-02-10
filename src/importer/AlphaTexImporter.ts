@@ -2343,7 +2343,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
     }
-    
+
     private harmonicValue(harmonicValue: number): number {
         this._allowNegatives = true;
         this._allowFloat = true;
@@ -2436,16 +2436,27 @@ export class AlphaTexImporter extends ScoreImporter {
             let syData: string = (this._syData as string).toLowerCase();
             if (syData === 'ts') {
                 this._sy = this.newSy();
-                if (this._sy !== AlphaTexSymbols.Number) {
-                    this.error('timesignature-numerator', AlphaTexSymbols.Number, true);
+                if (this._sy === AlphaTexSymbols.String) {
+                    if ((this._syData as string).toLowerCase() === 'common') {
+                        master.timeSignatureCommon = true;
+                        master.timeSignatureNumerator = 4;
+                        master.timeSignatureDenominator = 4;
+                        this._sy = this.newSy();
+                    } else {
+                        this.error('timesignature-numerator', AlphaTexSymbols.String, true);
+                    }
+                } else {
+                    if (this._sy !== AlphaTexSymbols.Number) {
+                        this.error('timesignature-numerator', AlphaTexSymbols.Number, true);
+                    }
+                    master.timeSignatureNumerator = this._syData as number;
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.Number) {
+                        this.error('timesignature-denominator', AlphaTexSymbols.Number, true);
+                    }
+                    master.timeSignatureDenominator = this._syData as number;
+                    this._sy = this.newSy();
                 }
-                master.timeSignatureNumerator = this._syData as number;
-                this._sy = this.newSy();
-                if (this._sy !== AlphaTexSymbols.Number) {
-                    this.error('timesignature-denominator', AlphaTexSymbols.Number, true);
-                }
-                master.timeSignatureDenominator = this._syData as number;
-                this._sy = this.newSy();
             } else if (syData == 'ft') {
                 master.isFreeTime = true;
             } else if (syData === 'ro') {
