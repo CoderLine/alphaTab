@@ -1709,4 +1709,29 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[1].displayScale).to.equal(0.5);
         expect(score.masterBars[2].displayWidth).to.equal(300);
     });
+
+    it('track-properties', () => {
+        let score = parseTex(`
+            \\track "First" { 
+                color "#FF0000" 
+                defaultSystemsLayout 6
+                systemsLayout 3 2 3
+                volume 7
+                balance 3
+                mute 
+                solo
+            }
+        `);
+
+        expect(score.tracks[0].color.rgba).to.equal('#FF0000');
+        expect(score.tracks[0].defaultSystemsLayout).to.equal(6);
+        expect(score.tracks[0].systemsLayout).to.have.length(3);
+        expect(score.tracks[0].systemsLayout[0]).to.equal(3);
+        expect(score.tracks[0].systemsLayout[1]).to.equal(2);
+        expect(score.tracks[0].systemsLayout[0]).to.equal(3);
+        expect(score.tracks[0].playbackInfo.volume).to.equal(7);
+        expect(score.tracks[0].playbackInfo.balance).to.equal(3);
+        expect(score.tracks[0].playbackInfo.isMute).to.be.true;
+        expect(score.tracks[0].playbackInfo.isSolo).to.be.true;
+    });
 });

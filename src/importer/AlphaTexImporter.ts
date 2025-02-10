@@ -1382,6 +1382,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('track-color', AlphaTexSymbols.String, true);
                     }
                     this._currentTrack.color = Color.fromJson(this._syData as string)!;
+                    this._sy = this.newSy();
 
                     break;
                 case 'defaultsystemslayout':
@@ -1406,6 +1407,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('track-volume', AlphaTexSymbols.Number, true);
                     }
                     this._currentTrack.playbackInfo.volume = ModelUtils.clamp(this._syData as number, 0, 16);
+                    this._sy = this.newSy();
                     break;
                 case 'balance':
                     this._sy = this.newSy();
@@ -1413,11 +1415,14 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('track-balance', AlphaTexSymbols.Number, true);
                     }
                     this._currentTrack.playbackInfo.balance = ModelUtils.clamp(this._syData as number, 0, 16);
+                    this._sy = this.newSy();
                     break;
                 case 'mute':
+                    this._sy = this.newSy();
                     this._currentTrack.playbackInfo.isMute = true;
                     break;
                 case 'solo':
+                    this._sy = this.newSy();
                     this._currentTrack.playbackInfo.isSolo = true;
                     break;
                 default:
