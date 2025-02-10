@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature, KeySignatureType, NoteAccidentalMode, VibratoType } from '@src/model';
+import { BendStyle, KeySignature, KeySignatureType, NoteAccidentalMode, VibratoType, WhammyType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1499,5 +1499,22 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].vibrato).to.equal(VibratoType.Slight);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].vibrato).to.equal(VibratoType.Wide);
+    });
+    
+    it('whammy', () => {
+        let score = parseTex(`
+            3.3.4{ tb dive (0 -12.5) } |
+            3.3.4{ tb dive gradual (0 -12.5) } |
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarType).to.equal(WhammyType.Dive);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyStyle).to.equal(BendStyle.Gradual);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
     });
 });
