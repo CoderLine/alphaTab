@@ -941,6 +941,7 @@ export class AlphaTexImporter extends ScoreImporter {
                                 // fall forward to bar meta if unknown score meta was found
                                 continueReading = false;
                             }
+                            break;
                         case StaffMetaResult.EndOfMetaDetected:
                             continueReading = false;
                             break;
