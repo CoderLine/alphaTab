@@ -675,8 +675,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 // negative number
                 // is number?
                 if (this._allowNegatives) {
-                    this._sy = AlphaTexSymbols.Number;
-                    this._syData = this.readNumber();
+                    this.readNumberOrName();
                 } else {
                     this._sy = AlphaTexSymbols.String;
                     this._syData = this.readName();
@@ -713,8 +712,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = AlphaTexSymbols.LowerThan;
                 this._ch = this.nextChar();
             } else if (this.isDigit(this._ch)) {
-                this._sy = AlphaTexSymbols.Number;
-                this._syData = this.readNumber();
+                this.readNumberOrName();
             } else if (AlphaTexImporter.isNameLetter(this._ch)) {
                 let name: string = this.readName();
                 let tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
@@ -730,6 +728,28 @@ export class AlphaTexImporter extends ScoreImporter {
             }
         }
         return this._sy;
+    }
+
+    private readNumberOrName() {
+        let str: string = '';
+        let isNumber = true;
+
+        do {
+            str += String.fromCharCode(this._ch);
+            if (!this.isDigit(this._ch)) {
+                isNumber = false;
+            }
+
+            this._ch = this.nextChar();
+        } while (this.isDigit(this._ch) || AlphaTexImporter.isNameLetter(this._ch));
+
+        if (isNumber) {
+            this._sy = AlphaTexSymbols.Number;
+            this._syData = this._allowFloat ? parseFloat(str) : parseInt(str);
+        } else {
+            this._sy = AlphaTexSymbols.String;
+            this._syData = str;
+        }
     }
 
     /**
@@ -755,6 +775,7 @@ export class AlphaTexImporter extends ScoreImporter {
             ch === 0x7c /* | */ ||
             ch === 0x27 /* ' */ ||
             ch === 0x22 /* " */ ||
+            ch === 0x2a /* * */ ||
             ch === 0x5c /* \ */
         );
     }
@@ -788,19 +809,6 @@ export class AlphaTexImporter extends ScoreImporter {
             this._ch = this.nextChar();
         } while (AlphaTexImporter.isNameLetter(this._ch) || this.isDigit(this._ch));
         return str;
-    }
-
-    /**
-     * Reads a number from the stream.
-     * @returns the read number.
-     */
-    private readNumber(): number {
-        let str: string = '';
-        do {
-            str += String.fromCharCode(this._ch);
-            this._ch = this.nextChar();
-        } while (this.isDigit(this._ch));
-        return this._allowFloat ? parseFloat(str) : parseInt(str);
     }
 
     private metaData(): boolean {
@@ -1165,7 +1173,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private makeCurrentStaffPitched() {
         // clear tuning
         this._currentStaff.stringTuning.tunings = [];
-        if(!this._staffHasExplicitDisplayTransposition) {
+        if (!this._staffHasExplicitDisplayTransposition) {
             this._currentStaff.displayTranspositionPitch = 0;
         }
     }

@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { BendStyle, KeySignature, KeySignatureType, NoteAccidentalMode, VibratoType, WhammyType } from '@src/model';
+import { BendStyle, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1516,5 +1516,13 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
+    });
+
+    it('beat-ottava', () => {
+        let score = parseTex(`
+            3.3.4{ ot 15ma } 3.3.4{ ot 8vb } 
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
     });
 });
