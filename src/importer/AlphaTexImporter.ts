@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { Fermata, FermataType, KeySignatureType, NoteAccidentalMode, Ottavia, WhammyType } from '@src/model';
+import { BendType, Fermata, FermataType, KeySignatureType, NoteAccidentalMode, Ottavia, WhammyType } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -2120,12 +2120,22 @@ export class AlphaTexImporter extends ScoreImporter {
             let syData = (this._syData as string).toLowerCase();
             if (syData === 'b' || syData === 'be') {
                 let exact: boolean = syData === 'be';
+
+                // Type
+                this._sy = this.newSy();
+                if (this._sy === AlphaTexSymbols.String) {
+                    note.bendType = this.parseBendType(this._syData as string);
+                    this._sy = this.newSy();
+                }
+
                 // read points
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.LParensis) {
                     this.error('bend-effect', AlphaTexSymbols.LParensis, true);
                 }
                 this._sy = this.newSy();
+                this._allowFloat = true;
+
                 while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
                     let offset: number = 0;
                     let value: number = 0;
@@ -2148,6 +2158,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     note.addBendPoint(new BendPoint(offset, value));
                     this._sy = this.newSy();
                 }
+                this._allowFloat = false;
                 const points = note.bendPoints;
                 if (points != null) {
                     while (points.length > 60) {
@@ -2370,6 +2381,32 @@ export class AlphaTexImporter extends ScoreImporter {
                 return Duration.Quarter;
         }
     }
+
+    private parseBendType(str: string): BendType {
+        switch (str.toLowerCase()) {
+            case 'none':
+                return BendType.None;
+            case 'custom':
+                return BendType.Custom;
+            case 'bend':
+                return BendType.Bend;
+            case 'release':
+                return BendType.Release;
+            case 'bendrelease':
+                return BendType.BendRelease;
+            case 'hold':
+                return BendType.Hold;
+            case 'prebend':
+                return BendType.Prebend;
+            case 'prebendbend':
+                return BendType.PrebendBend;
+            case 'prebendrelease':
+                return BendType.PrebendRelease;
+            default:
+                return BendType.Custom;
+        }
+    }
+
 
     private barMeta(bar: Bar): boolean {
         let anyMeta = false;
