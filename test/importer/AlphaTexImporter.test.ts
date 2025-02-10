@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature, KeySignatureType, NoteAccidentalMode } from '@src/model';
+import { KeySignature, KeySignatureType, NoteAccidentalMode, VibratoType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1474,5 +1474,13 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
         expect(score.tracks[0].staves[0].transpositionPitch).to.equal(-6);
+    });
+    
+    it('beat-vibrato', () => {
+        let score = parseTex(`
+            3.3.4{v} 3.3.4{vw}
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].vibrato).to.equal(VibratoType.Slight);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].vibrato).to.equal(VibratoType.Wide);
     });
 });
