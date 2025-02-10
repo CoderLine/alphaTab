@@ -997,6 +997,29 @@ export class AlphaTexImporter extends ScoreImporter {
             case 'accidentals':
                 this.handleAccidentalMode();
                 return StaffMetaResult.KnownStaffMeta;
+            case 'displaytranspose':
+                this._allowNegatives = true;
+                this._sy = this.newSy();
+                if (this._sy === AlphaTexSymbols.Number) {
+                    this._currentStaff.displayTranspositionPitch = this._syData as number;
+                    this._staffHasExplicitDisplayTransposition = true;
+                } else {
+                    this.error('displaytranspose', AlphaTexSymbols.Number, true);
+                }
+                this._allowNegatives = false;
+                this._sy = this.newSy();
+                return StaffMetaResult.KnownStaffMeta;
+            case 'transpose':
+                this._allowNegatives = true;
+                this._sy = this.newSy();
+                if (this._sy === AlphaTexSymbols.Number) {
+                    this._currentStaff.transpositionPitch = this._syData as number;
+                } else {
+                    this.error('transpose', AlphaTexSymbols.Number, true);
+                }
+                this._allowNegatives = false;
+                this._sy = this.newSy();
+                return StaffMetaResult.KnownStaffMeta;
             case 'track':
             case 'staff':
                 // on empty staves we need to proceeed when starting directly a new track or staff
