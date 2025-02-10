@@ -1552,7 +1552,20 @@ export class AlphaTexImporter extends ScoreImporter {
                 this.error('tuplet', AlphaTexSymbols.Number, true);
                 return false;
             }
-            AlphaTexImporter.applyTuplet(beat, this._syData as number);
+
+            const numerator = this._syData as number;
+            this._sy = this.newSy();
+
+            if (this._sy === AlphaTexSymbols.Number) {
+                const denominator = this._syData as number;
+                this._sy = this.newSy();
+                beat.tupletNumerator = numerator;
+                beat.tupletDenominator = denominator;
+            } else {
+                AlphaTexImporter.applyTuplet(beat, numerator);
+            }
+
+            return true;
         } else if (syData === 'tb' || syData === 'tbe') {
             let exact: boolean = syData === 'tbe';
             // read points
