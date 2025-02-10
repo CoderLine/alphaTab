@@ -817,7 +817,7 @@ export class Note {
         }
 
         if (hasBend && this.bendType === BendType.Custom) {
-            if (points.length === 4) {
+            if (points!.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
                 let middle2: BendPoint = points[2];

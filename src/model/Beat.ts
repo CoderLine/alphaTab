@@ -813,7 +813,7 @@ export class Beat {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
-            if (points.length === 4) {
+            if (points!.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
                 let middle2: BendPoint = points[2];
