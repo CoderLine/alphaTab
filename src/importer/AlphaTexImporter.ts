@@ -2562,6 +2562,15 @@ export class AlphaTexImporter extends ScoreImporter {
                 this.handleAccidentalMode();
             } else if (syData === 'jump') {
                 this.handleDirections(master);
+            } else if (syData === 'ottava') {
+                this._sy = this.newSy();
+
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('ottava', AlphaTexSymbols.String, true);
+                }
+
+                bar.clefOttava = this.parseClefOttavaFromString(this._syData as string);
+                this._sy = this.newSy();
             } else {
                 if (bar.index === 0) {
                     switch (this.handleStaffMeta()) {
