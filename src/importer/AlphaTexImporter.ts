@@ -53,6 +53,7 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { BendType } from '@src/model/BendType';
 import { SimileMark } from '@src/model/SimileMark';
 import { WhammyType } from '@src/model/WhammyType';
+import { BracketExtendMode } from '@src/model/RenderStylesheet';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -817,6 +818,53 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._score.tempoLabel = this._syData as string;
                         this._sy = this.newSy();
                     }
+                    anyMeta = true;
+                    break;
+                case 'defaultSystemsLayout':
+                    this._sy = this.newSy();
+                    if (this._sy === AlphaTexSymbols.Number) {
+                        this._score.defaultSystemsLayout = this._syData as number;
+                        this._sy = this.newSy();
+                        anyMeta = true;
+                    } else {
+                        this.error('default-systems-layout', AlphaTexSymbols.Number, true);
+                    }
+                    break;
+                case 'systemsLayout':
+                    this._sy = this.newSy();
+                    anyMeta = true;
+                    while (this._sy === AlphaTexSymbols.Number) {
+                        this._score.systemsLayout.push(this._syData as number);
+                        this._sy = this.newSy();
+                    }
+                    break;
+                case 'hideDynamics':
+                    this._score.stylesheet.hideDynamics = true;
+                    this._sy = this.newSy();
+                    anyMeta = true;
+                    break;
+                case 'showDynamics':
+                    this._score.stylesheet.hideDynamics = false;
+                    this._sy = this.newSy();
+                    anyMeta = true;
+                    break;
+                case 'bracketExtendMode':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('bracketExtendMode', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.bracketExtendMode = this.parseBracketExtendMode(this._syData as string);
+                    this._sy = this.newSy();
+                    anyMeta = true;
+                    break;
+                case 'useSystemSignSeparator':
+                    this._score.stylesheet.useSystemSignSeparator = true;
+                    this._sy = this.newSy();
+                    anyMeta = true;
+                    break;
+                case 'doNotUseSystemSignSeparator':
+                    this._score.stylesheet.useSystemSignSeparator = false;
+                    this._sy = this.newSy();
                     anyMeta = true;
                     break;
                 default:
@@ -1942,6 +1990,19 @@ export class AlphaTexImporter extends ScoreImporter {
         // does not handle new symbol + return on its own
         this._sy = this.newSy();
         return true;
+    }
+
+    private parseBracketExtendMode(str: string): BracketExtendMode {
+        switch (str.toLowerCase()) {
+            case 'nobrackets':
+                return BracketExtendMode.NoBrackets;
+            case 'groupstaves':
+                return BracketExtendMode.GroupStaves;
+            case 'groupsimilarinstruments':
+                return BracketExtendMode.GroupSimilarInstruments;
+            default:
+                return BracketExtendMode.GroupStaves;
+        }
     }
 
     private parseFermataFromString(str: string): FermataType {
