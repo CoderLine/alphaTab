@@ -74,7 +74,7 @@ export class Track {
     public systemsLayout: number[] = [];
 
     /**
-     * Gets or sets a mapping on which staff liens particular percussion instruments
+     * Gets or sets a mapping on which staff lines particular percussion instruments
      * should be shown.
      */
     public percussionArticulations: InstrumentArticulation[] = [];

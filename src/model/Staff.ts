@@ -11,6 +11,8 @@ import { Tuning } from '@src/model/Tuning';
  * @json_strict
  */
 export class Staff {
+    public static readonly DefaultStandardNotationLineCount = 5;
+
     /**
      * Gets or sets the zero-based index of this staff within the track.
      * @json_ignore
@@ -106,7 +108,7 @@ export class Staff {
      * The number of lines shown for the standard notation.
      * For some percussion instruments this number might vary.
      */
-    public standardNotationLineCount: number = 5;
+    public standardNotationLineCount: number = Staff.DefaultStandardNotationLineCount;
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this.stringTuning.finish();

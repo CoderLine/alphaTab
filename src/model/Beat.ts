@@ -801,13 +801,19 @@ export class Beat {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
         const points = this.whammyBarPoints;
-        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
+        const hasWhammy = points !== null && points.length > 0;
+        if (hasWhammy) {
+            const isContinuedWhammy: boolean = !!this.previousBeat && this.previousBeat.hasWhammyBar;
+            this.isContinuedWhammy = isContinuedWhammy;
+        } else {
+            this.whammyBarType = WhammyType.None;
+        }
+
+        if (hasWhammy && this.whammyBarType === WhammyType.Custom) {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
-            let isContinuedWhammy: boolean = !!this.previousBeat && this.previousBeat.hasWhammyBar;
-            this.isContinuedWhammy = isContinuedWhammy;
-            if (points.length === 4) {
+            if (points!.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
                 let middle2: BendPoint = points[2];
@@ -819,7 +825,7 @@ export class Beat {
                         (origin.value < middle1.value && middle1.value < destination.value) ||
                         (origin.value > middle1.value && middle1.value > destination.value)
                     ) {
-                        if (origin.value !== 0 && !isContinuedWhammy) {
+                        if (origin.value !== 0 && !this.isContinuedWhammy) {
                             this.whammyBarType = WhammyType.PrediveDive;
                         } else {
                             this.whammyBarType = WhammyType.Dive;
@@ -835,7 +841,7 @@ export class Beat {
                             points.splice(2, 1);
                         }
                     } else if (origin.value === middle1.value && middle1.value === destination.value) {
-                        if (origin.value !== 0 && !isContinuedWhammy) {
+                        if (origin.value !== 0 && !this.isContinuedWhammy) {
                             this.whammyBarType = WhammyType.Predive;
                         } else {
                             this.whammyBarType = WhammyType.Hold;

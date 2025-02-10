@@ -62,7 +62,6 @@ export class NoteSerializer {
         o.set("istiedestination", obj.isTieDestination);
         o.set("lefthandfinger", obj.leftHandFinger as number);
         o.set("righthandfinger", obj.rightHandFinger as number);
-        o.set("isfingering", obj.isFingering);
         o.set("trillvalue", obj.trillValue);
         o.set("trillspeed", obj.trillSpeed as number);
         o.set("durationpercent", obj.durationPercent);
@@ -167,9 +166,6 @@ export class NoteSerializer {
                 return true;
             case "righthandfinger":
                 obj.rightHandFinger = JsonHelper.parseEnum<Fingers>(v, Fingers)!;
-                return true;
-            case "isfingering":
-                obj.isFingering = v! as boolean;
                 return true;
             case "trillvalue":
                 obj.trillValue = v! as number;

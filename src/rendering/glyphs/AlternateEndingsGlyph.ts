@@ -1,7 +1,7 @@
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { RenderingResources } from '@src/RenderingResources';
-import { MasterBar } from '@src/model/MasterBar';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 export class AlternateEndingsGlyph extends EffectGlyph {
     private static readonly Padding: number = 3;
@@ -10,12 +10,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
 
     public constructor(x: number, y: number, alternateEndings: number) {
         super(x, y);
-        this._endings = [];
-        for (let i: number = 0; i < MasterBar.MaxAlternateEndings; i++) {
-            if ((alternateEndings & (0x01 << i)) !== 0) {
-                this._endings.push(i);
-            }
-        }
+        this._endings = ModelUtils.getAlternateEndingsList(alternateEndings);
     }
 
     public override doLayout(): void {

@@ -921,7 +921,7 @@ export class GpifParser {
             return;
         }
         let stringCount: number = parseInt(diagram.getAttribute('stringCount'));
-        let baseFret: number = parseInt(diagram.getAttribute('baseFret'));
+        let baseFret: number = diagram.attributes.has('baseFret') ? parseInt(diagram.getAttribute('baseFret')) : 0;
         chord.firstFret = baseFret + 1;
         for (let i: number = 0; i < stringCount; i++) {
             chord.strings.push(-1);
@@ -2075,7 +2075,6 @@ export class GpifParser {
                         }
                         break;
                     case 'LeftFingering':
-                        note.isFingering = true;
                         switch (c.innerText) {
                             case 'P':
                                 note.leftHandFinger = Fingers.Thumb;
@@ -2095,7 +2094,6 @@ export class GpifParser {
                         }
                         break;
                     case 'RightFingering':
-                        note.isFingering = true;
                         switch (c.innerText) {
                             case 'P':
                                 note.rightHandFinger = Fingers.Thumb;

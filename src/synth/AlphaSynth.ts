@@ -8,7 +8,6 @@ import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventA
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { Hydra } from '@src/synth/soundfont/Hydra';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
@@ -19,6 +18,7 @@ import { Queue } from '@src/synth/ds/Queue';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * This is the main synthesizer component which can be used to
@@ -100,7 +100,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set playbackSpeed(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
+        value = ModelUtils.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
         let oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
         this.timePosition = this.timePosition * (oldSpeed / value);
