@@ -2713,6 +2713,12 @@ export class AlphaTexImporter extends ScoreImporter {
         tempoAutomation.type = AutomationType.Tempo;
         tempoAutomation.value = this._syData as number;
         this._sy = this.newSy();
+
+        if (this._sy === AlphaTexSymbols.String) {
+            tempoAutomation.text = this._syData as string;
+            this._sy = this.newSy();
+        }
+
         return tempoAutomation;
     }
 
