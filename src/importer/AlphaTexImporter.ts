@@ -807,6 +807,10 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('tempo', AlphaTexSymbols.Number, true);
                     }
                     this._sy = this.newSy();
+                    if (this._sy === AlphaTexSymbols.String) {
+                        this._score.tempoLabel = this._syData as string;
+                        this._sy = this.newSy();
+                    }
                     anyMeta = true;
                     break;
                 default:
