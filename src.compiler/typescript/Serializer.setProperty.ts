@@ -1,5 +1,5 @@
 import * as ts from 'typescript';
-import { cloneTypeNode, createNodeFromSource, setMethodBody } from '../BuilderHelpers';
+import { cloneTypeNode, createNodeFromSource, isPrimitiveToJson, isSet, setMethodBody } from '../BuilderHelpers';
 import { isPrimitiveType } from '../BuilderHelpers';
 import { hasFlag } from '../BuilderHelpers';
 import { getTypeWithNullableInfo } from '../BuilderHelpers';
@@ -300,6 +300,83 @@ function generateSetPropertyBody(
                     )
                 )
             );
+
+            caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
+        } else if (isSet(type.type)) {
+            const setType = type.type as ts.TypeReference;
+            if (!isPrimitiveType(setType.typeArguments![0])) {
+                throw new Error('only Set<Primitive> maps are supported extend if needed!');
+            }
+
+            const collectionAddMethod = ts
+            .getJSDocTags(prop.property)
+            .filter(t => t.tagName.text === 'json_add')
+            .map(t => t.comment ?? '')[0] as string;
+
+            if (isPrimitiveFromJson(setType.typeArguments![0], typeChecker)) {
+                importer(
+                    setType.typeArguments![0].symbol!.name,
+                    findModule(setType.typeArguments![0], program.getCompilerOptions())
+                );
+
+                if(collectionAddMethod) {
+                    caseStatements.push(
+                        createNodeFromSource<ts.ForOfStatement>(
+                            `for (const i of (v as unknown[])) {
+                                obj.${collectionAddMethod}(i as  ${
+                                    setType.typeArguments![0].symbol!.name
+                                });
+                            }`,
+                            ts.SyntaxKind.ForOfStatement
+                        )
+                    );
+                } else {
+                    caseStatements.push(
+                        assignField(
+                            createNodeFromSource<ts.NewExpression>(
+                                `new Set<${setType.typeArguments![0].symbol!.name}>(v as ${
+                                    setType.typeArguments![0].symbol!.name
+                                }[])!`,
+                                ts.SyntaxKind.NewExpression
+                            )
+                        )
+                    );
+                }
+
+            } else if (isEnumType(setType.typeArguments![0])) {
+                importer(
+                    setType.typeArguments![0].symbol!.name,
+                    findModule(setType.typeArguments![0], program.getCompilerOptions())
+                );
+                importer('JsonHelper', '@src/io/JsonHelper');
+
+                if(collectionAddMethod) {
+                    caseStatements.push(
+                        createNodeFromSource<ts.ForOfStatement>(
+                            `for (const i of (v as number[]) ) {
+                                obj.${collectionAddMethod}(JsonHelper.parseEnum<${
+                                    setType.typeArguments![0].symbol!.name
+                                }>(i, ${setType.typeArguments![0].symbol!.name})!);
+                            }`,
+                            ts.SyntaxKind.ForOfStatement
+                        )
+                    );
+                } else {
+                    // obj.field = new Set<EnumType>((v! as number[]).map(i => JsonHelper.parseEnum<EnumType>(v!, EnumType)));
+                    caseStatements.push(
+                        assignField(
+                            createNodeFromSource<ts.NewExpression>(
+                                `new Set<${
+                                    setType.typeArguments![0].symbol!.name
+                                }>( (v! as number[]).map(i => JsonHelper.parseEnum<${
+                                    setType.typeArguments![0].symbol!.name
+                                }>(v,  ${setType.typeArguments![0].symbol!.name})!`,
+                                ts.SyntaxKind.NewExpression
+                            )
+                        )
+                    );
+                }
+            }
 
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
         } else if (isImmutable(type.type)) {

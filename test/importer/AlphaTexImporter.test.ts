@@ -28,6 +28,7 @@ import { FadeType } from '@src/model/FadeType';
 import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
+import { Direction } from '@src/model/Direction';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1350,5 +1351,19 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].hasRasgueado).to.be.true;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].rasgueado).to.equal(Rasgueado.AmiAnapaest);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].hasRasgueado).to.be.true;
+    });
+
+    
+    it('directions', () => {
+        let score = parseTex('. \\jump Segno | | \\jump DaCapoAlCoda \\jump Coda \\jump SegnoSegno ');
+        expect(score.masterBars[0].directions).to.be.ok;
+        expect(score.masterBars[0].directions).to.contain(Direction.TargetSegno);
+
+        expect(score.masterBars[1].directions).to.not.be.ok;
+
+        expect(score.masterBars[2].directions).to.be.ok;
+        expect(score.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
+        expect(score.masterBars[2].directions).to.contain(Direction.TargetCoda);
+        expect(score.masterBars[2].directions).to.contain(Direction.TargetSegnoSegno);
     });
 });

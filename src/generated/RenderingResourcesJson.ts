@@ -33,6 +33,10 @@ export interface RenderingResourcesJson {
      */
     effectFont?: FontJson;
     /**
+     * Gets or sets the font to use for displaying the directions texts.
+     */
+    directionsFont?: FontJson;
+    /**
      * Gets or sets the font to use for displaying the fretboard numbers in chord diagrams.
      */
     fretboardNumberFont?: FontJson;

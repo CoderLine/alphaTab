@@ -14,6 +14,7 @@ import { TripletFeel } from "@src/model/TripletFeel";
 import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
+import { Direction } from "@src/model/Direction";
 export class MasterBarSerializer {
     public static fromJson(obj: MasterBar, m: unknown): void {
         if (!m) {
@@ -50,6 +51,13 @@ export class MasterBarSerializer {
         o.set("isanacrusis", obj.isAnacrusis);
         o.set("displayscale", obj.displayScale);
         o.set("displaywidth", obj.displayWidth);
+        if (obj.directions !== null) {
+            const a: number[] = [];
+            o.set("directions", a);
+            for (const v of obj.directions!) {
+                a.push(v as number);
+            }
+        }
         return o;
     }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
@@ -114,6 +122,11 @@ export class MasterBarSerializer {
                 return true;
             case "displaywidth":
                 obj.displayWidth = v! as number;
+                return true;
+            case "directions":
+                for (const i of (v as number[])) {
+                    obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
+                }
                 return true;
         }
         if (["section"].indexOf(property) >= 0) {

@@ -46,6 +46,7 @@ import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { Direction } from '@src/model/Direction';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -2266,6 +2267,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else if (syData === 'accidentals') {
                 this.handleAccidentalMode();
+            } else if (syData === 'jump') {
+                this.handleDirections(master);
             } else {
                 if (bar.index === 0) {
                     if (!this.handleStaffMeta()) {
@@ -2285,6 +2288,84 @@ export class AlphaTexImporter extends ScoreImporter {
             master.tempoAutomations.push(tempoAutomation);
         }
         return anyMeta;
+    }
+
+    private handleDirections(master: MasterBar) {
+        this._sy = this.newSy();
+        if (this._sy !== AlphaTexSymbols.String) {
+            this.error('direction', AlphaTexSymbols.String, true);
+        }
+
+        switch ((this._syData as string).toLowerCase()) {
+
+            case 'fine':
+                master.addDirection(Direction.TargetFine);
+                break;
+            case 'segno':
+                master.addDirection(Direction.TargetSegno);
+                break;
+            case 'segnosegno':
+                master.addDirection(Direction.TargetSegnoSegno);
+                break;
+            case 'coda':
+                master.addDirection(Direction.TargetCoda);
+                break;
+            case 'doublecoda':
+                master.addDirection(Direction.TargetDoubleCoda);
+                break;
+
+
+            case 'dacapo':
+                master.addDirection(Direction.JumpDaCapo);
+                break;
+            case 'dacapoalcoda':
+                master.addDirection(Direction.JumpDaCapoAlCoda);
+                break;
+            case 'dacapoaldoublecoda':
+                master.addDirection(Direction.JumpDaCapoAlDoubleCoda);
+                break;
+            case 'dacapoalfine':
+                master.addDirection(Direction.JumpDaCapoAlFine);
+                break;
+
+            case 'dalsegno':
+                master.addDirection(Direction.JumpDalSegno);
+                break;
+            case 'dalsegnoalcoda':
+                master.addDirection(Direction.JumpDalSegnoAlCoda);
+                break;
+            case 'dalsegnoaldoublecoda':
+                master.addDirection(Direction.JumpDalSegnoAlDoubleCoda);
+                break;
+            case 'dalsegnoalfine':
+                master.addDirection(Direction.JumpDalSegnoAlFine);
+                break;
+
+            case 'dalsegnosegno':
+                master.addDirection(Direction.JumpDalSegnoSegno);
+                break;
+            case 'dalsegnosegnoalcoda':
+                master.addDirection(Direction.JumpDalSegnoSegnoAlCoda);
+                break;
+            case 'dalsegnosegnoaldoublecoda':
+                master.addDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+                break;
+            case 'dalsegnosegnoalfine':
+                master.addDirection(Direction.JumpDalSegnoSegnoAlFine);
+                break;
+
+            case 'dacoda':
+                master.addDirection(Direction.JumpDaCoda);
+                break;
+            case 'dadoublecoda':
+                master.addDirection(Direction.JumpDaDoubleCoda);
+                break;
+            default:
+                this.errorMessage(`Unexpected direction value: '${this._syData}'`);
+                return;
+        }
+
+        this._sy = this.newSy();
     }
 
     private readTempoAutomation() {

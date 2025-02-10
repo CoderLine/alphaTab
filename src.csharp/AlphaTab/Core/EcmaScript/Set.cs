@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript;
 
-public class Set<T> : IEnumerable<T>
+public class Set<T> : IEnumerable<T>, ICollection
 {
     private readonly HashSet<T> _data;
 
@@ -60,5 +60,13 @@ public class Set<T> : IEnumerable<T>
     public void Delete(T item)
     {
         _data.Remove(item);
+    }
+
+    int ICollection.Count => _data.Count;
+    bool ICollection.IsSynchronized => false;
+    object ICollection.SyncRoot => _data;
+    void ICollection.CopyTo(System.Array array, int index)
+    {
+        _data.CopyTo((T[])array, index);
     }
 }

@@ -8,6 +8,7 @@ import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Score } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
+import { Direction } from './Direction';
 
 /**
  * The MasterBar stores information about a bar which affects
@@ -156,6 +157,12 @@ export class MasterBar {
     public displayWidth: number = -1;
 
     /**
+     * The directions applied to this masterbar.
+     * @json_add addDirection
+     */
+    public directions: Set<Direction> | null = null;
+
+    /**
      * Calculates the time spent in this bar. (unit: midi ticks)
      */
     public calculateDuration(respectAnacrusis: boolean = true): number {
@@ -187,6 +194,17 @@ export class MasterBar {
             this.fermata = fermataMap;
         }
         fermataMap.set(offset, fermata);
+    }
+
+    /**
+     * Adds a direction to the masterbar.
+     * @param direction The direction to add.
+     */
+    public addDirection(direction:Direction):void {
+        if(this.directions == null){
+            this.directions = new Set<Direction>();
+        }
+        this.directions.add(direction);
     }
 
     /**

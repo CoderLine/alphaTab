@@ -91,6 +91,14 @@ class Expector<T>(private val actual: T) {
         }
     }
 
+    fun contain(value: Any) {
+        if(actual is Iterable<*>) {
+            Assert.assertTrue("Expected collection ${actual.joinToString(",")} to contain $value", actual.contains(value))
+        } else {
+            Assert.fail("contain can only be used with Iterable operands");
+        }
+    }
+
     fun ok() {
         Assert.assertNotNull(actual)
         when (actual) {

@@ -211,6 +211,10 @@ export function isMap(type: ts.Type | null): boolean {
     return !!(type && type.symbol?.name === 'Map');
 }
 
+export function isSet(type: ts.Type | null): boolean {
+    return !!(type && type.symbol?.name === 'Set');
+}
+
 function markNodeSynthesized(node: ts.Node): ts.Node {
     for (const c of node.getChildren()) {
         markNodeSynthesized(c);
@@ -258,4 +262,53 @@ export function cloneTypeNode<T extends ts.Node>(node: T): T {
     }
 
     throw new Error(`Unsupported TypeNode: '${ts.SyntaxKind[node.kind]}' extend type node cloning`);
+}
+
+
+export function isPrimitiveToJson(type: ts.Type, typeChecker: ts.TypeChecker) {
+    if (!type) {
+        return false;
+    }
+
+    const isArray = isTypedArray(type);
+    const arrayItemType = unwrapArrayItemType(type, typeChecker);
+
+    if (hasFlag(type, ts.TypeFlags.Unknown)) {
+        return true;
+    }
+    if (hasFlag(type, ts.TypeFlags.Number)) {
+        return true;
+    }
+    if (hasFlag(type, ts.TypeFlags.String)) {
+        return true;
+    }
+    if (hasFlag(type, ts.TypeFlags.Boolean)) {
+        return true;
+    }
+
+    if (arrayItemType) {
+        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Number)) {
+            return true;
+        }
+        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.String)) {
+            return true;
+        }
+        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Boolean)) {
+            return true;
+        }
+    } else if (type.symbol) {
+        switch (type.symbol.name) {
+            case 'Uint8Array':
+            case 'Uint16Array':
+            case 'Uint32Array':
+            case 'Int8Array':
+            case 'Int16Array':
+            case 'Int32Array':
+            case 'Float32Array':
+            case 'Float64Array':
+                return true;
+        }
+    }
+
+    return false;
 }
