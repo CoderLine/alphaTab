@@ -1736,7 +1736,6 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].playbackInfo.isSolo).to.be.true;
     });
 
-    
     it('beat-beam', () => {
         let score = parseTex(`
             :8 3.3{ beam invert } 3.3 |
@@ -1753,5 +1752,30 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+    });
+
+    it('note-show-string', () => {
+        let score = parseTex(`
+            :8 3.3{ string } 
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).to.be.true;
+    });
+    
+    it('note-hide', () => {
+        let score = parseTex(`
+            :8 3.3{ hide } 
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isVisible).to.be.false;
+    });
+
+    it('note-slur', () => {
+        let score = parseTex(`
+            :8 (3.3{ slur s1 } 3.4 3.5)  (10.3 {slur s1} 17.4 15.5)
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isSlurOrigin).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isSlurDestination).to.be.true;
     });
 });
