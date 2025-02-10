@@ -1888,6 +1888,13 @@ export class AlphaTexImporter extends ScoreImporter {
             }
 
             beat.ottava = this.parseClefOttavaFromString(this._syData as string);
+        } else if (syData === 'txt') {
+            this._sy = this.newSy();
+            if (this._sy === AlphaTexSymbols.String) {
+                beat.text = this._syData as string;
+            } else {
+                this.error('beat-text', AlphaTexSymbols.String, true);
+            }
         } else {
             // string didn't match any beat effect syntax
             return false;
