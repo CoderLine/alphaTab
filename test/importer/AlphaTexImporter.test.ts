@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { AutomationType, BendStyle, BendType, FermataType, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
+import { AutomationType, BendStyle, BendType, FermataType, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, SimileMark, VibratoType, WhammyType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1623,5 +1623,12 @@ describe('AlphaTexImporterTest', () => {
         \\ottava 15ma
         `);
         expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._15ma);
+    });
+    
+    it('simile-mark', () => {
+        let score = parseTex(`
+        \\simile simple
+        `);
+        expect(score.tracks[0].staves[0].bars[0].simileMark).to.equal(SimileMark.Simple);
     });
 });
