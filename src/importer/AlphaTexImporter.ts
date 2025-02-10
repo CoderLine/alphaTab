@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { BendType, Fermata, FermataType, KeySignatureType, NoteAccidentalMode, Ottavia, WhammyType } from '@src/model';
+import { BendType, Fermata, FermataType, KeySignatureType, NoteAccidentalMode, Ottavia, SimileMark, WhammyType } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -2571,6 +2571,15 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 bar.clefOttava = this.parseClefOttavaFromString(this._syData as string);
                 this._sy = this.newSy();
+            } else if (syData === 'simile') {
+                this._sy = this.newSy();
+
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('simile', AlphaTexSymbols.String, true);
+                }
+
+                bar.simileMark = this.parseSimileMarkFromString(this._syData as string);
+                this._sy = this.newSy();
             } else {
                 if (bar.index === 0) {
                     switch (this.handleStaffMeta()) {
@@ -2599,6 +2608,22 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         return anyMeta;
     }
+
+    private parseSimileMarkFromString(str: string): SimileMark {
+        switch (str.toLowerCase()) {
+            case 'none':
+                return SimileMark.None;
+            case 'simple':
+                return SimileMark.Simple;
+            case 'firstofdouble':
+                return SimileMark.FirstOfDouble;
+            case 'secondofdouble':
+                return SimileMark.SecondOfDouble;
+            default:
+                return SimileMark.None;
+        }
+    }
+
 
     private handleDirections(master: MasterBar) {
         this._sy = this.newSy();
