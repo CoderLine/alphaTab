@@ -36,6 +36,11 @@ export class RenderingResources {
     public effectFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Italic);
 
     /**
+     * Gets or sets the font to use for displaying the directions texts.
+     */
+    public directionsFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
+
+    /**
      * Gets or sets the font to use for displaying the fretboard numbers in chord diagrams.
      */
     public fretboardNumberFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);

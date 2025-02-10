@@ -2267,10 +2267,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else if (syData === 'accidentals') {
                 this.handleAccidentalMode();
-            } else if (syData === 'target') {
-                this.handleTargetDirections(master);
             } else if (syData === 'jump') {
-                this.handleJumpDirections(master);
+                this.handleDirections(master);
             } else {
                 if (bar.index === 0) {
                     if (!this.handleStaffMeta()) {
@@ -2292,13 +2290,14 @@ export class AlphaTexImporter extends ScoreImporter {
         return anyMeta;
     }
 
-    private handleTargetDirections(master: MasterBar) {
+    private handleDirections(master: MasterBar) {
         this._sy = this.newSy();
         if (this._sy !== AlphaTexSymbols.String) {
-            this.error('target-direction', AlphaTexSymbols.String, true);
+            this.error('direction', AlphaTexSymbols.String, true);
         }
 
         switch ((this._syData as string).toLowerCase()) {
+
             case 'fine':
                 master.addDirection(Direction.TargetFine);
                 break;
@@ -2315,21 +2314,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 master.addDirection(Direction.TargetDoubleCoda);
                 break;
 
-            default:
-                this.errorMessage(`Unexpected target direction value: '${this._syData}'`);
-                return;
-        }
 
-        this._sy = this.newSy();
-    }
-
-    private handleJumpDirections(master: MasterBar) {
-        this._sy = this.newSy();
-        if (this._sy !== AlphaTexSymbols.String) {
-            this.error('jump-direction', AlphaTexSymbols.String, true);
-        }
-
-        switch ((this._syData as string).toLowerCase()) {
             case 'dacapo':
                 master.addDirection(Direction.JumpDaCapo);
                 break;
@@ -2376,7 +2361,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 master.addDirection(Direction.JumpDaDoubleCoda);
                 break;
             default:
-                this.errorMessage(`Unexpected jump direction value: '${this._syData}'`);
+                this.errorMessage(`Unexpected direction value: '${this._syData}'`);
                 return;
         }
 

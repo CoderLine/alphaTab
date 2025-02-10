@@ -1355,7 +1355,7 @@ describe('AlphaTexImporterTest', () => {
 
     
     it('directions', () => {
-        let score = parseTex('. \\target Segno | | \\jump DaCapoAlCoda \\target Coda \\target SegnoSegno ');
+        let score = parseTex('. \\jump Segno | | \\jump DaCapoAlCoda \\jump Coda \\jump SegnoSegno ');
         expect(score.masterBars[0].directions).to.be.ok;
         expect(score.masterBars[0].directions).to.contain(Direction.TargetSegno);
 

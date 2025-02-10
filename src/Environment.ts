@@ -71,6 +71,7 @@ import { WahPedalEffectInfo } from './rendering/effects/WahPedalEffectInfo';
 import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
 import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
 import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
+import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -501,6 +502,7 @@ export class Environment {
                 new TempoEffectInfo(),
                 new TripletFeelEffectInfo(),
                 new MarkerEffectInfo(),
+                new DirectionsEffectInfo(),
                 new AlternateEndingsEffectInfo(),
                 new FreeTimeEffectInfo(),
                 new TextEffectInfo(),

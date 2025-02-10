@@ -327,6 +327,11 @@ export enum NotationElement {
      * The Rasgueado indicator above the staff Rasg. ----|"
      */
     EffectRasgueado,
+
+    /**
+     * The directions indicators like coda and segno.
+     */
+    EffectDirections,
 }
 
 /**
