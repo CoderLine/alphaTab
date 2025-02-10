@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { KeySignatureType, NoteAccidentalMode, WhammyType } from '@src/model';
+import { KeySignatureType, NoteAccidentalMode, Ottavia, WhammyType } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -1880,6 +1880,14 @@ export class AlphaTexImporter extends ScoreImporter {
             this._sy = this.newSy();
 
             return true;
+        } else if (syData === 'ot') {
+            this._sy = this.newSy();
+
+            if (this._sy !== AlphaTexSymbols.String) {
+                this.error('beat-ottava', AlphaTexSymbols.String, true);
+            }
+
+            beat.ottava = this.parseClefOttavaFromString(this._syData as string);
         } else {
             // string didn't match any beat effect syntax
             return false;
@@ -1888,6 +1896,23 @@ export class AlphaTexImporter extends ScoreImporter {
         // does not handle new symbol + return on its own
         this._sy = this.newSy();
         return true;
+    }
+
+    private parseClefOttavaFromString(str: string): Ottavia {
+        switch (str.toLowerCase()) {
+            case '15ma':
+                return Ottavia._15ma;
+            case '8va':
+                return Ottavia._8va;
+            case 'regular':
+                return Ottavia.Regular;
+            case '8vb':
+                return Ottavia._8vb;
+            case '15mb':
+                return Ottavia._15mb;
+            default:
+                return Ottavia.Regular;
+        }
     }
 
     private getChordId(currentStaff: Staff, chordName: string): string {
