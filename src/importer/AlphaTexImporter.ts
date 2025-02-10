@@ -1888,7 +1888,7 @@ export class AlphaTexImporter extends ScoreImporter {
             }
 
             beat.ottava = this.parseClefOttavaFromString(this._syData as string);
-        } else if (syData === 'txt') {
+        } else if (syData === 'text') {
             this._sy = this.newSy();
             if (this._sy === AlphaTexSymbols.String) {
                 beat.text = this._syData as string;
