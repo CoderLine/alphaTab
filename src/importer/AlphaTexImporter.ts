@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { KeySignatureType, NoteAccidentalMode, Ottavia, WhammyType } from '@src/model';
+import { Fermata, FermataType, KeySignatureType, NoteAccidentalMode, Ottavia, WhammyType } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -1908,6 +1908,26 @@ export class AlphaTexImporter extends ScoreImporter {
             automation.type = AutomationType.Instrument;
             automation.value = this._syData as number;
             beat.automations.push(automation);
+        } else if (syData === 'fermata') {
+            this._sy = this.newSy();
+            if (this._sy !== AlphaTexSymbols.String) {
+                this.error('fermata', AlphaTexSymbols.Number, true);
+            }
+
+            const fermata = new Fermata();
+            fermata.type = this.parseFermataFromString(this._syData as string);
+
+            this._allowFloat = true;
+            this._sy = this.newSy();
+            if (this._sy === AlphaTexSymbols.Number) {
+                fermata.length = this._syData as number;
+                this._sy = this.newSy();
+            }
+            this._allowFloat = false;
+
+            beat.fermata = fermata;
+
+            return true;
         } else {
             // string didn't match any beat effect syntax
             return false;
@@ -1917,6 +1937,20 @@ export class AlphaTexImporter extends ScoreImporter {
         this._sy = this.newSy();
         return true;
     }
+
+    private parseFermataFromString(str: string): FermataType {
+        switch (str.toLowerCase()) {
+            case 'short':
+                return FermataType.Short;
+            case 'medium':
+                return FermataType.Medium;
+            case 'long':
+                return FermataType.Long;
+            default:
+                return FermataType.Medium;
+        }
+    }
+
 
     private parseClefOttavaFromString(str: string): Ottavia {
         switch (str.toLowerCase()) {
