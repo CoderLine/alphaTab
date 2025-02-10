@@ -1464,4 +1464,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tempo).to.equal(80);
         expect(score.tempoLabel).to.equal("Label");
     });
+
+    it('transpose', () => {
+        let score = parseTex(`
+            \\staff 
+            \\displaytranspose -12
+            \\transpose -6
+            .
+        `);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
+        expect(score.tracks[0].staves[0].transpositionPitch).to.equal(-6);
+    });
 });

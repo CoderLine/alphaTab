@@ -1165,7 +1165,9 @@ export class AlphaTexImporter extends ScoreImporter {
     private makeCurrentStaffPitched() {
         // clear tuning
         this._currentStaff.stringTuning.tunings = [];
-        this._currentStaff.displayTranspositionPitch = 0;
+        if(!this._staffHasExplicitDisplayTransposition) {
+            this._currentStaff.displayTranspositionPitch = 0;
+        }
     }
 
     /**
@@ -1497,7 +1499,6 @@ export class AlphaTexImporter extends ScoreImporter {
         const program = this._currentTrack.playbackInfo.program;
         if (!this._staffTuningApplied && !this._staffHasExplicitTuning) {
             // reset to defaults
-            this._currentStaff.displayTranspositionPitch = 0;
             this._currentStaff.stringTuning.tunings = [];
 
             if (program == 15) {
@@ -1529,7 +1530,6 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (program == 43) {
                 // contrabass
                 // G2 D2 A1 E1
-                this._currentStaff.displayTranspositionPitch = -12;
                 this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (program == 105) {
                 // banjo
