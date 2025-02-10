@@ -1359,7 +1359,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].directions).to.be.ok;
         expect(score.masterBars[0].directions).to.contain(Direction.TargetSegno);
 
-        expect(score.masterBars[1].directions).to.be.not.ok;
+        expect(score.masterBars[1].directions).to.not.be.ok;
 
         expect(score.masterBars[2].directions).to.be.ok;
         expect(score.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
