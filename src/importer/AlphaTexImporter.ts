@@ -4,7 +4,7 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Chord } from '@src/model/Chord';
@@ -55,6 +55,8 @@ import { SimileMark } from '@src/model/SimileMark';
 import { WhammyType } from '@src/model/WhammyType';
 import { BracketExtendMode } from '@src/model/RenderStylesheet';
 import { Color } from '@src/model/Color';
+import { BendStyle } from '@src/model/BendStyle';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1695,6 +1697,13 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             }
 
+            // Style
+            this._sy = this.newSy();
+            if (this._sy === AlphaTexSymbols.String) {
+                beat.whammyStyle = this.parseBendStyle(this._syData as string);
+                this._sy = this.newSy();
+            }
+
             // read points
             this._sy = this.newSy();
             if (this._sy !== AlphaTexSymbols.LParensis) {
@@ -2007,13 +2016,6 @@ export class AlphaTexImporter extends ScoreImporter {
             }
 
             beat.ottava = this.parseClefOttavaFromString(this._syData as string);
-        } else if (syData === 'text') {
-            this._sy = this.newSy();
-            if (this._sy === AlphaTexSymbols.String) {
-                beat.text = this._syData as string;
-            } else {
-                this.error('beat-text', AlphaTexSymbols.String, true);
-            }
         } else if (syData === 'legato-origin') {
             beat.isLegatoOrigin = true;
         } else if (syData === 'instrument') {
@@ -2046,6 +2048,34 @@ export class AlphaTexImporter extends ScoreImporter {
 
             beat.fermata = fermata;
 
+            return true;
+        } else if (syData === 'beam') {
+            this._sy = this.newSy();
+            if (this._sy !== AlphaTexSymbols.String) {
+                this.error('beam', AlphaTexSymbols.Number, true);
+            }
+
+            switch ((this._syData as string).toLowerCase()) {
+                case 'invert':
+                    beat.invertBeamDirection = true;
+                    break;
+                case 'up':
+                    beat.preferredBeamDirection = BeamDirection.Up;
+                    break;
+                case 'down':
+                    beat.preferredBeamDirection = BeamDirection.Down;
+                    break;
+                case 'auto':
+                    beat.beamingMode = BeatBeamingMode.Auto;
+                    break;
+                case 'split':
+                    beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
+                    break;
+                case 'merge':
+                    beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
+                    break;
+            }
+            this._sy = this.newSy();
             return true;
         } else {
             // string didn't match any beat effect syntax
@@ -2531,6 +2561,17 @@ export class AlphaTexImporter extends ScoreImporter {
                 return Duration.TwoHundredFiftySixth;
             default:
                 return Duration.Quarter;
+        }
+    }
+
+    private parseBendStyle(str: string): BendStyle {
+        switch (str.toLowerCase()) {
+            case 'gradual':
+                return BendStyle.Gradual;
+            case 'fast':
+                return BendStyle.Fast;
+            default:
+                return BendStyle.Default;
         }
     }
 
