@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { KeySignatureType, NoteAccidentalMode } from '@src/model';
+import { KeySignatureType, NoteAccidentalMode, WhammyType } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -1568,12 +1568,21 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'tb' || syData === 'tbe') {
             let exact: boolean = syData === 'tbe';
+
+            // Type
+            this._sy = this.newSy();
+            if (this._sy === AlphaTexSymbols.String) {
+                beat.whammyBarType = this.parseWhammyType(this._syData as string);
+                this._sy = this.newSy();
+            }
+
             // read points
             this._sy = this.newSy();
             if (this._sy !== AlphaTexSymbols.LParensis) {
                 this.error('tremolobar-effect', AlphaTexSymbols.LParensis, true);
             }
             this._allowNegatives = true;
+            this._allowFloat = true;
             this._sy = this.newSy();
             while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
                 let offset: number = 0;
@@ -1616,6 +1625,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
             }
             this._allowNegatives = false;
+            this._allowFloat = false;
             if (this._sy !== AlphaTexSymbols.RParensis) {
                 this.error('tremolobar-effect', AlphaTexSymbols.RParensis, true);
             }
@@ -2535,5 +2545,26 @@ export class AlphaTexImporter extends ScoreImporter {
         // Alternate endings bitflag starts from 0
         master.alternateEndings |= 1 << (num - 1);
         this._sy = this.newSy();
+    }
+
+    private parseWhammyType(str: string): WhammyType {
+        switch (str.toLowerCase()) {
+            case 'none':
+                return WhammyType.None;
+            case 'custom':
+                return WhammyType.Custom;
+            case 'dive':
+                return WhammyType.Dive;
+            case 'dip':
+                return WhammyType.Dip;
+            case 'hold':
+                return WhammyType.Hold;
+            case 'predive':
+                return WhammyType.Predive;
+            case 'predivedive':
+                return WhammyType.PrediveDive;
+            default:
+                return WhammyType.Custom;
+        }
     }
 }
