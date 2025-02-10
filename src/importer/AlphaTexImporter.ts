@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { NoteAccidentalMode } from '@src/model';
+import { KeySignatureType, NoteAccidentalMode } from '@src/model';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -434,10 +434,11 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (str.toLowerCase()) {
             case 'cb':
             case 'cbmajor':
+            case 'abminor':
                 return KeySignature.Cb;
             case 'gb':
             case 'gbmajor':
-            case 'd#minor':
+            case 'ebminor':
                 return KeySignature.Gb;
             case 'db':
             case 'dbmajor':
@@ -485,15 +486,23 @@ export class AlphaTexImporter extends ScoreImporter {
                 return KeySignature.B;
             case 'f#':
             case 'f#major':
-            case 'ebminor':
+            case 'd#minor':
                 return KeySignature.FSharp;
             case 'c#':
             case 'c#major':
+            case 'a#minor':
                 return KeySignature.CSharp;
             default:
                 return KeySignature.C;
             // error("keysignature-value", AlphaTexSymbols.String, false); return 0
         }
+    }
+
+    private parseKeySignatureType(str: string): KeySignatureType {
+        if (str.toLowerCase().endsWith('minor')) {
+            return KeySignatureType.Minor;
+        }
+        return KeySignatureType.Major;
     }
 
     /**
@@ -2257,6 +2266,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this.error('keysignature', AlphaTexSymbols.String, true);
                 }
                 master.keySignature = this.parseKeySignature(this._syData as string);
+                master.keySignatureType = this.parseKeySignatureType(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'clef') {
                 this._sy = this.newSy();
