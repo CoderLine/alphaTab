@@ -38,7 +38,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { BendType, Fermata, FermataType, KeySignatureType, NoteAccidentalMode, Ottavia, SimileMark, WhammyType } from '@src/model';
+import { KeySignatureType } from '@src/model/KeySignatureType';
 import { GolpeType } from '@src/model/GolpeType';
 import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
@@ -47,6 +47,12 @@ import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { Direction } from '@src/model/Direction';
+import { Fermata, FermataType } from '@src/model/Fermata';
+import { Ottavia } from '@src/model/Ottavia';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { BendType } from '@src/model/BendType';
+import { SimileMark } from '@src/model/SimileMark';
+import { WhammyType } from '@src/model/WhammyType';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -2558,6 +2564,9 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'ac') {
                 master.isAnacrusis = true;
                 this._sy = this.newSy();
+            } else if (syData === 'db') {
+                master.isDoubleBar = true;
+                this._sy = this.newSy();
             } else if (syData === 'accidentals') {
                 this.handleAccidentalMode();
             } else if (syData === 'jump') {
@@ -2623,7 +2632,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 return SimileMark.None;
         }
     }
-
 
     private handleDirections(master: MasterBar) {
         this._sy = this.newSy();
