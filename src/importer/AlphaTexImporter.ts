@@ -1523,6 +1523,8 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.fade = FadeType.VolumeSwell;
         } else if (syData === 'v') {
             beat.vibrato = VibratoType.Slight;
+        } else if (syData === 'vw') {
+            beat.vibrato = VibratoType.Wide;
         } else if (syData === 's') {
             beat.slap = true;
         } else if (syData === 'p') {
