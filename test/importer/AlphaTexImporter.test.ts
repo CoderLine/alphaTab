@@ -1,7 +1,7 @@
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexError, AlphaTexImporter, AlphaTexSymbols } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -42,6 +42,7 @@ import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1733,5 +1734,24 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].playbackInfo.balance).to.equal(3);
         expect(score.tracks[0].playbackInfo.isMute).to.be.true;
         expect(score.tracks[0].playbackInfo.isSolo).to.be.true;
+    });
+
+    
+    it('beat-beam', () => {
+        let score = parseTex(`
+            :8 3.3{ beam invert } 3.3 |
+            3.3{ beam up } 3.3 |
+            3.3{ beam down } 3.3 |
+            3.3{ beam auto } 3.3 |
+            3.3{ beam split } 3.3 |
+            3.3{ beam merge } 3.3 |
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.true;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
     });
 });
