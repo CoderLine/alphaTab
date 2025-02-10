@@ -1631,4 +1631,18 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].simileMark).to.equal(SimileMark.Simple);
     });
+
+    it('tempo-automation-text', () => {
+        let score = parseTex(`
+        \\tempo 100 T1
+        .
+        3.3.4 * 4 | \\tempo 80 T2 4.3.4*4
+        `);
+        expect(score.tempo).to.equal(100);
+        expect(score.tempoLabel).to.equal("T1");
+
+        expect(score.masterBars[1].tempoAutomations).to.have.length(1);
+        expect(score.masterBars[1].tempoAutomations[0].value).to.equal(80);
+        expect(score.masterBars[1].tempoAutomations[0].text).to.equal("T2");
+    });
 });

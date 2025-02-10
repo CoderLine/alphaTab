@@ -138,6 +138,10 @@ export class ModelUtils {
         return !!ModelUtils.parseTuning(name);
     }
 
+    private static readonly TuningLetters = new Set<number>([
+        0x43 /* C */, 0x44 /* D */, 0x45 /* E */, 0x46 /* F */, 0x47 /* G */, 0x41 /* A */, 0x42 /* B */, 0x63 /* c */,
+        0x64 /* d */, 0x65 /* e */, 0x66 /* f */, 0x67 /* g */, 0x61 /* a */, 0x62 /* b */, 0x23 /* # */
+    ]);
     public static parseTuning(name: string): TuningParseResult | null {
         let note: string = '';
         let octave: string = '';
@@ -149,8 +153,8 @@ export class ModelUtils {
                     return null;
                 }
                 octave += String.fromCharCode(c);
-            } else if ((c >= 0x41 && c <= 0x5a) || (c >= 0x61 && c <= 0x7a) || c === 0x23) {
-                /* A-Za-Z# */ note += String.fromCharCode(c);
+            } else if (ModelUtils.TuningLetters.has(c)) {
+                note += String.fromCharCode(c);
             } else {
                 return null;
             }
@@ -371,7 +375,6 @@ export class ModelUtils {
         }
     }
 
-    
     public static clamp(value: number, min: number, max: number): number {
         if (value <= min) {
             return min;
