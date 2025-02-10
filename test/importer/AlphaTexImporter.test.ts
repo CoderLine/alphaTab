@@ -1455,4 +1455,13 @@ describe('AlphaTexImporterTest', () => {
         expect(score.title).to.equal("Title\tTitle");
         expect(score.instructions).to.equal("Line1\nLine2");
     });
+
+    it('tempo-label', () => {
+        let score = parseTex(`
+            \\tempo 80 "Label"
+            .
+        `);
+        expect(score.tempo).to.equal(80);
+        expect(score.tempoLabel).to.equal("Label");
+    });
 });
