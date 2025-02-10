@@ -1608,4 +1608,14 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicType).to.equal(HarmonicType.Feedback);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicValue).to.equal(7);
     });
+
+    
+    it('time-signature-commons', () => {
+        let score = parseTex(`
+        \\ts common
+        `);
+        expect(score.masterBars[0].timeSignatureNumerator).to.equal(4);
+        expect(score.masterBars[0].timeSignatureDenominator).to.equal(4);
+        expect(score.masterBars[0].timeSignatureCommon).to.be.true;
+    });
 });
