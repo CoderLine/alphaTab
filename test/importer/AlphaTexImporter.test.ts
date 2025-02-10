@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { AutomationType, BendStyle, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
+import { AutomationType, BendStyle, FermataType, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1551,5 +1551,14 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(AutomationType.Instrument);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(1);
+    });
+
+    it('beat-fermata', () => {
+        let score = parseTex(`
+            G4 G4 G4 { fermata medium 4 }
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.type).to.equal(FermataType.Medium);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.length).to.equal(4);
     });
 });
