@@ -1700,4 +1700,13 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.NoBrackets);
         expect(score.stylesheet.useSystemSignSeparator).to.be.true;
     });
+
+    it('bar-sizing', () => {
+        let score = parseTex(`
+            3.3.4 | \\scale 0.5 3.3.4 | \\width 300 3.3.4
+        `);
+
+        expect(score.masterBars[1].displayScale).to.equal(0.5);
+        expect(score.masterBars[2].displayWidth).to.equal(300);
+    });
 });
