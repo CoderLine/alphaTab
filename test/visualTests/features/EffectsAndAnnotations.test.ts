@@ -162,12 +162,12 @@ describe('EffectsAndAnnotationsTests', () => {
             `
         .
         \\track "pno."
-        :8 G4 { spd } G4 G4 { spu } G4 G4 { spd } G4 {spu} G4 G4 {spd} |
-        G4 { spu } G4 G4 G4 G4 G4 G4 G4 |
-        F5.1 { spd } | F5 | F5 |
-        F5.4 F5.4 { spu } F5 F5 |
-        G4.8 { spd } G4 G4 { spu } G4 G4 { spd } G4 G4 G4 {spu} |
-        G4.4 G4.4 G4.4 {spd} G4.4 {spe}
+        :8 G3 { spd } G3 G3 { spu } G3 G3 { spd } G3 {spu} G3 G3 {spd} |
+        G3 { spu } G3 G3 G3 G3 G3 G3 G3 |
+        F4.1 { spd } | F4 | F4 |
+        F4.4 F4.4 { spu } F4 F4 |
+        G3.8 { spd } G3 G3 { spu } G3 G3 { spd } G3 G3 G3 {spu} |
+        G3.4 G3.4 G3.4 {spd} G3.4 {spe}
         `,
             settings
         );

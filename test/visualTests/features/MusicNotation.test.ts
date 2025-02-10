@@ -143,7 +143,7 @@ describe('MusicNotationTests', () => {
             'Cb'
         ];
 
-        const ocatve = 4;
+        const ocatve = 3;
         const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
         const accidentalModes = ['', '#', '##', 'b', 'bb'];
 

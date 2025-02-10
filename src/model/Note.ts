@@ -737,10 +737,6 @@ export class Note {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
-        if (this.isDead && this.isStringed) {
-            this.fret = 0;
-        }
-        
         // connect ties
         if (this.isTieDestination) {
             this.chain(sharedDataBag);
