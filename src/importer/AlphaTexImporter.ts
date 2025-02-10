@@ -2650,6 +2650,26 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 bar.simileMark = this.parseSimileMarkFromString(this._syData as string);
                 this._sy = this.newSy();
+            }  else if(syData === 'scale') {
+                this._allowFloat = true;
+                this._sy = this.newSy();
+                this._allowFloat = false;
+
+                if (this._sy !== AlphaTexSymbols.Number) {
+                    this.error('scale', AlphaTexSymbols.Number, true);
+                }
+
+                master.displayScale = this._syData as number;
+                this._sy = this.newSy();
+            } else if(syData === 'width') {
+                this._sy = this.newSy();
+
+                if (this._sy !== AlphaTexSymbols.Number) {
+                    this.error('width', AlphaTexSymbols.Number, true);
+                }
+
+                master.displayWidth = this._syData as number;
+                this._sy = this.newSy();
             } else {
                 if (bar.index === 0) {
                     switch (this.handleStaffMeta()) {
