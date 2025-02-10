@@ -180,6 +180,8 @@ export class AlphaTexImporter extends ScoreImporter {
     private _percussionArticulationNames = new Map<string, number>();
     private _sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
 
+    private _slurs: Map<string, Note> = new Map<string, Note>();
+
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
 
     public logErrors: boolean = false;
@@ -336,6 +338,7 @@ export class AlphaTexImporter extends ScoreImporter {
         this._score.addTrack(this._currentTrack);
         this._lyrics.set(this._currentTrack.index, []);
         this._currentDynamics = DynamicValue.F;
+        this._slurs.clear();
     }
 
     /**
@@ -1258,6 +1261,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 const isPercussion = this._currentStaff.isPercussion;
                 this._currentStaff = this._currentTrack.staves[this._currentTrack.staves.length - 1];
+                this._slurs.clear();
 
                 if (isPercussion) {
                     this.applyPercussionStaff(this._currentStaff);
@@ -2289,6 +2293,13 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                 }
 
+                // Style
+                this._sy = this.newSy();
+                if (this._sy === AlphaTexSymbols.String) {
+                    note.bendStyle = this.parseBendStyle(this._syData as string);
+                    this._sy = this.newSy();
+                }
+
                 // read points
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.LParensis) {
@@ -2494,6 +2505,30 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'lmordent') {
                 this._sy = this.newSy();
                 note.ornament = NoteOrnament.LowerMordent;
+            } else if (syData === 'string') {
+                this._sy = this.newSy();
+                note.showStringNumber = true;
+            } else if (syData === 'hide') {
+                this._sy = this.newSy();
+                note.isVisible = false;
+            } else if (syData === 'slur') {
+                this._sy = this.newSy();
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('slur', AlphaTexSymbols.String, true);
+                }
+                
+                const slurId = this._syData as string;
+                if (this._slurs.has(slurId)) {
+                    const slurOrigin = this._slurs.get(slurId)!;
+                    slurOrigin.slurDestination = note;
+
+                    note.slurOrigin = slurOrigin;
+                    note.isSlurDestination = true;
+                } else {
+                    this._slurs.set(slurId, note);
+                }
+
+                this._sy = this.newSy();
             } else if (this.applyBeatEffect(note.beat)) {
                 // Success
             } else {

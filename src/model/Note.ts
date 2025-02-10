@@ -452,7 +452,7 @@ export class Note {
     public trillSpeed: Duration = Duration.ThirtySecond;
 
     /**
-     * Gets or sets the percentual duration of the note relative to the overall beat duration .
+     * Gets or sets the percentual duration of the note relative to the overall beat duration.
      */
     public durationPercent: number = 1;
 
