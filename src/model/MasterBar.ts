@@ -9,7 +9,6 @@ import { Score } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { Direction } from './Direction';
-import { dir } from 'console';
 
 /**
  * The MasterBar stores information about a bar which affects

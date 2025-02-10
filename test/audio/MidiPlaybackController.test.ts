@@ -155,4 +155,154 @@ describe('MidiPlaybackControllerTest', () => {
         ];
         testAlphaTexRepeat(tex, expectedBars, 50);
     });
+
+    // Da Capo
+    
+    it('da-capo', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | \\jump DaCapo r | r       
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-al-fine', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | \\jump fine r | \\jump DaCapoAlFine r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('da-capo-al-coda', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | \\jump DaCoda r | \\jump DaCapoAlCoda r | \\jump Coda r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+    
+    it('da-capo-al-double-coda', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | \\jump DaDoubleCoda r | \\jump DaCapoAlDoubleCoda r | \\jump DoubleCoda r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    // Dal Segno
+
+    it('dal-segno', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | \\jump Segno r | \\ro \\rc 2 r | \\jump DalSegno r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-al-coda', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | r |
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaCoda | 
+        r | r | \\jump DalSegnoAlCoda r | r | \\jump Coda r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-al-double-coda', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | r |
+        \\jump Segno r | \\ro \\rc 2 r | \\jump DaDoubleCoda | 
+        r | r | \\jump DalSegnoAlDoubleCoda r | r | \\jump DoubleCoda r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-al-fine', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | r |
+        \\jump Segno r | \\ro \\rc 2 r | \\jump Fine | 
+        r | r | \\jump DalSegnoAlFine r | r | 
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    // Dal Segno Segno
+
+    it('dal-segno-segno', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DalSegnoSegno r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-segno-al-coda', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | r |
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaCoda | 
+        r | r | \\jump DalSegnoSegnoAlCoda r | r | \\jump Coda r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-segno-al-double-coda', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | r |
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump DaDoubleCoda | 
+        r | r | \\jump DalSegnoSegnoAlDoubleCoda r | r | \\jump DoubleCoda r | r
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
+
+    it('dal-segno-segno-al-fine', () => {
+        let tex: string = `
+        .
+        \\ro :1 r | \\rc 2 r | r |
+        \\jump SegnoSegno r | \\ro \\rc 2 r | \\jump Fine | 
+        r | r | \\jump DalSegnoSegnoAlFine r | r | 
+        `;
+        let expectedBars: number[] = [
+            // TODO
+        ];
+        testAlphaTexRepeat(tex, expectedBars, 50);
+    });
 });
