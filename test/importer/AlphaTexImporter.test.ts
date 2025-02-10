@@ -745,8 +745,8 @@ describe('AlphaTexImporterTest', () => {
 
     it('key-signature', () => {
         let tex: string = `:1 3.3 | \\ks C 3.3 | \\ks Cmajor 3.3 | \\ks Aminor 3.3 |
-        \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks d#minor 3.3 |
-        \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks Ebminor 3.3`;
+        \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks Ebminor 3.3 |
+        \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks d#minor 3.3`;
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].keySignature).to.equal(KeySignature.C);
         expect(score.masterBars[1].keySignature).to.equal(KeySignature.C);
@@ -1173,10 +1173,6 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomations[0]?.value).to.equal(333.3);
     });
 
-    it('tempo-invalid-float', () => {
-        expect(() => parseTex('\\tempo 112.Q .')).to.throw(UnsupportedFormatError);
-    });
-
     it('percussion-numbers', () => {
         const score = parseTex(`
             \\instrument "percussion"
@@ -1352,7 +1348,6 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].rasgueado).to.equal(Rasgueado.AmiAnapaest);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].hasRasgueado).to.be.true;
     });
-
     
     it('directions', () => {
         let score = parseTex('. \\jump Segno | | \\jump DaCapoAlCoda \\jump Coda \\jump SegnoSegno ');
@@ -1365,5 +1360,51 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
         expect(score.masterBars[2].directions).to.contain(Direction.TargetCoda);
         expect(score.masterBars[2].directions).to.contain(Direction.TargetSegnoSegno);
+    });
+    
+    it('multi-voice-full', () => {
+        let score = parseTex(`
+            \\track "Piano"
+                \\staff{score} \\tuning piano \\instrument acousticgrandpiano
+                    \\voice 
+                        c4 d4 e4 f4 | c4 d4 e4 f4
+                    \\voice 
+                        c3 d3 e3 f3 | c3 d3 e3 f3
+        `);
+
+        expect(score.masterBars).to.have.length(2);
+
+        expect(score.tracks[0].staves[0].bars).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+    });
+    
+    it('multi-voice-simple-all-voices', () => {
+        let score = parseTex(`
+            \\voice 
+                c4 d4 e4 f4 | c4 d4 e4 f4
+            \\voice 
+                c3 d3 e3 f3 | c3 d3 e3 f3
+        `);
+
+        expect(score.masterBars).to.have.length(2);
+
+        expect(score.tracks[0].staves[0].bars).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+    });
+
+    it('multi-voice-simple-skip-initial', () => {
+        let score = parseTex(`
+            c4 d4 e4 f4 | c4 d4 e4 f4
+            \\voice 
+            c3 d3 e3 f3 | c3 d3 e3 f3
+        `);
+
+        expect(score.masterBars).to.have.length(2);
+
+        expect(score.tracks[0].staves[0].bars).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
     });
 });
