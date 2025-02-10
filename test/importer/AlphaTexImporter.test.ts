@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature, NoteAccidentalMode } from '@src/model';
+import { KeySignature, KeySignatureType, NoteAccidentalMode } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -749,21 +749,52 @@ describe('AlphaTexImporterTest', () => {
         \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks d#minor 3.3`;
         let score: Score = parseTex(tex);
         expect(score.masterBars[0].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[0].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[1].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[1].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[2].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[2].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[3].keySignature).to.equal(KeySignature.C);
+        expect(score.masterBars[3].keySignatureType).to.equal(KeySignatureType.Minor);
+
         expect(score.masterBars[4].keySignature).to.equal(KeySignature.F);
+        expect(score.masterBars[4].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[5].keySignature).to.equal(KeySignature.Bb);
+        expect(score.masterBars[5].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[6].keySignature).to.equal(KeySignature.Eb);
+        expect(score.masterBars[6].keySignatureType).to.equal(KeySignatureType.Minor);
+
         expect(score.masterBars[7].keySignature).to.equal(KeySignature.Ab);
+        expect(score.masterBars[7].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[8].keySignature).to.equal(KeySignature.Db);
+        expect(score.masterBars[8].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[9].keySignature).to.equal(KeySignature.Gb);
+        expect(score.masterBars[9].keySignatureType).to.equal(KeySignatureType.Minor);
+
         expect(score.masterBars[10].keySignature).to.equal(KeySignature.G);
+        expect(score.masterBars[10].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[11].keySignature).to.equal(KeySignature.D);
+        expect(score.masterBars[11].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[12].keySignature).to.equal(KeySignature.A);
+        expect(score.masterBars[12].keySignatureType).to.equal(KeySignatureType.Minor);
+
         expect(score.masterBars[13].keySignature).to.equal(KeySignature.E);
+        expect(score.masterBars[13].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[14].keySignature).to.equal(KeySignature.B);
+        expect(score.masterBars[14].keySignatureType).to.equal(KeySignatureType.Major);
+
         expect(score.masterBars[15].keySignature).to.equal(KeySignature.FSharp);
+        expect(score.masterBars[15].keySignatureType).to.equal(KeySignatureType.Minor);
     });
 
     it('pop-slap-tap', () => {
