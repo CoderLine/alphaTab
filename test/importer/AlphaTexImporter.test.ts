@@ -1525,4 +1525,12 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._15ma);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
     });
+
+    it('beat-text', () => {
+        let score = parseTex(`
+            3.3.4{ txt "Hello World" } 3.3.4{ txt Hello }
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].text).to.equal("Hello World");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].text).to.equal("Hello");
+    });
 });
