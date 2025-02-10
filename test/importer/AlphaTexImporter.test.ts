@@ -1407,4 +1407,11 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
     });
+
+    it('standard-notation-line-count', () => {
+        let score = parseTex(`
+            \\staff { score 3 }
+        `);
+        expect(score.tracks[0].staves[0].standardNotationLineCount).to.have.equal(3);
+    });
 });
