@@ -9,6 +9,7 @@ import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
+import { Direction } from '@src/model/Direction';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { FadeType } from '@src/model/FadeType';
@@ -1725,6 +1726,76 @@ export class GpifWriter {
 
         if (masterBar.tripletFeel !== TripletFeel.NoTripletFeel) {
             masterBarNode.addElement('TripletFeel').innerText = TripletFeel[masterBar.tripletFeel];
+        }
+
+        if (masterBar.directions && masterBar.directions.size > 0) {
+            const directions = masterBarNode.addElement('Directions');
+
+            for (const d of masterBar.directions) {
+                switch (d) {
+                    case Direction.TargetFine:
+                        directions.addElement('Target').innerText = 'Fine';
+                        break;
+                    case Direction.TargetSegno:
+                        directions.addElement('Target').innerText = 'Segno';
+                        break;
+                    case Direction.TargetSegnoSegno:
+                        directions.addElement('Target').innerText = 'SegnoSegno';
+                        break;
+                    case Direction.TargetCoda:
+                        directions.addElement('Target').innerText = 'Coda';
+                        break;
+                    case Direction.TargetDoubleCoda:
+                        directions.addElement('Target').innerText = 'DoubleCoda';
+                        break;
+
+                    case Direction.JumpDaCapo:
+                        directions.addElement('Jump').innerText = 'DaCapo';
+                        break;
+                    case Direction.JumpDaCapoAlCoda:
+                        directions.addElement('Jump').innerText = 'DaCapoAlCoda';
+                        break;
+                    case Direction.JumpDaCapoAlDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaCapoAlDoubleCoda';
+                        break;
+                    case Direction.JumpDaCapoAlFine:
+                        directions.addElement('Jump').innerText = 'DaCapoAlFine';
+                        break;
+
+                    case Direction.JumpDalSegno:
+                        directions.addElement('Jump').innerText = 'DaSegno';
+                        break;
+                    case Direction.JumpDalSegnoAlCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoAlCoda';
+                        break;
+                    case Direction.JumpDalSegnoAlDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoAlDoubleCoda';
+                        break;
+                    case Direction.JumpDalSegnoAlFine:
+                        directions.addElement('Jump').innerText = 'DaSegnoAlFine';
+                        break;
+
+                    case Direction.JumpDalSegnoSegno:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegno';
+                        break;
+                    case Direction.JumpDalSegnoSegnoAlCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegnoAlCoda';
+                        break;
+                    case Direction.JumpDalSegnoSegnoAlDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegnoAlDoubleCoda';
+                        break;
+                    case Direction.JumpDalSegnoSegnoAlFine:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegnoAlFine';
+                        break;
+
+                    case Direction.JumpDaCoda:
+                        directions.addElement('Jump').innerText = 'DaCoda';
+                        break;
+                    case Direction.JumpDaDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaDoubleCoda';
+                        break;
+                }
+            }
         }
 
         this.writeFermatas(masterBarNode, masterBar);
