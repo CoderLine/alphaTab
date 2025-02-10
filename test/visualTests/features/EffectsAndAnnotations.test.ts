@@ -260,4 +260,12 @@ describe('EffectsAndAnnotationsTests', () => {
         const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
         await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
     });
+
+    it('directions-simple', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/directions-simple.gp');
+    });
+
+    it('directions-symbols', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/directions-symbols.gp');
+    });
 });
