@@ -1897,6 +1897,17 @@ export class AlphaTexImporter extends ScoreImporter {
             }
         } else if (syData === 'legato-origin') {
             beat.isLegatoOrigin = true;
+        } else if (syData === 'instrument') {
+            this._sy = this.newSy();
+            if (this._sy !== AlphaTexSymbols.Number) {
+                this.error('instrument-change', AlphaTexSymbols.Number, true);
+            }
+
+            const automation = new Automation();
+            automation.isLinear = false;
+            automation.type = AutomationType.Instrument;
+            automation.value = this._syData as number;
+            beat.automations.push(automation);
         } else {
             // string didn't match any beat effect syntax
             return false;
