@@ -1645,4 +1645,10 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[1].tempoAutomations[0].value).to.equal(80);
         expect(score.masterBars[1].tempoAutomations[0].text).to.equal("T2");
     });
+
+    it('double-bar', () => {
+        let tex: string = '3.3 3.3 3.3 3.3 | \\db 1.1 2.1 3.1 4.1';
+        let score: Score = parseTex(tex);
+        expect(score.masterBars[1].isDoubleBar).to.be.equal(true);
+    });
 });
