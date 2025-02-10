@@ -1443,6 +1443,16 @@ describe('AlphaTexImporterTest', () => {
         let score = parseTex(`
             \\staff { score 3 }
         `);
-        expect(score.tracks[0].staves[0].standardNotationLineCount).to.have.equal(3);
+        expect(score.tracks[0].staves[0].standardNotationLineCount).to.equal(3);
+    });
+    
+    it('song-metadata', () => {
+        let score = parseTex(`
+            \\title "Title\\tTitle"
+            \\instructions "Line1\nLine2"
+            .
+        `);
+        expect(score.title).to.equal("Title\tTitle");
+        expect(score.instructions).to.equal("Line1\nLine2");
     });
 });
