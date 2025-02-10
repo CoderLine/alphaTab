@@ -1570,4 +1570,42 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).to.equal(BendStyle.Gradual);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints).to.have.length(2);
     });
+
+    it('harmonic-values', () => {
+        let score = parseTex(`
+        2.3{nh} 2.3{ah} 2.3{ah 7} 2.3{th} 2.3{th 7} 2.3{ph} 2.3{ph 7} 2.3{sh} 2.3{sh 7} 2.3{fh} 2.3{fh 7}
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.equal(HarmonicType.Natural);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicValue).to.equal(2.4);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.equal(HarmonicType.Artificial);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicValue).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.equal(HarmonicType.Artificial);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicValue).to.equal(7);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.equal(HarmonicType.Tap);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicValue).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.equal(HarmonicType.Tap);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicValue).to.equal(7);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].harmonicType).to.equal(HarmonicType.Pinch);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].notes[0].harmonicValue).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].harmonicType).to.equal(HarmonicType.Pinch);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].notes[0].harmonicValue).to.equal(7);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].harmonicType).to.equal(HarmonicType.Semi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].notes[0].harmonicValue).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].harmonicType).to.equal(HarmonicType.Semi);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[8].notes[0].harmonicValue).to.equal(7);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].harmonicType).to.equal(HarmonicType.Feedback);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[9].notes[0].harmonicValue).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicType).to.equal(HarmonicType.Feedback);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicValue).to.equal(7);
+    });
 });
