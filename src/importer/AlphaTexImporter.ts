@@ -872,12 +872,17 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._sy = this.newSy();
                         break;
                     case AlphaTexSymbols.Tuning:
+                    case AlphaTexSymbols.Number:
                         let tuning: number[] = [];
                         do {
-                            let t: TuningParseResult = this._syData as TuningParseResult;
-                            tuning.push(t.realValue);
+                            if (typeof this._syData === 'number') {
+                                tuning.push(this._syData as number);
+                            } else {
+                                let t: TuningParseResult = this._syData as TuningParseResult;
+                                tuning.push(t.realValue);
+                            }
                             this._sy = this.newSy();
-                        } while (this._sy === AlphaTexSymbols.Tuning);
+                        } while (this._sy === AlphaTexSymbols.Tuning || this._sy === AlphaTexSymbols.Number);
                         this._currentStaff.stringTuning.tunings = tuning;
                         break;
                     default:
