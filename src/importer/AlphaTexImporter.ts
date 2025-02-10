@@ -2417,7 +2417,6 @@ export class AlphaTexImporter extends ScoreImporter {
                     this.error('bend-effect', AlphaTexSymbols.LParensis, true);
                 }
                 this._sy = this.newSy();
-                this._allowFloat = true;
 
                 while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
                     let offset: number = 0;
@@ -2441,7 +2440,6 @@ export class AlphaTexImporter extends ScoreImporter {
                     note.addBendPoint(new BendPoint(offset, value));
                     this._sy = this.newSy();
                 }
-                this._allowFloat = false;
                 const points = note.bendPoints;
                 if (points != null) {
                     while (points.length > 60) {

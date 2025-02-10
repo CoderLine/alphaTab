@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { AutomationType, BendStyle, FermataType, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
+import { AutomationType, BendStyle, BendType, FermataType, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1560,5 +1560,14 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata).to.be.ok;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.type).to.equal(FermataType.Medium);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.length).to.equal(4);
+    });
+
+    it('bend-type', () => {
+        let score = parseTex(`
+            3.3{ b bend gradual (0 4)}
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).to.equal(BendType.Bend);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).to.equal(BendStyle.Gradual);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints).to.have.length(2);
     });
 });
