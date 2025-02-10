@@ -1895,6 +1895,8 @@ export class AlphaTexImporter extends ScoreImporter {
             } else {
                 this.error('beat-text', AlphaTexSymbols.String, true);
             }
+        } else if (syData === 'legato-origin') {
+            beat.isLegatoOrigin = true;
         } else {
             // string didn't match any beat effect syntax
             return false;
