@@ -876,6 +876,23 @@ describe('AlphaTexImporterTest', () => {
         expect(i).to.equal(durations.length);
     });
 
+
+    it('tuplet-custom', () => {
+        let tex: string = ':8 5.3{tu 5 2}*5';
+        let score: Score = parseTex(tex);
+        let tupletNumerators = [5, 5, 5, 5, 5];
+        let tupletDenominators = [2, 2, 2, 2, 2];
+
+        let i: number = 0;
+        let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        while (b) {
+            expect(b.tupletNumerator).to.equal(tupletNumerators[i], `Tuplet on beat ${i} was wrong`);
+            expect(b.tupletDenominator).to.equal(tupletDenominators[i], `Tuplet on beat ${i} was wrong`);
+            b = b.nextBeat;
+            i++;
+        }
+    });
+
     it('simple-anacrusis', () => {
         let tex: string = '\\ac 3.3 3.3 | 1.1 2.1 3.1 4.1';
         let score: Score = parseTex(tex);
