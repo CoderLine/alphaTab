@@ -42,7 +42,6 @@ export class NoteCloner {
         clone.isTieDestination = original.isTieDestination;
         clone.leftHandFinger = original.leftHandFinger;
         clone.rightHandFinger = original.rightHandFinger;
-        clone.isFingering = original.isFingering;
         clone.trillValue = original.trillValue;
         clone.trillSpeed = original.trillSpeed;
         clone.durationPercent = original.durationPercent;

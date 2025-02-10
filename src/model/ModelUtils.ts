@@ -6,6 +6,7 @@ import { Score } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 import { NoteAccidentalMode } from './NoteAccidentalMode';
+import { MasterBar } from './MasterBar';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -323,5 +324,50 @@ export class ModelUtils {
             s = '0' + s;
         }
         return s;
+    }
+
+    /**
+     * Gets the list of alternate endings on which the master bar is played.
+     * @param bitflag The alternate endings bitflag.
+     */
+    public static getAlternateEndingsList(bitflag: number): number[] {
+        const endings: number[] = [];
+        for (let i: number = 0; i < MasterBar.MaxAlternateEndings; i++) {
+            if ((bitflag & (0x01 << i)) !== 0) {
+                endings.push(i);
+            }
+        }
+        return endings;
+    }
+
+    public static deltaFretToHarmonicValue(deltaFret: number): number {
+        switch (deltaFret) {
+            case 2:
+                return 2.4;
+            case 3:
+                return 3.2;
+            case 4:
+            case 5:
+            case 7:
+            case 9:
+            case 12:
+            case 16:
+            case 17:
+            case 19:
+            case 24:
+                return deltaFret;
+            case 8:
+                return 8.2;
+            case 10:
+                return 9.6;
+            case 14:
+            case 15:
+                return 14.7;
+            case 21:
+            case 22:
+                return 21.7;
+            default:
+                return 12;
+        }
     }
 }

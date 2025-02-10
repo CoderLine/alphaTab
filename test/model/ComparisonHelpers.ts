@@ -8,8 +8,13 @@ export class ComparisonHelpers {
         expected: unknown,
         actual: unknown,
         path: string,
-        ignoreKeys: string[] | null
+        ignoreKeys: string[] | null,
+        ignorePaths: RegExp[] | null = null
     ): boolean {
+        if(ignorePaths && ignorePaths.findIndex(p => p.exec(path) !== null) !== -1) {
+            return true;
+        }
+        
         const expectedType = typeof expected;
         const actualType = typeof actual;
 

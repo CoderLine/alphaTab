@@ -429,7 +429,9 @@ export class Note {
     /**
      * Gets or sets whether this note has fingering defined.
      */
-    public isFingering: boolean = false;
+    public get isFingering(): boolean {
+        return this.leftHandFinger !== Fingers.Unknown || this.rightHandFinger !== Fingers.Unknown;
+    }
 
     /**
      * Gets or sets the target note value for the trill effect.
@@ -735,6 +737,10 @@ export class Note {
         let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
         let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
+        if (this.isDead && this.isStringed) {
+            this.fret = 0;
+        }
+        
         // connect ties
         if (this.isTieDestination) {
             this.chain(sharedDataBag);
@@ -805,9 +811,16 @@ export class Note {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
         const points = this.bendPoints;
-        if (points != null && points.length > 0 && this.bendType === BendType.Custom) {
+        const hasBend = points != null && points.length > 0;
+
+        if (hasBend) {
             let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
             this.isContinuedBend = isContinuedBend;
+        } else {
+            this.bendType = BendType.None;
+        }
+
+        if (hasBend && this.bendType === BendType.Custom) {
             if (points.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
@@ -819,7 +832,7 @@ export class Note {
                     if (destination.value > origin.value) {
                         if (middle1.value > destination.value) {
                             this.bendType = BendType.BendRelease;
-                        } else if (!isContinuedBend && origin.value > 0) {
+                        } else if (!this.isContinuedBend && origin.value > 0) {
                             this.bendType = BendType.PrebendBend;
                             points.splice(2, 1);
                             points.splice(1, 1);
@@ -830,7 +843,7 @@ export class Note {
                         }
                     } else if (destination.value < origin.value) {
                         // origin must be > 0 otherwise it's no release, we cannot bend negative
-                        if (isContinuedBend) {
+                        if (this.isContinuedBend) {
                             this.bendType = BendType.Release;
                             points.splice(2, 1);
                             points.splice(1, 1);
@@ -842,7 +855,7 @@ export class Note {
                     } else {
                         if (middle1.value > origin.value) {
                             this.bendType = BendType.BendRelease;
-                        } else if (origin.value > 0 && !isContinuedBend) {
+                        } else if (origin.value > 0 && !this.isContinuedBend) {
                             this.bendType = BendType.Prebend;
                             points.splice(2, 1);
                             points.splice(1, 1);
@@ -860,28 +873,26 @@ export class Note {
                 let destination: BendPoint = points[1];
                 // bend higher?
                 if (destination.value > origin.value) {
-                    if (!isContinuedBend && origin.value > 0) {
+                    if (!this.isContinuedBend && origin.value > 0) {
                         this.bendType = BendType.PrebendBend;
                     } else {
                         this.bendType = BendType.Bend;
                     }
                 } else if (destination.value < origin.value) {
                     // origin must be > 0 otherwise it's no release, we cannot bend negative
-                    if (isContinuedBend) {
+                    if (this.isContinuedBend) {
                         this.bendType = BendType.Release;
                     } else {
                         this.bendType = BendType.PrebendRelease;
                     }
                 } else {
-                    if (origin.value > 0 && !isContinuedBend) {
+                    if (origin.value > 0 && !this.isContinuedBend) {
                         this.bendType = BendType.Prebend;
                     } else {
                         this.bendType = BendType.Hold;
                     }
                 }
             }
-        } else if (points === null || points.length === 0) {
-            this.bendType = BendType.None;
         }
 
         // initial bend pitch offsets and forced accidentals don't play well together

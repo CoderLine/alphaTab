@@ -139,7 +139,7 @@ export class Gp3To5Importer extends ScoreImporter {
         // To be more in line with the GP7 structure we create an
         // initial tempo automation on the first masterbar
         if (this._score.masterBars.length > 0) {
-            const automation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);;
+            const automation = Automation.buildTempoAutomation(false, 0, this._score.tempo, 2);
             automation.text = this._score.tempoLabel;
             this._score.masterBars[0].tempoAutomations.push(automation);
         }
@@ -352,9 +352,9 @@ export class Gp3To5Importer extends ScoreImporter {
         // 1   - Percussion Track
         // 2   - 12 Stringed Track
         // 4   - Unknown
-        // 8   - Is Visible on Multi Track 
-        // 16  - Unknown 
-        // 32  - Unknown 
+        // 8   - Is Visible on Multi Track
+        // 16  - Unknown
+        // 32  - Unknown
         // 64  - Unknown
         // 128 - Unknown
 
@@ -366,8 +366,8 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 500) {
             newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
         }
-        
-        // 
+
+        //
         let stringCount: number = IOHelper.readInt32LE(this.data);
         let tuning: number[] = [];
         for (let i: number = 0; i < 7; i++) {
@@ -526,30 +526,26 @@ export class Gp3To5Importer extends ScoreImporter {
             this.readChord(newBeat);
         }
 
-        let beatTextAsLyrics = this.settings.importer.beatTextAsLyrics
-            && track.index !== this._lyricsTrack; // detect if not lyrics track
+        let beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack; // detect if not lyrics track
 
         if ((flags & 0x04) !== 0) {
             const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
             if (beatTextAsLyrics) {
-
                 const lyrics = new Lyrics();
                 lyrics.text = text.trim();
                 lyrics.finish(true);
 
-                // push them in reverse order to the store for applying them 
-                // to the next beats being read 
-                const beatLyrics:string[] = [];
+                // push them in reverse order to the store for applying them
+                // to the next beats being read
+                const beatLyrics: string[] = [];
                 for (let i = lyrics.chunks.length - 1; i >= 0; i--) {
                     beatLyrics.push(lyrics.chunks[i]);
                 }
                 this._beatTextChunksByTrack.set(track.index, beatLyrics);
-
             } else {
                 newBeat.text = text;
             }
         }
-
 
         let allNoteHarmonicType = HarmonicType.None;
         if ((flags & 0x08) !== 0) {
@@ -565,7 +561,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 if (allNoteHarmonicType !== HarmonicType.None) {
                     note.harmonicType = allNoteHarmonicType;
                     if (note.harmonicType === HarmonicType.Natural) {
-                        note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
+                        note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                     }
                 }
             }
@@ -578,9 +574,12 @@ export class Gp3To5Importer extends ScoreImporter {
             }
         }
 
-        if (beatTextAsLyrics && !newBeat.isRest && 
+        if (
+            beatTextAsLyrics &&
+            !newBeat.isRest &&
             this._beatTextChunksByTrack.has(track.index) &&
-            this._beatTextChunksByTrack.get(track.index)!.length > 0) {
+            this._beatTextChunksByTrack.get(track.index)!.length > 0
+        ) {
             newBeat.lyrics = [this._beatTextChunksByTrack.get(track.index)!.pop()!];
         }
     }
@@ -685,13 +684,13 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 400) {
             flags2 = this.data.readByte();
         }
-        if((flags & 0x10) !== 0) {
+        if ((flags & 0x10) !== 0) {
             beat.fade = FadeType.FadeIn;
         }
         if ((this._versionNumber < 400 && (flags & 0x01) !== 0) || (flags & 0x02) !== 0) {
             beat.vibrato = VibratoType.Slight;
         }
-        if( (flags2 & 0x01) !== 0) {
+        if ((flags2 & 0x01) !== 0) {
             beat.rasgueado = Rasgueado.Ii;
         }
         if ((flags & 0x20) !== 0 && this._versionNumber >= 400) {
@@ -925,7 +924,6 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x80) !== 0) {
             newNote.leftHandFinger = IOHelper.readSInt8(this.data) as Fingers;
             newNote.rightHandFinger = IOHelper.readSInt8(this.data) as Fingers;
-            newNote.isFingering = true;
         }
         let swapAccidentals = false;
         if (this._versionNumber >= 500) {
@@ -1137,7 +1135,7 @@ export class Gp3To5Importer extends ScoreImporter {
             switch (type) {
                 case 1:
                     note.harmonicType = HarmonicType.Natural;
-                    note.harmonicValue = this.deltaFretToHarmonicValue(note.fret);
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                     break;
                 case 2:
                     /*let _harmonicTone: number = */ this.data.readByte();
@@ -1147,7 +1145,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     break;
                 case 3:
                     note.harmonicType = HarmonicType.Tap;
-                    note.harmonicValue = this.deltaFretToHarmonicValue(this.data.readByte());
+                    note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(this.data.readByte());
                     break;
                 case 4:
                     note.harmonicType = HarmonicType.Pinch;
@@ -1182,37 +1180,6 @@ export class Gp3To5Importer extends ScoreImporter {
                     note.harmonicType = HarmonicType.Artificial;
                     break;
             }
-        }
-    }
-
-    public deltaFretToHarmonicValue(deltaFret: number): number {
-        switch (deltaFret) {
-            case 2:
-                return 2.4;
-            case 3:
-                return 3.2;
-            case 4:
-            case 5:
-            case 7:
-            case 9:
-            case 12:
-            case 16:
-            case 17:
-            case 19:
-            case 24:
-                return deltaFret;
-            case 8:
-                return 8.2;
-            case 10:
-                return 9.6;
-            case 14:
-            case 15:
-                return 14.7;
-            case 21:
-            case 22:
-                return 21.7;
-            default:
-                return 12;
         }
     }
 
