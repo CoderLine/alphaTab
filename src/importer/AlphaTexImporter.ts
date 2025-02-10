@@ -1951,7 +1951,6 @@ export class AlphaTexImporter extends ScoreImporter {
         }
     }
 
-
     private parseClefOttavaFromString(str: string): Ottavia {
         switch (str.toLowerCase()) {
             case '15ma':
@@ -2185,21 +2184,29 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else if (syData === 'nh') {
                 note.harmonicType = HarmonicType.Natural;
+                note.harmonicValue = ModelUtils.deltaFretToHarmonicValue(note.fret);
                 this._sy = this.newSy();
             } else if (syData === 'ah') {
                 // todo: Artificial Key
                 note.harmonicType = HarmonicType.Artificial;
+                note.harmonicValue = this.harmonicValue(note.harmonicValue);
                 this._sy = this.newSy();
             } else if (syData === 'th') {
                 // todo: store tapped fret in data
                 note.harmonicType = HarmonicType.Tap;
+                note.harmonicValue = this.harmonicValue(note.harmonicValue);
                 this._sy = this.newSy();
             } else if (syData === 'ph') {
                 note.harmonicType = HarmonicType.Pinch;
+                note.harmonicValue = this.harmonicValue(note.harmonicValue);
                 this._sy = this.newSy();
             } else if (syData === 'sh') {
                 note.harmonicType = HarmonicType.Semi;
+                note.harmonicValue = this.harmonicValue(note.harmonicValue);
                 this._sy = this.newSy();
+            } else if (syData === 'fh') {
+                note.harmonicType = HarmonicType.Feedback;
+                note.harmonicValue = this.harmonicValue(note.harmonicValue);
             } else if (syData === 'tr') {
                 this._sy = this.newSy();
                 if (this._sy !== AlphaTexSymbols.Number) {
@@ -2336,6 +2343,19 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
     }
+    
+    private harmonicValue(harmonicValue: number): number {
+        this._allowNegatives = true;
+        this._allowFloat = true;
+        this._sy = this.newSy();
+        if (this._sy === AlphaTexSymbols.Number) {
+            harmonicValue = this._syData as number;
+            this._sy = this.newSy();
+        }
+        this._allowNegatives = false;
+        this._allowFloat = false;
+        return harmonicValue;
+    }
 
     private toFinger(num: number): Fingers {
         switch (num) {
@@ -2406,7 +2426,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 return BendType.Custom;
         }
     }
-
 
     private barMeta(bar: Bar): boolean {
         let anyMeta = false;
