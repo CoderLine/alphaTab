@@ -886,7 +886,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
                     anyTopLevelMeta = true;
                     break;
-                case 'defaultSystemsLayout':
+                case 'defaultsystemslayout':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.Number) {
                         this._score.defaultSystemsLayout = this._syData as number;
@@ -896,7 +896,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('default-systems-layout', AlphaTexSymbols.Number, true);
                     }
                     break;
-                case 'systemsLayout':
+                case 'systemslayout':
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     while (this._sy === AlphaTexSymbols.Number) {
@@ -904,17 +904,17 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._sy = this.newSy();
                     }
                     break;
-                case 'hideDynamics':
+                case 'hidedynamics':
                     this._score.stylesheet.hideDynamics = true;
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
-                case 'showDynamics':
+                case 'showdynamics':
                     this._score.stylesheet.hideDynamics = false;
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
-                case 'bracketExtendMode':
+                case 'bracketextendmode':
                     this._sy = this.newSy();
                     if (this._sy !== AlphaTexSymbols.String) {
                         this.error('bracketExtendMode', AlphaTexSymbols.String, true);
@@ -923,13 +923,8 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
-                case 'useSystemSignSeparator':
+                case 'usesystemsignseparator':
                     this._score.stylesheet.useSystemSignSeparator = true;
-                    this._sy = this.newSy();
-                    anyTopLevelMeta = true;
-                    break;
-                case 'doNotUseSystemSignSeparator':
-                    this._score.stylesheet.useSystemSignSeparator = false;
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
@@ -1389,7 +1384,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._currentTrack.color = Color.fromJson(this._syData as string)!;
 
                     break;
-                case 'defaultSystemsLayout':
+                case 'defaultsystemslayout':
                     this._sy = this.newSy();
                     if (this._sy === AlphaTexSymbols.Number) {
                         this._currentTrack.defaultSystemsLayout = this._syData as number;
@@ -1398,7 +1393,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('default-systems-layout', AlphaTexSymbols.Number, true);
                     }
                     break;
-                case 'systemsLayout':
+                case 'systemslayout':
                     this._sy = this.newSy();
                     while (this._sy === AlphaTexSymbols.Number) {
                         this._currentTrack.systemsLayout.push(this._syData as number);
@@ -2131,7 +2126,7 @@ export class AlphaTexImporter extends ScoreImporter {
             }
 
             beat.ottava = this.parseClefOttavaFromString(this._syData as string);
-        } else if (syData === 'legato-origin') {
+        } else if (syData === 'legatoorigin') {
             beat.isLegatoOrigin = true;
         } else if (syData === 'instrument') {
             this._sy = this.newSy();

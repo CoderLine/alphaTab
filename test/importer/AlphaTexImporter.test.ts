@@ -1533,4 +1533,13 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].text).to.equal("Hello World");
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].text).to.equal("Hello");
     });
+
+    
+    it('legato-origin', () => {
+        let score = parseTex(`
+            3.3.4{ legatoOrigin } 4.3.4
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isLegatoOrigin).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isLegatoDestination).to.be.true;
+    });
 });
