@@ -581,7 +581,25 @@ export class AlphaTexImporter extends ScoreImporter {
                 let s: string = '';
                 this._sy = AlphaTexSymbols.String;
                 while (this._ch !== startChar && this._ch !== AlphaTexImporter.Eof) {
-                    s += String.fromCharCode(this._ch);
+                    // escape sequences
+                    if (this._ch === 0x5c /* \ */) {
+                        this._ch = this.nextChar();
+                        if (this._ch === 0x5c /* \\ */) {
+                            s += '\\';
+                        } else if (this._ch == startChar /* \<startchar> */) {
+                            s += String.fromCharCode(this._ch);
+                        } else if (this._ch == 0x52 /* \R */ || this._ch == 0x72 /* \r */) {
+                            s += '\r';
+                        } else if (this._ch == 0x4e /* \N */ || this._ch == 0x6e /* \n */) {
+                            s += '\n';
+                        } else if (this._ch == 0x54 /* \T */ || this._ch == 0x74 /* \t */) {
+                            s += '\t';
+                        } else {
+                            this.errorMessage('Unsupported escape sequence');
+                        }
+                    } else {
+                        s += String.fromCharCode(this._ch);
+                    }
                     this._ch = this.nextChar();
                 }
                 if (this._ch === AlphaTexImporter.Eof) {
@@ -734,6 +752,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'words':
                 case 'music':
                 case 'copyright':
+                case 'instructions':
+                case 'notices':
+                case 'tab':
                     this._sy = this.newSy();
                     if (this._sy !== AlphaTexSymbols.String) {
                         // Known issue: Strings that happen to be parsed as valid Tunings or positive Numbers will not pass this.
@@ -762,6 +783,15 @@ export class AlphaTexImporter extends ScoreImporter {
                             break;
                         case 'copyright':
                             this._score.copyright = metadataValue;
+                            break;
+                        case 'instructions':
+                            this._score.instructions = metadataValue;
+                            break;
+                        case 'notices':
+                            this._score.notices = metadataValue;
+                            break;
+                        case 'tab':
+                            this._score.tab = metadataValue;
                             break;
                     }
                     this._sy = this.newSy();
