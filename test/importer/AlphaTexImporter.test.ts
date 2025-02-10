@@ -10,7 +10,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { BendStyle, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
+import { AutomationType, BendStyle, KeySignature, KeySignatureType, NoteAccidentalMode, Ottavia, VibratoType, WhammyType } from '@src/model';
 import { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -1534,12 +1534,22 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].text).to.equal("Hello");
     });
 
-    
     it('legato-origin', () => {
         let score = parseTex(`
             3.3.4{ legatoOrigin } 4.3.4
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isLegatoOrigin).to.be.true;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isLegatoDestination).to.be.true;
+    });
+
+    it('instrument-change', () => {
+        let score = parseTex(`
+            \\instrument acousticgrandpiano
+            G4 G4 G4 { instrument brightacousticpiano }
+        `);
+        expect(score.tracks[0].playbackInfo.program).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(AutomationType.Instrument);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(1);
     });
 });

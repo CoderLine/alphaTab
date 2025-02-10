@@ -2130,14 +2130,21 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.isLegatoOrigin = true;
         } else if (syData === 'instrument') {
             this._sy = this.newSy();
-            if (this._sy !== AlphaTexSymbols.Number) {
+
+            let program = 0;
+
+            if (this._sy === AlphaTexSymbols.Number) {
+                program = this._syData as number;
+            } else if (this._sy === AlphaTexSymbols.String) {
+                program = GeneralMidi.getValue(this._syData as string);
+            } else {
                 this.error('instrument-change', AlphaTexSymbols.Number, true);
             }
 
             const automation = new Automation();
             automation.isLinear = false;
             automation.type = AutomationType.Instrument;
-            automation.value = this._syData as number;
+            automation.value = program;
             beat.automations.push(automation);
         } else if (syData === 'fermata') {
             this._sy = this.newSy();
