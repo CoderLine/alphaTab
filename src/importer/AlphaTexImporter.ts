@@ -54,6 +54,7 @@ import { BendType } from '@src/model/BendType';
 import { SimileMark } from '@src/model/SimileMark';
 import { WhammyType } from '@src/model/WhammyType';
 import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { Color } from '@src/model/Color';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -1241,6 +1242,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._currentTrack.shortName = this._syData as string;
                 this._sy = this.newSy();
             }
+
+            this.trackProperties();
         }
         if (this._sy === AlphaTexSymbols.MetaCommand && (this._syData as string).toLowerCase() === 'staff') {
             this._staffHasExplicitDisplayTransposition = false;
@@ -1263,6 +1266,68 @@ export class AlphaTexImporter extends ScoreImporter {
             this.staffProperties();
         }
         return true;
+    }
+
+    private trackProperties(): void {
+        if (this._sy !== AlphaTexSymbols.LBrace) {
+            return;
+        }
+        this._sy = this.newSy();
+        while (this._sy === AlphaTexSymbols.String) {
+            switch ((this._syData as string).toLowerCase()) {
+                case 'color':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('track-color', AlphaTexSymbols.String, true);
+                    }
+                    this._currentTrack.color = Color.fromJson(this._syData as string)!;
+
+                    break;
+                case 'defaultSystemsLayout':
+                    this._sy = this.newSy();
+                    if (this._sy === AlphaTexSymbols.Number) {
+                        this._currentTrack.defaultSystemsLayout = this._syData as number;
+                        this._sy = this.newSy();
+                    } else {
+                        this.error('default-systems-layout', AlphaTexSymbols.Number, true);
+                    }
+                    break;
+                case 'systemsLayout':
+                    this._sy = this.newSy();
+                    while (this._sy === AlphaTexSymbols.Number) {
+                        this._currentTrack.systemsLayout.push(this._syData as number);
+                        this._sy = this.newSy();
+                    }
+                    break;
+                case 'volume':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.Number) {
+                        this.error('track-volume', AlphaTexSymbols.Number, true);
+                    }
+                    this._currentTrack.playbackInfo.volume = ModelUtils.clamp(this._syData as number, 0, 16);
+                    break;
+                case 'balance':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.Number) {
+                        this.error('track-balance', AlphaTexSymbols.Number, true);
+                    }
+                    this._currentTrack.playbackInfo.balance = ModelUtils.clamp(this._syData as number, 0, 16);
+                    break;
+                case 'mute':
+                    this._currentTrack.playbackInfo.isMute = true;
+                    break;
+                case 'solo':
+                    this._currentTrack.playbackInfo.isSolo = true;
+                    break;
+                default:
+                    this.error('track-properties', AlphaTexSymbols.String, false);
+                    break;
+            }
+        }
+        if (this._sy !== AlphaTexSymbols.RBrace) {
+            this.error('track-properties', AlphaTexSymbols.RBrace, true);
+        }
+        this._sy = this.newSy();
     }
 
     private staffProperties(): void {
@@ -2650,7 +2715,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 bar.simileMark = this.parseSimileMarkFromString(this._syData as string);
                 this._sy = this.newSy();
-            }  else if(syData === 'scale') {
+            } else if (syData === 'scale') {
                 this._allowFloat = true;
                 this._sy = this.newSy();
                 this._allowFloat = false;
@@ -2661,7 +2726,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 master.displayScale = this._syData as number;
                 this._sy = this.newSy();
-            } else if(syData === 'width') {
+            } else if (syData === 'width') {
                 this._sy = this.newSy();
 
                 if (this._sy !== AlphaTexSymbols.Number) {

@@ -5,7 +5,6 @@ import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { Logger } from '@src/Logger';
@@ -18,6 +17,7 @@ import { MidiEventType } from '@src/midi/MidiEvent';
 import { Environment } from '@src/Environment';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { Settings } from '@src/Settings';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -119,7 +119,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public set playbackSpeed(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
+        value = ModelUtils.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
         this._playbackSpeed = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setPlaybackSpeed',

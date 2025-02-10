@@ -19,14 +19,4 @@ export class SynthHelper {
     public static cents2Hertz(cents: number): number {
         return 8.176 * Math.pow(2.0, cents / 1200.0);
     }
-
-    public static clamp(value: number, min: number, max: number): number {
-        if (value <= min) {
-            return min;
-        }
-        if (value >= max) {
-            return max;
-        }
-        return value;
-    }
 }
