@@ -5,7 +5,7 @@ namespace AlphaTab.Core.EcmaScript;
 
 internal class RegExp
 {
-    private static ConcurrentDictionary<(string pattern, string flags), RegExp> Cache =
+    private static readonly ConcurrentDictionary<(string pattern, string flags), RegExp> Cache =
         new ConcurrentDictionary<(string pattern, string flags), RegExp>();
 
     private readonly Regex _regex;
@@ -42,9 +42,15 @@ internal class RegExp
         }
     }
 
-    public bool Exec(string s)
+    public Match? Exec(string s)
     {
-        return _regex.IsMatch(s);
+        var match = _regex.Match(s);
+        if (match.Success)
+        {
+            return match;
+        }
+
+        return null;
     }
 
     public string Replace(string input, string replacement)

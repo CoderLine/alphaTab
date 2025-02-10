@@ -11,7 +11,7 @@ export class ComparisonHelpers {
         ignoreKeys: string[] | null,
         ignorePaths: RegExp[] | null = null
     ): boolean {
-        if(ignorePaths && ignorePaths.findIndex(p => p.exec(path) !== null) !== -1) {
+        if(ignorePaths && ignorePaths.some(p => p.exec(path) !== null)) {
             return true;
         }
         
