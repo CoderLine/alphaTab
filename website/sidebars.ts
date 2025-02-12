@@ -1,4 +1,4 @@
-import type { SidebarsConfig } from '@docusaurus/plugin-content-docs';
+import type { SidebarsConfig } from "@docusaurus/plugin-content-docs";
 
 const sidebars: SidebarsConfig = {
   docs: {
@@ -146,18 +146,43 @@ const sidebars: SidebarsConfig = {
       "alphatex/percussion",
     ],
   },
-  showcase: {
-    Showcase: [
-      "showcase/introduction",
-      "showcase/general",
-      "showcase/layouts",
-      "showcase/music-notation",
-      "showcase/guitar-tabs",
-      "showcase/special-tracks",
-      "showcase/special-notes",
-      "showcase/effects",
-    ],
-  },
+  showcase: [
+    {
+      type: "category",
+      label: "Showcase",
+      link: {
+        type: "doc",
+        id: "showcase/introduction"
+      },
+      items: [
+        "showcase/introduction",
+        "showcase/general",
+        "showcase/layouts",
+        "showcase/music-notation",
+        "showcase/guitar-tabs",
+        "showcase/special-tracks",
+        "showcase/special-notes",
+        "showcase/effects",
+      ],
+    },
+    {
+      type: "category",
+      label: "Formats",
+      link: {
+        type: "generated-index",
+        title: "Introduction",
+        description:
+          "These pages provide an insight on what the input file formats alphaTab supports and the compatibility for rendering and expressing the same in alphaTex.",
+      },
+      items: [
+        "formats/guitar-pro-7-8",
+        "formats/guitar-pro-6",
+        "formats/guitar-pro-3-5",
+        "formats/musicxml",
+        "formats/capella",
+      ],
+    },
+  ],
 };
 
 module.exports = sidebars;

@@ -1,0 +1,24 @@
+---
+title: Guitar Pro 7-8 (.gp)
+description: The proprietary file format of the current Arobas Guitar Pro version 7-8.
+---
+
+> Guitar Pro is a software program available on Windows and Mac OS that allows all musicians to read, write and share their tablatures. The world leader in tablature editing, Guitar Pro has been downloaded over 15 million times worldwide since 1997.
+> https://www.guitar-pro.com/
+
+In version 7, Guitar Pro changed to use a zip based file archive format. The zip contains similar files like Guitar Pro 6 but also additional ones: 
+
+* `VERSION` - A file holding version information about the archive. 
+* `Content/score.gpif` - The main XML structure representing the music notation.
+* `Content/Preferences.json`- A JSON file holding some settings influencing Guitar Pro itself (e.g. to activate the speed trainer).
+* `BinaryStylesheet` - A binary file holding key-value pairs with various settings around the display of music notation (File > Stylesheet in Guitar Pro). 
+* `PartConfiguration` - A binary file holding information on what tracks and staves to show in single and multi-track views. 
+* `LayoutConfiguration` - A binary file holding information on what layout to use for displaying music sheets (e.g. zoom level)
+
+The `score.gpif` is the same as in Guitar Pro 6 but evovling with new features since then.
+
+**Compatibility Level:** Mature and well tested
+
+| Feature | Reading and Data Model | Rendering | Audio Generation | alphaTex |
+|---------|------------------------|-----------|------------------|----------|
+|         |                        |           |                  |          |

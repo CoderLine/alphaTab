@@ -1,0 +1,23 @@
+---
+title: Guitar Pro 6 (.gpx)
+description: The proprietary file format of the older Arobas Guitar Pro version 6.
+---
+
+> Guitar Pro is a software program available on Windows and Mac OS that allows all musicians to read, write and share their tablatures. The world leader in tablature editing, Guitar Pro has been downloaded over 15 million times worldwide since 1997.
+> https://www.guitar-pro.com/
+
+In version 6, Guitar Pro changed to a XML based file format. The GPX file itself is a custom proprierary container format similar to Zip holding multiple files:
+
+* `score.gpif` - The main XML structure representing the music notation.
+* `misc.xml`- An auxiliary XML file holding some display information.
+* `BinaryStylesheet` - A binary file holding key-value pairs with various settings around the display of music notation (File > Stylesheet in Guitar Pro). 
+* `PartConfiguration` - A binary file holding information on what tracks and staves to show in single and multi-track views. 
+* `LayoutConfiguration` - A binary file holding information on what layout to use for displaying music sheets (e.g. zoom level)
+
+Luckily when Guitar Pro 6 was released, the author of the format explained to the community how the encoding works. 
+ 
+**Compatibility Level:** Mature and well tested
+
+| Feature | Reading and Data Model | Rendering | Audio Generation | alphaTex |
+|---------|------------------------|-----------|------------------|----------|
+|         |                        |           |                  |          |
