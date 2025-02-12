@@ -1,0 +1,11 @@
+.noWrap {
+    white-space: nowrap;
+}
+
+.hasTooltip {
+    text-decoration: underline;
+    text-decoration-style: dotted;
+    text-decoration-line: underline;
+    text-decoration-thickness: 1px;
+    cursor: help;
+}
