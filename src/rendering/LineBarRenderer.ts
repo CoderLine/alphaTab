@@ -480,7 +480,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas: ICanvas
     ): void;
 
-    protected getFlagStemSize(duration: Duration): number {
+    protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
@@ -495,7 +495,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 size = 3;
                 break;
             default:
-                size = 0;
+                size = forceMinStem ? 3 : 0;
                 break;
         }
         return this.getLineHeight(size);

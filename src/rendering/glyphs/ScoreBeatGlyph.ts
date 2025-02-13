@@ -77,7 +77,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this._skipPaint = true;
                 }
             }
-        } else if(this.slash) {
+        } else if (this.slash) {
             this.slash.updateBeamingHelper(this.container.x + this.x);
         }
     }
@@ -124,8 +124,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                             new SpacingGlyph(
                                 0,
                                 0,
-                                4 *
-                                    (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                                4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                             )
                         );
                         this.addGlyph(ghost);
@@ -208,9 +207,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.centerX = this.width / 2;
         } else if (this.restGlyph) {
             this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
-        } else if(this.noteHeads) {
+        } else if (this.noteHeads) {
             this.centerX = this.noteHeads!.x + this.noteHeads!.width / 2;
-        } else if(this.slash) {
+        } else if (this.slash) {
             this.centerX = this.slash!.x + this.slash!.width / 2;
         }
     }
@@ -270,6 +269,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
 
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;
+        const aboveBeatEffects = this.noteHeads!.aboveBeatEffects;
 
         if (n.isStaccato && !belowBeatEffects.has('Staccato')) {
             belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
@@ -285,11 +285,11 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
         if (n.showStringNumber && n.isStringed) {
             let container: StringNumberContainerGlyph;
-            if (!belowBeatEffects.has('StringNumber')) {
+            if (!aboveBeatEffects.has('StringNumber')) {
                 container = new StringNumberContainerGlyph(0, 0);
-                belowBeatEffects.set('StringNumber', container);
+                aboveBeatEffects.set('StringNumber', container);
             } else {
-                container = belowBeatEffects.get('StringNumber')! as StringNumberContainerGlyph;
+                container = aboveBeatEffects.get('StringNumber')! as StringNumberContainerGlyph;
             }
             container.addString(n.string);
         }

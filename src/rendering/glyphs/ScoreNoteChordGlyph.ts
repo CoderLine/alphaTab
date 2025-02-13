@@ -116,18 +116,27 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         let belowEffectSpacing = 1;
         let aboveEffectSpacing = -belowEffectSpacing;
 
+        let belowEffectSpacingShiftBefore = false;
+        let aboveEffectSpacingShiftBefore = false;
+
         if (this.beat.deadSlapped) {
             belowBeatEffectsY = scoreRenderer.getScoreY(0);
             aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
         } else {
             if (this.direction === BeamDirection.Up) {
-                belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
-                aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
+                belowEffectSpacingShiftBefore = false;
+                aboveEffectSpacingShiftBefore = true;
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 1);
+                aboveBeatEffectsY =
+                    scoreRenderer.getScoreY(this.minNote!.line) - scoreRenderer.getStemSize(this.beamingHelper, true);
             } else {
+                belowEffectSpacingShiftBefore = true;
+                aboveEffectSpacingShiftBefore = false;
                 belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line - 1);
-                aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 1);
-                aboveEffectSpacing *= -1;
                 belowEffectSpacing *= -1;
+                aboveEffectSpacing *= -1;
+                aboveBeatEffectsY =
+                    scoreRenderer.getScoreY(this.maxNote!.line) + scoreRenderer.getStemSize(this.beamingHelper, true);
             }
         }
 
@@ -138,7 +147,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             effect.renderer = this.renderer;
             effect.doLayout();
 
-            aboveBeatEffectsY += aboveEffectSpacing * effect.height;
+            if (aboveEffectSpacingShiftBefore) {
+                aboveBeatEffectsY += aboveEffectSpacing * effect.height;
+            }
+
             effect.y = aboveBeatEffectsY;
             if (minEffectY === null || minEffectY > aboveBeatEffectsY) {
                 minEffectY = aboveBeatEffectsY;
@@ -146,13 +158,20 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             if (maxEffectY === null || maxEffectY < aboveBeatEffectsY) {
                 maxEffectY = aboveBeatEffectsY;
             }
+
+            if (!aboveEffectSpacingShiftBefore) {
+                aboveBeatEffectsY += aboveEffectSpacing * effect.height;
+            }
         }
 
         for (const effect of this.belowBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
 
-            belowBeatEffectsY += belowEffectSpacing * effect.height;
+            if (belowEffectSpacingShiftBefore) {
+                belowBeatEffectsY += belowEffectSpacing * effect.height;
+            }
+
             effect.y = belowBeatEffectsY;
 
             if (minEffectY === null || minEffectY > belowBeatEffectsY) {
@@ -160,6 +179,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             }
             if (maxEffectY === null || maxEffectY < belowBeatEffectsY) {
                 maxEffectY = belowBeatEffectsY;
+            }
+
+            if (!belowEffectSpacingShiftBefore) {
+                belowBeatEffectsY += belowEffectSpacing * effect.height;
             }
         }
 
