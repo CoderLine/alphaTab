@@ -406,10 +406,18 @@ export class Gp3To5Importer extends ScoreImporter {
             mainStaff.showTablature = (staveFlags & 0x01) !== 0;
             mainStaff.showStandardNotation = (staveFlags & 0x02) !== 0;
 
+            const showChordDiagramListOnTopOfScore = (staveFlags & 0x64) !== 0;
+
+            if(this._score.stylesheet.perTrackChordDiagramsOnTop === null){
+                this._score.stylesheet.perTrackChordDiagramsOnTop = new Map<number, boolean>();
+            }
+            this._score.stylesheet.perTrackChordDiagramsOnTop!.set(newTrack.index, showChordDiagramListOnTopOfScore);
+
             // flags for
             //  0x02 -> auto let ring
             //  0x04 -> auto brush
             this.data.readByte();
+
             // unknown
             this.data.skip(43);
         }

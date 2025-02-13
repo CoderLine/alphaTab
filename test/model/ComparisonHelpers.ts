@@ -10,66 +10,54 @@ export class ComparisonHelpers {
         path: string,
         ignoreKeys: string[] | null,
         ignorePaths: RegExp[] | null = null
-    ): boolean {
-        if(ignorePaths && ignorePaths.some(p => p.exec(path) !== null)) {
-            return true;
+    ) {
+        if (ignorePaths && ignorePaths.some(p => p.exec(path) !== null)) {
+            return;
         }
-        
+
         const expectedType = typeof expected;
         const actualType = typeof actual;
 
-        // NOTE: performance wise expect() seems quite expensive
-        // that's why we do a manual check for most asserts
-        let result = true;
-
         if (actualType != expectedType) {
             assert.fail(`Type Mismatch on hierarchy: ${path}, actual<'${actualType}'> != expected<'${expectedType}'>`);
-            result = false;
         }
 
         switch (actualType) {
             case 'boolean':
                 if ((actual as boolean) != (expected as boolean)) {
-                    assert.fail(`Boolean mismatch on hierarchy: ${path}, actualy<'${actual}'> != expected<'${expected}'>`);
-                    result = false;
+                    assert.fail(
+                        `Boolean mismatch on hierarchy: ${path}, actualy<'${actual}'> != expected<'${expected}'>`
+                    );
                 }
                 break;
             case 'number':
                 if (Math.abs((actual as number) - (expected as number)) >= 0.000001) {
-                    assert.fail(`Number mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
-                    result = false;
+                    assert.fail(
+                        `Number mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
+                    );
                 }
                 break;
             case 'object':
                 if ((actual === null) !== (expected === null)) {
                     assert.fail(`Null mismatch on hierarchy: ${path}, actualy<'${actual}'> != expected<'${expected}'>`);
-                    result = false;
                 } else if (actual) {
                     if (Array.isArray(actual) !== Array.isArray(expected)) {
                         assert.fail(`IsArray mismatch on hierarchy: ${path}`);
-                        result = false;
                     } else if (Array.isArray(actual) && Array.isArray(expected)) {
                         if (actual.length !== expected.length) {
-                            assert.fail(`Array Length mismatch on hierarchy: ${path}, actual<${actual.length}> != expected<${expected.length}>`);
-                            result = false;
+                            assert.fail(
+                                `Array Length mismatch on hierarchy: ${path}, actual<${actual.length}> != expected<${expected.length}>`
+                            );
                         } else {
                             for (let i = 0; i < actual.length; i++) {
-                                if (
-                                    !ComparisonHelpers.expectJsonEqual(
-                                        expected[i],
-                                        actual[i],
-                                        `${path}[${i}]`,
-                                        ignoreKeys
-                                    )
-                                ) {
-                                    result = false;
-                                }
+                                ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`, ignoreKeys);
                             }
                         }
                     } else if (expected instanceof Map) {
                         if (!(actual instanceof Map)) {
-                            assert.fail(`Map mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
-                            result = false;
+                            assert.fail(
+                                `Map mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
+                            );
                         } else {
                             const expectedMap = expected as Map<string, unknown>;
                             const actualMap = actual as Map<string, unknown>;
@@ -85,7 +73,8 @@ export class ComparisonHelpers {
                                 'systemslayout',
                                 'defaultsystemslayout',
                                 'displayscale',
-                                'pertrackdisplaytuning'
+                                'pertrackdisplaytuning',
+                                'pertrackchorddiagramsontop'
                             ]);
                             if (ignoreKeys) {
                                 for (const k of ignoreKeys) {
@@ -103,42 +92,33 @@ export class ComparisonHelpers {
                                 assert.fail(
                                     `Object Keys mismatch on hierarchy: ${path}, actual<'${actualKeyList}'> != expected<'${expectedKeyList}'>`
                                 );
-                                result = false;
                             } else {
                                 for (const key of actualKeys) {
-                                    if (
-                                        !ComparisonHelpers.expectJsonEqual(
-                                            expectedMap.get(key),
-                                            actualMap.get(key),
-                                            `${path}.${key}`,
-                                            ignoreKeys
-                                        )
-                                    ) {
-                                        result = false;
-                                    }
+                                    ComparisonHelpers.expectJsonEqual(
+                                        expectedMap.get(key),
+                                        actualMap.get(key),
+                                        `${path}.${key}`,
+                                        ignoreKeys
+                                    );
                                 }
                             }
                         }
-                    } else if (!ComparisonHelpers.compareObjects(expected, actual, path, ignoreKeys)) {
-                        result = false;
+                    } else {
+                        ComparisonHelpers.compareObjects(expected, actual, path, ignoreKeys);
                     }
                 }
                 break;
             case 'string':
                 if ((actual as string) !== (expected as string)) {
                     assert.fail(`String mismatch on hierarchy: ${path}, actual<'${actual}'> != expeted<'${expected}'>`);
-                    result = false;
                 }
                 break;
             case 'undefined':
                 if (actual !== expected) {
                     assert.fail(`null mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
-                    result = false;
                 }
                 break;
         }
-
-        return result;
     }
 
     /**
