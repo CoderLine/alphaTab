@@ -402,10 +402,10 @@ export class Gp3To5Importer extends ScoreImporter {
         mainStaff.capo = IOHelper.readInt32LE(this.data);
         newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
         if (this._versionNumber >= 500) {
-            // flags for
-            //  0x01 -> show tablature
-            //  0x02 -> show standard notation
-            this.data.readByte();
+            const staveFlags = this.data.readByte();
+            mainStaff.showTablature = (staveFlags & 0x01) !== 0;
+            mainStaff.showStandardNotation = (staveFlags & 0x02) !== 0;
+
             // flags for
             //  0x02 -> auto let ring
             //  0x04 -> auto brush
