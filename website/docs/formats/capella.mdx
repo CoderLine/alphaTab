@@ -184,7 +184,7 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                               render={[FeatureStatus.Supported]}
                               audio={[FeatureStatus.Supported]}
                               tex={[FeatureStatus.Supported]} />
-                              
+
         <FileFormatFeatureRow feature="Multibar Rest" 
                               model={[FeatureStatus.NotSupported]}
                               reading={[FeatureStatus.NotSupported]}
@@ -373,11 +373,11 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
 
 
         <FileFormatFeatureRow feature="Custom Shapes (lines, rectangles, circles)"
-                            model={[FeatureStatus.Supported]}
-                            reading={[FeatureStatus.NotSupported]}
-                            render={[FeatureStatus.Supported]}
-                            audio={[FeatureStatus.Supported]}
-                            tex={[FeatureStatus.Supported]} />
+                            model={[FeatureStatus.Ignored]}
+                            reading={[FeatureStatus.Ignored]}
+                            render={[FeatureStatus.Ignored]}
+                            audio={[FeatureStatus.Ignored]}
+                            tex={[FeatureStatus.Ignored]} />
 
 
         <FileFormatFeatureRow feature="Tremolo Picking"
@@ -422,18 +422,18 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
 
 
         <FileFormatFeatureRow feature="Custom note heads"
-                            model={[FeatureStatus.Supported]}
+                            model={[FeatureStatus.NotSupported]}
                             reading={[FeatureStatus.NotSupported]}
-                            render={[FeatureStatus.Supported]}
-                            audio={[FeatureStatus.Supported]}
-                            tex={[FeatureStatus.Supported]} />
+                            render={[FeatureStatus.NotSupported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.NotSupported]} />
 
         <FileFormatFeatureRow feature="Note Colors"
-                            model={[FeatureStatus.Supported]}
+                            model={[FeatureStatus.NotSupported]}
                             reading={[FeatureStatus.NotSupported]}
-                            render={[FeatureStatus.Supported]}
-                            audio={[FeatureStatus.Supported]}
-                            tex={[FeatureStatus.Supported]} />
+                            render={[FeatureStatus.NotSupported]}
+                            audio={[FeatureStatus.NotSupported]}
+                            tex={[FeatureStatus.NotSupported]} />
 
 
     </FileFormatFeatureGroup>
