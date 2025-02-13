@@ -56,7 +56,7 @@ describe('Gp8ImporterTest', () => {
     it('bracket-braces', async () => {
         const noBrackets = (await prepareImporterWithFile('visual-tests/layout/brackets-braces-none.gp')).readScore();
         expect(noBrackets.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.NoBrackets);
-        
+
         const groupStaves = (
             await prepareImporterWithFile('visual-tests/layout/brackets-braces-staves.gp')
         ).readScore();
@@ -65,7 +65,9 @@ describe('Gp8ImporterTest', () => {
         const groupSimilarInstruments = (
             await prepareImporterWithFile('visual-tests/layout/brackets-braces-similar.gp')
         ).readScore();
-        expect(groupSimilarInstruments.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.GroupSimilarInstruments);
+        expect(groupSimilarInstruments.stylesheet.bracketExtendMode).to.equal(
+            BracketExtendMode.GroupSimilarInstruments
+        );
     });
 
     it('system-separator', async () => {
@@ -90,7 +92,6 @@ describe('Gp8ImporterTest', () => {
         expect(directions.masterBars[1].directions).to.contain(Direction.JumpDaCoda);
         expect(directions.masterBars[1].directions).to.contain(Direction.JumpDaDoubleCoda);
 
-
         expect(directions.masterBars[2].directions).to.be.ok;
         expect(directions.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
         expect(directions.masterBars[2].directions).to.contain(Direction.JumpDalSegnoAlCoda);
@@ -107,5 +108,13 @@ describe('Gp8ImporterTest', () => {
         expect(directions.masterBars[4].directions).to.contain(Direction.JumpDalSegnoSegnoAlFine);
 
         expect(directions.masterBars[5].directions).to.not.be.ok;
+    });
+
+    it('hide-tuning', async () => {
+        const hide = (await prepareImporterWithFile('guitarpro8/hide-tuning.gp')).readScore();
+        expect(hide.stylesheet.globalDisplayTuning).to.be.false;
+
+        const show = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
+        expect(show.stylesheet.globalDisplayTuning).to.be.true;
     });
 });

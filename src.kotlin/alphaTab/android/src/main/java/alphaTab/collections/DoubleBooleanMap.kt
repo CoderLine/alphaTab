@@ -1,22 +1,40 @@
 package alphaTab.collections
 
-internal open class DoubleBooleanMapEntry {
-    private var _key: Double = 0.0
+public open class DoubleBooleanMapEntry {
+    private var _key: Double
     public var key: Double
         get() = _key
         internal set(value) {
             _key = value
         }
 
-    private var _value: Boolean = false
+    private var _value: Boolean
     public var value: Boolean
         get() = _value
         internal set(value) {
             _value = value
         }
+
+    public operator fun component1(): Double {
+        return _key
+    }
+
+    public operator fun component2(): Boolean {
+        return _value
+    }
+
+    public constructor() {
+        _key = 0.0
+        _value = false
+    }
+
+    public constructor(key: Double, value: Boolean) {
+        _key = key
+        _value = value
+    }    
 }
 
-internal class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntryInternal {
+public class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntryInternal {
     public override var hashCode: Int = 0
     public override var next: Int = 0
 
@@ -26,7 +44,7 @@ internal class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntr
     }
 }
 
-internal class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMapEntryInternal>() {
+public class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMapEntryInternal>() {
     public fun has(key: Double): Boolean {
         return findEntryInternal(key,
             { entry, k -> entry.key == k }) >= 0
