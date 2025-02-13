@@ -4,7 +4,7 @@ import { AccentuationType } from '@src/model/AccentuationType';
 import { AutomationType } from '@src/model/Automation';
 import { Bar, SustainPedalMarkerType } from '@src/model/Bar';
 import { BarreShape } from '@src/model/BarreShape';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
@@ -740,9 +740,11 @@ export class GpifWriter {
             switch (beat.preferredBeamDirection) {
                 case BeamDirection.Up:
                     beatNode.addElement('TransposedPitchStemOrientation').innerText = 'Upward';
+                    beatNode.addElement('UserTransposedPitchStemOrientation').innerText = 'Upward';
                     break;
                 case BeamDirection.Down:
                     beatNode.addElement('TransposedPitchStemOrientation').innerText = 'Downward';
+                    beatNode.addElement('UserTransposedPitchStemOrientation').innerText = 'Downward';
                     break;
             }
         }
@@ -787,6 +789,18 @@ export class GpifWriter {
 
         if (beat.brushDuration > 0) {
             this.writeSimpleXPropertyNode(beatProperties, '687935489', 'Int', beat.brushDuration.toString());
+        }
+
+        switch(beat.beamingMode) {
+            case BeatBeamingMode.ForceSplitToNext:
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "2");
+                break;
+            case BeatBeamingMode.ForceMergeWithNext:
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "1");
+                break;
+            case BeatBeamingMode.ForceSplitOnSecondaryToNext:
+                this.writeSimpleXPropertyNode(beatProperties, '1124204552', 'Int', "1");
+            break;
         }
     }
 

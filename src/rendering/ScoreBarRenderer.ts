@@ -185,10 +185,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return helper.direction;
     }
 
-    public getStemSize(helper: BeamingHelper): number {
+    public getStemSize(helper: BeamingHelper, forceMinStem: boolean = false): number {
         let size: number =
             helper.beats.length === 1
-                ? this.getFlagStemSize(helper.shortestDuration)
+                ? this.getFlagStemSize(helper.shortestDuration, forceMinStem)
                 : this.getBarStemSize(helper.shortestDuration);
         if (helper.isGrace) {
             size = size * NoteHeadGlyph.GraceScale;
@@ -368,9 +368,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
                     let scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
-                        barCount *
-                        (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) *
-                        scaleMod;
+                        barCount * (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
                     barSpacing += BarRendererBase.BeamSpacing;
 
                     if (direction === BeamDirection.Up && h.minRestLine !== null) {

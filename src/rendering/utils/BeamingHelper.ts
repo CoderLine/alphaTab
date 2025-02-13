@@ -288,6 +288,7 @@ export class BeamingHelper {
         } else {
             switch (this.beats[this.beats.length - 1].beamingMode) {
                 case BeatBeamingMode.Auto:
+                case BeatBeamingMode.ForceSplitOnSecondaryToNext:
                     add = BeamingHelper.canJoin(this.beats[this.beats.length - 1], beat);
                     break;
                 case BeatBeamingMode.ForceSplitToNext:

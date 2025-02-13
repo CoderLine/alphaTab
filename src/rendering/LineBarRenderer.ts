@@ -14,6 +14,7 @@ import { BarSeperatorGlyph } from './glyphs/BarSeperatorGlyph';
 import { RepeatCloseGlyph } from './glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from './glyphs/RepeatCountGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
+import { BeatBeamingMode } from '@src/model/Beat';
 
 /**
  * This is a base class for any bar renderer which renders music notation on a staff
@@ -152,7 +153,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
         if (this._startSpacing) {
             return;
         }
-        const padding = this.index === 0 ? this.settings.display.firstStaffPaddingLeft : this.settings.display.staffPaddingLeft;
+        const padding =
+            this.index === 0 ? this.settings.display.firstStaffPaddingLeft : this.settings.display.staffPaddingLeft;
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, padding));
         this._startSpacing = true;
     }
@@ -380,7 +382,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             return false;
         }
 
-        if(beat.deadSlapped) {
+        if (beat.deadSlapped) {
             return false;
         }
 
@@ -461,13 +463,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Draw flag
             //
             if (h.hasFlag(true, beat)) {
-                let glyph: FlagGlyph = new FlagGlyph(
-                    beatLineX - 1 / 2,
-                    beamY,
-                    beat.duration,
-                    direction,
-                    isGrace
-                );
+                let glyph: FlagGlyph = new FlagGlyph(beatLineX - 1 / 2, beamY, beat.duration, direction, isGrace);
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(cx + this.x, cy + this.y, canvas);
@@ -484,7 +480,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas: ICanvas
     ): void;
 
-    protected getFlagStemSize(duration: Duration): number {
+    protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
         let size: number = 0;
         switch (duration) {
             case Duration.QuadrupleWhole:
@@ -499,7 +495,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 size = 3;
                 break;
             default:
-                size = 0;
+                size = forceMinStem ? 3 : 0;
                 break;
         }
         return this.getLineHeight(size);
@@ -509,7 +505,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this._startSpacing = false;
         super.recreatePreBeatGlyphs();
     }
-
 
     protected abstract getBarLineStart(beat: Beat, direction: BeamDirection): number;
 
@@ -574,8 +569,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 fingeringY -= canvas.font.size * 1.5;
             }
             let brokenBarOffset: number = 6 * scaleMod;
-            let barSpacing: number =
-                (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
+            let barSpacing: number = (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
             let barSize: number = BarRendererBase.BeamThickness * scaleMod;
             let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             let barStart: number = cy + this.y;
@@ -593,26 +587,63 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 // Bar to Next?
                 //
                 if (i < h.beats.length - 1) {
-                    // full bar?
-                    if (BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex)) {
-                        barStartX = beatLineX;
-                        barEndX = h.getBeatLineX(h.beats[i + 1]);
-                    } else if (i === 0 || !BeamingHelper.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
+                    const isFullBarJoin = BeamingHelper.isFullBarJoin(beat, h.beats[i + 1], barIndex);
+
+                    // force two broken bars on secondary (last) beam?
+                    if (
+                        barIndex === barCount - 1 &&
+                        isFullBarJoin &&
+                        beat.beamingMode === BeatBeamingMode.ForceSplitOnSecondaryToNext
+                    ) {
+                        // start part
                         barStartX = beatLineX;
                         barEndX = barStartX + brokenBarOffset;
+                        barStartY = barY + this.calculateBeamY(h, barStartX);
+                        barEndY = barY + this.calculateBeamY(h, barEndX);
+                        LineBarRenderer.paintSingleBar(
+                            canvas,
+                            cx + this.x + barStartX,
+                            barStartY,
+                            cx + this.x + barEndX,
+                            barEndY,
+                            barSize
+                        );
+
+                        // end part
+                        barEndX = h.getBeatLineX(h.beats[i + 1]);
+                        barStartX = barEndX - brokenBarOffset;
+                        barStartY = barY + this.calculateBeamY(h, barStartX);
+                        barEndY = barY + this.calculateBeamY(h, barEndX);
+                        LineBarRenderer.paintSingleBar(
+                            canvas,
+                            cx + this.x + barStartX,
+                            barStartY,
+                            cx + this.x + barEndX,
+                            barEndY,
+                            barSize
+                        );
                     } else {
-                        continue;
+                        if (isFullBarJoin) {
+                            // full bar?
+                            barStartX = beatLineX;
+                            barEndX = h.getBeatLineX(h.beats[i + 1]);
+                        } else if (i === 0 || !BeamingHelper.isFullBarJoin(h.beats[i - 1], beat, barIndex)) {
+                            barStartX = beatLineX;
+                            barEndX = barStartX + brokenBarOffset;
+                        } else {
+                            continue;
+                        }
+                        barStartY = barY + this.calculateBeamY(h, barStartX);
+                        barEndY = barY + this.calculateBeamY(h, barEndX);
+                        LineBarRenderer.paintSingleBar(
+                            canvas,
+                            cx + this.x + barStartX,
+                            barStartY,
+                            cx + this.x + barEndX,
+                            barEndY,
+                            barSize
+                        );
                     }
-                    barStartY = barY + this.calculateBeamY(h, barStartX);
-                    barEndY = barY + this.calculateBeamY(h, barEndX);
-                    LineBarRenderer.paintSingleBar(
-                        canvas,
-                        cx + this.x + barStartX,
-                        barStartY,
-                        cx + this.x + barEndX,
-                        barEndY,
-                        barSize
-                    );
                 } else if (i > 0 && !BeamingHelper.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
                     barStartX = beatLineX - brokenBarOffset;
                     barEndX = beatLineX;
