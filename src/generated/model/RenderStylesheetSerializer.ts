@@ -48,7 +48,7 @@ export class RenderStylesheetSerializer {
             case "pertrackdisplaytuning":
                 obj.perTrackDisplayTuning = new Map<number, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackDisplayTuning!.set(parseInt(k), v as any);
+                    obj.perTrackDisplayTuning!.set(parseInt(k), v as boolean);
                 });
                 return true;
         }

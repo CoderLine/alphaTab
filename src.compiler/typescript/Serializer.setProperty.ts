@@ -213,9 +213,7 @@ function generateSetPropertyBody(
             if (isPrimitiveFromJson(mapType.typeArguments![1], typeChecker)) {
                 mapValue = ts.factory.createAsExpression(
                     ts.factory.createIdentifier('v'),
-                    ts.isTypeReferenceNode(prop.property.type!) && prop.property.type.typeArguments
-                        ? cloneTypeNode(prop.property.type.typeArguments[1])
-                        : ts.factory.createKeywordTypeNode(ts.SyntaxKind.AnyKeyword)
+                    typeChecker.typeToTypeNode(mapType.typeArguments![1] , undefined, undefined)!
                 );
             } else {
                 itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
