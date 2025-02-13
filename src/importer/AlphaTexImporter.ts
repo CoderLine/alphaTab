@@ -2206,6 +2206,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'merge':
                     beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
                     break;
+                case 'splitsecondary':
+                    beat.beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
+                    break;
             }
             this._sy = this.newSy();
             return true;

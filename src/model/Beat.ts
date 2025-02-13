@@ -43,7 +43,11 @@ export enum BeatBeamingMode {
     /**
      * Force a merge with the next beat.
      */
-    ForceMergeWithNext
+    ForceMergeWithNext,
+    /**
+     * Force a split to the next beat on the secondary beam.
+     */
+    ForceSplitOnSecondaryToNext
 }
 
 /**
