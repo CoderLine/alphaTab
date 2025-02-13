@@ -43,6 +43,7 @@ import { IWriteable } from '@src/io/IWriteable';
 import { Tuning } from '@src/model/Tuning';
 import { FadeType } from '@src/model/FadeType';
 import { Rasgueado } from '@src/model/Rasgueado';
+import { Direction } from '@src/model/Direction';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -57,6 +58,8 @@ export class Gp3To5Importer extends ScoreImporter {
 
     private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
 
+    private _directionLookup: Map<number, Direction[]> = new Map<number, Direction[]>();
+
     public get name(): string {
         return 'Guitar Pro 3-5';
     }
@@ -66,6 +69,8 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readScore(): Score {
+        this._directionLookup.clear();
+
         this.readVersion();
         this._score = new Score();
         // basic song info
@@ -106,26 +111,30 @@ export class Gp3To5Importer extends ScoreImporter {
         this.readPlaybackInfos();
         // repetition stuff
         if (this._versionNumber >= 500) {
-            // "Coda" bar index (2)
-            // "Double Coda" bar index (2)
-            // "Segno" bar index (2)
-            // "Segno Segno" bar index (2)
-            // "Fine" bar index (2)
-            // "Da Capo" bar index (2)
-            // "Da Capo al Coda" bar index (2)
-            // "Da Capo al Double Coda" bar index (2)
-            // "Da Capo al Fine" bar index (2)
-            // "Da Segno" bar index (2)
-            // "Da Segno al Coda" bar index (2)
-            // "Da Segno al Double Coda" bar index (2)
-            // "Da Segno al Fine "bar index (2)
-            // "Da Segno Segno" bar index (2)
-            // "Da Segno Segno al Coda" bar index (2)
-            // "Da Segno Segno al Double Coda" bar index (2)
-            // "Da Segno Segno al Fine" bar index (2)
-            // "Da Coda" bar index (2)
-            // "Da Double Coda" bar index (2)
-            this.data.skip(38);
+            this.readDirection(Direction.TargetCoda);
+            this.readDirection(Direction.TargetDoubleCoda);
+            this.readDirection(Direction.TargetSegno);
+            this.readDirection(Direction.TargetSegnoSegno);
+            this.readDirection(Direction.TargetFine);
+
+            this.readDirection(Direction.JumpDaCapo);
+            this.readDirection(Direction.JumpDaCapoAlCoda);
+            this.readDirection(Direction.JumpDaCapoAlDoubleCoda);
+            this.readDirection(Direction.JumpDaCapoAlFine);
+
+            this.readDirection(Direction.JumpDalSegno);
+            this.readDirection(Direction.JumpDalSegnoAlCoda);
+            this.readDirection(Direction.JumpDalSegnoAlDoubleCoda);
+            this.readDirection(Direction.JumpDalSegnoAlFine);
+
+            this.readDirection(Direction.JumpDalSegnoSegno);
+            this.readDirection(Direction.JumpDalSegnoSegnoAlCoda);
+            this.readDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+            this.readDirection(Direction.JumpDalSegnoSegnoAlFine);
+
+            this.readDirection(Direction.JumpDaCoda);
+            this.readDirection(Direction.JumpDaDoubleCoda);
+
             // unknown (4)
             this.data.skip(4);
         }
@@ -149,6 +158,26 @@ export class Gp3To5Importer extends ScoreImporter {
             this._score.tracks[this._lyricsTrack].applyLyrics(this._lyrics);
         }
         return this._score;
+    }
+
+    private readDirection(direction: Direction) {
+        let directionIndex = IOHelper.readInt16LE(this.data);
+        // direction not set
+        if (directionIndex === -1) {
+            return;
+        }
+
+        // indexes are 1-based in file
+        directionIndex--;
+
+        let directionsList: Direction[];
+        if (this._directionLookup.has(directionIndex)) {
+            directionsList = this._directionLookup.get(directionIndex)!;
+        } else {
+            directionsList = [];
+            this._directionLookup.set(directionIndex, directionsList);
+        }
+        directionsList.push(direction);
     }
 
     public readVersion(): void {
@@ -333,6 +362,13 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         newMasterBar.isDoubleBar = (flags & 0x80) !== 0;
 
+        const barIndexForDirection = this._score.masterBars.length;
+        if (this._directionLookup.has(barIndexForDirection)) {
+            for (const direction of this._directionLookup.get(barIndexForDirection)!) {
+                newMasterBar.addDirection(direction);
+            }
+        }
+
         this._score.addMasterBar(newMasterBar);
     }
 
@@ -367,7 +403,7 @@ export class Gp3To5Importer extends ScoreImporter {
             newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
         }
 
-        if(this._score.stylesheet.perTrackDisplayTuning === null){
+        if (this._score.stylesheet.perTrackDisplayTuning === null) {
             this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
         }
         this._score.stylesheet.perTrackDisplayTuning!.set(newTrack.index, (flags & 0x80) !== 0);
@@ -408,7 +444,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
             const showChordDiagramListOnTopOfScore = (staveFlags & 0x64) !== 0;
 
-            if(this._score.stylesheet.perTrackChordDiagramsOnTop === null){
+            if (this._score.stylesheet.perTrackChordDiagramsOnTop === null) {
                 this._score.stylesheet.perTrackChordDiagramsOnTop = new Map<number, boolean>();
             }
             this._score.stylesheet.perTrackChordDiagramsOnTop!.set(newTrack.index, showChordDiagramListOnTopOfScore);
