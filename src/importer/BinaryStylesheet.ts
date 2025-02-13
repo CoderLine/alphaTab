@@ -126,6 +126,9 @@ export class BinaryStylesheet {
                 case 'Global/DisplayTuning':
                     score.stylesheet.globalDisplayTuning = value as boolean;
                     break;
+                case 'Global/DrawChords':
+                    score.stylesheet.globalDisplayChordDiagramsOnTop = value as boolean;
+                    break;
             }
         }
     }
@@ -142,6 +145,7 @@ export class BinaryStylesheet {
         BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode as number);
         BinaryStylesheet.writeBooleanEntry(writer, 'Global/useSystemSignSeparator', score.stylesheet.useSystemSignSeparator);
         BinaryStylesheet.writeBooleanEntry(writer, 'Global/DisplayTuning', score.stylesheet.globalDisplayTuning);
+        BinaryStylesheet.writeBooleanEntry(writer, 'Global/DrawChords', score.stylesheet.globalDisplayChordDiagramsOnTop);
 
         return writer.toArray();
     }

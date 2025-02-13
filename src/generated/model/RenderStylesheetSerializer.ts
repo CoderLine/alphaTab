@@ -29,6 +29,14 @@ export class RenderStylesheetSerializer {
                 m.set(k.toString(), v);
             }
         }
+        o.set("globaldisplaychorddiagramsontop", obj.globalDisplayChordDiagramsOnTop);
+        if (obj.perTrackChordDiagramsOnTop !== null) {
+            const m = new Map<string, unknown>();
+            o.set("pertrackchorddiagramsontop", m);
+            for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
+                m.set(k.toString(), v);
+            }
+        }
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -49,6 +57,15 @@ export class RenderStylesheetSerializer {
                 obj.perTrackDisplayTuning = new Map<number, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
                     obj.perTrackDisplayTuning!.set(parseInt(k), v as boolean);
+                });
+                return true;
+            case "globaldisplaychorddiagramsontop":
+                obj.globalDisplayChordDiagramsOnTop = v! as boolean;
+                return true;
+            case "pertrackchorddiagramsontop":
+                obj.perTrackChordDiagramsOnTop = new Map<number, boolean>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.perTrackChordDiagramsOnTop!.set(parseInt(k), v as boolean);
                 });
                 return true;
         }

@@ -245,6 +245,16 @@ export abstract class ScoreLayout {
             let chordIds: Set<string> = new Set<string>();
 
             for (let track of this.renderer.tracks!) {
+                const shouldShowDiagramsForTrack =
+                    score.stylesheet.globalDisplayChordDiagramsOnTop &&
+                    (score.stylesheet.perTrackChordDiagramsOnTop == null ||
+                        !score.stylesheet.perTrackChordDiagramsOnTop.has(track.index) ||
+                        score.stylesheet.perTrackChordDiagramsOnTop.get(track.index)!);
+
+                if (!shouldShowDiagramsForTrack) {
+                    continue;
+                }
+
                 for (let staff of track.staves) {
                     const sc = staff.chords;
                     if (sc) {

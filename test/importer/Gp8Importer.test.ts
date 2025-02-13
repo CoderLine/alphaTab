@@ -117,4 +117,12 @@ describe('Gp8ImporterTest', () => {
         const show = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
         expect(show.stylesheet.globalDisplayTuning).to.be.true;
     });
+
+    it('hide-chord-diagram-list', async () => {
+        const hide = (await prepareImporterWithFile('guitarpro8/hide-diagrams.gp')).readScore();
+        expect(hide.stylesheet.globalDisplayChordDiagramsOnTop).to.be.false;
+
+        const show = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
+        expect(show.stylesheet.globalDisplayChordDiagramsOnTop).to.be.true;
+    });
 });

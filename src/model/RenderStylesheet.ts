@@ -51,4 +51,14 @@ export class RenderStylesheet {
      * Whether to show the tuning.(per-track)
      */
     public perTrackDisplayTuning: Map<number, boolean> | null = null;
+
+    /**
+     * Whether to show the chord diagrams on top.
+     */
+    public globalDisplayChordDiagramsOnTop: boolean = true;
+
+    /**
+     * Whether to show the chord diagrams on top. (per-track)
+     */
+    public perTrackChordDiagramsOnTop: Map<number, boolean> | null = null;    
 }

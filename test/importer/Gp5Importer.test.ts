@@ -272,4 +272,15 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[2].staves[0].showTablature).to.be.true;
         expect(score.tracks[2].staves[0].showStandardNotation).to.be.false;
     });
+
+    it('hide-diagram', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hide-diagrams.gp5')).readScore();
+
+        expect(score.stylesheet.perTrackChordDiagramsOnTop).to.be.ok;
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(0)).to.be.true;
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(0)).to.equal(false);
+
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(1)).to.be.true;
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(1)).to.equal(true);
+    });
 });

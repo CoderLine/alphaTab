@@ -42,9 +42,8 @@ describe('Gp7ExporterTest', () => {
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
-        if (!ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys)) {
-            await TestPlatform.saveFile(fileName, exported);
-        }
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys);
+        await TestPlatform.saveFile(fileName, exported);
     }
 
     async function testRoundTripFolderEqual(name: string): Promise<void> {
