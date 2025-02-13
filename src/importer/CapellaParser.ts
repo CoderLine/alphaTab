@@ -80,6 +80,8 @@ class TrillDrawObject extends DrawObject { }
 class StaffLayout {
     public defaultClef: Clef = Clef.G2;
     public description: string = '';
+    public name:string = '';
+    public abbrev:string = '';
 
     public percussion: boolean = false;
     public instrument: number = 0;
@@ -108,13 +110,11 @@ export class CapellaParser {
     public score!: Score;
     private _trackChannel: number = 0;
     private _beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
-    private _galleryObjects!: Map<string, DrawObject>;
 
     private _voiceCounts!: Map<number /*track*/, number /*count*/>;
     private _isFirstSystem: boolean = true;
 
     public parseXml(xml: string, settings: Settings): void {
-        this._galleryObjects = new Map<string, DrawObject>();
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
         this._voiceCounts = new Map<number, number>();
@@ -274,7 +274,8 @@ export class CapellaParser {
             } else {
                 currentTrack = new Track();
                 currentTrack.ensureStaveCount(1);
-                currentTrack.name = staffLayout.description;
+                currentTrack.name = staffLayout.name;
+                currentTrack.shortName = staffLayout.abbrev;
                 currentTrack.playbackInfo.volume = Math.floor((staffLayout.volume / 128) * 16);
                 currentTrack.playbackInfo.program = staffLayout.instrument;
                 if (staffLayout.percussion) {
@@ -361,6 +362,10 @@ export class CapellaParser {
                             layout.transpose = parseInt(c.attributes.get('transpose')!);
                         }
                         break;
+
+                    case 'instrument':
+                        this.parseInstrument(layout, c);
+                        break;
                 }
             }
         }
@@ -368,6 +373,36 @@ export class CapellaParser {
         this._staffLayoutLookup.set(layout.description, layout);
         layout.index = this._staffLayouts.length;
         this._staffLayouts.push(layout);
+    }
+    
+    private parseInstrument(layout: StaffLayout, element: XmlNode) {
+        for (let c of element.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                const text = c.innerText;
+                switch (c.localName) {
+                    case 'name':
+                        if(layout.name.length === 0){
+                            layout.name = text;
+                        }
+                        break;
+                    case 'abbrev':
+                        if(layout.abbrev.length === 0){
+                            layout.abbrev = text;
+                        }
+                        break;
+                    case 'pairName':
+                        if(layout.name.length === 0){
+                            layout.name = text;
+                        }
+                        break;
+                    case 'pairAbbrev':
+                        if(layout.abbrev.length === 0){
+                            layout.abbrev = text;
+                        }
+                        break;
+                }
+            }
+        }
     }
 
     private parseClef(v: string): Clef {
@@ -686,6 +721,7 @@ export class CapellaParser {
                                     this._currentBar.masterBar.isRepeatStart = true;
                                     break;
                                 case 'dashed':
+                                    this._currentBar.masterBar.isFreeTime = true;
                                     if (!this._currentVoiceState.currentBarComplete) {
                                         this._currentBar.masterBar.isAnacrusis = true;
                                     }
@@ -1111,21 +1147,6 @@ export class CapellaParser {
                             }
                         }
 
-                        break;
-                }
-            }
-        }
-    }
-
-    private parseGallery(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'drawObj':
-                        const obj = this.parseDrawObj(c);
-                        if (obj) {
-                            this._galleryObjects.set(c.getAttribute('name'), obj);
-                        }
                         break;
                 }
             }
