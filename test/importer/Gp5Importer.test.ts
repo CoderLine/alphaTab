@@ -1,6 +1,4 @@
 import { Settings } from '@src/Settings';
-import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
-import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Ottavia } from '@src/model';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';

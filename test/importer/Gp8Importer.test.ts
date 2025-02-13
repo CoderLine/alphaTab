@@ -1,5 +1,4 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
-import { GpxImporter } from '@src/importer/GpxImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
