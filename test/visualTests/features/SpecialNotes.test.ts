@@ -31,4 +31,8 @@ describe('SpecialNotesTests', () => {
     it('ghost-notes', async () => {
         await VisualTestHelper.runVisualTest('special-notes/ghost-notes.gp');
     });
+
+    it('beaming-mode', async () => {
+        await VisualTestHelper.runVisualTest('special-notes/beaming-mode.gp');
+    });
 });

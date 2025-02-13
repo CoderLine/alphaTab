@@ -1,7 +1,10 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
+import { GpxImporter } from '@src/importer/GpxImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Settings } from '@src/Settings';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
@@ -124,5 +127,70 @@ describe('Gp8ImporterTest', () => {
 
         const show = (await prepareImporterWithFile('guitarpro8/directions.gp')).readScore();
         expect(show.stylesheet.globalDisplayChordDiagramsOnTop).to.be.true;
+    });
+
+    it('beaming-mode', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/beaming-mode.gp')).readScore();
+
+        // auto
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        // force
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).to.not.be.ok;
+
+        // break
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].preferredBeamDirection).to.not.be.ok;
+
+        // break secondary
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitOnSecondaryToNext);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+        
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+
+        // invert
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
     });
 });

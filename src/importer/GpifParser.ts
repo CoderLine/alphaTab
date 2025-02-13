@@ -2,7 +2,7 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Chord } from '@src/model/Chord';
@@ -1731,6 +1731,16 @@ export class GpifParser {
                                 break;
                         }
                         break;
+                    case 'UserTransposedPitchStemOrientation':
+                        switch (c.innerText) {
+                            case 'Downward':
+                                beat.preferredBeamDirection = BeamDirection.Down;
+                                break;
+                            case 'Upward':
+                                beat.preferredBeamDirection = BeamDirection.Up;
+                                break;
+                        }
+                        break;
                 }
             }
         }
@@ -1761,6 +1771,27 @@ export class GpifParser {
                         let id: string = c.getAttribute('id');
                         let value: number = 0;
                         switch (id) {
+                            case '1124204546':
+                                value = parseInt(c.findChildElement('Int')!.innerText);
+                                switch (value) {
+                                    case 1:
+                                        beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
+                                        break;
+                                    case 2:
+                                        beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
+                                        break;
+                                }
+                                break;
+                            case '1124204552':
+                                value = parseInt(c.findChildElement('Int')!.innerText);
+                                switch (value) {
+                                    case 1:
+                                        if (beat.beamingMode !== BeatBeamingMode.ForceSplitToNext) {
+                                            beat.beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
+                                        }
+                                        break;
+                                }
+                                break;
                             case '1124204545':
                                 value = parseInt(c.findChildElement('Int')!.innerText);
                                 beat.invertBeamDirection = value === 1;
