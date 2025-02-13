@@ -1001,6 +1001,15 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('tuning', AlphaTexSymbols.Tuning, true);
                         break;
                 }
+
+                if(this._sy === AlphaTexSymbols.String && (this._syData as string).toLowerCase() === "hide") {
+                    if(!this._score.stylesheet.perTrackDisplayTuning) {
+                        this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
+                    }
+                    this._score.stylesheet.perTrackDisplayTuning.set(this._currentTrack.index, false);
+                    this._sy = this.newSy();
+                }
+
                 if (strings !== this._currentStaff.tuning.length && (this._currentStaff.chords?.size ?? 0) > 0) {
                     this.errorMessage('Tuning must be defined before any chord');
                 }

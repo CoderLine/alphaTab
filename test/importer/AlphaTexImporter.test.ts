@@ -1778,4 +1778,18 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isSlurOrigin).to.be.true;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isSlurDestination).to.be.true;
     });
+
+    it('hide-tuning', () =>{
+        const score = parseTex(`
+            \\track "Track 1"
+            \\track "Track 2"
+            \\staff {tabs}
+            \\tuning A1 D2 A2 D3 G3 B3 E4 hide
+            4.1 3.1 2.1 1.1`);
+
+        expect(score.tracks[1].staves[0].stringTuning.tunings[0]).to.equal(33);
+        expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
+        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
+        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.be.false;
+    })
 });
