@@ -1,6 +1,6 @@
 package alphaTab.collections
 
-internal open class DoubleBooleanMapEntry {
+public open class DoubleBooleanMapEntry {
     private var _key: Double = 0.0
     public var key: Double
         get() = _key
@@ -16,7 +16,7 @@ internal open class DoubleBooleanMapEntry {
         }
 }
 
-internal class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntryInternal {
+public class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntryInternal {
     public override var hashCode: Int = 0
     public override var next: Int = 0
 
@@ -26,7 +26,7 @@ internal class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntr
     }
 }
 
-internal class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMapEntryInternal>() {
+public class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMapEntryInternal>() {
     public fun has(key: Double): Boolean {
         return findEntryInternal(key,
             { entry, k -> entry.key == k }) >= 0
