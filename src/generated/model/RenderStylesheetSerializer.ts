@@ -21,6 +21,14 @@ export class RenderStylesheetSerializer {
         o.set("hidedynamics", obj.hideDynamics);
         o.set("bracketextendmode", obj.bracketExtendMode as number);
         o.set("usesystemsignseparator", obj.useSystemSignSeparator);
+        o.set("globaldisplaytuning", obj.globalDisplayTuning);
+        if (obj.perTrackDisplayTuning !== null) {
+            const m = new Map<string, unknown>();
+            o.set("pertrackdisplaytuning", m);
+            for (const [k, v] of obj.perTrackDisplayTuning!) {
+                m.set(k.toString(), v);
+            }
+        }
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -33,6 +41,15 @@ export class RenderStylesheetSerializer {
                 return true;
             case "usesystemsignseparator":
                 obj.useSystemSignSeparator = v! as boolean;
+                return true;
+            case "globaldisplaytuning":
+                obj.globalDisplayTuning = v! as boolean;
+                return true;
+            case "pertrackdisplaytuning":
+                obj.perTrackDisplayTuning = new Map<number, boolean>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.perTrackDisplayTuning!.set(parseInt(k), v as any);
+                });
                 return true;
         }
         return false;
