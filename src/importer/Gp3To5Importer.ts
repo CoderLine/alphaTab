@@ -620,13 +620,13 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 500) {
             // not 100% sure about the bits here but they look good in all test files.
 
-            const flags = IOHelper.readInt16LE(this.data);
+            const flags2 = IOHelper.readInt16LE(this.data);
 
             // beam flags indicate how to handle beams connected to the previous beat,
             // so we have to set the beaming mode on the previous beat!
 
             // 1 - Break Beams
-            if ((flags & 0x01) !== 0) {
+            if ((flags2 & 0x01) !== 0) {
                 if (newBeat.index > 0) {
                     voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitToNext;
                 }
@@ -634,41 +634,41 @@ export class Gp3To5Importer extends ScoreImporter {
 
             // 2 - Force beams down
             // this bit also set if we 'invert' a down-stem, but bit 8 will force the direction to up as both bits are set
-            if ((flags & 0x02) !== 0) {
+            if ((flags2 & 0x02) !== 0) {
                 newBeat.preferredBeamDirection = BeamDirection.Down;
             }
 
             // 4 - Force Beams
-            if ((flags & 0x04) !== 0) {
+            if ((flags2 & 0x04) !== 0) {
                 if (newBeat.index > 0) {
                     voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceMergeWithNext;
                 }
             }
 
             // 8 - Force beams up
-            if ((flags & 0x08) !== 0) {
+            if ((flags2 & 0x08) !== 0) {
                 newBeat.preferredBeamDirection = BeamDirection.Up;
             }
 
             // 16 - Ottava 8va
-            if ((flags & 0x10) !== 0) {
+            if ((flags2 & 0x10) !== 0) {
                 newBeat.ottava = Ottavia._8va;
             }
 
             // 32 - Ottava 8vb
-            if ((flags & 0x20) !== 0) {
+            if ((flags2 & 0x20) !== 0) {
                 newBeat.ottava = Ottavia._8vb;
             }
 
             // 64 - Ottava 15ma
-            if ((flags & 0x40) !== 0) {
+            if ((flags2 & 0x40) !== 0) {
                 newBeat.ottava = Ottavia._15ma;
             }
 
             // 128 - Unknown, upper bit of first byte, maybe a placeholder.
 
             // 256 - Ottava 15mb
-            if ((flags & 0x100) !== 0) {
+            if ((flags2 & 0x100) !== 0) {
                 newBeat.ottava = Ottavia._15mb;
             }
 
@@ -676,7 +676,7 @@ export class Gp3To5Importer extends ScoreImporter {
             // 1024 - Unknown
 
             // 2048 - Break Secondary Beams info set? -> read another byte for flag
-            if ((flags & 0x800) !== 0) {
+            if ((flags2 & 0x800) !== 0) {
                 const breakSecondaryBeams = this.data.readByte() != 0;
                 if (newBeat.index > 0 && breakSecondaryBeams) {
                     voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
