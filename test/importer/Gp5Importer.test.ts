@@ -243,4 +243,23 @@ describe('Gp5ImporterTest', () => {
         );
     });
 
+    it('staves', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/staves.gp5')).readScore();
+
+        expect(score.tracks[0].staves[0].showNumbered).to.be.false;
+        expect(score.tracks[0].staves[0].showSlash).to.be.false;
+        expect(score.tracks[0].staves[0].showTablature).to.be.true;
+        expect(score.tracks[0].staves[0].showStandardNotation).to.be.true;
+
+        expect(score.tracks[1].staves[0].showNumbered).to.be.false;
+        expect(score.tracks[1].staves[0].showSlash).to.be.false;
+        expect(score.tracks[1].staves[0].showTablature).to.be.false;
+        expect(score.tracks[1].staves[0].showStandardNotation).to.be.true;
+        
+        expect(score.tracks[2].staves[0].showNumbered).to.be.false;
+        expect(score.tracks[2].staves[0].showSlash).to.be.false;
+        expect(score.tracks[2].staves[0].showTablature).to.be.true;
+        expect(score.tracks[2].staves[0].showStandardNotation).to.be.false;
+    });
+
 });
