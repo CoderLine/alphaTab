@@ -94,12 +94,14 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
             });
         }
 
+        console.log('Done transpiling');
+
         if (errorCount > 0) {
             ts.sys.exit(ts.ExitStatus.DiagnosticsPresent_OutputsGenerated);
         } else {
             ts.sys.exit(ts.ExitStatus.Success);
         }
+    } else{
+        console.log('Done transpiling');
     }
-
-    console.log('Done');
 }
