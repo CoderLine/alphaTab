@@ -13,9 +13,9 @@ export enum BracketExtendMode {
     GroupStaves = 1,
 
     /**
-     * Groups similar instruments in multi-track rendering into brackets. 
-     * The braces of tracks with grand-staffs break any brackets. 
-     * Similar instruments means actually the same "midi program". No custom grouping is currently done. 
+     * Groups similar instruments in multi-track rendering into brackets.
+     * The braces of tracks with grand-staffs break any brackets.
+     * Similar instruments means actually the same "midi program". No custom grouping is currently done.
      */
     GroupSimilarInstruments = 2
 }
@@ -41,4 +41,14 @@ export class RenderStylesheet {
      * Whether to draw the // sign to separate systems.
      */
     public useSystemSignSeparator: boolean = false;
+
+    /**
+     * Whether to show the tuning.
+     */
+    public globalDisplayTuning: boolean = true;
+
+    /**
+     * Whether to show the tuning.(per-track)
+     */
+    public perTrackDisplayTuning: Map<number, boolean> | null = null;
 }

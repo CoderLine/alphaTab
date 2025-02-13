@@ -356,7 +356,7 @@ export class Gp3To5Importer extends ScoreImporter {
         // 16  - Unknown
         // 32  - Unknown
         // 64  - Unknown
-        // 128 - Unknown
+        // 128 - Show Tuning
 
         let flags: number = this.data.readByte();
         newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
@@ -366,6 +366,11 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 500) {
             newTrack.isVisibleOnMultiTrack = (flags & 0x08) !== 0;
         }
+
+        if(this._score.stylesheet.perTrackDisplayTuning === null){
+            this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
+        }
+        this._score.stylesheet.perTrackDisplayTuning.set(newTrack.index, (flags & 0x80) !== 0);
 
         //
         let stringCount: number = IOHelper.readInt32LE(this.data);

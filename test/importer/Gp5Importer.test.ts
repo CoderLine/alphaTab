@@ -243,4 +243,14 @@ describe('Gp5ImporterTest', () => {
         );
     });
 
+    it('hide-tuning', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hide-tuning.gp5')).readScore();
+
+        expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
+        expect(score.stylesheet.perTrackDisplayTuning!.has(0)).to.be.true;
+        expect(score.stylesheet.perTrackDisplayTuning!.get(0)).to.equal(false);
+
+        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
+        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.equal(true);
+    });
 });

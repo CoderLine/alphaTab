@@ -123,6 +123,9 @@ export class BinaryStylesheet {
                 case 'Global/useSystemSignSeparator':
                     score.stylesheet.useSystemSignSeparator = value as boolean;
                     break;
+                case 'Global/DisplayTuning':
+                    score.stylesheet.globalDisplayTuning = value as boolean;
+                    break;
             }
         }
     }

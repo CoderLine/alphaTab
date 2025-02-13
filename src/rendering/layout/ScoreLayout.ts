@@ -212,14 +212,25 @@ export abstract class ScoreLayout {
             let tunings: Staff[] = [];
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
-                    if (!staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature) {
+                    let showTuning =
+                        !staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature;
+
+                    if (
+                        score.stylesheet.perTrackDisplayTuning &&
+                        score.stylesheet.perTrackDisplayTuning.has(track.index) &&
+                        score.stylesheet.perTrackDisplayTuning.get(track.index) === false
+                    ) {
+                        showTuning = false;
+                    }
+
+                    if (showTuning) {
                         tunings.push(staff);
                         break;
                     }
                 }
             }
             // tuning info
-            if (tunings.length > 0) {
+            if (tunings.length > 0 && score.stylesheet.globalDisplayTuning) {
                 this.tuningGlyph = new TuningContainerGlyph(0, 0);
                 this.tuningGlyph.renderer = fakeBarRenderer;
                 for (const t of tunings) {
