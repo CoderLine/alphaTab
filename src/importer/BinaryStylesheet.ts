@@ -139,7 +139,7 @@ export class BinaryStylesheet {
 
     public static writeForScore(score: Score): Uint8Array {
         const writer = ByteBuffer.withCapacity(128);
-        IOHelper.writeInt32BE(writer, 3); // entry count
+        IOHelper.writeInt32BE(writer, 5); // entry count
 
         BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
         BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode as number);
