@@ -2,14 +2,47 @@
 title: Lyrics
 ---
 
-TODO: Document Lyrics
+The lyrics system of alphaTab is borrowed from Guitar Pro. For every track multiple "lines" of lyrics can be defined which can either start at the beginning or at a later bar. 
+The syllables of the procided lyrics are spread automatically across the beats of the track. Syllables are separated with spaces. 
+If multiple words/syllables should stay on the same beat the space can be replaced with a `+`. 
+Comments which should not be displayed can be put `[into brackets]`.
 
-Staff Meta level meta:
+To add lyrics to a track use the `\lyrics "Text"` or `\lyrics StartBar "Text"` metadata tag on track/staff level.
 
-`\lyrics "Text"`
+Here some samples:
 
-`\lyrics StartBar "Text"`
+import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
 
-Spaces split word syllables,
-Plus for merge syllables
-`[..]` comments
+<AlphaTexSample>{`
+\\title "With Lyrics"
+\\instrument piano
+.
+\\lyrics "Do Re Mi Fa So La Ti"
+C4 D4 E4 F4 | G4 A4 B4 r 
+`}</AlphaTexSample>
+
+<AlphaTexSample>{`
+\\title "Combine Syllables (and empty beats)"
+\\instrument piano
+.
+\\lyrics "Do+Do  Mi+Mi"
+C4 C4 E4 E4
+`}</AlphaTexSample>
+
+<AlphaTexSample>{`
+\\title "Start Later"
+\\instrument piano
+.
+\\lyrics 2 "Do Re Mi Fa So La Ti"
+r r r r | r r r r |
+C4 D4 E4 F4 | G4 A4 B4 r 
+`}</AlphaTexSample>
+
+<AlphaTexSample>{`
+\\title "Comment"
+\\subtitle "Useful when loading lyrics from a different source"
+\\instrument piano
+.
+\\lyrics "[This is a comment]Do Re Mi Fa"
+C4 D4 E4 F4
+`}</AlphaTexSample>

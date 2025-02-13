@@ -144,6 +144,7 @@ const sidebars: SidebarsConfig = {
       "alphatex/beat-effects",
       "alphatex/note-effects",
       "alphatex/percussion",
+      "alphatex/lyrics",
     ],
   },
   showcase: [
