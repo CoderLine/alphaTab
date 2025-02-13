@@ -84,15 +84,25 @@ function computeFeatureStatistics(node: React.ReactNode): {
   );
 
   let totalFeatures = featureRows.length;
-  let supportedFeatures = featureRows.filter((f) => {
-    const status = toFeatureStatusDefinitionFull(f.props.reading)?.status;
-    return (
-      status === undefined ||
-      status == FeatureStatus.Ignored ||
-      status == FeatureStatus.Supported ||
-      status == FeatureStatus.Unspecified
-    );
-  }).length;
+  let supportedFeatures = featureRows
+    .map((f) => {
+      const status = toFeatureStatusDefinitionFull(f.props.reading)?.status;
+      if (status == undefined) {
+        return 1;
+      }
+      switch (status) {
+        case FeatureStatus.Supported:
+        case FeatureStatus.Ignored:
+        case FeatureStatus.Unspecified:
+          return 1;
+        case FeatureStatus.Partial:
+          return 0.5;
+        case FeatureStatus.NotSupported:
+        default:
+          return 0;
+      }
+    })
+    .reduce((p, v) => p + v, 0);
 
   const relevantFeatures = featureRows.filter(
     (r) =>
@@ -136,7 +146,12 @@ export class FileFormatFeatureGroup extends React.Component<{
       <>
         <tr>
           <td>
-            <strong className={classNames.join(' ')} data-tooltip-html={tooltip}>{this.props.title}</strong>
+            <strong
+              className={classNames.join(" ")}
+              data-tooltip-html={tooltip}
+            >
+              {this.props.title}
+            </strong>
           </td>
           <td></td>
           <td></td>
