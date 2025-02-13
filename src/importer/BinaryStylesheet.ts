@@ -141,6 +141,7 @@ export class BinaryStylesheet {
         BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
         BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode as number);
         BinaryStylesheet.writeBooleanEntry(writer, 'Global/useSystemSignSeparator', score.stylesheet.useSystemSignSeparator);
+        BinaryStylesheet.writeBooleanEntry(writer, 'Global/DisplayTuning', score.stylesheet.globalDisplayTuning);
 
         return writer.toArray();
     }
