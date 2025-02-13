@@ -23,7 +23,7 @@ class FeatureStatusDisplay extends React.Component<{ status: FeatureStatus }> {
       case FeatureStatus.NotSupported:
         return <>❌ Not Supported</>;
       case FeatureStatus.Ignored:
-        return <>✅ Ignored</>;
+        return <span className={styles.ignored}>✅ Ignored</span>;
       case FeatureStatus.Unspecified:
         return <></>;
     }
@@ -144,6 +144,7 @@ function toFeatureStatusDefinitionFull(
 
 export class FileFormatFeatureRow extends React.Component<{
   feature: string;
+  isNewFeature:boolean;
 
   model?: FeatureStatusDefinition;
   reading?: FeatureStatusDefinition;
@@ -154,7 +155,7 @@ export class FileFormatFeatureRow extends React.Component<{
   public render() {
     return (
       <tr>
-        <td>{this.props.feature}</td>
+        <td>{(this.props.isNewFeature ? "⭐ " : "") + this.props.feature}</td>
         <td>
           <FileFormatFeatureCell
             status={toFeatureStatusDefinitionFull(this.props.model)}
@@ -200,7 +201,7 @@ export class FileFormatFeatureTable extends React.Component<{
             <strong>Columns</strong>
           </p>
           <ul>
-            <li>Feature: The related feature</li>
+            <li>Feature: The related feature. If marked with ⭐ its a new or changed feature compared to the previous version of this format (e.g. a feature added in Guitar Pro 6)</li>
             <li>
               Data Model: Whether alphaTab supports storing this information in
               its own data model (e.g. from other formats).

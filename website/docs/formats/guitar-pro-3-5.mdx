@@ -32,6 +32,37 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                               render={[FeatureStatus.Supported]}
                               audio={[FeatureStatus.Ignored]}
                               tex={[FeatureStatus.Supported]} />
+         <FileFormatFeatureRow feature="Page Setup > Page Format" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+         <FileFormatFeatureRow feature="Page Setup > Orientation" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+         <FileFormatFeatureRow feature="Page Setup > Score Size" 
+                              model={[FeatureStatus.Supported, "", "See settings.display.scale"]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Supported]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+         <FileFormatFeatureRow feature="Page Setup > Margins" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+         <FileFormatFeatureRow feature="Page Setup > Header & Footer" 
+                              model={[FeatureStatus.Ignored]}
+                              reading={[FeatureStatus.Ignored]}
+                              render={[FeatureStatus.Ignored]}
+                              audio={[FeatureStatus.Ignored]}
+                              tex={[FeatureStatus.Ignored]} />
+
     </FileFormatFeatureGroup>
 
     <FileFormatFeatureGroup title="Track Level">
@@ -56,14 +87,14 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                     audio={[FeatureStatus.Supported]}
                                     tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Show/Hide Standard Notation" 
-                                    model={[FeatureStatus.NotSupported]}
-                                    reading={[FeatureStatus.Supported]}
+                                    model={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.NotSupported]}
                                     render={[FeatureStatus.Supported]}
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Show/Hide Tablature" 
-                                    model={[FeatureStatus.NotSupported]}
-                                    reading={[FeatureStatus.Supported]}
+                                    model={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.NotSupported]}
                                     render={[FeatureStatus.Supported]}
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.Supported]} />
@@ -157,10 +188,9 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                     render={[FeatureStatus.Ignored]}
                                     audio={[FeatureStatus.NotSupported]}
                                     tex={[FeatureStatus.NotSupported]} />
-
     </FileFormatFeatureGroup>
 
-    <FileFormatFeatureGroup title="Master Bar Level">
+    <FileFormatFeatureGroup title="Bar Level">
         <FileFormatFeatureRow feature="Time Signatures" 
                                         model={[FeatureStatus.Supported]}
                                         reading={[FeatureStatus.Supported]}
@@ -210,13 +240,19 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                         audio={[FeatureStatus.Ignored]}
                                         tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Line Breaks" 
-                                        model={[FeatureStatus.Supported, "", "Via Alternative: Systems Layout for specifying number of bars per row"]}
+                                        model={[FeatureStatus.NotSupported]}
                                         reading={[FeatureStatus.NotSupported]}
-                                        render={[FeatureStatus.Supported, "Via Alternative: Systems Layout for specifying number of bars per row"]}
+                                        render={[FeatureStatus.NotSupported]}
                                         audio={[FeatureStatus.Ignored]}
-                                        tex={[FeatureStatus.Supported, "Via Alternative: Systems Layout for specifying number of bars per row"]} />
+                                        tex={[FeatureStatus.NotSupported]} />
     </FileFormatFeatureGroup>
     <FileFormatFeatureGroup title="Beat Level">
+        <FileFormatFeatureRow feature="Multiple Voices" 
+                                        model={[FeatureStatus.Supported]}
+                                        reading={[FeatureStatus.Supported]}
+                                        render={[FeatureStatus.Supported]}
+                                        audio={[FeatureStatus.Supported]}
+                                        tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Chord Names" 
                                         model={[FeatureStatus.Supported]}
                                         reading={[FeatureStatus.Supported]}
@@ -355,7 +391,7 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                         render={[FeatureStatus.Supported]}
                                         audio={[FeatureStatus.Supported]}
                                         tex={[FeatureStatus.Supported]} />
-        <FileFormatFeatureRow feature="Ottava" 
+        <FileFormatFeatureRow feature="Ottavia" 
                                         model={[FeatureStatus.Supported]}
                                         reading={[FeatureStatus.NotSupported]}
                                         render={[FeatureStatus.Supported]}
@@ -490,7 +526,7 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                         audio={[FeatureStatus.Supported]}
                                         tex={[FeatureStatus.Supported]} />
     </FileFormatFeatureGroup>
-    <FileFormatFeatureGroup title="Percussion">
+    <FileFormatFeatureGroup title="Special Tracks">
         <FileFormatFeatureRow feature="Percussion Tracks" 
                                         model={[FeatureStatus.Supported]}
                                         reading={[FeatureStatus.Supported]}

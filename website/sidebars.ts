@@ -175,7 +175,8 @@ const sidebars: SidebarsConfig = {
           "These pages provide an insight on what the input file formats alphaTab supports and the compatibility for rendering and expressing the same in alphaTex.",
       },
       items: [
-        "formats/guitar-pro-7-8",
+        "formats/guitar-pro-8",
+        "formats/guitar-pro-7",
         "formats/guitar-pro-6",
         "formats/guitar-pro-3-5",
         "formats/musicxml",
