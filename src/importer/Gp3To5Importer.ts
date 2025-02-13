@@ -370,7 +370,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if(this._score.stylesheet.perTrackDisplayTuning === null){
             this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
         }
-        this._score.stylesheet.perTrackDisplayTuning.set(newTrack.index, (flags & 0x80) !== 0);
+        this._score.stylesheet.perTrackDisplayTuning!.set(newTrack.index, (flags & 0x80) !== 0);
 
         //
         let stringCount: number = IOHelper.readInt32LE(this.data);

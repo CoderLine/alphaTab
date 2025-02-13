@@ -217,8 +217,8 @@ export abstract class ScoreLayout {
 
                     if (
                         score.stylesheet.perTrackDisplayTuning &&
-                        score.stylesheet.perTrackDisplayTuning.has(track.index) &&
-                        score.stylesheet.perTrackDisplayTuning.get(track.index) === false
+                        score.stylesheet.perTrackDisplayTuning!.has(track.index) &&
+                        score.stylesheet.perTrackDisplayTuning!.get(track.index) === false
                     ) {
                         showTuning = false;
                     }

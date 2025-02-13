@@ -1006,7 +1006,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     if(!this._score.stylesheet.perTrackDisplayTuning) {
                         this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
                     }
-                    this._score.stylesheet.perTrackDisplayTuning.set(this._currentTrack.index, false);
+                    this._score.stylesheet.perTrackDisplayTuning!.set(this._currentTrack.index, false);
                     this._sy = this.newSy();
                 }
 
