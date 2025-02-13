@@ -1,5 +1,6 @@
 import { Settings } from '@src/Settings';
 import { Beat } from '@src/model/Beat';
+import { Direction } from '@src/model/Direction';
 import { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
@@ -163,12 +164,14 @@ describe('Gp5ImporterTest', () => {
     });
 
     it('alternate-endings-section-error', async () => {
-        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/alternate-endings-section-error.gp5');
+        const reader = await GpImporterTestHelper.prepareImporterWithFile(
+            'guitarpro5/alternate-endings-section-error.gp5'
+        );
         const score: Score = reader.readScore();
         expect(score.masterBars.length).to.be.equal(2);
         expect(score.masterBars[1].alternateEndings).to.be.equal(4);
         expect(score.masterBars[1].section).to.be.ok;
-        expect(score.masterBars[1].section?.text).to.be.equal("Outro");
+        expect(score.masterBars[1].section?.text).to.be.equal('Outro');
     });
 
     it('canon', async () => {
@@ -203,16 +206,53 @@ describe('Gp5ImporterTest', () => {
         let score: Score = reader.readScore();
 
         const expectedChunks: string[] = [
-            "",
-            "So", "close,",
-            "no", "mat", "ter", "how", "", "far.", 
-            "", "", 
-            "Could-", "n't", "be", "much", "more", "from", "the", "", "heart.", 
-            "", "", "", "", 
-            "For-", "ev-", "er", "trust-", "ing", "who", "we", "are.", 
-            "", "", "", "", "", "", 
-            "And", "noth-", "ing", "else", "", 
-            "mat-", "ters.", "", ""
+            '',
+            'So',
+            'close,',
+            'no',
+            'mat',
+            'ter',
+            'how',
+            '',
+            'far.',
+            '',
+            '',
+            'Could-',
+            "n't",
+            'be',
+            'much',
+            'more',
+            'from',
+            'the',
+            '',
+            'heart.',
+            '',
+            '',
+            '',
+            '',
+            'For-',
+            'ev-',
+            'er',
+            'trust-',
+            'ing',
+            'who',
+            'we',
+            'are.',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            'And',
+            'noth-',
+            'ing',
+            'else',
+            '',
+            'mat-',
+            'ters.',
+            '',
+            ''
         ];
 
         let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
@@ -230,17 +270,20 @@ describe('Gp5ImporterTest', () => {
     });
 
     it('layout-configuration', async () => {
-        const track1 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1.gp5')).readScore();
-        const track2 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-2.gp5')).readScore();
-        const trackAll = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-all.gp5')).readScore();
-        const track1And3 = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1-3.gp5')).readScore();
+        const track1 = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1.gp5')
+        ).readScore();
+        const track2 = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-2.gp5')
+        ).readScore();
+        const trackAll = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-all.gp5')
+        ).readScore();
+        const track1And3 = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1-3.gp5')
+        ).readScore();
 
-        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
-            track1, 
-            track2,
-            trackAll,
-            track1And3
-        );
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(track1, track2, trackAll, track1And3);
     });
 
     it('hide-tuning', async () => {
@@ -266,7 +309,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[1].staves[0].showSlash).to.be.false;
         expect(score.tracks[1].staves[0].showTablature).to.be.false;
         expect(score.tracks[1].staves[0].showStandardNotation).to.be.true;
-        
+
         expect(score.tracks[2].staves[0].showNumbered).to.be.false;
         expect(score.tracks[2].staves[0].showSlash).to.be.false;
         expect(score.tracks[2].staves[0].showTablature).to.be.true;
@@ -282,5 +325,43 @@ describe('Gp5ImporterTest', () => {
 
         expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(1)).to.be.true;
         expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(1)).to.equal(true);
+    });
+
+    it('directions', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/directions.gp5')).readScore();
+
+        // order just top down as in GP5, every direction on one bar.
+        const expectedDirections = [
+            Direction.TargetCoda,
+            Direction.TargetDoubleCoda,
+            Direction.TargetSegno,
+            Direction.TargetSegnoSegno,
+            Direction.TargetFine,
+
+            Direction.JumpDaCapo,
+            Direction.JumpDaCapoAlCoda,
+            Direction.JumpDaCapoAlDoubleCoda,
+            Direction.JumpDaCapoAlFine,
+
+            Direction.JumpDalSegno,
+            Direction.JumpDalSegnoSegno,
+
+            Direction.JumpDalSegnoAlCoda,
+            Direction.JumpDalSegnoAlDoubleCoda,
+
+            Direction.JumpDalSegnoSegnoAlCoda,
+            Direction.JumpDalSegnoSegnoAlDoubleCoda,
+
+            Direction.JumpDalSegnoAlFine,
+            Direction.JumpDalSegnoSegnoAlFine,
+
+            Direction.JumpDaCoda,
+            Direction.JumpDaDoubleCoda
+        ];
+
+        for (let i = 0; i < expectedDirections.length; i++) {
+            expect(score.masterBars[i].directions).to.be.ok;
+            expect(score.masterBars[i].directions!.has(expectedDirections[i])).to.be.true;
+        }
     });
 });
