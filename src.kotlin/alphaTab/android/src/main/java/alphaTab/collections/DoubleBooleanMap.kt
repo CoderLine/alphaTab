@@ -1,19 +1,37 @@
 package alphaTab.collections
 
 public open class DoubleBooleanMapEntry {
-    private var _key: Double = 0.0
+    private var _key: Double
     public var key: Double
         get() = _key
         internal set(value) {
             _key = value
         }
 
-    private var _value: Boolean = false
+    private var _value: Boolean
     public var value: Boolean
         get() = _value
         internal set(value) {
             _value = value
         }
+
+    public operator fun component1(): Double {
+        return _key
+    }
+
+    public operator fun component2(): Boolean {
+        return _value
+    }
+
+    public constructor() {
+        _key = 0.0
+        _value = false
+    }
+
+    public constructor(key: Double, value: Boolean) {
+        _key = key
+        _value = value
+    }    
 }
 
 public class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntryInternal {

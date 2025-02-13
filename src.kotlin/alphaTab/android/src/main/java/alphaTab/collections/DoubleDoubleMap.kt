@@ -1,19 +1,37 @@
 package alphaTab.collections
 
 public open class DoubleDoubleMapEntry {
-    private var _key: Double = 0.0
+    private var _key: Double
     public var key: Double
         get() = _key
         internal set(value) {
             _key = value
         }
 
-    private var _value: Double = 0.0
+    private var _value: Double
     public var value: Double
         get() = _value
         internal set(value) {
             _value = value
         }
+
+    public operator fun component1(): Double {
+        return _key
+    }
+
+    public operator fun component2(): Double {
+        return _value
+    }
+
+    public constructor() {
+        _key = 0.0
+        _value = 0.0
+    }
+
+    public constructor(key: Double, value: Double) {
+        _key = key
+        _value = value
+    }    
 }
 
 public class DoubleDoubleMapEntryInternal : DoubleDoubleMapEntry(), IMapEntryInternal {
