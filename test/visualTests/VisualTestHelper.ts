@@ -24,7 +24,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1,
+        tolerancePercent: number = 0.0000,
         triggerResize: boolean = false
     ): Promise<void> {
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -49,7 +49,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0.0000
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -75,7 +75,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0.0000
     ): Promise<void> {
         try {
             if (!settings) {
@@ -98,7 +98,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1,
+        tolerancePercent: number = 0.0000,
         triggerResize: boolean = false
     ): Promise<void> {
         const widths = [1300];
@@ -129,7 +129,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0.0000
     ): Promise<void> {
         if (!settings) {
             settings = new Settings();
@@ -276,6 +276,7 @@ export class VisualTestHelper {
      * @partial
      */
     static enableAlphaSkia(bravura: ArrayBuffer) {
+        alphaSkiaModule.AlphaSkiaCanvas.switchToFreeTypeFonts();
         Environment.enableAlphaSkia(
             bravura,
             alphaSkiaModule
@@ -299,7 +300,11 @@ export class VisualTestHelper {
         settings.display.resources.graceFont.families = ['Roboto'];
         settings.display.resources.barNumberFont.families = ['Roboto'];
         settings.display.resources.fingeringFont.families = ['PT Serif'];
+        settings.display.resources.inlineFingeringFont.families = ['PT Serif'];
         settings.display.resources.markerFont.families = ['PT Serif'];
+        settings.display.resources.directionsFont.families = ['PT Serif'];
+        settings.display.resources.numberedNotationFont.families = ['Roboto'];
+        settings.display.resources.numberedNotationGraceFont.families = ['Roboto'];
     }
 
     public static async compareVisualResult(
@@ -309,7 +314,7 @@ export class VisualTestHelper {
         referenceFileName: string,
         referenceFileData: Uint8Array,
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0.0000
     ): Promise<void> {
         // create final full image
         using actual = new AlphaSkiaCanvas();
@@ -335,7 +340,7 @@ export class VisualTestHelper {
         expectedFileName: string,
         expected: AlphaSkiaImage|undefined,
         message?: string,
-        tolerancePercent: number = 1
+        tolerancePercent: number = 0.0000
     ): Promise<void> {
         let pass = false;
         let errorMessage = '';

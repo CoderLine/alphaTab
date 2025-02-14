@@ -121,7 +121,7 @@ describe('MusicNotationTests', () => {
         // - for every full note, we generate a bar with every accidental applied (none, sharp, doublesharp, flat, double flat)
         // - for every bar we have 2 notes with the accidental and one again without (to have the natural accidental)
 
-        let tex = '\\tempo 240 . \\ts 3 4';
+        let tex = '\\tempo 240 \\instrument piano . \\ts 3 4';
 
         const keySignatures = [
             'C',
@@ -143,7 +143,7 @@ describe('MusicNotationTests', () => {
             'Cb'
         ];
 
-        const ocatve = 3;
+        const ocatve = 4;
         const notes = ['C', 'D', 'E', 'F', 'G', 'A', 'B'];
         const accidentalModes = ['', '#', '##', 'b', 'bb'];
 
