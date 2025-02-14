@@ -962,9 +962,8 @@ export class Gp3To5Importer extends ScoreImporter {
             }
         }
 
-        let mixTableFlags = 0;
         if (this._versionNumber >= 400) {
-            mixTableFlags = this.data.readByte(); // all tracks flag
+            this.data.readByte(); // mixTableFlags
         }
         if (this._versionNumber >= 500) {
             const wahType = IOHelper.readSInt8(this.data);
