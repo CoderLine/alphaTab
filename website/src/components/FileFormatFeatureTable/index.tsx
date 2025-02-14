@@ -107,7 +107,10 @@ function computeFeatureStatistics(node: React.ReactNode): {
   const relevantFeatures = featureRows.filter(
     (r) =>
       toFeatureStatusDefinitionFull(r.props.model)?.status !==
+      FeatureStatus.Ignored &&
+      toFeatureStatusDefinitionFull(r.props.reading)?.status !==
       FeatureStatus.Ignored
+
   );
   let totalRelevantFeatures = relevantFeatures.length;
   let supportedRelevantFeatures = relevantFeatures.filter((f) => {

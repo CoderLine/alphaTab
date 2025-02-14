@@ -47,29 +47,47 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Sizes & Spacings" isNewFeature="true"
-                                    model={[FeatureStatus.Partial, "", "Via settings.display.stretchForce"]}
-                                    reading={[FeatureStatus.NotSupported]}
-                                    render={[FeatureStatus.Supported]}
+                                    model={[FeatureStatus.Supported, "", "Via settings"]}
+                                    reading={[FeatureStatus.Ignored]}
+                                    render={[FeatureStatus.Ignored]}
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.Ignored]} />
-        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Tuning" isNewFeature="true"
+        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Tuning (Display)" isNewFeature="true"
+                                    model={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.Supported]}
+                                    render={[FeatureStatus.Supported]}
+                                    audio={[FeatureStatus.Ignored]}
+                                    tex={[FeatureStatus.Supported]} />
+        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Tuning (other settings)" isNewFeature="true"
+                                    model={[FeatureStatus.Ignored]}
+                                    reading={[FeatureStatus.Ignored]}
+                                    render={[FeatureStatus.Ignored]}
+                                    audio={[FeatureStatus.Ignored]}
+                                    tex={[FeatureStatus.Ignored]} />
+        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Chord Diagrams > On Top of Score > Visible" isNewFeature="true"
+                                    model={[FeatureStatus.Supported]}
+                                    reading={[FeatureStatus.Supported]}
+                                    render={[FeatureStatus.Supported]}
+                                    audio={[FeatureStatus.Ignored]}
+                                    tex={[FeatureStatus.Supported, "", "Chords are staff specific and element visibility is configurable"]} />
+        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Chord Diagrams > In Score > Visible" isNewFeature="true"
                                     model={[FeatureStatus.NotSupported]}
                                     reading={[FeatureStatus.NotSupported]}
                                     render={[FeatureStatus.NotSupported]}
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.NotSupported]} />
-        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Chord Diagrams" isNewFeature="true"
-                                    model={[FeatureStatus.NotSupported]}
-                                    reading={[FeatureStatus.NotSupported]}
-                                    render={[FeatureStatus.NotSupported]}
+        <FileFormatFeatureRow feature="Stylesheet > Page & Score format > Chord Diagrams (sizing)" isNewFeature="true"
+                                    model={[FeatureStatus.Ignored]}
+                                    reading={[FeatureStatus.Ignored]}
+                                    render={[FeatureStatus.Ignored]}
                                     audio={[FeatureStatus.Ignored]}
-                                    tex={[FeatureStatus.NotSupported]} />
+                                    tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Stylesheet > Systems & Staves > Staves" isNewFeature="true"
-                                    model={[FeatureStatus.NotSupported]}
-                                    reading={[FeatureStatus.NotSupported]}
-                                    render={[FeatureStatus.NotSupported]}
+                                    model={[FeatureStatus.Ignored]}
+                                    reading={[FeatureStatus.Ignored]}
+                                    render={[FeatureStatus.Ignored]}
                                     audio={[FeatureStatus.Ignored]}
-                                    tex={[FeatureStatus.NotSupported]} />
+                                    tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Stylesheet > Systems & Staves > Brackets" isNewFeature="true"
                                     model={[FeatureStatus.Supported]}
                                     reading={[FeatureStatus.Supported]}
@@ -89,17 +107,17 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Stylesheet > Texts & Styles" isNewFeature="true"
-                                    model={[FeatureStatus.Partial, "", "Via settings.display.resources"]}
+                                    model={[FeatureStatus.Supported, "", "Via settings.display.resources"]}
                                     reading={[FeatureStatus.Ignored]}
-                                    render={[FeatureStatus.Partial]}
+                                    render={[FeatureStatus.Supported]}
                                     audio={[FeatureStatus.Ignored]}
                                     tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Stylesheet > Notation" isNewFeature="true"
-                                    model={[FeatureStatus.NotSupported]}
-                                    reading={[FeatureStatus.NotSupported]}
-                                    render={[FeatureStatus.NotSupported]}
+                                    model={[FeatureStatus.Ignored]}
+                                    reading={[FeatureStatus.Ignored]}
+                                    render={[FeatureStatus.Ignored]}
                                     audio={[FeatureStatus.Ignored]}
-                                    tex={[FeatureStatus.NotSupported]} />                              
+                                    tex={[FeatureStatus.Ignored]} />                              
     </FileFormatFeatureGroup>
 
     <FileFormatFeatureGroup title="Track Level">
@@ -170,13 +188,13 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                     reading={[FeatureStatus.Supported]}
                                     render={[FeatureStatus.Ignored]}
                                     audio={[FeatureStatus.Supported]}
-                                    tex={[FeatureStatus.NotSupported]} />
+                                    tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Playback Information > Play settings" isNewFeature="true" 
-                                    model={[FeatureStatus.NotSupported]}
-                                    reading={[FeatureStatus.NotSupported]}
+                                    model={[FeatureStatus.Ignored]}
+                                    reading={[FeatureStatus.Ignored]}
                                     render={[FeatureStatus.Ignored]}
-                                    audio={[FeatureStatus.NotSupported]}
-                                    tex={[FeatureStatus.NotSupported]} />
+                                    audio={[FeatureStatus.Ignored]}
+                                    tex={[FeatureStatus.Ignored]} />
         <FileFormatFeatureRow feature="Playback Information > EQ" isNewFeature="true" 
                                     model={[FeatureStatus.Ignored]}
                                     reading={[FeatureStatus.Ignored]}

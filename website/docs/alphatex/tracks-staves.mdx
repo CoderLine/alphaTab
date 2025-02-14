@@ -43,6 +43,18 @@ By default both notation systems are shown.
     1.2 3.2 0.1 1.1
 `}</AlphaTexSample>
 
+## Hide Tuning
+
+To hide the tuning for a track add the `hide` keyword after the tuning. As of now tuning visibility is per-track not per-staff despite the tuning being on staff level.
+It should be rather uncommon to have multiple different staves with different string tunings.
+
+<AlphaTexSample>{`
+\\track "Track 1"
+    \\staff {tabs}
+    \\tuning A1 D2 A2 D3 G3 B3 E4 hide
+    4.1 3.1 2.1 1.1
+`}</AlphaTexSample>
+
 ## Automatic Bars
 
 The staff with the largest number of bars defines how long the overall song is.
