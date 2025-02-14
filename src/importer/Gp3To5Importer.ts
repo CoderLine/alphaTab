@@ -46,6 +46,7 @@ import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Ottavia } from '@src/model';
+import { WahPedal } from '@src/model/WahPedal';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -686,7 +687,7 @@ export class Gp3To5Importer extends ScoreImporter {
             // 4096 - Unknown
             // 8096 - Force Tuplet Bracket
         }
-           
+
         if (
             beatTextAsLyrics &&
             !newBeat.isRest &&
@@ -960,12 +961,20 @@ export class Gp3To5Importer extends ScoreImporter {
                 this.data.readByte(); // hideTempo (bool)
             }
         }
+
+        let mixTableFlags = 0;
         if (this._versionNumber >= 400) {
-            this.data.readByte(); // all tracks flag
+            mixTableFlags = this.data.readByte(); // all tracks flag
         }
-        // unknown
         if (this._versionNumber >= 500) {
-            this.data.readByte();
+            const wahType = IOHelper.readSInt8(this.data);
+            // const showWahWah = (mixTableFlags & 0x80) !== 0;
+            // -1 Off (when there is a mixtable but no wah-wah)
+            if (wahType >= 100) {
+                beat.wahPedal = WahPedal.Closed;
+            } else if (wahType >= 0) {
+                beat.wahPedal = WahPedal.Open;
+            }
         }
         // unknown
         if (this._versionNumber >= 510) {
