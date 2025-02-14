@@ -3,6 +3,7 @@ import { Ottavia } from '@src/model';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
 import { Score } from '@src/model/Score';
+import { WahPedal } from '@src/model/WahPedal';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
@@ -460,5 +461,16 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].ottava).to.equal(Ottavia._15ma);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].ottava).to.equal(Ottavia._15mb);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].ottava).to.equal(Ottavia.Regular);
+    });
+    
+    it('wah-wah', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/wah-wah.gp5')).readScore();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].wahPedal).to.equal(WahPedal.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].wahPedal).to.equal(WahPedal.Open);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].wahPedal).to.equal(WahPedal.Closed);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].wahPedal).to.equal(WahPedal.Open);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].wahPedal).to.equal(WahPedal.Closed);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].wahPedal).to.equal(WahPedal.None);
     });
 });
