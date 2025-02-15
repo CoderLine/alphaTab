@@ -1,16 +1,32 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab;
 
 static partial class TestPlatform
 {
+    private static readonly Lazy<string> RepositoryRoot = new(() =>
+    {
+        var currentDir = new DirectoryInfo(System.Environment.CurrentDirectory);
+        while (currentDir != null)
+        {
+            if (currentDir.GetFiles("package.json").Length == 1)
+            {
+                return currentDir.FullName;
+            }
+
+            currentDir = currentDir.Parent;
+        }
+
+        throw new IOException($"Could not find repository root via working dir {System.Environment.CurrentDirectory}");
+    });
+
     public static async Task<Uint8Array> LoadFile(string path)
     {
-        await using var fs = new FileStream(path, FileMode.Open);
+        await using var fs = new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
         await using var ms = new MemoryStream();
         await fs.CopyToAsync(ms);
         return new Uint8Array(ms.ToArray());
@@ -18,15 +34,15 @@ static partial class TestPlatform
 
     public static async Task SaveFile(string name, Uint8Array data)
     {
-        var path = Path.Combine("test-results", name);
+        var path = Path.Combine(RepositoryRoot.Value, name);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
-        await using var fs = new FileStream(Path.Combine("test-results", name), FileMode.Create);
+        await using var fs = new FileStream(path, FileMode.Create);
         await fs.WriteAsync(data.Data.Array!, data.Data.Offset, data.Data.Count);
     }
 
     public static Task<IList<string>> ListDirectory(string path)
     {
-        return Task.FromResult((IList<string>) Directory.EnumerateFiles(path)
+        return Task.FromResult((IList<string>) Directory.EnumerateFiles(Path.Combine(RepositoryRoot.Value, path))
             .Select(Path.GetFileName)
             .ToList());
     }
