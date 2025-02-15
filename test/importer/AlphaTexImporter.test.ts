@@ -41,7 +41,7 @@ import { BarreShape } from '@src/model/BarreShape';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
-import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 describe('AlphaTexImporterTest', () => {
@@ -1689,6 +1689,12 @@ describe('AlphaTexImporterTest', () => {
             \\hideDynamics
             \\bracketExtendMode nobrackets
             \\useSystemSignSeparator
+            \\singleTrackTrackNamePolicy allsystems
+            \\multiTrackTrackNamePolicy Hidden
+            \\firstSystemTrackNameMode fullname
+            \\otherSystemsTrackNameMode fullname
+            \\firstSystemTrackNameOrientation horizontal
+            \\otherSystemsTrackNameOrientation horizontal
             .
         `);
 
@@ -1700,6 +1706,12 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.hideDynamics).to.be.true;
         expect(score.stylesheet.bracketExtendMode).to.equal(BracketExtendMode.NoBrackets);
         expect(score.stylesheet.useSystemSignSeparator).to.be.true;
+        expect(score.stylesheet.singleTrackTrackNamePolicy).to.equal(TrackNamePolicy.AllSystems);
+        expect(score.stylesheet.multiTrackTrackNamePolicy).to.equal(TrackNamePolicy.Hidden);
+        expect(score.stylesheet.firstSystemTrackNameMode).to.equal(TrackNameMode.FullName);
+        expect(score.stylesheet.otherSystemsTrackNameMode).to.equal(TrackNameMode.FullName);
+        expect(score.stylesheet.firstSystemTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
+        expect(score.stylesheet.otherSystemsTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
     });
 
     it('bar-sizing', () => {
@@ -1748,10 +1760,16 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.true;
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.equal(
+            BeamDirection.Down
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
-        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitToNext
+        );
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceMergeWithNext
+        );
     });
 
     it('note-show-string', () => {
@@ -1761,7 +1779,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).to.be.true;
     });
-    
+
     it('note-hide', () => {
         let score = parseTex(`
             :8 3.3{ hide } 
@@ -1779,7 +1797,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isSlurDestination).to.be.true;
     });
 
-    it('hide-tuning', () =>{
+    it('hide-tuning', () => {
         const score = parseTex(`
             \\track "Track 1"
             \\track "Track 2"
@@ -1791,5 +1809,5 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
         expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
         expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.be.false;
-    })
+    });
 });
