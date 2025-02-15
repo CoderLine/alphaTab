@@ -275,7 +275,8 @@ export class BinaryStylesheet {
             case 'string':
                 return DataType.String;
             case 'number':
-                return (value as number) == ((value as number) | 0) ? DataType.Integer : DataType.Float;
+                const withoutFraction: number = (value as number) | 0;
+                return (value as number) == withoutFraction ? DataType.Integer : DataType.Float;
             case 'object':
                 if (value instanceof BendPoint) {
                     return DataType.Point;

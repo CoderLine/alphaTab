@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 namespace AlphaTab.Io;
 
@@ -7,6 +8,16 @@ internal static class TypeConversions
     public static double BytesToFloat32LE(Uint8Array array)
     {
         return BitConverter.ToSingle(array.Data.Array!, array.Data.Offset);
+    }
+
+    public static Uint8Array Float32BEToBytes(double v)
+    {
+        var bytes = BitConverter.GetBytes((float)v);
+        if (BitConverter.IsLittleEndian)
+        {
+            bytes.Reverse();
+        }
+        return new Uint8Array(new ArrayBuffer(bytes));
     }
 
     public static double BytesToFloat64LE(Uint8Array array)

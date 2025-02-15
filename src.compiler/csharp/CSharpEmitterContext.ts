@@ -1322,6 +1322,15 @@ export default class CSharpEmitterContext {
             return true;
         }
 
+        // no casts to "object"
+        if (
+            'objectFlags' in contextualType &&
+            'intrinsicName' in contextualType &&
+            contextualType.intrinsicName === 'object'
+        ) {
+            return true;
+        }
+
         // some core types
         if (contextualType.symbol) {
             switch (contextualType.symbol.name) {
