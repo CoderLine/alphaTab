@@ -33,6 +33,10 @@ export interface RenderingResourcesJson {
      */
     effectFont?: FontJson;
     /**
+     * Gets or sets the font to use for displaying beat time information in the music sheet.
+     */
+    timerFont?: FontJson;
+    /**
      * Gets or sets the font to use for displaying the directions texts.
      */
     directionsFont?: FontJson;

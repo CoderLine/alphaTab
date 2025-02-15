@@ -1540,11 +1540,8 @@ describe('MidiFileGeneratorTest', () => {
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
-        
     it('ornaments', async () => {
-        const buffer = await TestPlatform.loadFile(
-            'test-data/audio/ornaments.gp'
-        );
+        const buffer = await TestPlatform.loadFile('test-data/audio/ornaments.gp');
         const score = ScoreLoader.loadScoreFromBytes(buffer);
 
         const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
@@ -1615,27 +1612,23 @@ describe('MidiFileGeneratorTest', () => {
             new FlatNoteEvent(42240, 0, 0, 80, noteKey + 2, noteVelocity),
             new FlatNoteEvent(42320, 0, 0, 80, noteKey, noteVelocity),
             new FlatNoteEvent(42400, 0, 0, 80, noteKey - 1, noteVelocity),
-            new FlatNoteEvent(42480, 0, 0, 1680, noteKey, noteVelocity),
+            new FlatNoteEvent(42480, 0, 0, 1680, noteKey, noteVelocity)
         ];
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
-            e => e instanceof FlatNoteEvent
-        );
+        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(e => e instanceof FlatNoteEvent);
 
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
     it('rasgueado', async () => {
-        const buffer = await TestPlatform.loadFile(
-            'test-data/audio/rasgueado.gp'
-        );
+        const buffer = await TestPlatform.loadFile('test-data/audio/rasgueado.gp');
         const score = ScoreLoader.loadScoreFromBytes(buffer);
 
         const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        const noteVelocity = MidiUtils.dynamicToVelocity((note.dynamics as number));
+        const noteVelocity = MidiUtils.dynamicToVelocity(note.dynamics as number);
         const expectedEvents: FlatMidiEvent[] = [
             // ii - A string
             new FlatNoteEvent(0, 0, 0, 480, 48, noteVelocity), // down - no brush offset
@@ -1680,18 +1673,94 @@ describe('MidiFileGeneratorTest', () => {
             // pmp (anapaest) - E string
             new FlatNoteEvent(1920, 0, 0, 240, 64, noteVelocity),
             new FlatNoteEvent(2220, 0, 0, 180, 64, noteVelocity),
-            new FlatNoteEvent(2520, 0, 0, 360, 64, noteVelocity),
+            new FlatNoteEvent(2520, 0, 0, 360, 64, noteVelocity)
         ];
 
         const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(
-            e => e instanceof FlatNoteEvent
-        );
+        const actualNoteEvents: FlatMidiEvent[] = handler.midiEvents.filter(e => e instanceof FlatNoteEvent);
 
         assertEvents(actualNoteEvents, expectedEvents);
     });
 
+    it('beat-timer-repeats-jumps', () => {
+        const score: Score = parseTex(`
+            \\tempo 120
+            .
+                3.3.4 { timer } 3.3.4*3 |
+                \\ro 3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3 |
+                \\jump fine 3.3.4 { timer } 3.3.4*3 |
+                \\ae (1) 3.3.4 { timer } 3.3.4*3 |
+                \\ae (2 3) \\rc 3 3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3 |
+                \\jump DaCapoAlFine 3.3.4 { timer } 3.3.4*3 |
+                3.3.4 { timer } 3.3.4*3
+        `);
 
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const actualTimers: number[] = [];
+        let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        while (b !== null) {
+            if (b.showTimer) {
+                actualTimers.push(b.timer ?? -1);
+            }
+            b = b.nextBeat;
+        }
+
+        const expectedTimers: number[] = [0, 2000, 4000, 6000, 8000, 16000, 26000, 28000, -1];
+
+        expect(actualTimers.join(',')).to.equal(expectedTimers.join(','));
+    });
+
+    it('beat-timer-tempo-changes', () => {
+        const score: Score = parseTex(`
+            \\tempo 120
+            .
+                3.3.4 { timer }
+                3.3.8 { timer }
+                3.3.8 { timer }
+                3.3.4 { timer }
+                3.3.4 { timer } |
+                
+                3.3.4 { timer tempo 60 }
+                3.3.8 { timer }
+                3.3.8 { timer tempo 240 }
+                3.3.4 { timer }
+                3.3.4 { timer }
+        `);
+
+        // no timers at start
+        let b: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        while (b !== null) {
+            expect(b.showTimer).to.be.true;
+            expect(b.timer).to.equal(null);
+            b = b.nextBeat;
+        }
+
+        // generate audio
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        const actualTimers: number[] = [];
+        b = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
+        while (b !== null) {
+            actualTimers.push(b.timer ?? -1);
+            b = b.nextBeat;
+        }
+
+        const expectedTimers: number[] = [
+            // first bar
+            0, 500, 750, 1000, 1500,
+            // second bar
+            2000, 3000, 3500, 3625, 3875
+        ];
+
+        expect(actualTimers.join(',')).to.equal(expectedTimers.join(','));
+    });
 });

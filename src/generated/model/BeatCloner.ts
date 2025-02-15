@@ -67,6 +67,8 @@ export class BeatCloner {
         clone.barreFret = original.barreFret;
         clone.barreShape = original.barreShape;
         clone.rasgueado = original.rasgueado;
+        clone.showTimer = original.showTimer;
+        clone.timer = original.timer;
         return clone;
     }
 }

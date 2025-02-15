@@ -194,7 +194,9 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enablePlayer) {
             this.setupPlayer();
             if (score) {
-                this.player?.applyTranspositionPitches(MidiFileGenerator.buildTranspositionPitches(score, this.settings));
+                this.player?.applyTranspositionPitches(
+                    MidiFileGenerator.buildTranspositionPitches(score, this.settings)
+                );
             }
         } else {
             this.destroyPlayer();
@@ -290,7 +292,7 @@ export class AlphaTabApiBase<TSettings> {
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
-            this._trackIndexLookup = new Set<number>(this._trackIndexes)
+            this._trackIndexLookup = new Set<number>(this._trackIndexes);
             this.onScoreLoaded(score);
             this.loadMidiForScore();
             this.render();
@@ -300,7 +302,7 @@ export class AlphaTabApiBase<TSettings> {
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
-            this._trackIndexLookup = new Set<number>(this._trackIndexes)
+            this._trackIndexLookup = new Set<number>(this._trackIndexes);
             this.render();
         }
     }
@@ -608,9 +610,10 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private loadMidiForScore(): void {
-        if (!this.player || !this.score || !this.player.isReady) {
+        if (!this.score) {
             return;
         }
+
         Logger.debug('AlphaTab', 'Generating Midi');
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
@@ -622,8 +625,12 @@ export class AlphaTabApiBase<TSettings> {
         generator.generate();
         this._tickCache = generator.tickLookup;
         this.onMidiLoad(midiFile);
-        this.player.loadMidiFile(midiFile);
-        this.player.applyTranspositionPitches(generator.transpositionPitches);
+
+        const player = this.player;
+        if (player) {
+            player.loadMidiFile(midiFile);
+            player.applyTranspositionPitches(generator.transpositionPitches);
+        }
     }
 
     /**
@@ -1049,8 +1056,7 @@ export class AlphaTabApiBase<TSettings> {
                     let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
                     if (
                         nextBeatBoundings &&
-                        nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds ===
-                        barBoundings.staffSystemBounds
+                        nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
                     ) {
                         nextBeatX = nextBeatBoundings.visualBounds.x;
                     }
@@ -1174,8 +1180,12 @@ export class AlphaTabApiBase<TSettings> {
             this.settings.player.enableUserInteraction
         ) {
             if (this._selectionEnd) {
-                let startTick: number = this._tickCache?.getBeatStart(this._selectionStart!.beat) ?? this._selectionStart!.beat.absolutePlaybackStart;
-                let endTick: number = this._tickCache?.getBeatStart(this._selectionEnd!.beat) ?? this._selectionEnd!.beat.absolutePlaybackStart;
+                let startTick: number =
+                    this._tickCache?.getBeatStart(this._selectionStart!.beat) ??
+                    this._selectionStart!.beat.absolutePlaybackStart;
+                let endTick: number =
+                    this._tickCache?.getBeatStart(this._selectionEnd!.beat) ??
+                    this._selectionEnd!.beat.absolutePlaybackStart;
                 if (endTick < startTick) {
                     let t: SelectionInfo = this._selectionStart!;
                     this._selectionStart = this._selectionEnd;

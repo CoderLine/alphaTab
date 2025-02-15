@@ -85,6 +85,8 @@ export class BeatSerializer {
         o.set("barrefret", obj.barreFret);
         o.set("barreshape", obj.barreShape as number);
         o.set("rasgueado", obj.rasgueado as number);
+        o.set("showtimer", obj.showTimer);
+        o.set("timer", obj.timer);
         return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -234,6 +236,12 @@ export class BeatSerializer {
                 return true;
             case "rasgueado":
                 obj.rasgueado = JsonHelper.parseEnum<Rasgueado>(v, Rasgueado)!;
+                return true;
+            case "showtimer":
+                obj.showTimer = v! as boolean;
+                return true;
+            case "timer":
+                obj.timer = v as number | null;
                 return true;
         }
         return false;

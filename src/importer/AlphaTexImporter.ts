@@ -2306,6 +2306,10 @@ export class AlphaTexImporter extends ScoreImporter {
             }
             this._sy = this.newSy();
             return true;
+        } else if (syData === 'timer') {
+            beat.showTimer = true;
+            this._sy = this.newSy();
+            return true;
         } else {
             // string didn't match any beat effect syntax
             return false;

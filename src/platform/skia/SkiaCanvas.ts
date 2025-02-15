@@ -155,7 +155,8 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this._canvas.strokeRect(((x * this._scale) | 0), ((y * this._scale) | 0), w * this._scale, h * this._scale);
+        const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
+        this._canvas.strokeRect(((x * this._scale) | 0) + blurOffset, ((y * this._scale) | 0) + blurOffset, w * this._scale, h * this._scale);
     }
 
     public beginPath(): void {

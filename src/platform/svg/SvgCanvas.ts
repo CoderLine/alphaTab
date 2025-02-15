@@ -57,9 +57,10 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this.buffer += `<rect x="${(x * this.scale) | 0}" y="${(y * this.scale) | 0}" width="${
-            w * this.scale
-        }" height="${h * this.scale}" stroke="${this.color.rgba}"`;
+        const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
+        this.buffer += `<rect x="${((x * this.scale) | 0) + blurOffset}" y="${((y * this.scale) | 0) + blurOffset}" width="${
+            (w * this.scale)
+        }" height="${(h * this.scale)}" stroke="${this.color.rgba}"`;
         if (this.lineWidth !== 1) {
             this.buffer += ` stroke-width="${this.lineWidth * this.scale}"`;
         }
@@ -90,9 +91,9 @@ export abstract class SvgCanvas implements ICanvas {
 
     public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
         this._currentPathIsEmpty = false;
-        this._currentPath += ` C${cp1X * this.scale},${cp1Y * this.scale},${cp2X * this.scale},${
-            cp2Y * this.scale
-        },${x * this.scale},${y * this.scale}`;
+        this._currentPath += ` C${cp1X * this.scale},${cp1Y * this.scale},${cp2X * this.scale},${cp2Y * this.scale},${
+            x * this.scale
+        },${y * this.scale}`;
     }
 
     public fillCircle(x: number, y: number, radius: number): void {

@@ -97,7 +97,8 @@ export class Html5Canvas implements ICanvas {
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this._context.strokeRect(x | 0, y | 0, w, h);
+        const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
+        this._context.strokeRect((x | 0) + blurOffset, (y | 0) + blurOffset, w, h);
     }
 
     public beginPath(): void {

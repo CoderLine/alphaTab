@@ -295,6 +295,7 @@ export class VisualTestHelper {
         settings.display.resources.subTitleFont.families = ['PT Serif'];
         settings.display.resources.wordsFont.families = ['PT Serif'];
         settings.display.resources.effectFont.families = ['PT Serif'];
+        settings.display.resources.timerFont.families = ['PT Serif'];
         settings.display.resources.fretboardNumberFont.families = ['Roboto'];
         settings.display.resources.tablatureFont.families = ['Roboto'];
         settings.display.resources.graceFont.families = ['Roboto'];
