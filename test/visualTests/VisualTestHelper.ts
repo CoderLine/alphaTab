@@ -321,7 +321,7 @@ export class VisualTestHelper {
         actual.beginRender(totalWidth, totalHeight);
         for (const partialResult of result) {
             if (partialResult.renderResult) {
-                const partialCanvas = partialResult.renderResult as AlphaSkiaImage;
+                using partialCanvas = partialResult.renderResult as AlphaSkiaImage;
                 actual.drawImage(partialCanvas, partialResult.x, partialResult.y, partialResult.width, partialResult.height);
             }
         }
