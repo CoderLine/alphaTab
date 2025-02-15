@@ -30,6 +30,11 @@ export class TypeConversions {
         return TypeConversions._dataView.getFloat32(0, true);
     }
 
+    public static float32BEToBytes(v: number): Uint8Array {
+        TypeConversions._dataView.setFloat32(0, v, false);
+        return TypeConversions._conversionByteArray.slice(0, 4);
+    }
+
     public static uint16ToInt16(v: number): number {
         TypeConversions._dataView.setUint16(0, v, true);
         return TypeConversions._dataView.getInt16(0, true);

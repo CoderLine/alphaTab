@@ -2,7 +2,7 @@ import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
-import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Settings } from '@src/Settings';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
@@ -197,4 +197,23 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
     });
+
+    it('track-names-hidden', async () => {
+        const hide = (await prepareImporterWithFile('guitarpro8/track-names-hidden.gp')).readScore();
+        expect(hide.stylesheet.singleTrackTrackNamePolicy).to.equal(TrackNamePolicy.Hidden);
+        expect(hide.stylesheet.multiTrackTrackNamePolicy).to.equal(TrackNamePolicy.Hidden);
+    });
+
+    it('track-names-adjusted', async () => {
+        const hide = (await prepareImporterWithFile('guitarpro8/track-names.gp')).readScore();
+        expect(hide.stylesheet.singleTrackTrackNamePolicy).to.equal(TrackNamePolicy.AllSystems);
+        expect(hide.stylesheet.multiTrackTrackNamePolicy).to.equal(TrackNamePolicy.AllSystems);
+
+        expect(hide.stylesheet.firstSystemTrackNameMode).to.equal(TrackNameMode.FullName);
+        expect(hide.stylesheet.otherSystemsTrackNameMode).to.equal(TrackNameMode.FullName);
+
+        expect(hide.stylesheet.firstSystemTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
+        expect(hide.stylesheet.otherSystemsTrackNameOrientation).to.equal(TrackNameOrientation.Vertical);
+    });
+
 });

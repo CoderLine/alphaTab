@@ -5,7 +5,9 @@ import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';
-import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
+import { IWriteable } from '@src/io/IWriteable';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 enum DataType {
     Boolean,
@@ -59,15 +61,23 @@ enum DataType {
  *       1 byte | Alpha
  */
 export class BinaryStylesheet {
+    public readonly _types: Map<string, DataType> = new Map();
     public readonly raw: Map<string, unknown> = new Map();
 
-    public constructor(data: Uint8Array) {
+    public constructor(data?: Uint8Array) {
+        if (data) {
+            this.read(data);
+        }
+    }
+
+    private read(data: Uint8Array) {
         // BinaryStylesheet apears to be big-endien
         let readable: ByteBuffer = ByteBuffer.fromBuffer(data);
         let entryCount: number = IOHelper.readInt32BE(readable);
         for (let i: number = 0; i < entryCount; i++) {
             let key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
             let type: DataType = readable.readByte() as DataType;
+            this._types.set(key, type);
             switch (type) {
                 case DataType.Boolean:
                     let flag: boolean = readable.readByte() === 1;
@@ -118,7 +128,7 @@ export class BinaryStylesheet {
                     score.stylesheet.hideDynamics = value as boolean;
                     break;
                 case 'System/bracketExtendMode':
-                    score.stylesheet.bracketExtendMode = (value as number) as BracketExtendMode;
+                    score.stylesheet.bracketExtendMode = value as number as BracketExtendMode;
                     break;
                 case 'Global/useSystemSignSeparator':
                     score.stylesheet.useSystemSignSeparator = value as boolean;
@@ -129,36 +139,241 @@ export class BinaryStylesheet {
                 case 'Global/DrawChords':
                     score.stylesheet.globalDisplayChordDiagramsOnTop = value as boolean;
                     break;
+                case 'System/showTrackNameSingle':
+                    if (!(value as boolean)) {
+                        score.stylesheet.singleTrackTrackNamePolicy = TrackNamePolicy.Hidden;
+                    }
+                    break;
+                case 'System/showTrackNameMulti':
+                    if (!(value as boolean)) {
+                        score.stylesheet.multiTrackTrackNamePolicy = TrackNamePolicy.Hidden;
+                    }
+                    break;
+                case 'System/trackNameModeSingle':
+                    if (score.stylesheet.singleTrackTrackNamePolicy !== TrackNamePolicy.Hidden) {
+                        switch (value as number) {
+                            case 0: // First System
+                                score.stylesheet.singleTrackTrackNamePolicy = TrackNamePolicy.FirstSystem;
+                                break;
+                            case 1: // First System of Each Page
+                                score.stylesheet.singleTrackTrackNamePolicy = TrackNamePolicy.FirstSystem;
+                                break;
+                            case 2: // All Systems
+                                score.stylesheet.singleTrackTrackNamePolicy = TrackNamePolicy.AllSystems;
+                                break;
+                        }
+                    }
+                    break;
+                case 'System/trackNameModeMulti':
+                    if (score.stylesheet.multiTrackTrackNamePolicy !== TrackNamePolicy.Hidden) {
+                        switch (value as number) {
+                            case 0: // First System
+                                score.stylesheet.multiTrackTrackNamePolicy = TrackNamePolicy.FirstSystem;
+                                break;
+                            case 1: // First System of Each Page
+                                score.stylesheet.multiTrackTrackNamePolicy = TrackNamePolicy.FirstSystem;
+                                break;
+                            case 2: // All Systems
+                                score.stylesheet.multiTrackTrackNamePolicy = TrackNamePolicy.AllSystems;
+                                break;
+                        }
+                    }
+                    break;
+                case 'System/shortTrackNameOnFirstSystem':
+                    if (value as boolean) {
+                        score.stylesheet.firstSystemTrackNameMode = TrackNameMode.ShortName;
+                    } else {
+                        score.stylesheet.firstSystemTrackNameMode = TrackNameMode.FullName;
+                    }
+                    break;
+                case 'System/shortTrackNameOnOtherSystems':
+                    if (value as boolean) {
+                        score.stylesheet.otherSystemsTrackNameMode = TrackNameMode.ShortName;
+                    } else {
+                        score.stylesheet.otherSystemsTrackNameMode = TrackNameMode.FullName;
+                    }
+                    break;
+                case 'System/horizontalTrackNameOnFirstSystem':
+                    if (value as boolean) {
+                        score.stylesheet.firstSystemTrackNameOrientation = TrackNameOrientation.Horizontal;
+                    } else {
+                        score.stylesheet.firstSystemTrackNameOrientation = TrackNameOrientation.Vertical;
+                    }
+                    break;
+                case 'System/horizontalTrackNameOnOtherSystems':
+                    if (value as boolean) {
+                        score.stylesheet.otherSystemsTrackNameOrientation = TrackNameOrientation.Horizontal;
+                    } else {
+                        score.stylesheet.otherSystemsTrackNameOrientation = TrackNameOrientation.Vertical;
+                    }
+                    break;
             }
         }
     }
 
-    public addValue(key: string, value: unknown): void {
+    public addValue(key: string, value: unknown, type?: DataType): void {
         this.raw.set(key, value);
+        if (type !== undefined) {
+            this._types.set(key, type);
+        }
+    }
+
+    public writeTo(writer: IWriteable) {
+        IOHelper.writeInt32BE(writer, this.raw.size); // entry count
+
+        for (const [k, v] of this.raw) {
+            const dataType = this.getDataType(k, v);
+
+            GpBinaryHelpers.gpWriteString(writer, k);
+            writer.writeByte(dataType as number);
+
+            switch (dataType) {
+                case DataType.Boolean:
+                    writer.writeByte((v as boolean) ? 1 : 0);
+                    break;
+                case DataType.Integer:
+                    IOHelper.writeInt32BE(writer, v as number);
+                    break;
+                case DataType.Float:
+                    IOHelper.writeFloat32BE(writer, v as number);
+                    break;
+                case DataType.String:
+                    const encoded = IOHelper.stringToBytes(v as string);
+                    IOHelper.writeInt16BE(writer, encoded.length);
+                    writer.write(encoded, 0, encoded.length);
+                    break;
+                case DataType.Point:
+                    IOHelper.writeInt32BE(writer, (v as BendPoint).offset);
+                    IOHelper.writeInt32BE(writer, (v as BendPoint).value);
+                    break;
+                case DataType.Size:
+                    IOHelper.writeInt32BE(writer, (v as BendPoint).offset);
+                    IOHelper.writeInt32BE(writer, (v as BendPoint).value);
+                    break;
+                case DataType.Rectangle:
+                    IOHelper.writeInt32BE(writer, (v as Bounds).x);
+                    IOHelper.writeInt32BE(writer, (v as Bounds).y);
+                    IOHelper.writeInt32BE(writer, (v as Bounds).w);
+                    IOHelper.writeInt32BE(writer, (v as Bounds).h);
+                    break;
+                case DataType.Color:
+                    writer.writeByte((v as Color).r);
+                    writer.writeByte((v as Color).g);
+                    writer.writeByte((v as Color).b);
+                    writer.writeByte((v as Color).a);
+                    break;
+            }
+        }
+    }
+    private getDataType(key: string, value: unknown): DataType {
+        if (this._types.has(key)) {
+            return this._types.get(key)!;
+        }
+
+        const type = typeof value;
+        switch (typeof value) {
+            case 'string':
+                return DataType.String;
+            case 'number':
+                return (value as number) == ((value as number) | 0) ? DataType.Integer : DataType.Float;
+            case 'object':
+                if (value instanceof BendPoint) {
+                    return DataType.Point;
+                }
+                if (value instanceof Bounds) {
+                    return DataType.Rectangle;
+                }
+                if (value instanceof Color) {
+                    return DataType.Color;
+                }
+                break;
+        }
+
+        throw new AlphaTabError(AlphaTabErrorType.General, `Unknown value type in BinaryStylesheet: ${type}`);
     }
 
     public static writeForScore(score: Score): Uint8Array {
+        const binaryStylesheet = new BinaryStylesheet();
+        binaryStylesheet.addValue('StandardNotation/hideDynamics', score.stylesheet.hideDynamics, DataType.Boolean);
+        binaryStylesheet.addValue(
+            'System/bracketExtendMode',
+            score.stylesheet.bracketExtendMode as number,
+            DataType.Integer
+        );
+        binaryStylesheet.addValue(
+            'Global/useSystemSignSeparator',
+            score.stylesheet.useSystemSignSeparator,
+            DataType.Boolean
+        );
+        binaryStylesheet.addValue('Global/DisplayTuning', score.stylesheet.globalDisplayTuning, DataType.Boolean);
+        binaryStylesheet.addValue(
+            'Global/DrawChords',
+            score.stylesheet.globalDisplayChordDiagramsOnTop,
+            DataType.Boolean
+        );
+
+        switch (score.stylesheet.singleTrackTrackNamePolicy) {
+            case TrackNamePolicy.Hidden:
+                binaryStylesheet.addValue('System/showTrackNameSingle', false, DataType.Boolean);
+                break;
+            case TrackNamePolicy.FirstSystem:
+                binaryStylesheet.addValue('System/trackNameModeSingle', 0, DataType.Integer);
+                break;
+            case TrackNamePolicy.AllSystems:
+                binaryStylesheet.addValue('System/trackNameModeSingle', 2, DataType.Integer);
+                break;
+        }
+
+        switch (score.stylesheet.multiTrackTrackNamePolicy) {
+            case TrackNamePolicy.Hidden:
+                binaryStylesheet.addValue('System/trackNameModeMulti', false, DataType.Boolean);
+                break;
+            case TrackNamePolicy.FirstSystem:
+                binaryStylesheet.addValue('System/trackNameModeMulti', 0, DataType.Integer);
+                break;
+            case TrackNamePolicy.AllSystems:
+                binaryStylesheet.addValue('System/trackNameModeMulti', 2, DataType.Integer);
+                break;
+        }
+
+        switch (score.stylesheet.firstSystemTrackNameMode) {
+            case TrackNameMode.FullName:
+                binaryStylesheet.addValue('System/shortTrackNameOnFirstSystem', false, DataType.Boolean);
+                break;
+            case TrackNameMode.ShortName:
+                binaryStylesheet.addValue('System/shortTrackNameOnFirstSystem', true, DataType.Boolean);
+                break;
+        }
+
+        switch (score.stylesheet.otherSystemsTrackNameMode) {
+            case TrackNameMode.FullName:
+                binaryStylesheet.addValue('System/shortTrackNameOnOtherSystems', false, DataType.Boolean);
+                break;
+            case TrackNameMode.ShortName:
+                binaryStylesheet.addValue('System/shortTrackNameOnOtherSystems', true, DataType.Boolean);
+                break;
+        }
+
+        switch (score.stylesheet.firstSystemTrackNameOrientation) {
+            case TrackNameOrientation.Horizontal:
+                binaryStylesheet.addValue('System/horizontalTrackNameOnFirstSystem', true, DataType.Boolean);
+                break;
+            case TrackNameOrientation.Vertical:
+                binaryStylesheet.addValue('System/horizontalTrackNameOnFirstSystem', false, DataType.Boolean);
+                break;
+        }
+
+        switch (score.stylesheet.otherSystemsTrackNameOrientation) {
+            case TrackNameOrientation.Horizontal:
+                binaryStylesheet.addValue('System/horizontalTrackNameOnOtherSystems', true, DataType.Boolean);
+                break;
+            case TrackNameOrientation.Vertical:
+                binaryStylesheet.addValue('System/horizontalTrackNameOnOtherSystems', false, DataType.Boolean);
+                break;
+        }
+
         const writer = ByteBuffer.withCapacity(128);
-        IOHelper.writeInt32BE(writer, 5); // entry count
-
-        BinaryStylesheet.writeBooleanEntry(writer, 'StandardNotation/hideDynamics', score.stylesheet.hideDynamics);
-        BinaryStylesheet.writeNumberEntry(writer, 'System/bracketExtendMode', score.stylesheet.bracketExtendMode as number);
-        BinaryStylesheet.writeBooleanEntry(writer, 'Global/useSystemSignSeparator', score.stylesheet.useSystemSignSeparator);
-        BinaryStylesheet.writeBooleanEntry(writer, 'Global/DisplayTuning', score.stylesheet.globalDisplayTuning);
-        BinaryStylesheet.writeBooleanEntry(writer, 'Global/DrawChords', score.stylesheet.globalDisplayChordDiagramsOnTop);
-
+        binaryStylesheet.writeTo(writer);
         return writer.toArray();
-    }
-
-    private static writeBooleanEntry(writer: ByteBuffer, key: string, value: boolean) {
-        GpBinaryHelpers.gpWriteString(writer, key);
-        writer.writeByte(DataType.Boolean as number);
-        writer.writeByte(value ? 1 : 0);
-    }
-
-    private static writeNumberEntry(writer: ByteBuffer, key: string, value: number) {
-        GpBinaryHelpers.gpWriteString(writer, key);
-        writer.writeByte(DataType.Integer as number);
-        IOHelper.writeInt32BE(writer, value)
     }
 }
