@@ -134,7 +134,7 @@ export class RenderStylesheet {
     /**
      * The orientation of the the track names on the first system
      */
-    public firstSystemTrackNameOrientation: TrackNameOrientation = TrackNameOrientation.Horizontal;
+    public firstSystemTrackNameOrientation: TrackNameOrientation = TrackNameOrientation.Vertical;
 
     /**
      * The orientation of the the track names on other systems

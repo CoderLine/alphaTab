@@ -296,6 +296,7 @@ export class StaffSystem {
                         break;
                 }
 
+                let hasAnyTrackName = false;
                 if (shouldRender) {
                     let canvas: ICanvas = this.layout.renderer.canvas!;
                     let res: Font = settings.display.resources.effectFont;
@@ -311,22 +312,24 @@ export class StaffSystem {
                                 break;
                         }
 
-                        const size = canvas.measureText(trackNameText);
-                        switch (trackNameOrientation) {
-                            case TrackNameOrientation.Horizontal:
-                                this.accoladeWidth = Math.ceil(
-                                    Math.max(this.accoladeWidth, size.width)
-                                );
-                                break;
-                            case TrackNameOrientation.Vertical:
-                                this.accoladeWidth = Math.ceil(
-                                    Math.max(this.accoladeWidth, size.height)
-                                );
-                                break;
+                        if (trackNameText.length > 0) {
+                            hasAnyTrackName = true;
+                            const size = canvas.measureText(trackNameText);
+                            switch (trackNameOrientation) {
+                                case TrackNameOrientation.Horizontal:
+                                    this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, size.width));
+                                    break;
+                                case TrackNameOrientation.Vertical:
+                                    this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, size.height));
+                                    break;
+                            }
                         }
                     }
-                    this.accoladeWidth += settings.display.systemLabelPaddingLeft;
-                    this.accoladeWidth += settings.display.systemLabelPaddingRight;
+
+                    if (hasAnyTrackName) {
+                        this.accoladeWidth += settings.display.systemLabelPaddingLeft;
+                        this.accoladeWidth += settings.display.systemLabelPaddingRight;
+                    }
                 }
             }
 
@@ -550,38 +553,40 @@ export class StaffSystem {
                                     break;
                             }
 
-                            const textEndX =
-                                // start at beginning of first renderer
-                                cx +
-                                g.firstStaffInBracket.x -
-                                // left side of the bracket
-                                settings.display.accoladeBarPaddingRight -
-                                (g.bracket?.width ?? 0) -
-                                // padding between label and bracket
-                                settings.display.systemLabelPaddingRight;
+                            if (trackNameText.length > 0) {
+                                const textEndX =
+                                    // start at beginning of first renderer
+                                    cx +
+                                    g.firstStaffInBracket.x -
+                                    // left side of the bracket
+                                    settings.display.accoladeBarPaddingRight -
+                                    (g.bracket?.width ?? 0) -
+                                    // padding between label and bracket
+                                    settings.display.systemLabelPaddingRight;
 
-                            switch (trackNameOrientation) {
-                                case TrackNameOrientation.Horizontal:
-                                    canvas.textBaseline = TextBaseline.Middle;
-                                    canvas.textAlign = TextAlign.Right;
-                                    canvas.fillText(trackNameText, textEndX, (firstStart + lastEnd) / 2);
-                                    break;
-                                case TrackNameOrientation.Vertical:
-                                    canvas.textBaseline = TextBaseline.Bottom;
-                                    canvas.textAlign = TextAlign.Center;
+                                switch (trackNameOrientation) {
+                                    case TrackNameOrientation.Horizontal:
+                                        canvas.textBaseline = TextBaseline.Middle;
+                                        canvas.textAlign = TextAlign.Right;
+                                        canvas.fillText(trackNameText, textEndX, (firstStart + lastEnd) / 2);
+                                        break;
+                                    case TrackNameOrientation.Vertical:
+                                        canvas.textBaseline = TextBaseline.Bottom;
+                                        canvas.textAlign = TextAlign.Center;
 
-                                    // -90° looks terrible in chrome, antialiasing seems to be disabled
-                                    // adding 0.1° to re-enable antialiasing at the cost of a slight angle
-                                    const chromeTextAntialiasingFix = 0.1;
+                                        // -90° looks terrible in chrome, antialiasing seems to be disabled
+                                        // adding 0.1° to re-enable antialiasing at the cost of a slight angle
+                                        const chromeTextAntialiasingFix = 0.1;
 
-                                    canvas.beginRotate(
-                                        textEndX,
-                                        (firstStart + lastEnd) / 2,
-                                        -90 - chromeTextAntialiasingFix
-                                    );
-                                    canvas.fillText(trackNameText, 0, 0);
-                                    canvas.endRotate();
-                                    break;
+                                        canvas.beginRotate(
+                                            textEndX,
+                                            (firstStart + lastEnd) / 2,
+                                            -90 - chromeTextAntialiasingFix
+                                        );
+                                        canvas.fillText(trackNameText, 0, 0);
+                                        canvas.endRotate();
+                                        break;
+                                }
                             }
                         }
                     }
