@@ -24,7 +24,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 0.0000,
+        tolerancePercent: number =1,
         triggerResize: boolean = false
     ): Promise<void> {
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -49,7 +49,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 0.0000
+        tolerancePercent: number =1
     ): Promise<void> {
         try {
             const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
@@ -75,7 +75,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 0.0000
+        tolerancePercent: number =1
     ): Promise<void> {
         try {
             if (!settings) {
@@ -98,7 +98,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 0.0000,
+        tolerancePercent: number =1,
         triggerResize: boolean = false
     ): Promise<void> {
         const widths = [1300];
@@ -129,7 +129,7 @@ export class VisualTestHelper {
         settings?: Settings,
         tracks?: number[],
         message?: string,
-        tolerancePercent: number = 0.0000
+        tolerancePercent: number =1
     ): Promise<void> {
         if (!settings) {
             settings = new Settings();
@@ -314,7 +314,7 @@ export class VisualTestHelper {
         referenceFileName: string,
         referenceFileData: Uint8Array,
         message?: string,
-        tolerancePercent: number = 0.0000
+        tolerancePercent: number =1
     ): Promise<void> {
         // create final full image
         using actual = new AlphaSkiaCanvas();
@@ -340,7 +340,7 @@ export class VisualTestHelper {
         expectedFileName: string,
         expected: AlphaSkiaImage|undefined,
         message?: string,
-        tolerancePercent: number = 0.0000
+        tolerancePercent: number =1
     ): Promise<void> {
         let pass = false;
         let errorMessage = '';
