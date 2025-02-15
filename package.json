@@ -54,10 +54,10 @@
         "generate-kotlin": "npm run generate-typescript && tsx src.compiler/kotlin/KotlinTranspiler.ts --outDir dist/lib.kotlin",
         "build": "npm run generate-typescript && rollup --config rollup.config.ts --configPlugin @rollup/plugin-typescript",
         "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",
-        "build-kotlin": "npm run generate-kotlin && cd src.kotlin/alphaTab && gradlew assembleRelease",
+        "build-kotlin": "npm run generate-kotlin && node scripts/gradlew.mjs assembleRelease",
         "test": "mocha",
         "test-csharp": "cd src.csharp && dotnet test -c Release",
-        "test-kotlin": "cd src.kotlin/alphaTab && gradlew testReleaseUnitTest --info",
+        "test-kotlin": "node scripts/gradlew.mjs testReleaseUnitTest --info",
         "test-accept-reference": "tsx scripts/accept-new-reference-files.ts"
     },
     "devDependencies": {
