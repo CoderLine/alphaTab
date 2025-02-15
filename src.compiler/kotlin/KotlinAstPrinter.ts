@@ -1279,14 +1279,30 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         let hasDefault = false;
 
-        s.caseClauses.forEach(c => {
+        for(let i = 0; i < s.caseClauses.length; i++) {
+            const c = s.caseClauses[i];
             if (cs.isDefaultClause(c)) {
                 hasDefault = true;
                 this.writeDefaultClause(c as cs.DefaultClause);
             } else {
-                this.writeCaseClause(c as cs.CaseClause);
+                // avoid "value", "value2", else ->
+                // but write directly else ->
+                let hasNonElseStatement = false;
+                for(let j = i; j < s.caseClauses.length; j++) {
+                    const c2 = s.caseClauses[j];
+                    if(cs.isDefaultClause(c2)) {
+                        break;
+                    } else if((c2 as cs.CaseClause).statements.length > 0) {
+                        hasNonElseStatement = true;
+                        break;
+                    }
+                }
+
+                if(hasNonElseStatement) {
+                    this.writeCaseClause(c as cs.CaseClause);
+                }
             }
-        });
+        }
 
         if (!hasDefault) {
             this.writeLine('else -> { }');

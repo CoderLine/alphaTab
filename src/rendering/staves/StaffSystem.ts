@@ -13,7 +13,7 @@ import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
-import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { MusicFontSymbol } from '@src/model';
 import { Environment } from '@src/Environment';
 
@@ -261,20 +261,76 @@ export class StaffSystem {
         const settings = this.layout.renderer.settings;
         if (!this._accoladeSpacingCalculated) {
             this._accoladeSpacingCalculated = true;
-            if (
-                this.index === 0 &&
-                this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames)
-            ) {
-                let canvas: ICanvas = this.layout.renderer.canvas!;
-                let res: Font = settings.display.resources.effectFont;
-                canvas.font = res;
-                for (let t of tracks) {
-                    this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, canvas.measureText(t.shortName).width));
+
+            this.accoladeWidth = 0;
+
+            const stylesheet = this.layout.renderer.score!.stylesheet;
+            const hasTrackName = this.layout.renderer.settings.notation.isNotationElementVisible(
+                NotationElement.TrackNames
+            );
+
+            if (hasTrackName) {
+                const trackNamePolicy =
+                    this.layout.renderer.tracks!.length === 1
+                        ? stylesheet.singleTrackTrackNamePolicy
+                        : stylesheet.multiTrackTrackNamePolicy;
+
+                const trackNameMode =
+                    this.index === 0 ? stylesheet.firstSystemTrackNameMode : stylesheet.otherSystemsTrackNameMode;
+
+                const trackNameOrientation =
+                    this.index === 0
+                        ? stylesheet.firstSystemTrackNameOrientation
+                        : stylesheet.otherSystemsTrackNameOrientation;
+
+                let shouldRender = false;
+
+                switch (trackNamePolicy) {
+                    case TrackNamePolicy.Hidden:
+                        break;
+                    case TrackNamePolicy.FirstSystem:
+                        shouldRender = this.index === 0;
+                        break;
+                    case TrackNamePolicy.AllSystems:
+                        shouldRender = true;
+                        break;
                 }
-                this.accoladeWidth += settings.display.systemLabelPaddingLeft;
-                this.accoladeWidth += settings.display.systemLabelPaddingRight;
-            } else {
-                this.accoladeWidth = 0;
+
+                let hasAnyTrackName = false;
+                if (shouldRender) {
+                    let canvas: ICanvas = this.layout.renderer.canvas!;
+                    let res: Font = settings.display.resources.effectFont;
+                    canvas.font = res;
+                    for (let t of tracks) {
+                        let trackNameText = '';
+                        switch (trackNameMode) {
+                            case TrackNameMode.FullName:
+                                trackNameText = t.name;
+                                break;
+                            case TrackNameMode.ShortName:
+                                trackNameText = t.shortName;
+                                break;
+                        }
+
+                        if (trackNameText.length > 0) {
+                            hasAnyTrackName = true;
+                            const size = canvas.measureText(trackNameText);
+                            switch (trackNameOrientation) {
+                                case TrackNameOrientation.Horizontal:
+                                    this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, size.width));
+                                    break;
+                                case TrackNameOrientation.Vertical:
+                                    this.accoladeWidth = Math.ceil(Math.max(this.accoladeWidth, size.height));
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (hasAnyTrackName) {
+                        this.accoladeWidth += settings.display.systemLabelPaddingLeft;
+                        this.accoladeWidth += settings.display.systemLabelPaddingRight;
+                    }
+                }
             }
 
             // NOTE: we have a chicken-egg problem when it comes to scaling braces which we try to mitigate here:
@@ -446,34 +502,97 @@ export class StaffSystem {
             //
             // Draw track names
             const settings = this.layout.renderer.settings;
-            const hasTrackName =
-                this.index === 0 &&
-                this.layout.renderer.settings.notation.isNotationElementVisible(NotationElement.TrackNames);
+            const hasTrackName = this.layout.renderer.settings.notation.isNotationElementVisible(
+                NotationElement.TrackNames
+            );
             canvas.font = res.effectFont;
             if (hasTrackName) {
-                const oldBaseLine = canvas.textBaseline;
-                const oldTextAlign = canvas.textAlign;
-                for (const g of this.staves) {
-                    if (g.firstStaffInBracket && g.lastStaffInBracket) {
-                        let firstStart: number = cy + g.firstStaffInBracket.contentTop;
-                        let lastEnd: number = cy + g.lastStaffInBracket.contentBottom;
+                const stylesheet = this.layout.renderer.score!.stylesheet;
 
-                        const textX =
-                            // start at beginning of first renderer
-                            cx +
-                            g.firstStaffInBracket.x -
-                            // left side of the bracket
-                            settings.display.accoladeBarPaddingRight -
-                            (g.bracket?.width ?? 0) -
-                            // padding between label and bracket
-                            settings.display.systemLabelPaddingRight;
-                        canvas.textBaseline = TextBaseline.Middle;
-                        canvas.textAlign = TextAlign.Right;
-                        canvas.fillText(g.track.shortName, textX, (firstStart + lastEnd) / 2);
-                    }
+                const trackNamePolicy =
+                    this.layout.renderer.tracks!.length === 1
+                        ? stylesheet.singleTrackTrackNamePolicy
+                        : stylesheet.multiTrackTrackNamePolicy;
+
+                const trackNameMode =
+                    this.index === 0 ? stylesheet.firstSystemTrackNameMode : stylesheet.otherSystemsTrackNameMode;
+
+                const trackNameOrientation =
+                    this.index === 0
+                        ? stylesheet.firstSystemTrackNameOrientation
+                        : stylesheet.otherSystemsTrackNameOrientation;
+
+                let shouldRender = false;
+
+                switch (trackNamePolicy) {
+                    case TrackNamePolicy.Hidden:
+                        break;
+                    case TrackNamePolicy.FirstSystem:
+                        shouldRender = this.index === 0;
+                        break;
+                    case TrackNamePolicy.AllSystems:
+                        shouldRender = true;
+                        break;
                 }
-                canvas.textBaseline = oldBaseLine;
-                canvas.textAlign = oldTextAlign;
+
+                if (shouldRender) {
+                    const oldBaseLine = canvas.textBaseline;
+                    const oldTextAlign = canvas.textAlign;
+                    for (const g of this.staves) {
+                        if (g.firstStaffInBracket && g.lastStaffInBracket) {
+                            let firstStart: number = cy + g.firstStaffInBracket.contentTop;
+                            let lastEnd: number = cy + g.lastStaffInBracket.contentBottom;
+
+                            let trackNameText = '';
+                            switch (trackNameMode) {
+                                case TrackNameMode.FullName:
+                                    trackNameText = g.track.name;
+                                    break;
+                                case TrackNameMode.ShortName:
+                                    trackNameText = g.track.shortName;
+                                    break;
+                            }
+
+                            if (trackNameText.length > 0) {
+                                const textEndX =
+                                    // start at beginning of first renderer
+                                    cx +
+                                    g.firstStaffInBracket.x -
+                                    // left side of the bracket
+                                    settings.display.accoladeBarPaddingRight -
+                                    (g.bracket?.width ?? 0) -
+                                    // padding between label and bracket
+                                    settings.display.systemLabelPaddingRight;
+
+                                switch (trackNameOrientation) {
+                                    case TrackNameOrientation.Horizontal:
+                                        canvas.textBaseline = TextBaseline.Middle;
+                                        canvas.textAlign = TextAlign.Right;
+                                        canvas.fillText(trackNameText, textEndX, (firstStart + lastEnd) / 2);
+                                        break;
+                                    case TrackNameOrientation.Vertical:
+                                        canvas.textBaseline = TextBaseline.Bottom;
+                                        canvas.textAlign = TextAlign.Center;
+
+                                        // -90° looks terrible in chrome, antialiasing seems to be disabled
+                                        // adding 0.1° to re-enable antialiasing at the cost of a slight angle
+                                        const chromeTextAntialiasingFix = 0.1;
+
+                                        canvas.beginRotate(
+                                            textEndX,
+                                            (firstStart + lastEnd) / 2,
+                                            -90 - chromeTextAntialiasingFix
+                                        );
+                                        canvas.fillText(trackNameText, 0, 0);
+                                        canvas.endRotate();
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    canvas.textBaseline = oldBaseLine;
+                    canvas.textAlign = oldTextAlign;
+                }
             }
 
             //

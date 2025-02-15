@@ -6,6 +6,9 @@
 import { RenderStylesheet } from "@src/model/RenderStylesheet";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BracketExtendMode } from "@src/model/RenderStylesheet";
+import { TrackNamePolicy } from "@src/model/RenderStylesheet";
+import { TrackNameMode } from "@src/model/RenderStylesheet";
+import { TrackNameOrientation } from "@src/model/RenderStylesheet";
 export class RenderStylesheetSerializer {
     public static fromJson(obj: RenderStylesheet, m: unknown): void {
         if (!m) {
@@ -37,6 +40,12 @@ export class RenderStylesheetSerializer {
                 m.set(k.toString(), v);
             }
         }
+        o.set("singletracktracknamepolicy", obj.singleTrackTrackNamePolicy as number);
+        o.set("multitracktracknamepolicy", obj.multiTrackTrackNamePolicy as number);
+        o.set("firstsystemtracknamemode", obj.firstSystemTrackNameMode as number);
+        o.set("othersystemstracknamemode", obj.otherSystemsTrackNameMode as number);
+        o.set("firstsystemtracknameorientation", obj.firstSystemTrackNameOrientation as number);
+        o.set("othersystemstracknameorientation", obj.otherSystemsTrackNameOrientation as number);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -67,6 +76,24 @@ export class RenderStylesheetSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     obj.perTrackChordDiagramsOnTop!.set(parseInt(k), v as boolean);
                 });
+                return true;
+            case "singletracktracknamepolicy":
+                obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
+                return true;
+            case "multitracktracknamepolicy":
+                obj.multiTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
+                return true;
+            case "firstsystemtracknamemode":
+                obj.firstSystemTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(v, TrackNameMode)!;
+                return true;
+            case "othersystemstracknamemode":
+                obj.otherSystemsTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(v, TrackNameMode)!;
+                return true;
+            case "firstsystemtracknameorientation":
+                obj.firstSystemTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
+                return true;
+            case "othersystemstracknameorientation":
+                obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
                 return true;
         }
         return false;

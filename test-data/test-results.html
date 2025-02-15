@@ -44,6 +44,7 @@
             position: absolute;
             right: 0;
             top: 0;
+            border-left: 1px solid red;
         }
 
         .diff {
@@ -194,7 +195,7 @@
             })
 
             try {
-                await Promise.all([expected, actual, diff]);
+                await Promise.allSettled([expected, actual, diff]);
             }
             catch(e) {
                 // ignore potentially missing images

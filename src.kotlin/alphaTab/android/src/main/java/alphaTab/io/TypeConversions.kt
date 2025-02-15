@@ -42,5 +42,13 @@ internal class TypeConversions {
                 .order(java.nio.ByteOrder.LITTLE_ENDIAN)
             return buffer.getInt().toDouble()
         }
+
+        fun float32BEToBytes(v:Double): Uint8Array {
+            val buffer = ByteArray(4);
+            java.nio.ByteBuffer.wrap(buffer)
+                .order(java.nio.ByteOrder.BIG_ENDIAN)
+                .putFloat(v.toFloat());
+            return Uint8Array(buffer.toUByteArray());
+        }
     }
 }

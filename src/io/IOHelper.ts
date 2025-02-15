@@ -204,4 +204,9 @@ export class IOHelper {
         o.writeByte((v >> 8) & 0xff);
         o.writeByte((v >> 0) & 0xff);
     }
+
+    public static writeFloat32BE(o: IWriteable, v: number) {
+        const b = TypeConversions.float32BEToBytes(v);
+        o.write(b, 0, b.length);
+    }
 }

@@ -53,7 +53,7 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { BendType } from '@src/model/BendType';
 import { SimileMark } from '@src/model/SimileMark';
 import { WhammyType } from '@src/model/WhammyType';
-import { BracketExtendMode } from '@src/model/RenderStylesheet';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { Color } from '@src/model/Color';
 import { BendStyle } from '@src/model/BendStyle';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
@@ -928,6 +928,68 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
+                case 'singletracktracknamepolicy':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('singleTrackTrackNamePolicy', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.singleTrackTrackNamePolicy = this.parseTrackNamePolicy(
+                        this._syData as string
+                    );
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'multitracktracknamepolicy':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('multiTrackTrackNamePolicy', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.multiTrackTrackNamePolicy = this.parseTrackNamePolicy(
+                        this._syData as string
+                    );
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'firstsystemtracknamemode':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('firstSystemTrackNameMode', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.firstSystemTrackNameMode = this.parseTrackNameMode(this._syData as string);
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'othersystemstracknamemode':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('otherSystemsTrackNameMode', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.otherSystemsTrackNameMode = this.parseTrackNameMode(this._syData as string);
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'firstsystemtracknameorientation':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('firstSystemTrackNameOrientation', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.firstSystemTrackNameOrientation = this.parseTrackNameOrientation(
+                        this._syData as string
+                    );
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'othersystemstracknameorientation':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error('otherSystemsTrackNameOrientation', AlphaTexSymbols.String, true);
+                    }
+                    this._score.stylesheet.otherSystemsTrackNameOrientation = this.parseTrackNameOrientation(
+                        this._syData as string
+                    );
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
                 default:
                     switch (this.handleStaffMeta()) {
                         case StaffMetaResult.KnownStaffMeta:
@@ -960,6 +1022,38 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         return anyTopLevelMeta || anyOtherMeta;
+    }
+
+    private parseTrackNamePolicy(v: string): TrackNamePolicy {
+        switch (v.toLowerCase()) {
+            case 'hidden':
+                return TrackNamePolicy.Hidden;
+            case 'allsystems':
+                return TrackNamePolicy.AllSystems;
+            case 'firstsystem':
+            default:
+                return TrackNamePolicy.FirstSystem;
+        }
+    }
+
+    private parseTrackNameMode(v: string): TrackNameMode {
+        switch (v.toLowerCase()) {
+            case 'fullname':
+                return TrackNameMode.FullName;
+            case 'shortname':
+            default:
+                return TrackNameMode.ShortName;
+        }
+    }
+
+    private parseTrackNameOrientation(v: string): TrackNameOrientation {
+        switch (v.toLowerCase()) {
+            case 'horizontal':
+                return TrackNameOrientation.Horizontal;
+            case 'vertical':
+            default:
+                return TrackNameOrientation.Vertical;
+        }
     }
 
     private handleStaffMeta(): StaffMetaResult {
@@ -1002,8 +1096,8 @@ export class AlphaTexImporter extends ScoreImporter {
                         break;
                 }
 
-                if(this._sy === AlphaTexSymbols.String && (this._syData as string).toLowerCase() === "hide") {
-                    if(!this._score.stylesheet.perTrackDisplayTuning) {
+                if (this._sy === AlphaTexSymbols.String && (this._syData as string).toLowerCase() === 'hide') {
+                    if (!this._score.stylesheet.perTrackDisplayTuning) {
                         this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
                     }
                     this._score.stylesheet.perTrackDisplayTuning!.set(this._currentTrack.index, false);

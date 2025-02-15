@@ -59,11 +59,7 @@ describe('LayoutTests', () => {
     it('brackets-braces-none', async () => {
         const settings: Settings = new Settings();
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
-        await VisualTestHelper.runVisualTest(
-            'layout/brackets-braces-none.gp',
-            settings,
-            [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        );
+        await VisualTestHelper.runVisualTest('layout/brackets-braces-none.gp', settings, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
     });
 
     it('brackets-braces-similar', async () => {
@@ -79,16 +75,42 @@ describe('LayoutTests', () => {
     it('brackets-braces-staves', async () => {
         const settings: Settings = new Settings();
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
-        await VisualTestHelper.runVisualTest(
-            'layout/brackets-braces-staves.gp',
-            settings,
-            [0, 1, 2, 3, 4, 5, 6, 7, 8]
-        );
+        await VisualTestHelper.runVisualTest('layout/brackets-braces-staves.gp', settings, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
     });
 
     it('brackets-braces-system-divider', async () => {
         const settings: Settings = new Settings();
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
         await VisualTestHelper.runVisualTest('layout/system-divider.gp', settings, [0, 1]);
+    });
+
+    it('track-names-full-name-all', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('layout/track-names-full-name-all.gp', settings);
+    });
+
+    it('track-names-full-name-short-name', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('layout/track-names-full-name-short-name.gp', settings);
+    });
+
+    it('track-names-full-name-horizontal', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('layout/track-names-full-name-horizontal.gp', settings);
+    });
+
+    it('track-names-first-system', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('layout/track-names-first-system.gp', settings);
+    });
+
+    it('track-names-all-systems-multi', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTest('layout/track-names-all-systems-multi.gp', settings, [0, 1]);
     });
 });
