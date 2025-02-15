@@ -7,7 +7,7 @@ on:
 jobs:
   release_web:
     name: Web
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -28,7 +28,7 @@ jobs:
 
   release_csharp:
     name: C#
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -42,8 +42,8 @@ jobs:
       - run: npm install
       - run: node ./scripts/update-csharp-version.js ${{github.run_number}}
       - run: npm run build-csharp
-      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - run: dotnet nuget push src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
   release_kotlin_android:
     name: Kotlin (Android)
@@ -73,9 +73,9 @@ jobs:
       - run: npm install
       - run: node ./scripts/update-kotlin-version.js
       - run: npm run build-kotlin
-      - run: .\gradlew.bat publishAllPublicationsToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+      - run: ./gradlew publishAllPublicationsToSonatypeRepository closeAndReleaseSonatypeStagingRepository
         working-directory: ./src.kotlin/alphaTab/
 
-      - run: .\gradlew.bat --stop
+      - run: ./gradlew --stop
         working-directory: ./src.kotlin/alphaTab/
 
