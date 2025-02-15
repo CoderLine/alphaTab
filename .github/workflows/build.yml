@@ -10,7 +10,7 @@ on:
 jobs:
   build_web:
     name: Build and Test Web
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,7 +22,7 @@ jobs:
 
   build_csharp:
     name: Build and Test C#
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -37,7 +37,7 @@ jobs:
 
   build_kotlin:
     name: Build and Test Kotlin
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     env:
       OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
       OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
@@ -61,9 +61,9 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-cache-v4-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-cache-v5-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-cache-v4-${{ github.job }}-
+            ${{ runner.os }}-gradle-cache-v5-${{ github.job }}-
       - run: npm install
       - run: npm run build-kotlin
       - run: npm run test-kotlin

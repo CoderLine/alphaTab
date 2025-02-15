@@ -126,7 +126,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             if (this.direction === BeamDirection.Up) {
                 belowEffectSpacingShiftBefore = false;
                 aboveEffectSpacingShiftBefore = true;
-                belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 1);
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 2);
                 aboveBeatEffectsY =
                     scoreRenderer.getScoreY(this.minNote!.line) - scoreRenderer.getStemSize(this.beamingHelper, true);
             } else {

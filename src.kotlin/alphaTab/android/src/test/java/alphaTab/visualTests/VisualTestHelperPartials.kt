@@ -29,7 +29,7 @@ class VisualTestHelperPartials {
                     throw Error("Unsupported OS: $os")
                 }
             }
-
+            alphaTab.alphaSkia.AlphaSkiaCanvas.switchToFreeTypeFonts();
             Environment.enableAlphaSkia(
                 bravura,
                 null
