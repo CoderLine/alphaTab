@@ -122,11 +122,6 @@ export class RenderStylesheet {
     public multiTrackTrackNamePolicy: TrackNamePolicy = TrackNamePolicy.FirstSystem;
 
     /**
-     * The policy where to show track names when a single track is rendered.
-     */
-    public firstSystemTrackName: TrackNamePolicy = TrackNamePolicy.FirstSystem;
-
-    /**
      * The mode what text to display for the track name on the first system
      */
     public firstSystemTrackNameMode: TrackNameMode = TrackNameMode.ShortName;
