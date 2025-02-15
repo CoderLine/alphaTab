@@ -289,6 +289,10 @@ internal fun String.repeat(count:Double): String {
     return this.repeat(count.toInt())
 }
 
+internal fun String.padStart(length:Double, pad:String): String {
+    return this.padStart(length.toInt(), pad[0])
+}
+
 internal val Throwable.stack: String
     get() = this.stackTraceToString()
 
