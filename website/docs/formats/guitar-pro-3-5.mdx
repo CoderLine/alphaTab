@@ -240,11 +240,11 @@ import { FileFormatFeatureTable, FileFormatFeatureGroup, FileFormatFeatureRow, F
                                         audio={[FeatureStatus.Ignored]}
                                         tex={[FeatureStatus.Supported]} />
         <FileFormatFeatureRow feature="Line Breaks" 
-                                        model={[FeatureStatus.NotSupported]}
-                                        reading={[FeatureStatus.NotSupported]}
-                                        render={[FeatureStatus.NotSupported]}
+                                        model={[FeatureStatus.Supported, "", "Use systemsLayout to configure the bars per system"]}
+                                        reading={[FeatureStatus.Ignored, "", "With a different layouting than GP and the dynamic sizing supporting line breaks doesn't make much sense."]}
+                                        render={[FeatureStatus.Supported]}
                                         audio={[FeatureStatus.Ignored]}
-                                        tex={[FeatureStatus.NotSupported]} />
+                                        tex={[FeatureStatus.Supported]} />
     </FileFormatFeatureGroup>
     <FileFormatFeatureGroup title="Beat Level">
         <FileFormatFeatureRow feature="Multiple Voices" 
