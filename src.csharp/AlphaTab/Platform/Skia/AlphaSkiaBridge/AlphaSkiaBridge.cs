@@ -112,13 +112,13 @@ internal class AlphaSkiaCanvas : IDisposable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void FillRect(double x, double y, double w, double h)
     {
-        _canvas.FillRect((float)x, (int)y, (float)w, (float)h);
+        _canvas.FillRect((float)x, (float)y, (float)w, (float)h);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void StrokeRect(double x, double y, double w, double h)
     {
-        _canvas.StrokeRect((float)x, (int)y, (float)w, (float)h);
+        _canvas.StrokeRect((float)x, (float)y, (float)w, (float)h);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

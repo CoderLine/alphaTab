@@ -768,6 +768,10 @@ export class GpifWriter {
             beatNode.addElement('Wah').innerText = WahPedal[beat.wahPedal];
         }
 
+        if(beat.showTimer) {
+            beatNode.addElement('Timer').innerText = (beat.timer ?? 0).toString();
+        }
+
         this.writeBeatProperties(beatNode, beat);
         this.writeBeatXProperties(beatNode, beat);
 

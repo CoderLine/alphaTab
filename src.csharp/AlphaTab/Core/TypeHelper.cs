@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
-using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core
 {
@@ -204,7 +203,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case System.Collections.Generic.List<T> l:
+                case List<T> l:
                     l.Sort();
                     break;
                 case T[] array:
@@ -250,6 +249,13 @@ namespace AlphaTab.Core
         public static string Substr(this string s, double start, double length)
         {
             return s.Substring((int) start, (int) length);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string PadStart(this string s, double length, string pad)
+        {
+            // NOTE: we only need single char padding for now
+            return s.PadLeft((int)length, pad[0]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

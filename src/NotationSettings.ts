@@ -332,6 +332,11 @@ export enum NotationElement {
      * The directions indicators like coda and segno.
      */
     EffectDirections,
+
+    /**
+     * The absolute playback time of beats.
+     */
+    EffectBeatTimer,
 }
 
 /**

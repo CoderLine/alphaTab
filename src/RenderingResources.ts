@@ -36,6 +36,11 @@ export class RenderingResources {
     public effectFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Italic);
 
     /**
+     * Gets or sets the font to use for displaying beat time information in the music sheet.
+     */
+    public timerFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
+
+    /**
      * Gets or sets the font to use for displaying the directions texts.
      */
     public directionsFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);

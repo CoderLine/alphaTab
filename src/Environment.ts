@@ -72,6 +72,7 @@ import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
 import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
 import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
 import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
+import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
 
 export class LayoutEngineFactory {
     public readonly vertical: boolean;
@@ -506,6 +507,7 @@ export class Environment {
                 new AlternateEndingsEffectInfo(),
                 new FreeTimeEffectInfo(),
                 new TextEffectInfo(),
+                new BeatTimerEffectInfo(),
                 new ChordsEffectInfo()
             ]),
             // no before-slash-hideable

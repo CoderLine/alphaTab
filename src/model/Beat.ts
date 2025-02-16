@@ -508,6 +508,18 @@ export class Beat {
      */
     public rasgueado: Rasgueado = Rasgueado.None;
 
+    /**
+     * Whether to show the time when this beat is played the first time.
+     * (requires that the midi for the song is generated so that times are calculated).
+     * If no midi is generated the timer value might be filled from the input file (or manually).
+     */
+    public showTimer:boolean = false;
+
+    /**
+     * The absolute time in milliseconds when this beat will be played the first time.
+     */
+    public timer: number | null = null;
+
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;
         if (points === null) {

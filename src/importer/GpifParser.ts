@@ -1741,6 +1741,12 @@ export class GpifParser {
                                 break;
                         }
                         break;
+                    case 'Timer':
+                        beat.showTimer = true;
+                        if(c.innerText.length > 0) {
+                            beat.timer = parseInt(c.innerText);
+                        }
+                        break;
                 }
             }
         }

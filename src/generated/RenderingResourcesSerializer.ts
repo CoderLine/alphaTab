@@ -24,6 +24,7 @@ export class RenderingResourcesSerializer {
         o.set("subtitlefont", Font.toJson(obj.subTitleFont));
         o.set("wordsfont", Font.toJson(obj.wordsFont));
         o.set("effectfont", Font.toJson(obj.effectFont));
+        o.set("timerfont", Font.toJson(obj.timerFont));
         o.set("directionsfont", Font.toJson(obj.directionsFont));
         o.set("fretboardnumberfont", Font.toJson(obj.fretboardNumberFont));
         o.set("numberednotationfont", Font.toJson(obj.numberedNotationFont));
@@ -58,6 +59,9 @@ export class RenderingResourcesSerializer {
                 return true;
             case "effectfont":
                 obj.effectFont = Font.fromJson(v)!;
+                return true;
+            case "timerfont":
+                obj.timerFont = Font.fromJson(v)!;
                 return true;
             case "directionsfont":
                 obj.directionsFont = Font.fromJson(v)!;

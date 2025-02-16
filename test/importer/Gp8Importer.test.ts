@@ -141,15 +141,21 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
 
         // force
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceMergeWithNext
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
-        
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).to.equal(
+            BeatBeamingMode.ForceMergeWithNext
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).to.equal(
+            BeatBeamingMode.ForceMergeWithNext
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].preferredBeamDirection).to.equal(BeamDirection.Up);
 
@@ -158,15 +164,21 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).to.equal(BeamDirection.Up);
 
         // break
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitToNext
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
-        
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitToNext
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitToNext
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).to.equal(BeamDirection.Up);
 
@@ -175,10 +187,12 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].preferredBeamDirection).to.equal(BeamDirection.Up);
 
         // break secondary
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitOnSecondaryToNext);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitOnSecondaryToNext
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
-        
+
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].invertBeamDirection).to.be.false;
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
@@ -190,7 +204,9 @@ describe('Gp8ImporterTest', () => {
         // invert to down
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(
+            BeamDirection.Down
+        );
 
         // invert to up
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
@@ -216,4 +232,44 @@ describe('Gp8ImporterTest', () => {
         expect(hide.stylesheet.otherSystemsTrackNameOrientation).to.equal(TrackNameOrientation.Vertical);
     });
 
+    it('timer', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/timer.gp')).readScore();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].timer).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].timer).to.equal(2000);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].timer).to.equal(4000);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].timer).to.equal(6000);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].timer).to.equal(8000);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].timer).to.equal(16000);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[6].voices[0].beats[0].showTimer).to.be.true;
+        // inprecision bug in guitar pro, should actually be 26000
+        expect(score.tracks[0].staves[0].bars[6].voices[0].beats[0].timer).to.equal(25999);
+        expect(score.tracks[0].staves[0].bars[6].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[7].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[7].voices[0].beats[0].timer).to.equal(28000);
+        expect(score.tracks[0].staves[0].bars[7].voices[0].beats[1].showTimer).to.be.false;
+
+        expect(score.tracks[0].staves[0].bars[8].voices[0].beats[0].showTimer).to.be.true;
+        expect(score.tracks[0].staves[0].bars[8].voices[0].beats[0].timer).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[8].voices[0].beats[1].showTimer).to.be.false;
+    });
 });

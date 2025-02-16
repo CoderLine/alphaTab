@@ -69,6 +69,9 @@ export class MidiFileGenerator {
     private _handler: IMidiFileHandler;
     private _programsPerChannel: Map<number, number> = new Map<number, number>();
 
+    private _currentTime: number = 0;
+    private _calculatedBeatTimers: Set<number> = new Set<number>();
+
     /**
      * Gets a lookup object which can be used to quickly find beats and bars
      * at a given midi tick position.
@@ -102,6 +105,8 @@ export class MidiFileGenerator {
      */
     public generate(): void {
         this.transpositionPitches.clear();
+        this._calculatedBeatTimers.clear();
+        this._currentTime = 0;
 
         // initialize tracks
         for (const track of this._score.tracks) {
@@ -264,8 +269,48 @@ export class MidiFileGenerator {
     private generateBar(bar: Bar, barStartTick: number, tempoOnBarStart: number): void {
         let playbackBar: Bar = this.getPlaybackBar(bar);
 
+        const barStartTime = this._currentTime;
         for (const v of playbackBar.voices) {
+            this._currentTime = barStartTime;
             this.generateVoice(v, barStartTick, bar, tempoOnBarStart);
+        }
+
+        // calculate the real bar end time (bars might be not full or overfilled)
+        const masterBar = playbackBar.masterBar;
+        const tickDuration = masterBar.calculateDuration();
+        const tempoAutomations = masterBar.tempoAutomations.slice();
+        if (tempoAutomations.length === 0) {
+            // fast path: no tempo automations -> simply apply whole duration
+            this._currentTime = barStartTime + MidiUtils.ticksToMillis(tickDuration, tempoOnBarStart);
+        } else {
+            // slow path: loop through slices and advance time
+            this._currentTime = barStartTime;
+
+            let currentTick = barStartTick;
+            let currentTempo = tempoOnBarStart;
+
+            const endTick = barStartTick + tickDuration;
+
+            for (const automation of tempoAutomations) {
+                // calculate the tick difference to the next tempo automation
+                const automationTick = tickDuration * automation.ratioPosition;
+                const diff = automationTick - currentTick;
+
+                // apply the time
+                if (diff > 0) {
+                    this._currentTime += MidiUtils.ticksToMillis(diff, currentTempo);
+                }
+
+                // apply automation advance time
+                currentTempo = automation.value;
+                currentTick += diff;
+            }
+
+            // apply time until end
+            const remainingTick = endTick - currentTick;
+            if (remainingTick > 0) {
+                this._currentTime += MidiUtils.ticksToMillis(remainingTick, currentTempo);
+            }
         }
     }
 
@@ -335,6 +380,12 @@ export class MidiFileGenerator {
                 }
             }
         }
+
+        if (beat.showTimer && !this._calculatedBeatTimers.has(beat.id)) {
+            beat.timer = this._currentTime;
+            this._calculatedBeatTimers.add(beat.id);
+        }
+        this._currentTime += MidiUtils.ticksToMillis(audioDuration, tempoOnBeatStart);
 
         // in case of normal playback register playback
         if (realBar === beat.voice.bar) {

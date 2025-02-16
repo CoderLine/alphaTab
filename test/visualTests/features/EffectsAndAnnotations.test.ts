@@ -268,4 +268,8 @@ describe('EffectsAndAnnotationsTests', () => {
     it('directions-symbols', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/directions-symbols.gp');
     });
+
+    it('timer', async () => {
+        await VisualTestHelper.runVisualTest('effects-and-annotations/timer.gp');
+    });
 });
