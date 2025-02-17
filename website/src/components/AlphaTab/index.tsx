@@ -1,6 +1,9 @@
 import * as alphaTab from '@coderline/alphatab';
 import environment from '@site/src/environment';
 import React from 'react';
+import styles from './styles.module.scss';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { solid } from '@fortawesome/fontawesome-svg-core/import.macro';
 
 export interface AlphaTabProps {
     settings?: any;
@@ -8,14 +11,22 @@ export interface AlphaTabProps {
     tracks?: number[] | string;
     tex: boolean;
     children: string | React.ReactElement;
+    player?: boolean;
 }
 
-export class AlphaTab extends React.Component<AlphaTabProps> {
-    private _api?: alphaTab.AlphaTabApi;
+export interface AlphaTabState {
+    isPlaying: boolean;
+    api?: alphaTab.AlphaTabApi,
+}
+
+export class AlphaTab extends React.Component<AlphaTabProps, AlphaTabState> {
     private _element: React.RefObject<HTMLDivElement> = React.createRef();
 
     constructor(props) {
         super(props);
+        this.state = {
+            isPlaying: false
+        };
     }
 
     componentDidMount() {
@@ -35,21 +46,50 @@ export class AlphaTab extends React.Component<AlphaTabProps> {
                 }
             });
         }
+        if (this.props.player) {
+            settings.player.enablePlayer = true;
+            settings.player.scrollOffsetY = -50;
+            settings.player.soundFont = environment.soundFontDirectory + 'sonivox.sf2';
+        }
         if (this.props.settings) {
             settings.fillFromJson(this.props.settings)
         }
 
-        this._api = new alphaTab.AlphaTabApi(container, settings);
+        const api =  new alphaTab.AlphaTabApi(container, settings);
+        api.playerStateChanged.on((args) => {
+            this.setState({
+                isPlaying: args.state == alphaTab.synth.PlayerState.Playing,
+            });
+        });
+
+        this.setState({
+            api: api
+        });
+
+   
     }
 
     componentWillUnmount() {
-        this._api.destroy();
+        this.state.api?.destroy();
+    }
+
+    public playPause(e: Event) {
+        e.preventDefault();
+        this.state.api?.playPause();
     }
 
     render() {
         return (
-            <div ref={this._element}>
-                {this.props.children}
+            <div className={styles.wrapper}>
+                {this.props.player && (
+                    <button className='button button--primary'
+                        onClick={this.playPause.bind(this)}>
+                        <FontAwesomeIcon icon={this.state.isPlaying ? solid("pause") : solid("play")} />
+                    </button>
+                )}
+                <div ref={this._element}>
+                    {this.props.children}
+                </div>
             </div>
         );
     }
