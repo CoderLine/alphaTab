@@ -206,3 +206,38 @@ For example, a standard guitar tuning is `\tuning E4 B3 G3 D3 A2 E2`. A 5 string
 For non-stringed instruments, the values `piano`, `none` or `voice` can be used depending on preference.
 
 If `\instrument` is specified without `\tuning`, alphaTab will try to make a guess and apply the right default tuning.
+
+
+## Brackets and Braces
+
+To configure the mode how to show [brackets and braces](/docs/showcase/general.mdx) use 
+
+* `\bracketExtendMode NoBrackets`
+* `\bracketExtendMode GroupStaves`
+* `\bracketExtendMode GroupSimilarInstruments`
+
+<AlphaTexSample tracks="all">{`
+\\bracketextendmode GroupSimilarInstruments
+.
+\\track "Piano1"
+    \\staff {score}
+	\\instrument piano
+    C4 D4 E4 F4
+    \\staff {score}
+    \\clef f4 C3 D3 E3 F3
+\\track "Piano2"
+    \\staff {score}
+	\\instrument piano
+    C4 D4 E4 F4
+\\track "Flute 1"
+    \\staff { score }
+	\\instrument flute
+    C4 D4 E4 F4
+\\track "Flute 2"
+    \\staff { score }
+	\\instrument flute
+    \\clef f4 C3 D3 E3 F3
+\\track "Guitar 1"
+    \\staff { score tabs }
+    0.3.4 2.3.4 5.3.4 7.3.4 
+`}</AlphaTexSample>

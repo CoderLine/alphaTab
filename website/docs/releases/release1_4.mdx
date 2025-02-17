@@ -1,0 +1,205 @@
+---
+title: v1.4
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab/';
+
+## 1.4.0
+
+Time flies and its been almost one year since 1.3.0 was released. Hence it is already long overdue to have an official alphaTab release. 
+
+v1.4.0 brings again a lot of new features mainly centered around extending the file format support.
+
+### Music Notation
+
+This version of alphaTab adds quite a range of new music notation features and rendering adaptions. 
+The following list is (roughly) sorted by the visual impact of the added feature.
+
+#### rendering: Change on Paddings and Margins
+https://github.com/CoderLine/alphaTab/pull/1524
+
+Up to v1.3 alphaTab was fairly generious with the paddings and margins it defined and there was no possibility to adjust these sizes. 
+This way alphaTab required quite a bit of screen space, even for small music sheets. With this feature we introduced configurable
+paddings and margins for all general spacings that affect the system and stave placement. At the same time we reduced the paddings
+to some more reasonable defaults resulting in a more concise display.
+
+<img src="/img/release/v14/concise.png" />
+
+#### notation: Slash Notation
+https://github.com/CoderLine/alphaTab/pull/1511
+
+alphaTab can now display additionally a slash notation staff. On Guitar Pro 6-8 files the configured staves are respected,
+on alphaTex the new `slash` staff option can be used. Or the staff can be enabled on the data model via `score.track[].staves[].showSlash`.
+
+<AlphaTab tex="true">{`
+\\bracketextendmode nobrackets
+.
+\\staff {score tabs slash}
+1.6.4 1.6.8 1.6.8 1.6.2 |
+1.6.4 {tu 3} 1.6.4 {tu 3} 1.6.4 {tu 3} r.2 |
+5.5.1 | r.1
+`}</AlphaTab>
+
+#### notation: Add numbered notation (Jianpu)
+https://github.com/CoderLine/alphaTab/pull/1628
+
+alphaTab can now display additionally a numbered notation staff (aka. Jianpu). On Guitar Pro 6-8 files the configured staves are respected,
+on alphaTex the new `numbered` staff option can be used. Or the staff can be enabled on the data model via `score.track[].staves[].showNumbered`.
+
+<AlphaTab tex="true">{`
+\\bracketextendmode nobrackets
+.
+\\staff {score tabs numbered}
+1.6.4 2.6.8 3.6.8 4.6.2 |
+5.6.4 {tu 3} 10.6.4 {tu 3} 12.6.4 {tu 3} r.2 |
+5.5.1 | r.1
+`}</AlphaTab>
+
+#### notation: System Brackets & Braces
+https://github.com/CoderLine/alphaTab/pull/1730
+
+Up to alphaTab 1.3 there was always a rectangular bracket drawn across the staves of one track. With alphaTab 1.4 the display is now configurable 
+in multiple modes. See [Brackets and Braces](/docs/showcase/general#brackets-and-braces) for more details. 
+
+<AlphaTab tex="true" tracks="all">{`
+\\bracketextendmode GroupStaves
+.
+\\track 
+    \\staff {score}
+    C4 D4 E4 F4
+    \\staff {score}
+    \\clef f4 C3 D3 E3 F3
+\\track 
+    \\staff { score tabs }
+    0.3.4 2.3.4 5.3.4 7.3.4 
+`}</AlphaTab>
+
+#### notation: Track Name Display
+https://github.com/CoderLine/alphaTab/pull/1895
+
+#### notation: Directions (aka. Jumps)
+https://github.com/CoderLine/alphaTab/pull/1852
+
+#### notation: Support for multiple tempo changes in one Bar
+https://github.com/CoderLine/alphaTab/pull/1600
+
+#### notation: Ornaments (turn, inverted-turn, upper-mordent, lower-mordent)
+https://github.com/CoderLine/alphaTab/pull/1746
+
+#### notation: Rasgueado Patterns
+https://github.com/CoderLine/alphaTab/pull/1748
+
+#### notation: Inline Fingering
+https://github.com/CoderLine/alphaTab/pull/1645
+
+#### notation: Slashed Beats
+https://github.com/CoderLine/alphaTab/pull/1646
+
+#### notation: Dead Slap
+https://github.com/CoderLine/alphaTab/pull/1742
+
+#### notation: Beat Timer:
+https://github.com/CoderLine/alphaTab/pull/1896
+
+#### notation: Free Time
+https://github.com/CoderLine/alphaTab/pull/1643
+
+#### notation: Tenuto
+https://github.com/CoderLine/alphaTab/pull/1645
+
+#### notation: String Numbers
+https://github.com/CoderLine/alphaTab/pull/1645
+
+#### notation: Sustain Pedal
+https://github.com/CoderLine/alphaTab/pull/1730
+
+#### notation: Golpe
+https://github.com/CoderLine/alphaTab/pull/1743
+
+#### notation: Fading Styles (fade-in, fade-out, volume-swell)
+https://github.com/CoderLine/alphaTab/pull/1744
+
+#### notation: Wah-Pedal
+https://github.com/CoderLine/alphaTab/pull/1745
+
+#### notation: Beat Barré
+https://github.com/CoderLine/alphaTab/pull/1746
+
+### Player
+
+#### player: SoundFont3 Support (Experimental)
+https://github.com/CoderLine/alphaTab/pull/1807
+
+#### player: Live Change of Transposition Pitches
+https://github.com/CoderLine/alphaTab/pull/1642
+
+### alphaTex Extensions
+
+#### alphaTex: Support for Percussion Tabs
+https://github.com/CoderLine/alphaTab/pull/1493
+
+#### alphaTex: Add Support for all Notation Elements
+https://github.com/CoderLine/alphaTab/pull/1853
+
+#### alphaTex: Specify Accidentals
+https://github.com/CoderLine/alphaTab/pull/1729
+
+
+### Guitar Pro Extensions
+
+#### Guitar Pro 3-8: Respect Beaming Modes and Directions
+https://github.com/CoderLine/alphaTab/pull/1892
+
+#### Guitar Pro 6-8: Track Visibility Information
+https://github.com/CoderLine/alphaTab/pull/1491
+
+#### Guitar Pro 3-5: Respect Staff Visibility
+https://github.com/CoderLine/alphaTab/pull/1888
+
+#### Guitar Pro 3-8: Respect Tuning Visibility
+https://github.com/CoderLine/alphaTab/pull/1889
+
+#### Guitar Pro 3-8: Respect Chord Diagram List Visibility
+https://github.com/CoderLine/alphaTab/pull/1890
+
+#### Guitar Pro 3-5: Beat Ottava
+https://github.com/CoderLine/alphaTab/pull/1892
+
+### MusicXML Extensions
+
+#### musicxml: Support for Compressed MusicXML Files
+https://github.com/CoderLine/alphaTab/pull/1492
+
+#### musicxml: Support for Guitar Bends
+https://github.com/CoderLine/alphaTab/pull/1462
+
+### Improvements & Bugfixes
+
+#### API: TypeScript definitions for JSON Settings
+https://github.com/CoderLine/alphaTab/pull/1562
+https://github.com/CoderLine/alphaTab/pull/1578
+
+#### docs: File Format Compatiblity
+
+#### rendering: Central Scaling of Music Sheet
+https://github.com/CoderLine/alphaTab/pull/1772
+
+##### bundlers: Node20+ compatibility for Vite & WebPack Integrations
+https://github.com/CoderLine/alphaTab/pull/1579
+
+##### audio: Prevent Audio Clipping Noises
+https://github.com/CoderLine/alphaTab/pull/1607
+https://github.com/CoderLine/alphaTab/pull/1609
+
+#### rendering: Ensure correct effect band sizing on line breaks
+https://github.com/CoderLine/alphaTab/pull/1621
+https://github.com/CoderLine/alphaTab/pull/1641
+
+#### player: Scrolling Issue with `ScrollMode.OffScreen`
+https://github.com/CoderLine/alphaTab/pull/1771
+
+#### notation: Vibratos on Tied Notes with Bends
+https://github.com/CoderLine/alphaTab/pull/1843
+
+#### notation: Bends on Tied Notes
+https://github.com/CoderLine/alphaTab/issues/1825
