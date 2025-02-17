@@ -132,8 +132,6 @@ const config: Config = {
                   bv = String(bv);
                 }
 
-                console.log("comparing", av, bv);
-
                 if (typeof av === "string") {
                   if (ascending) {
                     return av.localeCompare(bv as string);

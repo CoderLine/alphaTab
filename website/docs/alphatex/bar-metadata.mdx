@@ -120,3 +120,52 @@ If you want to also specify a marker beside the text, use the format `\section M
 \\section S Solo // with marker and section name differently
 1.1 1.1 1.1 1.1
 `}</AlphaTexSample>
+
+## Directions
+
+To specify play directions (jumps and jump targets) use the `\jump` metadata followed by the respective instruction.
+The names should be self explaining if you're familiar with this notation: 
+
+**Jump Targets**
+
+* `Fine`
+* `Segno`
+* `SegnoSegno`
+* `Coda`
+* `DoubleCoda`
+
+**Jump Instructions**
+
+* `DaCapo`
+* `DaCapoAlCoda`
+* `DaCapoAlDoubleCoda`
+* `DaCapoAlFine`
+
+* `DalSegno`
+* `DalSegnoAlCoda`
+* `DalSegnoAlDoubleCoda`
+* `DalSegnoAlFine`
+
+* `DalSegnoSegno`
+* `DalSegnoSegnoAlCoda`
+* `DalSegnoSegnoAlDoubleCoda`
+* `DalSegnoSegnoAlFine`
+
+* `DaCoda`
+* `DaDoubleCoda`
+
+<AlphaTexSample player="true">{`
+.
+\\ro \\rc 2 3.3*4 | 
+3.3*4 | 
+\\jump Segno 3.3*4 |
+\\ro \\rc 2 3.3*4 | 
+\\jump DaCoda 3.3*4 |
+3.3*4 | 3.3*4
+\\jump DalSegnoAlCoda 3.3*4 |
+3.3*4 |
+\\jump Coda 3.3*4 |
+3.3*4 |
+3.3*4
+`}</AlphaTexSample>
+

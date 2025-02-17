@@ -79,17 +79,69 @@ in multiple modes. See [Brackets and Braces](/docs/showcase/general#brackets-and
 #### notation: Track Name Display
 https://github.com/CoderLine/alphaTab/pull/1895
 
+alphaTab has now multiple modes on how to display the track names. The settings are adopted from Guitar Pro and allow a variety of display formats.
+
+<AlphaTab tex="true" tracks="all">{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\firstsystemtracknameorientation horizontal
+\\othersystemstracknameorientation vertical
+.
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+    \\staff {score}
+    C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+`}</AlphaTab>
+
 #### notation: Directions (aka. Jumps)
 https://github.com/CoderLine/alphaTab/pull/1852
 
+Support for directions (aka. jumps) was added in alphaTab v1.4.0. 
+
+<AlphaTab tex="true" player="true">{`
+\\ro \\rc 2 3.3*4 | 
+3.3*4 | 
+\\jump Segno 3.3*4 |
+\\ro \\rc 2 3.3*4 | 
+\\jump DaCoda 3.3*4 |
+3.3*4 | 3.3*4
+\\jump DalSegnoAlCoda 3.3*4 |
+3.3*4 |
+\\jump Coda 3.3*4 |
+3.3*4 |
+3.3*4
+`}
+</AlphaTab>
 #### notation: Support for multiple tempo changes in one Bar
 https://github.com/CoderLine/alphaTab/pull/1600
+
+Starting with v1.4.0 alphaTab respects multiple tempo changes within a single bar.
+
+<AlphaTab tex="true" tracks="all" player="true">{`
+.
+C4 {tempo 120} D4 E4 {tempo 140} F4 | C4.8 {tempo 80} C4 D4 {tempo 100} D4 E4 {tempo 120} E4 F4 {tempo 240} F4
+`}</AlphaTab>
 
 #### notation: Ornaments (turn, inverted-turn, upper-mordent, lower-mordent)
 https://github.com/CoderLine/alphaTab/pull/1746
 
+Ornaments like turns are respected in both display and playback of notes. 
+
+<AlphaTab tex="true" tracks="all" player="true">{`
+.
+C4 {turn} D4 E4 {umordent} F4
+`}</AlphaTab>
+
 #### notation: Rasgueado Patterns
 https://github.com/CoderLine/alphaTab/pull/1748
+
+The exact Rasgueado patterns are now read from input formats and considered during playback. 
+
+<AlphaTab tex="true" tracks="all" player="true">{`
+.
+C4 {turn} D4 E4 {umordent} F4
+`}</AlphaTab>
+
 
 #### notation: Inline Fingering
 https://github.com/CoderLine/alphaTab/pull/1645

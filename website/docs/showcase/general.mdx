@@ -73,3 +73,29 @@ The mode is loaded from Guitar Pro files, can be [configured via alphaTex](/docs
     \\staff { score tabs }
     0.3.4 2.3.4 5.3.4 7.3.4 
 `}</AlphaTab>
+
+
+## Track Names
+alphaTab renders track names at selected systems in the configured format. 
+
+For Guitar Pro files the format is loaded from the files and for alphaTex it can be specified with a range of metadata options.
+The available options on the stylesheet are: 
+
+* `score.stylesheet.singleTrackTrackNamePolicy` - configuring how track names should be displayed when only a single track is rendered. (hidden, only first system, all systems)
+* `score.stylesheet.multiTrackTrackName` - configuring how track names should be displayed when multiple tracks are rendered.
+* `score.stylesheet.firstSystemTrackNameMode` - configuring what name to show on the first system (full or short track name).
+* `score.stylesheet.otherSystemsTrackNameMode` - configuring what name to show on the first system.
+* `score.stylesheet.firstSystemTrackNameOrientation` - the orientation of the track name on the first system (horizontal or vertical)
+* `score.stylesheet.otherSystemsTrackNameOrientation` - the orientation of the track name on the first system (horizontal or vertical)
+
+<AlphaTab tex="true" tracks="all">{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\firstsystemtracknameorientation horizontal
+\\othersystemstracknameorientation vertical
+.
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+    \\staff {score}
+    C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
+`}</AlphaTab>

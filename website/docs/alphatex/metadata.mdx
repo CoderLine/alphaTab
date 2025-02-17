@@ -207,10 +207,9 @@ For non-stringed instruments, the values `piano`, `none` or `voice` can be used 
 
 If `\instrument` is specified without `\tuning`, alphaTab will try to make a guess and apply the right default tuning.
 
-
 ## Brackets and Braces
 
-To configure the mode how to show [brackets and braces](/docs/showcase/general.mdx) use 
+To configure the mode how to show [brackets and braces](/docs/showcase/general.mdx#brackets-and-braces) use 
 
 * `\bracketExtendMode NoBrackets`
 * `\bracketExtendMode GroupStaves`
@@ -240,4 +239,27 @@ To configure the mode how to show [brackets and braces](/docs/showcase/general.m
 \\track "Guitar 1"
     \\staff { score tabs }
     0.3.4 2.3.4 5.3.4 7.3.4 
+`}</AlphaTexSample>
+
+## Track Names
+
+To configure the mode how to show [track names](/docs/showcase/general.mdx#track-names) use:
+
+* `\singleTrackTrackNamePolicy hidden`, `\singleTrackTrackNamePolicy firstSystem`, `singleTrackTrackNamePolicy allSystems`
+* `\multiTrackTrackNamePolicy hidden`, `\multiTrackTrackNamePolicy firstSystem`, `multiTrackTrackNamePolicy allSystems`
+* `\firstSystemTrackNameMode shortName`, `\firstSystemTrackNameMode fullName`
+* `\otherSystemsTrackNameMode shortName`, `\otherSystemsTrackNameMode fullName`
+* `\firstSystemTrackNameOrientation horizontal`, `\firstSystemTrackNameOrientation vertical`
+* `\otherSystemsTrackNameOrientation horizontal`, `\otherSystemsTrackNameOrientation vertical`
+
+<AlphaTexSample tracks="all">{`
+\\singletracktracknamepolicy AllSystems
+\\firstsystemtracknamemode fullname
+\\othersystemstracknamemode shortname
+\\firstsystemtracknameorientation horizontal
+\\othersystemstracknameorientation vertical
+.
+\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
+    \\staff {score}
+    C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
 `}</AlphaTexSample>

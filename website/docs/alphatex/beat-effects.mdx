@@ -155,3 +155,13 @@ To enable the display of timers add a `timer` to the beat effect list.
 3.3.4 { timer } 3.3.4*3
 `}</AlphaTexSample>
 
+## Tempo Changes
+
+With the support of multiple tempo changes within a single bar, tempo changes can now be applied on beat level to mark
+the exact spot when the tempo should be changed. 
+
+<AlphaTexSample>{`
+.
+C4 {tempo 120} D4 E4 {tempo 140} F4 | C4.8 {tempo 80} C4 D4 {tempo 100} D4 E4 {tempo 120} E4 F4 {tempo 240} F4
+`}</AlphaTexSample>
+
