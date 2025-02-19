@@ -33,8 +33,8 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - run: npm install
       - run: node ./scripts/update-version.js alpha ${{github.run_number}}
+      - run: npm install
       - run: npm run build
       - run: npm pack
 

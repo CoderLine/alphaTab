@@ -18,5 +18,5 @@ console.log(`Updating Version to ${version}`);
 const buildFile = `${__dirname}/../src.kotlin/alphaTab/android/build.gradle.kts`;
 
 let propsSource = fs.readFileSync(buildFile, 'utf-8');
-propsSource = propsSource.replace(/libVersion\s*=.*/g, `libVersion = "${version}"`);
+propsSource = propsSource.replace(/libVersion\s*= \".*/g, `libVersion = "${version}"`);
 fs.writeFileSync(buildFile, propsSource);
