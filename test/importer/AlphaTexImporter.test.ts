@@ -1503,8 +1503,8 @@ describe('AlphaTexImporterTest', () => {
     it('transpose', () => {
         let score = parseTex(`
             \\staff 
-            \\displaytranspose -12
-            \\transpose -6
+            \\displaytranspose 12
+            \\transpose 6
             .
         `);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
