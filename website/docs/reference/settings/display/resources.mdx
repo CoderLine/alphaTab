@@ -102,6 +102,36 @@ export var Resources = {
 			name: 'wordsFont',
 			defaultValue: '15px Arial, sans-serif',
 			description: 'The font to use for displaying the lyrics information in the header of the music sheet.',
+		},
+		{
+			name: 'timerFont',
+			defaultValue: '12px Georgia, serif',
+			description: 'The font to use for displaying beat time information in the music sheet.',
+			since: "1.4.0"
+		},
+		{
+			name: 'directionsFont',
+			defaultValue: '14px Georgia, serif',
+			description: 'The font to use for displaying the directions texts.',
+			since: "1.4.0"
+		},
+		{
+			name: 'numberedNotationFont',
+			defaultValue: '16px Arial, sans-serif',
+			description: 'The font to use for displaying the numbered music notation in the music sheet.',
+			since: "1.4.0"
+		},
+		{
+			name: 'numberedNotationGraceFont',
+			defaultValue: '14px Arial, sans-serif',
+			description: 'The font to use for displaying the grace notes in numbered music notation in the music sheet.',
+			since: "1.4.0"
+		},
+		{
+			name: 'inlineFingeringFont',
+			defaultValue: '12px Georgia, serif',
+			description: 'The font to use for displaying finger information when inline into the music sheet.',
+			since: "1.4.0"
 		}
 	]
 };
@@ -125,6 +155,7 @@ export function ResourceRow({resource, type}) {
             </td>
             <td>{resource.defaultValue}</td>
             <td>
+				{resource.since && <SinceBadge since={resource.since} inline="true" />}
                 {resource.description}
             </td>
         </tr>
