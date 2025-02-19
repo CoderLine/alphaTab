@@ -507,11 +507,7 @@ export class BarRendererBase {
             ? this.beatGlyphsStart
             : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.OnNotes);
         const x = firstOnNoteX;
-
         const w = this.postBeatGlyphsStart - firstOnNoteX;
-
-        const duration = this.bar.masterBar.calculateDuration();
-
         return x + w * ticks;
     }
 

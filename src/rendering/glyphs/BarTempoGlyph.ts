@@ -1,7 +1,6 @@
 import { ICanvas, TextBaseline } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
-import { Automation, Color, MusicFontSymbol } from '@src/model';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { Automation, MusicFontSymbol } from '@src/model';
 
 /**
  * This glyph renders tempo annotations for tempo automations

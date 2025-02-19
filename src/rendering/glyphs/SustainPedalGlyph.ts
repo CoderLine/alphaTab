@@ -2,7 +2,6 @@ import { ICanvas } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
 import { SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { MusicFontSymbol } from '@src/model';
-import { BeatXPosition } from '../BeatXPosition';
 
 export class SustainPedalGlyph extends EffectGlyph {
     private static readonly TextHeight = 19;
