@@ -287,4 +287,9 @@ describe('EffectsAndAnnotationsTests', () => {
     it('timer', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/timer.gp');
     });
+
+    it('legato', async () => {
+        await VisualTestHelper.runVisualTestTex(`3.3.4{ legatoOrigin } 10.3.4`,
+            'effects-and-annotations/legato.gp');
+    });
 });
