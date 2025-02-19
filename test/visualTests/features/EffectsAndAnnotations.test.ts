@@ -17,6 +17,17 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/tempo.gp');
     });
 
+    it('tempo-text', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `
+            \\tempo 90 "First"
+            .
+            :4 3.3*4 | 3.3 3.3 {v f tempo 120 "Other" } 3.3 6.3
+        `,
+            `effects-and-annotations/tempo-text.png`
+        );
+    });
+
     it('beat-tempo-change', async () => {
         await VisualTestHelper.runVisualTest('effects-and-annotations/beat-tempo-change.gp');
     });
@@ -245,7 +256,9 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('bend-vibrato-default', async () => {
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`);
+        const inputFileData = await TestPlatform.loadFile(
+            `test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`
+        );
         const referenceFileName = 'effects-and-annotations/bend-vibrato-default.png';
         const settings = new Settings();
         const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
@@ -253,7 +266,9 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('bend-vibrato-songbook', async () => {
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`);
+        const inputFileData = await TestPlatform.loadFile(
+            `test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`
+        );
         const referenceFileName = 'effects-and-annotations/bend-vibrato-songbook.png';
         const settings = new Settings();
         settings.setSongBookModeSettings();

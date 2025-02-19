@@ -249,12 +249,15 @@ export class BarRendererBase {
         this._postBeatGlyphs.width = this.layoutingInfo.postBeatSize;
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
         this.computedWidth = this.width;
-        
+
         // For cases like in the horizontal layout we need to set the fixed width early
         // to have correct partials splitting. the proper alignment to this scale will happen
         // later in the workflow.
         const fixedBarWidth = this.barDisplayWidth;
-        if (fixedBarWidth > 0 && this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
+        if (
+            fixedBarWidth > 0 &&
+            this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+        ) {
             this.width = fixedBarWidth;
             this.computedWidth = fixedBarWidth;
         }
@@ -452,7 +455,7 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
-        for(const voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 this.createVoiceGlyphs(voice);
             }
@@ -499,6 +502,19 @@ export class BarRendererBase {
         return 0;
     }
 
+    public getRatioPositionX(ticks: number): number {
+        const firstOnNoteX = this.bar.isEmpty
+            ? this.beatGlyphsStart
+            : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.OnNotes);
+        const x = firstOnNoteX;
+
+        const w = this.postBeatGlyphsStart - firstOnNoteX;
+
+        const duration = this.bar.masterBar.calculateDuration();
+
+        return x + w * ticks;
+    }
+
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         let container = this.getBeatContainer(note.beat);
         if (container) {
@@ -529,7 +545,7 @@ export class BarRendererBase {
         this.updateSizes();
         this.registerLayoutingInfo();
     }
-    
+
     protected recreatePreBeatGlyphs() {
         this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._preBeatGlyphs.renderer = this;
