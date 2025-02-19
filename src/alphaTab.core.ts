@@ -12,10 +12,11 @@ export { Settings } from '@src/Settings';
 export { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 export { FormatError } from '@src/FormatError';
 export { LogLevel } from '@src/LogLevel';
-export { ILogger, Logger, ConsoleLogger } from '@src/Logger';
+export { Logger, ConsoleLogger } from '@src/Logger';
+export type { ILogger } from '@src/Logger';
 export { FileLoadError } from '@src/FileLoadError';
 export { Environment, LayoutEngineFactory, RenderEngineFactory } from '@src/Environment';
-export { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+export type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 
 export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 export { WebPlatform } from '@src/platform/javascript/WebPlatform';
