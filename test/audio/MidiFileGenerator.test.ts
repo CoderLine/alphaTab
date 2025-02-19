@@ -1763,4 +1763,47 @@ describe('MidiFileGeneratorTest', () => {
 
         expect(actualTimers.join(',')).to.equal(expectedTimers.join(','));
     });
+
+    it('transpose', ()=>{
+        const score = parseTex(`
+            \\track \\staff \\instrument piano 
+                    C4.4| r.1
+            \\track \\staff \\instrument piano 
+                \\displayTranspose 12
+                    r.1 | C4.4 | r.1
+            \\track \\staff \\instrument piano
+                \\transpose 12
+                    r.1 | r.1 | C4.4
+        `);
+        expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);
+        expect(score.tracks[0].staves[0].transpositionPitch).to.equal(0);
+
+        expect(score.tracks[1].staves[0].displayTranspositionPitch).to.equal(-12);
+        expect(score.tracks[1].staves[0].transpositionPitch).to.equal(0);
+
+        expect(score.tracks[2].staves[0].displayTranspositionPitch).to.equal(0);
+        expect(score.tracks[2].staves[0].transpositionPitch).to.equal(-12);
+
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        generator.generate();
+
+        expect(generator.transpositionPitches.has(0)).to.be.true;
+        expect(generator.transpositionPitches.get(0)!).to.equal(0);
+
+        expect(generator.transpositionPitches.has(1)).to.be.true;
+        expect(generator.transpositionPitches.get(1)!).to.equal(0);
+
+        expect(generator.transpositionPitches.has(2)).to.be.true;
+        expect(generator.transpositionPitches.get(2)!).to.equal(0);
+
+        expect(generator.transpositionPitches.has(3)).to.be.true;
+        expect(generator.transpositionPitches.get(3)!).to.equal(0);
+
+        expect(generator.transpositionPitches.has(4)).to.be.true;
+        expect(generator.transpositionPitches.get(4)!).to.equal(12);
+
+        expect(generator.transpositionPitches.has(5)).to.be.true;
+        expect(generator.transpositionPitches.get(5)!).to.equal(12);
+    })
 });
