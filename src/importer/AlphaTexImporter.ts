@@ -3026,6 +3026,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
 
                 master.displayScale = this._syData as number;
+                bar.displayScale = this._syData as number;
                 this._sy = this.newSy();
             } else if (syData === 'width') {
                 this._sy = this.newSy();
@@ -3035,6 +3036,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
 
                 master.displayWidth = this._syData as number;
+                bar.displayWidth = this._syData as number;
                 this._sy = this.newSy();
             } else {
                 if (bar.index === 0) {

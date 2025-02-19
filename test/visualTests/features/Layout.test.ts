@@ -113,4 +113,15 @@ describe('LayoutTests', () => {
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
         await VisualTestHelper.runVisualTest('layout/track-names-all-systems-multi.gp', settings, [0, 1]);
     });
+
+    it('system-layout-tex', async () => {
+        const settings: Settings = new Settings();
+        settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+        await VisualTestHelper.runVisualTestTex(`
+            \\track { defaultSystemsLayout 3 }
+            \\scale 0.25 :1 c4 | \\scale 0.5 c4 | \\scale 0.25 c4 | 
+            \\scale 0.5 c4 | \\scale 2 c4 | \\scale 0.5 c4 |
+            c4 | c4  
+        `, 'layout/system-layout-tex.png', settings);
+    });
 });
