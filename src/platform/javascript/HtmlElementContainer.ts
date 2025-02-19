@@ -36,7 +36,7 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public set scrollLeft(value: number) {
-        this.element.scrollTop = value;
+        this.element.scrollLeft = value;
     }
 
     public get scrollTop(): number {
