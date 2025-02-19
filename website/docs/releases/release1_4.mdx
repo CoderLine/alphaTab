@@ -99,6 +99,8 @@ https://github.com/CoderLine/alphaTab/pull/1852
 Support for directions (aka. jumps) was added in alphaTab v1.4.0. 
 
 <AlphaTab tex="true" player="true">{`
+\\tempo 240
+.
 \\ro \\rc 2 3.3*4 | 
 3.3*4 | 
 \\jump Segno 3.3*4 |
@@ -138,8 +140,7 @@ https://github.com/CoderLine/alphaTab/pull/1748
 The exact Rasgueado patterns are now read from input formats and considered during playback. 
 
 <AlphaTab tex="true" tracks="all" player="true">{`
-.
-C4 {turn} D4 E4 {umordent} F4
+(1.1 3.2 2.3 0.4) * 4 {rasg amii}
 `}</AlphaTab>
 
 

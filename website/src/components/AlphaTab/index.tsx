@@ -50,6 +50,7 @@ export class AlphaTab extends React.Component<AlphaTabProps, AlphaTabState> {
             settings.player.enablePlayer = true;
             settings.player.scrollOffsetY = -50;
             settings.player.soundFont = environment.soundFontDirectory + 'sonivox.sf2';
+            settings.player.scrollMode = alphaTab.ScrollMode.Off;
         }
         if (this.props.settings) {
             settings.fillFromJson(this.props.settings)
