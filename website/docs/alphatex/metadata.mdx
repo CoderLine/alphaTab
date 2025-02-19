@@ -21,8 +21,11 @@ Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details
     \\words Daniel
     \\music alphaTab
     \\copyright Daniel
-    // Tempo in BPM
-    \\tempo 200
+    \\instructions "This is an example.\\nWith instructions."
+    \\notices "Additional notes\\nEmbedded in the data model."
+    \\tab "Daniel"
+    // Tempo in BPM (label is optional)
+    \\tempo 200 "Tempo Label"
 // Track and Staff Settings (can be used after \\track and \\staff)
     // Instrument as General MIDI number or name
     \\instrument 30
@@ -33,6 +36,8 @@ Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details
 // end of metadata
 .
 `}</AlphaTexSample>
+
+Strings can contain escape sequences: `\n`, `\r`, `\t`, `\\`, `\"`, `\'`.
 
 ## Instrument
 As indicated above, the instrument can be changed via the `\instrument` metadata.
@@ -206,60 +211,3 @@ For example, a standard guitar tuning is `\tuning E4 B3 G3 D3 A2 E2`. A 5 string
 For non-stringed instruments, the values `piano`, `none` or `voice` can be used depending on preference.
 
 If `\instrument` is specified without `\tuning`, alphaTab will try to make a guess and apply the right default tuning.
-
-## Brackets and Braces
-
-To configure the mode how to show [brackets and braces](/docs/showcase/general.mdx#brackets-and-braces) use 
-
-* `\bracketExtendMode NoBrackets`
-* `\bracketExtendMode GroupStaves`
-* `\bracketExtendMode GroupSimilarInstruments`
-
-<AlphaTexSample tracks="all">{`
-\\bracketextendmode GroupSimilarInstruments
-.
-\\track "Piano1"
-    \\staff {score}
-	\\instrument piano
-    C4 D4 E4 F4
-    \\staff {score}
-    \\clef f4 C3 D3 E3 F3
-\\track "Piano2"
-    \\staff {score}
-	\\instrument piano
-    C4 D4 E4 F4
-\\track "Flute 1"
-    \\staff { score }
-	\\instrument flute
-    C4 D4 E4 F4
-\\track "Flute 2"
-    \\staff { score }
-	\\instrument flute
-    \\clef f4 C3 D3 E3 F3
-\\track "Guitar 1"
-    \\staff { score tabs }
-    0.3.4 2.3.4 5.3.4 7.3.4 
-`}</AlphaTexSample>
-
-## Track Names
-
-To configure the mode how to show [track names](/docs/showcase/general.mdx#track-names) use:
-
-* `\singleTrackTrackNamePolicy hidden`, `\singleTrackTrackNamePolicy firstSystem`, `singleTrackTrackNamePolicy allSystems`
-* `\multiTrackTrackNamePolicy hidden`, `\multiTrackTrackNamePolicy firstSystem`, `multiTrackTrackNamePolicy allSystems`
-* `\firstSystemTrackNameMode shortName`, `\firstSystemTrackNameMode fullName`
-* `\otherSystemsTrackNameMode shortName`, `\otherSystemsTrackNameMode fullName`
-* `\firstSystemTrackNameOrientation horizontal`, `\firstSystemTrackNameOrientation vertical`
-* `\otherSystemsTrackNameOrientation horizontal`, `\otherSystemsTrackNameOrientation vertical`
-
-<AlphaTexSample tracks="all">{`
-\\singletracktracknamepolicy AllSystems
-\\firstsystemtracknamemode fullname
-\\othersystemstracknamemode shortname
-\\firstsystemtracknameorientation horizontal
-\\othersystemstracknameorientation vertical
-.
-\\track "Piano 1" "pno1" { defaultsystemslayout 3 }
-    \\staff {score}
-    C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
-`}</AlphaTexSample>

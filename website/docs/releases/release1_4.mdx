@@ -288,12 +288,84 @@ while the song is being played.
 #### alphaTex: Support for Percussion Tabs
 https://github.com/CoderLine/alphaTab/pull/1493
 
+With alphaTab 1.4.0 you can finally also express percussion tabs. [Learn more here](/docs/alphatex/percussion)
+
+<AlphaTab tex="true" player="true">{`
+\\track "Drums"
+\\instrument percussion
+\\tempo 120
+\\clef neutral
+\\articulation defaults
+(KickHit RideBell).16 r KickHit KickHit (KickHit RideBell).16 r KickHit KickHit (KickHit RideBell).16 r KickHit KickHit (KickHit RideBell).16 r KickHit KickHit |
+(KickHit HiHatOpen) KickHit KickHit KickHit (KickHit HiHatOpen) KickHit KickHit KickHit (KickHit SnareHit HiHatOpen) KickHit KickHit.32 KickHit KickHit.16 (KickHit HiHatOpen) KickHit KickHit KickHit |
+(KickHit HiHatOpen).8{tu 3} KickHit{tu 3} KickHit{tu 3} (KickHit SnareHit HiHatOpen){tu 3} KickHit.16{tu 3} KickHit{tu 3} KickHit.8{tu 3} (KickHit HiHatOpen).8{tu 3} KickHit{tu 3} KickHit{tu 3} (KickHit SnareHit HiHatOpen).8{tu 3} KickHit{tu 3} KickHit{tu 3}
+`}</AlphaTab>
+
 #### alphaTex: Add Support for all Notation Elements
 https://github.com/CoderLine/alphaTab/pull/1853
+
+With this release alphaTex closes the gaps between other file formats by adding support for all elements alphaTab supports across other formats.
+All elements are now described respectively in the [alphaTex documentation](/docs/alphatex/introduction).
+Some key changes beside larger features already mentioned here: 
+
+* Escape sequences (like `\n`) can now be used in strings.
+* Score metadata was extended for all fields. 
+* Tempo labels can now be specified
+* System Layout details can be configured
+* [Stylesheet](/docs/reference/score) details can be specified.
+* Transpose information can be specified. 
+* Specify track properties (volume, mute, solo)
+* Specify the number of standard notation lines in standard music notation staves.
+* Beat Vibrato Types
+* Custom tuplets
+* Whammy bar types and styles
+* Bend types and styles
+* Beat Ottava
+* Legatos
+* Instrument Automations
+* Fermata
+* Custom Beaming Modes and Stem directions.
+* Show String Numbers
+* Invisible Notes
+* Slurs
+* Common Time Signatures
+* Key Signature Types
+* Double Bars
+* Ottava
+* Bar Scale (for system layouts)
+* Fixed Bar Widths (for system layouts)
+* Simile Marks
+
+#### alphaTex: Multi-Voice Notation
+https://github.com/CoderLine/alphaTab/pull/1853
+
+Adding multiple voices to a single staff in alphaTex can now be done via the new `\voice` command.
+
+<AlphaTab tex="true">{`
+\\track "Piano"
+    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
+        \\voice 
+            c4 d4 e4 f4 | c4 d4 e4 f4
+        \\voice 
+            c3 d3 e3 f3 | c3 d3 e3 f3
+`}</AlphaTab>
 
 #### alphaTex: Specify Accidentals
 https://github.com/CoderLine/alphaTab/pull/1729
 
+With v1.4.0 alphaTab tries to respect the accidentals as specified when writing pitched notes. 
+Additionally accidentals can be forced to the desired one. 
+
+<AlphaTab tex="true" tracks="all">{`
+\\track "Piano"
+    C#4 Db4 C##4 Dbb4 | 
+    \\accidentals auto
+    C#4 Db4 C##4 Dbb4 |
+    C#4 { acc forceFlat } C4 { acc forceSharp } C4 { acc forceDoubleSharp } C4 { acc forceDoubleFlat } 
+\\track "Guitar"
+    :4 2.2 { acc forceFlat } 5.3 { acc forceSharp } 5.3 { acc forceDoubleSharp } 5.3 { acc forceDoubleFlat }
+`}</AlphaTab>
+            
 
 ### Guitar Pro Extensions
 
@@ -334,6 +406,9 @@ https://github.com/CoderLine/alphaTab/pull/1578
 #### rendering: Central Scaling of Music Sheet
 https://github.com/CoderLine/alphaTab/pull/1772
 
+#### rendering: Tempo Automation rendering (label, positioning and scale)
+https://github.com/CoderLine/alphaTab/pull/1906
+
 ##### bundlers: Node20+ compatibility for Vite & WebPack Integrations
 https://github.com/CoderLine/alphaTab/pull/1579
 
@@ -353,3 +428,10 @@ https://github.com/CoderLine/alphaTab/pull/1843
 
 #### notation: Bends on Tied Notes
 https://github.com/CoderLine/alphaTab/issues/1825
+
+
+#### alphaTex: Remember Clefs
+https://github.com/CoderLine/alphaTab/pull/1905
+
+Before this change clefs had to be specified on every single bar because alphaTab used some defaults on new bars. 
+With this change alphaTab takes over the clef from previous bars.

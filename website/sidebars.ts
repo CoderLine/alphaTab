@@ -150,6 +150,7 @@ const sidebars: SidebarsConfig = {
     alphaTex: [
       "alphatex/introduction",
       "alphatex/metadata",
+      "alphatex/stylesheet",
       "alphatex/notes",
       "alphatex/bar-metadata",
       "alphatex/tracks-staves",
