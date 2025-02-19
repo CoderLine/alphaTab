@@ -366,34 +366,55 @@ Additionally accidentals can be forced to the desired one.
     :4 2.2 { acc forceFlat } 5.3 { acc forceSharp } 5.3 { acc forceDoubleSharp } 5.3 { acc forceDoubleFlat }
 `}</AlphaTab>
             
-
 ### Guitar Pro Extensions
 
 #### Guitar Pro 3-8: Respect Beaming Modes and Directions
 https://github.com/CoderLine/alphaTab/pull/1892
 
+alphaTab loads now all stem directions and beaming modes from Guitar Pro 3 up to 8.
+
 #### Guitar Pro 6-8: Track Visibility Information
 https://github.com/CoderLine/alphaTab/pull/1491
+
+alphaTab loads now track visibility information from the `LayoutConfiguration` file and makes
+it available via `track.isVisibleOnMultiTrack`.
 
 #### Guitar Pro 3-5: Respect Staff Visibility
 https://github.com/CoderLine/alphaTab/pull/1888
 
+alphaTab loads now loads the activated staves from Guitar Pro 3-5 files and shows the respective staffs
+when rendering the music notation.
+
 #### Guitar Pro 3-8: Respect Tuning Visibility
 https://github.com/CoderLine/alphaTab/pull/1889
+
+alphaTab loads now loads the tuning visibility information from Guitar Pro 3-8 files and shows the guitar tunings
+accordingly.
 
 #### Guitar Pro 3-8: Respect Chord Diagram List Visibility
 https://github.com/CoderLine/alphaTab/pull/1890
 
+alphaTab loads now loads the information whether to display chord diagrams for a track in the chord list from 
+from Guitar Pro 3-8 files.
+
 #### Guitar Pro 3-5: Beat Ottava
 https://github.com/CoderLine/alphaTab/pull/1892
+
+alphaTab loads now loads beat ottava information from Guitar Pro 3-5 files.
 
 ### MusicXML Extensions
 
 #### musicxml: Support for Compressed MusicXML Files
 https://github.com/CoderLine/alphaTab/pull/1492
 
+alphaTab can now unzip compressed MusicXML files before reading.
+
 #### musicxml: Support for Guitar Bends
 https://github.com/CoderLine/alphaTab/pull/1462
+
+alphaTab can now parse guitar bends from MusicXML files.
+
+Thanks [@ldupouey](https://github.com/ldupouey) for this contribution.
 
 ### Improvements & Bugfixes
 
@@ -401,34 +422,65 @@ https://github.com/CoderLine/alphaTab/pull/1462
 https://github.com/CoderLine/alphaTab/pull/1562
 https://github.com/CoderLine/alphaTab/pull/1578
 
+alphaTab ships now TypeScript type definitions for the JSON flavor of the settings for better
+type safety and coding assistence when using APIs like `settings.fillFromJson`, `new AlphaTabApi()` 
+
 #### docs: File Format Compatiblity
+We invested quite some effort in documenting the currently supported file formats and features.
+For every format we now try to list out what features this format provides and what alphaTab understands from it. 
+
+Head over to the [format docs](/docs/category/formats) to learn more about the feature coverage.
 
 #### rendering: Central Scaling of Music Sheet
 https://github.com/CoderLine/alphaTab/pull/1772
 
+Up to this release alphaTab was handling the scaling of the music sheet across the different places where we draw items. 
+This was prone to errors if for some paddings or sizes the zoom scale was applied wrongly. 
+To eliminate this problem we moved the scaled rendering into the drawing layer (`ICanvas`). This way
+we do not need to handle the zoom level anymore across the whole codebase.
+
+This should result in a more consistent zooming experience and less overlaps.
+
 #### rendering: Tempo Automation rendering (label, positioning and scale)
 https://github.com/CoderLine/alphaTab/pull/1906
 
+In this release we improved the rendering of tempo information. Beside the addition of rendering the tempo label again,
+we also improved the placement of tempo changes above beats. This was crucial for the `Support for multiple tempo changes in one Bar`.
+
 ##### bundlers: Node20+ compatibility for Vite & WebPack Integrations
 https://github.com/CoderLine/alphaTab/pull/1579
+
+With Node20 there were some changes in copying files we had to adapt for the Vite and WebPack plugins. This could lead to wrong file copy steps.
 
 ##### audio: Prevent Audio Clipping Noises
 https://github.com/CoderLine/alphaTab/pull/1607
 https://github.com/CoderLine/alphaTab/pull/1609
 
+A really hard-to-catch problem was the generation of strange clipping sounds in some repeat and ending scenarios. 
+We improved various bits which could lead to this clipping problem.
+
 #### rendering: Ensure correct effect band sizing on line breaks
 https://github.com/CoderLine/alphaTab/pull/1621
 https://github.com/CoderLine/alphaTab/pull/1641
 
+When during layouting it is detected that a bar doesn't fit anymore into the system (line), it is removed from the system again. 
+There was a problem that these "reverted" bars had already reserved some spacings and those were not reverted resulting in strange whitespace. 
+This problem was fixed. 
+
 #### player: Scrolling Issue with `ScrollMode.OffScreen`
 https://github.com/CoderLine/alphaTab/pull/1771
+
+There was a problem fixed that scrolling with `ScrollMode.OffScreen` was not working as expected. This was due to wrong scroll properties being used. 
 
 #### notation: Vibratos on Tied Notes with Bends
 https://github.com/CoderLine/alphaTab/pull/1843
 
+There was a problem fixed that vibratos could not be combined with bends resulting in wrong display and audio generation. 
+
 #### notation: Bends on Tied Notes
 https://github.com/CoderLine/alphaTab/issues/1825
 
+There was a problem fixed that bends were not working when applied to tied notes.
 
 #### alphaTex: Remember Clefs
 https://github.com/CoderLine/alphaTab/pull/1905
