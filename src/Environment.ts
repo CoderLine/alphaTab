@@ -74,8 +74,17 @@ import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
 import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
 import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
 
+/**
+ * A factory for custom layout engines. 
+ */
 export class LayoutEngineFactory {
+    /**
+     * Whether the layout is considered "vertical" (affects mainly scrolling behavior).
+     */
     public readonly vertical: boolean;
+    /**
+     * Creates a new layout instance.
+     */
     public readonly createLayout: (renderer: ScoreRenderer) => ScoreLayout;
 
     public constructor(vertical: boolean, createLayout: (renderer: ScoreRenderer) => ScoreLayout) {
@@ -84,7 +93,15 @@ export class LayoutEngineFactory {
     }
 }
 
+/**
+ * A factory for custom render engines. 
+ * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are 
+ * also done in the background worker files (e.g. when bundling)
+ */
 export class RenderEngineFactory {
+    /**
+     * Whether the layout supports background workers. 
+     */
     public readonly supportsWorkers: boolean;
     public readonly createCanvas: () => ICanvas;
 

@@ -692,6 +692,11 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (this._ch === 0x5c /* \ */) {
                 this._ch = this.nextChar();
                 this._sy = AlphaTexSymbols.MetaCommand;
+                // allow double backslash (easier to test when copying from escaped Strings)
+                if(this._ch === 0x5c /* \ */) {
+                    this._ch = this.nextChar();
+                }
+
                 this._syData = this.readName();
             } else if (this._ch === 0x29 /* ) */) {
                 this._sy = AlphaTexSymbols.RParensis;
@@ -2892,6 +2897,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
             } else if (syData == 'ft') {
                 master.isFreeTime = true;
+                this._sy = this.newSy();
             } else if (syData === 'ro') {
                 master.isRepeatStart = true;
                 this._sy = this.newSy();

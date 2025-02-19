@@ -25,7 +25,7 @@ export class BeatTimerEffectInfo extends EffectBarRendererInfo {
     }
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
-        return beat.voice.index === 0 && beat.index === 0 && beat.showTimer;
+        return beat.showTimer;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
