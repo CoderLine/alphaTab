@@ -1221,7 +1221,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowNegatives = true;
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
-                    this._currentStaff.displayTranspositionPitch = this._syData as number;
+                    this._currentStaff.displayTranspositionPitch = (this._syData as number) * -1;
                     this._staffHasExplicitDisplayTransposition = true;
                 } else {
                     this.error('displaytranspose', AlphaTexSymbols.Number, true);
@@ -1233,7 +1233,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowNegatives = true;
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
-                    this._currentStaff.transpositionPitch = this._syData as number;
+                    this._currentStaff.transpositionPitch = (this._syData as number) * -1;
                 } else {
                     this.error('transpose', AlphaTexSymbols.Number, true);
                 }
@@ -1723,6 +1723,10 @@ export class AlphaTexImporter extends ScoreImporter {
         // need new bar
         const newBar: Bar = new Bar();
         staff.addBar(newBar);
+        if(newBar.previousBar) {
+            newBar.clef = newBar.previousBar.clef;
+            newBar.clefOttava = newBar.previousBar.clefOttava;
+        }
         this._barIndex++;
 
         for (let i = 0; i < voiceCount; i++) {
@@ -3062,6 +3066,7 @@ export class AlphaTexImporter extends ScoreImporter {
             tempoAutomation.isLinear = false;
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = this._score.tempo;
+            tempoAutomation.text = this._score.tempoLabel;
             master.tempoAutomations.push(tempoAutomation);
         }
         return anyMeta;

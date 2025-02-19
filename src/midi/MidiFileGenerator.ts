@@ -179,7 +179,7 @@ export class MidiFileGenerator {
             const transpositionPitch =
                 track.index < settings.notation.transpositionPitches.length
                     ? settings.notation.transpositionPitches[track.index]
-                    : 0;
+                    : -track.staves[0].transpositionPitch;
             transpositionPitches.set(track.playbackInfo.primaryChannel, transpositionPitch);
             transpositionPitches.set(track.playbackInfo.secondaryChannel, transpositionPitch);
         }
@@ -190,7 +190,7 @@ export class MidiFileGenerator {
         const transpositionPitch =
             track.index < this._settings.notation.transpositionPitches.length
                 ? this._settings.notation.transpositionPitches[track.index]
-                : 0;
+                : -track.staves[0].transpositionPitch;
         this.transpositionPitches.set(channel, transpositionPitch);
 
         let volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);

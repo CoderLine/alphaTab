@@ -1503,8 +1503,8 @@ describe('AlphaTexImporterTest', () => {
     it('transpose', () => {
         let score = parseTex(`
             \\staff 
-            \\displaytranspose -12
-            \\transpose -6
+            \\displaytranspose 12
+            \\transpose 6
             .
         `);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
@@ -1809,5 +1809,15 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
         expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
         expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.be.false;
+    });
+
+    it('clefs', () => {
+        let score = parseTex(`
+        \\clef C4 \\ottava 15ma C4 | C4
+        `);
+        expect(score.tracks[0].staves[0].bars[0].clef).to.equal(Clef.C4);
+        expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[1].clef).to.equal(Clef.C4);
+        expect(score.tracks[0].staves[0].bars[1].clefOttava).to.equal(Ottavia._15ma);
     });
 });
