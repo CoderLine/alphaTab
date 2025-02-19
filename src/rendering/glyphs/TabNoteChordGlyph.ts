@@ -83,6 +83,7 @@ export class TabNoteChordGlyph extends Glyph {
             this._deadSlapped.renderer = this.renderer;
             this._deadSlapped.doLayout();
             w = this._deadSlapped.width;
+            this.noteStringWidth = w;
         } else {
             let noteStringWidth: number = 0;
             for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
