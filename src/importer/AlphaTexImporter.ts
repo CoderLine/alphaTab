@@ -1718,6 +1718,10 @@ export class AlphaTexImporter extends ScoreImporter {
         // need new bar
         const newBar: Bar = new Bar();
         staff.addBar(newBar);
+        if(newBar.previousBar) {
+            newBar.clef = newBar.previousBar.clef;
+            newBar.clefOttava = newBar.previousBar.clefOttava;
+        }
         this._barIndex++;
 
         for (let i = 0; i < voiceCount; i++) {
