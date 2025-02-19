@@ -28,7 +28,7 @@ export class Fermata {
     public type: FermataType = FermataType.Short;
 
     /**
-     * Gets or sets the actual lenght of the fermata.
+     * Gets or sets the actual length of the fermata.
      */
     public length: number = 0;
 }
