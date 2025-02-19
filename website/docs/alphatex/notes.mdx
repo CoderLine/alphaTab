@@ -52,3 +52,63 @@ You can specify a multiplier after a beat to add the same beat multiple times to
 <AlphaTexSample>{`
 3.3*4 | 4.3*4
 `}</AlphaTexSample>
+
+## Multiple voices
+
+alphaTab supports showing multiple independent voices within one bar, to write such notation in alphaTex the `\voice` syntax can be used to start a new voice. 
+Once a new voice starts, you again can define the notes starting from the first bar. alphaTab will try to consolidate inconsistencies in the number of bars across voices. 
+
+<AlphaTexSample tracks="all">{`
+\\track "Piano"
+    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
+        \\voice 
+            c4 d4 e4 f4 | c4 d4 e4 f4
+        \\voice 
+            c3 d3 e3 f3 | c3 d3 e3 f3
+
+\\track "Piano2"
+    \\staff{score} \\tuning piano \\instrument acousticgrandpiano
+        \\voice 
+            c4 d4 e4 f4 | c4 d4 e4 f4
+        \\voice 
+            c3 d3 e3 f3
+
+`}</AlphaTexSample>
+            
+## Accidentals
+
+alphaTab places accidentals automatically but in some cases it is desired to force a particular accidental
+to be used for a note. When using pitched note, you already specify the note heights using accidentals and unless 
+the accidental mode is changed from `\accidentals explicit` (default) to `\accidentals auto` the accidentals will be used as specified.
+
+Specify `\accidentals explicit` to change alphaTex to respect the exactly specified accidentals. The accidentals in notes can be 
+
+- `#` - Sharp 
+- `b` - Flat
+- `bb` - Double Flat
+- `x` or '##' - Double Sharp
+
+Alternatively the accidental can also be specified in the note effect list via `acc accidental` where accidental can be 
+
+- `default`, `d` - Default (Automatic) Accidental
+- `forceNone`, `-` - Force to have no accidental
+- `forceNatural`, `b` - Force to have a naturalize accidental
+- `forceSharp`, `#` - Force to have a sharp accidental
+- `forceDoubleSharp`, `##`, `x` - Force to have a double-sharp accidental
+- `forceFlat`, `b` - Force to have a flat accidental
+- `forceDoubleFlat`, `bb`, Force to have a double-flat accidental
+
+Keep in mind that a change in accidental might result in a change of the note height and some combinations are not directly possible.
+alphaTab will do its best to keep the notes correct.
+
+<AlphaTexSample tracks="all">{`
+\\track
+    \\accidentals explicit
+    C#4 Db4 C##4 Dbb4 | 
+    \\accidentals auto
+    C#4 Db4 C##4 Dbb4 |
+    C#4 { acc forceFlat } C4 { acc forceSharp } C4 { acc forceDoubleSharp } C4 { acc forceDoubleFlat } 
+\\track 
+    :4 2.2 { acc forceFlat } 5.3 { acc forceSharp } 5.3 { acc forceDoubleSharp } 5.3 { acc forceDoubleFlat }
+`}</AlphaTexSample>
+            

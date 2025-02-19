@@ -13,10 +13,10 @@ Multiple effects are simply separated by spaces, like `3.3{f v}`.
 Please find the list of supported effects in the example below.
 
 <AlphaTexSample>{`
-// fade in
-3.3{f}
-// vibrato
-3.3{v}
+// fade in, fade out and volume swell
+3.3{f} 3.3{fo} 3.3{vs} |
+// vibrato (slight and wide)
+3.3{v} 3.3{vw} |
 // tap
 3.3{tt}
 // slap
@@ -39,9 +39,10 @@ Please find the list of supported effects in the example below.
 3.3{gr}
 3.3
 |
-// Tuplets (supported variants: 3, 5, 6, 7, 9, 10, 11, 12)
-3.3{tu 3} 3.3{tu 3} 3.3{tu 3}
-3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5}
+// Tuplets (supported variants: 3, 5, 6, 7, 9, 10, 11, 12 or custom)
+3.3{tu 3} 3.3{tu 3} 3.3{tu 3} |
+3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5} 3.3{tu 5} |
+3.3{tu 4 3} 3.3{tu 4 3} 3.3{tu 4 3} 3.3{tu 4 3} 
 |
 // tremolo picking (tp duration - where duration can be 8, 16 or 32)
 3.3{tp 8} 3.3{tp 16} 3.3{tp 32}
@@ -74,12 +75,39 @@ To reset the tuplet range, a new duration range can be started. For individual n
 The tremolo/whammy bar effect is a bit more complex than the others.
 You can specify a number of values which are evenly distributed over the
 time when the note is played with the format `tb (value1 value2 ...)`.
-The values indicate the number of quarter notes increased or decreased while playing.
+The values indicate the number of quarter notes increased or decreased while playing (use decimals for quarter notes).
 
-<AlphaTexSample>{`
+<AlphaTexSample player="true">{`
 3.3.1{tb (0 4 0 8)} |
 3.3.1{tb (0 -4 0 -8)} |
 `}</AlphaTexSample>
+
+To specify a whammy with exact positions (not evenly distributed) you can use `tbe (offset1 value1 offset2 value2)`.
+The offset is ranging from 0 to 60. 
+
+<AlphaTexSample player="true">{`
+3.3.1{tbe (0 0 5 4 30 8 60 0)}
+`}</AlphaTexSample>
+
+Additionally the exact whammy type and style can be specified for both kinds after before the value list. 
+
+* `tb type (value1 value2)`
+* `tb type style (value1 value2)`
+* `tbe type (value1 value2)`
+* `tbe type style (value1 value2)`
+
+It is recommended to rely on the auto-detection of the type and only specify the type explicitly if something is wrong:
+* `custom` - use this for non standard custom whammys with multiple points
+* `dive` - use this when having a gradual change between two points
+* `dip` - use this when you have a A->B->A whammy pattern.
+* `hold` - use this when holding whammys (on tied notes)
+* `predive` - use this when whammy bar is pressed/pulled before playing the note and then kept.
+* `predivedive` - use this when whammy bar is pressed/pulled before playing the note and then released again.
+
+The style can be one of these values: 
+* `default` - No additional text is shown, the bend offsets and values are respected as specified.
+* `gradual` - Will show an additional "grad." on the whammy line. The audio is generated according to the type spread evenly across the play duration.
+* `fast` - No additional text is shown. The audio is generated according to the type spread evenly across the fixed duration set via `settings.player.songBookBendDuration`.
 
 ## Brushes / Arpeggio
 
@@ -155,3 +183,156 @@ To enable the display of timers add a `timer` to the beat effect list.
 3.3.4 { timer } 3.3.4*3
 `}</AlphaTexSample>
 
+## Tempo Changes
+
+With the support of multiple tempo changes within a single bar, tempo changes can now be applied on beat level to mark
+the exact spot when the tempo should be changed. 
+
+<AlphaTexSample>{`
+.
+C4 {tempo 120} D4 E4 {tempo 140} F4 | C4.8 {tempo 80} C4 D4 {tempo 100} D4 E4 {tempo 120} E4 F4 {tempo 240} F4
+`}</AlphaTexSample>
+
+## Rasgueado 
+
+Rasgueado patterns can be added to beats via `rasg PATTERN` where pattern is one of the following values dervived from the patterns
+Guitar Pro supports: 
+
+import { RasgueadoPatterns } from '@site/src/components/RasgueadoPatterns';
+
+<RasgueadoPatterns />
+
+<AlphaTexSample player="true">{`
+(1.1 3.2 2.3 0.4) * 4 {rasg amii}
+`}</AlphaTexSample>
+
+## Slashed Beats
+
+To use slash notation on beats add the `slashed` keyword to the effect list. 
+
+<AlphaTexSample>{`
+C4.4 {slashed} C4.8 {slashed} C4.8 {slashed} C4.4 {slashed}
+`}</AlphaTexSample>
+
+## Dead Slap
+
+To use dead slapped beats the `ds` keyword to the effect list. As no notes should be on such a beat,
+simply use `()` to indicate the empty beat.
+
+<AlphaTexSample>{`
+().4 {ds} ().4 {ds}
+`}</AlphaTexSample>
+
+## Beat Timer
+
+To show the time when a beat is played the first time add `timer` to the effect list. 
+
+<AlphaTexSample>{`
+:2 C4 { timer } C4  |
+\\ro C4 { timer } C4 |
+\\ae 1 C4 C4 { timer }  |
+\\rc 3 \\ae (2 3) C4 { timer } C4 { timer } |
+C4 { timer } C4
+`}</AlphaTexSample>
+
+## Sustain Pedals
+
+To mark that on a beat the sustain pedal should be pressed add `spd`.
+To release it again `spu`
+
+<AlphaTexSample>{`
+3.3{string} 3.3{spd} 3.3 3.3 {spu}
+`}</AlphaTexSample>
+
+## Golpe
+
+To mark that on a beat a golpe should be performed with the thumb use `glpt`, to add a golpe played with a finger use `glpf`
+
+<AlphaTexSample>{`
+3.3{glpf} 3.3{glpt}
+`}</AlphaTexSample>
+
+## Wah-Pedal
+
+To mark that on a beat a wah pedal should be opened `waho`, and indicate a close use `wahc`.
+
+<AlphaTexSample>{`
+3.3 3.3{waho} 3.3 3.3 {wahc}
+`}</AlphaTexSample>
+
+## Barré
+
+To show barré chord notation, add `barre fret mode` to the effect list where 
+
+* `fret` is the numeric fret of the barré chord
+* `mode` is either `full` (default if no mode specified) or `half`
+
+<AlphaTexSample>{`
+1.1 {barre 24} 2.1 {barre 24} 3.1 {barre 24} 4.1 |
+1.1 {barre 4 half} 2.1 {barre 4 half} 3.1 {barre 4 half} 4.1 {barre 4 half} |
+`}</AlphaTexSample>
+
+## Ottava
+
+To mark octave changes on beats add `ottava value` to the effect list where value is one of:
+
+* `15ma`
+* `8va`
+* `regular`
+* `8vb`
+* `15mb`
+
+<AlphaTexSample>{`
+3.3.4{ ot 15ma } 3.3.4{ ot 8vb } 
+`}</AlphaTexSample>
+
+## Legato
+
+To indicate a beat starts a legato to the next beat mark it with `legatoOrigin`:
+
+<AlphaTexSample>{`
+3.3.4{ legatoOrigin } 10.3.4
+`}</AlphaTexSample>
+
+## Instrument Changes
+
+To mark a change of the instrument used for playback use the `instrument instrumentNumberOrName` effect. 
+
+See [Instrument](/docs/alphatex/metadata#instrument) for details on available instruments. 
+
+<AlphaTexSample player="true">{`
+\\instrument ElectricGuitarClean
+1.1 2.1 3.1 4.1 | 1.1 { instrument DistortionGuitar txt Distortion } 2.1 3.1 4.1
+`}</AlphaTexSample>
+
+## Fermata
+
+To mark fermatas add `fermata fermataType` or `fermata fermataType fermataLength` to the beat effects.
+* `fermataType` can be `short`, `medium` or `long`
+* `fermataLength` is currently ignored.
+
+<AlphaTexSample>{`
+G4 G4 G4 { fermata medium 4 }
+`}</AlphaTexSample>
+
+## Beaming Modes
+
+The beaming modes allow adjusting allow overriding the default beam placement.
+
+* `beam invert` - Inverts the default stem direction. 
+* `beam up` - Forces the stem to point upwards.
+* `beam down` - Forces the stem to point downwards.
+* `beam auto` - Sets the beaming mode to automatic. 
+* `beam split` - Forces a split of the beam to the next beat (if there would be any)
+* `beam merge` - Forces a merge of the beam to the next beat (even if there would be none)
+* `beam splitsecondary` - Forces a split of the last bar connecting two beats (if there is any).
+
+<AlphaTexSample>{`
+:8 3.3{ beam invert } 3.3 |
+3.1{ beam up } 3.1 |
+3.6{ beam down } 3.6 |
+3.3{ beam auto } 3.3 |
+3.3{ beam split } 3.3 |
+3.3 3.3 { beam merge } 3.3 3.3 |
+3.3.16 {beam splitsecondary} 3.3
+`}</AlphaTexSample>

@@ -25,10 +25,34 @@ Be sure to finish the previous beat with a vertical bar `|` to start a new bar o
 4.1 3.1 2.1 1.1 |
 `}</AlphaTexSample>
 
+Additional track metadata can be specified in braces after the track information. 
+
+### Track Color
+
+The data model holds information about the color of the track which might be used by user interfaces to visually differenciate them. 
+
+The `color colorCode` can be used to define the color. Where colorCode can be [any supported color format](/docs/reference/settings/display/resources#colors)
+
+<AlphaTexSample tracks="all">{`
+\\track { color "#FF0000" }
+1.1 2.1 3.1 4.1
+`}</AlphaTexSample>
+
+### System Layout
+
+The `systemsLayout` and `defaultSystemsLayout` allow configuring the system layout. See down below for details.
+
+### Playback Information
+
+* `solo` set the track to be played alone in the data model.
+* `mute` set the track to be muted (not played) in the data model.
+* `volume value` set the track volume, value can be 0-16
+* `balance value` set the track balance/pan, value can be 0-16
+
 ## Staves
 
 A new staff can be started with the `\staff` metadata.
-In braces you can optionally define via the options `score` (for standard notation) and `tab` (for guitar tablature)
+In braces you can optionally define via the options `score` (for standard notation), `tab` (for guitar tablature), `slash` (for slash notation), `numbered` (for Jianpu / numbered notation)
 whether the corresponding notation should be shown.
 By default both notation systems are shown.
 
@@ -41,6 +65,16 @@ By default both notation systems are shown.
 \\track "Guitar"
     \\staff{tabs} \\capo 5
     1.2 3.2 0.1 1.1
+`}</AlphaTexSample>
+
+### Standard notation line count
+
+For the standard notation staff you can configure the number of lines shown by specifying the number after the keyword:
+
+<AlphaTexSample tracks="all">{`
+\\track
+    \\staff{score 3}
+    c4 d4 e4 f4
 `}</AlphaTexSample>
 
 ## Hide Tuning
@@ -70,4 +104,55 @@ AlphaTab will create missing empty bars automatically.
 \\track "Guitar"
     \\staff{tabs} \\capo 5
     1.2 3.2 0.1 1.1 | 1.2 3.2 0.1 1.1
+`}</AlphaTexSample>
+
+## System Layout
+
+The system layout, defines how many bars should be displayed per system (line). 
+The use of the system layout has to be enabled via [`systemsLayoutMode`](/docs/reference/settings/display/systemslayoutmode).
+
+The system layout can be configured either on score or on track level via these two options.
+
+* `defaultSystemsLayout` - defines the number of bars to display unless specified differently. (default: 3)
+* `systemsLayout` - defines the number of bars to display per system. (default: empty)
+
+The `score` level options are used in case multiple tracks are displayed, otherwise the `track` level information is used. 
+
+<AlphaTexSample tracks="all" settings={{ display: {systemsLayoutMode: 'UseModelLayout'}  }}>{`
+\\title "Single Track"
+.
+\\track { defaultSystemsLayout 3 systemsLayout 2 2 }
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4 | c4
+`}</AlphaTexSample>
+
+<AlphaTexSample tracks="all" settings={{ display: {systemsLayoutMode: 'UseModelLayout'}  }}>{`
+\\title "Multi Track"
+\\defaultSystemsLayout 2
+\\systemsLayout 1 1
+.
+\\track { defaultSystemsLayout 1 systemsLayout 2 2 }
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4 | c4
+\\track { defaultSystemsLayout 4 systemsLayout 3 3 }
+    :1 c4 | c4 | c4 | c4 | c4 | c4 | c4 | c4
+`}</AlphaTexSample>
+
+### Bar Scale
+
+When using `systemsLayoutMode: 'UseModelLayout'` with page view layout the individual bars can be scaled relatively. this scale can be specified with `\scale Value`
+
+<AlphaTexSample settings={{ display: {systemsLayoutMode: 'UseModelLayout'}  }}>{`
+\\track { defaultSystemsLayout 3 }
+    \\scale 0.25 :1 c4 | \\scale 0.5 c4 | \\scale 0.25 c4 | 
+    \\scale 0.5 c4 | \\scale 2 c4 | \\scale 0.5 c4 |
+    c4 | c4 
+`}</AlphaTexSample>
+
+
+### Bar Width
+
+When using `systemsLayoutMode: 'UseModelLayout'` with the horizontal layout the individual bars can be scaled absolutely. this scale can be specified with `\width Value`
+
+<AlphaTexSample settings={{ display: {  layoutMode: 'Horizontal', systemsLayoutMode: 'UseModelLayout'}  }}>{`
+\\track
+    \\width 100 :1 c4 | \\width 300 c4 | \\width 350 c4 
 `}</AlphaTexSample>

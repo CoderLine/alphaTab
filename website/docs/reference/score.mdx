@@ -157,3 +157,13 @@ Notes have a huge set of annotations and effects which can influence the display
 ![Notes](/img/reference/score/notes.png)
 
 
+## Stylesheet
+
+alphaTab is moving gradually to a stylesheet based configuration of how music sheets should be displayed. Many file formats provide options on what to display and how and alphaTab tries to respect this information.
+The related settings are accessible via `Score.stylesheet`.
+
+The `Settings` related to display will me merged over time into the stylesheet. We envision to define a default stylesheet and overrides on `Settings` level.
+
+The stylesheet doesn't have yet a reference documentation pages here hence the documentation on code level is the best reference:
+
+https://github.com/CoderLine/alphaTab/blob/develop/src/model/RenderStylesheet.ts

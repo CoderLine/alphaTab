@@ -79,5 +79,28 @@ li.reference-item ul {
   margin-right: 0.25rem;
 }
 
+/* Styles for player */
+:global(.at-cursor-bar) {
+  /* Defines the color of the bar background when a bar is played */
+  background: rgba(255, 242, 0, 0.25);
+}
+
+:global(.at-selection div) {
+  /* Defines the color of the selection background */
+  background: rgba(64, 64, 255, 0.1);
+}
+
+:global(.at-cursor-beat) {
+  /* Defines the beat cursor */
+  background: rgba(64, 64, 255, 0.75);
+  width: 3px;
+}
+
+:global(.at-highlight) * {
+  /* Defines the color of the music symbols when they are being played (svg) */
+  fill: #0078ff;
+  stroke: #0078ff;
+}
+
 @import 'react-tooltip/dist/react-tooltip.css'
 

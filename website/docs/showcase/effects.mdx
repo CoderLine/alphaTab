@@ -33,10 +33,13 @@ From piano pianissimo to forte fortissimo, they are all there.
 Especially bass guitar players will like this feature.
 <AlphaTab file="/files/features/Tap.gp5" />
 
-## Fade-In
-This annotation is shown if you need to increase the note volume from silent to normal when
-playing it. 
-<AlphaTab file="/files/features/FadeIn.gp5" />
+## Fading Styles
+This annotation is shown if you need to increase or decrease the note volume from silent to normal when
+playing it. Volume Swells indicate to first get louder, then again silent.
+
+<AlphaTab tex="true" player="true">{`
+:1 3.3{f} | 3.3{fo} | 3.3{vs}
+`}</AlphaTab>
 
 ## Let Ring
 If this annotation is placed on a note, you don't stop the string after the beat ends. 
@@ -87,3 +90,112 @@ respective note on the instrument.
 Triplet feels are used to indicate that a pair of particular notes are played with a different 
 as they are indicated by the annotations. 
 <AlphaTab file="/files/features/TripletFeel.gpx" />
+
+## Directions
+Directions (or jumps) are special indicators that the player should continue playing at a different location
+within the music sheet (e.g. jump back to start and continue to some marker).
+
+<AlphaTab file="/files/features/directions-simple.gp" />
+
+## Rasgueado 
+
+Rasgueado is played by strumming the same chord with multiple fingers in a defined pattern. 
+They are displayed in alphaTab with a `rasg.` indicator above.
+
+<AlphaTab tex="true" tracks="all" player="true">{`
+(1.1 3.2 2.3 0.4) * 4 {rasg amii}
+`}</AlphaTab>
+
+## Slashed Beats
+
+Individual beats can be changed to be shown with slash notation.
+
+<AlphaTab tex="true">{`
+C4.4 {slashed} C4.8 {slashed} C4.8 {slashed} C4.4 {slashed}
+`}</AlphaTab>
+
+
+## Dead Slap
+
+Dead Slaps are dead notes across all strings where you simply hold your hand on the fretboard
+when playing the strings. 
+
+<AlphaTab tex="true">{`
+().4 {ds} ().4 {ds}
+`}</AlphaTab>
+
+## Beat Timer
+
+Beat timers can be used to indicate when a note is played (in absolute time). Repeats and jumps are respected
+for the time being shown.
+
+<AlphaTab tex="true">{`
+:2 C4 { timer } C4  |
+\\ro C4 { timer } C4 |
+\\ae 1 C4 C4 { timer }  |
+\\rc 3 \\ae (2 3) C4 { timer } C4 { timer } |
+C4 { timer } C4
+`}</AlphaTab>
+
+## Free Time
+
+Free time bars are marked accordingly with bar lines and on the time signature. 
+It will not affect the playback in alphaTab.
+
+<AlphaTab tex="true">{`
+.
+:2 
+C4*2 |
+\\ft C4*2 |
+\\ft C4*2 |
+C4*2 |
+`}</AlphaTab>
+
+## Accentuations
+
+Accentuations affect how strong/loud a note is played compared to others. 
+
+<AlphaTab tex="true">{`
+3.3{ac} 3.3{hac} 3.3{ten}
+`}</AlphaTab>
+
+## String Numbers
+
+alphaTab can show the string numbers above the stem in standard notation.
+ 
+<AlphaTab tex="true">{`
+3.3{string} 3.4{string} 3.5{string}
+`}</AlphaTab>
+
+## Sustain Pedal
+
+alphaTab can show when to press the sustain pedal. This information is currently not affecting the playback.
+ 
+<AlphaTab tex="true">{`
+3.3{string} 3.3{spd} 3.3 3.3 {spu}
+`}</AlphaTab>
+
+## Golpe
+
+alphaTab can show when golpe should be performed by a guitarist. This information is currently not affecting the playback.
+
+<AlphaTab tex="true">{`
+3.3{glpf} 3.3{glpt}
+`}</AlphaTab>
+
+## Wah Pedal
+
+alphaTab can show when a Wah pedal should be opened or closed. This information is currently not affecting the playback.
+
+<AlphaTab tex="true">{`
+3.3 3.3{waho} 3.3 3.3 {wahc}
+`}</AlphaTab>
+
+## Barré 
+
+alphaTab can show additional barré chord notation to guide the player.
+
+<AlphaTab tex="true">{`
+1.1 {barre 24} 2.1 {barre 24} 3.1 {barre 24} 4.1 |
+1.1 {barre 4 half} 2.1 {barre 4 half} 3.1 {barre 4 half} 4.1 {barre 4 half} |
+`}</AlphaTab>
