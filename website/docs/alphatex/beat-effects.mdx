@@ -13,10 +13,10 @@ Multiple effects are simply separated by spaces, like `3.3{f v}`.
 Please find the list of supported effects in the example below.
 
 <AlphaTexSample>{`
-// fade in
-3.3{f}
+// fade in, fade out and volume swell
+3.3{f} 3.3{fo} 3.3{vs} |
 // vibrato
-3.3{v}
+3.3{v} 
 // tap
 3.3{tt}
 // slap
@@ -176,4 +176,70 @@ import { RasgueadoPatterns } from '@site/src/components/RasgueadoPatterns';
 
 <AlphaTexSample player="true">{`
 (1.1 3.2 2.3 0.4) * 4 {rasg amii}
+`}</AlphaTexSample>
+
+## Slashed Beats
+
+To use slash notation on beats add the `slashed` keyword to the effect list. 
+
+<AlphaTexSample>{`
+C4.4 {slashed} C4.8 {slashed} C4.8 {slashed} C4.4 {slashed}
+`}</AlphaTexSample>
+
+## Dead Slap
+
+To use dead slapped beats the `ds` keyword to the effect list. As no notes should be on such a beat,
+simply use `()` to indicate the empty beat.
+
+<AlphaTexSample>{`
+().4 {ds} ().4 {ds}
+`}</AlphaTexSample>
+
+## Beat Timer
+
+To show the time when a beat is played the first time add `timer` to the effect list. 
+
+<AlphaTexSample>{`
+:2 C4 { timer } C4  |
+\\ro C4 { timer } C4 |
+\\ae 1 C4 C4 { timer }  |
+\\rc 3 \\ae (2 3) C4 { timer } C4 { timer } |
+C4 { timer } C4
+`}</AlphaTexSample>
+
+## Sustain Pedals
+
+To mark that on a beat the sustain pedal should be pressed add `spd`.
+To release it again `spu`
+
+<AlphaTexSample>{`
+3.3{string} 3.3{spd} 3.3 3.3 {spu}
+`}</AlphaTexSample>
+
+## Golpe
+
+To mark that on a beat a golpe should be performed with the thumb use `glpt`, to add a golpe played with a finger use `glpf`
+
+<AlphaTexSample>{`
+3.3{glpf} 3.3{glpt}
+`}</AlphaTexSample>
+
+## Wah-Pedal
+
+To mark that on a beat a wah pedal should be opened `waho`, and indicate a close use `wahc`.
+
+<AlphaTexSample>{`
+3.3 3.3{waho} 3.3 3.3 {wahc}
+`}</AlphaTexSample>
+
+## Barré
+
+To show barré chord notation, add `barre fret mode` to the effect list where 
+
+* `fret` is the numeric fret of the barré chord
+* `mode` is either `full` (default if no mode specified) or `half`
+
+<AlphaTexSample>{`
+1.1 {barre 24} 2.1 {barre 24} 3.1 {barre 24} 4.1 |
+1.1 {barre 4 half} 2.1 {barre 4 half} 3.1 {barre 4 half} 4.1 {barre 4 half} |
 `}</AlphaTexSample>

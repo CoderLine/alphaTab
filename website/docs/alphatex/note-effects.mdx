@@ -74,10 +74,10 @@ x.3 3.3{x}
 
 ### Accentuations
 
-Normal `ac` and heavy `hac`.
+Normal `ac`, heavy `hac` and tenuto `ten`.
 
 <AlphaTexSample>{`
-3.3{ac} 3.3{hac}
+3.3{ac} 3.3{hac} 3.3{ten}
 `}</AlphaTexSample>
 
 ### Staccato
@@ -125,6 +125,14 @@ C4 {umordent} |
 C4 {lmordent}
 `}</AlphaTexSample>
 
+### String Numbers
+
+To show the string numbers add `string` to the note effects list.
+
+<AlphaTexSample>{`
+3.3{string} 3.4{string} 3.5{string}
+`}</AlphaTexSample>
+
 ## Bends
 
 The bend effect works like the tremolo/whammy bar effect.
@@ -167,3 +175,4 @@ you can specify the note value as alternative and indicate the tie via a note ef
 :2 (a4 a3) (a4{t} a3) |
 :4 (a4 a3) (b2 b3) a4{t} a3{-} |
 `}</AlphaTexSample>
+
