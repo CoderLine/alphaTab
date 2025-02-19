@@ -35,7 +35,7 @@ const FeatureList: FeatureItem[] = [
     description: (
       <>
         The built-in audio synthesizer allows users to hear what they are
-        seeing. Using SoundFont2 containers as input, alphaTab can generate the
+        seeing. Using SoundFont2 and SoundFont3 containers as input, alphaTab can generate the
         matching audio to the displayed music notation and provide a live
         display cursor including interactive selection of playback position and
         ranges.

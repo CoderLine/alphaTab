@@ -265,12 +265,23 @@ Support for displaying barré chord notation was added.
 
 ### Player
 
-
 #### player: SoundFont3 Support (Experimental)
 https://github.com/CoderLine/alphaTab/pull/1807
 
+alphaTab 1.4.0 added experiemntal support for SoundFont3 files. In SF3 files audio samples are encoded as OGG Vorbis which allows
+a smaller footprint when transferring soundfonts over network. This allows using higher quality sounds without a direct increase of file size transferred to clients. 
+
+The decoding of the audio samples requires additional CPU time which might affect users. Only the samples required by the song played will be decoded to reduce load. 
+
+alphaTab ships now a SF3 flavor of the Sonivox soundfont but still has enabled by default the use of the SF2 file (where embedded).
+
+We did not thoroughly test yet the decoding of many files and the impact of the decoding time. Therefore the support is still considered experimental.
+
 #### player: Live Change of Transposition Pitches
 https://github.com/CoderLine/alphaTab/pull/1642
+
+The [`changeTrackTranspositionPitch`](/docs/reference/api/changetracktranspositionpitch) and [`setChannelTranspositionPitch`](/docs/reference/alphasynth/setchanneltranspositionpitch) APIs allow changing transposition pitches of individual tracks (or midi channels) on-the-fly 
+while the song is being played. 
 
 ### alphaTex Extensions
 
