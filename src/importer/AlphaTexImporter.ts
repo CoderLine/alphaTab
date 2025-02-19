@@ -3060,6 +3060,7 @@ export class AlphaTexImporter extends ScoreImporter {
             tempoAutomation.isLinear = false;
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = this._score.tempo;
+            tempoAutomation.text = this._score.tempoLabel;
             master.tempoAutomations.push(tempoAutomation);
         }
         return anyMeta;

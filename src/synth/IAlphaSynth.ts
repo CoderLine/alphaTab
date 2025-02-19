@@ -136,7 +136,7 @@ export interface IAlphaSynth {
     applyTranspositionPitches(transpositionPitches: Map<number, number>): void;
 
     /**
-     * Sets the transposition pitch a channel. This pitch is additionally applied beside the 
+     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the 
      * ones applied already via {@link applyTranspositionPitches}.
      * @param channel The channel number
      * @param semitones The number of semitones to apply as pitch offset.
