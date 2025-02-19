@@ -1216,7 +1216,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowNegatives = true;
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
-                    this._currentStaff.displayTranspositionPitch = this._syData as number;
+                    this._currentStaff.displayTranspositionPitch = (this._syData as number) * -1;
                     this._staffHasExplicitDisplayTransposition = true;
                 } else {
                     this.error('displaytranspose', AlphaTexSymbols.Number, true);
@@ -1228,7 +1228,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._allowNegatives = true;
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
-                    this._currentStaff.transpositionPitch = this._syData as number;
+                    this._currentStaff.transpositionPitch = (this._syData as number) * -1;
                 } else {
                     this.error('transpose', AlphaTexSymbols.Number, true);
                 }
