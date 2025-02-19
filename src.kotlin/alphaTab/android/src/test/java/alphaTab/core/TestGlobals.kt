@@ -43,7 +43,7 @@ class Expector<T>(private val actual: T) {
     val to
         get() = this
     val not
-        get() = NotExpector<T>(actual)
+        get() = NotExpector(actual)
 
     val be
         get() = this
@@ -51,17 +51,27 @@ class Expector<T>(private val actual: T) {
         get() = this
 
     fun equal(expected: Any?, message: String? = null) {
+        var actualToCheck = actual
         var expectedTyped: Any? = expected
 
-        if (expected is Int && actual is Double) {
+        if (expected is Int && actualToCheck is Double) {
             expectedTyped = expected.toDouble();
         }
 
-        if (expected is Double && actual is Int) {
+        if (expected is Double && actualToCheck is Int) {
             expectedTyped = expected.toInt();
         }
 
-        Assert.assertEquals(message, expectedTyped, actual as Any?)
+        if(expected is Double && expected == 0.0 &&
+            actualToCheck is Double) {
+            val d = actualToCheck as Double;
+            if (d == -0.0) {
+                @Suppress("UNCHECKED_CAST")
+                actualToCheck = 0.0 as T
+            }
+        }
+
+        Assert.assertEquals(message, expectedTyped, actualToCheck as Any?)
     }
 
     fun greaterThan(expected: Double) {
