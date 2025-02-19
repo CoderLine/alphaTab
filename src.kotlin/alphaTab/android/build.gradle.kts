@@ -61,7 +61,7 @@ group = "net.alphatab"
 version = libVersion
 
 val javaVersion = JavaVersion.VERSION_17;
-val jvmTarget = 17
+var jvmTarget = 17
 android {
     namespace = project.group.toString()
     compileSdk = 34
@@ -132,11 +132,7 @@ dependencies {
 var sonatypeSigningKeyId = ""
 var sonatypeSigningPassword = ""
 var sonatypeSigningKey = ""
-var ossrhUsername = ""
-var ossrhPassword = ""
 var sonatypeStagingProfileId = ""
-loadSetting("OSSRH_USERNAME", "ossrhUsername") { ossrhUsername = it }
-loadSetting("OSSRH_PASSWORD", "ossrhPassword") { ossrhPassword = it }
 loadSetting("SONATYPE_STAGING_PROFILE_ID", "sonatypeStagingProfileId") {
     sonatypeStagingProfileId = it
 }

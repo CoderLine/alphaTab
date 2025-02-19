@@ -18,7 +18,7 @@
     "license": "MPL-2.0",
     "repository": {
         "type": "git",
-        "url": "https://github.com/coderline/alphaTab"
+        "url": "git+https://github.com/coderline/alphaTab.git"
     },
     "main": "dist/alphaTab.js",
     "module": "dist/alphaTab.mjs",
