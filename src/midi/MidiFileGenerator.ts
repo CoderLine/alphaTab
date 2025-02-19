@@ -312,6 +312,16 @@ export class MidiFileGenerator {
                 this._currentTime += MidiUtils.ticksToMillis(remainingTick, currentTempo);
             }
         }
+
+        // in case of simile marks where we repeat we register the empty beat for the whole bar
+        if (playbackBar.id !== bar.id) {
+            this.tickLookup.addBeat(
+                bar.voices[0].beats[0],
+                0,
+                tickDuration
+            );
+            //this.tickLookup.addBeat(beat, 0, audioDuration);
+        }
     }
 
     private getPlaybackBar(bar: Bar): Bar {
@@ -390,9 +400,6 @@ export class MidiFileGenerator {
         // in case of normal playback register playback
         if (realBar === beat.voice.bar) {
             this.tickLookup.addBeat(beat, beatStart, audioDuration);
-        } else {
-            // in case of simile marks where we repeat we also register
-            this.tickLookup.addBeat(beat, 0, audioDuration);
         }
 
         const track: Track = beat.voice.bar.staff.track;
