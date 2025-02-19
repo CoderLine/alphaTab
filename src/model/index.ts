@@ -1,8 +1,9 @@
 export { AccentuationType } from '@src/model/AccentuationType';
 export { AccidentalType } from '@src/model/AccidentalType';
 export { AutomationType, Automation } from '@src/model/Automation';
-export { Bar } from '@src/model/Bar';
-export { Beat } from '@src/model/Beat';
+export { Bar, SustainPedalMarkerType, SustainPedalMarker } from '@src/model/Bar';
+export { BarreShape } from '@src/model/BarreShape';
+export { Beat, BeatBeamingMode } from '@src/model/Beat';
 export { BendPoint } from '@src/model/BendPoint';
 export { BendStyle } from '@src/model/BendStyle';
 export { BendType } from '@src/model/BendType';
@@ -13,9 +14,10 @@ export { Color } from '@src/model/Color';
 export { CrescendoType } from '@src/model/CrescendoType';
 export { Duration } from '@src/model/Duration';
 export { DynamicValue } from '@src/model/DynamicValue';
+export { FadeType } from '@src/model/FadeType';
 export { FermataType, Fermata } from '@src/model/Fermata';
 export { Fingers } from '@src/model/Fingers';
-export { FontStyle, Font } from '@src/model/Font';
+export { FontStyle, FontWeight, Font } from '@src/model/Font';
 export { GraceType } from '@src/model/GraceType';
 export { HarmonicType } from '@src/model/HarmonicType';
 export { InstrumentArticulation } from '@src/model/InstrumentArticulation';
@@ -27,10 +29,18 @@ export { MasterBar } from '@src/model/MasterBar';
 export { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 export { Note } from '@src/model/Note';
 export { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+export { NoteOrnament } from '@src/model/NoteOrnament';
 export { Ottavia } from '@src/model/Ottavia';
 export { PickStroke } from '@src/model/PickStroke';
 export { PlaybackInformation } from '@src/model/PlaybackInformation';
-export { RenderStylesheet } from '@src/model/RenderStylesheet';
+export { Rasgueado } from '@src/model/Rasgueado';
+export {
+    RenderStylesheet,
+    BracketExtendMode,
+    TrackNamePolicy,
+    TrackNameMode,
+    TrackNameOrientation
+} from '@src/model/RenderStylesheet';
 export { RepeatGroup } from '@src/model/RepeatGroup';
 export { Score } from '@src/model/Score';
 export { Section } from '@src/model/Section';
@@ -44,4 +54,5 @@ export { Tuning } from '@src/model/Tuning';
 export { TupletGroup } from '@src/model/TupletGroup';
 export { VibratoType } from '@src/model/VibratoType';
 export { Voice } from '@src/model/Voice';
+export { WahPedal } from '@src/model/WahPedal'
 export { WhammyType } from '@src/model/WhammyType';
