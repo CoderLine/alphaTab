@@ -6,6 +6,8 @@ import { ResolvedConfig } from './config';
 import { cleanUrl, getHash } from './utils';
 import type { OutputChunk } from 'rollup';
 import * as path from 'path';
+import { BuildEnvironment } from 'vite';
+import { injectEnvironmentToHooks } from './build';
 
 export const enum AlphaTabWorkerTypes {
     WorkerClassic = 'worker_classic',
@@ -31,7 +33,6 @@ export const workerCache = new WeakMap<ResolvedConfig, WorkerCache>();
 
 export const WORKER_FILE_ID = 'alphatab_worker';
 export const WORKER_ASSET_ID = '__ALPHATAB_WORKER_ASSET__';
-
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/plugins/worker.ts#L47
 function saveEmitWorkerAsset(config: ResolvedConfig, asset: WorkerBundleAsset): void {
@@ -80,10 +81,15 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
     // bundle the file as entry to support imports
     const { rollup } = await import('rollup');
     const { plugins, rollupOptions, format } = config.worker;
+
+    const workerConfig = await plugins(newBundleChain);
+    const workerEnvironment = new BuildEnvironment('client', workerConfig); // TODO: should this be 'worker'?
+    await workerEnvironment.init();
+
     const bundle = await rollup({
         ...rollupOptions,
         input,
-        plugins: await plugins(newBundleChain),
+        plugins: workerEnvironment.plugins.map(p => injectEnvironmentToHooks(workerEnvironment, p)),
         preserveEntrySignatures: false
     });
     let chunk: OutputChunk;

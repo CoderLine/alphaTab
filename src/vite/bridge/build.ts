@@ -2,10 +2,14 @@
 
 // index.ts for more details on contents and license of this file
 
-import { type InternalModuleFormat } from 'rollup';
+import { MinimalPluginContext, PluginContext, type InternalModuleFormat } from 'rollup';
 import { joinUrlSegments, partialEncodeURIPath } from './utils';
 import * as path from 'path';
 import { ResolvedConfig } from './config';
+import { BuildEnvironment, Plugin } from 'vite';
+import { RollupPluginHooks } from './typeUtils';
+import { ROLLUP_HOOKS } from './constants';
+import { getHookHandler } from './plugins';
 
 const needsEscapeRegEx = /[\n\r'\\\u2028\u2029]/;
 const quoteNewlineRegEx = /([\n\r'\u2028\u2029])/g;
@@ -97,4 +101,138 @@ export function toOutputFilePathInJS(
         return toRelative(filename, hostId);
     }
     return joinUrlSegments(config.base, filename);
+}
+
+// https://github.com/vitejs/vite/blob/v6.1.1/packages/vite/src/node/build.ts#L1131
+
+export function injectEnvironmentToHooks(environment: BuildEnvironment, plugin: Plugin): Plugin {
+    const { resolveId, load, transform } = plugin;
+
+    const clone = { ...plugin };
+
+    for (const hook of Object.keys(clone) as RollupPluginHooks[]) {
+        switch (hook) {
+            case 'resolveId':
+                clone[hook] = wrapEnvironmentResolveId(environment, resolveId);
+                break;
+            case 'load':
+                clone[hook] = wrapEnvironmentLoad(environment, load);
+                break;
+            case 'transform':
+                clone[hook] = wrapEnvironmentTransform(environment, transform);
+                break;
+            default:
+                if (ROLLUP_HOOKS.includes(hook)) {
+                    (clone as any)[hook] = wrapEnvironmentHook(environment, clone[hook]);
+                }
+                break;
+        }
+    }
+
+    return clone;
+}
+
+function wrapEnvironmentResolveId(environment: BuildEnvironment, hook?: Plugin['resolveId']): Plugin['resolveId'] {
+    if (!hook) return;
+
+    const fn = getHookHandler(hook);
+    const handler: Plugin['resolveId'] = function (id, importer, options) {
+        return fn.call(
+            injectEnvironmentInContext(this, environment),
+            id,
+            importer,
+            injectSsrFlag(options, environment)
+        );
+    };
+
+    if ('handler' in hook) {
+        return {
+            ...hook,
+            handler
+        } as Plugin['resolveId'];
+    } else {
+        return handler;
+    }
+}
+
+function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load']): Plugin['load'] {
+    if (!hook) return;
+
+    const fn = getHookHandler(hook);
+    const handler: Plugin['load'] = function (id, ...args) {
+        return fn.call(injectEnvironmentInContext(this, environment), id, injectSsrFlag(args[0], environment));
+    };
+
+    if ('handler' in hook) {
+        return {
+            ...hook,
+            handler
+        } as Plugin['load'];
+    } else {
+        return handler;
+    }
+}
+
+function wrapEnvironmentTransform(environment: BuildEnvironment, hook?: Plugin['transform']): Plugin['transform'] {
+    if (!hook) return;
+
+    const fn = getHookHandler(hook);
+    const handler: Plugin['transform'] = function (code, importer, ...args) {
+        return fn.call(
+            injectEnvironmentInContext(this, environment),
+            code,
+            importer,
+            injectSsrFlag(args[0], environment)
+        );
+    };
+
+    if ('handler' in hook) {
+        return {
+            ...hook,
+            handler
+        } as Plugin['transform'];
+    } else {
+        return handler;
+    }
+}
+
+function wrapEnvironmentHook<HookName extends keyof Plugin>(
+    environment: BuildEnvironment,
+    hook?: Plugin[HookName]
+): Plugin[HookName] {
+    if (!hook) return;
+
+    const fn = getHookHandler(hook);
+    if (typeof fn !== 'function') return hook;
+
+    const handler: Plugin[HookName] = function (this: PluginContext, ...args: any[]) {
+        return fn.call(injectEnvironmentInContext(this, environment), ...args);
+    };
+
+    if ('handler' in hook) {
+        return {
+            ...hook,
+            handler
+        } as Plugin[HookName];
+    } else {
+        return handler;
+    }
+}
+
+function injectEnvironmentInContext<Context extends MinimalPluginContext>(
+    context: Context,
+    environment: BuildEnvironment
+) {
+    context.environment ??= environment;
+    return context;
+}
+
+function injectSsrFlag<T extends Record<string, any>>(
+    options?: T,
+    environment?: BuildEnvironment
+): T & { ssr?: boolean } {
+    const ssr = environment ? environment.config.consumer === 'server' : true;
+    return { ...(options ?? {}), ssr } as T & {
+        ssr?: boolean;
+    };
 }

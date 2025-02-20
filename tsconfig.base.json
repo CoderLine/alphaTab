@@ -32,8 +32,8 @@
       "@src/*": [
         "src/*"
       ],
-      "@test*": [
-        "test*"
+      "@test/*": [
+        "test/*"
       ]
     },
     "typeRoots": [

@@ -1,6 +1,5 @@
 /**@target web */
 import { alphaTab } from '../../src/alphaTab.vite';
-import * as vite from 'vite';
 import path from 'path';
 import fs from 'fs';
 import { expect } from 'chai';
@@ -10,6 +9,9 @@ describe('Vite', () => {
         const bundlerProject = './test-data/bundler/vite';
         const cwd = process.cwd();
         process.chdir(bundlerProject);
+
+        const vite = await import('vite');
+
         try {
             await fs.promises.rm(path.join(process.cwd(), 'dist'), { force: true, recursive: true });
             await vite.build(

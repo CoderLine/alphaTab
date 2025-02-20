@@ -20,6 +20,7 @@
         "type": "git",
         "url": "git+https://github.com/coderline/alphaTab.git"
     },
+    "type": "module",
     "main": "dist/alphaTab.js",
     "module": "dist/alphaTab.mjs",
     "typings": "dist/alphaTab.d.ts",
@@ -99,7 +100,7 @@
         "tslib": "^2.8.1",
         "tsx": "^4.19.3",
         "typescript": "^5.7.3",
-        "vite": "^5.4.14",
+        "vite": "^6.1.1",
         "webpack": "^5.98.0",
         "webpack-cli": "^6.0.1"
     },
