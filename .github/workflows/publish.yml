@@ -20,56 +20,56 @@ jobs:
           path: dummy.txt
           key: check-sha-${{ github.sha }}
 
-  nighty_web:
-    name: Web
-    needs: check_sha
-    if: needs.check_sha.outputs.hit == 'false'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # nighty_web:
+  #   name: Web
+  #   needs: check_sha
+  #   if: needs.check_sha.outputs.hit == 'false'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 'lts/*'
+  #         cache: 'npm'
 
-      - run: node ./scripts/update-version.js alpha ${{github.run_number}}
-      - run: npm install
-      - run: npm run build
-      - run: npm pack
+  #     - run: npm install
+  #     - run: node ./scripts/update-version.js alpha ${{github.run_number}}
+  #     - run: npm run build
+  #     - run: npm pack
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          registry-url: https://registry.npmjs.org/
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 'lts/*'
+  #         registry-url: https://registry.npmjs.org/
 
-      - run: npm publish --access public --tag alpha
-        env:
-          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+  #     - run: npm publish --access public --tag alpha
+  #       env:
+  #         NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
-  nightly_csharp:
-    name: C#
-    needs: check_sha
-    if: needs.check_sha.outputs.hit == 'false'
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+  # nightly_csharp:
+  #   name: C#
+  #   needs: check_sha
+  #   if: needs.check_sha.outputs.hit == 'false'
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 'lts/*'
-          cache: 'npm'
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version: 'lts/*'
+  #         cache: 'npm'
 
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: "8"
+  #     - uses: actions/setup-dotnet@v4
+  #       with:
+  #         dotnet-version: "8"
 
-      - run: npm install
-      - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
-      - run: npm run build-csharp
+  #     - run: npm install
+  #     - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
+  #     - run: npm run build-csharp
 
-      - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-      - run: dotnet nuget push src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+  #     - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+  #     - run: dotnet nuget push src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
 
   nightly_kotlin_android:
     name: Kotlin (Android)
@@ -77,15 +77,11 @@ jobs:
     if: needs.check_sha.outputs.hit == 'false'
     runs-on: ubuntu-latest
     env:
-      KOTLIN_REQUIRE_SIGNING: true
-      OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
-      OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
-      OSSRH_USERTOKEN_USERNAME: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
-      OSSRH_USERTOKEN_PASSWORD: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
-      SONATYPE_STAGING_PROFILE_ID: ${{secrets.SONATYPE_STAGING_PROFILE_ID}}
-      SONATYPE_SIGNING_KEY_ID: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
-      SONATYPE_SIGNING_PASSWORD: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
-      SONATYPE_SIGNING_KEY: ${{secrets.SONATYPE_SIGNING_KEY}}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
       - uses: actions/checkout@v4
 
@@ -103,7 +99,7 @@ jobs:
       - run: node ./scripts/update-kotlin-version.js SNAPSHOT
       - run: npm run build-kotlin
 
-      - run: ./gradlew publishAllPublicationsToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+      - run: ./gradlew publishToMavenCentral
         working-directory: ./src.kotlin/alphaTab/
 
       - run: ./gradlew --stop
