@@ -49,15 +49,11 @@ jobs:
     name: Kotlin (Android)
     runs-on: windows-latest
     env:
-      KOTLIN_REQUIRE_SIGNING: true
-      OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
-      OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
-      OSSRH_USERTOKEN_USERNAME: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
-      OSSRH_USERTOKEN_PASSWORD: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}      
-      SONATYPE_STAGING_PROFILE_ID: ${{secrets.SONATYPE_STAGING_PROFILE_ID}}
-      SONATYPE_SIGNING_KEY_ID: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
-      SONATYPE_SIGNING_PASSWORD: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
-      SONATYPE_SIGNING_KEY: ${{secrets.SONATYPE_SIGNING_KEY}}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
       - uses: actions/checkout@v4
       
@@ -73,7 +69,7 @@ jobs:
       - run: npm install
       - run: node ./scripts/update-kotlin-version.js
       - run: npm run build-kotlin
-      - run: ./gradlew publishAllPublicationsToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+      - run: ./gradlew publishToMavenCentral
         working-directory: ./src.kotlin/alphaTab/
 
       - run: ./gradlew --stop

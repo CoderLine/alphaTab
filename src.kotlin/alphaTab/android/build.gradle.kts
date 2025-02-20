@@ -1,3 +1,5 @@
+import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import com.vanniktech.maven.publish.SonatypeHost
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -5,6 +7,7 @@ plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.dokka)
+    alias(libs.plugins.mavenPublish)
     `maven-publish`
     signing
 }
@@ -43,6 +46,8 @@ var libGitUrlGit = "scm:git:git://github.com/CoderLine/alphaTab.git"
 var libLicenseSpdx = "MPL-2.0"
 var libLicenseUrl = "https://opensource.org/licenses/MPL-2.0"
 var libIssuesUrl = "https://github.com/CoderLine/alphaTab/issues"
+val libGroup = "net.alphatab"
+val libArtifactId = "alphaTab"
 
 loadSetting("ALPHATAB_DESCRIPTION", "alphatabDescription") { libDescription = it }
 loadSetting("ALPHATAB_AUTHOR_ID", "alphatabAuthorId") { libAuthorId = it }
@@ -57,7 +62,7 @@ loadSetting("ALPHATAB_LICENSE_SPDX", "alphatabLicenseSpdx") { libLicenseSpdx = i
 loadSetting("ALPHATAB_LICENSE_URL", "alphatabLicenseUrl") { libLicenseUrl = it }
 loadSetting("ALPHATAB_ISSUES_URL", "alphatabIssuesUrl") { libIssuesUrl = it }
 
-group = "net.alphatab"
+group = libGroup
 version = libVersion
 
 val javaVersion = JavaVersion.VERSION_17;
@@ -103,12 +108,6 @@ android {
             kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
         }
     }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-        }
-    }
 }
 
 dependencies {
@@ -128,79 +127,42 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
+mavenPublishing {
+    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+    coordinates(libGroup, libArtifactId, libVersion)
 
-var sonatypeSigningKeyId = ""
-var sonatypeSigningPassword = ""
-var sonatypeSigningKey = ""
-var sonatypeStagingProfileId = ""
-loadSetting("SONATYPE_STAGING_PROFILE_ID", "sonatypeStagingProfileId") {
-    sonatypeStagingProfileId = it
-}
-loadSetting("SONATYPE_SIGNING_KEY_ID", "sonatypeSigningKeyId") { sonatypeSigningKeyId = it }
-loadSetting("SONATYPE_SIGNING_PASSWORD", "sonatypeSigningPassword") { sonatypeSigningPassword = it }
-loadSetting("SONATYPE_SIGNING_KEY", "sonatypeSigningKey") { sonatypeSigningKey = it }
+    configure(AndroidSingleVariantLibrary(
+        variant = "release",
+        sourcesJar = true,
+        publishJavadocJar = true
+    ))
 
-publishing {
-    repositories {
-        maven {
-            name = "DistPath"
-            url = rootProject.projectDir.resolve("dist").toURI()
-        }
-    }
-
-    val dokkaHtml by tasks.getting(org.jetbrains.dokka.gradle.DokkaTask::class)
-    val javadocJar: TaskProvider<Jar> by tasks.registering(Jar::class) {
-        dependsOn(dokkaHtml)
-        archiveClassifier.set("javadoc")
-        from(dokkaHtml.outputDirectory)
-    }
-
-    publications {
-        create<MavenPublication>("release") {
-            artifact(javadocJar)
-            afterEvaluate {
-                from(components["release"])
-            }
-
-            artifactId = tasks.withType<Jar>().firstOrNull()?.archiveBaseName?.get()
-            pom {
-                name = artifactId
-                description = libDescription
-                url = libProjectUrl
-                licenses {
-                    license {
-                        name = libLicenseSpdx
-                        url = libLicenseUrl
-                    }
-                }
-                developers {
-                    developer {
-                        id = libAuthorId
-                        name = libAuthorName
-                        organization = libCompany
-                        organizationUrl = libOrgUrl
-                    }
-                }
-                scm {
-                    url = libGitUrlHttp
-                    connection = "scm:git:$libGitUrlGit"
-                    developerConnection = "scm:git:$libGitUrlGit"
-                }
-                issueManagement {
-                    system = "GitHub"
-                    url = libIssuesUrl
-                }
+    pom {
+        name = libArtifactId
+        description = libDescription
+        url = libProjectUrl
+        licenses {
+            license {
+                name = libLicenseSpdx
+                url = libLicenseUrl
             }
         }
-    }
-}
-
-signing {
-    if (sonatypeSigningKeyId.isNotBlank() && sonatypeSigningKey.isNotBlank() && sonatypeSigningPassword.isNotBlank()) {
-        useInMemoryPgpKeys(sonatypeSigningKeyId, sonatypeSigningKey, sonatypeSigningPassword)
-        sign(publishing.publications["release"])
-    } else if (System.getenv("KOTLIN_REQUIRE_SIGNING") == "true") {
-        logger.error("Missing Signing Key configuration")
-        throw Exception("Missing Signing Key configuration")
+        developers {
+            developer {
+                id = libAuthorId
+                name = libAuthorName
+                organization = libCompany
+                organizationUrl = libOrgUrl
+            }
+        }
+        scm {
+            url = libGitUrlHttp
+            connection = "scm:git:$libGitUrlGit"
+            developerConnection = "scm:git:$libGitUrlGit"
+        }
+        issueManagement {
+            system = "GitHub"
+            url = libIssuesUrl
+        }
     }
 }
