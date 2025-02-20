@@ -17,8 +17,8 @@ namespace AlphaTab
 
         private DirectSoundOut _context;
         private CircularSampleBuffer _circularBuffer;
-        private int _bufferCount = 0;
-        private int _requestedBufferCount = 0;
+        private int _bufferCount;
+        private int _requestedBufferCount;
 
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
