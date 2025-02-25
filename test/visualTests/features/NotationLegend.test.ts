@@ -1,6 +1,6 @@
 import { LayoutMode } from '@src/LayoutMode';
 import { Settings } from '@src/Settings';
-import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { Score } from '@src/model/Score';
@@ -16,24 +16,24 @@ describe('NotationLegend', () => {
     it('full-default-small', async () => {
         const settings: Settings = new Settings();
         settings.display.scale = 0.75;
-        await VisualTestHelper.runVisualTestWithResize(
-            'notation-legend/notation-legend.gp',
-            [1300],
-            ['notation-legend/full-default-small.png'],
-            settings,
-            [0]
+        await VisualTestHelper.runVisualTestFull(
+            await VisualTestOptions.file(
+                'notation-legend/notation-legend.gp',
+                [new VisualTestRun(-1, 'notation-legend/full-default-small.png')],
+                settings
+            )
         );
     });
 
     it('full-default-large', async () => {
         const settings: Settings = new Settings();
         settings.display.scale = 1.5;
-        await VisualTestHelper.runVisualTestWithResize(
-            'notation-legend/notation-legend.gp',
-            [1300],
-            ['notation-legend/full-default-large.png'],
-            settings,
-            [0]
+        await VisualTestHelper.runVisualTestFull(
+            await VisualTestOptions.file(
+                'notation-legend/notation-legend.gp',
+                [new VisualTestRun(-1, 'notation-legend/full-default-large.png')],
+                settings
+            )
         );
     });
 
@@ -209,14 +209,14 @@ describe('NotationLegend', () => {
         await runNotationLegendTest(`sweep-default.png`, 93, 1, false);
     });
     it('sweep-songbook', async () => {
-        await runNotationLegendTest(`sweep-songbook.png`, 92, 1, true);
+        await runNotationLegendTest(`sweep-songbook.png`, 93, 1, true);
     });
 
     it('fingering-default', async () => {
-        await runNotationLegendTest(`fingering-default.png`, 94, 2, false, 'notation-legend.gp', 1.5);
+        await runNotationLegendTest(`fingering-default.png`, 94, 2, false, 'notation-legend.gp');
     });
     it('fingering-songbook', async () => {
-        await runNotationLegendTest(`fingering-songbook.png`, 94, 2, true, 'notation-legend.gp', 1.5);
+        await runNotationLegendTest(`fingering-songbook.png`, 94, 2, true, 'notation-legend.gp');
     });
 
     it('whammy-default', async () => {
@@ -248,18 +248,13 @@ describe('NotationLegend', () => {
     });
 
     it('resize-sequence', async () => {
-        let settings: Settings = new Settings();
-        await VisualTestHelper.runVisualTestWithResize(
-            'notation-legend/notation-legend.gp',
-            [1300, 800, 1500, 500],
-            [
-                'notation-legend/resize-sequence-1300.png',
-                'notation-legend/resize-sequence-800.png',
-                'notation-legend/resize-sequence-1500.png',
-                'notation-legend/resize-sequence-500.png'
-            ],
-            settings,
-            [0]
+        await VisualTestHelper.runVisualTestFull(
+            await VisualTestOptions.file('notation-legend/notation-legend.gp', [
+                new VisualTestRun(1300, 'notation-legend/resize-sequence-1300.png'),
+                new VisualTestRun(800, 'notation-legend/resize-sequence-800.png'),
+                new VisualTestRun(1500, 'notation-legend/resize-sequence-1500.png'),
+                new VisualTestRun(500, 'notation-legend/resize-sequence-500.png')
+            ])
         );
     });
 
@@ -268,8 +263,7 @@ describe('NotationLegend', () => {
         startBar: number,
         barCount: number,
         songBook: boolean,
-        fileName: string = 'notation-legend.gp',
-        tolerance: number = 1
+        fileName: string = 'notation-legend.gp'
     ): Promise<void> {
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
@@ -280,13 +274,8 @@ describe('NotationLegend', () => {
         }
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/${fileName}`);
         let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
-        await VisualTestHelper.runVisualTestScore(
-            score,
-            `notation-legend/${referenceFileName}`,
-            settings,
-            [0],
-            undefined,
-            tolerance
-        );
+
+        const o =  new VisualTestOptions(score, [new VisualTestRun(-1, `notation-legend/${referenceFileName}`)], settings);
+        await VisualTestHelper.runVisualTestFull(o);
     }
 });

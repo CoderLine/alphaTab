@@ -188,16 +188,16 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         if (p.type) {
             this.write(': ');
             if (p.params) {
-                this.writeType((p.type as cs.ArrayTypeNode).elementType, false, false);
+                this.writeType((p.type as cs.ArrayTypeNode).elementType, false, false, false, true, false);
             } else {
-                this.writeType(p.type, false);
+                this.writeType(p.type, false, false, false, true, false);
             }
         }
         if (!this.isOverrideMethod(p.parent!)) {
             if (p.initializer) {
                 this.write(' = ');
                 this.writeExpression(p.initializer);
-            } else if (p.type && p.type.isOptional) {
+            } else if (p.type && p.isOptional) {
                 let type: cs.TypeNode = p.type;
                 if (cs.isTypeReference(p.type)) {
                     type = p.type.reference as cs.TypeNode;
@@ -582,23 +582,32 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write(': ');
         this.writeType(d.type);
 
+        let initializerWritten = false;
         if (d.initializer && !isLateInit) {
             this.write(' = ');
             this.writeExpression(d.initializer);
+            initializerWritten = true;
             this.writeLine();
         } else if (writeAsField) {
             this.writeLine();
         }
 
-        if (!writeAsField && !isAutoProperty) {
+        if (!writeAsField) {
+            if(isAutoProperty && d.type.isNullable && !initializerWritten && 
+                d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration
+            ) {
+                this.write(' = null');
+            }
             this.writeLine();
 
-            if (d.getAccessor) {
-                this.writePropertyAccessor(d.getAccessor);
-            }
-
-            if (d.setAccessor) {
-                this.writePropertyAccessor(d.setAccessor);
+            if(!isAutoProperty) {
+                if (d.getAccessor) {
+                    this.writePropertyAccessor(d.getAccessor);
+                }
+    
+                if (d.setAccessor) {
+                    this.writePropertyAccessor(d.setAccessor);
+                }
             }
         }
     }
@@ -662,7 +671,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         forNew: boolean = false,
         asNativeArray: boolean = false,
         forTypeConstraint: boolean = false,
-        allowPromise: boolean = true
+        allowPromise: boolean = true,
+        optionalAsNullable: boolean = true
     ) {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
@@ -828,7 +838,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if ((type.isNullable || type.isOptional) && !forNew && !forTypeConstraint) {
+        if ((type.isNullable) && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }

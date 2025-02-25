@@ -1029,7 +1029,7 @@ export class AlphaTabApiBase<TSettings> {
             if (this.settings.player.enableAnimatedBeatCursor) {
                 beatCursor.stopAnimation();
             }
-            beatCursor.setBounds(beatBoundings.visualBounds.x, barBounds.y, 1, barBounds.h);
+            beatCursor.setBounds(beatBoundings.onNotesX, barBounds.y, 1, barBounds.h);
         }
 
         // if playing, animate the cursor to the next beat
@@ -1058,7 +1058,7 @@ export class AlphaTabApiBase<TSettings> {
                         nextBeatBoundings &&
                         nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
                     ) {
-                        nextBeatX = nextBeatBoundings.visualBounds.x;
+                        nextBeatX = nextBeatBoundings.onNotesX;
                     }
                 }
                 // we need to put the transition to an own animation frame

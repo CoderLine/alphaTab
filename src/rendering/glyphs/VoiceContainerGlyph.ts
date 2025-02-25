@@ -67,6 +67,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                         // respect the post beat width of the grace note
                         currentBeatGlyph.x -= graceSprings[currentBeatGlyph.beat.graceIndex].postSpringWidth;
                         // shift to right position of the particular grace note
+
                         currentBeatGlyph.x += graceSprings[currentBeatGlyph.beat.graceIndex].graceBeatWidth;
                         // move the whole group again forward for cases where another track has e.g. 3 beats and here we have only 2.
                         // so we shift the whole group of this voice to stick to the end of the group.
@@ -115,7 +116,6 @@ export class VoiceContainerGlyph extends GlyphGroup {
     }
 
     public registerLayoutingInfo(info: BarLayoutingInfo): void {
-        info.updateVoiceSize(this.width);
         let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
         for (let b of beatGlyphs) {
             b.registerLayoutingInfo(info);

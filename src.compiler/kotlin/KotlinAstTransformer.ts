@@ -310,6 +310,24 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return func;
     }
 
+    
+    protected override visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
+        this._paramReferences.push(new Map<string, cs.Identifier[]>());
+        this._paramsWithAssignment.push(new Set<string>());
+
+        const method = super.visitTestClassMethod(parent, d);
+
+        if (method.body && cs.isBlock(method.body)) {
+            this.injectParametersAsLocal(method.body);
+        }
+
+        this._paramReferences.pop();
+        this._paramsWithAssignment.pop();
+
+        return method;
+    }
+
+
     protected override visitMethodDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.MethodDeclaration

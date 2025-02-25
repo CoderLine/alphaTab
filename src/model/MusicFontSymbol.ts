@@ -5,6 +5,8 @@
 export enum MusicFontSymbol {
     None = -1,
 
+    Space = 0x20,
+
     Brace = 0xe000,
     BracketTop = 0xe003,
     BracketBottom = 0xe004,
@@ -59,6 +61,20 @@ export enum MusicFontSymbol {
 
     NoteQuarterUp = 0xe1d5,
     NoteEighthUp = 0xe1d7,
+
+    TextBlackNoteLongStem = 0xE1F1,
+    TextBlackNoteFrac8thLongStem = 0xE1F3,
+    TextBlackNoteFrac16thLongStem = 0xE1F5,
+    TextBlackNoteFrac32ndLongStem = 0xE1F6,
+
+    TextCont8thBeamLongStem = 0xE1F8,
+    TextCont16thBeamLongStem = 0xE1FA,
+    TextCont32ndBeamLongStem = 0xE1FB,
+
+    TextAugmentationDot = 0xE1FC,
+    TextTupletBracketStartLongStem = 0xE201,
+    TextTuplet3LongStem = 0xE202,
+    TextTupletBracketEndLongStem = 0xE203,
 
     Tremolo3 = 0xe222,
     Tremolo2 = 0xe221,

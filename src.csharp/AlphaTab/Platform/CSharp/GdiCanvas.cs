@@ -1,5 +1,4 @@
 ﻿using AlphaTab.Model;
-using AlphaTab.Rendering.Glyphs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -473,8 +472,7 @@ internal sealed class GdiCanvas : ICanvas
     }
 
     public void FillMusicFontSymbol(double x, double y, double scale, MusicFontSymbol symbol,
-        bool centerAtPosition =
-            false)
+        bool? centerAtPosition = false)
     {
         if (symbol == MusicFontSymbol.None)
         {
@@ -489,13 +487,12 @@ internal sealed class GdiCanvas : ICanvas
 
         _graphics.DrawString(String.FromCharCode((int)symbol), GetMusicFont(scale),
             _brush, (float)x, (float)y,
-            centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
+            centerAtPosition.GetValueOrDefault() ? MusicFontFormatCenter : MusicFontFormat);
     }
 
     public void FillMusicFontSymbols(double x, double y, double scale,
         IList<MusicFontSymbol> symbols,
-        bool centerAtPosition
-            = false)
+        bool? centerAtPosition = false)
     {
         var s = "";
         foreach (var symbol in symbols)
@@ -513,7 +510,7 @@ internal sealed class GdiCanvas : ICanvas
         x += scale;
 
         _graphics.DrawString(s, GetMusicFont(scale), _brush, (float)x, (float)y,
-            centerAtPosition ? MusicFontFormatCenter : MusicFontFormat);
+            centerAtPosition.GetValueOrDefault() ? MusicFontFormatCenter : MusicFontFormat);
     }
 
     public void BeginRotate(double centerX, double centerY, double angle)

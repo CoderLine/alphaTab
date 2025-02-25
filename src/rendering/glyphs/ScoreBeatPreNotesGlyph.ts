@@ -70,8 +70,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     new SpacingGlyph(
                         0,
                         0,
-                        4 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
@@ -80,21 +79,22 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 this.addGlyph(new SpacingGlyph(0, 0, 4));
             }
             if (!fingering.isEmpty) {
-                this.addGlyph(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
-                    )
-                );
+                if (!this.isEmpty) {
+                    this.addGlyph(
+                        new SpacingGlyph(
+                            0,
+                            0,
+                            2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        )
+                    );
+                }
+
                 this.addGlyph(fingering);
                 this.addGlyph(
                     new SpacingGlyph(
                         0,
                         0,
-                        2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
@@ -105,28 +105,28 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     new SpacingGlyph(
                         0,
                         0,
-                        4 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;
-                this.addGlyph(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
-                    )
-                );
+                if (!this.isEmpty) {
+                    this.addGlyph(
+                        new SpacingGlyph(
+                            0,
+                            0,
+                            2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        )
+                    );
+                }
+                
                 this.addGlyph(accidentals);
                 this.addGlyph(
                     new SpacingGlyph(
                         0,
                         0,
-                        2 *
-                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        2 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }

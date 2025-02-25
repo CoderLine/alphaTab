@@ -226,13 +226,13 @@ export interface ParameterDeclaration extends NamedElement, Node, DocumentedElem
     type?: TypeNode;
     initializer?: Expression;
     params: boolean;
+    isOptional: boolean;
 }
 
 // Type System
 
 export interface TypeNode extends Node {
     isNullable?: boolean;
-    isOptional?: boolean;
 }
 
 export interface UnresolvedTypeNode extends TypeNode {
