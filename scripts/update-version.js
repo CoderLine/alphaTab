@@ -1,6 +1,11 @@
+import * as fs from 'node:fs';
+import url from 'node:url';
+import {exec} from 'node:child_process';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 const packageJsonFilePath = `${__dirname}/../package.json`;
-const pkg = require(packageJsonFilePath);
-const {exec} = require('child_process');
+const pkg = JSON.parse(fs.readFileSync(packageJsonFilePath, 'utf-8'));
 
 let version = pkg.version.match(/([0-9]+\.[0-9]+\.[0-9]+)/)[0];
 
