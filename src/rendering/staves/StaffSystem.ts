@@ -704,12 +704,12 @@ export class StaffSystem {
         let x: number = this.x + _firstStaffInBrackets.x;
         let staffSystemBounds = new StaffSystemBounds();
         staffSystemBounds.visualBounds = new Bounds();
-        staffSystemBounds.visualBounds.x = cx;
+        staffSystemBounds.visualBounds.x = cx + this.x;
         staffSystemBounds.visualBounds.y = cy + this.y;
         staffSystemBounds.visualBounds.w = this.width;
         staffSystemBounds.visualBounds.h = this.height - this.topPadding - this.bottomPadding;
         staffSystemBounds.realBounds = new Bounds();
-        staffSystemBounds.realBounds.x = cx;
+        staffSystemBounds.realBounds.x = cx + this.x;
         staffSystemBounds.realBounds.y = cy + this.y;
         staffSystemBounds.realBounds.w = this.width;
         staffSystemBounds.realBounds.h = this.height;

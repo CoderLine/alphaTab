@@ -5,7 +5,7 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
-import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { expect } from 'chai';
 
 describe('EffectsAndAnnotationsTests', () => {
@@ -102,11 +102,12 @@ describe('EffectsAndAnnotationsTests', () => {
         importer.init(ByteBuffer.fromString(tex), settings);
         let score = importer.readScore();
 
-        await VisualTestHelper.runVisualTestScoreWithResize(
-            score,
-            [400],
-            ['effects-and-annotations/slides-line-break.png'],
-            settings
+        await VisualTestHelper.runVisualTestFull(
+            new VisualTestOptions(
+                score,
+                [new VisualTestRun(400, 'effects-and-annotations/slides-line-break.png')],
+                settings
+            )
         );
     });
 
@@ -123,7 +124,9 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('tuplets-advanced', async () => {
-        await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets-advanced.gp', undefined, [0, 1, 2]);
+        await VisualTestHelper.runVisualTest('effects-and-annotations/tuplets-advanced.gp', undefined, o => {
+            o.tracks = [0, 1, 2];
+        });
     });
 
     it('fingering', async () => {
@@ -155,14 +158,12 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('sustain-pedal', async () => {
-        await VisualTestHelper.runVisualTestWithResize(
-            'effects-and-annotations/sustain.gp',
-            [1200, 850, 600],
-            [
-                'effects-and-annotations/sustain-1200.png',
-                'effects-and-annotations/sustain-850.png',
-                'effects-and-annotations/sustain-600.png'
-            ]
+        await VisualTestHelper.runVisualTestFull(
+            await VisualTestOptions.file('effects-and-annotations/sustain.gp', [
+                new VisualTestRun(1200, 'effects-and-annotations/sustain-1200.png'),
+                new VisualTestRun(850, 'effects-and-annotations/sustain-850.png'),
+                new VisualTestRun(600, 'effects-and-annotations/sustain-600.png')
+            ])
         );
     });
 
@@ -185,14 +186,16 @@ describe('EffectsAndAnnotationsTests', () => {
         const score = importer.readScore();
         score.stylesheet.hideDynamics = true;
 
-        await VisualTestHelper.runVisualTestScoreWithResize(
-            score,
-            [1200, 850, 600],
-            [
-                'effects-and-annotations/sustain-1200.png',
-                'effects-and-annotations/sustain-850.png',
-                'effects-and-annotations/sustain-600.png'
-            ]
+        await VisualTestHelper.runVisualTestFull(
+            new VisualTestOptions(
+                score,
+                [
+                    new VisualTestRun(1200, 'effects-and-annotations/sustain-1200.png'),
+                    new VisualTestRun(850, 'effects-and-annotations/sustain-850.png'),
+                    new VisualTestRun(600, 'effects-and-annotations/sustain-600.png')
+                ],
+                settings
+            )
         );
     });
 
@@ -259,21 +262,33 @@ describe('EffectsAndAnnotationsTests', () => {
         const inputFileData = await TestPlatform.loadFile(
             `test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`
         );
-        const referenceFileName = 'effects-and-annotations/bend-vibrato-default.png';
         const settings = new Settings();
         const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
-        await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
+
+        await VisualTestHelper.runVisualTestFull(
+            new VisualTestOptions(
+                score,
+                [new VisualTestRun(-1, 'effects-and-annotations/bend-vibrato-default.png')],
+                settings
+            )
+        );
     });
 
     it('bend-vibrato-songbook', async () => {
         const inputFileData = await TestPlatform.loadFile(
             `test-data/visual-tests/effects-and-annotations/bend-vibrato.gp`
         );
-        const referenceFileName = 'effects-and-annotations/bend-vibrato-songbook.png';
         const settings = new Settings();
         settings.setSongBookModeSettings();
         const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
-        await VisualTestHelper.runVisualTestScore(score, referenceFileName, settings);
+
+        await VisualTestHelper.runVisualTestFull(
+            new VisualTestOptions(
+                score,
+                [new VisualTestRun(-1, 'effects-and-annotations/bend-vibrato-songbook.png')],
+                settings
+            )
+        );
     });
 
     it('directions-simple', async () => {
@@ -289,7 +304,6 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('legato', async () => {
-        await VisualTestHelper.runVisualTestTex(`3.3.4{ legatoOrigin } 10.3.4`,
-            'effects-and-annotations/legato.png');
+        await VisualTestHelper.runVisualTestTex(`3.3.4{ legatoOrigin } 10.3.4`, 'effects-and-annotations/legato.png');
     });
 });

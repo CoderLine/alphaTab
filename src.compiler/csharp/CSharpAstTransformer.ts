@@ -602,6 +602,8 @@ export default class CSharpAstTransformer {
 
         parent.members.push(csMethod);
         this._context.registerSymbol(csMethod);
+
+        return csMethod;
     }
 
     protected visitTestMethod(parent: cs.ClassDeclaration, d: ts.CallExpression) {
@@ -1861,6 +1863,10 @@ export default class CSharpAstTransformer {
             ];
         }
 
+        if (s.finallyBlock) {
+            tryStatement.finallyBlock = this.visitBlock(tryStatement, s.finallyBlock);
+        }
+
         return tryStatement;
     }
 
@@ -1967,21 +1973,14 @@ export default class CSharpAstTransformer {
             parent: csMethod,
             type: this.createUnresolvedTypeNode(null, p.type ?? p, type),
             tsNode: p,
-            params: !!p.dotDotDotToken
+            params: !!p.dotDotDotToken,
+            isOptional: !!p.questionToken
         };
         csParameter.type!.parent = csParameter;
-
-        if (p.questionToken) {
-            csParameter.type!.isOptional = true;
-        }
 
         if (p.initializer) {
             csParameter.initializer = this.visitExpression(csParameter, p.initializer) ?? undefined;
             if (csParameter.initializer && cs.isNullLiteral(csParameter.initializer)) {
-                csParameter.type!.isNullable = true;
-            }
-        } else if (csParameter.type!.isOptional) {
-            if (this._context.isDefaultValueNull(type)) {
                 csParameter.type!.isNullable = true;
             }
         }

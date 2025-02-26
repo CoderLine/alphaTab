@@ -161,7 +161,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         if (p.initializer) {
             this.write(' = ');
             this.writeExpression(p.initializer);
-        } else if (p.type && p.type.isOptional) {
+        } else if (p.type && p.isOptional) {
             this.write(' = default');
         }
     }
@@ -308,7 +308,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                             nodeType: cs.SyntaxKind.Identifier,
                             text: p.name,
                             tsNode: defaultConstructor.tsNode
-                        } as cs.Identifier)
+                        }) as cs.Identifier
                 );
                 this.writeMember(defaultConstructor);
             }
@@ -660,7 +660,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if (type.isNullable && !forNew && !forTypeConstraint) {
+        if ((type.isNullable) && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }

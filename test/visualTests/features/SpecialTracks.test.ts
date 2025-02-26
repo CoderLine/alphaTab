@@ -6,7 +6,9 @@ describe('SpecialTracksTests', () => {
     });
 
     it('percussion', async () => {
-        await VisualTestHelper.runVisualTest('special-tracks/percussion.gp', undefined, [0, 1, 2]);
+        await VisualTestHelper.runVisualTest('special-tracks/percussion.gp', undefined, o => {
+            o.tracks = [0, 1, 2];
+        });
     });
 
     it('grand-staff', async () => {

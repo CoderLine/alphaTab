@@ -176,28 +176,29 @@ export class EffectBand extends Glyph {
 
     private alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         let g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
-        let pos: Glyph;
         let container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
+                
+        // container is aligned with the "onTimeX" position of the beat in effect renders
+        
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
-                pos = container.preNotes;
-                g.x = this.renderer.beatGlyphsStart + pos.x + container.x;
-                g.width = pos.width;
+                // shift to the start using the biggest pre-beat size of the respective beat
+                const offsetToBegin = this.renderer.layoutingInfo.getPreBeatSize(beat);
+                g.x = this.renderer.beatGlyphsStart + container.x - offsetToBegin;
                 break;
             case EffectBarGlyphSizing.SingleOnBeat:
             case EffectBarGlyphSizing.GroupedOnBeat:
-                pos = container.onNotes;
-                g.x = this.renderer.beatGlyphsStart + pos.x + container.x;
-                g.width = pos.width;
+                g.x = this.renderer.beatGlyphsStart + container.x;
                 break;
             case EffectBarGlyphSizing.SingleOnBeatToEnd:
             case EffectBarGlyphSizing.GroupedOnBeatToEnd:
-                pos = container.onNotes;
-                g.x = this.renderer.beatGlyphsStart + pos.x + container.x;
+                g.x = this.renderer.beatGlyphsStart + container.x;
                 if (container.beat.isLastOfVoice) {
                     g.width = this.renderer.width - g.x;
                 } else {
-                    g.width = container.width - container.preNotes.width - container.preNotes.x;
+                    // shift to the start using the biggest post-beat size of the respective beat
+                    const offsetToEnd = this.renderer.layoutingInfo.getPostBeatSize(beat);
+                    g.width = offsetToEnd;
                 }
                 break;
             case EffectBarGlyphSizing.FullBar:

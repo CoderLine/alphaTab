@@ -241,16 +241,12 @@ export default class CSharpEmitterContext {
         }
 
         if (resolved) {
-            const wasOptional = node.isOptional;
             const wasNullable = node.isNullable;
             for (const prop of Object.getOwnPropertyNames(node)) {
                 delete (node as any)[prop];
             }
             for (const prop of Object.getOwnPropertyNames(resolved)) {
                 (node as any)[prop] = (resolved as any)[prop];
-            }
-            if (wasOptional) {
-                node.isOptional = true;
             }
             if (wasNullable) {
                 node.isNullable = true;
@@ -618,12 +614,11 @@ export default class CSharpEmitterContext {
         // external union type alias, refer by name
         if (!tsType.symbol && tsType.aliasSymbol) {
             let isNullable = false;
-            let isOptional = false;
             for (let t of tsType.types) {
                 if ((t.flags & ts.TypeFlags.Null) !== 0) {
                     isNullable = true;
                 } else if ((t.flags & ts.TypeFlags.Undefined) !== 0) {
-                    isOptional = true;
+                    isNullable = true;
                 }
             }
 
@@ -631,13 +626,11 @@ export default class CSharpEmitterContext {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: parent,
                 reference: this.buildCoreNamespace(tsType.aliasSymbol) + tsType.aliasSymbol.name,
-                isNullable: isNullable,
-                isOptional: isOptional
+                isNullable: isNullable
             } as cs.TypeReference;
         }
 
         let isNullable = false;
-        let isOptional = false;
         let actualType: ts.Type | null = null;
         let fallbackToObject = false;
         for (let t of tsType.types) {
@@ -648,7 +641,7 @@ export default class CSharpEmitterContext {
             if ((t.flags & ts.TypeFlags.Null) !== 0) {
                 isNullable = true;
             } else if ((t.flags & ts.TypeFlags.Undefined) !== 0) {
-                isOptional = true;
+                isNullable = true;
             } else if (actualType == null) {
                 actualType = t;
             } else if (actualType != null && actualType.flags !== t.flags) {
@@ -671,8 +664,7 @@ export default class CSharpEmitterContext {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
                 parent: parent,
                 type: cs.PrimitiveType.Object,
-                isNullable: isNullable,
-                isOptional: isOptional
+                isNullable: isNullable
             } as cs.PrimitiveTypeNode;
         }
 
@@ -686,8 +678,7 @@ export default class CSharpEmitterContext {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: parent,
                 reference: tsType.symbol.name,
-                isNullable: isNullable,
-                isOptional: isOptional
+                isNullable: isNullable
             } as cs.TypeReference;
         } else {
             type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments);
@@ -697,8 +688,7 @@ export default class CSharpEmitterContext {
             nodeType: cs.SyntaxKind.TypeReference,
             parent: parent,
             reference: type,
-            isNullable: isNullable,
-            isOptional: isOptional
+            isNullable: isNullable
         } as cs.TypeReference;
     }
 
@@ -725,13 +715,12 @@ export default class CSharpEmitterContext {
     private resolvePrimitiveType(parent: cs.Node, tsType: ts.Type): cs.TypeNode | null {
         const handleNullablePrimitive = (type: cs.PrimitiveType) => {
             let isNullable = false;
-            let isOptional = false;
             if (tsType.isUnion()) {
                 for (const t of tsType.types) {
                     if ((t.flags & ts.TypeFlags.Null) !== 0) {
                         isNullable = true;
                     } else if ((t.flags & ts.TypeFlags.Undefined) !== 0) {
-                        isOptional = true;
+                        isNullable = true;
                     }
                 }
             }
@@ -739,8 +728,7 @@ export default class CSharpEmitterContext {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
                 type: type,
-                isNullable: isNullable,
-                isOptional: isOptional
+                isNullable: isNullable
             } as cs.PrimitiveTypeNode;
         };
 

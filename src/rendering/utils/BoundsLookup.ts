@@ -38,6 +38,7 @@ export class BoundsLookup {
                         let bb: BeatBounds = {} as any;
                         bb.visualBounds = this.boundsToJson(beat.visualBounds);
                         bb.realBounds = this.boundsToJson(beat.realBounds);
+                        bb.onNotesX = beat.onNotesX;
                         let bbd: any = bb;
                         bbd.beatIndex = beat.beat.index;
                         bbd.voiceIndex = beat.beat.voice.index;
@@ -93,6 +94,7 @@ export class BoundsLookup {
                         let bb: BeatBounds = new BeatBounds();
                         bb.visualBounds = BoundsLookup.boundsFromJson(beat.visualBounds);
                         bb.realBounds = BoundsLookup.boundsFromJson(beat.realBounds);
+                        bb.onNotesX = beat.onNotesX;
                         let bd: any = beat;
                         bb.beat =
                             score.tracks[bd.trackIndex].staves[bd.staffIndex].bars[bd.barIndex].voices[

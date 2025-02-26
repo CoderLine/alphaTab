@@ -692,7 +692,7 @@ export class VorbisFloor1 implements IVorbisFloor {
     private _yBits: number;
 
     private _classMasterbooks: VorbisCodebook[];
-    private _subclassBooks: (VorbisCodebook|null)[][];
+    private _subclassBooks: (VorbisCodebook | null)[][];
     private _subclassBookIndex: Int32Array[];
 
     public constructor(packet: IntBitReader, codebooks: VorbisCodebook[]) {
@@ -711,7 +711,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         this._classSubclasses = new Int32Array(maximum_class);
         this._classMasterbooks = new Array<VorbisCodebook>(maximum_class);
         this._classMasterBookIndex = new Int32Array(maximum_class);
-        this._subclassBooks = new Array<(VorbisCodebook|null)[]>(maximum_class);
+        this._subclassBooks = new Array<(VorbisCodebook | null)[]>(maximum_class);
         this._subclassBookIndex = new Array<Int32Array>(maximum_class);
         for (let i = 0; i < maximum_class; i++) {
             this._classDimensions[i] = packet.readBits(3) + 1;
@@ -721,7 +721,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                 this._classMasterbooks[i] = codebooks[this._classMasterBookIndex[i]];
             }
 
-            this._subclassBooks[i] = new Array<VorbisCodebook|null>(1 << this._classSubclasses[i]);
+            this._subclassBooks[i] = new Array<VorbisCodebook | null>(1 << this._classSubclasses[i]);
             this._subclassBookIndex[i] = new Int32Array(this._subclassBooks[i].length);
             for (let j = 0; j < this._subclassBooks[i].length; j++) {
                 const bookNum = packet.readBits(8) - 1;
@@ -1078,7 +1078,7 @@ export class VorbisResidue0 implements IVorbisResidue {
     private _classifications: number;
     private _maxStages: number;
 
-    private _books: VorbisCodebook[][];
+    private _books: (VorbisCodebook | null)[][];
     private _classBook: VorbisCodebook;
 
     private _cascade: Int32Array;
@@ -1123,14 +1123,14 @@ export class VorbisResidue0 implements IVorbisResidue {
         }
 
         // now the lookups
-        this._books = new Array<VorbisCodebook[]>(this._classifications);
+        this._books = new Array<(VorbisCodebook | null)[]>(this._classifications);
 
         acc = 0;
         let maxstage = 0;
         let stages: number;
         for (let j = 0; j < this._classifications; j++) {
             stages = VorbisUtils.ilog(this._cascade[j]);
-            this._books[j] = new Array<VorbisCodebook>(stages);
+            this._books[j] = new Array<VorbisCodebook | null>(stages);
             if (stages > 0) {
                 maxstage = Math.max(maxstage, stages);
                 for (let k = 0; k < stages; k++) {
@@ -1209,7 +1209,7 @@ export class VorbisResidue0 implements IVorbisResidue {
                             const idx = partWordCache[ch][entryIdx][dimensionIdx];
                             if ((this._cascade[idx] & (1 << stage)) != 0) {
                                 const book = this._books[idx][stage];
-                                if (book != null) {
+                                if (book) {
                                     if (this.writeVectors(book, packet, buffer, ch, offset, this._partitionSize)) {
                                         // bad packet...  exit now and try to use what we already have
                                         partitionIdx = partitionCount;
