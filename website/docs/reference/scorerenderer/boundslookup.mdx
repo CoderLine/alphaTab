@@ -26,9 +26,9 @@ also the location of the individual notes can be obtained.
 The property contains a `BoundsLookup` instance which follows a hierarchical structure that represents
 the tree of rendered elements. 
 
-The hierarchy is: `staveGroups > bars(1) > bars(2) > beats > notes`
+The hierarchy is: `staffSystems > bars(1) > bars(2) > beats > notes`
 
-* `staveGroups` - Represent the bounds of the invidual "lines" where staves are contained. 
+* `staffSystems` - Represent the bounds of the individual systems ("rows") where staves are contained. 
 * `bars(1)` - Represent the bounds of all bars for a particular master bar across all tracks.
 * `bars(2)` - Represent the bounds of an individual bar of a track. The bounds on y-axis span the region of the staff and notes might exceed this bounds. 
 * `beats` - Represent the bounds of the individual beats within a track. The bounds on y-axis are equal to the bar bounds.

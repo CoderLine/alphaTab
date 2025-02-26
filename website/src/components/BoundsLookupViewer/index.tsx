@@ -9,7 +9,7 @@ enum GuideType {
 }
 
 enum GuideElements {
-    StaveGroups = 0,
+    StaffSystems = 0,
     MasterBars = 1,
     Bars = 2,
     Beats = 3,
@@ -32,7 +32,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps,
         super(props);
         this.state = {
             selectedType: GuideType.VisualBounds,
-            selectedElements: GuideElements.StaveGroups
+            selectedElements: GuideElements.StaffSystems
         };
         this.setElements = this.setElements.bind(this);
         this.setType = this.setType.bind(this);
@@ -85,8 +85,8 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps,
     }
 
     createStaveGroupGuides(wrapper: HTMLDivElement, lookup: alphaTab.rendering.BoundsLookup) {
-        for (const staveGroup of lookup.staveGroups) {
-            if (this.state.selectedElements === GuideElements.StaveGroups) {
+        for (const staveGroup of lookup.staffSystems) {
+            if (this.state.selectedElements === GuideElements.StaffSystems) {
                 this.createGuide(wrapper, staveGroup, "#1976d2");
             } else {
                 this.createMasterBarGuides(wrapper, staveGroup);
@@ -94,7 +94,7 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps,
         }
     }
 
-    createMasterBarGuides(wrapper: HTMLDivElement, staveGroup: alphaTab.rendering.StaveGroupBounds) {
+    createMasterBarGuides(wrapper: HTMLDivElement, staveGroup: alphaTab.rendering.StaffSystemBounds) {
         for (const masterBar of staveGroup.bars) {
             if (this.state.selectedElements === GuideElements.MasterBars) {
                 this.createGuide(wrapper, masterBar, "#388e3c");
@@ -206,9 +206,9 @@ export class BoundsLookupViewer extends React.Component<BoundsLookupViewerProps,
                     </ul>
                     <span>|</span>
                     <ul className="pills">
-                        <li className={`pills__item ${this.elementClass(GuideElements.StaveGroups)}`}
-                            onClick={() => this.setElements(GuideElements.StaveGroups)}>
-                            Stave Groups
+                        <li className={`pills__item ${this.elementClass(GuideElements.StaffSystems)}`}
+                            onClick={() => this.setElements(GuideElements.StaffSystems)}>
+                            Staff System
                         </li>
                         <li className={`pills__item ${this.elementClass(GuideElements.MasterBars)}`}
                             onClick={() => this.setElements(GuideElements.MasterBars)}>
