@@ -1,6 +1,7 @@
 import * as alphaTab from "@coderline/alphatab";
 import { useEffect, useRef } from "react";
 import styles from "./styles.module.scss";
+import environment from "@site/src/environment";
 
 type RasguadoItemMode = "down" | "up" | "head";
 type RasgueadoPatternItem = {
@@ -197,6 +198,7 @@ type RasgueadoPatternProps = {
 
 const canvas = alphaTab.Environment.renderEngines.get("svg")!.createCanvas();
 canvas.settings = new alphaTab.Settings();
+environment.setAlphaTabDefaults(canvas.settings);
 canvas.settings.display.scale = 1.5;
 
 export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {

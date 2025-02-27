@@ -9,6 +9,7 @@ import type {
 import * as path from "path";
 import * as fs from "fs";
 import { AlphaTabWebPackPlugin } from "@coderline/alphatab/webpack";
+import { Configuration, RuleSetRule } from "webpack";
 
 const alphaTabVersionFull = JSON.parse(
   fs.readFileSync(
@@ -273,7 +274,54 @@ const config: Config = {
       injectHtmlTags() {
         return {};
       },
+      configurePostCss(options) {
+        options["map"] = true;
+        return options;
+      },
       configureWebpack(config, isServer, options) {
+        const matchRule = (r: Configuration["module"]["rules"][0]) => {
+          if (typeof r === "object") {
+            if(r.test instanceof RegExp) {
+              return !!r.test.exec("custom.sass");
+            } else if(typeof r.test === "undefined") {
+              return true;
+            } else {
+              // unsupported
+              return false;
+            }
+          } else {
+            return false;
+          }
+        };
+
+        let sassRule = config.module.rules.find(matchRule);
+
+        if (typeof sassRule !== "object") {
+          throw new Error("Could not find SASS rule");
+        }
+
+        if (sassRule.oneOf) {
+          sassRule = sassRule.oneOf.find(matchRule);
+        }
+
+        if (typeof sassRule !== "object") {
+          throw new Error("Could not find inner SASS rule");
+        }
+
+        if (!Array.isArray(sassRule.use)) {
+          throw new Error("Need SASS rule with use[]");
+        }
+
+        const sassLoaderIndex = sassRule.use.findIndex(l => typeof l === "object" && l.loader?.includes('sass-loader'));
+        if (sassLoaderIndex === -1) {
+          throw new Error("Could not find sass-loader in rule");
+        }
+
+        // insert resolve-url-loader before SASS loader to fix relative URLs
+        sassRule.use.splice(sassLoaderIndex, 0, {
+          loader: "resolve-url-loader",
+        });
+
         return {
           plugins: [
             // Copy the Font and SoundFont Files to the output

@@ -63,6 +63,7 @@ import * as fs from 'fs';
 // 1. Load File
 const fileData = await fs.promises.readFile(process.argv[2]);
 const settings = new alphaTab.Settings();
+
 const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
   new Uint8Array(fileData),
   settings
@@ -85,6 +86,7 @@ renderer.preRender.on((isResize) => {
 // alphaTab separates "layouting" and "rendering" of the individual
 // partial results. in this case we want to render directly any partial layouted
 // (in UI scenarios the rendering might be delayed to the point when partials become visible)
+// Alternatively settings.core.enableLazyLoading could be set to false. 
 renderer.partialLayoutFinished.on((r) => {
     renderer.renderResult(r.id);
 })
@@ -369,6 +371,7 @@ renderer.preRender.on((isResize) => {
 // alphaTab separates "layouting" and "rendering" of the individual
 // partial results. in this case we want to render directly any partial layouted
 // (in UI scenarios the rendering might be delayed to the point when partials become visible)
+// Alternatively settings.core.enableLazyLoading could be set to false. 
 renderer.partialLayoutFinished.on((r) => {
     partialIds.push(r.id);
 });

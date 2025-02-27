@@ -8,7 +8,7 @@ import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
 export interface AlphaTabProps {
   settings?: alphaTab.json.SettingsJson;
   file?: string;
-  tracks?: number[] | string;
+  tracks?: number[] | 'all';
   tex: boolean;
   children: string | React.ReactElement;
   player?: boolean;
@@ -32,7 +32,7 @@ export class AlphaTab extends React.Component<AlphaTabProps, AlphaTabState> {
   componentDidMount() {
     const container = this._element.current;
     const settings = new alphaTab.Settings();
-    settings.core.fontDirectory = environment.fontDirectory;
+    environment.setAlphaTabDefaults(settings);
     if (this.props.file) {
       settings.core.file = this.props.file;
     }
@@ -49,8 +49,6 @@ export class AlphaTab extends React.Component<AlphaTabProps, AlphaTabState> {
     if (this.props.player) {
       settings.player.enablePlayer = true;
       settings.player.scrollOffsetY = -50;
-      settings.player.soundFont =
-        environment.soundFontDirectory + "sonivox.sf2";
       settings.player.scrollMode = alphaTab.ScrollMode.Off;
     }
     if (this.props.settings) {

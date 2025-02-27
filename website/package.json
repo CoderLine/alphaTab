@@ -19,6 +19,8 @@
     "@docusaurus/core": "^3.3.2",
     "@docusaurus/preset-classic": "^3.3.2",
     "@docusaurus/theme-mermaid": "^3.3.2",
+    "@fontsource/pt-serif": "^5.1.1",
+    "@fontsource/roboto": "^5.1.1",
     "@fortawesome/fontawesome-svg-core": "^6.5.2",
     "@fortawesome/free-regular-svg-icons": "^6.5.2",
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
@@ -39,6 +41,7 @@
     "babel-plugin-macros": "^3.1.0",
     "copy-webpack-plugin": "^12.0.2",
     "docusaurus-plugin-sass": "^0.2.5",
+    "resolve-url-loader": "^5.0.0",
     "sass": "^1.77.1",
     "typescript": "^5.4.5"
   },
