@@ -153,7 +153,7 @@ export abstract class SvgCanvas implements ICanvas {
         }
         let s: string = `<text x="${(x * this.scale) | 0}" y="${
             (y * this.scale) | 0
-        }" style="stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}"`;
+        }" style='stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}'`;
         if (this.color.rgba !== '#000000') {
             s += ` fill="${this.color.rgba}"`;
         }
