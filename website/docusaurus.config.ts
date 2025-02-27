@@ -274,16 +274,12 @@ const config: Config = {
       injectHtmlTags() {
         return {};
       },
-      configurePostCss(options) {
-        options["map"] = true;
-        return options;
-      },
       configureWebpack(config, isServer, options) {
         const matchRule = (r: Configuration["module"]["rules"][0]) => {
           if (typeof r === "object") {
-            if(r.test instanceof RegExp) {
+            if (r.test instanceof RegExp) {
               return !!r.test.exec("custom.sass");
-            } else if(typeof r.test === "undefined") {
+            } else if (typeof r.test === "undefined") {
               return true;
             } else {
               // unsupported
@@ -312,16 +308,27 @@ const config: Config = {
           throw new Error("Need SASS rule with use[]");
         }
 
-        const sassLoaderIndex = sassRule.use.findIndex(l => typeof l === "object" && l.loader?.includes('sass-loader'));
+        const sassLoaderIndex = sassRule.use.findIndex(
+          (l) => typeof l === "object" && l.loader?.includes("sass-loader")
+        );
         if (sassLoaderIndex === -1) {
           throw new Error("Could not find sass-loader in rule");
         }
+
+        // ensure source-map before resolve-url-loader
+        const sassLoader = sassRule.use[sassLoaderIndex] as RuleSetRule;
+        sassLoader.options = {
+          ...((sassLoader.options as object | undefined) ?? {}),
+          sourceMap: true // force sourcemaps
+        };
+
 
         // insert resolve-url-loader before SASS loader to fix relative URLs
         sassRule.use.splice(sassLoaderIndex, 0, {
           loader: "resolve-url-loader",
         });
 
+        
         return {
           plugins: [
             // Copy the Font and SoundFont Files to the output
