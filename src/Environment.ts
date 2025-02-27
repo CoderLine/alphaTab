@@ -743,6 +743,13 @@ export class Environment {
     /**
      * @target web
      */
+    public static get alphaTabUrl(): any {
+        return this.globalThis.URL;
+    }
+
+    /**
+     * @target web
+     */
     public static initializeWorker() {
         if (!Environment.isRunningInWorker) {
             throw new AlphaTabError(
