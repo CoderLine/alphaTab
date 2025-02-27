@@ -1,94 +1,49 @@
-import * as alphaTab from '@coderline/alphatab';
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { solid } from '@fortawesome/fontawesome-svg-core/import.macro'
+import * as alphaTab from "@coderline/alphatab";
+import React, { useEffect, useState } from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as solid from "@fortawesome/free-solid-svg-icons";
 
 export interface ZoomLevelSelectorProps {
-    api: alphaTab.AlphaTabApi;
+  api: alphaTab.AlphaTabApi;
 }
 
-export interface ZoomLevelSelectorState {
-    zoom: number;
-}
+export const ZoomLevelSelector: React.FC<ZoomLevelSelectorProps> = ({
+  api,
+}) => {
+  const [zoom, setZoom] = useState(100);
 
-export class ZoomLevelSelector extends React.Component<ZoomLevelSelectorProps, ZoomLevelSelectorState> {
-    public constructor(props: ZoomLevelSelectorProps) {
-        super(props);
-        this.state = {
-            zoom: 100
-        };
-        this.setZoom = this.setZoom.bind(this);
+  useEffect(() => {
+    if (api) {
+      api.settings.display.scale = zoom / 100.0;
+      api.updateSettings();
+      api.render();
     }
+  }, [zoom]);
 
-    public setZoom(zoom: number, e: React.MouseEvent) {
-        e.preventDefault();
-        const api = this.props.api;
-        if (api) {
-            this.setState({
-                zoom: zoom,
-            });
+  const zoomLevels = [25, 50, 75, 90, 100, 110, 125, 150, 200];
 
-            api.settings.display.scale = zoom / 100.0;
-            api.updateSettings();
-            api.render();
-        }
-    }
-
-    render() {
-        return (
-            <div className="dropdown dropdown--hoverable">
-                <span title="Zoom Level">
-                    <FontAwesomeIcon icon={solid('search')}></FontAwesomeIcon>
-                    {this.state.zoom}%
-                </span>
-                <ul className="dropdown__menu">
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(25, e)}>
-                            25%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(50, e)}>
-                            50%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(75, e)}>
-                            75%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(90, e)}>
-                            90%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(100, e)}>
-                            100%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(110, e)}>
-                            110%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(125, e)}>
-                            125%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(150, e)}>
-                            150%
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.setZoom(200, e)}>
-                            200%
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        );
-    }
-}
+  return (
+    <div className="dropdown dropdown--hoverable">
+      <span title="Zoom Level">
+        <FontAwesomeIcon icon={solid.faSearch}></FontAwesomeIcon>
+        {zoom}%
+      </span>
+      <ul className="dropdown__menu">
+        {zoomLevels.map((z) => (
+          <li key={z}>
+            <a
+              className="dropdown__link"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault;
+                setZoom(z);
+              }}
+            >
+              {z}%
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};

@@ -3,6 +3,7 @@
   "extends": "@docusaurus/tsconfig",
   "compilerOptions": {
     "baseUrl": ".",
-    "downlevelIteration": true
+    "downlevelIteration": true,
+    "strictNullChecks": true
   }
 }

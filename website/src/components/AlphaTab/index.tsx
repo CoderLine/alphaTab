@@ -1,96 +1,70 @@
 import * as alphaTab from "@coderline/alphatab";
 import environment from "@site/src/environment";
-import React from "react";
+import React, { useState } from "react";
 import styles from "./styles.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { solid } from "@fortawesome/fontawesome-svg-core/import.macro";
+import * as solid from "@fortawesome/free-solid-svg-icons";
+import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
 
 export interface AlphaTabProps {
   settings?: alphaTab.json.SettingsJson;
   file?: string;
-  tracks?: number[] | 'all';
+  tracks?: number[] | "all";
   tex: boolean;
   children: string | React.ReactElement;
   player?: boolean;
 }
 
-export interface AlphaTabState {
-  isPlaying: boolean;
-  api?: alphaTab.AlphaTabApi;
-}
-
-export class AlphaTab extends React.Component<AlphaTabProps, AlphaTabState> {
-  private _element: React.RefObject<HTMLDivElement> = React.createRef();
-
-  constructor(props) {
-    super(props);
-    this.state = {
-      isPlaying: false,
-    };
-  }
-
-  componentDidMount() {
-    const container = this._element.current;
-    const settings = new alphaTab.Settings();
-    environment.setAlphaTabDefaults(settings);
-    if (this.props.file) {
-      settings.core.file = this.props.file;
+export const AlphaTab: React.FC<AlphaTabProps> = ({
+  settings,
+  file,
+  tracks,
+  tex,
+  children,
+  player,
+}) => {
+  const [api, element] = useAlphaTab((s) => {
+    if (file) {
+      s.core.file = file;
     }
-    if (this.props.tex) {
-      settings.core.tex = true;
+    if (tex) {
+      s.core.tex = true;
     }
-    if (this.props.tracks) {
-      settings.fillFromJson({
-        core: {
-          tracks: this.props.tracks,
-        },
-      });
-    }
-    if (this.props.player) {
-      settings.player.enablePlayer = true;
-      settings.player.scrollOffsetY = -50;
-      settings.player.scrollMode = alphaTab.ScrollMode.Off;
-    }
-    if (this.props.settings) {
-      settings.fillFromJson(this.props.settings);
+    if (tracks) {
+      s.core.tracks = tracks;
     }
 
-    const api = new alphaTab.AlphaTabApi(container, settings);
-    api.playerStateChanged.on((args) => {
-      this.setState({
-        isPlaying: args.state == alphaTab.synth.PlayerState.Playing,
-      });
-    });
+    if (player) {
+      s.player.enablePlayer = true;
+      s.player.scrollOffsetY = -50;
+      s.player.scrollMode = alphaTab.ScrollMode.Off;
+    }
 
-    this.setState({
-      api: api,
-    });
-  }
+    if (settings) {
+      s.fillFromJson(settings);
+    }
+  });
+  const [isPlaying, setPlaying] = useState(false);
 
-  componentWillUnmount() {
-    this.state.api?.destroy();
-  }
+  useAlphaTabEvent(
+    api,
+    "playerStateChanged",
+    (args: alphaTab.synth.PlayerStateChangedEventArgs) => {
+      setPlaying(args.state == alphaTab.synth.PlayerState.Playing);
+    }
+  );
 
-  public playPause(e: Event) {
-    e.preventDefault();
-    this.state.api?.playPause();
-  }
-
-  render() {
-    return (
-      <div className={styles.wrapper}>
-        {this.props.player && (
-          <button
-            className="button button--primary"
-            onClick={this.playPause.bind(this)}
-          >
-            <FontAwesomeIcon
-              icon={this.state.isPlaying ? solid("pause") : solid("play")}
-            />
-          </button>
-        )}
-        <div ref={this._element}>{this.props.children}</div>
-      </div>
-    );
-  }
-}
+  return (
+    <div className={styles.wrapper}>
+      {player && (
+        <button
+          className="button button--primary"
+          onClick={() => api?.playPause()}
+        >
+          <FontAwesomeIcon icon={isPlaying ? solid.faPause : solid.faPlay} />
+        </button>
+      )}
+      <div ref={element}>{children}</div>
+    </div>
+  );
+};

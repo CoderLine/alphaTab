@@ -1,54 +1,45 @@
-import { faRotate } from '@fortawesome/free-solid-svg-icons';
-import React from 'react';
-import styles from './styles.module.scss';
+import React from "react";
+import styles from "./styles.module.scss";
 
 export interface PlayerProgressIndicatorProps {
-    percentage: number;
+  percentage: number;
 }
 
-export interface PlayerProgressIndicatorState {
-}
+export const PlayerProgressIndicator: React.FC<
+  PlayerProgressIndicatorProps
+> = ({ percentage }) => {
+  const v = percentage * 100;
 
-export class PlayerProgressIndicator extends React.Component<PlayerProgressIndicatorProps, PlayerProgressIndicatorState> {
-    private _radius = 16;
-    private _stroke = 2;
-    private _normalizedRadius = this._radius - this._stroke * 2;
-    private _circumference = this._normalizedRadius * 2 * Math.PI;
+  const radius = 16;
+  const stroke = 2;
+  const normalizedRadius = radius - stroke * 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
 
-    public constructor(props: PlayerProgressIndicatorProps) {
-        super(props);
-    }
+  return (
+    percentage < 0.99 && (
+      <div className={styles.progress}>
+        <svg width={radius * 2} height={radius * 2}>
+          <circle
+            stroke="white"
+            strokeDasharray={`${circumference} ${circumference}`}
+            style={{
+              strokeDashoffset: circumference - (v / 100) * circumference,
+              transformOrigin: `50% 50%`,
+              transform: "rotate(-90deg)",
+            }}
+            strokeWidth={stroke}
+            fill="transparent"
+            r={normalizedRadius}
+            cx={radius}
+            cy={radius}
+          />
+        </svg>
 
-    public render() {
-        const v = this.props.percentage * 100;
-        return (
-            this.props.percentage < 0.99 && (
-                <div className={styles.progress}>
-                    <svg width={this._radius * 2}
-                        height={this._radius * 2}>
-                        <circle
-                            stroke="white"
-                            strokeDasharray={`${this._circumference} ${this._circumference}`}
-                            style={ {
-                                strokeDashoffset: this._circumference - (v / 100 * this._circumference),
-                                transformOrigin: `50% 50%`,
-                                transform: 'rotate(-90deg)'
-                            } }
-                            strokeWidth={this._stroke}                            
-                            fill="transparent"
-                            r={this._normalizedRadius}
-                            cx={this._radius}
-                            cy={this._radius} />
-                    </svg>
-
-                    <div className={`${styles['progress-value']}`}>
-                        <span className={styles['progress-value-number']}>
-                            {v | 0}
-                        </span>
-                        <sup className="small">%</sup>
-                    </div>
-                </div>
-            )
-        );
-    }
-}
+        <div className={`${styles["progress-value"]}`}>
+          <span className={styles["progress-value-number"]}>{v | 0}</span>
+          <sup className="small">%</sup>
+        </div>
+      </div>
+    )
+  );
+};

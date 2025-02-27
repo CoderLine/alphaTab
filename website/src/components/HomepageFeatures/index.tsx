@@ -4,7 +4,7 @@ import styles from './styles.module.scss';
 type FeatureItem = {
   title: string;
   Image: any;
-  description: JSX.Element;
+  description: React.ReactNode;
 };
 
 const FeatureList: FeatureItem[] = [
@@ -69,7 +69,7 @@ function Feature({title, Image, description}: FeatureItem) {
   );
 }
 
-export function HomepageFeatures(): JSX.Element {
+export function HomepageFeatures() {
   return (
     <section className={styles.features}>
       <div className="container">

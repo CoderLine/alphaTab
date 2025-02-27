@@ -202,7 +202,7 @@ environment.setAlphaTabDefaults(canvas.settings);
 canvas.settings.display.scale = 1.5;
 
 export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
-  const pattern = RasgueadoPatternDefinition.get(rasgueado);
+  const pattern = RasgueadoPatternDefinition.get(rasgueado)!;
 
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -220,7 +220,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
       canvasWidth * canvas.settings.display.scale,
       canvasHeight * canvas.settings.display.scale
     );
-    const canvasStyle = window.getComputedStyle(canvasRef.current);
+    const canvasStyle = window.getComputedStyle(canvasRef.current!);
 
     const offset = 13;
     const actualWidth = (pattern.length - 1) * offset;
@@ -234,7 +234,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
 
     canvas.color = new alphaTab.model.Color(0, 0, 0);
 
-    canvas.font = alphaTab.model.Font.fromJson(canvasStyle.font).withSize(10);
+    canvas.font = alphaTab.model.Font.fromJson(canvasStyle.font)!.withSize(10);
     canvas.font.families = [canvas.font.families[0]];
     canvas.font.weight = 1;
     canvas.font.style = alphaTab.model.FontStyle.Italic;
@@ -261,7 +261,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
       if (pattern[i].bars) {
         if (i < pattern.length - 1) {
           let by = topLineY;
-          for (let b = 0; b < pattern[i].bars; b++) {
+          for (let b = 0; b < pattern[i].bars!; b++) {
             canvas.fillRect(x, by, offset, 3);
             by += 5;
           }
@@ -269,7 +269,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
       }
 
       if (pattern[i].flag) {
-        canvas.fillMusicFontSymbol(x, topLineY, 0.5, pattern[i].flag, false);
+        canvas.fillMusicFontSymbol(x, topLineY, 0.5, pattern[i].flag!, false);
       }
 
       switch (pattern[i].mode) {
@@ -343,7 +343,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
       canvas.fillText(pattern[i].finger, x, fingerY);
 
       if (pattern[i].tuplet !== undefined) {
-        tupletNumber = pattern[i].tuplet;
+        tupletNumber = pattern[i].tuplet!;
         if (tupletBracketStartX === -1) {
           tupletBracketStartX = x;
         }
@@ -380,7 +380,7 @@ export function RasgueadoPattern({ rasgueado }: RasgueadoPatternProps) {
       );
     }
 
-    canvasRef.current.innerHTML = canvas.endRender() as string;
+    canvasRef.current!.innerHTML = canvas.endRender() as string;
   }, []);
 
   return (

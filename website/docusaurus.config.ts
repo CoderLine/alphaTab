@@ -275,7 +275,7 @@ const config: Config = {
         return {};
       },
       configureWebpack(config, isServer, options) {
-        const matchRule = (r: Configuration["module"]["rules"][0]) => {
+        const matchRule = (r: RuleSetRule) => {
           if (typeof r === "object") {
             if (r.test instanceof RegExp) {
               return !!r.test.exec("custom.sass");
@@ -290,33 +290,33 @@ const config: Config = {
           }
         };
 
-        let sassRule = config.module.rules.find(matchRule);
+        let sassRule = config.module!.rules!.find(matchRule);
 
         if (typeof sassRule !== "object") {
           throw new Error("Could not find SASS rule");
         }
 
-        if (sassRule.oneOf) {
-          sassRule = sassRule.oneOf.find(matchRule);
+        if (sassRule!.oneOf) {
+          sassRule = sassRule!.oneOf.find(matchRule);
         }
 
         if (typeof sassRule !== "object") {
           throw new Error("Could not find inner SASS rule");
         }
 
-        if (!Array.isArray(sassRule.use)) {
+        if (!Array.isArray(sassRule!.use)) {
           throw new Error("Need SASS rule with use[]");
         }
 
-        const sassLoaderIndex = sassRule.use.findIndex(
-          (l) => typeof l === "object" && l.loader?.includes("sass-loader")
+        const sassLoaderIndex = sassRule!.use.findIndex(
+          (l) => typeof l === "object" && l!.loader?.includes("sass-loader")
         );
         if (sassLoaderIndex === -1) {
           throw new Error("Could not find sass-loader in rule");
         }
 
         // ensure source-map before resolve-url-loader
-        const sassLoader = sassRule.use[sassLoaderIndex] as RuleSetRule;
+        const sassLoader = sassRule!.use[sassLoaderIndex] as RuleSetRule;
         sassLoader.options = {
           ...((sassLoader.options as object | undefined) ?? {}),
           sourceMap: true // force sourcemaps
@@ -324,7 +324,7 @@ const config: Config = {
 
 
         // insert resolve-url-loader before SASS loader to fix relative URLs
-        sassRule.use.splice(sassLoaderIndex, 0, {
+        sassRule!.use.splice(sassLoaderIndex, 0, {
           loader: "resolve-url-loader",
         });
 
@@ -333,7 +333,7 @@ const config: Config = {
           plugins: [
             // Copy the Font and SoundFont Files to the output
             new AlphaTabWebPackPlugin({
-              assetOutputDir: config.output.path,
+              assetOutputDir: config.output!.path,
             }),
           ],
           resolve: {

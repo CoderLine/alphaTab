@@ -1,58 +1,64 @@
 import React from "react";
-import {CodeBadge, Platform } from "../CodeBadge";
+import { CodeBadge, Platform } from "../CodeBadge";
 import { SinceBadge } from "../SinceBadge";
-import {MDXProvider} from '@mdx-js/react'
+import { MDXProvider } from "@mdx-js/react";
 
-function renderChild(child: string | JSX.Element): JSX.Element {
-    if (typeof child === "string") {
-        return (
-            <MDXProvider children={child} />
-        )
-    } else {
-        return child;
-    }
+function renderChild(child: React.ReactNode): React.ReactNode {
+  if (typeof child === "string") {
+    return <MDXProvider children={child} />;
+  } else {
+    return child;
+  }
 }
 
-export class ParameterRow extends React.Component<{
-    children: React.ReactNode,
-    platform: Platform,
-    type: string,
-    name: string,
-    since: string
-}> {
-    public render() {
-        return (
-            <tr>
-                <td>
-                    <CodeBadge type={this.props.platform} name={this.props.name} />
-                </td>
-                <td>
-                    <code>{this.props.type}</code>
-                </td>
-                <td>
-                    {Array.isArray(this.props.children)
-                        ? this.props.children.map((c) => renderChild(c))
-                        : renderChild(this.props.children as any)}
-                    <SinceBadge since={this.props.since} inline={true} />
-                </td>
-            </tr>
-        );
-    }
-}
+export type ParameterRowProps = {
+  children: React.ReactNode;
+  platform: Platform;
+  type: string;
+  name: string;
+  since?: string;
+};
 
-export class ParameterTable extends React.Component<{ children: React.ReactNode }> {
-    public render() {
-        return (
-            <table className="table table-striped table-condensed type-table">
-                <thead>
-                    <tr>
-                        <th>Parameters</th>
-                        <th>Type</th>
-                        <th>Summary</th>
-                    </tr>
-                </thead>
-                <tbody>{this.props.children}</tbody>
-            </table>
-        );
-    }
-}
+export const ParameterRow: React.FC<ParameterRowProps> = ({
+  children,
+  platform,
+  type,
+  name,
+  since,
+}) => {
+  return (
+    <tr>
+      <td>
+        <CodeBadge type={platform} name={name} />
+      </td>
+      <td>
+        <code>{type}</code>
+      </td>
+      <td>
+        {Array.isArray(children)
+          ? React.Children.map(children, renderChild)
+          : renderChild(children as any)}
+        {since && <SinceBadge since={since} inline={true} />}
+      </td>
+    </tr>
+  );
+};
+
+export type ParameterTableProps = {
+  children: React.ReactNode;
+};
+
+export const ParameterTable: React.FC<ParameterTableProps> = ({ children }) => {
+  return (
+    <table className="table table-striped table-condensed type-table">
+      <thead>
+        <tr>
+          <th>Parameters</th>
+          <th>Type</th>
+          <th>Summary</th>
+        </tr>
+      </thead>
+      <tbody>{children}</tbody>
+    </table>
+  );
+};

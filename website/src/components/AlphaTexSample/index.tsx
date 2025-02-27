@@ -1,37 +1,32 @@
 import React from "react";
 import CodeBlock from "@theme/CodeBlock";
 import { AlphaTab } from "../AlphaTab";
-import * as alphaTab from '@coderline/alphatab'
+import * as alphaTab from "@coderline/alphatab";
+import {useDoc} from '@docusaurus/plugin-content-docs/client';
 
 export interface AlphaTexSampleProps {
-  tracks?: number[] | string;
+  tracks?: number[] | "all";
   children: string | React.ReactElement;
   player: boolean;
   settings?: alphaTab.json.SettingsJson;
 }
 
-export class AlphaTexSample extends React.Component<AlphaTexSampleProps> {
-  public constructor(props: AlphaTexSampleProps) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <>
-        <AlphaTab
-          tex={true}
-          player={this.props.player}
-          tracks={this.props.tracks}
-          settings={this.props.settings}
-        >
-          {this.props.children}
-        </AlphaTab>
-        <CodeBlock>
-          {typeof this.props.children === "string"
-            ? this.props.children.trim()
-            : this.props.children}
-        </CodeBlock>
-      </>
-    );
-  }
-}
+export const AlphaTexSample: React.FC<AlphaTexSampleProps> = ({
+  tracks,
+  children,
+  player,
+  settings,
+}) => {
+  const doc = useDoc();
+  debugger;
+  return (
+    <>
+      <AlphaTab tex={true} player={player} tracks={tracks} settings={settings}>
+        {children}
+      </AlphaTab>
+      <CodeBlock>
+        {typeof children === "string" ? children.trim() : children}
+      </CodeBlock>
+    </>
+  );
+};
