@@ -3,6 +3,7 @@
 import type { Plugin, ResolvedConfig } from './bridge';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as url from 'url';
 
 import { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 
@@ -29,13 +30,34 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
 
             let alphaTabSourceDir = options.alphaTabSourceDir;
             if (!alphaTabSourceDir) {
-                alphaTabSourceDir = path.join(resolvedConfig.root, 'node_modules/@coderline/alphatab/dist/');
+                try {
+                    const isEsm = typeof import.meta.url === 'string';
+                    if (isEsm) {
+                        alphaTabSourceDir = url.fileURLToPath(import.meta.resolve('@coderline/alphatab'));
+                    } else {
+                        alphaTabSourceDir = require.resolve('@coderline/alphatab');
+                    }
+
+                    alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
+                } catch (e) {
+                    alphaTabSourceDir = path.join(resolvedConfig.root, 'node_modules/@coderline/alphatab/dist/');
+                }
             }
 
-            if (
-                !alphaTabSourceDir ||
-                !fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK)
-            ) {
+            let isValidAlphaTabSourceDir: boolean;
+
+            if (alphaTabSourceDir) {
+                try {
+                    await fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK);
+                    isValidAlphaTabSourceDir = true;
+                } catch (e) {
+                    isValidAlphaTabSourceDir = false;
+                }
+            } else {
+                isValidAlphaTabSourceDir = false;
+            }
+
+            if (!isValidAlphaTabSourceDir) {
                 resolvedConfig.logger.error(
                     'Could not find alphaTab, please ensure it is installed into node_modules or configure alphaTabSourceDir'
                 );

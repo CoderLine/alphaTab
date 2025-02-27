@@ -1,6 +1,7 @@
 /**@target web */
 import * as fs from 'fs';
 import * as path from 'path';
+import * as url from 'url';
 
 // webpack doesn't defined properly types for all these internals
 // needed for the plugin
@@ -225,13 +226,34 @@ export class AlphaTabWebPackPlugin {
             async (_, callback) => {
                 let alphaTabSourceDir = options.alphaTabSourceDir;
                 if (!alphaTabSourceDir) {
-                    alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
+                    try {
+                        const isEsm = typeof import.meta.url === 'string';
+                        if (isEsm) {
+                            alphaTabSourceDir = url.fileURLToPath(import.meta.resolve('@coderline/alphatab'));
+                        } else {
+                            alphaTabSourceDir = require.resolve('@coderline/alphatab');
+                        }
+
+                        alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
+                    } catch (e) {
+                        alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
+                    }
                 }
 
-                if (
-                    !alphaTabSourceDir ||
-                    !fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK)
-                ) {
+                let isValidAlphaTabSourceDir: boolean;
+
+                if (alphaTabSourceDir) {
+                    try {
+                        await fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK);
+                        isValidAlphaTabSourceDir = true;
+                    } catch (e) {
+                        isValidAlphaTabSourceDir = false;
+                    }
+                } else {
+                    isValidAlphaTabSourceDir = false;
+                }
+
+                if (!isValidAlphaTabSourceDir) {
                     compilation.errors.push(
                         new this._webPackWithAlphaTab.webpack.WebpackError(
                             'Could not find alphaTab, please ensure it is installed into node_modules or configure alphaTabSourceDir'
