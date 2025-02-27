@@ -174,6 +174,10 @@ export class AlphaTabWebPackPlugin {
             test: /\.sf2/,
             type: 'asset/resource'
         });
+        compiler.options.module.rules.push({
+            test: /\.sf3/,
+            type: 'asset/resource'
+        });
     }
 
     configure(compiler: webpackTypes.Compiler) {
