@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -31,6 +33,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -56,7 +60,8 @@ jobs:
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          lfs: true      
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'

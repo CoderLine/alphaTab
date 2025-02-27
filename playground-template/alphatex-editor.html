@@ -5,17 +5,10 @@
     <meta charset="utf-8" />
     <title>AlphaTab alphaTex Editor Demo</title>
 
-    <link rel="stylesheet" href="/node_modules/bootstrap/dist/css/bootstrap.min.css" />
     <script src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
 
-    <link rel="stylesheet" href="/node_modules/@fontsource/roboto/300.css" />
-    <link rel="stylesheet" href="/node_modules/@fontsource/roboto/400.css" />
-    <link rel="stylesheet" href="/node_modules/@fontsource/roboto/400-italic.css" />
-    <link rel="stylesheet" href="/node_modules/@fontsource/roboto/500.css" />
-    <link rel="stylesheet" href="/node_modules/@fontsource/roboto/700.css" />
     <script src="/node_modules/handlebars/dist/handlebars.min.js"></script>
-    <link rel="stylesheet" href="/node_modules/@fortawesome/fontawesome-free/css/all.css" />
 
     <link rel="stylesheet" href="control.css" />
     <link rel="stylesheet" href="alphatex-editor.css" />
@@ -71,13 +64,13 @@
         req.onload = data => {
             document.getElementById('placeholder').outerHTML = req.responseText;
 
-            const element = document.getElementById('alphaTabControl');
+            const element = document.getElementById('alphaTab');
             delete element.dataset.file;
             delete element.dataset.tracks;
             element.dataset.tex = true;
             element.innerHTML = document.getElementById('editor').innerHTML;
 
-            window.at = setupControl('#alphaTabControl', { file: undefined, tex: ''});
+            window.at = setupControl('#alphaTab', { file: undefined, tex: ''});
             setupEditor(window.at, '#editor');
         };
         req.open('GET', 'control-template.html');
