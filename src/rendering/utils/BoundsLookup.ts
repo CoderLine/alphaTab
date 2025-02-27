@@ -106,7 +106,7 @@ export class BoundsLookup {
                                 let n: NoteBounds = new NoteBounds();
                                 let nd: any = note;
                                 n.note = bb.beat.notes[nd.index];
-                                n.noteHeadBounds = note.noteHeadBounds;
+                                n.noteHeadBounds = BoundsLookup.boundsFromJson(note.noteHeadBounds);
                                 bb.addNote(n);
                             }
                         }
