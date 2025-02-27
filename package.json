@@ -64,7 +64,8 @@
     "devDependencies": {
         "@coderline/alphaskia": "^2.3.120",
         "@coderline/alphaskia-windows": "^2.3.120",
-        "@fontsource/roboto": "^5.1.1",
+        "@fontsource/noto-sans": "^5.1.1",
+        "@fontsource/noto-serif": "^5.1.1",
         "@fortawesome/fontawesome-free": "^6.7.2",
         "@popperjs/core": "^2.11.8",
         "@rollup/plugin-commonjs": "^28.0.2",

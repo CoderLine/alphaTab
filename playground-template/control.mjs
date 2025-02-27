@@ -1,4 +1,4 @@
-import * as alphaTab from '../dist/alphaTab.mjs'
+import * as alphaTab from '../dist/alphaTab.mjs';
 
 const toDomElement = (function () {
     const parser = document.createElement('div');
@@ -10,17 +10,35 @@ const toDomElement = (function () {
 
 const params = new URL(window.location.href).searchParams;
 
-
 const defaultSettings = {
     core: {
         logLevel: params.get('loglevel') ?? 'info'
     },
-    file: "/test-data/audio/full-song.gp5",
+    file: '/test-data/audio/full-song.gp5',
     player: {
         enablePlayer: true,
         scrollOffsetX: -10,
-        soundFont: "/font/sonivox/sonivox.sf2"
+        soundFont: '/font/sonivox/sonivox.sf2'
     }
+};
+
+function applyFonts(settings) {
+    settings.display.resources.copyrightFont.families = ["Noto Sans"];
+    settings.display.resources.titleFont.families = ["Noto Serif"];
+    settings.display.resources.subTitleFont.families = ["Noto Serif"];
+    settings.display.resources.wordsFont.families = ["Noto Serif"];
+    settings.display.resources.effectFont.families = ["Noto Serif"];
+    settings.display.resources.timerFont.families = ["Noto Serif"];
+    settings.display.resources.fretboardNumberFont.families = ["Noto Sans"];
+    settings.display.resources.tablatureFont.families = ["Noto Sans"];
+    settings.display.resources.graceFont.families = ["Noto Sans"];
+    settings.display.resources.barNumberFont.families = ["Noto Sans"];
+    settings.display.resources.fingeringFont.families = ["Noto Serif"];
+    settings.display.resources.inlineFingeringFont.families = ["Noto Serif"];
+    settings.display.resources.markerFont.families = ["Noto Serif"];
+    settings.display.resources.directionsFont.families = ["Noto Serif"];
+    settings.display.resources.numberedNotationFont.families = ["Noto Sans"];
+    settings.display.resources.numberedNotationGraceFont.families = ["Noto Sans"];
 }
 
 function createTrackItem(track, trackSelection) {
@@ -77,20 +95,25 @@ function createTrackItem(track, trackSelection) {
     return trackItem;
 }
 
-export function setupControl(selector, settings) {
+export function setupControl(selector, customSettings) {
     const el = document.querySelector(selector);
     const control = el.closest('.at-wrap');
 
     const viewPort =
         'playerScrollelement' in el.dataset ? el.dataset.playerScrollelement : control.querySelector('.at-viewport');
-    const at = new alphaTab.AlphaTabApi(el, {
+
+    const settings = new alphaTab.Settings();
+    applyFonts(settings);
+    settings.fillFromJson({
         ...defaultSettings,
         player: {
             ...defaultSettings.player,
             scrollElement: viewPort
         },
-        ...settings
+        ...customSettings
     });
+
+    const at = new alphaTab.AlphaTabApi(el, settings);
     at.error.on(function (e) {
         console.error('alphaTab error', e);
     });
@@ -154,7 +177,6 @@ export function setupControl(selector, settings) {
         // fill track selector
         const trackList = control.querySelector('.at-track-list');
         trackList.innerHTML = '';
-
 
         score.tracks.forEach(function (track) {
             const trackItem = createTrackItem(track, tracks);
@@ -308,8 +330,7 @@ export function setupControl(selector, settings) {
         };
     });
 
-    for(const t of control.querySelectorAll('[data-toggle="tooltip"]'))
-    {
+    for (const t of control.querySelectorAll('[data-toggle="tooltip"]')) {
         new bootstrap.Tooltip(t);
     }
 
