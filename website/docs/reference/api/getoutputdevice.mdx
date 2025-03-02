@@ -1,0 +1,73 @@
+---
+title: getOutputDevice
+description: Gets the currently configured output device.
+sidebar_custom_props:
+  category: Methods - Player
+  since:  1.5.0
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.5.0" />
+
+import { TypeTable, TypeRow } from '@site/src/components/TypeTable';
+
+## Description
+Gets the currently configured output device used by the player. Assumes [`setOutputDevice`](./setoutputdevice) has been used. 
+
+In the web version this functionality relies on experimental APIs and might not yet be available in all browsers. https://caniuse.com/mdn-api_audiocontext_sinkid
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="js" name="async function getOutputDevice()" />
+    <TypeRow type="net" name="Task<ISynthOutputDevice?> GetOutputDevice()" />
+    <TypeRow type="android" name="fun getOutputDevice(): Deferred<ISynthOutputDevice?>" />
+</TypeTable>
+
+### Parameters
+None
+
+### Returns
+Returns an awaitable, which completes with the currently configured output device.
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+updateOutputDeviceUI(await api.getOutputDevice())
+
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+UpdateOutputDeviceUI(await api.GetOutputDevice())
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+fun init() = kotlinx.coroutines.runBlocking {
+  val api = AlphaTabApi<MyControl>(...)
+  updateOutputDeviceUI(api.getOutputDevice().await())
+}
+```
+
+</TabItem>
+</Tabs>

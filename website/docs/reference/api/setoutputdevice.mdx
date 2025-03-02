@@ -1,0 +1,100 @@
+---
+title: setOutputDevice
+description: Changes the output device which should be used for playing the audio.
+sidebar_custom_props:
+  category: Methods - Player
+  since:  1.5.0
+---
+
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.5.0" />
+
+import { TypeTable, TypeRow } from '@site/src/components/TypeTable';
+
+## Description
+Changes the output device which should be used for playing the audio (player must be enabled).
+
+Use [`enumerateOutputDevices`](./enumerateoutputdevices.mdx) to load the list of available devices.
+
+In the web version this functionality relies on experimental APIs and might not yet be available in all browsers. https://caniuse.com/mdn-api_audiocontext_sinkid
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="js" name="async function setOutputDevice(outputDevice)" />
+    <TypeRow type="net" name="Task SetOutputDevice(ISynthOutputDevice outputDevice)" />
+    <TypeRow type="android" name="fun setOutputDevice(ISynthOutputDevice outputDevice): Deferred<Unit>" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="outputDevice" type="ISynthOutputDevice|null">
+        The output device to use, or null to switch to the default device.
+    </ParameterRow>
+    <ParameterRow platform="net" name="outputDevice" type="ISynthOutputDevice?">
+        The output device to use, or null to switch to the default device.
+    </ParameterRow>
+    <ParameterRow platform="android" name="outputDevice" type="ISynthOutputDevice?">
+        The output device to use, or null to switch to the default device.
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Returns an awaitable, which completes when the output device is changed.
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+const devices = await api.enumerateOutputDevices();
+
+buildDeviceSelector(devices, async selectedDevice => {
+  await api.setOutputDevice(selectedDevice);
+});
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+var devices = await api.EnumerateOutputDevices();
+
+BuildDeviceSelector(devices, async selectedDevice => {
+  await api.SetOutputDevice(selectedDevice);
+});
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+fun init() = kotlinx.coroutines.runBlocking {
+  val api = AlphaTabApi<MyControl>(...)
+  val devices = api.enumerateOutputDevices().await()
+
+  buildDeviceSelector(devices, fun (selectedDevice) {
+    suspend {
+      await api.setOutputDevice(selectedDevice)
+    }
+  });
+}
+
+```
+
+</TabItem>
+</Tabs>
