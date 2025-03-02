@@ -159,7 +159,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         var player: AndroidThreadAlphaSynthWorkerPlayer? = null
         player = AndroidThreadAlphaSynthWorkerPlayer(
             api.settings.core.logLevel,
-            AndroidSynthOutput {
+            AndroidSynthOutput(_renderWrapper.context) {
                 player!!.addToWorker(it)
             },
             this::beginInvoke,
