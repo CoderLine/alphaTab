@@ -68,9 +68,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     protected override visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
         const pre = super.visitPrefixUnaryExpression(parent, expression);
 
-        const preUnwrapped = pre && cs.isCastExpression(pre)
-            ? (pre.expression as cs.PrefixUnaryExpression)
-            : (pre as cs.PrefixUnaryExpression);
+        const preUnwrapped =
+            pre && cs.isCastExpression(pre)
+                ? (pre.expression as cs.PrefixUnaryExpression)
+                : (pre as cs.PrefixUnaryExpression);
 
         if (preUnwrapped) {
             switch (preUnwrapped.operator) {
@@ -229,43 +230,65 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         // and await expressions are normal method calls.
         // this is a problem when we want to use the raw Promise like  asyncFunction().then().catch()
         // The following code wraps the code to a "alphaTab.core.TypeHelper.suspendToDeferred({ asyncFunction() }).then().catch()
+
+        // similarly in reverse cases, when we have suspend function calling a method which returns a Deferred directly (e.g. on async interface methods)
+        // then we call .await()
         if (invocation && cs.isInvocationExpression(invocation)) {
             const returnType = this._context.typeChecker.getTypeAtLocation(expression);
             const method = this._context.typeChecker.getSymbolAtLocation(expression.expression);
 
-            if (returnType?.symbol?.name === "Promise" 
-                && (method as any)?.parent?.name !== 'Promise'
-                && !ts.isAwaitExpression(expression.parent)) {
-                const suspendToDeferred = {
-                    nodeType: cs.SyntaxKind.InvocationExpression,
-                } as cs.InvocationExpression;
+            if (returnType?.symbol?.name === 'Promise' && (method as any)?.parent?.name !== 'Promise') {
+                if (!ts.isAwaitExpression(expression.parent)) {
+                    const suspendToDeferred = {
+                        nodeType: cs.SyntaxKind.InvocationExpression
+                    } as cs.InvocationExpression;
 
-                suspendToDeferred.expression = this.makeMemberAccess(
-                    suspendToDeferred,
-                    this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                    this._context.toMethodName('suspendToDeferred')
-                );
+                    suspendToDeferred.expression = this.makeMemberAccess(
+                        suspendToDeferred,
+                        this._context.makeTypeName('alphaTab.core.TypeHelper'),
+                        this._context.toMethodName('suspendToDeferred')
+                    );
 
-                suspendToDeferred.arguments = [
-                    {
-                        nodeType: cs.SyntaxKind.LambdaExpression,
-                        parameters: [] as cs.ParameterDeclaration[],
-                        body: invocation,
-                        parent: suspendToDeferred,
-                        returnType: {
-                            nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                            type: cs.PrimitiveType.Void
-                        } as cs.PrimitiveTypeNode
-                    } as cs.LambdaExpression
-                ];
+                    suspendToDeferred.arguments = [
+                        {
+                            nodeType: cs.SyntaxKind.LambdaExpression,
+                            parameters: [] as cs.ParameterDeclaration[],
+                            body: invocation,
+                            parent: suspendToDeferred,
+                            returnType: {
+                                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                                type: cs.PrimitiveType.Void
+                            } as cs.PrimitiveTypeNode
+                        } as cs.LambdaExpression
+                    ];
 
-                return suspendToDeferred;
+                    return suspendToDeferred;
+                } else {
+                    const isSuspend = (method?.valueDeclaration as ts.MethodDeclaration).modifiers?.some(
+                        m => m.kind === ts.SyntaxKind.AsyncKeyword
+                    );
+                    if (!isSuspend) {
+                        const deferredToSuspend = {
+                            nodeType: cs.SyntaxKind.InvocationExpression
+                        } as cs.InvocationExpression;
+
+                        deferredToSuspend.expression = {
+                            expression: invocation,
+                            member: 'await',
+                            parent: parent,
+                            nodeType: cs.SyntaxKind.MemberAccessExpression
+                        } as cs.MemberAccessExpression;
+
+                        deferredToSuspend.arguments = [];
+
+                        return deferredToSuspend;
+                    }
+                }
             }
         }
 
         return invocation;
     }
-
 
     protected override visitConstructorDeclaration(
         parent: cs.ClassDeclaration,
@@ -310,7 +333,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return func;
     }
 
-    
     protected override visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
@@ -326,7 +348,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         return method;
     }
-
 
     protected override visitMethodDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
