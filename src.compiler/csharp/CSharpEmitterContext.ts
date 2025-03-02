@@ -649,13 +649,21 @@ export default class CSharpEmitterContext {
                 if (isEmitted && t.symbol.name !== 'PromiseLike') {
                     this.addCsNodeDiagnostics(
                         parent,
-                        'Union type covering multiple types detected, fallback to dynamic',
+                        'Union type covering multiple types detected, fallback to object',
                         ts.DiagnosticCategory.Warning
                     );
                 }
                 fallbackToObject = true;
-            } else {
-                actualType = t;
+            } else if(actualType !== t) {
+                if (t.symbol?.name === 'PromiseLike') {
+                    this.addCsNodeDiagnostics(
+                        parent,
+                        'Union type with promise detected, ignoring',
+                        ts.DiagnosticCategory.Warning
+                    );
+                } else {
+                    actualType = t;
+                }
             }
         }
 
@@ -976,8 +984,8 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-            ? symbol.declarations[0]
-            : undefined;
+              ? symbol.declarations[0]
+              : undefined;
 
         if (declaration) {
             return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;

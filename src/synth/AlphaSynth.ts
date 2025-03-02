@@ -37,11 +37,11 @@ export class AlphaSynth implements IAlphaSynth {
     private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
     private _notPlayedSamples: number = 0;
     private _synthStopping = false;
+    private _output: ISynthOutput;
 
-    /**
-     * Gets the {@link ISynthOutput} used for playing the generated samples.
-     */
-    public readonly output: ISynthOutput;
+    public get output(): ISynthOutput {
+        return this._output;
+    }
 
     public isReady: boolean = false;
 
@@ -171,7 +171,7 @@ export class AlphaSynth implements IAlphaSynth {
         this.state = PlayerState.Paused;
 
         Logger.debug('AlphaSynth', 'Creating output');
-        this.output = output;
+        this._output = output;
 
         Logger.debug('AlphaSynth', 'Creating synthesizer');
         this._synthesizer = new TinySoundFont(this.output.sampleRate);
@@ -505,8 +505,8 @@ export class AlphaSynth implements IAlphaSynth {
         const mode = this._sequencer.isPlayingMain
             ? 'main'
             : this._sequencer.isPlayingCountIn
-            ? 'count-in'
-            : 'one-time';
+              ? 'count-in'
+              : 'one-time';
 
         Logger.debug(
             'AlphaSynth',
@@ -559,7 +559,6 @@ export class AlphaSynth implements IAlphaSynth {
         return this._synthesizer.hasSamplesForProgram(program);
     }
 
-    
     /**
      * @internal
      */

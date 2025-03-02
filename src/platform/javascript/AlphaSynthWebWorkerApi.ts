@@ -40,6 +40,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _playbackRange: PlaybackRange | null = null;
     private _midiEventsPlayedFilter: MidiEventType[] = [];
 
+    public get output(): ISynthOutput {
+        return this._output;
+    }
+
     public get isReady(): boolean {
         return this._workerIsReady && this._outputIsReady;
     }
@@ -189,10 +193,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
-    public constructor(
-        player: ISynthOutput,
-        settings: Settings
-    ) {
+    public constructor(player: ISynthOutput, settings: Settings) {
         this._workerIsReadyForPlayback = false;
         this._workerIsReady = false;
         this._outputIsReady = false;

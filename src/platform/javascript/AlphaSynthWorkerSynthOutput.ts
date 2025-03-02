@@ -1,4 +1,4 @@
-import { ISynthOutput } from '@src/synth/ISynthOutput';
+import { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
@@ -86,5 +86,13 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
 
     public activate(): void {
         // nothing to do
+    }
+
+    public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
+        return [];
+    }
+    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
+    public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
+        return null;
     }
 }

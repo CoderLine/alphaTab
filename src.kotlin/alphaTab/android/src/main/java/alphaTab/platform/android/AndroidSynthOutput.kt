@@ -3,14 +3,23 @@ package alphaTab.platform.android
 import alphaTab.*
 import alphaTab.EventEmitter
 import alphaTab.EventEmitterOfT
+import alphaTab.collections.List
 import alphaTab.synth.ISynthOutput
 import alphaTab.synth.ds.CircularSampleBuffer
 import kotlin.contracts.ExperimentalContracts
 import alphaTab.core.ecmaScript.Float32Array
+import alphaTab.synth.ISynthOutputDevice
+import android.content.Context
+import android.media.AudioDeviceInfo
+import android.media.AudioManager
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
+import kotlin.math.min
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
 internal class AndroidSynthOutput(
+    private val context: Context,
     private val synthInvoke: (action: (() -> Unit)) -> Unit
 ) : ISynthOutput {
     companion object {
@@ -18,6 +27,7 @@ internal class AndroidSynthOutput(
         private const val PreferredSampleRate = 44100
     }
 
+    private var _device: ISynthOutputDevice? = null
     private var _bufferCount = 0
     private var _requestedBufferCount = 0
 
@@ -106,7 +116,7 @@ internal class AndroidSynthOutput(
 
     fun read(buffer: FloatArray, offset: Int, sampleCount: Int): Int {
         val read = Float32Array(sampleCount.toDouble())
-        val actual = _circularBuffer.read(read, 0.0, Math.min(read.length, _circularBuffer.count))
+        val actual = _circularBuffer.read(read, 0.0, min(read.length, _circularBuffer.count))
 
         read.data.copyInto(buffer, offset, 0, sampleCount)
         requestBuffers()
@@ -117,4 +127,37 @@ internal class AndroidSynthOutput(
     override val ready: IEventEmitter = EventEmitter()
     override val samplesPlayed: IEventEmitterOfT<Double> = EventEmitterOfT()
     override val sampleRequest: IEventEmitter = EventEmitter()
+
+    override fun enumerateOutputDevices(): Deferred<List<ISynthOutputDevice>> {
+        val audioService = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
+            ?: return CompletableDeferred(List())
+
+        return CompletableDeferred(List(
+            audioService.getDevices(AudioManager.GET_DEVICES_OUTPUTS).filter {
+                it.isSink
+            }.map { AndroidOutputDevice(it) }
+        ))
+
+    }
+
+    override fun setOutputDevice(device: ISynthOutputDevice?): Deferred<Unit> {
+        _audioContext.setOutputDevice((device as AndroidOutputDevice?)?.device)
+        _device = device
+        return CompletableDeferred()
+    }
+
+    override fun getOutputDevice(): Deferred<ISynthOutputDevice?> {
+        return CompletableDeferred(_device)
+    }
+}
+
+@ExperimentalUnsignedTypes
+@ExperimentalContracts
+internal class AndroidOutputDevice(val device: AudioDeviceInfo) : ISynthOutputDevice {
+    override val deviceId: String
+        get() = device.id.toString()
+    override val label: String
+        get() = device.productName.toString()
+    override val isDefault: Boolean
+        get() = false
 }
