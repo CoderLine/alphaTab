@@ -15,7 +15,7 @@ import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
 import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
 
 ## Description
-This function initiates a load of the soundfont using the given data. The supported data types is depending on the platform. AlphaTab only supports SoundFont2 encoded soundfonts for loading. To load a soundfont the player must be enabled in advance. 	
+This function initiates a load of the soundfont using the given data. The supported data types is depending on the platform. AlphaTab only supports SoundFont2 and SoundFont3 (<SinceBadge since="1.4.0" inline="true" />) encoded soundfonts for loading. To load a soundfont the player must be enabled in advance. 	
 
 ## Signatures
 
@@ -59,31 +59,31 @@ This function initiates a load of the soundfont using the given data. The suppor
 
 <ParameterTable>
     <ParameterRow platform="js-jquery" name="arraybuffer" type="ArrayBuffer">
-        The arraybuffer containing the raw bytes of a SoundFont2 file
+        The arraybuffer containing the raw bytes of a SoundFont file
     </ParameterRow>
     <ParameterRow platform="js-jquery" name="uint8array" type="Uint8Array">
-        The Uint8Array containing the raw bytes of a SoundFont2 file
+        The Uint8Array containing the raw bytes of a SoundFont file
     </ParameterRow>
     <ParameterRow platform="js-jquery" name="url" type="string">
-        A URL pointing to a SoundFont2 file that should be loaded via AJAX.
+        A URL pointing to a SoundFont file that should be loaded via AJAX.
     </ParameterRow>
     <ParameterRow platform="net" name="raw" type="byte[]">
-        The raw bytes containing a SoundFont2 file.
+        The raw bytes containing a SoundFont file.
     </ParameterRow>
     <ParameterRow platform="net" name="raw" type="System.IO.Stream">
-        The stream containing a SoundFont2 file.
+        The stream containing a SoundFont file.
     </ParameterRow>
     <ParameterRow platform="android" name="raw" type="ByteArray">
-        The raw bytes containing a SoundFont2 file.
+        The raw bytes containing a SoundFont file.
     </ParameterRow>
     <ParameterRow platform="android" name="raw" type="ByteArray">
-        The raw bytes containing a SoundFont2 file.
+        The raw bytes containing a SoundFont file.
     </ParameterRow>
     <ParameterRow platform="android" name="raw" type="UByteArray">
-        The raw bytes containing a SoundFont2 file.
+        The raw bytes containing a SoundFont file.
     </ParameterRow>
     <ParameterRow platform="android" name="stream" type="java.io.InputStream">
-        The stream containing a SoundFont2 file.
+        The stream containing a SoundFont file.
     </ParameterRow>
     <ParameterRow platform="all" name="append" type="boolean">
         Whether to append the presets of the new soundfont to the already loaded

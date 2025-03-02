@@ -1,50 +1,57 @@
-import * as alphaTab from '@coderline/alphatab'
-import React from 'react';
+import * as alphaTab from "@coderline/alphatab";
+import React, { useEffect, useState } from "react";
 
 export interface ScoreDetailsProps {
-    file: string
+  file: string;
 }
 
-export interface ScoreDetailsState {
-    error: any
-    score: alphaTab.model.Score
-}
+export const ScoreDetails: React.FC<ScoreDetailsProps> = ({ file }) => {
+  const [score, setScore] = useState<alphaTab.model.Score>();
+  const [error, setError] = useState(null);
 
-export class ScoreDetails extends React.Component<ScoreDetailsProps, ScoreDetailsState> {
-    constructor(props) {
-        super(props);
-        this.state = {
-            score: null,
-            error: null
-        };
-    }
-    componentDidMount() {
-        alphaTab.importer.ScoreLoader.loadScoreAsync(this.props.file, score => {
-            this.setState({ score });
-        },
-            error => {
-                this.setState({ error });
-            });
-    }
-    render() {
-        if (this.state.error) {
-            return this.state.error;
-        } else if (this.state.score) {
-            return (
-                <>
-                    <p><strong>Title:</strong> {this.state.score.title}</p>
-                    <p><strong>Subtitle:</strong> {this.state.score.subTitle}</p>
-                    <p><strong>Album:</strong> {this.state.score.album}</p>
-                    <p><strong>Tempo:</strong> {this.state.score.tempo}</p>
-                    <p><strong>Bars:</strong> {this.state.score.masterBars.length}</p>
-                    <p><strong>Tracks:</strong> {this.state.score.tracks.length}</p>
-                    <ul>
-                        {this.state.score.tracks.map(t => <li>{t.name}</li>)}
-                    </ul>
-                </>);
-        }
-        else {
-            return "Loading...";
-        }
-    }
-}
+  useEffect(() => {
+    alphaTab.importer.ScoreLoader.loadScoreAsync(
+      file,
+      (score) => {
+        setScore(score);
+      },
+      (error) => {
+        setError(error);
+      }
+    );
+  }, []);
+
+  if (error) {
+    return error;
+  } else if (score) {
+    return (
+      <>
+        <p>
+          <strong>Title:</strong> {score.title}
+        </p>
+        <p>
+          <strong>Subtitle:</strong> {score.subTitle}
+        </p>
+        <p>
+          <strong>Album:</strong> {score.album}
+        </p>
+        <p>
+          <strong>Tempo:</strong> {score.tempo}
+        </p>
+        <p>
+          <strong>Bars:</strong> {score.masterBars.length}
+        </p>
+        <p>
+          <strong>Tracks:</strong> {score.tracks.length}
+        </p>
+        <ul>
+          {score.tracks.map((t) => (
+            <li key={t.index}>{t.name}</li>
+          ))}
+        </ul>
+      </>
+    );
+  } else {
+    return "Loading...";
+  }
+};

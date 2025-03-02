@@ -1,61 +1,72 @@
-import * as alphaTab from '@coderline/alphatab';
-import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { solid, regular } from '@fortawesome/fontawesome-svg-core/import.macro'
+import * as alphaTab from "@coderline/alphatab";
+import React from "react";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import * as regular from "@fortawesome/free-regular-svg-icons";
+import * as solid from "@fortawesome/free-solid-svg-icons";
 
 export interface LayoutSelectorProps {
-    api: alphaTab.AlphaTabApi;
-    onLayoutChange?: (layoutMode: alphaTab.LayoutMode, scrollMode: alphaTab.ScrollMode) => void;
+  onLayoutChange?: (
+    layoutMode: alphaTab.LayoutMode | undefined,
+    scrollMode: alphaTab.ScrollMode | undefined
+  ) => void;
 }
 
-export interface LayoutSelectorState {
-}
+export const LayoutSelector: React.FC<LayoutSelectorProps> = ({
+  onLayoutChange,
+}) => {
+  const layouts = [
+    {
+      icon: solid.faWandSparkles,
+      name: "Automatic",
+      layoutMode: undefined,
+      scrollMode: undefined,
+    },
+    {
+      icon: regular.faCaretSquareRight,
+      name: "Horizontal Layout (Off-Screen)",
+      layoutMode: alphaTab.LayoutMode.Horizontal,
+      scrollMode: alphaTab.ScrollMode.OffScreen,
+    },
+    {
+      icon: solid.faCaretSquareRight,
+      name: "Horizontal Layout (Bar-Wise)",
+      layoutMode: alphaTab.LayoutMode.Horizontal,
+      scrollMode: alphaTab.ScrollMode.Continuous,
+    },
+    {
+      icon: regular.faCaretSquareDown,
+      name: "Vertical Layout (Off-Screen)",
+      layoutMode: alphaTab.LayoutMode.Page,
+      scrollMode: alphaTab.ScrollMode.OffScreen,
+    },
+    {
+      icon: solid.faCaretSquareDown,
+      name: "Vertical Layout (System-Wise)",
+      layoutMode: alphaTab.LayoutMode.Page,
+      scrollMode: alphaTab.ScrollMode.Continuous,
+    },
+  ];
 
-export class LayoutSelector extends React.Component<LayoutSelectorProps, LayoutSelectorState> {
-    public constructor(props: LayoutSelectorProps) {
-        super(props);
-        this.selectLayout = this.selectLayout.bind(this);
-    }
-
-    public selectLayout(layoutMode: alphaTab.LayoutMode | undefined, scrollMode: alphaTab.ScrollMode | undefined, e: React.MouseEvent) {
-        e.preventDefault();
-
-        if (this.props.onLayoutChange) {
-            this.props.onLayoutChange(layoutMode, scrollMode);
-        }
-    }
-
-    public render() {
-        return (
-            <div className="dropdown dropdown--hoverable">
-                <span>Layout</span>
-                <ul className="dropdown__menu">
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.selectLayout(undefined, undefined, e)}>
-                            <FontAwesomeIcon icon={solid('wand-sparkles')}></FontAwesomeIcon>
-                            Automatic
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.selectLayout(alphaTab.LayoutMode.Horizontal, alphaTab.ScrollMode.OffScreen, e)}>
-                            <FontAwesomeIcon icon={regular('caret-square-right')}></FontAwesomeIcon>
-                            Horizontal Layout (Off-Screen)
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.selectLayout(alphaTab.LayoutMode.Horizontal, alphaTab.ScrollMode.OffScreen, e)}>
-                            <FontAwesomeIcon icon={solid('caret-square-right')}></FontAwesomeIcon>
-                            Horizontal Layout (Bar-Wise)
-                        </a>
-                    </li>
-                    <li>
-                        <a className="dropdown__link" href="#" onClick={e => this.selectLayout(alphaTab.LayoutMode.Page, alphaTab.ScrollMode.Continuous, e)}>
-                            <FontAwesomeIcon icon={solid('caret-square-down')}></FontAwesomeIcon>
-                            Vertical Layout
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        );
-    }
-}
+  return (
+    <div className="dropdown dropdown--hoverable">
+      <span>Layout</span>
+      <ul className="dropdown__menu">
+        {layouts.map((l) => (
+          <li key={l.name}>
+            <a
+              className="dropdown__link"
+              href="#"
+              onClick={(e) => {
+                e.preventDefault();
+                onLayoutChange?.(l.layoutMode, l.scrollMode);
+              }}
+            >
+              <FontAwesomeIcon icon={l.icon}></FontAwesomeIcon>
+              {l.name}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};

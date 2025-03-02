@@ -9,7 +9,7 @@ import type {
 export class Page {
   constructor(
     private pageMeta: PropSidebarItem | DocMetadata,
-    private doc: PropVersionDoc
+    private doc: PropVersionDoc | undefined
   ) {}
 
   public prop<T>(key: string, defaultValue: T): T {
@@ -34,7 +34,7 @@ export class Page {
 
     if ("frontMatter" in this.pageMeta && this.pageMeta.frontMatter) {
       if (
-        (this.pageMeta.frontMatter as DocFrontMatter).sidebar_custom_props &&
+        this.pageMeta.frontMatter.sidebar_custom_props &&
         key in this.pageMeta.frontMatter.sidebar_custom_props
       ) {
         return this.pageMeta.frontMatter.sidebar_custom_props[key] as T;

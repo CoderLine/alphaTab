@@ -7,13 +7,12 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 <SinceBadge since="1.2.3" />
 
 The JavaScript version of alphaTab is primarily optimized for usage in Browsers. At least the top level `AlphaTabApi`
-which is a UI focused interface to alphaTab. But this does not mean that alphaTab cannot be used in other
+which is a UI focused interface to alphaTab. But alphaTab can also be used in other
 JavaScript environments like Node.js or headless JavaScript engines. The core of alphaTab is platform independent
-and simply requires certain APIs to be available. If you are able to make a HTML5 canvas compatible API available
-to the runtime (e.g. via node-canvas, skia-canvas) the built-in HTML5 renderer might also work. 
+and simply requires certain APIs to be available. With [alphaSkia](https://github.com/CoderLine/alphaSkia) you can 
+even produce raster graphics output.
 
-In this guide we will setup a Node.js example which is using alphaTab to render a given input file to an SVG.
-This SVG could then be sent to a browser for display. 
+In this guide we will setup a Node.js example which is using alphaTab to render a given input file to an SVG and PNG.
 
 ## 1. Setup project
 
@@ -21,7 +20,7 @@ The start is quite simple:
 
 1. Run `npm init` in a new directory 
 2. Run `npm install @coderline/alphatab` to install alphaTab
-3. Create a new index.js into which our code will go .
+3. Create a new `index.mjs` into which our code will go .
 
 ## 2. The basic code structure
 
@@ -29,12 +28,12 @@ In our code we will first load alphaTab and load the `Score` from a given input 
 
 ```js
 // load alphaTab
-const alphaTab = require("@coderline/alphatab");
+import * as alphaTab from "@coderline/alphatab";
 // needed for file load
-const fs = require("fs");
+import * as fs from 'fs';
 
 // Load the file
-const fileData = fs.readFileSync(process.argv[2]);
+const fileData = await fs.promises.readFile(process.argv[2]);
 const settings = new alphaTab.Settings();
 const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
   new Uint8Array(fileData),
@@ -56,12 +55,15 @@ special needs for your project.
 The code below is mainly taken from the [Low Level API guide](/docs/guides/lowlevel-apis). 
 
 ```js
-const alphaTab = require("@coderline/alphatab");
-const fs = require("fs");
+// load alphaTab
+import * as alphaTab from "@coderline/alphatab";
+// needed for file load
+import * as fs from 'fs';
 
 // 1. Load File
-const fileData = fs.readFileSync(process.argv[2]);
+const fileData = await fs.promises.readFile(process.argv[2]);
 const settings = new alphaTab.Settings();
+
 const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
   new Uint8Array(fileData),
   settings
@@ -74,9 +76,22 @@ renderer.width = 1200;
 
 // 3. Listen to Events
 let svgChunks = [];
+
+// clear on new rendering
 renderer.preRender.on((isResize) => {
-  svgChunks = []; // clear on new rendering
+  svgChunks = []; 
 });
+
+// Since 1.3.0:
+// alphaTab separates "layouting" and "rendering" of the individual
+// partial results. in this case we want to render directly any partial layouted
+// (in UI scenarios the rendering might be delayed to the point when partials become visible)
+// Alternatively settings.core.enableLazyLoading could be set to false. 
+renderer.partialLayoutFinished.on((r) => {
+    renderer.renderResult(r.id);
+})
+
+// whenever the rendering of a partial is finished, we remember all individual outputs.
 renderer.partialRenderFinished.on((r) => {
   svgChunks.push({
     svg: r.renderResult, // svg string
@@ -84,14 +99,11 @@ renderer.partialRenderFinished.on((r) => {
     height: r.height,
   });
 });
-renderer.renderFinished.on((r) => {
-  displayResult(svgChunks, r.totalWidth, r.totalHeight);
-});
 
-// 4. Fire off rendering
+// 4. Fire off rendering, this is synchronous so we can assume all results to be available after this call.
 renderer.renderScore(score, [0]);
 
-// log the SVG chunks
+// 5. log the SVG chunks
 console.log(svgChunks.map((c) => c.svg).join("\n"));
 ```
 
@@ -99,8 +111,7 @@ Running the script again, we can see the output.
 
 <img src="/img/guides/nodejs/svg.png" />
 
-
-### 4. The CSS dependency
+## 4. The CSS dependency
 The rendered SVG assumes some CSS specific parts to be available for the Music Font. Normally alphaTab adds 
 a `style` tag to the page which loads the Music Symbol Font (Bravura) via as Web Font. Without these 
 styles the SVG will not display the symbols correctly.   
@@ -138,3 +149,267 @@ The related CSS template is:
     overflow: visible !important;
 }
 ```
+
+## 5. PNG rendering <SinceBadge since="1.3.0" inline="true" />
+
+While SVG can be nice for some use-cases, having PNGs as output is easier to handle in some environments. 
+[`alphaSkia`](https://github.com/CoderLine/alphaSkia) is a custom wrapper we created around [Skia](https://skia.org/) to have best compatibility and consistent rendering
+across platforms.
+
+First we need to install main alphaSkia library via `npm install @coderline/alphaskia`.  
+Second we need to install the native operating system dependencies (skia libs) on which we plan to run our application:
+
+* `npm install @coderline/alphaskia-windows`
+* `npm install @coderline/alphaskia-linux`
+* `npm install @coderline/alphaskia-macos`
+
+This done we can update our alphaTab code with following parts:
+
+1. We connect alphaTab and alphaSkia to enable the raster graphics rendering. 
+2. We load the fonts we plan to use into alphaSkia.
+3. We change the rendering settings to produce PNG with our custom fonts. 
+3. We combine all individual PNGs into one final one and save it.
+
+
+### Connecting alphaTab and alphaSkia
+
+To enable alphaSkia we can call `alphaTab.Environment.enableAlphaSkia` where we pass in the Bravura font data to have the music notation font available. 
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+import * as fs from 'fs';
+import * as alphaSkia from '@coderline/alphaskia';
+
+// 1. Initialize alphaSkia
+alphaTab.Environment.enableAlphaSkia(
+  (await fs.promises.readFile('node_modules/@coderline/alphatab/dist/font/Bravura.ttf')).buffer /* needs an ArrayBuffer */,
+  alphaSkia
+);
+```
+
+### Load the fonts we plan to use. 
+
+We want to use some custom fonts in alphaTab for normal texts so we load them for later use.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+import * as fs from 'fs';
+import * as alphaSkia from '@coderline/alphaskia';
+
+// 1. Initialize alphaSkia
+alphaTab.Environment.enableAlphaSkia(
+  (await fs.promises.readFile('node_modules/@coderline/alphatab/dist/font/Bravura.ttf')).buffer /* needs an ArrayBuffer */,
+  alphaSkia
+);
+
+// 2. Load custom fonts
+const fontFiles = [
+  'font/roboto/Roboto-Regular.ttf',
+  'font/roboto/Roboto-Italic.ttf',
+  'font/roboto/Roboto-Bold.ttf',
+  'font/roboto/Roboto-BoldItalic.ttf',
+  'font/ptserif/PTSerif-Regular.ttf',
+  'font/ptserif/PTSerif-Italic.ttf',
+  'font/ptserif/PTSerif-Bold.ttf',
+  'font/ptserif/PTSerif-BoldItalic.ttf',
+];
+
+const fontInfo = [];
+for (const fontFile of fontFiles) {
+  const fontData = await fs.promises.readFile(fontFile);
+  fontInfo.push(alphaTab.Environment.registerAlphaSkiaCustomFont(new Uint8Array(fontData)));
+}
+
+// 3. Load File
+const fileData = await fs.promises.readFile(process.argv[2]);
+const settings = new alphaTab.Settings();
+const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+  new Uint8Array(fileData),
+  settings
+);
+```
+
+### Change the rendering settings to produce PNG with our custom fonts.
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+import * as fs from 'fs';
+import * as alphaSkia from '@coderline/alphaskia';
+
+// 1. Initialize alphaSkia
+alphaTab.Environment.enableAlphaSkia(
+  (await fs.promises.readFile('node_modules/@coderline/alphatab/dist/font/Bravura.ttf')).buffer /* needs an ArrayBuffer */,
+  alphaSkia
+);
+
+// 2. Load custom fonts
+const fontFiles = [
+  'path-to-fonts/roboto/Roboto-Regular.ttf',
+  'path-to-fonts/roboto/Roboto-Italic.ttf',
+  'path-to-fonts/roboto/Roboto-Bold.ttf',
+  'path-to-fonts/roboto/Roboto-BoldItalic.ttf',
+  'path-to-fonts/ptserif/PTSerif-Regular.ttf',
+  'path-to-fonts/ptserif/PTSerif-Italic.ttf',
+  'path-to-fonts/ptserif/PTSerif-Bold.ttf',
+  'path-to-fonts/ptserif/PTSerif-BoldItalic.ttf',
+];
+
+const fontInfo = [];
+for (const fontFile of fontFiles) {
+  const fontData = await fs.promises.readFile(fontFile);
+  fontInfo.push(alphaTab.Environment.registerAlphaSkiaCustomFont(new Uint8Array(fontData)));
+}
+
+// 3. Load File
+const fileData = await fs.promises.readFile(process.argv[2]);
+const settings = new alphaTab.Settings();
+const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+  new Uint8Array(fileData),
+  settings
+);
+
+// 4. Setup renderer
+settings.core.engine = "skia"; // ask for skia rendering
+
+const sansFontName = fontInfo[0].families;
+const serifFontName = fontInfo[4].families;
+
+settings.display.resources.copyrightFont.families = sansFontName;
+settings.display.resources.titleFont.families = serifFontName;
+settings.display.resources.subTitleFont.families = serifFontName;
+settings.display.resources.wordsFont.families = serifFontName;
+settings.display.resources.effectFont.families = serifFontName;
+settings.display.resources.fretboardNumberFont.families = sansFontName;
+settings.display.resources.tablatureFont.families = sansFontName;
+settings.display.resources.graceFont.families = sansFontName;
+settings.display.resources.barNumberFont.families = sansFontName;
+settings.display.resources.fingeringFont.families = serifFontName;
+settings.display.resources.markerFont.families = serifFontName;
+
+const renderer = new alphaTab.rendering.ScoreRenderer(settings);
+renderer.width = 1200;
+```
+
+### Combine all individual PNGs into one final one and save it.
+
+Here it gets a bit more tricky: To draw the final image, we need to know the final size of it. 
+
+Technically we could collect all partial results and draw the full image at the end but this might result
+in quite some memory consumption as all partials have to be kept in-memory until combining them. But we want to do better by 
+drawing any partial directly into the final image and then cleanup the partial.
+
+Therefore we cannot directly ask for drawing when the layouting finished, instead we first wait for the layouting to be fully finished to have the total size. 
+Then we request all partials to be rendered. This logic is implemented in the following part:
+
+
+```js
+import * as alphaTab from '@coderline/alphatab';
+import * as fs from 'fs';
+import * as alphaSkia from '@coderline/alphaskia';
+
+// 1. Initialize alphaSkia
+alphaTab.Environment.enableAlphaSkia(
+  (await fs.promises.readFile('node_modules/@coderline/alphatab/dist/font/Bravura.ttf')).buffer /* needs an ArrayBuffer */,
+  alphaSkia
+);
+
+// 2. Load custom fonts
+const fontFiles = [
+  'font/roboto/Roboto-Regular.ttf',
+  'font/roboto/Roboto-Italic.ttf',
+  'font/roboto/Roboto-Bold.ttf',
+  'font/roboto/Roboto-BoldItalic.ttf',
+  'font/ptserif/PTSerif-Regular.ttf',
+  'font/ptserif/PTSerif-Italic.ttf',
+  'font/ptserif/PTSerif-Bold.ttf',
+  'font/ptserif/PTSerif-BoldItalic.ttf',
+];
+
+const fontInfo = [];
+for (const fontFile of fontFiles) {
+  const fontData = await fs.promises.readFile(fontFile);
+  fontInfo.push(alphaTab.Environment.registerAlphaSkiaCustomFont(new Uint8Array(fontData)));
+}
+
+// 3. Load File
+const fileData = await fs.promises.readFile(process.argv[2]);
+const settings = new alphaTab.Settings();
+const score = alphaTab.importer.ScoreLoader.loadScoreFromBytes(
+  new Uint8Array(fileData),
+  settings
+);
+
+// 4. Setup renderer
+settings.core.engine = "skia"; // ask for skia rendering
+
+const sansFontName = fontInfo[0].families;
+const serifFontName = fontInfo[4].families;
+
+settings.display.resources.copyrightFont.families = sansFontName;
+settings.display.resources.titleFont.families = serifFontName;
+settings.display.resources.subTitleFont.families = serifFontName;
+settings.display.resources.wordsFont.families = serifFontName;
+settings.display.resources.effectFont.families = serifFontName;
+settings.display.resources.fretboardNumberFont.families = sansFontName;
+settings.display.resources.tablatureFont.families = sansFontName;
+settings.display.resources.graceFont.families = sansFontName;
+settings.display.resources.barNumberFont.families = sansFontName;
+settings.display.resources.fingeringFont.families = serifFontName;
+settings.display.resources.markerFont.families = serifFontName;
+
+const renderer = new alphaTab.rendering.ScoreRenderer(settings);
+renderer.width = 1200;
+
+// 5. Listen to Events
+
+// clear on new rendering
+let partialIds = [];
+renderer.preRender.on((isResize) => {
+  partialIds = []; 
+});
+
+// alphaTab separates "layouting" and "rendering" of the individual
+// partial results. in this case we want to render directly any partial layouted
+// (in UI scenarios the rendering might be delayed to the point when partials become visible)
+// Alternatively settings.core.enableLazyLoading could be set to false. 
+renderer.partialLayoutFinished.on((r) => {
+    partialIds.push(r.id);
+});
+
+// due to the historic behavior of `renderFinished` the name can be misleading. But this event is 
+// fired as soon the layouting of the song finished and all partials are available and ready for rendering. 
+// there is no event anymore indicating that all partials have been rendered.
+const finalImageCanvas = new alphaSkia.AlphaSkiaCanvas();
+renderer.renderFinished.on((r) => {
+  finalImageCanvas.beginRender(r.totalWidth, r.totalHeight);
+  // just for visibility in this demo we fill the canvas with a white background, but you can keep it transparent if you like
+  finalImageCanvas.color = alphaSkia.AlphaSkiaCanvas.rgbaToColor(255, 255, 255, 255);
+  finalImageCanvas.fillRect(0,0, r.totalWidth, r.totalHeight);
+
+  for(const id of partialIds) {
+    renderer.renderResult(id);
+  }
+});
+
+// whenever the rendering of a partial is finished, we draw it into the final image.
+renderer.partialRenderFinished.on((r) => {
+  finalImageCanvas.drawImage(r.renderResult, r.x, r.y, r.width, r.height);
+
+  // free the partial image and release the memory used by it
+  r.renderResult[Symbol.dispose]();
+});
+
+// 6. Fire off rendering, this is synchronous so we can assume all results to be available after this call.
+renderer.renderScore(score, [0]);
+
+// 7. save the final image as png
+const finalImage = finalImageCanvas.endRender();
+const outputFilePath = process.argv[2] + '.png';
+// encode as PNG and free the memory of the final image
+const png = finalImage.toPng();
+finalImage[Symbol.dispose]();
+finalImageCanvas[Symbol.dispose]();
+await fs.promises.writeFile(outputFilePath, new Uint8Array(png));
+```
+
+<img src="/img/guides/nodejs/png.png" />

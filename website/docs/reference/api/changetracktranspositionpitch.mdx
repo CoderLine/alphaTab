@@ -1,0 +1,86 @@
+---
+title: changeTrackTranspositionPitch
+description: Changes the pitch transpose applied to the given tracks.
+sidebar_custom_props:
+  category: Methods - Player
+  since: 1.4.0
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.4.0" />
+
+import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
+
+## Description
+Changes the pitch transpose applied to the given tracks. These pitches are additional to the ones
+applied to the song via the settings and data model and allows a more live-update via a UI.
+
+## Signatures
+
+<TypeTable>
+    <TypeRow type="js" name="function changeTrackVolume(tracks, semitones)" />
+    <TypeRow type="net" name="void ChangeTrackVolume(Track[] tracks, double semitones)" />
+    <TypeRow type="android" name="fun changeTrackVolume(tracks: alphaTab.collections.List<alphaTab.model.Track>, semitones: Double): Unit" />
+</TypeTable>
+
+### Parameters
+
+<ParameterTable>
+    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Tracks[]">
+        The array of tracks that should be changed.
+    </ParameterRow>
+    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
+        The array of tracks that should be changed.
+    </ParameterRow>
+    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
+        The array of tracks that should be changed.
+    </ParameterRow>
+    <ParameterRow platform="all" name="semitones" type="double">
+        The number of semitones to apply as pitch offset
+    </ParameterRow>
+</ParameterTable>
+
+### Returns
+Nothing
+
+## Examples
+
+<Tabs
+  defaultValue="js"
+  values={[
+    { label: 'JavaScript', value: 'js', },
+    { label: 'C#', value: 'cs', },
+    { label: 'Android', value: 'android', }
+  ]
+}>
+<TabItem value="js">
+
+```js
+const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+api.changeTrackTranspositionPitch([api.score.tracks[0], api.score.tracks[1]], 3);
+api.changeTrackTranspositionPitch([api.score.tracks[2]], 2);
+```
+
+</TabItem>
+<TabItem value="cs">
+
+```csharp
+var api = new AlphaTabApi<MyControl>(...);
+api.ChangeTrackTranspositionPitch(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 3);
+api.ChangeTrackTranspositionPitch(new Track[] { api.Score.Tracks[2] }, 3);
+```
+
+</TabItem>
+<TabItem value="android">
+
+```kotlin
+val api = AlphaTabApi<MyControl>(...);
+api.changeTrackTranspositionPitch(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), 3);
+api.changeTrackTranspositionPitch(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[2]), 2);
+```
+
+</TabItem>
+</Tabs>

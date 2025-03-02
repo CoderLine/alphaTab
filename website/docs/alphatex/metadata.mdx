@@ -21,8 +21,11 @@ Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details
     \\words Daniel
     \\music alphaTab
     \\copyright Daniel
-    // Tempo in BPM
-    \\tempo 200
+    \\instructions "This is an example.\\nWith instructions."
+    \\notices "Additional notes\\nEmbedded in the data model."
+    \\tab "Daniel"
+    // Tempo in BPM (label is optional)
+    \\tempo 200 "Tempo Label"
 // Track and Staff Settings (can be used after \\track and \\staff)
     // Instrument as General MIDI number or name
     \\instrument 30
@@ -33,6 +36,8 @@ Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details
 // end of metadata
 .
 `}</AlphaTexSample>
+
+Strings can contain escape sequences: `\n`, `\r`, `\t`, `\\`, `\"`, `\'`.
 
 ## Instrument
 As indicated above, the instrument can be changed via the `\instrument` metadata.

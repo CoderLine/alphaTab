@@ -11,11 +11,12 @@ mix the score metadata and the bar metadata of the first bar.
 
 ## Time Signatures
 
-Time signatures have the format `\ts Numerator Denominator`.
+Time signatures have the format `\ts Numerator Denominator` or `\ts common`
 
 <AlphaTexSample>{`
-\\ts 3 4 | \\ts 4 4 | \\ts 6 8
+\\ts 3 4 | \\ts 4 4 | \\ts 6 8 | \\ts common
 `}</AlphaTexSample>
+
 
 ## Repeats
 
@@ -50,15 +51,24 @@ A major scale can also be explicitly written out, like `Dmajor`.
 \\ks Aminor | \\ks Dmajor | \\ks Bminor
 `}</AlphaTexSample>
 
+The type of key signatures (major or minor) is derived from the used name.
+
 ## Clef
 
 To change the clef simply specify `\clef Clef` where Clef is one of the following
 values: `G2, Treble, F4, Bass, C3, Tenor, C4, Alto, N, Neutral`
 
+To add ottavia to the clef add `\ottava Ottava` where Ottava is one of the following
+values: `15ma`, `8va`, `regular`, `8vb`, `15mb`.
+
+Clefs are remembered across bars unless explicitly changed.
+
 <AlphaTexSample>{`
 \\clef G2 | \\clef F4 | \\clef C3 | \\clef C4 | \\clef N |
-\\clef Treble | \\clef Bass | \\clef Tenor | \\clef Alto | \\clef Neutral
+\\clef Treble | \\clef Bass | \\clef Tenor | \\clef Alto | \\clef Neutral |
+\\clef F4 \\ottava 15ma | | \\ottava regular | | \\clef C3 \\ottava 8vb | |
 `}</AlphaTexSample>
+
 
 ## Tempo
 
@@ -119,4 +129,103 @@ If you want to also specify a marker beside the text, use the format `\section M
 1.1 1.1 1.1 1.1 |
 \\section S Solo // with marker and section name differently
 1.1 1.1 1.1 1.1
+`}</AlphaTexSample>
+
+## Directions
+
+To specify play directions (jumps and jump targets) use the `\jump` metadata followed by the respective instruction.
+The names should be self explaining if you're familiar with this notation: 
+
+**Jump Targets**
+
+* `Fine`
+* `Segno`
+* `SegnoSegno`
+* `Coda`
+* `DoubleCoda`
+
+**Jump Instructions**
+
+* `DaCapo`
+* `DaCapoAlCoda`
+* `DaCapoAlDoubleCoda`
+* `DaCapoAlFine`
+
+* `DalSegno`
+* `DalSegnoAlCoda`
+* `DalSegnoAlDoubleCoda`
+* `DalSegnoAlFine`
+
+* `DalSegnoSegno`
+* `DalSegnoSegnoAlCoda`
+* `DalSegnoSegnoAlDoubleCoda`
+* `DalSegnoSegnoAlFine`
+
+* `DaCoda`
+* `DaDoubleCoda`
+
+<AlphaTexSample player="true">{`
+.
+\\ro \\rc 2 3.3*4 | 
+3.3*4 | 
+\\jump Segno 3.3*4 |
+\\ro \\rc 2 3.3*4 | 
+\\jump DaCoda 3.3*4 |
+3.3*4 | 3.3*4
+\\jump DalSegnoAlCoda 3.3*4 |
+3.3*4 |
+\\jump Coda 3.3*4 |
+3.3*4 |
+3.3*4
+`}</AlphaTexSample>
+
+## Free Time
+
+To mark bars as free time bars, add the `\ft` tag to it. 
+
+<AlphaTexSample player="true">{`
+.
+:2 
+C4*2 |
+\\ft C4*2 |
+\\ft C4*2 |
+C4*2 |
+`}</AlphaTexSample>
+
+
+## Transpose
+
+This metadata affects the whole staff, its recommended to specify this only on the first bar of a staff not later.
+
+* `displayTranspose semitones` - Defines the number of semitones to transpose the notes in this staff with. This only affects the display of the notes, not their audio.
+* `transpose semitones` - Defines the number of semitones to transpose the notes in this staff with. This affects the display and audio.
+
+<AlphaTexSample player="true" tracks="all">{`
+\\track \\staff \\instrument piano
+    \\displayTranspose -12
+        C4.4 D4 E4 F4 | r.1
+\\track \\staff \\instrument piano
+    \\transpose -12
+        r.1 | C4.4 D4 E4 F4
+`}</AlphaTexSample>
+
+## Double Bar
+
+To mark a bar as double bar add `\db`
+
+<AlphaTexSample>{`
+\\db 3.3 3.3 3.3 3.3 | 1.1 2.1 3.1 4.1
+`}</AlphaTexSample>
+
+## Simile Marks
+
+To apply simile marks use the `\simile type` where type is:
+
+* `none` - No simile mark is applied
+* `simple` -  A simple simile mark. The previous bar is repeated.
+* `firstofdouble` - A double simile mark. This value is assigned to the first bar of the 2 repeat bars.
+* `secondofdouble` - A double simile mark. This value is assigned to the second bar of the 2 repeat bars.
+
+<AlphaTexSample player="true">{`
+3.3*4 | \\simile simple | 3.3*4 | 4.3*4 | \\simile firstofdouble | \\simile secondofdouble
 `}</AlphaTexSample>

@@ -4,6 +4,26 @@
  * work well for content-centric websites.
  */
 
+@import "@fontsource/noto-sans/300.css";
+@import "@fontsource/noto-sans/400.css";
+@import "@fontsource/noto-sans/500.css";
+@import "@fontsource/noto-sans/700.css";
+
+@import "@fontsource/noto-sans/300-italic.css";
+@import "@fontsource/noto-sans/400-italic.css";
+@import "@fontsource/noto-sans/500-italic.css";
+@import "@fontsource/noto-sans/700-italic.css";
+
+@import "@fontsource/noto-serif/300.css";
+@import "@fontsource/noto-serif/400.css";
+@import "@fontsource/noto-serif/500.css";
+@import "@fontsource/noto-serif/700.css";
+
+@import "@fontsource/noto-serif/300-italic.css";
+@import "@fontsource/noto-serif/400-italic.css";
+@import "@fontsource/noto-serif/500-italic.css";
+@import "@fontsource/noto-serif/700-italic.css";
+
 /* You can override the default Infima variables here. */
 :root {
   --ifm-color-primary: #426d9d;
@@ -16,6 +36,8 @@
   --ifm-code-font-size: 95%;
   --ifm-z-index-fixed: 2000;
   --docusaurus-highlighted-code-line-bg: rgba(0,0,0, 0.20);
+
+  --ifm-font-family-base: "Noto Sans";
 }
 
 /* For readability concerns, you should choose a lighter palette in dark mode. */
@@ -78,3 +100,29 @@ li.reference-item ul {
     no-repeat;
   margin-right: 0.25rem;
 }
+
+/* Styles for player */
+:global(.at-cursor-bar) {
+  /* Defines the color of the bar background when a bar is played */
+  background: rgba(255, 242, 0, 0.25);
+}
+
+:global(.at-selection div) {
+  /* Defines the color of the selection background */
+  background: rgba(64, 64, 255, 0.1);
+}
+
+:global(.at-cursor-beat) {
+  /* Defines the beat cursor */
+  background: rgba(64, 64, 255, 0.75);
+  width: 3px;
+}
+
+:global(.at-highlight) * {
+  /* Defines the color of the music symbols when they are being played (svg) */
+  fill: #0078ff;
+  stroke: #0078ff;
+}
+
+@import 'react-tooltip/dist/react-tooltip.css'
+
