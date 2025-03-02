@@ -130,6 +130,7 @@ dependencies {
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     coordinates(libGroup, libArtifactId, libVersion)
+    signAllPublications()
 
     configure(AndroidSingleVariantLibrary(
         variant = "release",
