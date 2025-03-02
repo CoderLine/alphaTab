@@ -7,7 +7,7 @@
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <NoWarn>$(NoWarn);0659;0168</NoWarn>
+        <NoWarn>$(NoWarn);0659;0168;;1998</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>

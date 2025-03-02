@@ -45,6 +45,7 @@ import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs'
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
 import { BeatTickLookupItem } from './midi/BeatTickLookup';
+import { ISynthOutputDevice } from './synth/ISynthOutput';
 
 class SelectionInfo {
     public beat: Beat;
@@ -1573,5 +1574,41 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.settingsUpdated as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'settingsUpdated', null);
+    }
+
+    /**
+     * Loads and lists the available output devices which can be used by the player. Will request permissions if needed.
+     * @returns the list of available devices or an empty list if there are no permissions, or the player is not enabled.
+     */
+    public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
+        if (this.player) {
+            return await this.player.output.enumerateOutputDevices();
+        }
+
+        return [] as ISynthOutputDevice[];
+    }
+
+    /**
+     * Changes the output device which should be used for playing the audio (player must be enabled).
+     * @param device The output device to use, or null to switch to the default device.
+     */
+    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {
+        if (this.player) {
+            await this.player.output.setOutputDevice(device);
+        }
+    }
+
+    /**
+     * The currently configured output device if changed via {@link setOutputDevice}.
+     * @returns The custom configured output device which was set via {@link setOutputDevice} or `null`
+     * if the default outputDevice is used.
+     * The output device might change dynamically if devices are connected/disconnected (e.g. bluetooth headset).
+     */
+    public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
+        if (this.player) {
+            return await this.player.output.getOutputDevice();
+        }
+
+        return null;
     }
 }

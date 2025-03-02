@@ -8,6 +8,7 @@ import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { LogLevel } from '@src/LogLevel';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEventType } from '@src/midi/MidiEvent';
+import { ISynthOutput } from './ISynthOutput';
 
 /**
  * The public API interface for interacting with the synthesizer.
@@ -78,6 +79,11 @@ export interface IAlphaSynth {
      * Gets or sets the midi events which will trigger the `midiEventsPlayed` event.
      */
     midiEventsPlayedFilter: MidiEventType[];
+
+    /**
+     * Gets the output used by alphaSynth.
+     */
+    readonly output: ISynthOutput;
 
     /**
      * Destroys the synthesizer and all related components

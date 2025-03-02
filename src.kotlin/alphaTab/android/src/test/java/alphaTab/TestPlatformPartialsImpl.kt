@@ -1,6 +1,7 @@
 package alphaTab
 
 import alphaTab.core.ecmaScript.Uint8Array
+import kotlinx.coroutines.CompletableDeferred
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.InputStream
@@ -17,13 +18,13 @@ class TestPlatformPartials {
             filePath.toFile().delete()
         }
 
-        fun loadFile(path: String): Uint8Array {
+        fun loadFile(path: String): kotlinx.coroutines.Deferred<Uint8Array> {
             val fs = openFileRead(path)
             val ms = ByteArrayOutputStream()
             fs.use {
                 fs.copyTo(ms)
             }
-            return Uint8Array(ms.toByteArray().asUByteArray())
+            return CompletableDeferred(Uint8Array(ms.toByteArray().asUByteArray()))
         }
 
         val projectRoot: String by lazy {
