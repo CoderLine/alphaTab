@@ -30,6 +30,9 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private var _logLevel: LogLevel
     private var _bufferTimeInMilliseconds: Double
 
+    override val output: ISynthOutput
+        get() = _output
+
     constructor(
         logLevel: LogLevel,
         output: ISynthOutput,
