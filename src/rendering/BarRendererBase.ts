@@ -23,6 +23,7 @@ import { Settings } from '@src/Settings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
+import { BeamDirection } from './utils/BeamDirection';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -72,12 +73,12 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
-    public static readonly LineSpacing: number = 8;
-    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.LineSpacing;
+    protected static readonly RawLineSpacing: number = 8;
+    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.RawLineSpacing;
     public static readonly StaffLineThickness: number =
-        0.13 /*bravura staffLineThickness */ * BarRendererBase.LineSpacing;
-    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.LineSpacing;
-    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.LineSpacing;
+        0.13 /*bravura staffLineThickness */ * BarRendererBase.RawLineSpacing;
+    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.RawLineSpacing;
+    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.RawLineSpacing;
 
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
@@ -177,16 +178,12 @@ export class BarRendererBase {
         return this.scoreRenderer.settings;
     }
 
-    public get scale(): number {
-        return this.settings.display.scale;
-    }
-
     /**
      * Gets the scale with which the bar should be displayed in case the model
      * scale should be respected.
      */
     public get barDisplayScale(): number {
-        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
+        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayScale : this.bar.displayScale;
     }
 
     /**
@@ -194,7 +191,7 @@ export class BarRendererBase {
      * scale should be respected.
      */
     public get barDisplayWidth(): number {
-        return this.staff.staveGroup.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
+        return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
     private _wasFirstOfLine: boolean = false;
@@ -252,12 +249,15 @@ export class BarRendererBase {
         this._postBeatGlyphs.width = this.layoutingInfo.postBeatSize;
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
         this.computedWidth = this.width;
-        
+
         // For cases like in the horizontal layout we need to set the fixed width early
         // to have correct partials splitting. the proper alignment to this scale will happen
         // later in the workflow.
         const fixedBarWidth = this.barDisplayWidth;
-        if (fixedBarWidth > 0 && this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths) {
+        if (
+            fixedBarWidth > 0 &&
+            this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+        ) {
             this.width = fixedBarWidth;
             this.computedWidth = fixedBarWidth;
         }
@@ -365,7 +365,7 @@ export class BarRendererBase {
         }
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
-        this.height += this.layoutingInfo.height * this.scale;
+        this.height += this.layoutingInfo.height;
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -455,10 +455,9 @@ export class BarRendererBase {
     }
 
     protected createBeatGlyphs(): void {
-        for (let v: number = 0; v < this.bar.voices.length; v++) {
-            let voice: Voice = this.bar.voices[v];
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(this.bar.voices[v]);
+                this.createVoiceGlyphs(voice);
             }
         }
     }
@@ -503,6 +502,15 @@ export class BarRendererBase {
         return 0;
     }
 
+    public getRatioPositionX(ticks: number): number {
+        const firstOnNoteX = this.bar.isEmpty
+            ? this.beatGlyphsStart
+            : this.getBeatX(this.bar.voices[0].beats[0], BeatXPosition.OnNotes);
+        const x = firstOnNoteX;
+        const w = this.postBeatGlyphsStart - firstOnNoteX;
+        return x + w * ticks;
+    }
+
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         let container = this.getBeatContainer(note.beat);
         if (container) {
@@ -528,19 +536,23 @@ export class BarRendererBase {
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
         // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
         if ((this._wasFirstOfLine && !this.isFirstOfLine) || (!this._wasFirstOfLine && this.isFirstOfLine)) {
-            this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
-            this._preBeatGlyphs.renderer = this;
-            this.createPreBeatGlyphs();
+            this.recreatePreBeatGlyphs();
         }
         this.updateSizes();
         this.registerLayoutingInfo();
+    }
+
+    protected recreatePreBeatGlyphs() {
+        this._preBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
+        this._preBeatGlyphs.renderer = this;
+        this.createPreBeatGlyphs();
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
                 canvas.fillMusicFontSymbol(
-                    cx + this.x + (this.width - 20 * this.scale) / 2,
+                    cx + this.x + (this.width - 20) / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat1Bar,
@@ -549,7 +561,7 @@ export class BarRendererBase {
                 break;
             case SimileMark.SecondOfDouble:
                 canvas.fillMusicFontSymbol(
-                    cx + this.x - (28 * this.scale) / 2,
+                    cx + this.x - 28 / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat2Bars,
@@ -561,5 +573,9 @@ export class BarRendererBase {
 
     public completeBeamingHelper(helper: BeamingHelper) {
         // nothing by default
+    }
+
+    public getBeatDirection(beat: Beat): BeamDirection {
+        return this.helpers.getBeamingHelperForBeat(beat).direction;
     }
 }

@@ -35,21 +35,22 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let sizeX: number = 12 * this.scale;
-        let sizeY: number = 3 * this.scale;
+        let sizeX: number = 12;
+        let sizeY: number = 3;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
+        const offsetX = 2;
         switch (this._inType) {
             case SlideInType.IntoFromBelow:
-                endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left);
+                endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - offsetX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 startX = endX - sizeX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 break;
             case SlideInType.IntoFromAbove:
-                endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left);
+                endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - offsetX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 startX = endX - sizeX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
@@ -62,15 +63,15 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         let startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let sizeX: number = 12 * this.scale;
-        let sizeY: number = 3 * this.scale;
+        let sizeX: number = 12;
+        let sizeY: number = 3;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
         let waves: boolean = false;
 
-        const endXOffset = 2 * this.scale;
+        const offsetX = 2;
 
         switch (this._outType) {
             case SlideOutType.Shift:
@@ -78,7 +79,8 @@ export class TabSlideLineGlyph extends Glyph {
                 startX =
                     cx +
                     startNoteRenderer.x +
-                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes);
+                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes)
+                    + offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
                     let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
@@ -93,7 +95,7 @@ export class TabSlideLineGlyph extends Glyph {
                             cx +
                             endNoteRenderer.x +
                             endNoteRenderer.getBeatX(this._startNote.slideTarget.beat, BeatXPosition.OnNotes)
-                            - endXOffset;
+                            - offsetX;
                         endY =
                             cy +
                             endNoteRenderer.y +
@@ -113,31 +115,47 @@ export class TabSlideLineGlyph extends Glyph {
                 }
                 break;
             case SlideOutType.OutUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
-                endX = startX + sizeX - endXOffset;
+                endX = startX + sizeX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 break;
             case SlideOutType.OutDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
-                endX = startX + sizeX - endXOffset;
+                endX = startX + sizeX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 break;
             case SlideOutType.PickSlideDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX * 2;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
-                endX =
-                    cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.EndBeat);
+                endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                 endY = startY + sizeY * 3;
+                if (
+                    this._startNote.beat.nextBeat &&
+                    this._startNote.beat.nextBeat.voice === this._startNote.beat.voice
+                ) {
+                    endX =
+                        cx +
+                        startNoteRenderer.x +
+                        startNoteRenderer.getBeatX(this._startNote.beat.nextBeat, BeatXPosition.PreNotes);
+                }
                 waves = true;
                 break;
             case SlideOutType.PickSlideUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right);
+                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX * 2;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
-                endX =
-                    cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.EndBeat);
+                endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                 endY = startY - sizeY * 3;
+                if (
+                    this._startNote.beat.nextBeat &&
+                    this._startNote.beat.nextBeat.voice === this._startNote.beat.voice
+                ) {
+                    endX =
+                        cx +
+                        startNoteRenderer.x +
+                        startNoteRenderer.getBeatX(this._startNote.beat.nextBeat, BeatXPosition.PreNotes);
+                }
                 waves = true;
                 break;
             default:

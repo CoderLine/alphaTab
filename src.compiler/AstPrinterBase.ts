@@ -254,6 +254,10 @@ export default abstract class AstPrinterBase {
         this.write(')');
     }
 
+    protected writeSpreadExpression(expr: cs.SpreadExpression) {
+        this.writeExpression(expr.expression);
+    }
+
     protected writeTypeParameter(p: cs.TypeParameterDeclaration) {
         this.writeIdentifier(p.name);
     }
@@ -334,6 +338,9 @@ export default abstract class AstPrinterBase {
                 break;
             case cs.SyntaxKind.ParenthesizedExpression:
                 this.writeParenthesizedExpression(expr as cs.ParenthesizedExpression);
+                break;
+            case cs.SyntaxKind.SpreadExpression:
+                this.writeSpreadExpression(expr as cs.SpreadExpression);
                 break;
             case cs.SyntaxKind.ArrayCreationExpression:
                 this.writeArrayCreationExpression(expr as cs.ArrayCreationExpression);
@@ -487,9 +494,9 @@ export default abstract class AstPrinterBase {
         if (cs.isBlock(s.statement)) {
             this.writeStatement(s.statement);
         } else {
-            this._indent++;
+            this.beginBlock();
             this.writeStatement(s.statement);
-            this._indent--;
+            this.endBlock();
         }
     }
 
@@ -509,9 +516,9 @@ export default abstract class AstPrinterBase {
         if (cs.isBlock(s.thenStatement)) {
             this.writeStatement(s.thenStatement);
         } else {
-            this._indent++;
+            this.beginBlock();
             this.writeStatement(s.thenStatement);
-            this._indent--;
+            this.endBlock();
         }
 
         if (s.elseStatement) {
@@ -523,9 +530,9 @@ export default abstract class AstPrinterBase {
                 this.writeStatement(s.elseStatement);
             } else {
                 this.writeLine();
-                this._indent++;
+                this.beginBlock();
                 this.writeStatement(s.elseStatement);
-                this._indent--;
+                this.endBlock();
             }
         }
     }

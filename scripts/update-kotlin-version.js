@@ -1,6 +1,10 @@
+import * as fs from 'node:fs';
+import url from 'node:url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 const packageJsonFilePath = `${__dirname}/../package.json`;
-const pkg = require(packageJsonFilePath);
-const fs = require('fs');
+const pkg = JSON.parse(fs.readFileSync(packageJsonFilePath, 'utf-8'));
 
 let version = pkg.version.match(/([0-9]+\.[0-9]+\.[0-9]+)/)[0];
 
@@ -15,8 +19,8 @@ if(process.argv.length === 3) {
 
 console.log(`Updating Version to ${version}`);
 
-const buildFile = `${__dirname}/../src.kotlin/alphaTab/alphaTab/build.gradle.kts`;
+const buildFile = `${__dirname}/../src.kotlin/alphaTab/android/build.gradle.kts`;
 
 let propsSource = fs.readFileSync(buildFile, 'utf-8');
-propsSource = propsSource.replace(/version\s*=.*/g, `version = "${version}"`);
+propsSource = propsSource.replace(/libVersion\s*= \".*/g, `libVersion = "${version}"`);
 fs.writeFileSync(buildFile, propsSource);

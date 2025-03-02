@@ -19,6 +19,12 @@ export class BeatBounds {
     public visualBounds!: Bounds;
 
     /**
+     * Gets or sets x-position where the timely center of the notes for this beat is. 
+     * This is where the cursor should be at the time when this beat is played.
+     */
+    public onNotesX: number = 0;
+
+    /**
      * Gets or sets the actual bounds of the elements in this beat including whitespace areas.
      */
     public realBounds!: Bounds;
@@ -67,5 +73,19 @@ export class BeatBounds {
             }
         }
         return null;
+    }
+
+    /**
+     * Finishes the lookup object and optimizes itself for fast access.
+     */
+    public finish(scale: number = 1) {
+        this.realBounds.scaleWith(scale);
+        this.visualBounds.scaleWith(scale);
+
+        if(this.notes){
+            for(const n of this.notes!){
+                n.finish(scale);
+            }
+        }
     }
 }

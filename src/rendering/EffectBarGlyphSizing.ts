@@ -29,6 +29,7 @@ export enum EffectBarGlyphSizing {
      * the applied beat.
      */
     GroupedOnBeatToEnd,
+    
     /**
      * The effect glyph is placed on the whole bar covering the whole width
      */

@@ -34,6 +34,8 @@ export class StaffSerializer {
         o.set("transpositionpitch", obj.transpositionPitch);
         o.set("displaytranspositionpitch", obj.displayTranspositionPitch);
         o.set("stringtuning", TuningSerializer.toJson(obj.stringTuning));
+        o.set("showslash", obj.showSlash);
+        o.set("shownumbered", obj.showNumbered);
         o.set("showtablature", obj.showTablature);
         o.set("showstandardnotation", obj.showStandardNotation);
         o.set("ispercussion", obj.isPercussion);
@@ -66,6 +68,12 @@ export class StaffSerializer {
                 return true;
             case "displaytranspositionpitch":
                 obj.displayTranspositionPitch = v! as number;
+                return true;
+            case "showslash":
+                obj.showSlash = v! as boolean;
+                return true;
+            case "shownumbered":
+                obj.showNumbered = v! as boolean;
                 return true;
             case "showtablature":
                 obj.showTablature = v! as boolean;

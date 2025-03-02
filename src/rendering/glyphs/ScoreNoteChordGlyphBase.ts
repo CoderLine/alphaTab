@@ -107,7 +107,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         // TODO: this method seems to be quite heavy according to the profiler, why?
         let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         // TODO: Take care of beateffects in overflow
-        let linePadding: number = 3 * this.scale;
+        let linePadding: number = 3;
         let lineWidth: number = this.width - this.noteStartX + linePadding * 2;
         if (this.hasTopOverflow) {
             let color: Color = canvas.color;
@@ -116,7 +116,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             while (l >= this.minNote!.line) {
                 // + 1 Because we want to place the line in the center of the note, not at the top
                 let lY: number = cy + scoreRenderer.getScoreY(l);
-                canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, this.scale);
+                canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, 1);
                 l -= 2;
             }
             canvas.color = color;
@@ -127,7 +127,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             let l: number = 10;
             while (l <= this.maxNote!.line) {
                 let lY: number = cy + scoreRenderer.getScoreY(l);
-                canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, this.scale);
+                canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, 1);
                 l += 2;
             }
             canvas.color = color;

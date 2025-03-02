@@ -140,7 +140,6 @@ export class CapellaParser {
         // voice counts and contents might be inconsistent
         // we need to ensure we have an equal amount of voices across all bars
         // and voices must contain an empty beat at minimum
-        let tempo = this.score.tempo;
         for (const track of this.score.tracks) {
             const trackVoiceCount = this._voiceCounts.get(track.index)!;
             for (const staff of track.staves) {
@@ -158,15 +157,6 @@ export class CapellaParser {
                             const emptyBeat = new Beat();
                             emptyBeat.isEmpty = true;
                             voice.addBeat(emptyBeat);
-                        }
-                    }
-
-                    const mb = bar.masterBar;
-                    if (mb.tempoAutomation) {
-                        if (mb.tempoAutomation.value !== tempo) {
-                            tempo = mb.tempoAutomation.value;
-                        } else {
-                            mb.tempoAutomation = null;
                         }
                     }
                 }
@@ -619,10 +609,12 @@ export class CapellaParser {
         const noteObjects = element.findChildElement('noteObjects');
 
         if (systemElement.attributes.has('tempo')) {
-            this._currentBar.masterBar.tempoAutomation = new Automation();
-            this._currentBar.masterBar.tempoAutomation.isLinear = true;
-            this._currentBar.masterBar.tempoAutomation.type = AutomationType.Tempo;
-            this._currentBar.masterBar.tempoAutomation.value = parseInt(systemElement.attributes.get('tempo')!);
+            const automation = new Automation()
+            automation.isLinear = true;
+            automation.type = AutomationType.Tempo;
+            automation.value = parseInt(systemElement.attributes.get('tempo')!);
+            automation.ratioPosition = this._currentVoiceState.currentPosition / this._currentVoiceState.currentBarDuration;
+            this._currentBar.masterBar.tempoAutomations.push(automation); 
         }
 
         if (noteObjects) {
@@ -860,7 +852,7 @@ export class CapellaParser {
         const note = new Note();
         const pitch = ModelUtils.parseTuning(element.getAttribute('pitch'));
         note.octave = pitch!.octave - 1;
-        note.tone = pitch!.noteValue;
+        note.tone = pitch!.tone.noteValue;
         note.isStaccato = articulation.isStaccato;
         note.accentuated = articulation.accentuated;
         beat.addNote(note);

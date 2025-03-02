@@ -1,20 +1,19 @@
 ﻿using System.Text;
 using AlphaTab.Core.EcmaScript;
 
-namespace AlphaTab.Core.Dom
+namespace AlphaTab.Core.Dom;
+
+internal class TextDecoder
 {
-    public class TextDecoder
+    private readonly Encoding _encoding;
+
+    public TextDecoder(string encoding)
     {
-        private readonly Encoding _encoding;
+        _encoding = Encoding.GetEncoding(encoding);
+    }
 
-        public TextDecoder(string encoding)
-        {
-            _encoding = Encoding.GetEncoding(encoding);
-        }
-
-        public string Decode(ArrayBuffer data)
-        {
-            return _encoding.GetString(data.Raw.Array, data.Raw.Offset, data.Raw.Count);
-        }
+    public string Decode(ArrayBuffer data)
+    {
+        return _encoding.GetString(data.Raw.Array, data.Raw.Offset, data.Raw.Count);
     }
 }

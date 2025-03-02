@@ -4,72 +4,93 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace AlphaTab.Core.EcmaScript
+namespace AlphaTab.Core.EcmaScript;
+
+public class Float32Array : IEnumerable<float>
 {
-    public class Float32Array : IEnumerable<float>
+    internal readonly ArraySegment<float> Data;
+    public double Length => Data.Count;
+    internal ArrayBuffer Buffer
     {
-        public readonly float[] Data;
-        public double Length => Data.Length;
-
-
-        public Float32Array(ArrayBuffer buffer)
-            : this(buffer.Raw.Count / sizeof(float))
+        get
         {
-            Buffer.BlockCopy(buffer.Raw.Array, buffer.Raw.Offset, Data, 0, buffer.Raw.Count);
+            var bytes = new byte[Data.Count * sizeof(float)];
+            System.Buffer.BlockCopy(Data.Array!, Data.Offset, bytes, 0, bytes.Length);
+            return new ArrayBuffer(bytes);
         }
+    }
 
-        private Float32Array(float[] data)
+    public Float32Array(float[] data)
+    {
+        Data = new ArraySegment<float>(data);
+    }
+
+    public Float32Array(double size)
+    {
+        Data = new ArraySegment<float>(new float[(int)size]);
+    }
+
+    public Float32Array(IEnumerable<double> values)
+    {
+        Data = new ArraySegment<float>(values.Select(d => (float)d).ToArray());
+    }
+
+    public Float32Array(IEnumerable<int> values)
+    {
+        Data = new ArraySegment<float>(values.Select(d => (float)d).ToArray());
+    }
+
+    private Float32Array(ArraySegment<float> data)
+    {
+        Data = data;
+    }
+
+    public double this[double index]
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Data.Array![Data.Offset + (int)index];
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        set => Data.Array![Data.Offset + (int)index] = (float)value;
+    }
+
+    public Float32Array Subarray(double start, double end)
+    {
+        return new Float32Array(new ArraySegment<float>(Data.Array!, Data.Offset + (int)start,
+            (int)end - (int)start));
+    }
+
+    public void Set(Float32Array subarray, double offset)
+    {
+        System.Buffer.BlockCopy(subarray.Data.Array!,
+            subarray.Data.Offset * sizeof(float),
+            Data.Array!,
+            Data.Offset + (int)offset * sizeof(float),
+            subarray.Data.Count * sizeof(float));
+    }
+
+    public IEnumerator<float> GetEnumerator()
+    {
+        return ((IEnumerable<float>)Data).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public void Fill(double value, double start, double end)
+    {
+        var count = (int)end - (int)start;
+        if (value == 0)
         {
-            Data = data;
+            System.Array.Clear(Data.Array!, Data.Offset + (int)start, count);
         }
-
-        public Float32Array(double size)
+        else
         {
-            Data = new float[(int) size];
-        }
-
-        public Float32Array(IEnumerable<double> values)
-        {
-            Data = values.Select(d => (float) d).ToArray();
-        }
-
-        public Float32Array(IEnumerable<int> values)
-        {
-            Data = values.Select(d => (float) d).ToArray();
-        }
-
-        public double this[double index]
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => Data[(int) index];
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            set => Data[(int) index] = (float) value;
-        }
-
-        public Float32Array Subarray(double start, double end)
-        {
-            var sub = new float[(int)(end - start)];
-            Buffer.BlockCopy(Data, (int) start * sizeof(float), sub, 0, sub.Length * sizeof(float));
-            return new Float32Array(sub);
-        }
-
-        public void Set(Float32Array subarray, double offset)
-        {
-            Buffer.BlockCopy(subarray.Data,
-                    0,
-                Data,
-                (int) offset * sizeof(float),
-                subarray.Data.Length * sizeof(float));
-        }
-
-        public IEnumerator<float> GetEnumerator()
-        {
-            return ((IEnumerable<float>)Data).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            for (var i = 0; i < count; i++)
+            {
+                Data.Array![Data.Offset + i] = i;
+            }
         }
     }
 }

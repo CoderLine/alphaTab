@@ -9,10 +9,12 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
     public static readonly LineTopOffset: number = 5;
     public static readonly LineSize: number = 8;
     private _label: string;
+    private _dashed: boolean;
 
-    public constructor(label: string) {
+    public constructor(label: string, dashed: boolean = true) {
         super(BeatXPosition.OnNotes);
         this._label = label;
+        this._dashed = dashed;
     }
 
     public override doLayout(): void {
@@ -35,23 +37,31 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         this.paintNonGrouped(cx, cy, canvas);
-        let lineSpacing: number = 3 * this.scale;
-        let textWidth: number = canvas.measureText(this._label);
+        let lineSpacing: number = 3;
+        let textWidth: number = canvas.measureText(this._label).width;
         let startX: number = cx + this.x + textWidth / 2 + lineSpacing;
-        let lineY: number = cy + this.y + 4 * this.scale;
-        let lineSize: number = 8 * this.scale;
-        if (endX > startX) {
-            let lineX: number = startX;
-            while (lineX < endX) {
+        let lineY: number = cy + this.y + 4;
+        let lineSize: number = 8;
+        if (this._dashed) {
+            if (endX > startX) {
+                let lineX: number = startX;
+                while (lineX < endX) {
+                    canvas.beginPath();
+                    canvas.moveTo(lineX, lineY | 0);
+                    canvas.lineTo(Math.min(lineX + lineSize, endX), lineY | 0);
+                    lineX += lineSize + lineSpacing;
+                    canvas.stroke();
+                }
                 canvas.beginPath();
-                canvas.moveTo(lineX, lineY | 0);
-                canvas.lineTo(Math.min(lineX + lineSize, endX), lineY | 0);
-                lineX += lineSize + lineSpacing;
+                canvas.moveTo(endX, (lineY - 5) | 0);
+                canvas.lineTo(endX, (lineY + 5) | 0);
                 canvas.stroke();
             }
+        } else {
             canvas.beginPath();
-            canvas.moveTo(endX, (lineY - 5 * this.scale) | 0);
-            canvas.lineTo(endX, (lineY + 5 * this.scale) | 0);
+            canvas.moveTo(startX, lineY | 0);
+            canvas.lineTo(endX, lineY | 0);
+            canvas.lineTo(endX, (lineY + 5) | 0);
             canvas.stroke();
         }
     }

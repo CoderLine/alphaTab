@@ -1,9 +1,7 @@
 import * as ts from 'typescript';
-import * as path from 'path'
+import * as path from 'path';
 
-const ignoredFiles = [
-    /rollup.*/
-]
+const ignoredFiles = [/rollup.*/];
 
 export function transpileFilter(file: string): boolean {
     const fileName = path.basename(file);
@@ -58,7 +56,7 @@ function findNode(node: ts.Node, kind: ts.SyntaxKind): ts.Node | null {
 
 export function getTypeWithNullableInfo(
     checker: ts.TypeChecker,
-    node: ts.TypeNode | undefined,
+    node: ts.TypeNode | ts.Type | undefined,
     allowUnionAsPrimitive: boolean
 ) {
     if (!node) {
@@ -72,31 +70,53 @@ export function getTypeWithNullableInfo(
     let isNullable = false;
     let isUnionType = false;
     let type: ts.Type | null = null;
-    if (ts.isUnionTypeNode(node)) {
-        for (const t of node.types) {
-            if (t.kind === ts.SyntaxKind.NullKeyword) {
-                isNullable = true;
-            } else if (ts.isLiteralTypeNode(t) && t.literal.kind === ts.SyntaxKind.NullKeyword) {
-                isNullable = true;
-            } else if (type !== null) {
-                if (allowUnionAsPrimitive) {
-                    isUnionType = true;
-                    type = checker.getTypeAtLocation(node);
-                    break;
+    if ('kind' in node) {
+        if (ts.isUnionTypeNode(node)) {
+            for (const t of node.types) {
+                if (t.kind === ts.SyntaxKind.NullKeyword) {
+                    isNullable = true;
+                } else if (ts.isLiteralTypeNode(t) && t.literal.kind === ts.SyntaxKind.NullKeyword) {
+                    isNullable = true;
+                } else if (type !== null) {
+                    if (allowUnionAsPrimitive) {
+                        isUnionType = true;
+                        type = checker.getTypeAtLocation(node);
+                        break;
+                    } else {
+                        throw new Error(
+                            'Multi union types on JSON settings not supported: ' +
+                                node.getSourceFile().fileName +
+                                ':' +
+                                node.getText()
+                        );
+                    }
                 } else {
-                    throw new Error(
-                        'Multi union types on JSON settings not supported: ' +
-                        node.getSourceFile().fileName +
-                        ':' +
-                        node.getText()
-                    );
+                    type = checker.getTypeAtLocation(t);
                 }
-            } else {
-                type = checker.getTypeAtLocation(t);
             }
+        } else {
+            type = checker.getTypeAtLocation(node);
         }
-    } else {
-        type = checker.getTypeAtLocation(node);
+    } else if ('flags' in node) {
+        if (node.isUnion()) {
+            for (const t of node.types) {
+                if ((t.flags & ts.TypeFlags.Null) !== 0 || (t.flags & ts.TypeFlags.Undefined) !== 0) {
+                    isNullable = true;
+                } else if (type !== null) {
+                    if (allowUnionAsPrimitive) {
+                        isUnionType = true;
+                        type = node;
+                        break;
+                    } else {
+                        throw new Error('Multi union types on JSON settings not supported: ' + node.symbol.name);
+                    }
+                } else {
+                    type = t;
+                }
+            }
+        } else {
+            type = node;
+        }
     }
 
     return {
@@ -191,6 +211,10 @@ export function isMap(type: ts.Type | null): boolean {
     return !!(type && type.symbol?.name === 'Map');
 }
 
+export function isSet(type: ts.Type | null): boolean {
+    return !!(type && type.symbol?.name === 'Set');
+}
+
 function markNodeSynthesized(node: ts.Node): ts.Node {
     for (const c of node.getChildren()) {
         markNodeSynthesized(c);
@@ -200,4 +224,91 @@ function markNodeSynthesized(node: ts.Node): ts.Node {
         end: -1
     });
     return node;
+}
+
+export function cloneTypeNode<T extends ts.Node>(node: T): T {
+    if (ts.isUnionTypeNode(node)) {
+        return ts.factory.createUnionTypeNode(node.types.map(cloneTypeNode)) as any as T;
+    } else if (
+        node.kind === ts.SyntaxKind.StringKeyword ||
+        node.kind === ts.SyntaxKind.NumberKeyword ||
+        node.kind === ts.SyntaxKind.BooleanKeyword ||
+        node.kind === ts.SyntaxKind.UnknownKeyword ||
+        node.kind === ts.SyntaxKind.AnyKeyword ||
+        node.kind === ts.SyntaxKind.VoidKeyword
+    ) {
+        return ts.factory.createKeywordTypeNode(node.kind) as any as T;
+    } else if (ts.isLiteralTypeNode(node)) {
+        switch (node.literal.kind) {
+            case ts.SyntaxKind.StringLiteral:
+                return ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(node.literal.text)) as any as T;
+            default:
+                return ts.factory.createLiteralTypeNode(node.literal) as any as T;
+        }
+    } else if (ts.isArrayTypeNode(node)) {
+        return ts.factory.createArrayTypeNode(cloneTypeNode(node.elementType)) as any as T;
+    } else if (ts.isTypeReferenceNode(node)) {
+        return ts.factory.createTypeReferenceNode(cloneTypeNode(node.typeName),
+        node.typeArguments?.map(a => cloneTypeNode(a))        
+    ) as any as T;
+    } else if (ts.isIdentifier(node)) {
+        return ts.factory.createIdentifier(node.text) as any as T;
+    } else if (ts.isQualifiedName(node)) {
+        if (typeof node.right === 'string') {
+            return ts.factory.createQualifiedName(cloneTypeNode(node.left), node.right) as any as T;
+        } else {
+            return ts.factory.createQualifiedName(cloneTypeNode(node.left), cloneTypeNode(node.right)) as any as T;
+        }
+    }
+
+    throw new Error(`Unsupported TypeNode: '${ts.SyntaxKind[node.kind]}' extend type node cloning`);
+}
+
+
+export function isPrimitiveToJson(type: ts.Type, typeChecker: ts.TypeChecker) {
+    if (!type) {
+        return false;
+    }
+
+    const isArray = isTypedArray(type);
+    const arrayItemType = unwrapArrayItemType(type, typeChecker);
+
+    if (hasFlag(type, ts.TypeFlags.Unknown)) {
+        return true;
+    }
+    if (hasFlag(type, ts.TypeFlags.Number)) {
+        return true;
+    }
+    if (hasFlag(type, ts.TypeFlags.String)) {
+        return true;
+    }
+    if (hasFlag(type, ts.TypeFlags.Boolean)) {
+        return true;
+    }
+
+    if (arrayItemType) {
+        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Number)) {
+            return true;
+        }
+        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.String)) {
+            return true;
+        }
+        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Boolean)) {
+            return true;
+        }
+    } else if (type.symbol) {
+        switch (type.symbol.name) {
+            case 'Uint8Array':
+            case 'Uint16Array':
+            case 'Uint32Array':
+            case 'Int8Array':
+            case 'Int16Array':
+            case 'Int32Array':
+            case 'Float32Array':
+            case 'Float64Array':
+                return true;
+        }
+    }
+
+    return false;
 }

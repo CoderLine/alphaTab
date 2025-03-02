@@ -24,7 +24,11 @@ export class RenderingResourcesSerializer {
         o.set("subtitlefont", Font.toJson(obj.subTitleFont));
         o.set("wordsfont", Font.toJson(obj.wordsFont));
         o.set("effectfont", Font.toJson(obj.effectFont));
+        o.set("timerfont", Font.toJson(obj.timerFont));
+        o.set("directionsfont", Font.toJson(obj.directionsFont));
         o.set("fretboardnumberfont", Font.toJson(obj.fretboardNumberFont));
+        o.set("numberednotationfont", Font.toJson(obj.numberedNotationFont));
+        o.set("numberednotationgracefont", Font.toJson(obj.numberedNotationGraceFont));
         o.set("tablaturefont", Font.toJson(obj.tablatureFont));
         o.set("gracefont", Font.toJson(obj.graceFont));
         o.set("stafflinecolor", Color.toJson(obj.staffLineColor));
@@ -32,6 +36,7 @@ export class RenderingResourcesSerializer {
         o.set("barnumberfont", Font.toJson(obj.barNumberFont));
         o.set("barnumbercolor", Color.toJson(obj.barNumberColor));
         o.set("fingeringfont", Font.toJson(obj.fingeringFont));
+        o.set("inlinefingeringfont", Font.toJson(obj.inlineFingeringFont));
         o.set("markerfont", Font.toJson(obj.markerFont));
         o.set("mainglyphcolor", Color.toJson(obj.mainGlyphColor));
         o.set("secondaryglyphcolor", Color.toJson(obj.secondaryGlyphColor));
@@ -55,8 +60,20 @@ export class RenderingResourcesSerializer {
             case "effectfont":
                 obj.effectFont = Font.fromJson(v)!;
                 return true;
+            case "timerfont":
+                obj.timerFont = Font.fromJson(v)!;
+                return true;
+            case "directionsfont":
+                obj.directionsFont = Font.fromJson(v)!;
+                return true;
             case "fretboardnumberfont":
                 obj.fretboardNumberFont = Font.fromJson(v)!;
+                return true;
+            case "numberednotationfont":
+                obj.numberedNotationFont = Font.fromJson(v)!;
+                return true;
+            case "numberednotationgracefont":
+                obj.numberedNotationGraceFont = Font.fromJson(v)!;
                 return true;
             case "tablaturefont":
                 obj.tablatureFont = Font.fromJson(v)!;
@@ -78,6 +95,9 @@ export class RenderingResourcesSerializer {
                 return true;
             case "fingeringfont":
                 obj.fingeringFont = Font.fromJson(v)!;
+                return true;
+            case "inlinefingeringfont":
+                obj.inlineFingeringFont = Font.fromJson(v)!;
                 return true;
             case "markerfont":
                 obj.markerFont = Font.fromJson(v)!;

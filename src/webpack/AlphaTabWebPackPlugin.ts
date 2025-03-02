@@ -1,6 +1,7 @@
 /**@target web */
 import * as fs from 'fs';
 import * as path from 'path';
+import * as url from 'url';
 
 // webpack doesn't defined properly types for all these internals
 // needed for the plugin
@@ -144,7 +145,8 @@ export class AlphaTabWebPackPlugin {
             alphaTab: {} as any
         } satisfies webPackWithAlphaTab;
 
-        if ('alphaTab' in compiler.webpack.util.serialization.register) { // prevent multi registration
+        if ('alphaTab' in compiler.webpack.util.serialization.register) {
+            // prevent multi registration
             webPackWithAlphaTab.alphaTab = compiler.webpack.util.serialization.register.alphaTab;
         } else {
             (compiler.webpack.util.serialization.register as any).alphaTab = webPackWithAlphaTab.alphaTab;
@@ -170,6 +172,10 @@ export class AlphaTabWebPackPlugin {
         // register soundfont as resource
         compiler.options.module.rules.push({
             test: /\.sf2/,
+            type: 'asset/resource'
+        });
+        compiler.options.module.rules.push({
+            test: /\.sf3/,
             type: 'asset/resource'
         });
     }
@@ -224,13 +230,34 @@ export class AlphaTabWebPackPlugin {
             async (_, callback) => {
                 let alphaTabSourceDir = options.alphaTabSourceDir;
                 if (!alphaTabSourceDir) {
-                    alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
+                    try {
+                        const isEsm = typeof import.meta.url === 'string';
+                        if (isEsm) {
+                            alphaTabSourceDir = url.fileURLToPath(import.meta.resolve('@coderline/alphatab'));
+                        } else {
+                            alphaTabSourceDir = require.resolve('@coderline/alphatab');
+                        }
+
+                        alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
+                    } catch (e) {
+                        alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
+                    }
                 }
 
-                if (
-                    !alphaTabSourceDir ||
-                    !fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK)
-                ) {
+                let isValidAlphaTabSourceDir: boolean;
+
+                if (alphaTabSourceDir) {
+                    try {
+                        await fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK);
+                        isValidAlphaTabSourceDir = true;
+                    } catch (e) {
+                        isValidAlphaTabSourceDir = false;
+                    }
+                } else {
+                    isValidAlphaTabSourceDir = false;
+                }
+
+                if (!isValidAlphaTabSourceDir) {
                     compilation.errors.push(
                         new this._webPackWithAlphaTab.webpack.WebpackError(
                             'Could not find alphaTab, please ensure it is installed into node_modules or configure alphaTabSourceDir'
@@ -262,7 +289,9 @@ export class AlphaTabWebPackPlugin {
                         files
                             .filter(f => f.isFile())
                             .map(async file => {
-                                const sourceFilename = path.join(file.path, file.name);
+                                // node v20.12.0 has parentPath pointing to the path (not the file)
+                                // see https://github.com/nodejs/node/pull/50976
+                                const sourceFilename = path.join(file.parentPath ?? file.path, file.name);
                                 await fs.promises.copyFile(sourceFilename, path.join(outputPath!, subdir, file.name));
                                 const assetFileName = subdir + '/' + file.name;
                                 const existingAsset = compilation.getAsset(assetFileName);

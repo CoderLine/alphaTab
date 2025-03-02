@@ -94,7 +94,7 @@ export class TieGlyph extends Glyph {
             } else {
                 this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
                 this.height = TieGlyph.calculateActualTieHeight(
-                    this.renderer.scale,
+                    1,
                     this._startX,
                     this._startY,
                     this._endX,
@@ -121,12 +121,12 @@ export class TieGlyph extends Glyph {
                     cx + this._endX,
                     cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
-                    this.scale
+                    1
                 );
             } else {
                 TieGlyph.paintTie(
                     canvas,
-                    this.scale,
+                    1,
                     cx + this._startX,
                     cy + this._startY,
                     cx + this._endX,
@@ -354,7 +354,7 @@ export class TieGlyph extends Glyph {
         canvas.lineTo(x2, y2);
         canvas.stroke();
         if (slurText) {
-            let w: number = canvas.measureText(slurText);
+            let w: number = canvas.measureText(slurText).width;
             let textOffset: number = down ? 0 : -canvas.font.size;
             canvas.fillText(slurText, cp1X - w / 2, cp1Y + textOffset);
         }

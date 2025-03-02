@@ -3,58 +3,70 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace AlphaTab.Core.EcmaScript
+namespace AlphaTab.Core.EcmaScript;
+
+public class Set<T> : IEnumerable<T>, ICollection
 {
-    public class Set<T> : IEnumerable<T>
+    private readonly HashSet<T> _data;
+
+    public Set()
     {
-        private readonly HashSet<T> _data;
+        _data = new HashSet<T>();
+    }
 
-        public Set()
+    public double Size => _data.Count;
+
+    public Set(IEnumerable<T> values)
+    {
+        _data = new HashSet<T>(values);
+    }
+
+    public void Clear()
+    {
+        _data.Clear();
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Add(T item)
+    {
+        _data.Add(item);
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool Has(T item)
+    {
+        return _data.Contains(item);
+    }
+
+    public void ForEach(Action<T> action)
+    {
+        foreach (var i in _data)
         {
-            _data = new HashSet<T>();
+            action(i);
         }
+    }
 
-        public double Size => _data.Count;
+    public IEnumerator<T> GetEnumerator()
+    {
+        return _data.GetEnumerator();
+    }
 
-        public Set(IEnumerable<T> values)
-        {
-            _data = new HashSet<T>(values);
-        }
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(T item)
-        {
-            _data.Add(item);
-        }
+    public void Delete(T item)
+    {
+        _data.Remove(item);
+    }
 
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Has(T item)
-        {
-            return _data.Contains(item);
-        }
-
-        public void ForEach(Action<T> action)
-        {
-            foreach (var i in _data)
-            {
-                action(i);
-            }
-        }
-
-        public IEnumerator<T> GetEnumerator()
-        {
-            return _data.GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-
-        public void Delete(T item)
-        {
-            _data.Remove(item);
-        }
+    int ICollection.Count => _data.Count;
+    bool ICollection.IsSynchronized => false;
+    object ICollection.SyncRoot => _data;
+    void ICollection.CopyTo(System.Array array, int index)
+    {
+        _data.CopyTo((T[])array, index);
     }
 }

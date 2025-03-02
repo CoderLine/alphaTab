@@ -3,6 +3,7 @@ import { LogLevel } from '@src/LogLevel';
 
 /**
  * @json
+ * @json_declaration
  */
 export class CoreSettings {
     /**
@@ -33,8 +34,9 @@ export class CoreSettings {
     /**
      * Gets or sets the initial tracks that should be loaded for the score.
      * @target web
+     * @json_raw
      */
-    public tracks: unknown = null;
+    public tracks: number | number[] | 'all' | null = null;
 
     /**
      * Gets or sets whether lazy loading for displayed elements is enabled.

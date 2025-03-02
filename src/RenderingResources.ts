@@ -4,6 +4,7 @@ import { Font, FontStyle, FontWeight } from '@src/model/Font';
 /**
  * This public class contains central definitions for controlling the visual appearance.
  * @json
+ * @json_declaration
  */
 export class RenderingResources {
     private static sansFont: string = 'Arial, sans-serif';
@@ -35,9 +36,29 @@ export class RenderingResources {
     public effectFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Italic);
 
     /**
+     * Gets or sets the font to use for displaying beat time information in the music sheet.
+     */
+    public timerFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
+
+    /**
+     * Gets or sets the font to use for displaying the directions texts.
+     */
+    public directionsFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
+
+    /**
      * Gets or sets the font to use for displaying the fretboard numbers in chord diagrams.
      */
     public fretboardNumberFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);
+
+    /**
+     * Gets or sets the font to use for displaying the numbered music notation in the music sheet.
+     */
+    public numberedNotationFont: Font = new Font(RenderingResources.sansFont, 16, FontStyle.Plain);
+
+    /**
+     * Gets or sets the font to use for displaying the grace notes in numbered music notation in the music sheet.
+     */
+    public numberedNotationGraceFont: Font = new Font(RenderingResources.sansFont, 14, FontStyle.Plain);
 
     /**
      * Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet.
@@ -70,9 +91,14 @@ export class RenderingResources {
     public barNumberColor: Color = new Color(200, 0, 0, 0xff);
 
     /**
-     * Gets or sets the font to use for displaying finger information in the music sheet.
+     * Gets or sets the font to use for displaying finger information above the music sheet.
      */
     public fingeringFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
+
+    /**
+     * Gets or sets the font to use for displaying finger information when inline into the music sheet.
+     */
+    public inlineFingeringFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
 
     /**
      * Gets or sets the font to use for section marker labels shown above the music sheet.

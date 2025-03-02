@@ -8,7 +8,6 @@ import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventA
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { Hydra } from '@src/synth/soundfont/Hydra';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { SynthHelper } from '@src/synth/SynthHelper';
 import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
@@ -19,6 +18,7 @@ import { Queue } from '@src/synth/ds/Queue';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
  * This is the main synthesizer component which can be used to
@@ -36,6 +36,7 @@ export class AlphaSynth implements IAlphaSynth {
     private _playedEventsQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
     private _midiEventsPlayedFilter: Set<MidiEventType> = new Set<MidiEventType>();
     private _notPlayedSamples: number = 0;
+    private _synthStopping = false;
 
     /**
      * Gets the {@link ISynthOutput} used for playing the generated samples.
@@ -99,7 +100,7 @@ export class AlphaSynth implements IAlphaSynth {
     }
 
     public set playbackSpeed(value: number) {
-        value = SynthHelper.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
+        value = ModelUtils.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
         let oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
         this.timePosition = this.timePosition * (oldSpeed / value);
@@ -183,7 +184,10 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
         });
         this.output.sampleRequest.on(() => {
-            if (this.state == PlayerState.Playing && !this._sequencer.isFinished) {
+            if (
+                this.state == PlayerState.Playing &&
+                (!this._sequencer.isFinished || this._synthesizer.activeVoiceCount > 0)
+            ) {
                 let samples: Float32Array = new Float32Array(
                     SynthConstants.MicroBufferSize * SynthConstants.MicroBufferCount * SynthConstants.AudioChannels
                 );
@@ -254,6 +258,7 @@ export class AlphaSynth implements IAlphaSynth {
 
         Logger.debug('AlphaSynth', 'Starting playback');
         this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
+        this._synthStopping = false;
         this.state = PlayerState.Playing;
         (this.stateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(
             new PlayerStateChangedEventArgs(this.state, false)
@@ -321,9 +326,12 @@ export class AlphaSynth implements IAlphaSynth {
     public resetSoundFonts(): void {
         this.stop();
         this._synthesizer.resetPresets();
+        this._loadedSoundFonts = [];
         this._isSoundFontLoaded = false;
         (this.soundFontLoaded as EventEmitter).trigger();
     }
+
+    private _loadedSoundFonts: Hydra[] = [];
 
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
@@ -333,7 +341,11 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Loading soundfont from bytes');
             let soundFont: Hydra = new Hydra();
             soundFont.load(input);
-            this._synthesizer.loadPresets(soundFont, append);
+            if (!append) {
+                this._loadedSoundFonts = [];
+            }
+            this._loadedSoundFonts.push(soundFont);
+
             this._isSoundFontLoaded = true;
             (this.soundFontLoaded as EventEmitter).trigger();
 
@@ -348,6 +360,13 @@ export class AlphaSynth implements IAlphaSynth {
     private checkReadyForPlayback(): void {
         if (this.isReadyForPlayback) {
             this._synthesizer.setupMetronomeChannel(this.metronomeVolume);
+            const programs = this._sequencer.instrumentPrograms;
+            const percussionKeys = this._sequencer.percussionKeys;
+            let append = false;
+            for (const soundFont of this._loadedSoundFonts) {
+                this._synthesizer.loadPresets(soundFont, programs, percussionKeys, append);
+                append = true;
+            }
             (this.readyForPlayback as EventEmitter).trigger();
         }
     }
@@ -383,6 +402,10 @@ export class AlphaSynth implements IAlphaSynth {
 
     public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
         this._synthesizer.applyTranspositionPitches(transpositionPitches);
+    }
+
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+        this._synthesizer.setChannelTranspositionPitch(channel, semitones);
     }
 
     public setChannelMute(channel: number, mute: boolean): void {
@@ -436,15 +459,22 @@ export class AlphaSynth implements IAlphaSynth {
                 this.output.resetSamples();
                 this.state = PlayerState.Paused;
                 this.stopOneTimeMidi();
+            } else if (this.isLooping) {
+                Logger.debug('AlphaSynth', 'Finished playback (main looping)');
+                (this.finished as EventEmitter).trigger();
+                this.tickPosition = startTick;
+                this._synthStopping = false;
+            } else if (this._synthesizer.activeVoiceCount > 0) {
+                // smooth stop
+                if (!this._synthStopping) {
+                    this._synthesizer.noteOffAll(true);
+                    this._synthStopping = true;
+                }
             } else {
+                this._synthStopping = false;
                 Logger.debug('AlphaSynth', 'Finished playback (main)');
                 (this.finished as EventEmitter).trigger();
-
-                if (this.isLooping) {
-                    this.tickPosition = startTick;
-                } else {
-                    this.stop();
-                }
+                this.stop();
             }
         }
     }
@@ -458,19 +488,25 @@ export class AlphaSynth implements IAlphaSynth {
 
     private updateTimePosition(timePosition: number, isSeek: boolean): void {
         // update the real positions
-        const currentTime: number = timePosition;
+        let currentTime: number = timePosition;
         this._timePosition = currentTime;
-        const currentTick: number = this._sequencer.currentTimePositionToTickPosition(currentTime);
+        let currentTick: number = this._sequencer.currentTimePositionToTickPosition(currentTime);
         this._tickPosition = currentTick;
 
         const endTime: number = this._sequencer.currentEndTime;
         const endTick: number = this._sequencer.currentEndTick;
 
+        // on fade outs we can have some milliseconds longer, ensure we don't report this
+        if (currentTime > endTime) {
+            currentTime = endTime;
+            currentTick = endTick;
+        }
+
         const mode = this._sequencer.isPlayingMain
             ? 'main'
             : this._sequencer.isPlayingCountIn
-                ? 'count-in'
-                : 'one-time';
+            ? 'count-in'
+            : 'one-time';
 
         Logger.debug(
             'AlphaSynth',
@@ -515,4 +551,19 @@ export class AlphaSynth implements IAlphaSynth {
         new EventEmitterOfT<MidiEventsPlayedEventArgs>();
     readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
         new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+
+    /**
+     * @internal
+     */
+    public hasSamplesForProgram(program: number): boolean {
+        return this._synthesizer.hasSamplesForProgram(program);
+    }
+
+    
+    /**
+     * @internal
+     */
+    public hasSamplesForPercussion(key: number): boolean {
+        return this._synthesizer.hasSamplesForPercussion(key);
+    }
 }

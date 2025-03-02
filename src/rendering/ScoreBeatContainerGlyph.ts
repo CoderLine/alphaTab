@@ -25,26 +25,6 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         this._effectSlur = null;
         this._effectEndSlur = null;
         super.doLayout();
-        if (this.beat.isLegatoOrigin) {
-            // only create slur for very first origin of "group"
-            if (!this.beat.previousBeat || !this.beat.previousBeat.isLegatoOrigin) {
-                // tie with end beat
-                let destination: Beat = this.beat.nextBeat!;
-                while (destination.nextBeat && destination.nextBeat.isLegatoDestination) {
-                    destination = destination.nextBeat;
-                }
-                this.addTie(new ScoreLegatoGlyph(this.beat, destination, false));
-            }
-        } else if (this.beat.isLegatoDestination) {
-            // only create slur for last destination of "group"
-            if (!this.beat.isLegatoOrigin) {
-                let origin: Beat = this.beat.previousBeat!;
-                while (origin.previousBeat && origin.previousBeat.isLegatoOrigin) {
-                    origin = origin.previousBeat;
-                }
-                this.addTie(new ScoreLegatoGlyph(origin, this.beat, true));
-            }
-        }
         if (this._bend) {
             this._bend.renderer = this.renderer;
             this._bend.doLayout();
@@ -115,6 +95,27 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             }
             // tslint:disable-next-line: no-unnecessary-type-assertion
             this._bend!.addBends(n);
+        }
+
+        if (this.beat.isLegatoOrigin) {
+            // only create slur for very first origin of "group"
+            if (!this.beat.previousBeat || !this.beat.previousBeat.isLegatoOrigin) {
+                // tie with end beat
+                let destination: Beat = this.beat.nextBeat!;
+                while (destination.nextBeat && destination.nextBeat.isLegatoDestination) {
+                    destination = destination.nextBeat;
+                }
+                this.addTie(new ScoreLegatoGlyph(this.beat, destination, false));
+            }
+        } else if (this.beat.isLegatoDestination) {
+            // only create slur for last destination of "group"
+            if (!this.beat.isLegatoOrigin) {
+                let origin: Beat = this.beat.previousBeat!;
+                while (origin.previousBeat && origin.previousBeat.isLegatoOrigin) {
+                    origin = origin.previousBeat;
+                }
+                this.addTie(new ScoreLegatoGlyph(origin, this.beat, true));
+            }
         }
     }
 }

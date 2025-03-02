@@ -19,52 +19,54 @@ export enum ScrollMode {
 /**
  * This object defines the details on how to generate the vibrato effects.
  * @json
+ * @json_declaration
  */
 export class VibratoPlaybackSettings {
     /**
      * Gets or sets the wavelength of the note-wide vibrato in midi ticks.
      */
-    public noteWideLength: number = 480;
+    public noteWideLength: number = 240;
 
     /**
      * Gets or sets the amplitude for the note-wide vibrato in semitones.
      */
-    public noteWideAmplitude: number = 2;
+    public noteWideAmplitude: number = 1;
 
     /**
      * Gets or sets the wavelength of the note-slight vibrato in midi ticks.
      */
-    public noteSlightLength: number = 480;
+    public noteSlightLength: number = 360;
 
     /**
      * Gets or sets the amplitude for the note-slight vibrato in semitones.
      */
-    public noteSlightAmplitude: number = 2;
+    public noteSlightAmplitude: number = 0.5;
 
     /**
      * Gets or sets the wavelength of the beat-wide vibrato in midi ticks.
      */
-    public beatWideLength: number = 240;
+    public beatWideLength: number = 480;
 
     /**
      * Gets or sets the amplitude for the beat-wide vibrato in semitones.
      */
-    public beatWideAmplitude: number = 3;
+    public beatWideAmplitude: number = 2;
 
     /**
      * Gets or sets the wavelength of the beat-slight vibrato in midi ticks.
      */
-    public beatSlightLength: number = 240;
+    public beatSlightLength: number = 480;
 
     /**
      * Gets or sets the amplitude for the beat-slight vibrato in semitones.
      */
-    public beatSlightAmplitude: number = 3;
+    public beatSlightAmplitude: number = 2;
 }
 
 /**
  * This object defines the details on how to generate the slide effects.
  * @json
+ * @json_declaration
  */
 export class SlidePlaybackSettings {
     /**
@@ -109,6 +111,7 @@ export enum PlayerOutputMode {
 /**
  * The player settings control how the audio playback and UI is behaving.
  * @json
+ * @json_declaration
  */
 export class PlayerSettings {
     /**

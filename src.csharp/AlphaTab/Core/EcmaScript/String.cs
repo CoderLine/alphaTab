@@ -1,10 +1,9 @@
-﻿namespace AlphaTab.Core.EcmaScript
+﻿namespace AlphaTab.Core.EcmaScript;
+
+internal static class String
 {
-    public static class String
+    public static string FromCharCode(double code)
     {
-        public static string FromCharCode(double code)
-        {
-            return "" + (char) (int) code;
-        }
+        return "" + (char) (int) code;
     }
 }

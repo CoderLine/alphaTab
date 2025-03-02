@@ -7,211 +7,210 @@ using AlphaTab.Model;
 using AlphaTab.Rendering;
 using AlphaTab.Rendering.Utils;
 
-namespace AlphaTab.Platform.CSharp
+namespace AlphaTab.Platform.CSharp;
+
+internal class ManagedThreadScoreRenderer : IScoreRenderer
 {
-    internal class ManagedThreadScoreRenderer : IScoreRenderer
+    private readonly Action<Action> _uiInvoke;
+
+    private readonly Thread _workerThread;
+    private readonly BlockingCollection<Action> _workerQueue;
+    private readonly ManualResetEventSlim? _threadStartedEvent;
+    private readonly CancellationTokenSource _workerCancellationToken;
+    private ScoreRenderer _renderer;
+    private double _width;
+
+    public BoundsLookup? BoundsLookup { get; private set; }
+
+    public ManagedThreadScoreRenderer(Settings settings, Action<Action> uiInvoke)
     {
-        private readonly Action<Action> _uiInvoke;
+        _uiInvoke = uiInvoke;
+        _renderer = null!;
+        _threadStartedEvent = new ManualResetEventSlim(false);
+        _workerQueue = new BlockingCollection<Action>();
+        _workerCancellationToken = new CancellationTokenSource();
 
-        private readonly Thread _workerThread;
-        private readonly BlockingCollection<Action> _workerQueue;
-        private readonly ManualResetEventSlim? _threadStartedEvent;
-        private readonly CancellationTokenSource _workerCancellationToken;
-        private ScoreRenderer _renderer;
-        private double _width;
-
-        public BoundsLookup? BoundsLookup { get; private set; }
-
-        public ManagedThreadScoreRenderer(Settings settings, Action<Action> uiInvoke)
+        _workerThread = new Thread(DoWork)
         {
-            _uiInvoke = uiInvoke;
-            _renderer = null!;
-            _threadStartedEvent = new ManualResetEventSlim(false);
-            _workerQueue = new BlockingCollection<Action>();
-            _workerCancellationToken = new CancellationTokenSource();
+            IsBackground = true
+        };
+        _workerThread.Start();
 
-            _workerThread = new Thread(DoWork)
-            {
-                IsBackground = true
-            };
-            _workerThread.Start();
+        _threadStartedEvent.Wait();
 
-            _threadStartedEvent.Wait();
-
-            _workerQueue.Add(() => Initialize(settings));
-            _threadStartedEvent.Dispose();
-            _threadStartedEvent = null;
-        }
+        _workerQueue.Add(() => Initialize(settings));
+        _threadStartedEvent.Dispose();
+        _threadStartedEvent = null;
+    }
 
 
-        private void DoWork()
+    private void DoWork()
+    {
+        _threadStartedEvent.Set();
+        while (_workerQueue.TryTake(out var action, Timeout.Infinite,
+                   _workerCancellationToken.Token))
         {
-            _threadStartedEvent.Set();
-            while (_workerQueue.TryTake(out var action, Timeout.Infinite,
-                       _workerCancellationToken.Token))
+            if (_workerCancellationToken.IsCancellationRequested)
             {
-                if (_workerCancellationToken.IsCancellationRequested)
-                {
-                    break;
-                }
-
-                action();
+                break;
             }
-        }
 
-        private void Initialize(Settings settings)
-        {
-            _renderer = new ScoreRenderer(settings);
-            _renderer.PartialRenderFinished.On(result =>
-                _uiInvoke(() => OnPartialRenderFinished(result)));
-            _renderer.PartialLayoutFinished.On(result =>
-                _uiInvoke(() => OnPartialLayoutFinished(result)));
-            _renderer.RenderFinished.On(result => _uiInvoke(() => OnRenderFinished(result)));
-            _renderer.PostRenderFinished.On(() =>
-                _uiInvoke(() => OnPostFinished(_renderer.BoundsLookup)));
-            _renderer.PreRender.On(resize => _uiInvoke(() => OnPreRender(resize)));
-            _renderer.Error.On(e => _uiInvoke(() => OnError(e)));
+            action();
         }
+    }
 
-        private void OnPostFinished(BoundsLookup boundsLookup)
+    private void Initialize(Settings settings)
+    {
+        _renderer = new ScoreRenderer(settings);
+        _renderer.PartialRenderFinished.On(result =>
+            _uiInvoke(() => OnPartialRenderFinished(result)));
+        _renderer.PartialLayoutFinished.On(result =>
+            _uiInvoke(() => OnPartialLayoutFinished(result)));
+        _renderer.RenderFinished.On(result => _uiInvoke(() => OnRenderFinished(result)));
+        _renderer.PostRenderFinished.On(() =>
+            _uiInvoke(() => OnPostFinished(_renderer.BoundsLookup)));
+        _renderer.PreRender.On(resize => _uiInvoke(() => OnPreRender(resize)));
+        _renderer.Error.On(e => _uiInvoke(() => OnError(e)));
+    }
+
+    private void OnPostFinished(BoundsLookup boundsLookup)
+    {
+        BoundsLookup = boundsLookup;
+        OnPostRenderFinished();
+    }
+
+    public void Destroy()
+    {
+        _workerCancellationToken.Cancel();
+        _workerThread.Join();
+    }
+
+    public void UpdateSettings(Settings settings)
+    {
+        if (CheckAccess())
         {
-            BoundsLookup = boundsLookup;
-            OnPostRenderFinished();
+            _renderer.UpdateSettings(settings);
         }
-
-        public void Destroy()
+        else
         {
-            _workerCancellationToken.Cancel();
-            _workerThread.Join();
+            _workerQueue.Add(() => UpdateSettings(settings));
         }
+    }
 
-        public void UpdateSettings(Settings settings)
+    private bool CheckAccess()
+    {
+        return Thread.CurrentThread == _workerThread;
+    }
+
+    public void Render()
+    {
+        if (CheckAccess())
         {
+            _renderer.Render();
+        }
+        else
+        {
+            _workerQueue.Add(Render);
+        }
+    }
+
+    public void RenderResult(string resultId)
+    {
+        if (CheckAccess())
+        {
+            _renderer.RenderResult(resultId);
+        }
+        else
+        {
+            _workerQueue.Add(() => RenderResult(resultId));
+        }
+    }
+
+    public double Width
+    {
+        get => _width;
+        set
+        {
+            _width = value;
             if (CheckAccess())
             {
-                _renderer.UpdateSettings(settings);
+                _renderer.Width = value;
             }
             else
             {
-                _workerQueue.Add(() => UpdateSettings(settings));
+                _workerQueue.Add(() => _renderer.Width = value);
             }
         }
+    }
 
-        private bool CheckAccess()
+    public void ResizeRender()
+    {
+        if (CheckAccess())
         {
-            return Thread.CurrentThread == _workerThread;
+            _renderer.ResizeRender();
         }
-
-        public void Render()
+        else
         {
-            if (CheckAccess())
-            {
-                _renderer.Render();
-            }
-            else
-            {
-                _workerQueue.Add(Render);
-            }
+            _workerQueue.Add(ResizeRender);
         }
+    }
 
-        public void RenderResult(string resultId)
+    public void RenderScore(Score? score, IList<double>? trackIndexes)
+    {
+        if (CheckAccess())
         {
-            if (CheckAccess())
-            {
-                _renderer.RenderResult(resultId);
-            }
-            else
-            {
-                _workerQueue.Add(() => RenderResult(resultId));
-            }
+            _renderer.RenderScore(score, trackIndexes);
         }
-
-        public double Width
+        else
         {
-            get => _width;
-            set
-            {
-                _width = value;
-                if (CheckAccess())
-                {
-                    _renderer.Width = value;
-                }
-                else
-                {
-                    _workerQueue.Add(() => _renderer.Width = value);
-                }
-            }
+            _workerQueue.Add(() =>
+                RenderScore(score,
+                    trackIndexes));
         }
+    }
 
-        public void ResizeRender()
-        {
-            if (CheckAccess())
-            {
-                _renderer.ResizeRender();
-            }
-            else
-            {
-                _workerQueue.Add(ResizeRender);
-            }
-        }
+    public IEventEmitterOfT<bool> PreRender { get; } = new EventEmitterOfT<bool>();
 
-        public void RenderScore(Score? score, IList<double>? trackIndexes)
-        {
-            if (CheckAccess())
-            {
-                _renderer.RenderScore(score, trackIndexes);
-            }
-            else
-            {
-                _workerQueue.Add(() =>
-                    RenderScore(score,
-                        trackIndexes));
-            }
-        }
+    protected virtual void OnPreRender(bool isResize)
+    {
+        ((EventEmitterOfT<bool>)PreRender).Trigger(isResize);
+    }
 
-        public IEventEmitterOfT<bool> PreRender { get; } = new EventEmitterOfT<bool>();
+    public IEventEmitterOfT<RenderFinishedEventArgs> PartialRenderFinished { get; } =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
 
-        protected virtual void OnPreRender(bool isResize)
-        {
-            ((EventEmitterOfT<bool>)PreRender).Trigger(isResize);
-        }
+    protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs obj)
+    {
+        ((EventEmitterOfT<RenderFinishedEventArgs>)PartialRenderFinished).Trigger(obj);
+    }
 
-        public IEventEmitterOfT<RenderFinishedEventArgs> PartialRenderFinished { get; } =
-            new EventEmitterOfT<RenderFinishedEventArgs>();
+    public IEventEmitterOfT<RenderFinishedEventArgs> PartialLayoutFinished { get; } =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
 
-        protected virtual void OnPartialRenderFinished(RenderFinishedEventArgs obj)
-        {
-            ((EventEmitterOfT<RenderFinishedEventArgs>)PartialRenderFinished).Trigger(obj);
-        }
+    protected virtual void OnPartialLayoutFinished(RenderFinishedEventArgs obj)
+    {
+        ((EventEmitterOfT<RenderFinishedEventArgs>)PartialLayoutFinished).Trigger(obj);
+    }
 
-        public IEventEmitterOfT<RenderFinishedEventArgs> PartialLayoutFinished { get; } =
-            new EventEmitterOfT<RenderFinishedEventArgs>();
+    public IEventEmitterOfT<RenderFinishedEventArgs> RenderFinished { get; } =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
 
-        protected virtual void OnPartialLayoutFinished(RenderFinishedEventArgs obj)
-        {
-            ((EventEmitterOfT<RenderFinishedEventArgs>)PartialLayoutFinished).Trigger(obj);
-        }
+    protected virtual void OnRenderFinished(RenderFinishedEventArgs obj)
+    {
+        ((EventEmitterOfT<RenderFinishedEventArgs>)RenderFinished).Trigger(obj);
+    }
 
-        public IEventEmitterOfT<RenderFinishedEventArgs> RenderFinished { get; } =
-            new EventEmitterOfT<RenderFinishedEventArgs>();
+    public IEventEmitterOfT<Error> Error { get; } = new EventEmitterOfT<Error>();
 
-        protected virtual void OnRenderFinished(RenderFinishedEventArgs obj)
-        {
-            ((EventEmitterOfT<RenderFinishedEventArgs>)RenderFinished).Trigger(obj);
-        }
+    protected virtual void OnError(Error details)
+    {
+        ((EventEmitterOfT<Error>)Error).Trigger(details);
+    }
 
-        public IEventEmitterOfT<Error> Error { get; } = new EventEmitterOfT<Error>();
+    public IEventEmitter PostRenderFinished { get; } = new EventEmitter();
 
-        protected virtual void OnError(Error details)
-        {
-            ((EventEmitterOfT<Error>)Error).Trigger(details);
-        }
-
-        public IEventEmitter PostRenderFinished { get; } = new EventEmitter();
-
-        protected virtual void OnPostRenderFinished()
-        {
-            ((EventEmitter)PostRenderFinished).Trigger();
-        }
+    protected virtual void OnPostRenderFinished()
+    {
+        ((EventEmitter)PostRenderFinished).Trigger();
     }
 }

@@ -13,5 +13,9 @@ export enum AccentuationType {
     /**
      * Heavy accentuation
      */
-    Heavy
+    Heavy,
+    /**
+     * Tenuto accentuation
+     */
+    Tenuto
 }

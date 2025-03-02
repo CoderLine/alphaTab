@@ -77,7 +77,9 @@ export enum SyntaxKind {
     ToDoExpression,
     TypeOfExpression,
 
-    Attribute
+    Attribute,
+
+    SpreadExpression
 }
 
 export interface Node {
@@ -224,13 +226,13 @@ export interface ParameterDeclaration extends NamedElement, Node, DocumentedElem
     type?: TypeNode;
     initializer?: Expression;
     params: boolean;
+    isOptional: boolean;
 }
 
 // Type System
 
 export interface TypeNode extends Node {
     isNullable?: boolean;
-    isOptional?: boolean;
 }
 
 export interface UnresolvedTypeNode extends TypeNode {
@@ -270,7 +272,8 @@ export enum PrimitiveType {
     Void,
     Object,
     Dynamic,
-    Var
+    Var,
+    Long
 }
 
 export interface PrimitiveTypeNode extends TypeNode {
@@ -279,7 +282,7 @@ export interface PrimitiveTypeNode extends TypeNode {
 
 // Expressions
 
-export interface Expression extends Node { }
+export interface Expression extends Node {}
 
 export interface PrefixUnaryExpression extends Node {
     operand: Expression;
@@ -291,13 +294,13 @@ export interface PostfixUnaryExpression extends Node {
     operator: string;
 }
 
-export interface NullLiteral extends Node { }
+export interface NullLiteral extends Node {}
 
-export interface BooleanLiteral extends Node { }
+export interface BooleanLiteral extends Node {}
 
-export interface ThisLiteral extends Node { }
+export interface ThisLiteral extends Node {}
 
-export interface BaseLiteralExpression extends Node { }
+export interface BaseLiteralExpression extends Node {}
 
 export interface StringLiteral extends Node {
     text: string;
@@ -338,6 +341,9 @@ export interface IsExpression extends Node {
     newName?: string;
 }
 export interface ParenthesizedExpression extends Node {
+    expression: Expression;
+}
+export interface SpreadExpression extends Node {
     expression: Expression;
 }
 export interface DefaultExpression extends Node {
@@ -401,17 +407,17 @@ export interface Identifier extends Expression {
     text: string;
 }
 
-export interface ToDoExpression extends Node { }
+export interface ToDoExpression extends Node {}
 
 // Statements
 
-export interface Statement extends Node { }
+export interface Statement extends Node {}
 
 export interface Block extends Statement {
     statements: Statement[];
 }
 
-export interface EmptyStatement extends Statement { }
+export interface EmptyStatement extends Statement {}
 
 export enum VariableStatementKind {
     Normal,
@@ -474,9 +480,9 @@ export interface ForEachStatement extends Statement {
     statement: Statement;
 }
 
-export interface BreakStatement extends Statement { }
+export interface BreakStatement extends Statement {}
 
-export interface ContinueStatement extends Statement { }
+export interface ContinueStatement extends Statement {}
 
 export interface ReturnStatement extends Statement {
     expression?: Expression;
@@ -512,80 +518,230 @@ export interface CatchClause extends Node {
 }
 
 // Node Tests
-export function isNode(node: any): node is Node { return typeof (node) === 'object' && 'nodeType' in node; }
-export function isSourceFile(node: Node): node is SourceFile { return node.nodeType === SyntaxKind.SourceFile; }
-export function isUsingDeclaration(node: Node): node is UsingDeclaration { return node.nodeType === SyntaxKind.UsingDeclaration; }
-export function isNamespaceDeclaration(node: Node): node is NamespaceDeclaration { return node.nodeType === SyntaxKind.NamespaceDeclaration; }
-export function isClassDeclaration(node: Node): node is ClassDeclaration { return node.nodeType === SyntaxKind.ClassDeclaration; }
-export function isEnumDeclaration(node: Node): node is EnumDeclaration { return node.nodeType === SyntaxKind.EnumDeclaration; }
-export function isInterfaceDeclaration(node: Node): node is InterfaceDeclaration { return node.nodeType === SyntaxKind.InterfaceDeclaration; }
-export function isTypeParameterDeclaration(node: Node): node is TypeParameterDeclaration { return node.nodeType === SyntaxKind.TypeParameterDeclaration; }
-export function isMethodDeclaration(node: Node): node is MethodDeclaration { return node.nodeType === SyntaxKind.MethodDeclaration; }
-export function isConstructorDeclaration(node: Node): node is ConstructorDeclaration { return node.nodeType === SyntaxKind.ConstructorDeclaration; }
-export function isFieldDeclaration(node: Node): node is FieldDeclaration { return node.nodeType === SyntaxKind.FieldDeclaration; }
-export function isPropertyDeclaration(node: Node): node is PropertyDeclaration { return node.nodeType === SyntaxKind.PropertyDeclaration; }
-export function isPropertyAccessorDeclaration(node: Node): node is PropertyAccessorDeclaration { return node.nodeType === SyntaxKind.PropertyAccessorDeclaration; }
-export function isParameterDeclaration(node: Node): node is ParameterDeclaration { return node.nodeType === SyntaxKind.ParameterDeclaration; }
-export function isUnresolvedTypeNode(node: Node): node is UnresolvedTypeNode { return node.nodeType === SyntaxKind.UnresolvedTypeNode; }
-export function isTypeReference(node: Node): node is TypeReference { return node.nodeType === SyntaxKind.TypeReference; }
-export function isFunctionTypeNode(node: Node): node is FunctionTypeNode { return node.nodeType === SyntaxKind.FunctionTypeNode; }
-export function isPrimitiveTypeNode(node: Node): node is PrimitiveTypeNode { return node.nodeType === SyntaxKind.PrimitiveTypeNode; }
-export function isEnumMember(node: Node): node is EnumMember { return node.nodeType === SyntaxKind.EnumMember; }
-export function isArrayTypeNode(node: Node): node is ArrayTypeNode { return node.nodeType === SyntaxKind.ArrayTypeNode; }
-export function isMapTypeNode(node: Node): node is MapTypeNode { return node.nodeType === SyntaxKind.MapTypeNode; }
+export function isNode(node: any): node is Node {
+    return typeof node === 'object' && 'nodeType' in node;
+}
+export function isSourceFile(node: Node): node is SourceFile {
+    return node.nodeType === SyntaxKind.SourceFile;
+}
+export function isUsingDeclaration(node: Node): node is UsingDeclaration {
+    return node.nodeType === SyntaxKind.UsingDeclaration;
+}
+export function isNamespaceDeclaration(node: Node): node is NamespaceDeclaration {
+    return node.nodeType === SyntaxKind.NamespaceDeclaration;
+}
+export function isClassDeclaration(node: Node): node is ClassDeclaration {
+    return node.nodeType === SyntaxKind.ClassDeclaration;
+}
+export function isEnumDeclaration(node: Node): node is EnumDeclaration {
+    return node.nodeType === SyntaxKind.EnumDeclaration;
+}
+export function isInterfaceDeclaration(node: Node): node is InterfaceDeclaration {
+    return node.nodeType === SyntaxKind.InterfaceDeclaration;
+}
+export function isTypeParameterDeclaration(node: Node): node is TypeParameterDeclaration {
+    return node.nodeType === SyntaxKind.TypeParameterDeclaration;
+}
+export function isMethodDeclaration(node: Node): node is MethodDeclaration {
+    return node.nodeType === SyntaxKind.MethodDeclaration;
+}
+export function isConstructorDeclaration(node: Node): node is ConstructorDeclaration {
+    return node.nodeType === SyntaxKind.ConstructorDeclaration;
+}
+export function isFieldDeclaration(node: Node): node is FieldDeclaration {
+    return node.nodeType === SyntaxKind.FieldDeclaration;
+}
+export function isPropertyDeclaration(node: Node): node is PropertyDeclaration {
+    return node.nodeType === SyntaxKind.PropertyDeclaration;
+}
+export function isPropertyAccessorDeclaration(node: Node): node is PropertyAccessorDeclaration {
+    return node.nodeType === SyntaxKind.PropertyAccessorDeclaration;
+}
+export function isParameterDeclaration(node: Node): node is ParameterDeclaration {
+    return node.nodeType === SyntaxKind.ParameterDeclaration;
+}
+export function isUnresolvedTypeNode(node: Node): node is UnresolvedTypeNode {
+    return node.nodeType === SyntaxKind.UnresolvedTypeNode;
+}
+export function isTypeReference(node: Node): node is TypeReference {
+    return node.nodeType === SyntaxKind.TypeReference;
+}
+export function isFunctionTypeNode(node: Node): node is FunctionTypeNode {
+    return node.nodeType === SyntaxKind.FunctionTypeNode;
+}
+export function isPrimitiveTypeNode(node: Node): node is PrimitiveTypeNode {
+    return node.nodeType === SyntaxKind.PrimitiveTypeNode;
+}
+export function isEnumMember(node: Node): node is EnumMember {
+    return node.nodeType === SyntaxKind.EnumMember;
+}
+export function isArrayTypeNode(node: Node): node is ArrayTypeNode {
+    return node.nodeType === SyntaxKind.ArrayTypeNode;
+}
+export function isMapTypeNode(node: Node): node is MapTypeNode {
+    return node.nodeType === SyntaxKind.MapTypeNode;
+}
 
-export function isBlock(node: Node): node is Block { return node.nodeType === SyntaxKind.Block; }
-export function isEmptyStatement(node: Node): node is EmptyStatement { return node.nodeType === SyntaxKind.EmptyStatement; }
-export function isVariableStatement(node: Node): node is VariableStatement { return node.nodeType === SyntaxKind.VariableStatement; }
-export function isExpressionStatement(node: Node): node is ExpressionStatement { return node.nodeType === SyntaxKind.ExpressionStatement; }
-export function isIfStatement(node: Node): node is IfStatement { return node.nodeType === SyntaxKind.IfStatement; }
-export function isDoStatement(node: Node): node is DoStatement { return node.nodeType === SyntaxKind.DoStatement; }
-export function isWhileStatement(node: Node): node is WhileStatement { return node.nodeType === SyntaxKind.WhileStatement; }
-export function isForStatement(node: Node): node is ForStatement { return node.nodeType === SyntaxKind.ForStatement; }
-export function isForEachStatement(node: Node): node is ForEachStatement { return node.nodeType === SyntaxKind.ForEachStatement; }
-export function isBreakStatement(node: Node): node is BreakStatement { return node.nodeType === SyntaxKind.BreakStatement; }
-export function isContinueStatement(node: Node): node is ContinueStatement { return node.nodeType === SyntaxKind.ContinueStatement; }
-export function isReturnStatement(node: Node): node is ReturnStatement { return node.nodeType === SyntaxKind.ReturnStatement; }
-export function isSwitchStatement(node: Node): node is SwitchStatement { return node.nodeType === SyntaxKind.SwitchStatement; }
-export function isThrowStatement(node: Node): node is ThrowStatement { return node.nodeType === SyntaxKind.ThrowStatement; }
-export function isTryStatement(node: Node): node is TryStatement { return node.nodeType === SyntaxKind.TryStatement; }
+export function isBlock(node: Node): node is Block {
+    return node.nodeType === SyntaxKind.Block;
+}
+export function isEmptyStatement(node: Node): node is EmptyStatement {
+    return node.nodeType === SyntaxKind.EmptyStatement;
+}
+export function isVariableStatement(node: Node): node is VariableStatement {
+    return node.nodeType === SyntaxKind.VariableStatement;
+}
+export function isExpressionStatement(node: Node): node is ExpressionStatement {
+    return node.nodeType === SyntaxKind.ExpressionStatement;
+}
+export function isIfStatement(node: Node): node is IfStatement {
+    return node.nodeType === SyntaxKind.IfStatement;
+}
+export function isDoStatement(node: Node): node is DoStatement {
+    return node.nodeType === SyntaxKind.DoStatement;
+}
+export function isWhileStatement(node: Node): node is WhileStatement {
+    return node.nodeType === SyntaxKind.WhileStatement;
+}
+export function isForStatement(node: Node): node is ForStatement {
+    return node.nodeType === SyntaxKind.ForStatement;
+}
+export function isForEachStatement(node: Node): node is ForEachStatement {
+    return node.nodeType === SyntaxKind.ForEachStatement;
+}
+export function isBreakStatement(node: Node): node is BreakStatement {
+    return node.nodeType === SyntaxKind.BreakStatement;
+}
+export function isContinueStatement(node: Node): node is ContinueStatement {
+    return node.nodeType === SyntaxKind.ContinueStatement;
+}
+export function isReturnStatement(node: Node): node is ReturnStatement {
+    return node.nodeType === SyntaxKind.ReturnStatement;
+}
+export function isSwitchStatement(node: Node): node is SwitchStatement {
+    return node.nodeType === SyntaxKind.SwitchStatement;
+}
+export function isThrowStatement(node: Node): node is ThrowStatement {
+    return node.nodeType === SyntaxKind.ThrowStatement;
+}
+export function isTryStatement(node: Node): node is TryStatement {
+    return node.nodeType === SyntaxKind.TryStatement;
+}
 
-export function isVariableDeclarationList(node: Node): node is VariableDeclarationList { return node.nodeType === SyntaxKind.VariableDeclarationList; }
-export function isVariableDeclaration(node: Node): node is VariableDeclaration { return node.nodeType === SyntaxKind.VariableDeclaration; }
-export function isDeconstructDeclaration(node: Node): node is DeconstructDeclaration { return node.nodeType === SyntaxKind.DeconstructDeclaration; }
-export function isCaseClause(node: Node): node is CaseClause { return node.nodeType === SyntaxKind.CaseClause; }
-export function isDefaultClause(node: Node): node is DefaultClause { return node.nodeType === SyntaxKind.DefaultClause; }
-export function isCatchClause(node: Node): node is CatchClause { return node.nodeType === SyntaxKind.CatchClause; }
+export function isVariableDeclarationList(node: Node): node is VariableDeclarationList {
+    return node.nodeType === SyntaxKind.VariableDeclarationList;
+}
+export function isVariableDeclaration(node: Node): node is VariableDeclaration {
+    return node.nodeType === SyntaxKind.VariableDeclaration;
+}
+export function isDeconstructDeclaration(node: Node): node is DeconstructDeclaration {
+    return node.nodeType === SyntaxKind.DeconstructDeclaration;
+}
+export function isCaseClause(node: Node): node is CaseClause {
+    return node.nodeType === SyntaxKind.CaseClause;
+}
+export function isDefaultClause(node: Node): node is DefaultClause {
+    return node.nodeType === SyntaxKind.DefaultClause;
+}
+export function isCatchClause(node: Node): node is CatchClause {
+    return node.nodeType === SyntaxKind.CatchClause;
+}
 
-export function isPrefixUnaryExpression(node: Node): node is PrefixUnaryExpression { return node.nodeType === SyntaxKind.PrefixUnaryExpression; }
-export function isPostfixUnaryExpression(node: Node): node is PostfixUnaryExpression { return node.nodeType === SyntaxKind.PostfixUnaryExpression; }
-export function isNullLiteral(node: Node): node is NullLiteral { return node.nodeType === SyntaxKind.NullLiteral; }
-export function isTrueLiteral(node: Node): node is BooleanLiteral { return node.nodeType === SyntaxKind.TrueLiteral; }
-export function isFalseLiteral(node: Node): node is BooleanLiteral { return node.nodeType === SyntaxKind.FalseLiteral; }
-export function isThisLiteral(node: Node): node is ThisLiteral { return node.nodeType === SyntaxKind.ThisLiteral; }
-export function isBaseLiteralExpression(node: Node): node is BaseLiteralExpression { return node.nodeType === SyntaxKind.BaseLiteralExpression; }
-export function isStringLiteral(node: Node): node is StringLiteral { return node.nodeType === SyntaxKind.StringLiteral; }
-export function isAwaitExpression(node: Node): node is AwaitExpression { return node.nodeType === SyntaxKind.AwaitExpression; }
-export function isBinaryExpression(node: Node): node is BinaryExpression { return node.nodeType === SyntaxKind.BinaryExpression; }
-export function isConditionalExpression(node: Node): node is ConditionalExpression { return node.nodeType === SyntaxKind.ConditionalExpression; }
-export function isLambdaExpression(node: Node): node is LambdaExpression { return node.nodeType === SyntaxKind.LambdaExpression; }
-export function isNumericLiteral(node: Node): node is NumericLiteral { return node.nodeType === SyntaxKind.NumericLiteral; }
-export function isStringTemplateExpression(node: Node): node is StringTemplateExpression { return node.nodeType === SyntaxKind.StringTemplateExpression; }
-export function isIsExpression(node: Node): node is IsExpression { return node.nodeType === SyntaxKind.IsExpression; }
-export function isParenthesizedExpression(node: Node): node is ParenthesizedExpression { return node.nodeType === SyntaxKind.ParenthesizedExpression; }
-export function isArrayCreationExpression(node: Node): node is ArrayCreationExpression { return node.nodeType === SyntaxKind.ArrayCreationExpression; }
-export function isMemberAccessExpression(node: Node): node is MemberAccessExpression { return node.nodeType === SyntaxKind.MemberAccessExpression; }
-export function isAnonymousObjectCreationExpression(node: Node): node is AnonymousObjectCreationExpression { return node.nodeType === SyntaxKind.AnonymousObjectCreationExpression; }
-export function isAnonymousObjectProperty(node: Node): node is AnonymousObjectProperty { return node.nodeType === SyntaxKind.AnonymousObjectProperty; }
-export function isElementAccessExpression(node: Node): node is ElementAccessExpression { return node.nodeType === SyntaxKind.ElementAccessExpression; }
-export function isInvocationExpression(node: Node): node is InvocationExpression { return node.nodeType === SyntaxKind.InvocationExpression; }
-export function isNewExpression(node: Node): node is NewExpression { return node.nodeType === SyntaxKind.NewExpression; }
-export function isCastExpression(node: Node): node is CastExpression { return node.nodeType === SyntaxKind.CastExpression; }
-export function isNonNullExpression(node: Node): node is NonNullExpression { return node.nodeType === SyntaxKind.NonNullExpression; }
-export function isNullSafeExpression(node: Node): node is NullSafeExpression { return node.nodeType === SyntaxKind.NullSafeExpression; }
-export function isIdentifier(node: Node): node is Identifier { return node.nodeType === SyntaxKind.Identifier; }
-export function isDefaultExpression(node: Node): node is DefaultExpression { return node.nodeType === SyntaxKind.DefaultExpression; }
-export function isToDoExpression(node: Node): node is ToDoExpression { return node.nodeType === SyntaxKind.ToDoExpression; }
-export function isTypeOfExpression(node: Node): node is TypeOfExpression { return node.nodeType === SyntaxKind.TypeOfExpression; }
+export function isPrefixUnaryExpression(node: Node): node is PrefixUnaryExpression {
+    return node.nodeType === SyntaxKind.PrefixUnaryExpression;
+}
+export function isPostfixUnaryExpression(node: Node): node is PostfixUnaryExpression {
+    return node.nodeType === SyntaxKind.PostfixUnaryExpression;
+}
+export function isNullLiteral(node: Node): node is NullLiteral {
+    return node.nodeType === SyntaxKind.NullLiteral;
+}
+export function isTrueLiteral(node: Node): node is BooleanLiteral {
+    return node.nodeType === SyntaxKind.TrueLiteral;
+}
+export function isFalseLiteral(node: Node): node is BooleanLiteral {
+    return node.nodeType === SyntaxKind.FalseLiteral;
+}
+export function isThisLiteral(node: Node): node is ThisLiteral {
+    return node.nodeType === SyntaxKind.ThisLiteral;
+}
+export function isBaseLiteralExpression(node: Node): node is BaseLiteralExpression {
+    return node.nodeType === SyntaxKind.BaseLiteralExpression;
+}
+export function isStringLiteral(node: Node): node is StringLiteral {
+    return node.nodeType === SyntaxKind.StringLiteral;
+}
+export function isAwaitExpression(node: Node): node is AwaitExpression {
+    return node.nodeType === SyntaxKind.AwaitExpression;
+}
+export function isBinaryExpression(node: Node): node is BinaryExpression {
+    return node.nodeType === SyntaxKind.BinaryExpression;
+}
+export function isConditionalExpression(node: Node): node is ConditionalExpression {
+    return node.nodeType === SyntaxKind.ConditionalExpression;
+}
+export function isLambdaExpression(node: Node): node is LambdaExpression {
+    return node.nodeType === SyntaxKind.LambdaExpression;
+}
+export function isNumericLiteral(node: Node): node is NumericLiteral {
+    return node.nodeType === SyntaxKind.NumericLiteral;
+}
+export function isStringTemplateExpression(node: Node): node is StringTemplateExpression {
+    return node.nodeType === SyntaxKind.StringTemplateExpression;
+}
+export function isIsExpression(node: Node): node is IsExpression {
+    return node.nodeType === SyntaxKind.IsExpression;
+}
+export function isParenthesizedExpression(node: Node): node is ParenthesizedExpression {
+    return node.nodeType === SyntaxKind.ParenthesizedExpression;
+}
+export function isArrayCreationExpression(node: Node): node is ArrayCreationExpression {
+    return node.nodeType === SyntaxKind.ArrayCreationExpression;
+}
+export function isMemberAccessExpression(node: Node): node is MemberAccessExpression {
+    return node.nodeType === SyntaxKind.MemberAccessExpression;
+}
+export function isAnonymousObjectCreationExpression(node: Node): node is AnonymousObjectCreationExpression {
+    return node.nodeType === SyntaxKind.AnonymousObjectCreationExpression;
+}
+export function isAnonymousObjectProperty(node: Node): node is AnonymousObjectProperty {
+    return node.nodeType === SyntaxKind.AnonymousObjectProperty;
+}
+export function isElementAccessExpression(node: Node): node is ElementAccessExpression {
+    return node.nodeType === SyntaxKind.ElementAccessExpression;
+}
+export function isInvocationExpression(node: Node): node is InvocationExpression {
+    return node.nodeType === SyntaxKind.InvocationExpression;
+}
+export function isNewExpression(node: Node): node is NewExpression {
+    return node.nodeType === SyntaxKind.NewExpression;
+}
+export function isCastExpression(node: Node): node is CastExpression {
+    return node.nodeType === SyntaxKind.CastExpression;
+}
+export function isNonNullExpression(node: Node): node is NonNullExpression {
+    return node.nodeType === SyntaxKind.NonNullExpression;
+}
+export function isNullSafeExpression(node: Node): node is NullSafeExpression {
+    return node.nodeType === SyntaxKind.NullSafeExpression;
+}
+export function isIdentifier(node: Node): node is Identifier {
+    return node.nodeType === SyntaxKind.Identifier;
+}
+export function isDefaultExpression(node: Node): node is DefaultExpression {
+    return node.nodeType === SyntaxKind.DefaultExpression;
+}
+export function isToDoExpression(node: Node): node is ToDoExpression {
+    return node.nodeType === SyntaxKind.ToDoExpression;
+}
+export function isTypeOfExpression(node: Node): node is TypeOfExpression {
+    return node.nodeType === SyntaxKind.TypeOfExpression;
+}
 
-export function isAttribute(node: Node): node is Attribute { return node.nodeType === SyntaxKind.Attribute; }
+export function isAttribute(node: Node): node is Attribute {
+    return node.nodeType === SyntaxKind.Attribute;
+}
+
+export function isSpreadExpression(node: Node): node is SpreadExpression {
+    return node.nodeType === SyntaxKind.SpreadExpression;
+}

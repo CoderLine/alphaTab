@@ -5,7 +5,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { RenderingResources } from '@src/RenderingResources';
 
 export class ChordDiagramGlyph extends EffectGlyph {
-    private static readonly Padding: number = 5;
+    private static readonly Padding: number[] = [5, 2];
     private static readonly Frets: number = 5;
     private static readonly CircleRadius: number = 2.5;
     private static readonly StringSpacing: number = 10;
@@ -23,34 +23,33 @@ export class ChordDiagramGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const scale = this.scale;
         let res: RenderingResources = this.renderer.resources;
-        this._textRow = res.effectFont.size * 1.5 * scale;
-        this._fretRow = res.effectFont.size * 1.5 * scale;
+        this._textRow = res.effectFont.size * 1.5;
+        this._fretRow = res.effectFont.size * 1.5;
         if (this._chord.firstFret > 1) {
-            this._firstFretSpacing = ChordDiagramGlyph.FretSpacing * scale;
+            this._firstFretSpacing = ChordDiagramGlyph.FretSpacing;
         } else {
             this._firstFretSpacing = 0;
         }
         this.height =
             this._textRow +
             this._fretRow +
-            (ChordDiagramGlyph.Frets - 1) * ChordDiagramGlyph.FretSpacing * scale +
-            2 * ChordDiagramGlyph.Padding * scale;
+            ChordDiagramGlyph.Frets * ChordDiagramGlyph.FretSpacing +
+            2 * ChordDiagramGlyph.Padding[1];
         this.width =
             this._firstFretSpacing +
-            (this._chord.staff.tuning.length - 1) * ChordDiagramGlyph.StringSpacing * scale +
-            2 * ChordDiagramGlyph.Padding * scale;
+            (this._chord.staff.tuning.length - 1) * ChordDiagramGlyph.StringSpacing +
+            2 * ChordDiagramGlyph.Padding[0];
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        cx += this.x + ChordDiagramGlyph.Padding * this.scale + this._firstFretSpacing;
+        cx += this.x + ChordDiagramGlyph.Padding[0] + this._firstFretSpacing;
         cy += this.y;
-        let w: number = this.width - 2 * ChordDiagramGlyph.Padding * this.scale + this.scale - this._firstFretSpacing;
-        let stringSpacing: number = ChordDiagramGlyph.StringSpacing * this.scale;
-        let fretSpacing: number = ChordDiagramGlyph.FretSpacing * this.scale;
+        let stringSpacing: number = ChordDiagramGlyph.StringSpacing;
+        let fretSpacing: number = ChordDiagramGlyph.FretSpacing;
         let res: RenderingResources = this.renderer.resources;
-        let circleRadius: number = ChordDiagramGlyph.CircleRadius * this.scale;
+        let circleRadius: number = ChordDiagramGlyph.CircleRadius;
+        let w: number = this.width - 2 * ChordDiagramGlyph.Padding[0] - this._firstFretSpacing;
 
         let align: TextAlign = canvas.textAlign;
         let baseline: TextBaseline = canvas.textBaseline;
@@ -58,11 +57,10 @@ export class ChordDiagramGlyph extends EffectGlyph {
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Top;
         if (this._chord.showName) {
-            canvas.fillText(this._chord.name, cx + this.width / 2, cy + res.effectFont.size / 2);
+            canvas.fillText(this._chord.name, cx + w / 2, cy + res.effectFont.size / 2);
         }
 
         cy += this._textRow;
-        cx += stringSpacing / 2;
         canvas.font = res.fretboardNumberFont;
         canvas.textBaseline = TextBaseline.Middle;
         for (let i: number = 0; i < this._chord.staff.tuning.length; i++) {
@@ -70,9 +68,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
             let y: number = cy + this._fretRow / 2;
             let fret: number = this._chord.strings[this._chord.staff.tuning.length - i - 1];
             if (fret < 0) {
-                canvas.fillMusicFontSymbol(x, y, this.scale, MusicFontSymbol.FretboardX, true);
+                canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardX, true);
             } else if (fret === 0) {
-                canvas.fillMusicFontSymbol(x, y, this.scale, MusicFontSymbol.FretboardO, true);
+                canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardO, true);
             } else {
                 fret -= this._chord.firstFret - 1;
                 canvas.fillText(fret.toString(), x, y);
@@ -82,7 +80,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
         cy += this._fretRow;
         for (let i: number = 0; i < this._chord.staff.tuning.length; i++) {
             let x: number = cx + i * stringSpacing;
-            canvas.fillRect(x, cy, 1, fretSpacing * ChordDiagramGlyph.Frets + this.scale);
+            canvas.fillRect(x, cy, 1, fretSpacing * ChordDiagramGlyph.Frets + 1);
         }
 
         if (this._chord.firstFret > 1) {
@@ -90,10 +88,10 @@ export class ChordDiagramGlyph extends EffectGlyph {
             canvas.fillText(this._chord.firstFret.toString(), cx - this._firstFretSpacing, cy + fretSpacing / 2);
         }
 
-        canvas.fillRect(cx, cy - this.scale, w, 2 * this.scale);
+        canvas.fillRect(cx, cy - 1, w, 2);
         for (let i: number = 0; i <= ChordDiagramGlyph.Frets; i++) {
             let y: number = cy + i * fretSpacing;
-            canvas.fillRect(cx, y, w, this.scale);
+            canvas.fillRect(cx, y, w, 1);
         }
 
         let barreLookup = new Map<number, number[]>();
@@ -115,14 +113,14 @@ export class ChordDiagramGlyph extends EffectGlyph {
                         info[1] = guitarString;
                     }
                 }
-                let y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5 * this.scale;
+                let y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
                 let x: number = cx + (this._chord.strings.length - guitarString - 1) * stringSpacing;
                 canvas.fillCircle(x, y, circleRadius);
             }
         }
 
-        for(const [fret, strings] of barreLookup) {
-            let y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5 * this.scale;
+        for (const [fret, strings] of barreLookup) {
+            let y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
             let xLeft: number = cx + (this._chord.strings.length - strings[1] - 1) * stringSpacing;
             let xRight: number = cx + (this._chord.strings.length - strings[0] - 1) * stringSpacing;
             canvas.fillRect(xLeft, y - circleRadius, xRight - xLeft, circleRadius * 2);

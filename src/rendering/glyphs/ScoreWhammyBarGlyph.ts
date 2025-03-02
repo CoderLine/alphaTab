@@ -58,8 +58,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         let res: RenderingResources = this.renderer.resources;
                         (this.renderer as ScoreBarRenderer).simpleWhammyOverflow =
                             res.tablatureFont.size * 1.5 +
-                            ScoreWhammyBarGlyph.SimpleDipHeight * this.scale +
-                            ScoreWhammyBarGlyph.SimpleDipPadding * this.scale;
+                            ScoreWhammyBarGlyph.SimpleDipHeight +
+                            ScoreWhammyBarGlyph.SimpleDipPadding;
                     } else {
                         let middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         middleGlyphs.renderer = this.renderer;
@@ -133,14 +133,14 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             } else {
                 endX += startNoteRenderer.getBeatX(beat, BeatXPosition.EndBeat);
             }
-            endX -= 8 * this.scale;
+            endX -= 8;
             let slurText: string = beat.whammyStyle === BendStyle.Gradual && i === 0 ? 'grad.' : '';
             let endNoteRenderer: ScoreBarRenderer | null = null;
             if (note.isTieOrigin) {
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                     this.renderer.staff.staveId,
                     note.tieDestination!.beat.voice.bar
-                ) as ScoreBarRenderer;
+                ) as ScoreBarRenderer | null;
                 if (endNoteRenderer && endNoteRenderer.staff === startNoteRenderer.staff) {
                     endX =
                         cx +
@@ -150,7 +150,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     endNoteRenderer = null;
                 }
             }
-            let heightOffset: number = NoteHeadGlyph.NoteHeadHeight * this.scale * NoteHeadGlyph.GraceScale * 0.5;
+            let heightOffset: number = NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
             if (direction === BeamDirection.Up) {
                 heightOffset = -heightOffset;
             }
@@ -170,7 +170,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, NoteYPosition.Top);
                 bendTie = true;
                 if (direction === BeamDirection.Down) {
-                    endY += NoteHeadGlyph.NoteHeadHeight * this.scale;
+                    endY += NoteHeadGlyph.NoteHeadHeight;
                 }
             } else if (note.isTieOrigin) {
                 if (!endNoteRenderer) {
@@ -179,7 +179,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, NoteYPosition.Top);
                 }
                 if (direction === BeamDirection.Down) {
-                    endY += NoteHeadGlyph.NoteHeadHeight * this.scale;
+                    endY += NoteHeadGlyph.NoteHeadHeight;
                 }
             }
 
@@ -188,7 +188,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     if (note.isTieOrigin) {
                         TieGlyph.paintTie(
                             canvas,
-                            this.scale,
+                            1,
                             startX,
                             startY,
                             endX,
@@ -216,13 +216,13 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                     } else if (note.isTieOrigin) {
                         TieGlyph.paintTie(
                             canvas,
-                            this.scale,
+                            1,
                             startX,
                             startY,
                             endX,
@@ -240,12 +240,12 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 cx +
                                 startNoteRenderer.x +
                                 startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) -
-                                2 * this.scale;
+                                2;
                             let simpleEndX: number =
                                 cx +
                                 startNoteRenderer.x +
                                 startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) +
-                                2 * this.scale;
+                                2;
                             let middleX: number = (simpleStartX + simpleEndX) / 2;
                             let text: string = (
                                 ((this._beat.whammyBarPoints![1].value - this._beat.whammyBarPoints![0].value) / 4) |
@@ -253,8 +253,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             ).toString();
                             canvas.font = this.renderer.resources.tablatureFont;
                             canvas.fillText(text, middleX, cy + this.y);
-                            let simpleStartY: number = cy + this.y + canvas.font.size + 2 * this.scale;
-                            let simpleEndY: number = simpleStartY + ScoreWhammyBarGlyph.SimpleDipHeight * this.scale;
+                            let simpleStartY: number = cy + this.y + canvas.font.size + 2;
+                            let simpleEndY: number = simpleStartY + ScoreWhammyBarGlyph.SimpleDipHeight;
                             if (this._beat.whammyBarPoints![1].value > this._beat.whammyBarPoints![0].value) {
                                 canvas.moveTo(simpleStartX, simpleEndY);
                                 canvas.lineTo(middleX, simpleStartY);
@@ -269,7 +269,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         if (note.isTieOrigin) {
                             TieGlyph.paintTie(
                                 canvas,
-                                this.scale,
+                                1,
                                 startX,
                                 startY,
                                 endX,
@@ -293,7 +293,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             middleX,
                             middleY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                         this.BendNoteHeads[1].x = endX - this.BendNoteHeads[1].noteHeadOffset;
@@ -307,7 +307,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                     }
@@ -335,7 +335,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         startX,
                         startY,
                         direction === BeamDirection.Down,
-                        this.scale,
+                        1,
                         slurText
                     );
                     if (this.BendNoteHeads.length > 0) {
@@ -349,7 +349,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                     }

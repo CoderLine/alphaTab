@@ -44,6 +44,7 @@ export default createEmitter('json', (program, input) => {
                     serializable.properties.push({
                         property: propertyDeclaration,
                         jsonNames: jsonNames,
+                        asRaw: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_raw'),
                         partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
                         target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment as string,
                         isReadOnly: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_read_only')

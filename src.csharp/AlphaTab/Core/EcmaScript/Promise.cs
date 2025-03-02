@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace AlphaTab.Core.EcmaScript;
 
-public static class Promise
+internal static class Promise
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Task Race(IList<Task> tasks)

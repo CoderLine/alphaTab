@@ -8,6 +8,7 @@ import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Score } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
+import { Direction } from './Direction';
 
 /**
  * The MasterBar stores information about a bar which affects
@@ -92,6 +93,11 @@ export class MasterBar {
     public timeSignatureCommon: boolean = false;
 
     /**
+     * Gets or sets whether the bar indicates a free time playing.
+     */
+    public isFreeTime: boolean = false;
+
+    /**
      * Gets or sets the triplet feel that is valid for this bar.
      */
     public tripletFeel: TripletFeel = TripletFeel.NoTripletFeel;
@@ -106,9 +112,17 @@ export class MasterBar {
     }
 
     /**
-     * Gets or sets the tempo automation for this bar.
+     * Gets or sets the first tempo automation for this bar.
+     * @deprecated Use {@link tempoAutomations}.
      */
-    public tempoAutomation: Automation | null = null;
+    public get tempoAutomation(): Automation | null {
+        return this.tempoAutomations.length > 0 ? this.tempoAutomations[0] : null;
+    }
+
+    /**
+     * Gets or sets all tempo automation for this bar.
+     */
+    public tempoAutomations: Automation[] = [];
 
     /**
      * Gets or sets the reference to the score this song belongs to.
@@ -140,7 +154,13 @@ export class MasterBar {
     /**
      * An absolute width of the bar to use when displaying in a multi-track layout.
      */
-    public displayWidth:number = -1;    
+    public displayWidth: number = -1;
+
+    /**
+     * The directions applied to this masterbar.
+     * @json_add addDirection
+     */
+    public directions: Set<Direction> | null = null;
 
     /**
      * Calculates the time spent in this bar. (unit: midi ticks)
@@ -174,6 +194,17 @@ export class MasterBar {
             this.fermata = fermataMap;
         }
         fermataMap.set(offset, fermata);
+    }
+
+    /**
+     * Adds a direction to the masterbar.
+     * @param direction The direction to add.
+     */
+    public addDirection(direction:Direction):void {
+        if(this.directions == null){
+            this.directions = new Set<Direction>();
+        }
+        this.directions.add(direction);
     }
 
     /**

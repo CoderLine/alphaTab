@@ -1,20 +1,19 @@
 ﻿using System.Collections.Generic;
 
-namespace AlphaTab.Collections
+namespace AlphaTab.Collections;
+
+internal class List<T> : System.Collections.Generic.List<T>, Iterable<T>
 {
-    internal class List<T> : System.Collections.Generic.List<T>, Iterable<T>
+    public List(double size)
+        : this(new T[(int)size])
     {
-        public List(double size)
-            : this(new T[(int)size])
-        {
-        }
+    }
 
-        public List()
-        {
-        }
+    public List()
+    {
+    }
 
-        public List(IEnumerable<T> collection) : base(collection)
-        {
-        }
+    public List(IEnumerable<T> collection) : base(collection)
+    {
     }
 }

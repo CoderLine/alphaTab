@@ -13,6 +13,7 @@ import { BendStyle } from "@src/model/BendStyle";
 import { Ottavia } from "@src/model/Ottavia";
 import { Duration } from "@src/model/Duration";
 import { Automation } from "@src/model/Automation";
+import { FadeType } from "@src/model/FadeType";
 import { BrushType } from "@src/model/BrushType";
 import { WhammyType } from "@src/model/WhammyType";
 import { BendPoint } from "@src/model/BendPoint";
@@ -20,9 +21,13 @@ import { VibratoType } from "@src/model/VibratoType";
 import { GraceType } from "@src/model/GraceType";
 import { PickStroke } from "@src/model/PickStroke";
 import { CrescendoType } from "@src/model/CrescendoType";
+import { GolpeType } from "@src/model/GolpeType";
 import { DynamicValue } from "@src/model/DynamicValue";
 import { BeamDirection } from "@src/rendering/utils/BeamDirection";
 import { BeatBeamingMode } from "@src/model/Beat";
+import { WahPedal } from "@src/model/WahPedal";
+import { BarreShape } from "@src/model/BarreShape";
+import { Rasgueado } from "@src/model/Rasgueado";
 export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {
@@ -44,13 +49,14 @@ export class BeatSerializer {
         o.set("duration", obj.duration as number);
         o.set("automations", obj.automations.map(i => AutomationSerializer.toJson(i)));
         o.set("dots", obj.dots);
-        o.set("fadein", obj.fadeIn);
+        o.set("fade", obj.fade as number);
         o.set("lyrics", obj.lyrics);
-        o.set("hasrasgueado", obj.hasRasgueado);
         o.set("pop", obj.pop);
         o.set("slap", obj.slap);
         o.set("tap", obj.tap);
         o.set("text", obj.text);
+        o.set("slashed", obj.slashed);
+        o.set("deadslapped", obj.deadSlapped);
         o.set("brushtype", obj.brushType as number);
         o.set("brushduration", obj.brushDuration);
         o.set("tupletdenominator", obj.tupletDenominator);
@@ -70,10 +76,17 @@ export class BeatSerializer {
         o.set("playbackstart", obj.playbackStart);
         o.set("displayduration", obj.displayDuration);
         o.set("playbackduration", obj.playbackDuration);
+        o.set("golpe", obj.golpe as number);
         o.set("dynamics", obj.dynamics as number);
         o.set("invertbeamdirection", obj.invertBeamDirection);
         o.set("preferredbeamdirection", obj.preferredBeamDirection as number | null);
         o.set("beamingmode", obj.beamingMode as number);
+        o.set("wahpedal", obj.wahPedal as number);
+        o.set("barrefret", obj.barreFret);
+        o.set("barreshape", obj.barreShape as number);
+        o.set("rasgueado", obj.rasgueado as number);
+        o.set("showtimer", obj.showTimer);
+        o.set("timer", obj.timer);
         return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -115,14 +128,11 @@ export class BeatSerializer {
             case "dots":
                 obj.dots = v! as number;
                 return true;
-            case "fadein":
-                obj.fadeIn = v! as boolean;
+            case "fade":
+                obj.fade = JsonHelper.parseEnum<FadeType>(v, FadeType)!;
                 return true;
             case "lyrics":
                 obj.lyrics = v as string[] | null;
-                return true;
-            case "hasrasgueado":
-                obj.hasRasgueado = v! as boolean;
                 return true;
             case "pop":
                 obj.pop = v! as boolean;
@@ -135,6 +145,12 @@ export class BeatSerializer {
                 return true;
             case "text":
                 obj.text = v as string | null;
+                return true;
+            case "slashed":
+                obj.slashed = v! as boolean;
+                return true;
+            case "deadslapped":
+                obj.deadSlapped = v! as boolean;
                 return true;
             case "brushtype":
                 obj.brushType = JsonHelper.parseEnum<BrushType>(v, BrushType)!;
@@ -194,6 +210,9 @@ export class BeatSerializer {
             case "playbackduration":
                 obj.playbackDuration = v! as number;
                 return true;
+            case "golpe":
+                obj.golpe = JsonHelper.parseEnum<GolpeType>(v, GolpeType)!;
+                return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
                 return true;
@@ -205,6 +224,24 @@ export class BeatSerializer {
                 return true;
             case "beamingmode":
                 obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!;
+                return true;
+            case "wahpedal":
+                obj.wahPedal = JsonHelper.parseEnum<WahPedal>(v, WahPedal)!;
+                return true;
+            case "barrefret":
+                obj.barreFret = v! as number;
+                return true;
+            case "barreshape":
+                obj.barreShape = JsonHelper.parseEnum<BarreShape>(v, BarreShape)!;
+                return true;
+            case "rasgueado":
+                obj.rasgueado = JsonHelper.parseEnum<Rasgueado>(v, Rasgueado)!;
+                return true;
+            case "showtimer":
+                obj.showTimer = v! as boolean;
+                return true;
+            case "timer":
+                obj.timer = v as number | null;
                 return true;
         }
         return false;

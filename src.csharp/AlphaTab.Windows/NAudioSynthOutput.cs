@@ -17,8 +17,8 @@ namespace AlphaTab
 
         private DirectSoundOut _context;
         private CircularSampleBuffer _circularBuffer;
-        private int _bufferCount = 0;
-        private int _requestedBufferCount = 0;
+        private int _bufferCount;
+        private int _requestedBufferCount;
 
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
@@ -136,7 +136,7 @@ namespace AlphaTab
             var samplesFromBuffer = (int)_circularBuffer.Read(read, 0,
                 System.Math.Min(read.Length, _circularBuffer.Count));
 
-            Buffer.BlockCopy(read.Data, 0, buffer, offset * sizeof(float),
+            Buffer.BlockCopy(read.Data.Array!, read.Data.Offset, buffer, offset * sizeof(float),
                 samplesFromBuffer * sizeof(float));
 
             ((EventEmitterOfT<double>)SamplesPlayed).Trigger(samplesFromBuffer /

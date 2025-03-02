@@ -20,6 +20,7 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
+import { NoteOrnament } from './NoteOrnament';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
@@ -113,6 +114,11 @@ export class Note {
      * It then increases the the number of strings on available on the track.
      */
     public string: number = -1;
+
+    /**
+     * Gets or sets whether the string number for this note should be shown.
+     */
+    public showStringNumber: boolean = false;
 
     public get isPiano(): boolean {
         return !this.isStringed && this.octave >= 0 && this.tone >= 0;
@@ -423,7 +429,9 @@ export class Note {
     /**
      * Gets or sets whether this note has fingering defined.
      */
-    public isFingering: boolean = false;
+    public get isFingering(): boolean {
+        return this.leftHandFinger !== Fingers.Unknown || this.rightHandFinger !== Fingers.Unknown;
+    }
 
     /**
      * Gets or sets the target note value for the trill effect.
@@ -444,7 +452,7 @@ export class Note {
     public trillSpeed: Duration = Duration.ThirtySecond;
 
     /**
-     * Gets or sets the percentual duration of the note relative to the overall beat duration .
+     * Gets or sets the percentual duration of the note relative to the overall beat duration.
      */
     public durationPercent: number = 1;
 
@@ -492,6 +500,11 @@ export class Note {
      * @json_ignore
      */
     public effectSlurDestination: Note | null = null;
+
+    /**
+     * The ornament applied on the note.
+     */
+    public ornament: NoteOrnament = NoteOrnament.None;
 
     public get stringTuning(): number {
         return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);
@@ -794,10 +807,17 @@ export class Note {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all bends
         const points = this.bendPoints;
-        if (points != null && points.length > 0 && this.bendType === BendType.Custom) {
+        const hasBend = points != null && points.length > 0;
+
+        if (hasBend) {
             let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
             this.isContinuedBend = isContinuedBend;
-            if (points.length === 4) {
+        } else {
+            this.bendType = BendType.None;
+        }
+
+        if (hasBend && this.bendType === BendType.Custom) {
+            if (points!.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
                 let middle2: BendPoint = points[2];
@@ -808,7 +828,7 @@ export class Note {
                     if (destination.value > origin.value) {
                         if (middle1.value > destination.value) {
                             this.bendType = BendType.BendRelease;
-                        } else if (!isContinuedBend && origin.value > 0) {
+                        } else if (!this.isContinuedBend && origin.value > 0) {
                             this.bendType = BendType.PrebendBend;
                             points.splice(2, 1);
                             points.splice(1, 1);
@@ -819,7 +839,7 @@ export class Note {
                         }
                     } else if (destination.value < origin.value) {
                         // origin must be > 0 otherwise it's no release, we cannot bend negative
-                        if (isContinuedBend) {
+                        if (this.isContinuedBend) {
                             this.bendType = BendType.Release;
                             points.splice(2, 1);
                             points.splice(1, 1);
@@ -831,7 +851,7 @@ export class Note {
                     } else {
                         if (middle1.value > origin.value) {
                             this.bendType = BendType.BendRelease;
-                        } else if (origin.value > 0 && !isContinuedBend) {
+                        } else if (origin.value > 0 && !this.isContinuedBend) {
                             this.bendType = BendType.Prebend;
                             points.splice(2, 1);
                             points.splice(1, 1);
@@ -849,24 +869,26 @@ export class Note {
                 let destination: BendPoint = points[1];
                 // bend higher?
                 if (destination.value > origin.value) {
-                    if (!isContinuedBend && origin.value > 0) {
+                    if (!this.isContinuedBend && origin.value > 0) {
                         this.bendType = BendType.PrebendBend;
                     } else {
                         this.bendType = BendType.Bend;
                     }
                 } else if (destination.value < origin.value) {
                     // origin must be > 0 otherwise it's no release, we cannot bend negative
-                    if (isContinuedBend) {
+                    if (this.isContinuedBend) {
                         this.bendType = BendType.Release;
                     } else {
                         this.bendType = BendType.PrebendRelease;
                     }
                 } else {
-                    this.bendType = BendType.Hold;
+                    if (origin.value > 0 && !this.isContinuedBend) {
+                        this.bendType = BendType.Prebend;
+                    } else {
+                        this.bendType = BendType.Hold;
+                    }
                 }
             }
-        } else if (points === null || points.length === 0) {
-            this.bendType = BendType.None;
         }
 
         // initial bend pitch offsets and forced accidentals don't play well together

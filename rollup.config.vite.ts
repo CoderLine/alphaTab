@@ -26,7 +26,7 @@ export default function vite(isWatch: boolean, bundlePlugins: Plugin[]): RollupO
                     format: 'es'
                 }
             ],
-            external: ['vite', 'rollup', 'fs'],
+            external: ['vite', 'rollup', 'fs', 'url'],
             plugins: [
                 dts(),
                 resolve({

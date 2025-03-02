@@ -13,6 +13,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { BeamingHelper } from '../utils/BeamingHelper';
 
 export class BeatContainerGlyph extends Glyph {
     public static readonly GraceBeatPadding: number = 3;
@@ -39,47 +40,40 @@ export class BeatContainerGlyph extends Glyph {
         this.ties.push(tie);
     }
 
+    protected drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
+        return helper.hasFlag(false, undefined);
+    }
+
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
         let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
-        if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
-            preBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
-        }
 
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if ((helper && helper.hasFlag) || this.beat.graceType !== GraceType.None) {
-            postBeatStretch +=
-                FlagGlyph.FlagWidth *
-                this.scale *
-                (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
+        if(this.beat.graceType !== GraceType.None) {
+            // flagged grace
+            if(this.beat.graceGroup!.beats.length === 1) {
+                postBeatStretch += FlagGlyph.FlagWidth * NoteHeadGlyph.GraceScale;
+            }
+            // grace with bars, some space for bar unless last
+            else if(this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
+                postBeatStretch += 7;
+            }
+            else {
+                postBeatStretch += BeatContainerGlyph.GraceBeatPadding;
+            }
+        }
+        else if (helper && this.drawBeamHelperAsFlags(helper)) {
+            postBeatStretch += FlagGlyph.FlagWidth;
         }
         for (const tie of this.ties) {
             postBeatStretch += tie.width;
         }
 
-        // Add some further spacing to grace notes
-        if (this.beat.graceType !== GraceType.None) {
-            postBeatStretch += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
-        }
-
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
-        // store sizes for special renderers like the EffectBarRenderer
-        layoutings.setPreBeatSize(this.beat, this.preNotes.computedWidth);
-        layoutings.setOnBeatSize(this.beat, this.onNotes.computedWidth);
-        layoutings.setBeatCenterX(this.beat, this.onNotes.centerX);
     }
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
-        let offset: number = info.getBeatCenterX(this.beat) - this.onNotes.centerX;
-        if (this.beat.graceGroup && !this.beat.graceGroup.isComplete) {
-            offset += BeatContainerGlyph.GraceBeatPadding * this.renderer.scale;
-        }
-
-        this.preNotes.x = offset;
-        this.preNotes.width = info.getPreBeatSize(this.beat);
-        this.onNotes.width = info.getOnBeatSize(this.beat);
-        this.onNotes.x = this.preNotes.x + this.preNotes.width;
         this.onNotes.updateBeamingHelper();
         this.updateWidth();
     }
@@ -107,14 +101,14 @@ export class BeatContainerGlyph extends Glyph {
             if (this.onNotes.beamingHelper.beats.length === 1) {
                 // make space for flag
                 if (this.beat.duration >= Duration.Eighth) {
-                    this.minWidth += 20 * this.scale;
+                    this.minWidth += 20;
                 }
             } else {
                 // ensure some space for small notes
                 switch (this.beat.duration) {
                     case Duration.OneHundredTwentyEighth:
                     case Duration.TwoHundredFiftySixth:
-                        this.minWidth += 10 * this.scale;
+                        this.minWidth += 10;
                         break;
                 }
             }
@@ -146,11 +140,6 @@ export class BeatContainerGlyph extends Glyph {
         if (this.beat.voice.isEmpty) {
             return;
         }
-        let isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
-        if (isEmptyGlyph) {
-            return;
-        }
-        canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));
         // var c = canvas.color;
         // var ta = canvas.textAlign;
         // canvas.color = new Color(255, 0, 0);
@@ -170,23 +159,31 @@ export class BeatContainerGlyph extends Glyph {
         // canvas.color = new Color(0, 0, 0);
         // canvas.fillText(this.beat.voice.index + ":" + this.beat.index, cx + this.x, cy + this.y + 15 * this.beat.voice.index);
 
+        // const c = canvas.color;
         // if (this.beat.voice.index === 0) {
+        //     canvas.color = new Color(0, 0, 200, 100);
+        //     canvas.strokeRect(cx + this.x, cy + this.y, this.width, 10);
+
         //     canvas.color = new Color(200, 0, 0, 100);
-        //     canvas.strokeRect(cx + this.x, cy + this.y + this.preNotes.y + 30, this.width, 10);
+        //     canvas.strokeRect(cx + this.x + this.preNotes.x, cy + this.y + 10, this.preNotes.width, 10);
+
+        //     canvas.color = new Color(0, 200, 0, 100);
+        //     canvas.strokeRect(cx + this.x + this.onNotes.x, cy + this.y + 10, this.onNotes.width, 10);
+
+        //     canvas.color = new Color(0, 200, 200, 100);
+        //     canvas.strokeRect(cx + this.x  + this.onNotes.x + this.onNotes.centerX, cy, 1, this.renderer.height);
         // }
+        // canvas.color = c;
+
+        let isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
+        if (isEmptyGlyph) {
+            return;
+        }
+        canvas.beginGroup(BeatContainerGlyph.getGroupId(this.beat));
 
         this.preNotes.paint(cx + this.x, cy + this.y, canvas);
-        // if (this.beat.voice.index === 0) {
-        //     canvas.color = new Color(200, 0, 0, 100);
-        //     canvas.strokeRect(cx + this.x + this.preNotes.x, cy + this.y + this.preNotes.y, this.preNotes.width, 10);
-        // }
         this.onNotes.paint(cx + this.x, cy + this.y, canvas);
-        // if (this.beat.voice.index === 0) {
-        //     canvas.color = new Color(0, 200, 0, 100);
-        //     canvas.strokeRect(cx + this.x + this.onNotes.x, cy + this.y + this.onNotes.y - 10, this.onNotes.width, 10);
-        // }
 
-        // paint the ties relative to the whole staff,
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
         let staffX: number = cx - this.voiceContainer.x - this.renderer.x;
         let staffY: number = cy - this.voiceContainer.y - this.renderer.y;
@@ -201,22 +198,62 @@ export class BeatContainerGlyph extends Glyph {
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, isEmptyBar: boolean) {
         let beatBoundings: BeatBounds = new BeatBounds();
         beatBoundings.beat = this.beat;
-        beatBoundings.visualBounds = new Bounds();
-        beatBoundings.visualBounds.x = cx + this.x + this.onNotes.x;
-        beatBoundings.visualBounds.y = barBounds.visualBounds.y;
-        beatBoundings.visualBounds.w = this.onNotes.width;
-        beatBoundings.visualBounds.h = barBounds.visualBounds.h;
 
-        beatBoundings.realBounds = new Bounds();
-        beatBoundings.realBounds.x = cx + this.x;
-        beatBoundings.realBounds.y = barBounds.realBounds.y;
-        beatBoundings.realBounds.w = this.width;
-        beatBoundings.realBounds.h = barBounds.realBounds.h;
-
-        if (isEmptyBar) {
+        if (this.beat.isEmpty) {
+            beatBoundings.visualBounds = new Bounds();
             beatBoundings.visualBounds.x = cx + this.x;
-            beatBoundings.realBounds.x = beatBoundings.visualBounds.x;
+            beatBoundings.visualBounds.y = barBounds.visualBounds.y;
+            beatBoundings.visualBounds.w = this.width;
+            beatBoundings.visualBounds.h = barBounds.visualBounds.h;
+
+            beatBoundings.realBounds = new Bounds();
+            beatBoundings.realBounds.x = cx + this.x;
+            beatBoundings.realBounds.y = barBounds.realBounds.y;
+            beatBoundings.realBounds.w = this.width;
+            beatBoundings.realBounds.h = barBounds.realBounds.h;
+
+            beatBoundings.onNotesX = cx + this.x + this.onNotes.centerX;
+        } else {
+            beatBoundings.visualBounds = new Bounds();
+            beatBoundings.visualBounds.x = cx + this.x;
+
+            if (!this.preNotes.isEmpty) {
+                beatBoundings.visualBounds.x = cx + this.x + this.preNotes.x;
+            } else if (!this.onNotes.isEmpty) {
+                beatBoundings.visualBounds.x = cx + this.x + this.onNotes.x;
+            } else {
+                beatBoundings.visualBounds.x = cx + this.x;
+            }
+
+            let visualEndX = 0;
+
+            if (!this.onNotes.isEmpty) {
+                visualEndX = cx + this.x + this.onNotes.x + this.onNotes.width;
+            } else if (!this.preNotes.isEmpty) {
+                visualEndX = cx + this.x + this.preNotes.x + this.preNotes.width;
+            } else {
+                visualEndX = cx + this.x + this.width;
+            }
+
+            beatBoundings.visualBounds.w = visualEndX - beatBoundings.visualBounds.x;
+            const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
+            if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
+                beatBoundings.visualBounds.w +=
+                    FlagGlyph.FlagWidth * (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
+            }
+
+            beatBoundings.visualBounds.y = barBounds.visualBounds.y;
+            beatBoundings.visualBounds.h = barBounds.visualBounds.h;
+
+            beatBoundings.realBounds = new Bounds();
+            beatBoundings.realBounds.x = cx + this.x;
+            beatBoundings.realBounds.y = barBounds.realBounds.y;
+            beatBoundings.realBounds.w = this.width;
+            beatBoundings.realBounds.h = barBounds.realBounds.h;
+
+            beatBoundings.onNotesX = cx + this.x + this.onNotes.x + this.onNotes.centerX;
         }
+
         barBounds.addBeat(beatBoundings);
 
         if (this.renderer.settings.core.includeNoteBounds) {

@@ -63,9 +63,7 @@ export class EffectBarRenderer extends BarRendererBase {
     }
 
     public override applyLayoutingInfo(): boolean {
-        if (!super.applyLayoutingInfo()) {
-            return false;
-        }
+        const result = !super.applyLayoutingInfo();
         // we create empty slots for the same group
         if (this.index > 0) {
             let previousRenderer: EffectBarRenderer = this.previousRenderer as EffectBarRenderer;
@@ -74,6 +72,7 @@ export class EffectBarRenderer extends BarRendererBase {
             this.sizingInfo = new EffectBandSizingInfo();
         }
         for (let effectBand of this._bands) {
+            effectBand.resetHeight();
             effectBand.alignGlyphs();
             if (!effectBand.isEmpty) {
                 // find a slot that ended before the start of the band
@@ -81,7 +80,7 @@ export class EffectBarRenderer extends BarRendererBase {
             }
         }
         this.updateHeight();
-        return true;
+        return result;
     }
 
     public override scaleToWidth(width: number): void {

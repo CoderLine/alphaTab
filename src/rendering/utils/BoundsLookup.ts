@@ -7,7 +7,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
-import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
+import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 
 export class BoundsLookup {
     /**
@@ -15,14 +15,14 @@ export class BoundsLookup {
      */
     public toJson(): unknown {
         let json: any = {} as any;
-        let staveGroups: StaveGroupBounds[] = [];
-        json.staveGroups = staveGroups;
-        for (let group of this.staveGroups) {
-            let g: StaveGroupBounds = {} as any;
-            g.visualBounds = this.boundsToJson(group.visualBounds);
-            g.realBounds = this.boundsToJson(group.realBounds);
+        let systems: StaffSystemBounds[] = [];
+        json.staffSystems = systems;
+        for (let system of this.staffSystems) {
+            let g: StaffSystemBounds = {} as any;
+            g.visualBounds = this.boundsToJson(system.visualBounds);
+            g.realBounds = this.boundsToJson(system.realBounds);
             g.bars = [];
-            for (let masterBar of group.bars) {
+            for (let masterBar of system.bars) {
                 let mb: MasterBarBounds = {} as any;
                 mb.lineAlignedBounds = this.boundsToJson(masterBar.lineAlignedBounds);
                 mb.visualBounds = this.boundsToJson(masterBar.visualBounds);
@@ -38,6 +38,7 @@ export class BoundsLookup {
                         let bb: BeatBounds = {} as any;
                         bb.visualBounds = this.boundsToJson(beat.visualBounds);
                         bb.realBounds = this.boundsToJson(beat.realBounds);
+                        bb.onNotesX = beat.onNotesX;
                         let bbd: any = bb;
                         bbd.beatIndex = beat.beat.index;
                         bbd.voiceIndex = beat.beat.voice.index;
@@ -60,7 +61,7 @@ export class BoundsLookup {
                 }
                 g.bars.push(mb);
             }
-            staveGroups.push(g);
+            systems.push(g);
         }
         return json;
     }
@@ -70,29 +71,30 @@ export class BoundsLookup {
      */
     public static fromJson(json: unknown, score: Score): BoundsLookup {
         let lookup: BoundsLookup = new BoundsLookup();
-        let staveGroups: StaveGroupBounds[] = (json as any)['staveGroups'];
-        for (let staveGroup of staveGroups) {
-            let sg: StaveGroupBounds = new StaveGroupBounds();
-            sg.visualBounds = staveGroup.visualBounds;
-            sg.realBounds = staveGroup.realBounds;
-            lookup.addStaveGroup(sg);
-            for (let masterBar of staveGroup.bars) {
+        let staffSystems: StaffSystemBounds[] = (json as any)['staffSystems'];
+        for (let staffSystem of staffSystems) {
+            let sg: StaffSystemBounds = new StaffSystemBounds();
+            sg.visualBounds = BoundsLookup.boundsFromJson(staffSystem.visualBounds);
+            sg.realBounds = BoundsLookup.boundsFromJson(staffSystem.realBounds);
+            lookup.addStaffSystem(sg);
+            for (let masterBar of staffSystem.bars) {
                 let mb: MasterBarBounds = new MasterBarBounds();
                 mb.index = masterBar.index;
                 mb.isFirstOfLine = masterBar.isFirstOfLine;
-                mb.lineAlignedBounds = masterBar.lineAlignedBounds;
-                mb.visualBounds = masterBar.visualBounds;
-                mb.realBounds = masterBar.realBounds;
+                mb.lineAlignedBounds = BoundsLookup.boundsFromJson(masterBar.lineAlignedBounds);
+                mb.visualBounds = BoundsLookup.boundsFromJson(masterBar.visualBounds);
+                mb.realBounds = BoundsLookup.boundsFromJson(masterBar.realBounds);
                 sg.addBar(mb);
                 for (let bar of masterBar.bars) {
                     let b: BarBounds = new BarBounds();
-                    b.visualBounds = bar.visualBounds;
-                    b.realBounds = bar.realBounds;
+                    b.visualBounds = BoundsLookup.boundsFromJson(bar.visualBounds);
+                    b.realBounds = BoundsLookup.boundsFromJson(bar.realBounds);
                     mb.addBar(b);
                     for (let beat of bar.beats) {
                         let bb: BeatBounds = new BeatBounds();
-                        bb.visualBounds = beat.visualBounds;
-                        bb.realBounds = beat.realBounds;
+                        bb.visualBounds = BoundsLookup.boundsFromJson(beat.visualBounds);
+                        bb.realBounds = BoundsLookup.boundsFromJson(beat.realBounds);
+                        bb.onNotesX = beat.onNotesX;
                         let bd: any = beat;
                         bb.beat =
                             score.tracks[bd.trackIndex].staves[bd.staffIndex].bars[bd.barIndex].voices[
@@ -104,7 +106,7 @@ export class BoundsLookup {
                                 let n: NoteBounds = new NoteBounds();
                                 let nd: any = note;
                                 n.note = bb.beat.notes[nd.index];
-                                n.noteHeadBounds = note.noteHeadBounds;
+                                n.noteHeadBounds = BoundsLookup.boundsFromJson(note.noteHeadBounds);
                                 bb.addNote(n);
                             }
                         }
@@ -114,6 +116,20 @@ export class BoundsLookup {
             }
         }
         return lookup;
+    }
+
+    /**
+     * @target web
+     */
+    private static boundsFromJson(boundsRaw: Bounds): Bounds {
+        // TODO: can we just set the right prototype here?
+        // Object.setPrototypeOf(...)
+        const b = new Bounds();
+        b.x = boundsRaw.x;
+        b.y = boundsRaw.y;
+        b.w = boundsRaw.w;
+        b.h = boundsRaw.h;
+        return b;
     }
 
     /**
@@ -130,11 +146,11 @@ export class BoundsLookup {
 
     private _beatLookup: Map<number, BeatBounds[]> = new Map();
     private _masterBarLookup: Map<number, MasterBarBounds> = new Map();
-    private _currentStaveGroup: StaveGroupBounds | null = null;
+    private _currentStaffSystem: StaffSystemBounds | null = null;
     /**
-     * Gets a list of all individual stave groups contained in the rendered music notation.
+     * Gets a list of all individual staff systems contained in the rendered music notation.
      */
-    public staveGroups: StaveGroupBounds[] = [];
+    public staffSystems: StaffSystemBounds[] = [];
 
     /**
      * Gets or sets a value indicating whether this lookup was finished already.
@@ -144,22 +160,22 @@ export class BoundsLookup {
     /**
      * Finishes the lookup for optimized access.
      */
-    public finish(): void {
-        for (let t of this.staveGroups) {
-            t.finish();
+    public finish(scale: number = 1): void {
+        for (let t of this.staffSystems) {
+            t.finish(scale);
         }
         this.isFinished = true;
     }
 
     /**
-     * Adds a new stave group to the lookup.
-     * @param bounds The stave group bounds to add.
+     * Adds a new staff sytem to the lookup.
+     * @param bounds The staff system bounds to add.
      */
-    public addStaveGroup(bounds: StaveGroupBounds): void {
-        bounds.index = this.staveGroups.length;
+    public addStaffSystem(bounds: StaffSystemBounds): void {
+        bounds.index = this.staffSystems.length;
         bounds.boundsLookup = this;
-        this.staveGroups.push(bounds);
-        this._currentStaveGroup = bounds;
+        this.staffSystems.push(bounds);
+        this._currentStaffSystem = bounds;
     }
 
     /**
@@ -167,10 +183,10 @@ export class BoundsLookup {
      * @param bounds The master bar bounds to add.
      */
     public addMasterBar(bounds: MasterBarBounds): void {
-        if (!bounds.staveGroupBounds) {
-            bounds.staveGroupBounds = this._currentStaveGroup!;
+        if (!bounds.staffSystemBounds) {
+            bounds.staffSystemBounds = this._currentStaffSystem!;
             this._masterBarLookup.set(bounds.index, bounds);
-            this._currentStaveGroup!.addBar(bounds);
+            this._currentStaffSystem!.addBar(bounds);
         } else {
             this._masterBarLookup.set(bounds.index, bounds);
         }
@@ -245,31 +261,31 @@ export class BoundsLookup {
         //
         // find a bar which matches in y-axis
         let bottom: number = 0;
-        let top: number = this.staveGroups.length - 1;
-        let staveGroupIndex: number = -1;
+        let top: number = this.staffSystems.length - 1;
+        let staffSystemIndex: number = -1;
         while (bottom <= top) {
             let middle: number = ((top + bottom) / 2) | 0;
-            let group: StaveGroupBounds = this.staveGroups[middle];
+            let system: StaffSystemBounds = this.staffSystems[middle];
             // found?
-            if (y >= group.realBounds.y && y <= group.realBounds.y + group.realBounds.h) {
-                staveGroupIndex = middle;
+            if (y >= system.realBounds.y && y <= system.realBounds.y + system.realBounds.h) {
+                staffSystemIndex = middle;
                 break;
             }
             // search in lower half
-            if (y < group.realBounds.y) {
+            if (y < system.realBounds.y) {
                 top = middle - 1;
             } else {
                 bottom = middle + 1;
             }
         }
         // no bar found
-        if (staveGroupIndex === -1) {
+        if (staffSystemIndex === -1) {
             return null;
         }
         //
         // Find the matching bar in the row
-        let staveGroup: StaveGroupBounds = this.staveGroups[staveGroupIndex];
-        let bar: MasterBarBounds | null = staveGroup.findBarAtPos(x);
+        let staffSystem: StaffSystemBounds = this.staffSystems[staffSystemIndex];
+        let bar: MasterBarBounds | null = staffSystem.findBarAtPos(x);
         if (bar) {
             return bar.findBeatAtPos(x, y);
         }

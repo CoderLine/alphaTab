@@ -1,81 +1,80 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace AlphaTab.Collections
+namespace AlphaTab.Collections;
+
+public interface IMap
 {
-    public interface IMap
+    double Size { get; }
+    void Clear();
+}
+public interface IMap<TKey, TValue> : IMap, IEnumerable<MapEntry<TKey, TValue>>
+    where TValue : class?
+{
+    IEnumerable<TKey> Keys();
+    IEnumerable<TValue> Values();
+    bool Has(TKey key);
+    TValue Get(TKey key);
+    void Set(TKey key, TValue value);
+    void Delete(TKey key);
+}
+
+public class Map<TKey, TValue> : Dictionary<TKey, TValue>, IMap<TKey, TValue>
+    where TValue : class?
+{
+    public double Size => Count;
+    IEnumerable<TKey> IMap<TKey, TValue>.Keys()
     {
-        double Size { get; }
-        void Clear();
+        return base.Keys;
     }
-    public interface IMap<TKey, TValue> : IMap, IEnumerable<MapEntry<TKey, TValue>>
-        where TValue : class?
+
+    IEnumerable<TValue> IMap<TKey, TValue>.Values()
     {
-        IEnumerable<TKey> Keys();
-        IEnumerable<TValue> Values();
-        bool Has(TKey key);
-        TValue Get(TKey key);
-        void Set(TKey key, TValue value);
-        void Delete(TKey key);
+        return base.Values;
     }
 
-    public class Map<TKey, TValue> : Dictionary<TKey, TValue>, IMap<TKey, TValue>
-        where TValue : class?
+    public Map()
     {
-        public double Size => Count;
-        IEnumerable<TKey> IMap<TKey, TValue>.Keys()
-        {
-            return base.Keys;
-        }
+    }
 
-        IEnumerable<TValue> IMap<TKey, TValue>.Values()
+    public Map(IEnumerable<MapEntry<TKey, TValue>> entries)
+    {
+        foreach (var entry in entries)
         {
-            return base.Values;
+            this[entry.Key] = entry.Value;
         }
+    }
+    public Map(IEnumerable<KeyValuePair<TKey, TValue>> entries)
+    {
+        foreach (var entry in entries)
+        {
+            this[entry.Key] = entry.Value;
+        }
+    }
 
-        public Map()
-        {
-        }
+    public bool Has(TKey key)
+    {
+        return ContainsKey(key);
+    }
 
-        public Map(IEnumerable<MapEntry<TKey, TValue>> entries)
-        {
-            foreach (var entry in entries)
-            {
-                this[entry.Key] = entry.Value;
-            }
-        }
-        public Map(IEnumerable<KeyValuePair<TKey, TValue>> entries)
-        {
-            foreach (var entry in entries)
-            {
-                this[entry.Key] = entry.Value;
-            }
-        }
+    public TValue Get(TKey key)
+    {
+        return this[key];
+    }
 
-        public bool Has(TKey key)
-        {
-            return ContainsKey(key);
-        }
+    public void Set(TKey key, TValue value)
+    {
+        this[key] = value;
+    }
 
-        public TValue Get(TKey key)
-        {
-            return this[key];
-        }
+    IEnumerator<MapEntry<TKey, TValue>> IEnumerable<MapEntry<TKey, TValue>>.GetEnumerator()
+    {
+        return ((IEnumerable<KeyValuePair<TKey, TValue>>) this).Select(kvp =>
+            new MapEntry<TKey, TValue>(kvp)).GetEnumerator();
+    }
 
-        public void Set(TKey key, TValue value)
-        {
-            this[key] = value;
-        }
-
-        IEnumerator<MapEntry<TKey, TValue>> IEnumerable<MapEntry<TKey, TValue>>.GetEnumerator()
-        {
-            return ((IEnumerable<KeyValuePair<TKey, TValue>>) this).Select(kvp =>
-                new MapEntry<TKey, TValue>(kvp)).GetEnumerator();
-        }
-
-        public void Delete(TKey key)
-        {
-            Remove(key);
-        }
+    public void Delete(TKey key)
+    {
+        Remove(key);
     }
 }

@@ -1,3 +1,27 @@
+@import url('../node_modules/@fontsource/noto-sans/300.css');
+@import url('../node_modules/@fontsource/noto-sans/400.css');
+@import url('../node_modules/@fontsource/noto-sans/500.css');
+@import url('../node_modules/@fontsource/noto-sans/700.css');
+
+@import url('../node_modules/@fontsource/noto-sans/300-italic.css');
+@import url('../node_modules/@fontsource/noto-sans/400-italic.css');
+@import url('../node_modules/@fontsource/noto-sans/500-italic.css');
+@import url('../node_modules/@fontsource/noto-sans/700-italic.css');
+
+@import url('../node_modules/@fontsource/noto-serif/300.css');
+@import url('../node_modules/@fontsource/noto-serif/400.css');
+@import url('../node_modules/@fontsource/noto-serif/500.css');
+@import url('../node_modules/@fontsource/noto-serif/700.css');
+
+@import url('../node_modules/@fontsource/noto-serif/300-italic.css');
+@import url('../node_modules/@fontsource/noto-serif/400-italic.css');
+@import url('../node_modules/@fontsource/noto-serif/500-italic.css');
+@import url('../node_modules/@fontsource/noto-serif/700-italic.css');
+
+@import url('../node_modules/@fortawesome/fontawesome-free/css/all.css');
+
+@import url('../node_modules/bootstrap/dist/css/bootstrap.min.css');
+
 .at-cursor-bar {
     /* Defines the color of the bar background when a bar is played */
     background: rgba(255, 242, 0, 0.25);
@@ -22,7 +46,7 @@
 
 html,
 body {
-    font-family: 'Roboto', sans-serif;
+    font-family: 'Noto Sans', sans-serif;
     font-size: 14px;
     height: 100vh;
 }
@@ -224,6 +248,11 @@ input[type='range']::-moz-range-thumb {
     display: flex;
     justify-content: space-between;
 }
+
+.at-player a {
+    text-decoration: none;
+}
+
 .at-player > div {
     padding: 3px;
     display: flex;
@@ -415,4 +444,16 @@ input[type='range']::-moz-range-thumb {
     .at-viewport {
         left: 0 !important;
     }
+}
+
+.at-menu {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 10000;
+    overflow: initial;
+}
+
+.at-menu .dropdown-toggle::after {
+    display: none;
 }

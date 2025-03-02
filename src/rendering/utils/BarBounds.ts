@@ -62,7 +62,13 @@ export class BarBounds {
     /**
      * Finishes the lookup object and optimizes itself for fast access.
      */
-    public finish(): void {
+    public finish(scale: number = 1): void {
+        this.realBounds.scaleWith(scale);
+        this.visualBounds.scaleWith(scale);
+
         this.beats.sort((a, b) => a.realBounds.x - b.realBounds.x);
+        for(const b of this.beats){
+            b.finish(scale);
+        }
     }
 }

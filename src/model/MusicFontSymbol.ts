@@ -1,9 +1,16 @@
 /**
  * Lists all music font symbols used within alphaTab. The names
- * and values are aligned with the SMuFL standard. 
+ * and values are aligned with the SMuFL standard.
  */
 export enum MusicFontSymbol {
     None = -1,
+
+    Space = 0x20,
+
+    Brace = 0xe000,
+    BracketTop = 0xe003,
+    BracketBottom = 0xe004,
+    SystemDivider = 0xe007,
 
     GClef = 0xe050,
     CClef = 0xe05c,
@@ -48,8 +55,26 @@ export enum MusicFontSymbol {
     NoteheadHeavyX = 0xe0f8,
     NoteheadHeavyXHat = 0xe0f9,
 
+    NoteheadSlashVerticalEnds = 0xe100,
+    NoteheadSlashWhiteWhole = 0xe102,
+    NoteheadSlashWhiteHalf = 0xe103,
+
     NoteQuarterUp = 0xe1d5,
     NoteEighthUp = 0xe1d7,
+
+    TextBlackNoteLongStem = 0xE1F1,
+    TextBlackNoteFrac8thLongStem = 0xE1F3,
+    TextBlackNoteFrac16thLongStem = 0xE1F5,
+    TextBlackNoteFrac32ndLongStem = 0xE1F6,
+
+    TextCont8thBeamLongStem = 0xE1F8,
+    TextCont16thBeamLongStem = 0xE1FA,
+    TextCont32ndBeamLongStem = 0xE1FB,
+
+    TextAugmentationDot = 0xE1FC,
+    TextTupletBracketStartLongStem = 0xE201,
+    TextTuplet3LongStem = 0xE202,
+    TextTupletBracketEndLongStem = 0xE203,
 
     Tremolo3 = 0xe222,
     Tremolo2 = 0xe221,
@@ -76,10 +101,18 @@ export enum MusicFontSymbol {
     AccidentalQuarterToneFlatArrowUp = 0xe270,
     AccidentalQuarterToneSharpArrowUp = 0xe274,
     AccidentalQuarterToneNaturalArrowUp = 0xe272,
-    
+
+    Segno = 0xe047,
+    Coda = 0xe048,
+
     ArticAccentAbove = 0xe4a0,
+    ArticAccentBelow = 0xe4a1,
     ArticStaccatoAbove = 0xe4a2,
+    ArticStaccatoBelow = 0xe4a3,
+    ArticTenutoAbove = 0xe4a4,
+    ArticTenutoBelow = 0xe4a5,
     ArticMarcatoAbove = 0xe4ac,
+    ArticMarcatoBelow = 0xe4ad,
 
     FermataAbove = 0xe4c0,
     FermataShortAbove = 0xe4c4,
@@ -105,7 +138,7 @@ export enum MusicFontSymbol {
     OttavaBassaVb = 0xe51c,
     Quindicesima = 0xe514,
     QuindicesimaAlta = 0xe515,
-    
+
     DynamicPPP = 0xe52a,
     DynamicPP = 0xe52b,
     DynamicPiano = 0xe520,
@@ -116,9 +149,16 @@ export enum MusicFontSymbol {
     DynamicFFF = 0xe530,
 
     OrnamentTrill = 0xe566,
+    OrnamentTurn = 0xe567,
+    OrnamentTurnInverted = 0xe568,
+    OrnamentShortTrill = 0xe56c,
+    OrnamentMordent = 0xe56d,
 
     StringsDownBow = 0xe610,
     StringsUpBow = 0xe612,
+
+    KeyboardPedalPed = 0xE650,
+    KeyboardPedalUp = 0xE655,
 
     PictEdgeOfCymbal = 0xe729,
 
@@ -129,11 +169,17 @@ export enum MusicFontSymbol {
     GuitarString4 = 0xe837,
     GuitarString5 = 0xe838,
     GuitarString6 = 0xe839,
-    GuitarString7 = 0xe83A,
-    GuitarString8 = 0xe83B,
-    GuitarString9 = 0xe83C,
+    GuitarString7 = 0xe83a,
+    GuitarString8 = 0xe83b,
+    GuitarString9 = 0xe83c,
+
+    GuitarOpenPedal = 0xe83d,
+    GuitarClosePedal = 0xe83f,
 
     GuitarGolpe = 0xe842,
+    GuitarFadeIn = 0xe843,
+    GuitarFadeOut = 0xe844,
+    GuitarVolumeSwell = 0xe845,
 
     FretboardX = 0xe859,
     FretboardO = 0xe85a,

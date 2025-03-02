@@ -17,24 +17,24 @@ export class NoteHeadGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let offset: number = this._isGrace ? this.scale : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale * this.scale, this.symbol, false);
+        let offset: number = this._isGrace ? 1 : 0;
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
     }
 
     public override doLayout(): void {
-        let scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+        let scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
         switch (this._duration) {
             case Duration.QuadrupleWhole:
                 this.width = 14 * scale;
                 break;
             case Duration.DoubleWhole:
-                this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+                this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
                 break;
             case Duration.Whole:
-                this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+                this.width = 14 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
                 break;
             default:
-                this.width = NoteHeadGlyph.QuarterNoteHeadWidth * (this._isGrace ? NoteHeadGlyph.GraceScale : 1) * this.scale;
+                this.width = NoteHeadGlyph.QuarterNoteHeadWidth * (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
                 break;
         }
         this.height = NoteHeadGlyph.NoteHeadHeight * scale;

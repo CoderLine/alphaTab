@@ -11,6 +11,8 @@ import { TabBendRenderPoint } from '@src/rendering/glyphs/TabBendRenderPoint';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { RenderingResources } from '@src/RenderingResources';
 import { BendPoint } from '@src/model/BendPoint';
+import { VibratoType } from '@src/model';
+import { NoteVibratoGlyph } from './NoteVibratoGlyph';
 
 export class TabBendGlyph extends Glyph {
     private static readonly ArrowSize: number = 6;
@@ -124,7 +126,7 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight * this.scale;
+        let bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight;
         this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (let note of this._notes) {
@@ -188,7 +190,9 @@ export class TabBendGlyph extends Glyph {
                 break;
             case BendType.BendRelease:
                 renderingPoints.push(new TabBendRenderPoint(0, note.bendPoints![0].value));
-                renderingPoints.push(new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints![1].value));
+                renderingPoints.push(
+                    new TabBendRenderPoint((BendPoint.MaxPosition / 2) | 0, note.bendPoints![1].value)
+                );
                 renderingPoints.push(new TabBendRenderPoint(BendPoint.MaxPosition, note.bendPoints![3].value));
                 break;
             case BendType.Bend:
@@ -214,7 +218,7 @@ export class TabBendGlyph extends Glyph {
             let startNoteRenderer: BarRendererBase = this.renderer;
             let endNote: Note = note;
             let isMultiBeatBend: boolean = false;
-            let endNoteRenderer: TabBarRenderer | null = null;
+            let endNoteRenderer: BarRendererBase | null = null;
             let endNoteHasBend: boolean = false;
             let slurText: string = note.bendStyle === BendStyle.Gradual ? 'grad.' : '';
             let endBeat: Beat | null = null;
@@ -223,17 +227,22 @@ export class TabBendGlyph extends Glyph {
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                     this.renderer.staff.staveId,
                     nextNote.beat.voice.bar
-                ) as TabBarRenderer;
+                );
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
                     break;
                 }
                 endNote = nextNote;
                 isMultiBeatBend = true;
-                if (endNote.hasBend || !this.renderer.settings.notation.extendBendArrowsOnTiedNotes) {
+                if (
+                    endNote.hasBend ||
+                    !this.renderer.settings.notation.extendBendArrowsOnTiedNotes ||
+                    endNote.vibrato != VibratoType.None
+                ) {
                     endNoteHasBend = true;
                     break;
                 }
             }
+
             endBeat = endNote.beat;
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
                 this.renderer.staff.staveId,
@@ -273,7 +282,7 @@ export class TabBendGlyph extends Glyph {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
             }
             if (!isMultiBeatBend) {
-                endX -= TabBendGlyph.ArrowSize * this.scale;
+                endX -= TabBendGlyph.ArrowSize;
             }
             // we need some pixels for the arrow. otherwise we might draw into the next
             // note
@@ -290,25 +299,31 @@ export class TabBendGlyph extends Glyph {
                 }
                 if (note.bendType !== BendType.Prebend) {
                     if (i === 0) {
-                        startX += 2 * this.scale;
+                        startX += 2;
                     }
                     this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
                     secondPt = new TabBendRenderPoint(BendPoint.MaxPosition, firstPt.value);
                     secondPt.lineValue = firstPt.lineValue;
 
-                    this.paintBend(
-                        note,
-                        firstPt,
-                        secondPt,
-                        startX,
-                        topY,
-                        dX,
-                        slurText,
-                        canvas
-                    );
+                    this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 }
             }
+
+            if (endNote.vibrato !== VibratoType.None) {
+                const vibratoStartX = endX - cx + TabBendGlyph.ArrowSize - endNoteRenderer.x;
+                const vibratoStartY: number =
+                    topY -
+                    cy -
+                    TabBendGlyph.BendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
+
+                const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato, 1.2);
+                vibrato.beat = endNote.beat;
+                vibrato.renderer = endNoteRenderer;
+                vibrato.doLayout();
+                vibrato.paint(cx + endNoteRenderer.x, cy, canvas);
+            }
+
             canvas.color = color;
         }
     }
@@ -327,7 +342,7 @@ export class TabBendGlyph extends Glyph {
         let res: RenderingResources = this.renderer.resources;
         let overflowOffset: number = r.lineOffset / 2;
         let x1: number = cx + dX * firstPt.offset;
-        let bendValueHeight: number = TabBendGlyph.BendValueHeight * this.scale;
+        let bendValueHeight: number = TabBendGlyph.BendValueHeight;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
@@ -347,7 +362,7 @@ export class TabBendGlyph extends Glyph {
         }
         // what type of arrow? (up/down)
         let arrowOffset: number = 0;
-        let arrowSize: number = TabBendGlyph.ArrowSize * this.scale;
+        let arrowSize: number = TabBendGlyph.ArrowSize;
         if (secondPt.value > firstPt.value) {
             if (y2 + arrowSize > y1) {
                 y2 = y1 - arrowSize;
@@ -371,14 +386,14 @@ export class TabBendGlyph extends Glyph {
             canvas.fill();
             arrowOffset = -arrowSize;
         }
-        canvas.stroke();
+        canvas.beginPath();
         if (firstPt.value === secondPt.value) {
             // draw horizontal dashed line
             // to really have the line ending at the right position
             // we draw from right to left. it's okay if the space is at the beginning
             if (firstPt.lineValue > 0) {
                 let dashX: number = x2;
-                let dashSize: number = TabBendGlyph.DashSize * this.scale;
+                let dashSize: number = TabBendGlyph.DashSize;
                 let end: number = x1 + dashSize;
                 let dashes: number = (dashX - x1) / (dashSize * 2);
                 if (dashes < 1) {
@@ -395,7 +410,7 @@ export class TabBendGlyph extends Glyph {
             }
         } else {
             if (x2 > x1) {
-                // draw bezier lien from first to second point
+                // draw bezier line from first to second point
                 canvas.moveTo(x1, y1);
                 canvas.bezierCurveTo((x1 + x2) / 2, y1, x2, y1, x2, y2 + arrowOffset);
                 canvas.stroke();
@@ -407,7 +422,7 @@ export class TabBendGlyph extends Glyph {
         }
         if (slurText && firstPt.offset < secondPt.offset) {
             canvas.font = res.graceFont;
-            let size: number = canvas.measureText(slurText);
+            let size: number = canvas.measureText(slurText).width;
             let y: number = 0;
             let x: number = 0;
             if (y1 > y2) {
@@ -447,8 +462,8 @@ export class TabBendGlyph extends Glyph {
                 }
                 // draw label
                 canvas.font = res.tablatureFont;
-                let size: number = canvas.measureText(s);
-                let y: number = startY - res.tablatureFont.size * 0.5 - 2 * this.scale;
+                let size: number = canvas.measureText(s).width;
+                let y: number = startY - res.tablatureFont.size * 0.5 - 2;
                 let x: number = x2 - size / 2;
                 canvas.fillText(s, x, y);
             }

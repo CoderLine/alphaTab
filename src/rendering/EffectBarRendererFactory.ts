@@ -4,27 +4,46 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { RenderStaff } from './staves/RenderStaff';
+import { Staff, Track } from '@src/model';
 
 export class EffectBarRendererFactory extends BarRendererFactory {
-    private _infos: EffectBarRendererInfo[];
+    public infos: EffectBarRendererInfo[];
     private _staffId: string;
     public get staffId(): string {
         return this._staffId;
     }
 
-    public constructor(staffId: string, infos: EffectBarRendererInfo[]) {
-        super();
-        this._infos = infos;
-        this._staffId = staffId;
-        this.isInAccolade = false;
-        this.isRelevantForBoundsLookup = false;
+    public shouldShow: ((track:Track, staff:Staff) => boolean) | null;
+
+    public override getStaffPaddingTop(staff: RenderStaff): number {
+        return staff.system.layout.renderer.settings.display.effectStaffPaddingTop;
     }
+
+    public override getStaffPaddingBottom(staff: RenderStaff): number {
+        return staff.system.layout.renderer.settings.display.effectStaffPaddingBottom;
+    }
+
+    public constructor(staffId: string, infos: EffectBarRendererInfo[], shouldShow: ((track:Track, staff:Staff) => boolean) | null = null) {
+        super();
+        this.infos = infos;
+        this._staffId = staffId;
+        this.isInsideBracket = false;
+        this.isRelevantForBoundsLookup = false;
+        this.shouldShow = shouldShow;
+    }
+
+    public override canCreate(track: Track, staff: Staff): boolean {
+        const shouldShow = this.shouldShow;
+        return super.canCreate(track, staff) && (!shouldShow || shouldShow(track, staff));
+    }
+
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
         return new EffectBarRenderer(
             renderer,
             bar,
-            this._infos.filter(i => renderer.settings.notation.isNotationElementVisible(i.notationElement))
+            this.infos.filter(i => renderer.settings.notation.isNotationElementVisible(i.notationElement))
         );
     }
 }

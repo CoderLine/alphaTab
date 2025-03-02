@@ -16,7 +16,7 @@ describe('GeneralTests', () => {
     it('alternate-endings', async () => {
         let settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
-        await VisualTestHelper.runVisualTest('general/alternate-endings.gp', settings, undefined, undefined, 1.5);
+        await VisualTestHelper.runVisualTest('general/alternate-endings.gp', settings);
     });
 
     it('tuning', async () => {

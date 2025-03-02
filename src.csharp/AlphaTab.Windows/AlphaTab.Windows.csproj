@@ -1,10 +1,10 @@
-<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <RootNamespace>AlphaTab</RootNamespace>
         <AssemblyName>AlphaTab.Windows</AssemblyName>
         <PackageId>AlphaTab.Windows</PackageId>
-		<PackageReadmeFile>README.md</PackageReadmeFile>
+		    <PackageReadmeFile>README.md</PackageReadmeFile>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <TargetFramework>net8.0-windows</TargetFramework>
@@ -13,6 +13,7 @@
         <NoWarn>$(NoWarn);NU5105</NoWarn>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
+        <EnableWindowsTargeting>true</EnableWindowsTargeting>
     </PropertyGroup>
 
     <ItemGroup>
@@ -26,7 +27,7 @@
 
     <ItemGroup>
       <PackageReference Include="NAudio.Core" Version="2.2.1" />
-      <PackageReference Include="AlphaSkia.Native.Windows" Version="2.1.120" />
+      <PackageReference Include="AlphaSkia.Native.Windows" Version="2.3.120" />
     </ItemGroup>
 
 </Project>

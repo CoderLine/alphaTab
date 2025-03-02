@@ -5,6 +5,10 @@
 // </auto-generated>
 import { RenderStylesheet } from "@src/model/RenderStylesheet";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { BracketExtendMode } from "@src/model/RenderStylesheet";
+import { TrackNamePolicy } from "@src/model/RenderStylesheet";
+import { TrackNameMode } from "@src/model/RenderStylesheet";
+import { TrackNameOrientation } from "@src/model/RenderStylesheet";
 export class RenderStylesheetSerializer {
     public static fromJson(obj: RenderStylesheet, m: unknown): void {
         if (!m) {
@@ -18,12 +22,78 @@ export class RenderStylesheetSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("hidedynamics", obj.hideDynamics);
+        o.set("bracketextendmode", obj.bracketExtendMode as number);
+        o.set("usesystemsignseparator", obj.useSystemSignSeparator);
+        o.set("globaldisplaytuning", obj.globalDisplayTuning);
+        if (obj.perTrackDisplayTuning !== null) {
+            const m = new Map<string, unknown>();
+            o.set("pertrackdisplaytuning", m);
+            for (const [k, v] of obj.perTrackDisplayTuning!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o.set("globaldisplaychorddiagramsontop", obj.globalDisplayChordDiagramsOnTop);
+        if (obj.perTrackChordDiagramsOnTop !== null) {
+            const m = new Map<string, unknown>();
+            o.set("pertrackchorddiagramsontop", m);
+            for (const [k, v] of obj.perTrackChordDiagramsOnTop!) {
+                m.set(k.toString(), v);
+            }
+        }
+        o.set("singletracktracknamepolicy", obj.singleTrackTrackNamePolicy as number);
+        o.set("multitracktracknamepolicy", obj.multiTrackTrackNamePolicy as number);
+        o.set("firstsystemtracknamemode", obj.firstSystemTrackNameMode as number);
+        o.set("othersystemstracknamemode", obj.otherSystemsTrackNameMode as number);
+        o.set("firstsystemtracknameorientation", obj.firstSystemTrackNameOrientation as number);
+        o.set("othersystemstracknameorientation", obj.otherSystemsTrackNameOrientation as number);
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
         switch (property) {
             case "hidedynamics":
                 obj.hideDynamics = v! as boolean;
+                return true;
+            case "bracketextendmode":
+                obj.bracketExtendMode = JsonHelper.parseEnum<BracketExtendMode>(v, BracketExtendMode)!;
+                return true;
+            case "usesystemsignseparator":
+                obj.useSystemSignSeparator = v! as boolean;
+                return true;
+            case "globaldisplaytuning":
+                obj.globalDisplayTuning = v! as boolean;
+                return true;
+            case "pertrackdisplaytuning":
+                obj.perTrackDisplayTuning = new Map<number, boolean>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.perTrackDisplayTuning!.set(parseInt(k), v as boolean);
+                });
+                return true;
+            case "globaldisplaychorddiagramsontop":
+                obj.globalDisplayChordDiagramsOnTop = v! as boolean;
+                return true;
+            case "pertrackchorddiagramsontop":
+                obj.perTrackChordDiagramsOnTop = new Map<number, boolean>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.perTrackChordDiagramsOnTop!.set(parseInt(k), v as boolean);
+                });
+                return true;
+            case "singletracktracknamepolicy":
+                obj.singleTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
+                return true;
+            case "multitracktracknamepolicy":
+                obj.multiTrackTrackNamePolicy = JsonHelper.parseEnum<TrackNamePolicy>(v, TrackNamePolicy)!;
+                return true;
+            case "firstsystemtracknamemode":
+                obj.firstSystemTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(v, TrackNameMode)!;
+                return true;
+            case "othersystemstracknamemode":
+                obj.otherSystemsTrackNameMode = JsonHelper.parseEnum<TrackNameMode>(v, TrackNameMode)!;
+                return true;
+            case "firstsystemtracknameorientation":
+                obj.firstSystemTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
+                return true;
+            case "othersystemstracknameorientation":
+                obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
                 return true;
         }
         return false;

@@ -11,12 +11,32 @@ export class IOHelper {
         return (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4;
     }
 
+    public static readFloat32BE(readable: IReadable): number {
+        const bits = new Uint8Array(4);
+        readable.read(bits, 0, bits.length);
+        bits.reverse();
+        return TypeConversions.bytesToFloat32LE(bits);
+    }
+
+    public static readFloat64BE(readable: IReadable): number {
+        const bits = new Uint8Array(8);
+        readable.read(bits, 0, bits.length);
+        bits.reverse();
+        return TypeConversions.bytesToFloat64LE(bits);
+    }
+
     public static readInt32LE(input: IReadable): number {
         let ch1: number = input.readByte();
         let ch2: number = input.readByte();
         let ch3: number = input.readByte();
         let ch4: number = input.readByte();
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
+    }
+
+    public static readInt64LE(input: IReadable): number {
+        const b = new Uint8Array(8);
+        input.read(b, 0, b.length);
+        return TypeConversions.bytesToInt64LE(b);
     }
 
     public static readUInt32LE(input: IReadable): number {
@@ -132,7 +152,7 @@ export class IOHelper {
             encoding = 'utf-8';
         }
         let decoder: TextDecoder = new TextDecoder(encoding);
-        return decoder.decode(data.buffer);
+        return decoder.decode(data.buffer as ArrayBuffer);
     }
 
     private static detectEncoding(data: Uint8Array): string | null {
@@ -179,9 +199,14 @@ export class IOHelper {
         o.writeByte((v >> 0) & 0xff);
         o.writeByte((v >> 8) & 0xff);
     }
-    
+
     public static writeInt16BE(o: IWriteable, v: number) {
         o.writeByte((v >> 8) & 0xff);
         o.writeByte((v >> 0) & 0xff);
+    }
+
+    public static writeFloat32BE(o: IWriteable, v: number) {
+        const b = TypeConversions.float32BEToBytes(v);
+        o.write(b, 0, b.length);
     }
 }

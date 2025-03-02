@@ -13,7 +13,11 @@ export enum TabRhythmMode {
     /**
      * Rhythm notation is shown and behaves like normal score notation with connected bars.
      */
-    ShowWithBars
+    ShowWithBars,
+    /**
+     * Automatic detection whether the tabs should show rhythm based on hidden standard notation.
+     */
+    Automatic,
 }
 
 /**
@@ -127,7 +131,7 @@ export enum NotationElement {
      * The track names which are shown in the accolade.
      */
     TrackNames,
-    
+
     /**
      * The chord diagrams for guitars. Usually shown
      * below the score info.
@@ -287,12 +291,58 @@ export enum NotationElement {
     /**
      * The left hand tap symbol shown above the staff.
      */
-    EffectLeftHandTap
+    EffectLeftHandTap,
+
+    /**
+     * The "Free time" text shown above the staff.
+     */
+    EffectFreeTime,
+
+    /**
+     * The Sustain pedal effect shown above the staff "Ped.____*"
+     */
+    EffectSustainPedal,
+
+    /**
+     * The Golpe effect signs above and below the staff.
+     */
+    EffectGolpe,
+
+    /**
+     * The Wah effect signs above and below the staff.
+     */
+    EffectWahPedal,
+
+    /**
+     * The Beat barre effect signs above and below the staff "1/2B IV ─────┐"
+     */
+    EffectBeatBarre,
+
+    /**
+     * The note ornaments like turns and mordents.
+     */
+    EffectNoteOrnament,
+
+    /**
+     * The Rasgueado indicator above the staff Rasg. ----|"
+     */
+    EffectRasgueado,
+
+    /**
+     * The directions indicators like coda and segno.
+     */
+    EffectDirections,
+
+    /**
+     * The absolute playback time of beats.
+     */
+    EffectBeatTimer,
 }
 
 /**
  * The notation settings control how various music notation elements are shown and behaving
  * @json
+ * @json_declaration
  */
 export class NotationSettings {
     /**
@@ -323,7 +373,7 @@ export class NotationSettings {
     /**
      * Whether to show rhythm notation in the guitar tablature.
      */
-    public rhythmMode: TabRhythmMode = TabRhythmMode.Hidden;
+    public rhythmMode: TabRhythmMode = TabRhythmMode.Automatic;
 
     /**
      * The height of the rythm bars.

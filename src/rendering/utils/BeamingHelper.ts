@@ -1,7 +1,6 @@
 import { Bar } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { Note } from '@src/model/Note';
@@ -28,10 +27,10 @@ export class BeamingHelperDrawInfo {
     public endX: number = 0;
     public endY: number = 0;
 
-    // 
+    //
     /**
-     * calculates the Y-position given a X-pos using the current start end point 
-     * @param x 
+     * calculates the Y-position given a X-pos using the current start end point
+     * @param x
      */
     public calcY(x: number): number {
         // get the y position of the given beat on this curve
@@ -59,14 +58,11 @@ export class BeamingHelper {
     public shortestDuration: Duration = Duration.QuadrupleWhole;
 
     /**
-     * the number of fingering indicators that will be drawn
-     */
-    public fingeringCount: number = 0;
-
-    /**
      * an indicator whether any beat has a tuplet on it.
      */
     public hasTuplet: boolean = false;
+
+    public slashBeats: Beat[] = [];
 
     private _firstBeatLowestNoteCompareValue: number = -1;
     private _firstBeatHighestNoteCompareValue: number = -1;
@@ -93,16 +89,26 @@ export class BeamingHelper {
         return this.beats.length === 1 && this.beats[0].isRest;
     }
 
-    public get hasLine(): boolean {
-        return this.beats.length === 1 && this.beats[0].duration > Duration.Whole;
+    public hasLine(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
+        return (
+            (forceFlagOnSingleBeat && this.beatHasLine(beat!)) ||
+            (!forceFlagOnSingleBeat && this.beats.length === 1 && this.beatHasLine(beat!))
+        );
     }
 
-    public get hasFlag(): boolean {
+    private beatHasLine(beat: Beat): boolean {
+        return beat!.duration > Duration.Whole;
+    }
+
+    public hasFlag(forceFlagOnSingleBeat: boolean, beat?: Beat): boolean {
         return (
-            this.beats.length === 1 &&
-            !this.beats[0].isRest && 
-            (this.beats[0].duration > Duration.Quarter || this.beats[0].graceType !== GraceType.None)
+            (forceFlagOnSingleBeat && this.beatHasFlag(beat!)) ||
+            (!forceFlagOnSingleBeat && this.beats.length === 1 && this.beatHasFlag(this.beats[0]))
         );
+    }
+
+    private beatHasFlag(beat: Beat) {
+        return !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None);
     }
 
     public constructor(staff: Staff, renderer: BarRendererBase) {
@@ -111,9 +117,11 @@ export class BeamingHelper {
         this.beats = [];
     }
 
-    public getBeatLineX(beat: Beat): number {
+    public getBeatLineX(beat: Beat, direction?: BeamDirection): number {
+        direction = direction ?? this.direction;
+
         if (this.hasBeatLineX(beat)) {
-            if (this.direction === BeamDirection.Up) {
+            if (direction === BeamDirection.Up) {
                 return this._beatLineXPositions.get(beat.index)!.up;
             }
             return this._beatLineXPositions.get(beat.index)!.down;
@@ -130,7 +138,7 @@ export class BeamingHelper {
         positions.staffId = staffId;
         positions.up = up;
         positions.down = down;
-        for(const v of this.drawingInfos.values()) {
+        for (const v of this.drawingInfos.values()) {
             if (v.startBeat == beat) {
                 v.startX = this.getBeatLineX(beat);
             } else if (v.endBeat == beat) {
@@ -221,14 +229,16 @@ export class BeamingHelper {
 
     /**
      * Registers a rest beat within the accidental helper so the rest
-     * symbol is considered properly during beaming. 
-     * @param beat The rest beat. 
+     * symbol is considered properly during beaming.
+     * @param beat The rest beat.
      * @param line The line on which the rest symbol is placed
      */
     public applyRest(beat: Beat, line: number): void {
         // do not accept rests after the last beat which has notes
-        if (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index ||
-            this._firstNonRestBeat && beat.index <= this._firstNonRestBeat.index) {
+        if (
+            (this._lastNonRestBeat && beat.index >= this._lastNonRestBeat.index) ||
+            (this._firstNonRestBeat && beat.index <= this._firstNonRestBeat.index)
+        ) {
             return;
         }
 
@@ -278,6 +288,7 @@ export class BeamingHelper {
         } else {
             switch (this.beats[this.beats.length - 1].beamingMode) {
                 case BeatBeamingMode.Auto:
+                case BeatBeamingMode.ForceSplitOnSecondaryToNext:
                     add = BeamingHelper.canJoin(this.beats[this.beats.length - 1], beat);
                     break;
                 case BeatBeamingMode.ForceSplitToNext:
@@ -290,8 +301,16 @@ export class BeamingHelper {
         }
 
         if (add) {
-            if (beat.preferredBeamDirection !== null) {
+            if (this.preferredBeamDirection == null && beat.preferredBeamDirection !== null) {
                 this.preferredBeamDirection = beat.preferredBeamDirection;
+            }
+
+            if (beat.hasTuplet) {
+                this.hasTuplet = true;
+            }
+
+            if (beat.graceType !== GraceType.None) {
+                this.isGrace = true;
             }
 
             if (!beat.isRest) {
@@ -299,37 +318,20 @@ export class BeamingHelper {
                     this.beats = [];
                 }
                 this.beats.push(beat);
-
-                if (beat.graceType !== GraceType.None) {
-                    this.isGrace = true;
-                }
-                if (beat.hasTuplet) {
-                    this.hasTuplet = true;
-                }
-                let fingeringCount: number = 0;
-                for (let n: number = 0; n < beat.notes.length; n++) {
-                    let note: Note = beat.notes[n];
-                    if (note.leftHandFinger !== Fingers.Unknown || note.rightHandFinger !== Fingers.Unknown) {
-                        fingeringCount++;
-                    }
-                }
-                if (fingeringCount > this.fingeringCount) {
-                    this.fingeringCount = fingeringCount;
-                }
                 this.checkNote(beat.minNote);
                 this.checkNote(beat.maxNote);
                 if (this.shortestDuration < beat.duration) {
                     this.shortestDuration = beat.duration;
                 }
-                if(!this._firstNonRestBeat) {
+                if (!this._firstNonRestBeat) {
                     this._firstNonRestBeat = beat;
                 }
                 this._lastNonRestBeat = beat;
             } else if (this.beats.length === 0) {
                 this.beats.push(beat);
             }
-            if (beat.hasTuplet) {
-                this.hasTuplet = true;
+            if (beat.slashed) {
+                this.slashBeats.push(beat);
             }
         }
         return add;
@@ -341,8 +343,8 @@ export class BeamingHelper {
         }
 
         // a note can expand to 2 note heads if it has a harmonic
-        let lowestValueForNote:number;
-        let highestValueForNote:number;
+        let lowestValueForNote: number;
+        let highestValueForNote: number;
 
         // For percussion we use the line as value to compare whether it is
         // higher or lower.
@@ -361,10 +363,16 @@ export class BeamingHelper {
         }
 
         if (this.beats.length === 1 && this.beats[0] === note.beat) {
-            if (this._firstBeatLowestNoteCompareValue === -1 || lowestValueForNote < this._firstBeatLowestNoteCompareValue) {
+            if (
+                this._firstBeatLowestNoteCompareValue === -1 ||
+                lowestValueForNote < this._firstBeatLowestNoteCompareValue
+            ) {
                 this._firstBeatLowestNoteCompareValue = lowestValueForNote;
             }
-            if (this._firstBeatHighestNoteCompareValue === -1 || highestValueForNote > this._firstBeatHighestNoteCompareValue) {
+            if (
+                this._firstBeatHighestNoteCompareValue === -1 ||
+                highestValueForNote > this._firstBeatHighestNoteCompareValue
+            ) {
                 this._firstBeatHighestNoteCompareValue = highestValueForNote;
             }
         }
@@ -373,7 +381,10 @@ export class BeamingHelper {
             this._lastBeatLowestNoteCompareValue = lowestValueForNote;
         }
 
-        if (this._lastBeatHighestNoteCompareValue === -1 || highestValueForNote > this._lastBeatHighestNoteCompareValue) {
+        if (
+            this._lastBeatHighestNoteCompareValue === -1 ||
+            highestValueForNote > this._lastBeatHighestNoteCompareValue
+        ) {
             this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
 
@@ -386,7 +397,6 @@ export class BeamingHelper {
             this._highestNoteCompareValueInHelper = highestValueForNote;
         }
     }
-
 
     // TODO: Check if this beaming is really correct, I'm not sure if we are connecting beats correctly
     private static canJoin(b1: Beat, b2: Beat): boolean {

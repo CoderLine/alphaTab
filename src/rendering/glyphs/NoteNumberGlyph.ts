@@ -78,14 +78,14 @@ export class NoteNumberGlyph extends Glyph {
         this.isEmpty = !this._noteString;
         if (!this.isEmpty) {
             this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.tablatureFont;
-            this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(this._noteString) * this.scale;
+            this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(this._noteString).width;
             this.width = this.noteStringWidth;
             this.height = this.renderer.scoreRenderer.canvas!.font.size;
             let hasTrill: boolean = !!this._trillNoteString;
             if (hasTrill) {
                 this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
                 this._trillNoteStringWidth =
-                    3 * this.scale + this.renderer.scoreRenderer.canvas!.measureText(this._trillNoteString);
+                    3 + this.renderer.scoreRenderer.canvas!.measureText(this._trillNoteString).width;
                 this.width += this._trillNoteStringWidth;
             }
         }
@@ -99,7 +99,7 @@ export class NoteNumberGlyph extends Glyph {
         let x: number = cx + this.x + (this.width - textWidth) / 2;
         let prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + 3 * this.scale, cy + this.y);
+        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + 3, cy + this.y);
         this.renderer.scoreRenderer.canvas!.font = prevFont;
         canvas.fillText(this._noteString!, x, cy + this.y);
     }

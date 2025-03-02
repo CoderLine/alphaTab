@@ -22,6 +22,11 @@ import { Settings } from '@src/Settings';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
+import { GolpeType } from './GolpeType';
+import { FadeType } from './FadeType';
+import { WahPedal } from './WahPedal';
+import { BarreShape } from './BarreShape';
+import { Rasgueado } from './Rasgueado';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -38,7 +43,11 @@ export enum BeatBeamingMode {
     /**
      * Force a merge with the next beat.
      */
-    ForceMergeWithNext
+    ForceMergeWithNext,
+    /**
+     * Force a split to the next beat on the secondary beam.
+     */
+    ForceSplitOnSecondaryToNext
 }
 
 /**
@@ -174,7 +183,7 @@ export class Beat {
     public duration: Duration = Duration.Quarter;
 
     public get isRest(): boolean {
-        return this.isEmpty || this.notes.length === 0;
+        return this.isEmpty || (!this.deadSlapped && this.notes.length === 0);
     }
 
     /**
@@ -207,9 +216,25 @@ export class Beat {
     public dots: number = 0;
 
     /**
+     * Gets a value indicating whether this beat is fade-in.
+     * @deprecated Use `fade`
+     */
+    public get fadeIn(): boolean {
+        return this.fade === FadeType.FadeIn;
+    }
+
+    /**
+     * Sets a value indicating whether this beat is fade-in.
+     * @deprecated Use `fade`
+     */
+    public set fadeIn(value: boolean) {
+        this.fade = value ? FadeType.FadeIn : FadeType.None;
+    }
+
+    /**
      * Gets or sets a value indicating whether this beat is fade-in.
      */
-    public fadeIn: boolean = false;
+    public fade: FadeType = FadeType.None;
 
     /**
      * Gets or sets the lyrics shown on this beat.
@@ -219,7 +244,9 @@ export class Beat {
     /**
      * Gets or sets a value indicating whether the beat is played in rasgueado style.
      */
-    public hasRasgueado: boolean = false;
+    public get hasRasgueado(): boolean {
+        return this.rasgueado !== Rasgueado.None;
+    }
 
     /**
      * Gets or sets a value indicating whether the notes on this beat are played with a pop-style (bass).
@@ -240,6 +267,16 @@ export class Beat {
      * Gets or sets the text annotation shown on this beat.
      */
     public text: string | null = null;
+
+    /**
+     * Gets or sets whether this beat should be rendered as slashed note.
+     */
+    public slashed: boolean = false;
+
+    /**
+     * Whether this beat should rendered and played as "dead slapped".
+     */
+    public deadSlapped: boolean = false;
 
     /**
      * Gets or sets the brush type applied to the notes of this beat.
@@ -390,6 +427,11 @@ export class Beat {
      */
     public playbackDuration: number = 0;
 
+    /**
+     * The type of golpe to play.
+     */
+    public golpe: GolpeType = GolpeType.None;
+
     public get absoluteDisplayStart(): number {
         return this.voice.bar.masterBar.start + this.displayStart;
     }
@@ -438,6 +480,45 @@ export class Beat {
      * Gets or sets how the beaming should be done for this beat.
      */
     public beamingMode: BeatBeamingMode = BeatBeamingMode.Auto;
+
+    /**
+     * Whether the wah pedal should be used when playing the beat.
+     */
+    public wahPedal: WahPedal = WahPedal.None;
+
+    /**
+     * The fret of a barré being played on this beat.
+     */
+    public barreFret: number = -1;
+
+    /**
+     * The shape how the barre should be played on this beat.
+     */
+    public barreShape: BarreShape = BarreShape.None;
+
+    /**
+     * Gets a value indicating whether the beat should be played as Barré
+     */
+    public get isBarre() {
+        return this.barreShape !== BarreShape.None && this.barreFret >= 0;
+    }
+
+    /**
+     * The Rasgueado pattern to play with this beat.
+     */
+    public rasgueado: Rasgueado = Rasgueado.None;
+
+    /**
+     * Whether to show the time when this beat is played the first time.
+     * (requires that the midi for the song is generated so that times are calculated).
+     * If no midi is generated the timer value might be filled from the input file (or manually).
+     */
+    public showTimer:boolean = false;
+
+    /**
+     * The absolute time in milliseconds when this beat will be played the first time.
+     */
+    public timer: number | null = null;
 
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;
@@ -584,10 +665,27 @@ export class Beat {
             }
             this.tupletGroup = currentTupletGroup;
         }
+
+        if (this.index > 0) {
+            const barDuration = this.voice.bar.masterBar.calculateDuration();
+            const validBeatAutomations: Automation[] = [];
+            for (const automation of this.automations) {
+                if (automation.ratioPosition === 0) {
+                    automation.ratioPosition = this.playbackStart / barDuration;
+                }
+
+                // we store tempo automations only on masterbar level
+                if (automation.type !== AutomationType.Volume) {
+                    validBeatAutomations.push(automation);
+                }
+            }
+            this.automations = validBeatAutomations;
+        }
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        if (this.getAutomation(AutomationType.Instrument) === null &&
+        if (
+            this.getAutomation(AutomationType.Instrument) === null &&
             this.index === 0 &&
             this.voice.index === 0 &&
             this.voice.bar.index === 0 &&
@@ -719,13 +817,19 @@ export class Beat {
         // try to detect what kind of bend was used and cleans unneeded points if required
         // Guitar Pro 6 and above (gpif.xml) uses exactly 4 points to define all whammys
         const points = this.whammyBarPoints;
-        if (points !== null && points.length > 0 && this.whammyBarType === WhammyType.Custom) {
+        const hasWhammy = points !== null && points.length > 0;
+        if (hasWhammy) {
+            const isContinuedWhammy: boolean = !!this.previousBeat && this.previousBeat.hasWhammyBar;
+            this.isContinuedWhammy = isContinuedWhammy;
+        } else {
+            this.whammyBarType = WhammyType.None;
+        }
+
+        if (hasWhammy && this.whammyBarType === WhammyType.Custom) {
             if (displayMode === NotationMode.SongBook) {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
-            let isContinuedWhammy: boolean = !!this.previousBeat && this.previousBeat.hasWhammyBar;
-            this.isContinuedWhammy = isContinuedWhammy;
-            if (points.length === 4) {
+            if (points!.length === 4) {
                 let origin: BendPoint = points[0];
                 let middle1: BendPoint = points[1];
                 let middle2: BendPoint = points[2];
@@ -737,7 +841,7 @@ export class Beat {
                         (origin.value < middle1.value && middle1.value < destination.value) ||
                         (origin.value > middle1.value && middle1.value > destination.value)
                     ) {
-                        if (origin.value !== 0 && !isContinuedWhammy) {
+                        if (origin.value !== 0 && !this.isContinuedWhammy) {
                             this.whammyBarType = WhammyType.PrediveDive;
                         } else {
                             this.whammyBarType = WhammyType.Dive;
@@ -753,7 +857,7 @@ export class Beat {
                             points.splice(2, 1);
                         }
                     } else if (origin.value === middle1.value && middle1.value === destination.value) {
-                        if (origin.value !== 0 && !isContinuedWhammy) {
+                        if (origin.value !== 0 && !this.isContinuedWhammy) {
                             this.whammyBarType = WhammyType.Predive;
                         } else {
                             this.whammyBarType = WhammyType.Hold;
@@ -765,6 +869,7 @@ export class Beat {
             }
         }
         this.updateDurations();
+
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes
@@ -816,7 +921,7 @@ export class Beat {
 
             // ensure cloned beat has also a grace simple grace group for itself
             // (see Voice.finish where every beat gets one)
-            // this ensures later that grace rods are assigned correctly to this beat. 
+            // this ensures later that grace rods are assigned correctly to this beat.
             cloneBeat.graceGroup = new GraceGroup();
             cloneBeat.graceGroup.addBeat(this);
             cloneBeat.graceGroup.isComplete = true;

@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading.Tasks;
-using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core
 {
@@ -28,6 +28,16 @@ namespace AlphaTab.Core
                     list.Add(i);
                 }
             }
+        }
+
+        public static T Find<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            return list.FirstOrDefault(predicate);
+        }
+
+        public static bool Some<T>(this IList<T> list, Func<T, bool> predicate)
+        {
+            return list.Any(predicate);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
@@ -193,7 +203,7 @@ namespace AlphaTab.Core
         {
             switch (data)
             {
-                case System.Collections.Generic.List<T> l:
+                case List<T> l:
                     l.Sort();
                     break;
                 case T[] array:
@@ -239,6 +249,13 @@ namespace AlphaTab.Core
         public static string Substr(this string s, double start, double length)
         {
             return s.Substring((int) start, (int) length);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string PadStart(this string s, double length, string pad)
+        {
+            // NOTE: we only need single char padding for now
+            return s.PadLeft((int)length, pad[0]);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -296,6 +313,11 @@ namespace AlphaTab.Core
         public static KeyValuePair<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
         {
             return new KeyValuePair<TKey, TValue>(key, value);
+        }
+
+        public static KeyValuePair<TKey, IList<TListItem>> CreateMapEntry<TKey, TListItem>(TKey key, AlphaTab.Collections.List<TListItem> value)
+        {
+            return new KeyValuePair<TKey, IList<TListItem>>(key, value);
         }
 
         public static string ToInvariantString(this double num, int radix)
@@ -475,6 +497,23 @@ namespace AlphaTab.Core
         public static string[] Split(this string value, RegExp pattern)
         {
             return pattern.Split(value);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Repeat(this string value, double count)
+        {
+            var icount = (int)count;
+            if (icount == 0)
+            {
+                return "";
+            }
+
+            var builder = new StringBuilder(value.Length * icount);
+            for (var i = 0; i < icount; i++)
+            {
+                builder.Append(value);
+            }
+            return builder.ToString();
         }
 
         public static Task CreatePromise(Action<Action, Action<object>> run)

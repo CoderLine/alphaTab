@@ -1,6 +1,10 @@
+import * as fs from 'node:fs';
+import url from 'node:url';
+
+const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
+
 const packageJsonFilePath = `${__dirname}/../package.json`;
-const pkg = require(packageJsonFilePath);
-const fs = require('fs');
+const pkg = JSON.parse(fs.readFileSync(packageJsonFilePath, 'utf-8'));
 
 let version = pkg.version.match(/([0-9]+\.[0-9]+\.[0-9]+)/)[0];
 let assemblyVersion = version;

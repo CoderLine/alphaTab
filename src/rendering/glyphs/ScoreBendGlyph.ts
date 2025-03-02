@@ -104,7 +104,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         } else {
             endBeatX += startNoteRenderer.getBeatX(this._beat.nextBeat!, BeatXPosition.PreNotes);
         }
-        endBeatX -= 8 * this.scale;
+        endBeatX -= 8;
         let middleX: number = (startX + endBeatX) / 2;
         if (this._middleNoteGlyph) {
             this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.noteHeadOffset;
@@ -129,9 +129,9 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 direction = BeamDirection.Down;
             }
             let startY: number = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(note, NoteYPosition.Top);
-            let heightOffset: number = NoteHeadGlyph.NoteHeadHeight * this.scale * NoteHeadGlyph.GraceScale * 0.5;
+            let heightOffset: number = NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
             if (direction === BeamDirection.Down) {
-                startY += NoteHeadGlyph.NoteHeadHeight * this.scale;
+                startY += NoteHeadGlyph.NoteHeadHeight;
             }
             let slurText: string = note.bendStyle === BendStyle.Gradual ? 'grad.' : '';
             if (note.isTieOrigin) {
@@ -156,7 +156,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
                         TieGlyph.paintTie(
                             canvas,
-                            this.scale,
+                            1,
                             startX,
                             startY,
                             endX,
@@ -173,7 +173,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                     }
@@ -182,12 +182,12 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                         cx + endNoteRenderer.x + endNoteRenderer.getBeatX(endNote.beat, BeatXPosition.MiddleNotes);
                     let endY: number = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(endNote, NoteYPosition.Top);
                     if (direction === BeamDirection.Down) {
-                        endY += NoteHeadGlyph.NoteHeadHeight * this.scale;
+                        endY += NoteHeadGlyph.NoteHeadHeight;
                     }
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
                         TieGlyph.paintTie(
                             canvas,
-                            this.scale,
+                            1,
                             startX,
                             startY,
                             endX,
@@ -204,7 +204,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                     }
@@ -234,7 +234,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             startX,
                             startY,
                             direction === BeamDirection.Down,
-                            this.scale
+                            1
                         );
                         break;
                 }
@@ -255,7 +255,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endBeatX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                         break;
@@ -269,7 +269,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             middleX,
                             middleY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                         endValue = this.getBendNoteValue(note, note.bendPoints![note.bendPoints!.length - 1]);
@@ -281,7 +281,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endBeatX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.scale,
+                            1,
                             slurText
                         );
                         break;
@@ -296,7 +296,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                                 endBeatX,
                                 endY,
                                 direction === BeamDirection.Down,
-                                this.scale,
+                                1,
                                 slurText
                             );
                         }
@@ -325,7 +325,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             startX,
                             startY,
                             direction === BeamDirection.Down,
-                            this.scale
+                            1
                         );
                         if (this.BendNoteHeads.length > 0) {
                             endValue = this.getBendNoteValue(note, note.bendPoints![note.bendPoints!.length - 1]);
@@ -337,7 +337,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                                 endBeatX,
                                 endY,
                                 direction === BeamDirection.Down,
-                                this.scale,
+                                1,
                                 slurText
                             );
                         }

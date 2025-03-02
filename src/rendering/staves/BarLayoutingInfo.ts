@@ -27,63 +27,10 @@ export class BarLayoutingInfo {
      */
     public version: number = 0;
 
-    public preBeatSizes: Map<number, number> = new Map();
-    public onBeatSizes: Map<number, number> = new Map();
-    public onBeatCenterX: Map<number, number> = new Map();
     public preBeatSize: number = 0;
     public postBeatSize: number = 0;
-    public voiceSize: number = 0;
     public minStretchForce: number = 0;
     public totalSpringConstant: number = 0;
-
-    public updateVoiceSize(size: number): void {
-        if (size > this.voiceSize) {
-            this.voiceSize = size;
-            this.version++;
-        }
-    }
-
-    public setPreBeatSize(beat: Beat, size: number): void {
-        if (!this.preBeatSizes.has(beat.id) || this.preBeatSizes.get(beat.id)! < size) {
-            this.preBeatSizes.set(beat.id, size);
-            this.version++;
-        }
-    }
-
-    public getPreBeatSize(beat: Beat): number {
-        if (this.preBeatSizes.has(beat.id)) {
-            return this.preBeatSizes.get(beat.id)!;
-        }
-        return 0;
-    }
-
-    public setOnBeatSize(beat: Beat, size: number): void {
-        if (!this.onBeatSizes.has(beat.id) || this.onBeatSizes.get(beat.id)! < size) {
-            this.onBeatSizes.set(beat.id, size);
-            this.version++;
-        }
-    }
-
-    public getOnBeatSize(beat: Beat): number {
-        if (this.onBeatSizes.has(beat.id)) {
-            return this.onBeatSizes.get(beat.id)!;
-        }
-        return 0;
-    }
-
-    public getBeatCenterX(beat: Beat): number {
-        if (this.onBeatCenterX.has(beat.id)) {
-            return this.onBeatCenterX.get(beat.id)!;
-        }
-        return 0;
-    }
-
-    public setBeatCenterX(beat: Beat, x: number): void {
-        if (!this.onBeatCenterX.has(beat.id) || this.onBeatCenterX.get(beat.id)! < x) {
-            this.onBeatCenterX.set(beat.id, x);
-            this.version++;
-        }
-    }
 
     private updateMinStretchForce(force: number): void {
         if (this.minStretchForce < force) {
@@ -91,11 +38,47 @@ export class BarLayoutingInfo {
         }
     }
 
+    public getPreBeatSize(beat: Beat) {
+        if (beat.graceType !== GraceType.None) {
+            const groupId = beat.graceGroup!.id;
+            const graceRod = this.allGraceRods.get(groupId)![beat.graceIndex];
+            return graceRod.preBeatWidth;
+        } else {
+            const start: number = beat.absoluteDisplayStart;
+            if (!this.springs.has(start)) {
+                return 0;
+            }
+
+            return this.springs.get(start)!.preBeatWidth;
+        }
+    }
+
+    public getPostBeatSize(beat: Beat) {
+        if (beat.graceType !== GraceType.None) {
+            const groupId = beat.graceGroup!.id;
+            const graceRod = this.allGraceRods.get(groupId)![beat.graceIndex];
+            return graceRod.postSpringWidth;
+        } else {
+            const start: number = beat.absoluteDisplayStart;
+            if (!this.springs.has(start)) {
+                return 0;
+            }
+
+            return this.springs.get(start)!.postSpringWidth;
+        }
+    }
+
     public incompleteGraceRods: Map<string, Spring[]> = new Map();
     public allGraceRods: Map<string, Spring[]> = new Map();
     public springs: Map<number, Spring> = new Map();
 
-    public addSpring(start: number, duration: number, graceBeatWidth: number, preBeatWidth: number, postSpringSize: number): Spring {
+    public addSpring(
+        start: number,
+        duration: number,
+        graceBeatWidth: number,
+        preBeatWidth: number,
+        postSpringSize: number
+    ): Spring {
         this.version++;
         let spring: Spring;
         if (!this.springs.has(start)) {
@@ -154,7 +137,7 @@ export class BarLayoutingInfo {
         let start: number = beat.absoluteDisplayStart;
         if (beat.graceType !== GraceType.None) {
             // For grace beats we just remember the the sizes required for them
-            // these sizes are then considered when the target beat is added. 
+            // these sizes are then considered when the target beat is added.
 
             const groupId = beat.graceGroup!.id;
 
@@ -197,22 +180,15 @@ export class BarLayoutingInfo {
     }
 
     public finish(): void {
-        for (const [k, s] of this.allGraceRods) {
-            let offset = 0;
-            if (this.incompleteGraceRods.has(k)) {
-                for (const sp of s) {
-                    offset += sp.preBeatWidth;
-                    sp.graceBeatWidth = offset;
-                    offset += sp.postSpringWidth;
-                }
-            } else {
-                for (let i = s.length - 1; i >= 0; i--) {
-                    // for grace beats we store the offset 
-                    // in the 'graceBeatWidth' for later use during applying
-                    // beat positions
-                    s[i].graceBeatWidth = offset;
-                    offset -= (s[i].preBeatWidth + s[i].postSpringWidth);
-                }
+        for (const [_, s] of this.allGraceRods) {
+            // for grace beats we store the offset
+            // in the 'graceBeatWidth' for later use during applying
+            // beat positions
+            let x = 0;
+            for (const sp of s) {
+                x += sp.preBeatWidth;
+                sp.graceBeatWidth = x;
+                x += sp.postSpringWidth;
             }
         }
         this._incompleteGraceRodsWidth = 0;
@@ -272,7 +248,7 @@ export class BarLayoutingInfo {
                 requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
             }
 
-            // for the first spring we need to ensure we take the initial 
+            // for the first spring we need to ensure we take the initial
             // pre-spring width into account
             if (i === 0) {
                 requiredSpace += currentSpring.preSpringWidth;
@@ -284,7 +260,7 @@ export class BarLayoutingInfo {
     }
 
     public height: number = 0;
-    public paint(_cx: number, _cy: number, _canvas: ICanvas) { }
+    public paint(_cx: number, _cy: number, _canvas: ICanvas) {}
 
     // public height: number = 30;
     // public paint(cx: number, cy: number, canvas: ICanvas) {
@@ -296,12 +272,11 @@ export class BarLayoutingInfo {
     //     const settings = canvas.settings;
     //     const force = Math.max(settings.display.stretchForce, this.minStretchForce);
 
-    //     const height = this.height * settings.display.scale;
+    //     const height = this.height;
     //     cy -= height;
 
     //     canvas.color = settings.display.resources.mainGlyphColor;
-    //     const font = settings.display.resources.effectFont.clone();
-    //     font.size *= 0.8;
+    //     const font = settings.display.resources.effectFont.withSize(settings.display.resources.effectFont.size * 0.8);
     //     canvas.font = font;
     //     canvas.fillText(force.toFixed(2), cx, cy);
 
@@ -341,7 +316,7 @@ export class BarLayoutingInfo {
     public spaceToForce(space: number): number {
         if (this.totalSpringConstant !== -1) {
             if (this._timeSortedSprings.length > 0) {
-                space -= this._timeSortedSprings[0].preSpringWidth
+                space -= this._timeSortedSprings[0].preSpringWidth;
             }
             space -= this._incompleteGraceRodsWidth;
             return Math.max(space, 0) * this.totalSpringConstant;

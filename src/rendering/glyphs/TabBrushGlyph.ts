@@ -16,7 +16,7 @@ export class TabBrushGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 10 * this.scale;
+        this.width = 10;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -26,7 +26,7 @@ export class TabBrushGlyph extends Glyph {
         let endY: number =
             cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
         let arrowX: number = (cx + this.x + this.width / 2) | 0;
-        let arrowSize: number = 8 * this.scale;
+        let arrowSize: number = 8;
         if (this._beat.brushType !== BrushType.None) {
             if (this._beat.brushType === BrushType.BrushUp || this._beat.brushType === BrushType.BrushDown) {
                 canvas.beginPath();
@@ -42,7 +42,7 @@ export class TabBrushGlyph extends Glyph {
                 let lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + 4 * this.scale, lineEndY, -90);
+                canvas.beginRotate(cx + this.x + 4, lineEndY, -90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
@@ -54,7 +54,7 @@ export class TabBrushGlyph extends Glyph {
                 let lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
                 
-                canvas.beginRotate(cx + this.x + 4 * this.scale, lineStartY, 90);
+                canvas.beginRotate(cx + this.x + 4, lineStartY, 90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             }

@@ -1,7 +1,7 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Gp7Importer } from '@src/importer/Gp7Importer';
+import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendType } from '@src/model/BendType';
 import { FermataType } from '@src/model/Fermata';
 import { GraceType } from '@src/model/GraceType';
@@ -18,21 +18,22 @@ import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 import { AutomationType } from '@src/model/Automation';
 import { expect } from 'chai';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 describe('Gp7ImporterTest', () => {
-    async function prepareGp7ImporterWithFile(name: string): Promise<Gp7Importer> {
+    async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
         const data = await TestPlatform.loadFile('test-data/' + name);
-        return prepareGp7ImporterWithBytes(data);
+        return prepareImporterWithBytes(data);
     }
 
-    function prepareGp7ImporterWithBytes(buffer: Uint8Array) {
-        let readerBase: Gp7Importer = new Gp7Importer();
+    function prepareImporterWithBytes(buffer: Uint8Array) {
+        let readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }
 
     it('score-info', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/score-info.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/score-info.gp');
         let score: Score = reader.readScore();
         expect(score.title).to.equal('Title');
         expect(score.subTitle).to.equal('Subtitle');
@@ -51,49 +52,49 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('notes', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/notes.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/notes.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkNotes(score);
     });
 
     it('time-signatures', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/time-signatures.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/time-signatures.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkTimeSignatures(score);
     });
 
     it('dead', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/dead.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/dead.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkDead(score);
     });
 
     it('grace', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/grace.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/grace.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkGrace(score);
     });
 
     it('accentuations', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/accentuations.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/accentuations.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkAccentuations(score, true);
     });
 
     it('harmonics', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/harmonics.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/harmonics.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkHarmonics(score);
     });
 
     it('hammer', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/hammer.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/hammer.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkHammer(score);
     });
 
     it('bend', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/bends.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/bends.gp');
         let score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).to.equal(BendType.Bend);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
@@ -120,7 +121,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('bends-advanced', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/bends-advanced.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/bends-advanced.gp');
         let score: Score = reader.readScore();
 
         // Simple Standalone Bends
@@ -417,7 +418,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('whammy-advanced', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/whammy-advanced.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/whammy-advanced.gp');
         let score: Score = reader.readScore();
 
         // Bar 1
@@ -575,7 +576,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('tremolo', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/tremolo.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/tremolo.gp');
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
@@ -583,10 +584,16 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
@@ -594,7 +601,10 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
@@ -602,13 +612,22 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![3].value).to.equal(-4);
 
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
@@ -616,102 +635,111 @@ describe('Gp7ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(15, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            15,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(30.6, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            30.6,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(45, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(
+            45,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).to.equal(0);
     });
 
     it('slides', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/slides.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/slides.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkSlides(score);
     });
 
     it('vibrato', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/vibrato.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/vibrato.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkVibrato(score, true);
     });
 
     it('trills', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/trills.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/trills.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkTrills(score);
     });
 
     it('other-effects', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/other-effects.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/other-effects.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkOtherEffects(score, true);
     });
 
     it('fingering', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/fingering.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/fingering.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkFingering(score);
     });
 
     it('stroke', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/strokes.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/strokes.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkStroke(score);
     });
 
     it('tuplets', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/tuplets.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/tuplets.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkTuplets(score);
     });
 
     it('ranges', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/ranges.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/ranges.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkRanges(score);
     });
 
     it('effects', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/effects.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/effects.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkEffects(score);
     });
 
     it('serenade', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/serenade.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/serenade.gp');
         reader.readScore();
         // only Check reading
     });
 
     it('strings', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/strings.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/strings.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkStrings(score);
     });
 
     it('key-signatures', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/key-signatures.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/key-signatures.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkKeySignatures(score);
     });
 
     it('chords', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/chords.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/chords.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkChords(score);
     });
 
     it('colors', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/colors.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/colors.gp');
         let score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
     });
 
     it('tremolo-vibrato', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/tremolo-vibrato.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/tremolo-vibrato.gp');
         let score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).to.equal(VibratoType.Slight);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].vibrato).to.equal(VibratoType.Wide);
@@ -722,7 +750,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('ottavia', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/ottavia.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/ottavia.gp');
         let score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._8va);
         expect(score.tracks[0].staves[0].bars[1].clefOttava).to.equal(Ottavia._8vb);
@@ -735,7 +763,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('simile-mark', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/simile-mark.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/simile-mark.gp');
         let score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].simileMark).to.equal(SimileMark.None);
         expect(score.tracks[0].staves[0].bars[1].simileMark).to.equal(SimileMark.Simple);
@@ -746,7 +774,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('anacrusis', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/anacrusis.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/anacrusis.gp');
         let score: Score = reader.readScore();
         expect(score.masterBars[0].isAnacrusis).to.be.equal(true);
         expect(score.masterBars[0].calculateDuration()).to.equal(1920);
@@ -754,7 +782,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('left-hand-tap', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/left-hand-tap.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/left-hand-tap.gp');
         let score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).to.be.equal(true);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].notes[0].isLeftHandTapped).to.be.equal(true);
@@ -764,7 +792,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('fermata', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/fermata.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/fermata.gp');
         let score: Score = reader.readScore();
         expect(score.masterBars[0].fermata!.size).to.equal(5);
         expect(score.masterBars[1].fermata!.size).to.equal(5);
@@ -798,7 +826,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('pick-slide', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/pick-slide.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/pick-slide.gp');
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].slideOutType).to.equal(
@@ -860,20 +888,20 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('beat-lyrics', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/beat-lyrics.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/beat-lyrics.gp');
         let score: Score = reader.readScore();
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics![0]).to.be.equal("This");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).to.be.equal("is");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.be.equal("a");
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).to.be.equal("test file");
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).to.be.equal("for");
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).to.be.equal("lyrics");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics![0]).to.be.equal('This');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).to.be.equal('is');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.be.equal('a');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).to.be.equal('test file');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].lyrics![0]).to.be.equal('for');
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].lyrics![0]).to.be.equal('lyrics');
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].lyrics).to.be.equal(null);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].lyrics).to.be.equal(null);
     });
 
     it('track-volume', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/track-volume.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/track-volume.gp');
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].playbackInfo.volume).to.be.equal(16);
@@ -886,7 +914,7 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('track-balance', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/track-balance.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/track-balance.gp');
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].playbackInfo.balance).to.be.equal(0);
@@ -897,11 +925,13 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('program-change', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/program-change.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/program-change.gp');
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].playbackInfo.program).to.be.equal(25);
-        const automation = score.tracks[0].staves[0].bars[2].voices[0].beats[0].getAutomation(AutomationType.Instrument);
+        const automation = score.tracks[0].staves[0].bars[2].voices[0].beats[0].getAutomation(
+            AutomationType.Instrument
+        );
         expect(automation).to.be.ok;
         if (automation) {
             expect(automation.value).to.be.equal(29);
@@ -909,11 +939,100 @@ describe('Gp7ImporterTest', () => {
     });
 
     it('chord-no-diagram', async () => {
-        const reader = await prepareGp7ImporterWithFile('guitarpro7/chord-no-diagram.gp');
+        const reader = await prepareImporterWithFile('guitarpro7/chord-no-diagram.gp');
         let score: Score = reader.readScore();
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.be.equal("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.be.equal('C');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings.length).to.be.equal(0);
-    })
+    });
+
+    it('layout-configuration', async () => {
+        const track1 = (await prepareImporterWithFile('guitarpro7/layout-configuration-multi-track-1.gp')).readScore();
+        const track2 = (await prepareImporterWithFile('guitarpro7/layout-configuration-multi-track-2.gp')).readScore();
+        const trackAll = (await prepareImporterWithFile('guitarpro7/layout-configuration-multi-track-all.gp')).readScore();
+        const track1And3 = (await prepareImporterWithFile('guitarpro7/layout-configuration-multi-track-1-3.gp')).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
+            track1, 
+            track2,
+            trackAll,
+            track1And3
+        );
+    });
+
+    it('slash', async () => {
+        const score = (await prepareImporterWithFile('guitarpro7/slash.gp')).readScore();
+        GpImporterTestHelper.checkSlash(score);
+    });
+
+    it('beaming-mode', async () => {
+        const score = (await prepareImporterWithFile('guitarpro7/beaming-mode.gp')).readScore();
+
+        // auto
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        // force
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+        
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.ForceMergeWithNext);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        // break
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+        
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.ForceSplitToNext);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        // break secondary
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.ForceSplitOnSecondaryToNext);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+        
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].preferredBeamDirection).to.equal(BeamDirection.Up);
+
+        // invert to down
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+
+        // invert to up
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+    });
 });

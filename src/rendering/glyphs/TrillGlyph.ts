@@ -10,18 +10,18 @@ export class TrillGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.resources.markerFont.size * this.scale;
+        this.height = this.renderer.resources.markerFont.size;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let res: RenderingResources = this.renderer.resources;
         canvas.font = res.markerFont;
-        let textw: number = canvas.measureText('tr');
+        let textw: number = canvas.measureText('tr').width;
         canvas.fillText('tr', cx + this.x, cy + this.y);
-        let startX: number = textw + 3 * this.scale;
+        let startX: number = textw + 3;
         let endX: number = this.width - startX;
         let waveScale: number = 1.2;
-        let step: number = 11 * this.scale * waveScale;
+        let step: number = 11 * waveScale;
         let loops: number = Math.max(1, (endX - startX) / step);
         let loopX: number = startX;
         let loopY: number = cy + this.y + this.height * 1.2;

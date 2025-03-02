@@ -10,7 +10,7 @@ import { MasterBar } from '@src/model/MasterBar';
  */
 export class MidiTickLookupFindBeatResult {
     /**
-     * Gets or sets the beat that is currently played and used for the start 
+     * Gets or sets the beat that is currently played and used for the start
      * position of the cursor animation.
      */
     public beat!: Beat;
@@ -51,40 +51,83 @@ export class MidiTickLookupFindBeatResult {
     public constructor(masterBar: MasterBarTickLookup) {
         this.masterBar = masterBar;
     }
+
+    public calculateDuration() {
+        // fast path: only a single tempo throughout the masterbar
+        if (this.masterBar.tempoChanges.length === 1) {
+            this.duration = MidiUtils.ticksToMillis(this.tickDuration, this.masterBar.tempoChanges[0].tempo);
+        } else {
+            // Performance Note: I still wonder if we cannot calculate these slices efficiently ahead-of-time. 
+            // the sub-slicing in the lookup across beats makes it a bit tricky to do on-the-fly
+            // but maybe on finalizing the tick lookup?
+
+            // slow path: need to walk through the tick time-axis and calculate for each slice the milliseconds
+            // matching the tempo
+            let millis = 0;
+            let currentTick = this.start;
+            let currentTempo = this.masterBar.tempoChanges[0].tempo;
+            const endTick = this.end;
+
+            // for every change calculate the lot
+            for (const change of this.masterBar.tempoChanges) {
+                // seek to the beat
+                if (change.tick < currentTick) {
+                    currentTempo = change.tempo;
+                }
+                // next change is after beat, we can stop looking at changes
+                else if (change.tick > endTick) {
+                    break;
+                } 
+                // change while beat is playing
+                else {
+                    millis += MidiUtils.ticksToMillis(change.tick - currentTick, currentTempo);
+                    currentTempo = change.tempo;
+                    currentTick = change.tick;
+                }
+            }
+
+            // last slice
+            if(endTick > currentTick) {
+                millis += MidiUtils.ticksToMillis(endTick - currentTick, currentTempo);
+            }
+
+            this.duration = millis;
+        }
+    }
 }
 
 /**
  * This class holds all information about when {@link MasterBar}s and {@link Beat}s are played.
- * 
- * On top level it is organized into {@link MasterBarTickLookup} objects indicating the 
+ *
+ * On top level it is organized into {@link MasterBarTickLookup} objects indicating the
  * master bar start and end times. This information is used to highlight the currently played bars
- * and it gives access to the played beats in this masterbar and their times. 
- * 
- * The {@link BeatTickLookup} are then the slices into which the masterbar is separated by the voices and beats 
+ * and it gives access to the played beats in this masterbar and their times.
+ *
+ * The {@link BeatTickLookup} are then the slices into which the masterbar is separated by the voices and beats
  * of all tracks. An example how things are organized:
- * 
- * Time (eighths):  | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 | 
- * 
+ *
+ * Time (eighths):  | 01 | 02 | 03 | 04 | 05 | 06 | 07 | 08 | 09 | 10 | 11 | 12 | 13 | 14 | 15 | 16 |
+ *
  * Track 1:         |        B1         |        B2         |    B3   |    B4   |    B5   |    B6   |
  * Track 2:         |                  B7                   |         B7        | B9 | B10| B11| B12|
  * Track 3:         |                                      B13                                      |
- * 
+ *
  * Lookup:          |        L1         |        L2         |    L3    |   L4   | L5 | L6 | L7 | L8 |
- * Active Beats:    
- * - L1             B1,B7,B13           
- * - L2                                 B2,B7,B13           
- * - L3                                                      B3,B7,B13    
+ * Active Beats:
+ * - L1             B1,B7,B13
+ * - L2                                 B2,B7,B13
+ * - L3                                                      B3,B7,B13
  * - L4                                                                 B4,B7,B13
  * - L5                                                                          B5,B9,B13
  * - L6                                                                               B5,B10,B13
  * - L7                                                                                    B6,B11,B13
  * - L8                                                                                         B6,B12,B13
- * 
+ *
  * Then during playback we build out of this list {@link MidiTickLookupFindBeatResult} objects which are sepcific
- * to the visible tracks displayed. This is required because if only Track 2 is displayed we cannot use the the 
- * Lookup L1 alone to determine the start and end of the beat cursor. In this case we will derive a 
+ * to the visible tracks displayed. This is required because if only Track 2 is displayed we cannot use the the
+ * Lookup L1 alone to determine the start and end of the beat cursor. In this case we will derive a
  * MidiTickLookupFindBeatResult which holds for Time 01 the lookup L1 as start and L3 as end. This will be used
- * both for the cursor and beat highlighting. 
+ * both for the cursor and beat highlighting.
  */
 export class MidiTickLookup {
     private _currentMasterBar: MasterBarTickLookup | null = null;
@@ -154,7 +197,11 @@ export class MidiTickLookup {
         current.nextBeat = this.findBeatInMasterBar(
             current.masterBar,
             current.beatLookup.nextBeat,
-            current.end, trackLookup, false, true);
+            current.end,
+            trackLookup,
+            false,
+            true
+        );
 
         if (current.nextBeat == null) {
             current.nextBeat = this.findBeatSlow(trackLookup, current, current.end, true);
@@ -163,27 +210,32 @@ export class MidiTickLookup {
         // if we have the next beat take the difference between the times as duration
         if (current.nextBeat) {
             current.tickDuration = current.nextBeat.start - current.start;
-            current.duration = MidiUtils.ticksToMillis(current.tickDuration, current.masterBar.tempo);
+            current.calculateDuration();
         }
 
         // no next beat, animate to the end of the bar (could be an incomplete bar)
         if (!current.nextBeat) {
             current.tickDuration = current.masterBar.end - current.start;
-            current.duration = MidiUtils.ticksToMillis(current.tickDuration, current.masterBar.tempo);
+            current.calculateDuration();
         }
     }
 
-    private findBeatSlow(trackLookup: Set<number>, currentBeatHint: MidiTickLookupFindBeatResult | null, tick: number, isNextSearch: boolean): MidiTickLookupFindBeatResult | null {
+    private findBeatSlow(
+        trackLookup: Set<number>,
+        currentBeatHint: MidiTickLookupFindBeatResult | null,
+        tick: number,
+        isNextSearch: boolean
+    ): MidiTickLookupFindBeatResult | null {
         // get all beats within the masterbar
         let masterBar: MasterBarTickLookup | null = null;
         if (currentBeatHint != null) {
-            // same masterbar? 
-            if (currentBeatHint.masterBar.start <= tick &&
-                currentBeatHint.masterBar.end > tick) {
+            // same masterbar?
+            if (currentBeatHint.masterBar.start <= tick && currentBeatHint.masterBar.end > tick) {
                 masterBar = currentBeatHint.masterBar;
             }
             // next masterbar
-            else if (currentBeatHint.masterBar.nextMasterBar &&
+            else if (
+                currentBeatHint.masterBar.nextMasterBar &&
                 currentBeatHint.masterBar.nextMasterBar.start <= tick &&
                 currentBeatHint.masterBar.nextMasterBar.end > tick
             ) {
@@ -210,13 +262,13 @@ export class MidiTickLookup {
                     tick,
                     trackLookup,
                     true,
-                    isNextSearch);
+                    isNextSearch
+                );
 
                 if (beat) {
                     return beat;
                 }
             }
-
 
             masterBar = masterBar.nextMasterBar;
         }
@@ -226,12 +278,12 @@ export class MidiTickLookup {
 
     /**
      * Finds the beat at a given tick position within the known master bar.
-     * @param masterBar 
-     * @param currentStartLookup 
-     * @param tick 
-     * @param visibleTracks 
-     * @param fillNext 
-     * @returns 
+     * @param masterBar
+     * @param currentStartLookup
+     * @param tick
+     * @param visibleTracks
+     * @param fillNext
+     * @returns
      */
     private findBeatInMasterBar(
         masterBar: MasterBarTickLookup,
@@ -239,7 +291,8 @@ export class MidiTickLookup {
         tick: number,
         visibleTracks: Set<number>,
         fillNext: boolean,
-        isNextSeach: boolean): MidiTickLookupFindBeatResult | null {
+        isNextSeach: boolean
+    ): MidiTickLookupFindBeatResult | null {
         if (!currentStartLookup) {
             return null;
         }
@@ -257,7 +310,6 @@ export class MidiTickLookup {
                 // found the matching beat lookup but none of the beats are visible
                 // in this case scan further to the next lookup which has any visible beat
                 if (!startBeat) {
-
                     if (isNextSeach) {
                         let currentMasterBar: MasterBarTickLookup | null = masterBar;
                         while (currentMasterBar != null && startBeat == null) {
@@ -278,7 +330,6 @@ export class MidiTickLookup {
                                 currentStartLookup = currentMasterBar?.firstBeat ?? null;
                             }
                         }
-
                     } else {
                         let currentMasterBar: MasterBarTickLookup | null = masterBar;
                         while (currentMasterBar != null && startBeat == null) {
@@ -322,7 +373,8 @@ export class MidiTickLookup {
         beatLookup: BeatTickLookup,
         beat: Beat,
         fillNext: boolean,
-        visibleTracks: Set<number>) {
+        visibleTracks: Set<number>
+    ) {
         const result = new MidiTickLookupFindBeatResult(masterBar);
 
         result.beat = beat;
@@ -334,7 +386,7 @@ export class MidiTickLookup {
             this.fillNextBeat(result, visibleTracks);
         }
 
-        result.duration = MidiUtils.ticksToMillis(result.tickDuration, masterBar.tempo);
+        result.calculateDuration();
 
         return result;
     }
@@ -386,7 +438,6 @@ export class MidiTickLookup {
         return this.masterBarLookup.get(bar.index)!.start;
     }
 
-
     /**
      * Gets the start time in midi ticks for a given beat at which the masterbar is played the first time.
      * @param beat The beat to find the time period for.
@@ -421,15 +472,16 @@ export class MidiTickLookup {
         if (currentMasterBar) {
             // pre-beat grace notes at the start of the bar we also add the beat to the previous bar
             if (start < 0 && currentMasterBar.previousMasterBar) {
-                const relativeMasterBarEnd = currentMasterBar.previousMasterBar!.end - currentMasterBar.previousMasterBar!.start;
+                const relativeMasterBarEnd =
+                    currentMasterBar.previousMasterBar!.end - currentMasterBar.previousMasterBar!.start;
                 const previousStart = relativeMasterBarEnd + start;
                 const previousEnd = previousStart + duration;
 
-                // add to previous bar 
+                // add to previous bar
                 currentMasterBar.previousMasterBar!.addBeat(beat, previousStart, previousStart, duration);
 
                 // overlap to current bar?
-                if(previousEnd > relativeMasterBarEnd) {
+                if (previousEnd > relativeMasterBarEnd) {
                     // the start is negative and representing the overlap to the previous bar.
                     const overlapDuration = duration + start;
                     currentMasterBar.addBeat(beat, start, 0, overlapDuration);

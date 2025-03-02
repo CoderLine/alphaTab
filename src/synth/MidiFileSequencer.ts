@@ -1,4 +1,10 @@
-import { MidiEventType, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
+import {
+    MidiEventType,
+    NoteOnEvent,
+    ProgramChangeEvent,
+    TempoChangeEvent,
+    TimeSignatureEvent
+} from '@src/midi/MidiEvent';
 import { MidiFile } from '@src/midi/MidiFile';
 import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
@@ -71,8 +77,16 @@ export class MidiFileSequencer {
     public set mainPlaybackRange(value: PlaybackRange | null) {
         this._mainState.playbackRange = value;
         if (value) {
-            this._mainState.playbackRangeStartTime = this.tickPositionToTimePositionWithSpeed(this._mainState, value.startTick, 1);
-            this._mainState.playbackRangeEndTime = this.tickPositionToTimePositionWithSpeed(this._mainState, value.endTick, 1);
+            this._mainState.playbackRangeStartTime = this.tickPositionToTimePositionWithSpeed(
+                this._mainState,
+                value.startTick,
+                1
+            );
+            this._mainState.playbackRangeEndTime = this.tickPositionToTimePositionWithSpeed(
+                this._mainState,
+                value.endTick,
+                1
+            );
         }
     }
 
@@ -135,14 +149,14 @@ export class MidiFileSequencer {
         let start: number = Date.now();
         let finalTime: number = this._mainState.currentTime + milliseconds;
 
-        if(this.isPlayingMain) {
+        if (this.isPlayingMain) {
             while (this._mainState.currentTime < finalTime) {
                 if (this.fillMidiEventQueueLimited(finalTime - this._mainState.currentTime)) {
                     this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
                 }
             }
         }
-        
+
         this._mainState.currentTime = finalTime;
 
         let duration: number = Date.now() - start;
@@ -154,13 +168,20 @@ export class MidiFileSequencer {
         this._currentState = this._oneTimeState;
     }
 
+    public instrumentPrograms: Set<number> = new Set<number>();
+    public percussionKeys: Set<number> = new Set<number>();
+
     public loadMidi(midiFile: MidiFile): void {
+        this.instrumentPrograms.clear();
+        this.percussionKeys.clear();
         this._mainState = this.createStateFromFile(midiFile);
         this._currentState = this._mainState;
     }
 
     public createStateFromFile(midiFile: MidiFile): MidiSequencerState {
         const state = new MidiSequencerState();
+
+        this.percussionKeys.add(SynthConstants.MetronomeKey); // Metronome
 
         state.tempoChanges = [];
 
@@ -195,7 +216,8 @@ export class MidiFileSequencer {
 
             if (metronomeLengthInTicks > 0) {
                 while (metronomeTick < absTick) {
-                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(state.synthData.length,
+                    let metronome: SynthEvent = SynthEvent.newMetronomeEvent(
+                        state.synthData.length,
                         metronomeTick,
                         Math.floor(metronomeTick / metronomeLengthInTicks) % metronomeCount,
                         metronomeLengthInTicks,
@@ -212,21 +234,32 @@ export class MidiFileSequencer {
                 let meta: TempoChangeEvent = mEvent as TempoChangeEvent;
                 bpm = 60000000 / meta.microSecondsPerQuarterNote;
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
-                metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division))
+                metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division));
             } else if (mEvent.type === MidiEventType.TimeSignature) {
                 let meta: TimeSignatureEvent = mEvent as TimeSignatureEvent;
                 let timeSignatureDenominator: number = Math.pow(2, meta.denominatorIndex);
                 metronomeCount = meta.numerator;
                 metronomeLengthInTicks = (state.division * (4.0 / timeSignatureDenominator)) | 0;
-                metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division))
+                metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division));
                 if (state.firstTimeSignatureDenominator === 0) {
-                    state.firstTimeSignatureNumerator = meta.numerator
+                    state.firstTimeSignatureNumerator = meta.numerator;
                     state.firstTimeSignatureDenominator = timeSignatureDenominator;
                 }
             } else if (mEvent.type === MidiEventType.ProgramChange) {
-                let channel: number = (mEvent as ProgramChangeEvent).channel;
+                const programChange = mEvent as ProgramChangeEvent;
+                let channel: number = programChange.channel;
                 if (!state.firstProgramEventPerChannel.has(channel)) {
                     state.firstProgramEventPerChannel.set(channel, synthData);
+                }
+                const isPercussion = channel === SynthConstants.PercussionChannel;
+                if (!isPercussion) {
+                    this.instrumentPrograms.add(programChange.program);
+                }
+            } else if (mEvent.type == MidiEventType.NoteOn) {
+                const noteOn = mEvent as NoteOnEvent;
+                const isPercussion = noteOn.channel === SynthConstants.PercussionChannel;
+                if (isPercussion) {
+                    this.percussionKeys.add(noteOn.noteKey);
                 }
             }
         }
@@ -284,12 +317,16 @@ export class MidiFileSequencer {
     public mainTimePositionToTickPosition(timePosition: number): number {
         return this.timePositionToTickPositionWithSpeed(this._mainState, timePosition, this.playbackSpeed);
     }
-    
+
     public currentTimePositionToTickPosition(timePosition: number): number {
         return this.timePositionToTickPositionWithSpeed(this._currentState, timePosition, this.playbackSpeed);
     }
 
-    private tickPositionToTimePositionWithSpeed(state: MidiSequencerState, tickPosition: number, playbackSpeed: number): number {
+    private tickPositionToTimePositionWithSpeed(
+        state: MidiSequencerState,
+        tickPosition: number,
+        playbackSpeed: number
+    ): number {
         let timePosition: number = 0.0;
         let bpm: number = 120.0;
         let lastChange: number = 0;
@@ -312,7 +349,11 @@ export class MidiFileSequencer {
         return timePosition / playbackSpeed;
     }
 
-    private timePositionToTickPositionWithSpeed(state: MidiSequencerState, timePosition: number, playbackSpeed: number): number {
+    private timePositionToTickPositionWithSpeed(
+        state: MidiSequencerState,
+        timePosition: number,
+        playbackSpeed: number
+    ): number {
         timePosition *= playbackSpeed;
 
         let ticks: number = 0;

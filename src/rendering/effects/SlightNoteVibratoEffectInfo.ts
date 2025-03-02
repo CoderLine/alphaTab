@@ -9,15 +9,23 @@ import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { NotationElement } from '@src/NotationSettings';
 
 export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
+    
+    // for tied bends ending in a vibrato, the vibrato is drawn by the TabBendGlyph for proper alignment
+    private _hideOnTiedBend: boolean;
+
     public get notationElement(): NotationElement {
         return NotationElement.EffectSlightNoteVibrato;
     }
 
     protected shouldCreateGlyphForNote(note: Note): boolean {
-        return (
+        let hasVibrato =
             note.vibrato === VibratoType.Slight ||
-            (note.isTieDestination && note.tieOrigin!.vibrato === VibratoType.Slight)
-        );
+            (note.isTieDestination && note.tieOrigin!.vibrato === VibratoType.Slight);
+
+        if (this._hideOnTiedBend && hasVibrato && note.isTieDestination && note.tieOrigin!.hasBend) {
+            hasVibrato = false;
+        }
+        return hasVibrato;
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
@@ -28,7 +36,8 @@ export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
         return new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
     }
 
-    public constructor() {
+    public constructor(hideOnTiedBend: boolean) {
         super();
+        this._hideOnTiedBend = hideOnTiedBend;
     }
 }

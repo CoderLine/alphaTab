@@ -1,6 +1,5 @@
 /**@target web */
 import { alphaTab } from '../../src/alphaTab.vite';
-import vite from 'vite';
 import path from 'path';
 import fs from 'fs';
 import { expect } from 'chai';
@@ -10,6 +9,9 @@ describe('Vite', () => {
         const bundlerProject = './test-data/bundler/vite';
         const cwd = process.cwd();
         process.chdir(bundlerProject);
+
+        const vite = await import('vite');
+
         try {
             await fs.promises.rm(path.join(process.cwd(), 'dist'), { force: true, recursive: true });
             await vite.build(
@@ -49,7 +51,7 @@ describe('Vite', () => {
 
         for (const file of dir) {
             if (file.isFile()) {
-                const text = await fs.promises.readFile(path.join(file.path, file.name), 'utf8');
+                const text = await fs.promises.readFile(path.join(file.parentPath ?? file.path, file.name), 'utf8');
 
                 if (file.name.startsWith('index-')) {
                     // ensure new worker has worker import

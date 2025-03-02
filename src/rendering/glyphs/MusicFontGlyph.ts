@@ -5,6 +5,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 export class MusicFontGlyph extends EffectGlyph {
     protected glyphScale: number = 0;
     protected symbol: MusicFontSymbol;
+    protected center: boolean = false;
 
     public constructor(x: number, y: number, glyphScale: number, symbol: MusicFontSymbol) {
         super(x, y);
@@ -13,6 +14,6 @@ export class MusicFontGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, this.glyphScale * this.scale, this.symbol, false);
+        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, this.glyphScale, this.symbol, this.center);
     }
 }

@@ -1,28 +1,27 @@
-﻿namespace AlphaTab.Util
+﻿namespace AlphaTab.Util;
+
+internal class Lazy<T> where T:class?
 {
-    public class Lazy<T> where T:class?
+    private readonly System.Func<T> _factory;
+
+    private bool _created = false;
+    private T _value;
+
+    public Lazy(System.Func<T> factory)
     {
-        private readonly System.Func<T> _factory;
+        _factory = factory;
+        _value = null!;
+    }
 
-        private bool _created = false;
-        private T _value;
-
-        public Lazy(System.Func<T> factory)
+    public T Value
+    {
+        get
         {
-            _factory = factory;
-            _value = null!;
-        }
-
-        public T Value
-        {
-            get
+            if (!_created)
             {
-                if (!_created)
-                {
-                    _value = _factory();
-                }
-                return _value;
+                _value = _factory();
             }
+            return _value;
         }
     }
 }

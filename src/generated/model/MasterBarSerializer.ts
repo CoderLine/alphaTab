@@ -14,6 +14,7 @@ import { TripletFeel } from "@src/model/TripletFeel";
 import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
 import { Fermata } from "@src/model/Fermata";
+import { Direction } from "@src/model/Direction";
 export class MasterBarSerializer {
     public static fromJson(obj: MasterBar, m: unknown): void {
         if (!m) {
@@ -35,9 +36,10 @@ export class MasterBarSerializer {
         o.set("timesignaturenumerator", obj.timeSignatureNumerator);
         o.set("timesignaturedenominator", obj.timeSignatureDenominator);
         o.set("timesignaturecommon", obj.timeSignatureCommon);
+        o.set("isfreetime", obj.isFreeTime);
         o.set("tripletfeel", obj.tripletFeel as number);
         o.set("section", SectionSerializer.toJson(obj.section));
-        o.set("tempoautomation", AutomationSerializer.toJson(obj.tempoAutomation));
+        o.set("tempoautomations", obj.tempoAutomations.map(i => AutomationSerializer.toJson(i)));
         if (obj.fermata !== null) {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
@@ -49,6 +51,13 @@ export class MasterBarSerializer {
         o.set("isanacrusis", obj.isAnacrusis);
         o.set("displayscale", obj.displayScale);
         o.set("displaywidth", obj.displayWidth);
+        if (obj.directions !== null) {
+            const a: number[] = [];
+            o.set("directions", a);
+            for (const v of obj.directions!) {
+                a.push(v as number);
+            }
+        }
         return o;
     }
     public static setProperty(obj: MasterBar, property: string, v: unknown): boolean {
@@ -80,8 +89,19 @@ export class MasterBarSerializer {
             case "timesignaturecommon":
                 obj.timeSignatureCommon = v! as boolean;
                 return true;
+            case "isfreetime":
+                obj.isFreeTime = v! as boolean;
+                return true;
             case "tripletfeel":
                 obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!;
+                return true;
+            case "tempoautomations":
+                obj.tempoAutomations = [];
+                for (const o of (v as (Map<string, unknown> | null)[])) {
+                    const i = new Automation();
+                    AutomationSerializer.fromJson(i, o);
+                    obj.tempoAutomations.push(i);
+                }
                 return true;
             case "fermata":
                 obj.fermata = new Map<number, Fermata>();
@@ -103,6 +123,11 @@ export class MasterBarSerializer {
             case "displaywidth":
                 obj.displayWidth = v! as number;
                 return true;
+            case "directions":
+                for (const i of (v as number[])) {
+                    obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
+                }
+                return true;
         }
         if (["section"].indexOf(property) >= 0) {
             if (v) {
@@ -111,16 +136,6 @@ export class MasterBarSerializer {
             }
             else {
                 obj.section = null;
-            }
-            return true;
-        }
-        if (["tempoautomation"].indexOf(property) >= 0) {
-            if (v) {
-                obj.tempoAutomation = new Automation();
-                AutomationSerializer.fromJson(obj.tempoAutomation, v as Map<string, unknown>);
-            }
-            else {
-                obj.tempoAutomation = null;
             }
             return true;
         }

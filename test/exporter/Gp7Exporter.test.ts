@@ -1,4 +1,4 @@
-import { Gp7Importer } from '@src/importer/Gp7Importer';
+import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
@@ -8,7 +8,6 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { assert } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -20,8 +19,8 @@ describe('Gp7ExporterTest', () => {
         }
     }
 
-    function prepareGp7ImporterWithBytes(buffer: Uint8Array): Gp7Importer {
-        let readerBase: Gp7Importer = new Gp7Importer();
+    function prepareImporterWithBytes(buffer: Uint8Array): Gp7To8Importer {
+        let readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }
@@ -31,25 +30,19 @@ describe('Gp7ExporterTest', () => {
     }
 
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null): Promise<void> {
-        try {
-            const expected = await loadScore(name);
-            if (!expected) {
-                return;
-            }
-
-            const fileName = name.substr(name.lastIndexOf('/') + 1);
-            const exported = exportGp7(expected);
-            const actual = prepareGp7ImporterWithBytes(exported).readScore();
-
-            const expectedJson = JsonConverter.scoreToJsObject(expected);
-            const actualJson = JsonConverter.scoreToJsObject(actual);
-
-            if (!ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys)) {
-                await TestPlatform.saveFile(fileName, exported);
-            }
-        } catch (e) {
-            assert.fail(String(e));
+        const expected = await loadScore(name);
+        if (!expected) {
+            return;
         }
+
+        const fileName = name.substr(name.lastIndexOf('/') + 1);
+        const exported = exportGp7(expected);
+        const actual = prepareImporterWithBytes(exported).readScore();
+
+        const expectedJson = JsonConverter.scoreToJsObject(expected);
+        const actualJson = JsonConverter.scoreToJsObject(actual);
+
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys);
     }
 
     async function testRoundTripFolderEqual(name: string): Promise<void> {
@@ -133,7 +126,7 @@ describe('Gp7ExporterTest', () => {
         const expected = importer.readScore();
         const exported = exportGp7(expected);
 
-        const actual = prepareGp7ImporterWithBytes(exported).readScore();
+        const actual = prepareImporterWithBytes(exported).readScore();
 
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);

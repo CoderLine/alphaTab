@@ -18,6 +18,7 @@ import { Fingers } from "@src/model/Fingers";
 import { Duration } from "@src/model/Duration";
 import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
+import { NoteOrnament } from "@src/model/NoteOrnament";
 export class NoteSerializer {
     public static fromJson(obj: Note, m: unknown): void {
         if (!m) {
@@ -40,6 +41,7 @@ export class NoteSerializer {
         }
         o.set("fret", obj.fret);
         o.set("string", obj.string);
+        o.set("showstringnumber", obj.showStringNumber);
         o.set("octave", obj.octave);
         o.set("tone", obj.tone);
         o.set("percussionarticulation", obj.percussionArticulation);
@@ -60,12 +62,12 @@ export class NoteSerializer {
         o.set("istiedestination", obj.isTieDestination);
         o.set("lefthandfinger", obj.leftHandFinger as number);
         o.set("righthandfinger", obj.rightHandFinger as number);
-        o.set("isfingering", obj.isFingering);
         o.set("trillvalue", obj.trillValue);
         o.set("trillspeed", obj.trillSpeed as number);
         o.set("durationpercent", obj.durationPercent);
         o.set("accidentalmode", obj.accidentalMode as number);
         o.set("dynamics", obj.dynamics as number);
+        o.set("ornament", obj.ornament as number);
         obj.toJson(o);
         return o;
     }
@@ -101,6 +103,9 @@ export class NoteSerializer {
                 return true;
             case "string":
                 obj.string = v! as number;
+                return true;
+            case "showstringnumber":
+                obj.showStringNumber = v! as boolean;
                 return true;
             case "octave":
                 obj.octave = v! as number;
@@ -162,9 +167,6 @@ export class NoteSerializer {
             case "righthandfinger":
                 obj.rightHandFinger = JsonHelper.parseEnum<Fingers>(v, Fingers)!;
                 return true;
-            case "isfingering":
-                obj.isFingering = v! as boolean;
-                return true;
             case "trillvalue":
                 obj.trillValue = v! as number;
                 return true;
@@ -179,6 +181,9 @@ export class NoteSerializer {
                 return true;
             case "dynamics":
                 obj.dynamics = JsonHelper.parseEnum<DynamicValue>(v, DynamicValue)!;
+                return true;
+            case "ornament":
+                obj.ornament = JsonHelper.parseEnum<NoteOrnament>(v, NoteOrnament)!;
                 return true;
         }
         return obj.setProperty(property, v);

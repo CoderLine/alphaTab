@@ -21,6 +21,7 @@ export class NoteCloner {
         }
         clone.fret = original.fret;
         clone.string = original.string;
+        clone.showStringNumber = original.showStringNumber;
         clone.octave = original.octave;
         clone.tone = original.tone;
         clone.percussionArticulation = original.percussionArticulation;
@@ -41,12 +42,12 @@ export class NoteCloner {
         clone.isTieDestination = original.isTieDestination;
         clone.leftHandFinger = original.leftHandFinger;
         clone.rightHandFinger = original.rightHandFinger;
-        clone.isFingering = original.isFingering;
         clone.trillValue = original.trillValue;
         clone.trillSpeed = original.trillSpeed;
         clone.durationPercent = original.durationPercent;
         clone.accidentalMode = original.accidentalMode;
         clone.dynamics = original.dynamics;
+        clone.ornament = original.ornament;
         return clone;
     }
 }

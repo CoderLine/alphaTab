@@ -8,7 +8,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
         super(typeScript, context);
         this._testClassAttribute = '';
-        this._testMethodAttribute = 'kotlin.test.Test';
+        this._testMethodAttribute = 'Test';
     }
 
     public override get extension(): string {
@@ -309,6 +309,24 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         return func;
     }
+
+    
+    protected override visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
+        this._paramReferences.push(new Map<string, cs.Identifier[]>());
+        this._paramsWithAssignment.push(new Set<string>());
+
+        const method = super.visitTestClassMethod(parent, d);
+
+        if (method.body && cs.isBlock(method.body)) {
+            this.injectParametersAsLocal(method.body);
+        }
+
+        this._paramReferences.pop();
+        this._paramsWithAssignment.pop();
+
+        return method;
+    }
+
 
     protected override visitMethodDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,

@@ -50,7 +50,8 @@ export default function webpack(isWatch: boolean, bundlePlugins: Plugin[]): Roll
             external: [
                 'webpack',
                 'fs',
-                'path'
+                'path',
+                'url'
             ],
             watch: {
                 include: ['src/alphaTab.webpack.ts'],

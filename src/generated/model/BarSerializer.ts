@@ -6,10 +6,12 @@
 import { Bar } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
+import { SustainPedalMarkerSerializer } from "@src/generated/model/SustainPedalMarkerSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
+import { SustainPedalMarker } from "@src/model/Bar";
 export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
         if (!m) {
@@ -29,6 +31,7 @@ export class BarSerializer {
         o.set("similemark", obj.simileMark as number);
         o.set("displayscale", obj.displayScale);
         o.set("displaywidth", obj.displayWidth);
+        o.set("sustainpedals", obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJson(i)));
         return o;
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
@@ -58,6 +61,14 @@ export class BarSerializer {
                 return true;
             case "displaywidth":
                 obj.displayWidth = v! as number;
+                return true;
+            case "sustainpedals":
+                obj.sustainPedals = [];
+                for (const o of (v as (Map<string, unknown> | null)[])) {
+                    const i = new SustainPedalMarker();
+                    SustainPedalMarkerSerializer.fromJson(i, o);
+                    obj.sustainPedals.push(i);
+                }
                 return true;
         }
         return false;

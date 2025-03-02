@@ -27,13 +27,14 @@ export class BeatCloner {
             clone.automations.push(AutomationCloner.clone(i));
         }
         clone.dots = original.dots;
-        clone.fadeIn = original.fadeIn;
+        clone.fade = original.fade;
         clone.lyrics = original.lyrics ? original.lyrics.slice() : null;
-        clone.hasRasgueado = original.hasRasgueado;
         clone.pop = original.pop;
         clone.slap = original.slap;
         clone.tap = original.tap;
         clone.text = original.text;
+        clone.slashed = original.slashed;
+        clone.deadSlapped = original.deadSlapped;
         clone.brushType = original.brushType;
         clone.brushDuration = original.brushDuration;
         clone.tupletDenominator = original.tupletDenominator;
@@ -56,11 +57,18 @@ export class BeatCloner {
         clone.playbackStart = original.playbackStart;
         clone.displayDuration = original.displayDuration;
         clone.playbackDuration = original.playbackDuration;
+        clone.golpe = original.golpe;
         clone.dynamics = original.dynamics;
         clone.invertBeamDirection = original.invertBeamDirection;
         clone.preferredBeamDirection = original.preferredBeamDirection;
         clone.isEffectSlurOrigin = original.isEffectSlurOrigin;
         clone.beamingMode = original.beamingMode;
+        clone.wahPedal = original.wahPedal;
+        clone.barreFret = original.barreFret;
+        clone.barreShape = original.barreShape;
+        clone.rasgueado = original.rasgueado;
+        clone.showTimer = original.showTimer;
+        clone.timer = original.timer;
         return clone;
     }
 }

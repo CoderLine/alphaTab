@@ -1,8 +1,8 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Chord } from '@src/model/Chord';
@@ -46,6 +46,13 @@ import { TextBaseline } from '@src/platform/ICanvas';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
 import { Logger } from '@src/Logger';
+import { GolpeType } from '@src/model/GolpeType';
+import { FadeType } from '@src/model/FadeType';
+import { WahPedal } from '@src/model/WahPedal';
+import { BarreShape } from '@src/model/BarreShape';
+import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Rasgueado } from '@src/model/Rasgueado';
+import { Direction } from '@src/model/Direction';
 
 /**
  * This structure represents a duration within a gpif
@@ -91,6 +98,7 @@ export class GpifParser {
 
     private _masterTrackAutomations!: Map<number, Automation[]>;
     private _automationsPerTrackIdAndBarIndex!: Map<string, Map<number, Automation[]>>;
+    private _sustainPedalsPerTrackIdAndBarIndex!: Map<string, Map<number, SustainPedalMarker[]>>;
     private _tracksMapping!: string[];
     private _tracksById!: Map<string, Track>;
     private _masterBars!: MasterBar[];
@@ -114,6 +122,7 @@ export class GpifParser {
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<number, Automation[]>();
         this._automationsPerTrackIdAndBarIndex = new Map<string, Map<number, Automation[]>>();
+        this._sustainPedalsPerTrackIdAndBarIndex = new Map<string, Map<number, SustainPedalMarker[]>>();
         this._tracksMapping = [];
         this._tracksById = new Map<string, Track>();
         this._masterBars = [];
@@ -254,7 +263,6 @@ export class GpifParser {
                     case 'ScoreSystemsLayout':
                         this.score.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
                         break;
-
                 }
             }
         }
@@ -268,7 +276,7 @@ export class GpifParser {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automations':
-                        this.parseAutomations(c, this._masterTrackAutomations, null);
+                        this.parseAutomations(c, this._masterTrackAutomations, null, null);
                         break;
                     case 'Tracks':
                         this._tracksMapping = c.innerText.split(' ');
@@ -281,19 +289,29 @@ export class GpifParser {
         }
     }
 
-    private parseAutomations(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
+    private parseAutomations(
+        node: XmlNode,
+        automations: Map<number, Automation[]>,
+        sounds: Map<string, GpifSound> | null,
+        sustainPedals: Map<number, SustainPedalMarker[]> | null
+    ): void {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
                     case 'Automation':
-                        this.parseAutomation(c, automations, sounds);
+                        this.parseAutomation(c, automations, sounds, sustainPedals);
                         break;
                 }
             }
         }
     }
 
-    private parseAutomation(node: XmlNode, automations: Map<number, Automation[]>, sounds: Map<string, GpifSound> | null): void {
+    private parseAutomation(
+        node: XmlNode,
+        automations: Map<number, Automation[]>,
+        sounds: Map<string, GpifSound> | null,
+        sustainPedals: Map<number, SustainPedalMarker[]> | null
+    ): void {
         let type: string | null = null;
         let isLinear: boolean = false;
         let barIndex: number = -1;
@@ -349,8 +367,38 @@ export class GpifParser {
                 break;
             case 'Sound':
                 if (textValue && sounds && sounds.has(textValue)) {
-                    automation = Automation.buildInstrumentAutomation(isLinear, ratioPosition, sounds.get(textValue)!.program);
+                    automation = Automation.buildInstrumentAutomation(
+                        isLinear,
+                        ratioPosition,
+                        sounds.get(textValue)!.program
+                    );
                 }
+                break;
+            case 'SustainPedal':
+                // we expect sustain pedals only on track automations
+                if (sustainPedals) {
+                    let v: SustainPedalMarker[];
+                    if (sustainPedals.has(barIndex)) {
+                        v = sustainPedals.get(barIndex)!;
+                    } else {
+                        v = [];
+                        sustainPedals.set(barIndex, v);
+                    }
+
+                    const sustain = new SustainPedalMarker();
+                    sustain.ratioPosition = ratioPosition;
+                    switch (reference) {
+                        case 1:
+                            sustain.pedalType = SustainPedalMarkerType.Down;
+                            break;
+                        case 3:
+                            sustain.pedalType = SustainPedalMarkerType.Up;
+                            break;
+                    }
+
+                    v.push(sustain);
+                }
+
                 break;
         }
         if (automation) {
@@ -469,9 +517,13 @@ export class GpifParser {
     }
 
     private parseTrackAutomations(trackId: string, c: XmlNode) {
-        const trackAutomations = new Map<number, Automation[]>()
-        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations)
-        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!);
+        const trackAutomations = new Map<number, Automation[]>();
+        this._automationsPerTrackIdAndBarIndex.set(trackId, trackAutomations);
+
+        const sustainPedals = new Map<number, SustainPedalMarker[]>();
+        this._sustainPedalsPerTrackIdAndBarIndex.set(trackId, sustainPedals);
+
+        this.parseAutomations(c, trackAutomations, this._soundsByTrack.get(trackId)!, sustainPedals);
     }
 
     private parseNotationPatch(track: Track, node: XmlNode) {
@@ -537,7 +589,7 @@ export class GpifParser {
 
     private parseElement(track: Track, node: XmlNode) {
         const typeElement = node.findChildElement('Type');
-        const type = typeElement ? typeElement.innerText : "";
+        const type = typeElement ? typeElement.innerText : '';
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -861,15 +913,15 @@ export class GpifParser {
 
     private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
-        
+
         let diagram = node.findChildElement('Diagram');
-        if(!diagram) {
+        if (!diagram) {
             chord.showDiagram = false;
             chord.showFingering = false;
             return;
         }
         let stringCount: number = parseInt(diagram.getAttribute('stringCount'));
-        let baseFret: number = parseInt(diagram.getAttribute('baseFret'));
+        let baseFret: number = diagram.attributes.has('baseFret') ? parseInt(diagram.getAttribute('baseFret')) : 0;
         chord.firstFret = baseFret + 1;
         for (let i: number = 0; i < stringCount; i++) {
             chord.strings.push(-1);
@@ -1157,6 +1209,9 @@ export class GpifParser {
                         masterBar.timeSignatureNumerator = parseInt(timeParts[0]);
                         masterBar.timeSignatureDenominator = parseInt(timeParts[1]);
                         break;
+                    case 'FreeTime':
+                        masterBar.isFreeTime = true;
+                        break;
                     case 'DoubleBar':
                         masterBar.isDoubleBar = true;
                         break;
@@ -1228,14 +1283,94 @@ export class GpifParser {
                     case 'Fermatas':
                         this.parseFermatas(masterBar, c);
                         break;
-                    case "XProperties":
-                        this.parseMasterBarXProperties(c, masterBar);
+                    case 'XProperties':
+                        this.parseMasterBarXProperties(masterBar, c);
                         break;
-    
+                    case 'Directions':
+                        this.parseDirections(masterBar, c);
+                        break;
                 }
             }
         }
         this._masterBars.push(masterBar);
+    }
+
+    private parseDirections(masterBar: MasterBar, node: XmlNode) {
+        for (let c of node.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                switch (c.localName) {
+                    case 'Target':
+                        switch (c.innerText) {
+                            case 'Coda':
+                                masterBar.addDirection(Direction.TargetCoda);
+                                break;
+                            case 'DoubleCoda':
+                                masterBar.addDirection(Direction.TargetDoubleCoda);
+                                break;
+                            case 'Segno':
+                                masterBar.addDirection(Direction.TargetSegno);
+                                break;
+                            case 'SegnoSegno':
+                                masterBar.addDirection(Direction.TargetSegnoSegno);
+                                break;
+                            case 'Fine':
+                                masterBar.addDirection(Direction.TargetFine);
+                                break;
+                        }
+                        break;
+                    case 'Jump':
+                        switch (c.innerText) {
+                            case 'DaCapo':
+                                masterBar.addDirection(Direction.JumpDaCapo);
+                                break;
+                            case 'DaCapoAlCoda':
+                                masterBar.addDirection(Direction.JumpDaCapoAlCoda);
+                                break;
+                            case 'DaCapoAlDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDaCapoAlDoubleCoda);
+                                break;
+                            case 'DaCapoAlFine':
+                                masterBar.addDirection(Direction.JumpDaCapoAlFine);
+                                break;
+
+                            // Note: no typo on our side, GPIF has wrongly "DaSegno" instead of "DalSegno"
+                            case 'DaSegno':
+                                masterBar.addDirection(Direction.JumpDalSegno);
+                                break;
+                            case 'DaSegnoAlCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoAlCoda);
+                                break;
+                            case 'DaSegnoAlDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoAlDoubleCoda);
+                                break;
+                            case 'DaSegnoAlFine':
+                                masterBar.addDirection(Direction.JumpDalSegnoAlFine);
+                                break;
+
+                            case 'DaSegnoSegno':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegno);
+                                break;
+                            case 'DaSegnoSegnoAlCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegnoAlCoda);
+                                break;
+                            case 'DaSegnoSegnoAlDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegnoAlDoubleCoda);
+                                break;
+                            case 'DaSegnoSegnoAlFine':
+                                masterBar.addDirection(Direction.JumpDalSegnoSegnoAlFine);
+                                break;
+
+                            case 'DaCoda':
+                                masterBar.addDirection(Direction.JumpDaCoda);
+                                break;
+                            case 'DaDoubleCoda':
+                                masterBar.addDirection(Direction.JumpDaDoubleCoda);
+                                break;
+                        }
+                        break;
+                }
+            }
+        }
     }
 
     private parseFermatas(masterBar: MasterBar, node: XmlNode): void {
@@ -1358,7 +1493,7 @@ export class GpifParser {
                                 break;
                         }
                         break;
-                    case "XProperties":
+                    case 'XProperties':
                         this.parseBarXProperties(c, bar);
                         break;
                 }
@@ -1425,8 +1560,16 @@ export class GpifParser {
                         this._rhythmOfBeat.set(beatId, c.getAttribute('ref'));
                         break;
                     case 'Fadding':
-                        if (c.innerText === 'FadeIn') {
-                            beat.fadeIn = true;
+                        switch (c.innerText) {
+                            case 'FadeIn':
+                                beat.fade = FadeType.FadeIn;
+                                break;
+                            case 'FadeOut':
+                                beat.fade = FadeType.FadeOut;
+                                break;
+                            case 'VolumeSwell':
+                                beat.fade = FadeType.VolumeSwell;
+                                break;
                         }
                         break;
                     case 'Tremolo':
@@ -1562,6 +1705,48 @@ export class GpifParser {
                         beat.lyrics = this.parseBeatLyrics(c);
                         this._skipApplyLyrics = true;
                         break;
+                    case 'Slashed':
+                        beat.slashed = true;
+                        break;
+                    case 'DeadSlapped':
+                        beat.deadSlapped = true;
+                        break;
+                    case 'Golpe':
+                        switch (c.innerText) {
+                            case 'Finger':
+                                beat.golpe = GolpeType.Finger;
+                                break;
+                            case 'Thumb':
+                                beat.golpe = GolpeType.Thumb;
+                                break;
+                        }
+                        break;
+                    case 'Wah':
+                        switch (c.innerText) {
+                            case 'Open':
+                                beat.wahPedal = WahPedal.Open;
+                                break;
+                            case 'Closed':
+                                beat.wahPedal = WahPedal.Closed;
+                                break;
+                        }
+                        break;
+                    case 'UserTransposedPitchStemOrientation':
+                        switch (c.innerText) {
+                            case 'Downward':
+                                beat.preferredBeamDirection = BeamDirection.Down;
+                                break;
+                            case 'Upward':
+                                beat.preferredBeamDirection = BeamDirection.Up;
+                                break;
+                        }
+                        break;
+                    case 'Timer':
+                        beat.showTimer = true;
+                        if(c.innerText.length > 0) {
+                            beat.timer = parseInt(c.innerText);
+                        }
+                        break;
                 }
             }
         }
@@ -1592,6 +1777,27 @@ export class GpifParser {
                         let id: string = c.getAttribute('id');
                         let value: number = 0;
                         switch (id) {
+                            case '1124204546':
+                                value = parseInt(c.findChildElement('Int')!.innerText);
+                                switch (value) {
+                                    case 1:
+                                        beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
+                                        break;
+                                    case 2:
+                                        beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
+                                        break;
+                                }
+                                break;
+                            case '1124204552':
+                                value = parseInt(c.findChildElement('Int')!.innerText);
+                                switch (value) {
+                                    case 1:
+                                        if (beat.beamingMode !== BeatBeamingMode.ForceSplitToNext) {
+                                            beat.beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
+                                        }
+                                        break;
+                                }
+                                break;
                             case '1124204545':
                                 value = parseInt(c.findChildElement('Int')!.innerText);
                                 beat.invertBeamDirection = value === 1;
@@ -1606,7 +1812,6 @@ export class GpifParser {
             }
         }
     }
-
 
     private parseBarXProperties(node: XmlNode, bar: Bar) {
         for (let c of node.childNodes) {
@@ -1626,7 +1831,7 @@ export class GpifParser {
         }
     }
 
-    private parseMasterBarXProperties(node: XmlNode, masterBar: MasterBar) {
+    private parseMasterBarXProperties(masterBar: MasterBar, node: XmlNode) {
         for (let c of node.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -1743,6 +1948,77 @@ export class GpifParser {
                                     parseFloat(c.findChildElement('Float')!.innerText)
                                 );
                                 break;
+                            case 'BarreFret':
+                                beat.barreFret = parseInt(c.findChildElement('Fret')!.innerText);
+                                break;
+                            case 'BarreString':
+                                switch (c.findChildElement('String')!.innerText) {
+                                    case '0':
+                                        beat.barreShape = BarreShape.Full;
+                                        break;
+                                    case '1':
+                                        beat.barreShape = BarreShape.Half;
+                                        break;
+                                }
+                                break;
+                            case 'Rasgueado':
+                                switch (c.findChildElement('Rasgueado')!.innerText) {
+                                    case 'ii_1':
+                                        beat.rasgueado = Rasgueado.Ii;
+                                        break;
+                                    case 'mi_1':
+                                        beat.rasgueado = Rasgueado.Mi;
+                                        break;
+                                    case 'mii_1':
+                                        beat.rasgueado = Rasgueado.MiiTriplet;
+                                        break;
+                                    case 'mii_2':
+                                        beat.rasgueado = Rasgueado.MiiAnapaest;
+                                        break;
+                                    case 'pmp_1':
+                                        beat.rasgueado = Rasgueado.PmpTriplet;
+                                        break;
+                                    case 'pmp_2':
+                                        beat.rasgueado = Rasgueado.PmpAnapaest;
+                                        break;
+                                    case 'pei_1':
+                                        beat.rasgueado = Rasgueado.PeiTriplet;
+                                        break;
+                                    case 'pei_2':
+                                        beat.rasgueado = Rasgueado.PeiAnapaest;
+                                        break;
+                                    case 'pai_1':
+                                        beat.rasgueado = Rasgueado.PaiTriplet;
+                                        break;
+                                    case 'pai_2':
+                                        beat.rasgueado = Rasgueado.PaiAnapaest;
+                                        break;
+                                    case 'ami_1':
+                                        beat.rasgueado = Rasgueado.AmiTriplet;
+                                        break;
+                                    case 'ami_2':
+                                        beat.rasgueado = Rasgueado.AmiAnapaest;
+                                        break;
+                                    case 'ppp_1':
+                                        beat.rasgueado = Rasgueado.Ppp;
+                                        break;
+                                    case 'amii_1':
+                                        beat.rasgueado = Rasgueado.Amii;
+                                        break;
+                                    case 'amip_1':
+                                        beat.rasgueado = Rasgueado.Amip;
+                                        break;
+                                    case 'eami_1':
+                                        beat.rasgueado = Rasgueado.Eami;
+                                        break;
+                                    case 'eamii_1':
+                                        beat.rasgueado = Rasgueado.Eamii;
+                                        break;
+                                    case 'peami_1':
+                                        beat.rasgueado = Rasgueado.Peami;
+                                        break;
+                                }
+                                break;
                         }
                         break;
                 }
@@ -1816,6 +2092,9 @@ export class GpifParser {
                         if ((accentFlags & 0x08) !== 0) {
                             note.accentuated = AccentuationType.Normal;
                         }
+                        if ((accentFlags & 0x10) !== 0) {
+                            note.accentuated = AccentuationType.Tenuto;
+                        }
                         break;
                     case 'Tie':
                         if (c.getAttribute('destination').toLowerCase() === 'true') {
@@ -1833,7 +2112,6 @@ export class GpifParser {
                         }
                         break;
                     case 'LeftFingering':
-                        note.isFingering = true;
                         switch (c.innerText) {
                             case 'P':
                                 note.leftHandFinger = Fingers.Thumb;
@@ -1853,7 +2131,6 @@ export class GpifParser {
                         }
                         break;
                     case 'RightFingering':
-                        note.isFingering = true;
                         switch (c.innerText) {
                             case 'P':
                                 note.rightHandFinger = Fingers.Thumb;
@@ -1874,6 +2151,22 @@ export class GpifParser {
                         break;
                     case 'InstrumentArticulation':
                         note.percussionArticulation = parseInt(c.innerText);
+                        break;
+                    case 'Ornament':
+                        switch (c.innerText) {
+                            case 'Turn':
+                                note.ornament = NoteOrnament.Turn;
+                                break;
+                            case 'InvertedTurn':
+                                note.ornament = NoteOrnament.InvertedTurn;
+                                break;
+                            case 'UpperMordent':
+                                note.ornament = NoteOrnament.UpperMordent;
+                                break;
+                            case 'LowerMordent':
+                                note.ornament = NoteOrnament.LowerMordent;
+                                break;
+                        }
                         break;
                 }
             }
@@ -1898,6 +2191,11 @@ export class GpifParser {
                     case 'Property':
                         let name: string = c.getAttribute('name');
                         switch (name) {
+                            case 'ShowStringNumber':
+                                if (c.findChildElement('Enable')) {
+                                    note.showStringNumber = true;
+                                }
+                                break;
                             case 'String':
                                 note.string = parseInt(c.findChildElement('String')!.innerText) + 1;
                                 break;
@@ -2116,7 +2414,7 @@ export class GpifParser {
     }
 
     private toBendOffset(gpxOffset: number): number {
-        return (gpxOffset * GpifParser.BendPointPositionFactor);
+        return gpxOffset * GpifParser.BendPointPositionFactor;
     }
 
     private parseRhythms(node: XmlNode): void {
@@ -2285,7 +2583,7 @@ export class GpifParser {
             }
         }
 
-        // clear out percussion articulations where not needed 
+        // clear out percussion articulations where not needed
         // and add automations
         for (let trackId of this._tracksMapping) {
             if (!trackId) {
@@ -2306,15 +2604,29 @@ export class GpifParser {
 
             if (this._automationsPerTrackIdAndBarIndex.has(trackId)) {
                 const trackAutomations = this._automationsPerTrackIdAndBarIndex.get(trackId)!;
+
                 for (const [barNumber, automations] of trackAutomations) {
                     if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
                         const bar = track.staves[0].bars[barNumber];
                         if (bar.voices.length > 0 && bar.voices[0].beats.length > 0) {
                             const beat = bar.voices[0].beats[0];
                             for (const a of automations) {
+                                // NOTE: currently the automations of a bar are applied to the
+                                // first beat of a bar
                                 beat.automations.push(a);
                             }
+                        } else {
                         }
+                    }
+                }
+            }
+
+            if (this._sustainPedalsPerTrackIdAndBarIndex.has(trackId)) {
+                const sustainPedals = this._sustainPedalsPerTrackIdAndBarIndex.get(trackId)!;
+                for (const [barNumber, markers] of sustainPedals) {
+                    if (track.staves.length > 0 && barNumber < track.staves[0].bars.length) {
+                        const bar = track.staves[0].bars[barNumber];
+                        bar.sustainPedals = markers;
                     }
                 }
             }
@@ -2332,7 +2644,7 @@ export class GpifParser {
                             this.score.tempoLabel = automation.text;
                         }
                     }
-                    masterBar.tempoAutomation = automation;
+                    masterBar.tempoAutomations.push(automation);
                 }
             }
         }

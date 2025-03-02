@@ -1,43 +1,34 @@
 import { FontStyle, FontWeight } from '@src/model/Font';
 import { Environment } from '@src/Environment';
+import { TextMetrics } from '../ICanvas';
+import { WebPlatform } from '../javascript/WebPlatform';
+
+/**
+ * Describes the sizes of a font for measuring purposes.
+ */
+export class FontSizeDefinition {
+    /**
+     * The widths of each character starting with the ascii code 0x20 at index 0.
+     */
+    public characterWidths: Uint8Array;
+    /**
+     * A factor to translate a given font size to an actual text height.
+     * This is not precise but just an estimation for reserving spaces.
+     */
+    public fontSizeToHeight: number;
+
+    public constructor(characterWidths: Uint8Array, fontSizeToHeight: number) {
+        this.characterWidths = characterWidths;
+        this.fontSizeToHeight = fontSizeToHeight;
+    }
+}
 
 /**
  * This public class stores text widths for several fonts and allows width calculation
  * @partial
  */
 export class FontSizes {
-    // prettier-ignore
-    public static Georgia: Uint8Array = new Uint8Array([
-        3, 4, 5, 7, 7, 9, 8, 2, 4, 4, 5, 7, 3, 4, 3, 5, 7, 5, 6, 6, 6, 6, 6, 6, 7, 6, 3, 3, 7,
-        7, 7, 5, 10, 7, 7, 7, 8, 7, 7, 8, 9, 4, 6, 8, 7, 10, 8, 8, 7, 8, 8, 6, 7, 8, 7, 11, 8,
-        7, 7, 4, 5, 4, 7, 7, 6, 6, 6, 5, 6, 5, 4, 6, 6, 3, 3, 6, 3, 10, 6, 6, 6, 6, 5, 5, 4, 6,
-        5, 8, 6, 5, 5, 5, 4, 5, 7, 6, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8,
-        8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 8, 3, 4, 6, 7, 6, 7, 4, 6, 6, 10, 6, 6, 7, 0, 10, 7,
-        5, 7, 6, 6, 6, 6, 6, 3, 6, 6, 6, 6, 12, 12, 12, 5, 7, 7, 7, 7, 7, 7, 11, 7, 7, 7, 7, 7,
-        4, 4, 4, 4, 8, 8, 8, 8, 8, 8, 8, 7, 8, 8, 8, 8, 8, 7, 7, 6, 6, 6, 6, 6, 6, 6, 8, 5, 5,
-        5, 5, 5, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 5, 6
-    ]);
-
-    // prettier-ignore
-    public static Arial: Uint8Array = new Uint8Array([
-        3, 3, 4, 6, 6, 10, 7, 2, 4, 4, 4, 6, 3, 4, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 3, 3, 6,
-        6, 6, 6, 11, 7, 7, 8, 8, 7, 7, 9, 8, 3, 6, 7, 6, 9, 8, 9, 7, 9, 8, 7, 7, 8, 7, 10, 7, 7,
-        7, 3, 3, 3, 5, 6, 4, 6, 6, 6, 6, 6, 3, 6, 6, 2, 2, 6, 2, 9, 6, 6, 6, 6, 4, 6, 3, 6, 6,
-        8, 6, 6, 6, 4, 3, 4, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 4, 6, 6, 6, 6, 3, 6, 4, 8, 4, 6, 6, 0, 8, 6, 4,
-        6, 4, 4, 4, 6, 6, 4, 4, 4, 4, 6, 9, 9, 9, 7, 7, 7, 7, 7, 7, 7, 11, 8, 7, 7, 7, 7, 3, 3,
-        3, 3, 8, 8, 9, 9, 9, 9, 9, 6, 9, 8, 8, 8, 8, 7, 7, 7, 6, 6, 6, 6, 6, 6, 10, 6, 6, 6, 6,
-        6, 3, 3, 3, 3, 6, 6, 6, 6, 6, 6, 6, 6, 7, 6, 6, 6, 6, 6, 6
-    ]);
-
-    public static FontSizeLookupTables: Map<string, Uint8Array> = new Map<string, Uint8Array>([
-        ['Arial', FontSizes.Arial],
-        ["'Arial'", FontSizes.Arial],
-        ['"Arial"', FontSizes.Arial],
-        ['Georgia', FontSizes.Georgia],
-        ["'Georgia'", FontSizes.Georgia],
-        ['"Georgia"', FontSizes.Georgia]
-    ]);
+    public static FontSizeLookupTables: Map<string, FontSizeDefinition> = new Map<string, FontSizeDefinition>();
 
     public static readonly ControlChars: number = 0x20;
 
@@ -50,31 +41,48 @@ export class FontSizes {
             return;
         }
 
-        if (!Environment.isRunningInWorker) {
+        if (!Environment.isRunningInWorker && Environment.webPlatform != WebPlatform.NodeJs) {
             let canvas: HTMLCanvasElement = document.createElement('canvas');
             let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
-            measureContext.font = `11px ${family}`;
-            let sizes: number[] = [];
-            for (let i: number = 0x20; i < 255; i++) {
+            const measureSize = 11;
+            measureContext.font = `${measureSize}px ${family}`;
+            const widths: number[] = [];
+            let fullTxt = '';
+            for (let i: number = FontSizes.ControlChars; i < 255; i++) {
                 let s: string = String.fromCharCode(i);
-                sizes.push(measureContext.measureText(s).width);
+                fullTxt += s;
+                const metrics = measureContext.measureText(s);
+                widths.push(metrics.width);
             }
 
-            let data: Uint8Array = new Uint8Array(sizes);
+            const heightMetrics = measureContext.measureText(fullTxt + 'ÄÖÜÁÈ');
+
+            const top = 0 - Math.abs(heightMetrics.fontBoundingBoxAscent);
+            const bottom = 0 + Math.abs(heightMetrics.fontBoundingBoxDescent);
+            const height = bottom - top;
+
+            const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array(widths), height / measureSize);
             FontSizes.FontSizeLookupTables.set(family, data);
         } else {
-            FontSizes.FontSizeLookupTables.set(family, new Uint8Array([8]));
+            const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array([8]), 1.2);
+            FontSizes.FontSizeLookupTables.set(family, data);
         }
     }
 
-    public static measureString(s: string, families: string[], size: number, style: FontStyle, weight:FontWeight): number {
-        let data: Uint8Array;
+    public static measureString(
+        s: string,
+        families: string[],
+        size: number,
+        style: FontStyle,
+        weight: FontWeight
+    ): TextMetrics {
+        let data: FontSizeDefinition;
         let dataSize: number = 11;
         let family = families[0]; // default to first font
 
         // find a font which is maybe registered already
-        for(let i = 0; i < families.length; i++) {
-            if(FontSizes.FontSizeLookupTables.has(families[i])) {
+        for (let i = 0; i < families.length; i++) {
+            if (FontSizes.FontSizeLookupTables.has(families[i])) {
                 family = families[i];
                 break;
             }
@@ -86,18 +94,24 @@ export class FontSizes {
         data = FontSizes.FontSizeLookupTables.get(family)!;
         let factor: number = 1;
         if (style === FontStyle.Italic) {
-            factor *= 1.2;
+            factor *= 1.1;
         }
         if (weight === FontWeight.Bold) {
-            factor *= 1.2;
+            factor *= 1.1;
         }
+
         let stringSize: number = 0;
         for (let i: number = 0; i < s.length; i++) {
-            let code: number = Math.min(data.length - 1, s.charCodeAt(i) - 32);
+            let code: number = Math.min(data.characterWidths.length - 1, s.charCodeAt(i) - FontSizes.ControlChars);
             if (code >= 0) {
-                stringSize += (data[code] * size) / dataSize;
+                stringSize += (data.characterWidths[code] * size) / dataSize;
             }
         }
-        return stringSize * factor;
+
+        // add a small increase of size for spacing/kerning etc.
+        // we really need to improve the width calculation, maybe by using offscreencanvas? 
+        factor *= 1.07; 
+
+        return new TextMetrics(stringSize * factor, size * data.fontSizeToHeight);
     }
 }

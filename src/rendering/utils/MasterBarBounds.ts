@@ -2,7 +2,7 @@ import { Beat } from '@src/model/Beat';
 import { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
-import { StaveGroupBounds } from '@src/rendering/utils/StaveGroupBounds';
+import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 
 /**
  * Represents the boundaries of a list of bars related to a single master bar.
@@ -39,9 +39,17 @@ export class MasterBarBounds {
     public bars: BarBounds[] = [];
 
     /**
-     * Gets or sets a reference to the parent {@link staveGroupBounds}.
+     * Gets or sets a reference to the parent {@link staffSystemBounds}.
      */
-    public staveGroupBounds: StaveGroupBounds | null = null;
+    public staffSystemBounds: StaffSystemBounds | null = null;
+
+    /**
+     * Gets or sets a reference to the parent {@link staffSystemBounds}.
+     * @deprecated use staffSystemBounds
+     */
+    public get staveGroupBounds(): StaffSystemBounds | null {
+        return this.staffSystemBounds;
+    }
 
     /**
      * Adds a new bar to this lookup.
@@ -76,7 +84,11 @@ export class MasterBarBounds {
     /**
      * Finishes the lookup object and optimizes itself for fast access.
      */
-    public finish(): void {
+    public finish(scale: number = 1): void {
+        this.realBounds.scaleWith(scale);
+        this.visualBounds.scaleWith(scale);
+        this.lineAlignedBounds.scaleWith(scale);
+
         this.bars.sort((a, b) => {
             if (a.realBounds.y < b.realBounds.y) {
                 return -1;
@@ -93,7 +105,7 @@ export class MasterBarBounds {
             return 0;
         });
         for (const bar of this.bars) {
-            bar.finish();
+            bar.finish(scale);
         }
     }
 
@@ -102,6 +114,6 @@ export class MasterBarBounds {
      * @param bounds The beat bounds to add.
      */
     public addBeat(bounds: BeatBounds): void {
-        this.staveGroupBounds!.boundsLookup.addBeat(bounds);
+        this.staffSystemBounds!.boundsLookup.addBeat(bounds);
     }
 }

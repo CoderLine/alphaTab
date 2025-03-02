@@ -1,0 +1,2 @@
+test-data/** filter=lfs diff=lfs merge=lfs -text
+font/** filter=lfs diff=lfs merge=lfs -text

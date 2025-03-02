@@ -2,7 +2,7 @@ import { LayoutMode } from '@src/LayoutMode';
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
-import { Gp7Importer } from '@src/importer/Gp7Importer';
+import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
@@ -20,7 +20,7 @@ import { CapoEffectInfo } from '@src/rendering/effects/CapoEffectInfo';
 import { ChordsEffectInfo } from '@src/rendering/effects/ChordsEffectInfo';
 import { CrescendoEffectInfo } from '@src/rendering/effects/CrescendoEffectInfo';
 import { DynamicsEffectInfo } from '@src/rendering/effects/DynamicsEffectInfo';
-import { FadeInEffectInfo } from '@src/rendering/effects/FadeInEffectInfo';
+import { FadeEffectInfo } from '@src/rendering/effects/FadeEffectInfo';
 import { FermataEffectInfo } from '@src/rendering/effects/FermataEffectInfo';
 import { FingeringEffectInfo } from '@src/rendering/effects/FingeringEffectInfo';
 import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';
@@ -41,7 +41,6 @@ import { TripletFeelEffectInfo } from '@src/rendering/effects/TripletFeelEffectI
 import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo';
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
@@ -60,9 +59,32 @@ import { SkiaCanvas } from './platform/skia/SkiaCanvas';
 import { Font } from './model';
 import { Settings } from './Settings';
 import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
+import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
+import { NumberedBarRendererFactory } from './rendering/NumberedBarRendererFactory';
+import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
+import { ScoreBarRenderer } from './rendering/ScoreBarRenderer';
+import { TabBarRenderer } from './rendering/TabBarRenderer';
+import { SustainPedalEffectInfo } from './rendering/effects/SustainPedalEffectInfo';
+import { GolpeEffectInfo } from './rendering/effects/GolpeEffectInfo';
+import { GolpeType } from './model/GolpeType';
+import { WahPedalEffectInfo } from './rendering/effects/WahPedalEffectInfo';
+import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
+import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
+import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
+import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
+import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
 
+/**
+ * A factory for custom layout engines. 
+ */
 export class LayoutEngineFactory {
+    /**
+     * Whether the layout is considered "vertical" (affects mainly scrolling behavior).
+     */
     public readonly vertical: boolean;
+    /**
+     * Creates a new layout instance.
+     */
     public readonly createLayout: (renderer: ScoreRenderer) => ScoreLayout;
 
     public constructor(vertical: boolean, createLayout: (renderer: ScoreRenderer) => ScoreLayout) {
@@ -71,7 +93,15 @@ export class LayoutEngineFactory {
     }
 }
 
+/**
+ * A factory for custom render engines. 
+ * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are 
+ * also done in the background worker files (e.g. when bundling)
+ */
 export class RenderEngineFactory {
+    /**
+     * Whether the layout supports background workers. 
+     */
     public readonly supportsWorkers: boolean;
     public readonly createCanvas: () => ICanvas;
 
@@ -91,6 +121,14 @@ export class RenderEngineFactory {
  * @partial
  */
 export class Environment {
+    private static readonly StaffIdBeforeSlashAlways = 'before-slash-always';
+    private static readonly StaffIdBeforeScoreAlways = 'before-score-always';
+    private static readonly StaffIdBeforeScoreHideable = 'before-score-hideable';
+    private static readonly StaffIdBeforeNumberedAlways = 'before-numbered-always';
+    private static readonly StaffIdBeforeTabAlways = 'before-tab-always';
+    private static readonly StaffIdBeforeTabHideable = 'before-tab-hideable';
+    private static readonly StaffIdBeforeEndAlways = 'before-end-always';
+
     /**
      * The font size of the music font in pixel.
      */
@@ -116,6 +154,7 @@ export class Environment {
             styleElement.id = 'alphaTabStyle';
             let css: string = `
             @font-face {
+                font-display: block;
                 font-family: 'alphaTab';
                  src: url('${fontDirectory}Bravura.eot');
                  src: url('${fontDirectory}Bravura.eot?#iefix') format('embedded-opentype')
@@ -132,7 +171,8 @@ export class Environment {
             }
             .at-surface-svg text {
                 dominant-baseline: central;
-            }             
+                white-space:pre;
+            }
             .at {
                  font-family: 'alphaTab';
                  speak: none;
@@ -411,7 +451,7 @@ export class Environment {
         return [
             new Gp3To5Importer(),
             new GpxImporter(),
-            new Gp7Importer(),
+            new Gp7To8Importer(),
             new MusicXmlImporter(),
             new CapellaImporter(),
             new AlphaTexImporter()
@@ -441,11 +481,11 @@ export class Environment {
 
     /**
      * Enables the usage of alphaSkia as rendering backend.
-     * @param musicFontData The raw binary data of the music font. 
+     * @param musicFontData The raw binary data of the music font.
      * @param alphaSkia The alphaSkia module.
      */
     public static enableAlphaSkia(musicFontData: ArrayBuffer, alphaSkia: unknown) {
-        SkiaCanvas.enable(musicFontData, alphaSkia)
+        SkiaCanvas.enable(musicFontData, alphaSkia);
     }
 
     /**
@@ -455,9 +495,7 @@ export class Environment {
      * @param fontInfo If provided the font info provided overrules
      * @returns The font info under which the font was registered.
      */
-    public static registerAlphaSkiaCustomFont(
-        fontData: Uint8Array,
-        fontInfo?: Font | undefined): Font {
+    public static registerAlphaSkiaCustomFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
         return SkiaCanvas.registerFont(fontData, fontInfo);
     }
 
@@ -474,126 +512,158 @@ export class Environment {
         );
     }
 
+    private static createDefaultRenderers(): BarRendererFactory[] {
+        return [
+            //
+            // Slash
+            new EffectBarRendererFactory(Environment.StaffIdBeforeSlashAlways, [
+                new TempoEffectInfo(),
+                new TripletFeelEffectInfo(),
+                new MarkerEffectInfo(),
+                new DirectionsEffectInfo(),
+                new AlternateEndingsEffectInfo(),
+                new FreeTimeEffectInfo(),
+                new TextEffectInfo(),
+                new BeatTimerEffectInfo(),
+                new ChordsEffectInfo()
+            ]),
+            // no before-slash-hideable
+            new SlashBarRendererFactory(),
+
+            //
+            // Score (standard notation)
+            new EffectBarRendererFactory(Environment.StaffIdBeforeScoreAlways, [
+                new FermataEffectInfo(),
+                new BeatBarreEffectInfo(),
+                new NoteOrnamentEffectInfo(),
+                new RasgueadoEffectInfo(),
+                new WahPedalEffectInfo(),
+            ]),
+            new EffectBarRendererFactory(
+                Environment.StaffIdBeforeScoreHideable,
+                [
+                    new WhammyBarEffectInfo(),
+                    new TrillEffectInfo(),
+                    new OttaviaEffectInfo(true),
+                    new WideBeatVibratoEffectInfo(),
+                    new SlightBeatVibratoEffectInfo(),
+                    new WideNoteVibratoEffectInfo(),
+                    new SlightNoteVibratoEffectInfo(false),
+                    new LeftHandTapEffectInfo(),
+                    new GolpeEffectInfo(GolpeType.Finger)
+                ],
+                (_, staff) => staff.showStandardNotation
+            ),
+            new ScoreBarRendererFactory(),
+
+            //
+            // Numbered
+            new EffectBarRendererFactory(Environment.StaffIdBeforeNumberedAlways, [
+                new CrescendoEffectInfo(),
+                new OttaviaEffectInfo(false),
+                new DynamicsEffectInfo(),
+                new GolpeEffectInfo(GolpeType.Thumb, (s, b) => b.voice.bar.staff.showStandardNotation),
+                new SustainPedalEffectInfo()
+            ]),
+            // no before-numbered-hideable
+            new NumberedBarRendererFactory(),
+
+            //
+            // Tabs
+            new EffectBarRendererFactory(Environment.StaffIdBeforeTabAlways, [new LyricsEffectInfo()]),
+            new EffectBarRendererFactory(
+                Environment.StaffIdBeforeTabHideable,
+                [
+                    // TODO: whammy line effect
+                    new TrillEffectInfo(),
+                    new WideBeatVibratoEffectInfo(),
+                    new SlightBeatVibratoEffectInfo(),
+                    new WideNoteVibratoEffectInfo(),
+                    new SlightNoteVibratoEffectInfo(true),
+                    new TapEffectInfo(),
+                    new FadeEffectInfo(),
+                    new HarmonicsEffectInfo(HarmonicType.Natural),
+                    new HarmonicsEffectInfo(HarmonicType.Artificial),
+                    new HarmonicsEffectInfo(HarmonicType.Pinch),
+                    new HarmonicsEffectInfo(HarmonicType.Tap),
+                    new HarmonicsEffectInfo(HarmonicType.Semi),
+                    new HarmonicsEffectInfo(HarmonicType.Feedback),
+                    new LetRingEffectInfo(),
+                    new CapoEffectInfo(),
+                    new FingeringEffectInfo(),
+                    new PalmMuteEffectInfo(),
+                    new PickStrokeEffectInfo(),
+                    new PickSlideEffectInfo(),
+                    new LeftHandTapEffectInfo(),
+                    new GolpeEffectInfo(GolpeType.Finger, (s, b) => !b.voice.bar.staff.showStandardNotation)
+                ],
+                (_, staff) => staff.showTablature
+            ),
+            new TabBarRendererFactory(),
+            new EffectBarRendererFactory(Environment.StaffIdBeforeEndAlways, [
+                new GolpeEffectInfo(GolpeType.Thumb, (s, b) => !b.voice.bar.staff.showStandardNotation)
+            ])
+        ];
+    }
+
     private static createDefaultStaveProfiles(): Map<StaveProfile, BarRendererFactory[]> {
         const staveProfiles = new Map<StaveProfile, BarRendererFactory[]>();
 
-        // default combinations of stave textprofiles
-        staveProfiles.set(StaveProfile.ScoreTab, [
-            new EffectBarRendererFactory('score-effects', [
-                new TempoEffectInfo(),
-                new TripletFeelEffectInfo(),
-                new MarkerEffectInfo(),
-                new TextEffectInfo(),
-                new ChordsEffectInfo(),
-                new FermataEffectInfo(),
-                new WhammyBarEffectInfo(),
-                new TrillEffectInfo(),
-                new OttaviaEffectInfo(true),
-                new WideBeatVibratoEffectInfo(),
-                new SlightBeatVibratoEffectInfo(),
-                new WideNoteVibratoEffectInfo(),
-                new SlightNoteVibratoEffectInfo(),
-                new LeftHandTapEffectInfo(),
-                new AlternateEndingsEffectInfo()
-            ]),
-            new ScoreBarRendererFactory(),
-            new EffectBarRendererFactory('tab-effects', [
-                new CrescendoEffectInfo(),
-                new OttaviaEffectInfo(false),
-                new DynamicsEffectInfo(),
-                new LyricsEffectInfo(),
-                new TrillEffectInfo(),
-                new WideBeatVibratoEffectInfo(),
-                new SlightBeatVibratoEffectInfo(),
-                new WideNoteVibratoEffectInfo(),
-                new SlightNoteVibratoEffectInfo(),
-                new TapEffectInfo(),
-                new FadeInEffectInfo(),
-                new HarmonicsEffectInfo(HarmonicType.Natural),
-                new HarmonicsEffectInfo(HarmonicType.Artificial),
-                new HarmonicsEffectInfo(HarmonicType.Pinch),
-                new HarmonicsEffectInfo(HarmonicType.Tap),
-                new HarmonicsEffectInfo(HarmonicType.Semi),
-                new HarmonicsEffectInfo(HarmonicType.Feedback),
-                new LetRingEffectInfo(),
-                new CapoEffectInfo(),
-                new FingeringEffectInfo(),
-                new PalmMuteEffectInfo(),
-                new PickStrokeEffectInfo(),
-                new PickSlideEffectInfo(),
-                new LeftHandTapEffectInfo()
-            ]),
-            new TabBarRendererFactory(false, false, false)
+        // the general layout is repeating the same pattern across the different notation staffs:
+        // * general effects before notation renderer, shown also if notation renderer is hidden (`before-xxxx-always`)
+        // * effects specific to the notation renderer, hidden if the nottation renderer is hidden (`before-xxxx-hideable`)
+        // * the notation renderer itself, hidden based on settings (`xxxx`)
+
+        const defaultRenderers = Environment.createDefaultRenderers();
+        staveProfiles.set(StaveProfile.Default, defaultRenderers);
+        staveProfiles.set(StaveProfile.ScoreTab, defaultRenderers);
+
+        const scoreRenderers = new Set<string>([
+            Environment.StaffIdBeforeSlashAlways,
+            Environment.StaffIdBeforeScoreAlways,
+            Environment.StaffIdBeforeNumberedAlways,
+            Environment.StaffIdBeforeTabAlways,
+            ScoreBarRenderer.StaffId,
+            Environment.StaffIdBeforeEndAlways
         ]);
-        staveProfiles.set(StaveProfile.Score, [
-            new EffectBarRendererFactory('score-effects', [
-                new TempoEffectInfo(),
-                new TripletFeelEffectInfo(),
-                new MarkerEffectInfo(),
-                new TextEffectInfo(),
-                new ChordsEffectInfo(),
-                new FermataEffectInfo(),
-                new WhammyBarEffectInfo(),
-                new TrillEffectInfo(),
-                new OttaviaEffectInfo(true),
-                new WideBeatVibratoEffectInfo(),
-                new SlightBeatVibratoEffectInfo(),
-                new WideNoteVibratoEffectInfo(),
-                new SlightNoteVibratoEffectInfo(),
-                new FadeInEffectInfo(),
-                new LetRingEffectInfo(),
-                new PalmMuteEffectInfo(),
-                new PickStrokeEffectInfo(),
-                new PickSlideEffectInfo(),
-                new LeftHandTapEffectInfo(),
-                new AlternateEndingsEffectInfo()
-            ]),
-            new ScoreBarRendererFactory(),
-            new EffectBarRendererFactory('score-bottom-effects', [
-                new CrescendoEffectInfo(),
-                new OttaviaEffectInfo(false),
-                new DynamicsEffectInfo(),
-                new LyricsEffectInfo()
-            ])
+        staveProfiles.set(
+            StaveProfile.Score,
+            defaultRenderers.filter(r => scoreRenderers.has(r.staffId))
+        );
+
+        const tabRenderers = new Set<string>([
+            Environment.StaffIdBeforeSlashAlways,
+            Environment.StaffIdBeforeScoreAlways,
+            Environment.StaffIdBeforeNumberedAlways,
+            Environment.StaffIdBeforeTabAlways,
+            TabBarRenderer.StaffId,
+            Environment.StaffIdBeforeEndAlways
         ]);
-        let tabEffectInfos: EffectBarRendererInfo[] = [
-            new TempoEffectInfo(),
-            new TripletFeelEffectInfo(),
-            new MarkerEffectInfo(),
-            new TextEffectInfo(),
-            new ChordsEffectInfo(),
-            new FermataEffectInfo(),
-            new TrillEffectInfo(),
-            new WideBeatVibratoEffectInfo(),
-            new SlightBeatVibratoEffectInfo(),
-            new WideNoteVibratoEffectInfo(),
-            new SlightNoteVibratoEffectInfo(),
-            new TapEffectInfo(),
-            new FadeInEffectInfo(),
-            new HarmonicsEffectInfo(HarmonicType.Artificial),
-            new HarmonicsEffectInfo(HarmonicType.Pinch),
-            new HarmonicsEffectInfo(HarmonicType.Tap),
-            new HarmonicsEffectInfo(HarmonicType.Semi),
-            new HarmonicsEffectInfo(HarmonicType.Feedback),
-            new LetRingEffectInfo(),
-            new CapoEffectInfo(),
-            new FingeringEffectInfo(),
-            new PalmMuteEffectInfo(),
-            new PickStrokeEffectInfo(),
-            new PickSlideEffectInfo(),
-            new LeftHandTapEffectInfo(),
-            new AlternateEndingsEffectInfo()
-        ];
-        staveProfiles.set(StaveProfile.Tab, [
-            new EffectBarRendererFactory('tab-effects', tabEffectInfos),
-            new TabBarRendererFactory(true, true, true),
-            new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
-        ]);
-        staveProfiles.set(StaveProfile.TabMixed, [
-            new EffectBarRendererFactory('tab-effects', tabEffectInfos),
-            new TabBarRendererFactory(false, false, false),
-            new EffectBarRendererFactory('tab-bottom-effects', [new LyricsEffectInfo()])
-        ]);
+        staveProfiles.set(
+            StaveProfile.Tab,
+            Environment.createDefaultRenderers().filter(r => {
+                if (r instanceof TabBarRendererFactory) {
+                    const tab = r as TabBarRendererFactory;
+                    tab.showTimeSignature = true;
+                    tab.showRests = true;
+                    tab.showTiedNotes = true;
+                }
+                return tabRenderers.has(r.staffId);
+            })
+        );
+
+        staveProfiles.set(
+            StaveProfile.TabMixed,
+            Environment.createDefaultRenderers().filter(r => {
+                if (r instanceof TabBarRendererFactory) {
+                    const tab = r as TabBarRendererFactory;
+                    tab.showTimeSignature = false;
+                    tab.showRests = false;
+                    tab.showTiedNotes = false;
+                }
+                return tabRenderers.has(r.staffId);
+            })
+        );
 
         return staveProfiles;
     }
@@ -623,15 +693,12 @@ export class Environment {
         createWebWorker: (settings: Settings) => Worker,
         createAudioWorklet: (context: AudioContext, settings: Settings) => Promise<void>
     ) {
-        if(Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
+        if (Environment.isRunningInWorker || Environment.isRunningInAudioWorklet) {
             return;
         }
-        
+
         // browser polyfills
-        if (
-            Environment.webPlatform === WebPlatform.Browser ||
-            Environment.webPlatform === WebPlatform.BrowserModule
-        ) {
+        if (Environment.webPlatform === WebPlatform.Browser || Environment.webPlatform === WebPlatform.BrowserModule) {
             Environment.registerJQueryPlugin();
             Environment.HighDpiFactor = window.devicePixelRatio;
             // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
@@ -651,7 +718,9 @@ export class Environment {
                     this.append(...nodes);
                 };
                 (Document.prototype as Document).replaceChildren = (Element.prototype as Element).replaceChildren;
-                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (Element.prototype as Element).replaceChildren;
+                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (
+                    Element.prototype as Element
+                ).replaceChildren;
             }
             if (!('replaceAll' in String.prototype)) {
                 (String.prototype as any).replaceAll = function (str: string, newStr: string) {
@@ -667,19 +736,31 @@ export class Environment {
     /**
      * @target web
      */
-    public static get alphaTabWorker(): any { return this.globalThis.Worker }
+    public static get alphaTabWorker(): any {
+        return this.globalThis.Worker;
+    }
+
+    /**
+     * @target web
+     */
+    public static get alphaTabUrl(): any {
+        return this.globalThis.URL;
+    }
 
     /**
      * @target web
      */
     public static initializeWorker() {
         if (!Environment.isRunningInWorker) {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Not running in worker, cannot run worker initialization");
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Not running in worker, cannot run worker initialization'
+            );
         }
         AlphaTabWebWorker.init();
         AlphaSynthWebWorker.init();
         Environment.createWebWorker = _ => {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Nested workers are not supported");
+            throw new AlphaTabError(AlphaTabErrorType.General, 'Nested workers are not supported');
         };
     }
 
@@ -688,7 +769,10 @@ export class Environment {
      */
     public static initializeAudioWorklet() {
         if (!Environment.isRunningInAudioWorklet) {
-            throw new AlphaTabError(AlphaTabErrorType.General, "Not running in audio worklet, cannot run worklet initialization");
+            throw new AlphaTabError(
+                AlphaTabErrorType.General,
+                'Not running in audio worklet, cannot run worklet initialization'
+            );
         }
         AlphaSynthWebWorklet.init();
     }

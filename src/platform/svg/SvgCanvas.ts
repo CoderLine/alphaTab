@@ -1,6 +1,6 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
 import { FontSizes } from '@src/platform/svg/FontSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Settings } from '@src/Settings';
@@ -14,6 +14,8 @@ export abstract class SvgCanvas implements ICanvas {
     private _currentPath: string = '';
     private _currentPathIsEmpty: boolean = true;
 
+    public scale = 1;
+
     public color: Color = new Color(255, 255, 255, 0xff);
     public lineWidth: number = 1;
     public font: Font = new Font('Arial', 10, FontStyle.Plain);
@@ -21,12 +23,13 @@ export abstract class SvgCanvas implements ICanvas {
     public textBaseline: TextBaseline = TextBaseline.Top;
     public settings!: Settings;
 
-    public destroy() {
-    }
+    public destroy() {}
 
     public beginRender(width: number, height: number): void {
-        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${height | 0
-            }px" class="at-surface-svg">\n`;
+        this.scale = this.settings.display.scale;
+        this.buffer = `<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="${width | 0}px" height="${
+            height | 0
+        }px" class="at-surface-svg">\n`;
         this._currentPath = '';
         this._currentPathIsEmpty = true;
         this.textBaseline = TextBaseline.Top;
@@ -47,14 +50,19 @@ export abstract class SvgCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this.buffer += `<rect x="${x | 0}" y="${y | 0}" width="${w}" height="${h}" fill="${this.color.rgba}" />\n`;
+            this.buffer += `<rect x="${(x * this.scale) | 0}" y="${(y * this.scale) | 0}" width="${
+                w * this.scale
+            }" height="${h * this.scale}" fill="${this.color.rgba}" />\n`;
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this.buffer += `<rect x="${x | 0}" y="${y | 0}" width="${w}" height="${h}" stroke="${this.color.rgba}"`;
+        const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
+        this.buffer += `<rect x="${((x * this.scale) | 0) + blurOffset}" y="${((y * this.scale) | 0) + blurOffset}" width="${
+            (w * this.scale)
+        }" height="${(h * this.scale)}" stroke="${this.color.rgba}"`;
         if (this.lineWidth !== 1) {
-            this.buffer += ` stroke-width="${this.lineWidth}"`;
+            this.buffer += ` stroke-width="${this.lineWidth * this.scale}"`;
         }
         this.buffer += ' fill="transparent" />\n';
     }
@@ -68,26 +76,33 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public moveTo(x: number, y: number): void {
-        this._currentPath += ` M${x},${y}`;
+        this._currentPath += ` M${x * this.scale},${y * this.scale}`;
     }
 
     public lineTo(x: number, y: number): void {
         this._currentPathIsEmpty = false;
-        this._currentPath += ` L${x},${y}`;
+        this._currentPath += ` L${x * this.scale},${y * this.scale}`;
     }
 
     public quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void {
         this._currentPathIsEmpty = false;
-        this._currentPath += ` Q${cpx},${cpy},${x},${y}`;
+        this._currentPath += ` Q${cpx * this.scale},${cpy * this.scale},${x * this.scale},${y * this.scale}`;
     }
 
     public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
         this._currentPathIsEmpty = false;
-        this._currentPath += ` C${cp1X},${cp1Y},${cp2X},${cp2Y},${x},${y}`;
+        this._currentPath += ` C${cp1X * this.scale},${cp1Y * this.scale},${cp2X * this.scale},${cp2Y * this.scale},${
+            x * this.scale
+        },${y * this.scale}`;
     }
 
     public fillCircle(x: number, y: number, radius: number): void {
         this._currentPathIsEmpty = false;
+
+        x *= this.scale;
+        y *= this.scale;
+        radius *= this.scale;
+
         //
         // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
         this._currentPath += ` M${x - radius},${y} A1,1 0 0,0 ${x + radius},${y} A1,1 0 0,0 ${x - radius},${y} z`;
@@ -96,6 +111,11 @@ export abstract class SvgCanvas implements ICanvas {
 
     public strokeCircle(x: number, y: number, radius: number): void {
         this._currentPathIsEmpty = false;
+
+        x *= this.scale;
+        y *= this.scale;
+        radius *= this.scale;
+
         //
         // M0,250 A1,1 0 0,0 500,250 A1,1 0 0,0 0,250 z
         this._currentPath += ` M${x - radius},${y} A1,1 0 0,0 ${x + radius},${y} A1,1 0 0,0 ${x - radius},${y} z`;
@@ -117,8 +137,8 @@ export abstract class SvgCanvas implements ICanvas {
     public stroke(): void {
         if (!this._currentPathIsEmpty) {
             let s: string = `<path d="${this._currentPath}" stroke="${this.color.rgba}"`;
-            if (this.lineWidth !== 1) {
-                s += ` stroke-width="${this.lineWidth}"`;
+            if (this.lineWidth !== 1 || this.scale !== 1) {
+                s += ` stroke-width="${this.lineWidth * this.scale}"`;
             }
             s += ' style="fill: none" />';
             this.buffer += s;
@@ -131,9 +151,9 @@ export abstract class SvgCanvas implements ICanvas {
         if (text === '') {
             return;
         }
-        let s: string = `<text x="${x | 0}" y="${y | 0}" style="stroke: none; font:${this.font.toCssString(
-            this.settings.display.scale
-        )}" ${this.getSvgBaseLine()}`;
+        let s: string = `<text x="${(x * this.scale) | 0}" y="${
+            (y * this.scale) | 0
+        }" style='stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}'`;
         if (this.color.rgba !== '#000000') {
             s += ` fill="${this.color.rgba}"`;
         }
@@ -168,9 +188,9 @@ export abstract class SvgCanvas implements ICanvas {
     protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return `dominant-baseline="hanging"`;
+                return `dominant-baseline: hanging`;
             case TextBaseline.Bottom:
-                return `dominant-baseline="bottom"`;
+                return `dominant-baseline: ideographic`;
             // case TextBaseline.Middle:
             default:
                 // middle is set as default on the SVG tag via css
@@ -178,17 +198,23 @@ export abstract class SvgCanvas implements ICanvas {
         }
     }
 
-    public measureText(text: string): number {
+    public measureText(text: string) {
         if (!text) {
-            return 0;
+            return new TextMetrics(0, 0);
         }
-        return FontSizes.measureString(text, this.font.families, this.font.size, this.font.style, this.font.weight);
+        return FontSizes.measureString(
+            text,
+            this.font.families,
+            this.font.size * this.scale,
+            this.font.style,
+            this.font.weight
+        );
     }
 
     public abstract fillMusicFontSymbol(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol,
         centerAtPosition?: boolean
     ): void;
@@ -196,7 +222,7 @@ export abstract class SvgCanvas implements ICanvas {
     public abstract fillMusicFontSymbols(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: MusicFontSymbol[],
         centerAtPosition?: boolean
     ): void;
@@ -207,7 +233,14 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
-        this.buffer += '<g transform="translate(' + centerX + ' ,' + centerY + ') rotate( ' + angle + ')">';
+        this.buffer +=
+            '<g transform="translate(' +
+            centerX * this.scale +
+            ' ,' +
+            centerY * this.scale +
+            ') rotate( ' +
+            angle +
+            ')">';
     }
 
     public endRotate(): void {

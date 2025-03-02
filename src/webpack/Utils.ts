@@ -109,7 +109,7 @@ export function getWorkerRuntime(
     let i = workerIndexMap.get(parser.state) || 0;
     workerIndexMap.set(parser.state, i + 1);
     let name = `${cachedContextify(parser.state.module.identifier())}|${i}`;
-    const hash = compilation.compiler.webpack.util.createHash(compilation.outputOptions.hashFunction);
+    const hash = compilation.compiler.webpack.util.createHash(compilation.outputOptions.hashFunction!);
     hash.update(name);
     const digest = hash.digest(compilation.outputOptions.hashDigest) as string;
     const runtime = digest.slice(0, compilation.outputOptions.hashDigestLength);

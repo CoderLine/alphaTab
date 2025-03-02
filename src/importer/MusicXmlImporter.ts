@@ -4,6 +4,7 @@ import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
+import { BendPoint } from '@src/model/BendPoint';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
@@ -27,6 +28,8 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
+import { ZipReader } from '@src/zip/ZipReader';
+import { ZipEntry } from '@src/zip/ZipEntry';
 
 export class MusicXmlImporter extends ScoreImporter {
     private _score!: Score;
@@ -54,7 +57,8 @@ export class MusicXmlImporter extends ScoreImporter {
         this._tieStarts = [];
         this._tieStartIds = new Map<number, boolean>();
         this._slurStarts = new Map<string, Note>();
-        let xml: string = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+
+        let xml: string = this.extractMusicXml();
         let dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
@@ -71,6 +75,67 @@ export class MusicXmlImporter extends ScoreImporter {
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
         return this._score;
+    }
+
+    extractMusicXml(): string {
+        const zip = new ZipReader(this.data);
+        let entries: ZipEntry[];
+        try {
+            entries = zip.read();
+        } catch (e) {
+            entries = [];
+        }
+
+        // no compressed MusicXML, try raw
+        if (entries.length === 0) {
+            this.data.reset();
+            return IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+        }
+
+        const container = entries.find(e => e.fullName === 'META-INF/container.xml');
+        if (!container) {
+            throw new UnsupportedFormatError('No compressed MusicXML');
+        }
+
+        const containerDom = new XmlDocument();
+        try {
+            containerDom.parse(IOHelper.toString(container.data, this.settings.importer.encoding));
+        } catch (e) {
+            throw new UnsupportedFormatError('Malformed container.xml, could not parse as XML', e as Error);
+        }
+
+        let root: XmlNode | null = containerDom.firstElement;
+        if (!root || root.localName !== 'container') {
+            throw new UnsupportedFormatError("Malformed container.xml, root element not 'container'");
+        }
+
+        const rootFiles = root.findChildElement('rootfiles');
+        if (!rootFiles) {
+            throw new UnsupportedFormatError("Malformed container.xml, 'container/rootfiles' not found");
+        }
+
+        let uncompressedFileFullPath: string = '';
+        for (const c of rootFiles.childNodes) {
+            if (c.nodeType == XmlNodeType.Element && c.localName === 'rootfile') {
+                // The MusicXML root must be described in the first <rootfile> element.
+                // https://www.w3.org/2021/06/musicxml40/tutorial/compressed-mxl-files/
+                uncompressedFileFullPath = c.getAttribute('full-path');
+                break;
+            }
+        }
+
+        if (!uncompressedFileFullPath) {
+            throw new UnsupportedFormatError('Unsupported compressed MusicXML, missing rootfile');
+        }
+
+        const file = entries.find(e => e.fullName === uncompressedFileFullPath);
+        if (!file) {
+            throw new UnsupportedFormatError(
+                `Malformed container.xml, '${uncompressedFileFullPath}' not contained in zip`
+            );
+        }
+
+        return IOHelper.toString(file.data, this.settings.importer.encoding);
     }
 
     private mergePartGroups(): void {
@@ -993,6 +1058,8 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTechnical(element: XmlNode, note: Note): void {
+        let bends: XmlNode[] = [];
+
         for (let c of element.childNodes) {
             if (c.nodeType === XmlNodeType.Element) {
                 switch (c.localName) {
@@ -1011,12 +1078,61 @@ export class MusicXmlImporter extends ScoreImporter {
                     case 'up-bow':
                         note.beat.pickStroke = PickStroke.Up;
                         break;
+                    case 'bend':
+                        bends.push(c);
+                        break;
                 }
             }
         }
+
+        if (bends.length > 0) {
+            this.parseBends(bends, note);
+        }
+
         if (note.string === -2147483648 || note.fret === -2147483648) {
             note.string = -1;
             note.fret = -1;
+        }
+    }
+
+    private parseBends(elements: XmlNode[], note: Note): void {
+        let baseOffset: number = BendPoint.MaxPosition / elements.length;
+        let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
+        let isFirstBend: boolean = true;
+
+        for (let bend of elements) {
+            let bendAlterElement: XmlNode | null = bend.findChildElement('bend-alter');
+            if (bendAlterElement) {
+                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
+                if (bend.findChildElement('pre-bend')) {
+                    if (isFirstBend) {
+                        currentValue += absValue;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        currentOffset += baseOffset;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        isFirstBend = false;
+                    } else {
+                        currentOffset += baseOffset;
+                    }
+                } else if (bend.findChildElement('release')) {
+                    if (isFirstBend) {
+                        currentValue += absValue;
+                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentOffset += baseOffset;
+                    currentValue -= absValue;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                } else {
+                    // "regular" bend
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentValue += absValue;
+                    currentOffset += baseOffset;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                }
+            }
         }
     }
 
@@ -1032,6 +1148,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'staccato':
                 case 'detached-legato':
                     note.isStaccato = true;
+                    break;
+                case 'tenuto':
+                    note.accentuated = AccentuationType.Tenuto;
                     break;
             }
         }
@@ -1105,7 +1224,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
-        let value: number = octave * 12 + ModelUtils.getToneForText(step) + semitones;
+        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
     }
@@ -1133,7 +1252,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
         }
-        let value: number = octave * 12 + ModelUtils.getToneForText(step) + (semitones | 0);
+        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + (semitones | 0);
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
     }
@@ -1160,7 +1279,7 @@ export class MusicXmlImporter extends ScoreImporter {
                             tempoAutomation.isLinear = true;
                             tempoAutomation.type = AutomationType.Tempo;
                             tempoAutomation.value = parseInt(tempo);
-                            masterBar.tempoAutomation = tempoAutomation;
+                            masterBar.tempoAutomations.push(tempoAutomation);
                             if (masterBar.index === 0) {
                                 masterBar.score.tempo = tempoAutomation.value;
                             }
@@ -1199,11 +1318,22 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         let tempoAutomation: Automation = new Automation();
         tempoAutomation.type = AutomationType.Tempo;
-        tempoAutomation.value = perMinute * ((unit / 4) | 0);
-        masterBar.tempoAutomation = tempoAutomation;
-        if (masterBar.index === 0) {
-            masterBar.score.tempo = tempoAutomation.value;
+        tempoAutomation.value = (perMinute * (unit / 4)) | 0;
+
+        if (!this.hasSameTempo(masterBar, tempoAutomation)) {
+            masterBar.tempoAutomations.push(tempoAutomation);
+            if (masterBar.index === 0) {
+                masterBar.score.tempo = tempoAutomation.value;
+            }
         }
+    }
+    private hasSameTempo(masterBar: MasterBar, tempoAutomation: Automation) {
+        for (const existing of masterBar.tempoAutomations) {
+            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value == existing.value) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {

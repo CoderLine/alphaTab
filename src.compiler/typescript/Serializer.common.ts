@@ -5,6 +5,7 @@ export interface JsonProperty {
     partialNames: boolean;
     property: ts.PropertyDeclaration;
     jsonNames: string[];
+    asRaw: boolean;
     target?: string;
     isReadOnly: boolean;
 }

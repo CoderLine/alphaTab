@@ -24,7 +24,7 @@ interface Emitter {
 }
 
 export default function (emitters: Emitter[], handleErrors: boolean = false) {
-    console.log('Parsing...');
+    console.log(`Parsing using typescript ${ts.version}...`);
     const commandLine = ts.parseCommandLine(ts.sys.args);
     if (!commandLine.options.project) {
         commandLine.options.project = 'tsconfig.json';
@@ -94,12 +94,14 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
             });
         }
 
+        console.log('Done transpiling');
+
         if (errorCount > 0) {
             ts.sys.exit(ts.ExitStatus.DiagnosticsPresent_OutputsGenerated);
         } else {
             ts.sys.exit(ts.ExitStatus.Success);
         }
+    } else{
+        console.log('Done transpiling');
     }
-
-    console.log('Done');
 }

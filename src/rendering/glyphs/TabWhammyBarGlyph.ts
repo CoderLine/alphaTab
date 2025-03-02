@@ -96,8 +96,8 @@ export class TabWhammyBarGlyph extends Glyph {
             return 0;
         }
         let offset: number =
-            TabWhammyBarGlyph.PerHalfSize * this.scale +
-            Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize * this.scale;
+            TabWhammyBarGlyph.PerHalfSize +
+            Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize;
         if (value < 0) {
             offset = -offset;
         }
@@ -136,16 +136,16 @@ export class TabWhammyBarGlyph extends Glyph {
                 cx +
                 startNoteRenderer.x +
                 startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) -
-                2 * this.scale;
+                2;
             endX =
                 cx +
                 startNoteRenderer.x +
                 startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) +
-                2 * this.scale;
+                2;
         } else {
             startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
             endX = !endNoteRenderer
-                ? cx + startNoteRenderer.x + startNoteRenderer.width - 2 * this.scale
+                ? cx + startNoteRenderer.x + startNoteRenderer.width - 2
                 : cx + endNoteRenderer.x + endNoteRenderer.getBeatX(endBeat!, endXPositionType);
         }
         let old: TextAlign = canvas.textAlign;
@@ -190,7 +190,7 @@ export class TabWhammyBarGlyph extends Glyph {
         let y1: number = cy - this.getOffset(firstPt.value);
         let y2: number = cy - this.getOffset(secondPt.value);
         if (firstPt.offset === secondPt.offset) {
-            let dashSize: number = TabWhammyBarGlyph.DashSize * this.scale;
+            let dashSize: number = TabWhammyBarGlyph.DashSize;
             let dashes: number = Math.abs(y2 - y1) / (dashSize * 2);
             if (dashes < 1) {
                 canvas.moveTo(x1, y1);
@@ -206,7 +206,7 @@ export class TabWhammyBarGlyph extends Glyph {
             }
             canvas.stroke();
         } else if (firstPt.value === secondPt.value) {
-            let dashSize: number = TabWhammyBarGlyph.DashSize * this.scale;
+            let dashSize: number = TabWhammyBarGlyph.DashSize;
             let dashes: number = Math.abs(x2 - x1) / (dashSize * 2);
             if (dashes < 1) {
                 canvas.moveTo(x1, y1);
@@ -228,12 +228,12 @@ export class TabWhammyBarGlyph extends Glyph {
         let res: RenderingResources = this.renderer.resources;
         if (isFirst && !this._beat.isContinuedWhammy && !this._isSimpleDip) {
             let y: number = y1;
-            y -= res.tablatureFont.size + 2 * this.scale;
+            y -= res.tablatureFont.size + 2;
             if (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys)) {
                 canvas.fillText('0', x1, y);
             }
             if (slurText) {
-                y -= res.tablatureFont.size + 2 * this.scale;
+                y -= res.tablatureFont.size + 2;
                 canvas.fillText(slurText, x1, y);
             }
         }
@@ -259,12 +259,12 @@ export class TabWhammyBarGlyph extends Glyph {
             }
             let y: number = 0;
             if (this._isSimpleDip) {
-                y = Math.min(y1, y2) - res.tablatureFont.size - 2 * this.scale;
+                y = Math.min(y1, y2) - res.tablatureFont.size - 2;
             } else {
                 y = firstPt.offset === secondPt.offset ? Math.min(y1, y2) : y2;
-                y -= res.tablatureFont.size + 2 * this.scale;
+                y -= res.tablatureFont.size + 2;
                 if (nextPt && nextPt.value > secondPt.value) {
-                    y -= 2 * this.scale;
+                    y -= 2;
                 }
             }
             let x: number = x2;

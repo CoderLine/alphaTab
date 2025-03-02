@@ -7,9 +7,11 @@ on:
 jobs:
   release_web:
     name: Web
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -28,9 +30,11 @@ jobs:
 
   release_csharp:
     name: C#
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -42,22 +46,22 @@ jobs:
       - run: npm install
       - run: node ./scripts/update-csharp-version.js ${{github.run_number}}
       - run: npm run build-csharp
-      - run: dotnet nuget push src.csharp\AlphaTab\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-      - run: dotnet nuget push src.csharp\AlphaTab.Windows\bin\Release\*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
+      - run: dotnet nuget push src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
 
   release_kotlin_android:
     name: Kotlin (Android)
     runs-on: windows-latest
     env:
-      OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
-      OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
-      SONATYPE_STAGING_PROFILE_ID: ${{secrets.SONATYPE_STAGING_PROFILE_ID}}
-      SONATYPE_SIGNING_KEY_ID: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
-      SONATYPE_SIGNING_PASSWORD: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
-      SONATYPE_SIGNING_KEY: ${{secrets.SONATYPE_SIGNING_KEY}}
+      ORG_GRADLE_PROJECT_mavenCentralUsername: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
+      ORG_GRADLE_PROJECT_mavenCentralPassword: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyId: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
+      ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
+      ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          lfs: true      
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -70,9 +74,9 @@ jobs:
       - run: npm install
       - run: node ./scripts/update-kotlin-version.js
       - run: npm run build-kotlin
-      - run: .\gradlew.bat publishAllPublicationsToSonatypeRepository closeAndReleaseSonatypeStagingRepository
+      - run: ./gradlew publishToMavenCentral
         working-directory: ./src.kotlin/alphaTab/
 
-      - run: .\gradlew.bat --stop
+      - run: ./gradlew --stop
         working-directory: ./src.kotlin/alphaTab/
 

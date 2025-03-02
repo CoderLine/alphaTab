@@ -10,9 +10,11 @@ on:
 jobs:
   build_web:
     name: Build and Test Web
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -22,9 +24,11 @@ jobs:
 
   build_csharp:
     name: Build and Test C#
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -37,9 +41,20 @@ jobs:
 
   build_kotlin:
     name: Build and Test Kotlin
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
+    env:
+      OSSRH_USERNAME: ${{secrets.OSSRH_USERNAME}}
+      OSSRH_PASSWORD: ${{secrets.OSSRH_PASSWORD}}
+      OSSRH_USERTOKEN_USERNAME: ${{secrets.OSSRH_USERTOKEN_USERNAME}}
+      OSSRH_USERTOKEN_PASSWORD: ${{secrets.OSSRH_USERTOKEN_PASSWORD}}
+      SONATYPE_STAGING_PROFILE_ID: ${{secrets.SONATYPE_STAGING_PROFILE_ID}}
+      SONATYPE_SIGNING_KEY_ID: ${{secrets.SONATYPE_SIGNING_KEY_ID}}
+      SONATYPE_SIGNING_PASSWORD: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
+      SONATYPE_SIGNING_KEY: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
@@ -52,9 +67,9 @@ jobs:
           path: |
             ~/.gradle/caches
             ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-cache-v3-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          key: ${{ runner.os }}-gradle-cache-v5-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-cache-v3-${{ github.job }}-
+            ${{ runner.os }}-gradle-cache-v5-${{ github.job }}-
       - run: npm install
       - run: npm run build-kotlin
       - run: npm run test-kotlin

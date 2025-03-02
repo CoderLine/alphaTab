@@ -2,7 +2,18 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { ControlChangeEvent, MidiEvent, MidiEventType, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
+import {
+    ControlChangeEvent,
+    MidiEvent,
+    MidiEventType,
+    NoteBendEvent,
+    NoteOffEvent,
+    NoteOnEvent,
+    PitchBendEvent,
+    ProgramChangeEvent,
+    TempoChangeEvent,
+    TimeSignatureEvent
+} from '@src/midi/MidiEvent';
 import {
     Hydra,
     HydraIbag,
@@ -41,7 +52,11 @@ export class TinySoundFont {
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
     private _isAnySolo: boolean = false;
+
+    // these are the transposition pitches applied generally on the song (via Settings or general transposition)
     private _transpositionPitches: Map<number, number> = new Map<number, number>();
+    // these are the transposition pitches only applied on playback (adjusting the pitch only during playback)
+    private _liveTranspositionPitches: Map<number, number> = new Map<number, number>();
 
     public currentTempo: number = 0;
     public timeSignatureNumerator: number = 0;
@@ -95,30 +110,58 @@ export class TinySoundFont {
     public resetChannelStates(): void {
         this._mutedChannels = new Map<number, boolean>();
         this._soloChannels = new Map<number, boolean>();
+        this._liveTranspositionPitches = new Map<number, number>();
 
         this.applyTranspositionPitches(new Map<number, number>());
         this._isAnySolo = false;
     }
 
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+        let previousTransposition = 0;
+        if (this._liveTranspositionPitches.has(channel)) {
+            previousTransposition = this._liveTranspositionPitches.get(channel)!;
+        }
+
+        if (semitones === 0) {
+            this._liveTranspositionPitches.delete(channel);
+        } else {
+            this._liveTranspositionPitches.set(channel, semitones);
+        }
+
+        for (const voice of this._voices) {
+            if (voice.playingChannel === channel && voice.playingChannel !== 9 /*percussion*/) {
+                let pitchDifference = 0;
+                pitchDifference -= previousTransposition;
+                pitchDifference += semitones;
+
+                voice.playingKey += pitchDifference;
+
+                if (this._channels) {
+                    voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
+                }
+            }
+        }
+    }
+
     public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
-        // dynamically adjust actively playing voices to the new pitch they have. 
-        // we are not updating the used preset and regions though. 
+        // dynamically adjust actively playing voices to the new pitch they have.
+        // we are not updating the used preset and regions though.
         const previousTransposePitches = this._transpositionPitches;
         for (const voice of this._voices) {
             if (voice.playingChannel >= 0 && voice.playingChannel !== 9 /*percussion*/) {
                 let pitchDifference = 0;
 
-                if(previousTransposePitches.has(voice.playingChannel)) {
+                if (previousTransposePitches.has(voice.playingChannel)) {
                     pitchDifference -= previousTransposePitches.get(voice.playingChannel)!;
                 }
-                
-                if(transpositionPitches.has(voice.playingChannel)) {
+
+                if (transpositionPitches.has(voice.playingChannel)) {
                     pitchDifference += transpositionPitches.get(voice.playingChannel)!;
                 }
 
                 voice.playingKey += pitchDifference;
 
-                if(this._channels) {
+                if (this._channels) {
                     voice.updatePitchRatio(this._channels!.channelList[voice.playingChannel], this.outSampleRate);
                 }
             }
@@ -143,8 +186,8 @@ export class TinySoundFont {
         while (!this._midiEventQueue.isEmpty) {
             let m: SynthEvent = this._midiEventQueue.dequeue();
             if (m.isMetronome && this.metronomeVolume > 0) {
-                this.channelNoteOff(SynthConstants.MetronomeChannel, 33);
-                this.channelNoteOn(SynthConstants.MetronomeChannel, 33, 95 / 127);
+                this.channelNoteOff(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey);
+                this.channelNoteOn(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey, 95 / 127);
             } else if (m.event) {
                 this.processMidiMessage(m.event);
             }
@@ -157,8 +200,9 @@ export class TinySoundFont {
                 const channel: number = voice.playingChannel;
                 // channel is muted if it is either explicitley muted, or another channel is set to solo but not this one.
                 // exception. metronome is implicitly added in solo
-                const isChannelMuted: boolean = this._mutedChannels.has(channel)
-                    || (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
+                const isChannelMuted: boolean =
+                    this._mutedChannels.has(channel) ||
+                    (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
 
                 if (!buffer) {
                     voice.kill();
@@ -172,14 +216,14 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('MIdi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick)
+        Logger.debug('Midi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick);
         const command: MidiEventType = e.type;
         switch (command) {
             case MidiEventType.TimeSignature:
-                const timeSignature = (e as TimeSignatureEvent);
+                const timeSignature = e as TimeSignatureEvent;
                 this.timeSignatureNumerator = timeSignature.numerator;
                 this.timeSignatureDenominator = Math.pow(2, timeSignature.denominatorIndex);
-                break
+                break;
             case MidiEventType.NoteOn:
                 const noteOn = e as NoteOnEvent;
                 this.channelNoteOn(noteOn.channel, noteOn.noteKey, noteOn.noteVelocity / 127.0);
@@ -197,7 +241,7 @@ export class TinySoundFont {
                 this.channelSetPresetNumber(programChange.channel, programChange.program, programChange.channel === 9);
                 break;
             case MidiEventType.TempoChange:
-                const tempoChange = e as TempoChangeEvent
+                const tempoChange = e as TempoChangeEvent;
                 this.currentTempo = 60000000 / tempoChange.microSecondsPerQuarterNote;
                 break;
             case MidiEventType.PitchBend:
@@ -229,7 +273,6 @@ export class TinySoundFont {
             this.channelSetPresetNumber(SynthConstants.MetronomeChannel, 0, true);
         }
     }
-
 
     public get masterVolume(): number {
         return SynthHelper.decibelsToGain(this.globalGainDb);
@@ -514,10 +557,10 @@ export class TinySoundFont {
      */
     public noteOffAll(immediate: boolean): void {
         for (const voice of this._voices) {
-            if (voice.playingPreset !== -1 && voice.ampEnv.segment < VoiceEnvelopeSegment.Release) {
+            if (voice.playingPreset !== -1) {
                 if (immediate) {
                     voice.endQuick(this.outSampleRate);
-                } else {
+                } else if (voice.ampEnv.segment < VoiceEnvelopeSegment.Release) {
                     voice.end(this.outSampleRate);
                 }
             }
@@ -615,6 +658,10 @@ export class TinySoundFont {
             key += this._transpositionPitches.get(channel)!;
         }
 
+        if (this._liveTranspositionPitches.has(channel)) {
+            key += this._liveTranspositionPitches.get(channel)!;
+        }
+
         this._channels.activeChannel = channel;
         this.noteOn(this._channels.channelList[channel].presetIndex, key, vel);
     }
@@ -627,6 +674,9 @@ export class TinySoundFont {
     public channelNoteOff(channel: number, key: number): void {
         if (this._transpositionPitches.has(channel)) {
             key += this._transpositionPitches.get(channel)!;
+        }
+        if (this._liveTranspositionPitches.has(channel)) {
+            key += this._liveTranspositionPitches.get(channel)!;
         }
 
         const matches: Voice[] = [];
@@ -749,7 +799,7 @@ export class TinySoundFont {
             presetIndex = this.getPresetIndex(c.bank & 0x7ff, presetNumber);
         }
         c.presetIndex = presetIndex;
-        return (presetIndex !== -1);
+        return presetIndex !== -1;
     }
 
     /**
@@ -844,6 +894,9 @@ export class TinySoundFont {
     public channelSetPerNotePitchWheel(channel: number, key: number, pitchWheel: number): void {
         if (this._transpositionPitches.has(channel)) {
             key += this._transpositionPitches.get(channel)!;
+        }
+        if (this._liveTranspositionPitches.has(channel)) {
+            key += this._liveTranspositionPitches.get(channel)!;
         }
 
         const c: Channel = this.channelInit(channel);
@@ -1078,7 +1131,12 @@ export class TinySoundFont {
         this.presets = [];
     }
 
-    public loadPresets(hydra: Hydra, append: boolean): void {
+    public loadPresets(
+        hydra: Hydra,
+        instrumentPrograms: Set<number>,
+        percussionKeys: Set<number>,
+        append: boolean
+    ): void {
         const newPresets: Preset[] = [];
         for (let phdrIndex: number = 0; phdrIndex < hydra.phdrs.length - 1; phdrIndex++) {
             const phdr: HydraPhdr = hydra.phdrs[phdrIndex];
@@ -1089,7 +1147,6 @@ export class TinySoundFont {
             preset.name = phdr.presetName;
             preset.bank = phdr.bank;
             preset.presetNumber = phdr.preset;
-            preset.fontSamples = hydra.fontSamples;
             let regionNum: number = 0;
 
             for (
@@ -1326,10 +1383,85 @@ export class TinySoundFont {
 
                                     zoneRegion.tune += shdr.pitchCorrection;
                                     zoneRegion.sampleRate = shdr.sampleRate;
-                                    if (zoneRegion.end !== 0 && zoneRegion.end < preset.fontSamples.length) {
-                                        zoneRegion.end++;
+
+                                    const isPercussion = phdr.bank == SynthConstants.PercussionBank;
+
+                                    const shouldLoadSamples =
+                                        (isPercussion &&
+                                            TinySoundFont.setContainsRange(
+                                                percussionKeys,
+                                                zoneRegion.loKey,
+                                                zoneRegion.hiKey
+                                            )) ||
+                                        (!isPercussion && instrumentPrograms.has(phdr.preset));
+
+                                    if (!shouldLoadSamples) {
+                                        Logger.debug(
+                                            'AlphaSynth',
+                                            `Skipping load of unused sample ${shdr.sampleName} for preset ${phdr.presetName} (bank ${preset.bank} program ${preset.presetNumber})`
+                                        );
+                                        zoneRegion.samples = new Float32Array(0);
+                                    } else if ((shdr.sampleType & 0x01) !== 0) {
+                                        Logger.debug(
+                                            'AlphaSynth',
+                                            `Loading of used sample ${shdr.sampleName} for preset ${phdr.presetName} (bank ${preset.bank} program ${preset.presetNumber})`
+                                        );
+
+                                        // Mono Sample
+                                        const decompressVorbis = (shdr.sampleType & 0x10) !== 0;
+                                        if (decompressVorbis) {
+                                            // for SF3 the shdr contains the byte offsets within the overall buffer holding the OGG container
+                                            zoneRegion.samples = hydra.decodeSamples(
+                                                shdr.start,
+                                                shdr.end,
+                                                true
+                                            );
+                                            // loop points are already relative within the individual samples.
+                                        } else {
+                                            zoneRegion.samples = hydra.decodeSamples(
+                                                // The DWORD dwStart contains the index, in sample data points, from the beginning of the sample data
+                                                // field to the first data point of this sample
+                                                zoneRegion.offset * 2,
+                                                // The DWORD dwEnd contains the index, in sample data points, from the beginning of the sample data
+                                                // field to the first of the set of 46 zero valued data points following this sample.
+                                                zoneRegion.end * 2,
+                                                false
+                                            );
+
+                                            // The DWORD dwStartloop contains the index, in sample data points, from the beginning of the sample data field to the first
+                                            // data point in the loop of this sample
+
+                                            // The DWORD dwEndloop contains the index, in sample data points, from the beginning of the sample data field to the first
+                                            // data point following the loop of this sample. Note that this is the data point “equivalent to” the first loop data point, and that
+                                            // to produce portable artifact free loops, the eight proximal data points surrounding both the Startloop and Endloop points
+                                            // should be identical. 
+
+                                            // reset offsets relative to sub-buffer
+                                            if (zoneRegion.loopStart > 0) {
+                                                zoneRegion.loopStart -= zoneRegion.offset;
+                                            }
+                                            if (zoneRegion.loopEnd > 0) {
+                                                zoneRegion.loopEnd -= zoneRegion.offset;
+                                            }
+                                        }
+
+                                        // play whole sample
+                                        zoneRegion.offset = 0;
+                                        zoneRegion.end = zoneRegion.samples.length - 1;
                                     } else {
-                                        zoneRegion.end = preset.fontSamples.length;
+                                        // unsupported
+                                        //  0x02: // Right Sample
+                                        //  0x04: // Left Sample
+                                        //  0x08: // Linked Sample
+                                        //  0x8001: // RomMonoSample
+                                        //  0x8002: // RomRightSample
+                                        //  0x8004: // RomLeftSample
+                                        //  0x8008: // RomLinkedSample
+                                        Logger.warning(
+                                            'AlphaSynth',
+                                            `Skipping load of unsupported sample ${shdr.sampleName} for preset ${phdr.presetName}, sample type ${shdr.sampleType} is not supported (bank ${preset.bank} program ${preset.presetNumber})`
+                                        );
+                                        zoneRegion.samples = new Float32Array(0);
                                     }
 
                                     preset.regions[regionIndex] = new Region(zoneRegion);
@@ -1373,5 +1505,52 @@ export class TinySoundFont {
                 this.presets.push(preset);
             }
         }
+    }
+
+    private static setContainsRange(x: Set<number>, lo: number, hi: number) {
+        for (let i = lo; i <= hi; i++) {
+            if (x.has(i)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public hasSamplesForProgram(program: number): boolean {
+        const presets = this.presets;
+        if (!presets) {
+            return false;
+        }
+
+        for (const preset of presets) {
+            if (preset.presetNumber === program) {
+                for (const region of preset.regions!) {
+                    if (region.samples.length > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public hasSamplesForPercussion(key: number): boolean {
+        const presets = this.presets;
+        if (!presets) {
+            return false;
+        }
+
+        for (const preset of presets) {
+            if (preset.bank == SynthConstants.PercussionBank) {
+                for (const region of preset.regions!) {
+                    if (region.loKey >= key && region.hiKey <= key && region.samples.length > 0) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 }

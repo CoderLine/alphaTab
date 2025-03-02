@@ -3,7 +3,7 @@ import { Duration } from '@src/model/Duration';
 export class MidiUtils {
     public static readonly QuarterTime: number = 960;
     private static readonly MinVelocity: number = 15;
-    private static readonly VelocityIncrement: number = 16;
+    public static readonly VelocityIncrement: number = 16;
 
     /**
      * Converts the given midi tick duration into milliseconds.

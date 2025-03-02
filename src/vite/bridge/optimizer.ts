@@ -2,7 +2,7 @@
 
 // index.ts for more details on contents and license of this file
 
-import { DepOptimizationMetadata, InternalResolveOptions, OptimizedDepInfo, normalizePath } from 'vite';
+import { DepOptimizationMetadata, DevEnvironment, OptimizedDepInfo, normalizePath } from 'vite';
 import { ResolvedConfig } from './config';
 import { tryFsResolve } from './resolve';
 import { cleanUrl } from './utils';
@@ -33,7 +33,7 @@ export function tryOptimizedDepResolve(
     return undefined;
 }
 
-type DepsOptimizer = ReturnType<Required<InternalResolveOptions>['getDepsOptimizer']>;
+type DepsOptimizer = DevEnvironment['depsOptimizer']
 
 // https://github.com/Danielku15/vite/blob/88b7def341f12d07d7d4f83cbe3dc73cc8c6b7be/packages/vite/src/node/optimizer/optimizer.ts#L32-L40
 const depsOptimizerMap = new WeakMap<ResolvedConfig, DepsOptimizer>();
@@ -63,6 +63,8 @@ function createDepsOptimizer(config: ResolvedConfig) {
         throw new Error('not implemented');
     };
     const depsOptimizer: DepsOptimizer = {
+        async init() {
+        },
         metadata,
         registerMissingImport: notImplemented,
         run: notImplemented,

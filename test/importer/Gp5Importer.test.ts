@@ -1,6 +1,10 @@
 import { Settings } from '@src/Settings';
-import { Beat } from '@src/model/Beat';
+import { Ottavia } from '@src/model';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { Direction } from '@src/model/Direction';
 import { Score } from '@src/model/Score';
+import { WahPedal } from '@src/model/WahPedal';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
 
@@ -163,12 +167,14 @@ describe('Gp5ImporterTest', () => {
     });
 
     it('alternate-endings-section-error', async () => {
-        const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/alternate-endings-section-error.gp5');
+        const reader = await GpImporterTestHelper.prepareImporterWithFile(
+            'guitarpro5/alternate-endings-section-error.gp5'
+        );
         const score: Score = reader.readScore();
         expect(score.masterBars.length).to.be.equal(2);
         expect(score.masterBars[1].alternateEndings).to.be.equal(4);
         expect(score.masterBars[1].section).to.be.ok;
-        expect(score.masterBars[1].section?.text).to.be.equal("Outro");
+        expect(score.masterBars[1].section?.text).to.be.equal('Outro');
     });
 
     it('canon', async () => {
@@ -203,16 +209,53 @@ describe('Gp5ImporterTest', () => {
         let score: Score = reader.readScore();
 
         const expectedChunks: string[] = [
-            "",
-            "So", "close,",
-            "no", "mat", "ter", "how", "", "far.", 
-            "", "", 
-            "Could-", "n't", "be", "much", "more", "from", "the", "", "heart.", 
-            "", "", "", "", 
-            "For-", "ev-", "er", "trust-", "ing", "who", "we", "are.", 
-            "", "", "", "", "", "", 
-            "And", "noth-", "ing", "else", "", 
-            "mat-", "ters.", "", ""
+            '',
+            'So',
+            'close,',
+            'no',
+            'mat',
+            'ter',
+            'how',
+            '',
+            'far.',
+            '',
+            '',
+            'Could-',
+            "n't",
+            'be',
+            'much',
+            'more',
+            'from',
+            'the',
+            '',
+            'heart.',
+            '',
+            '',
+            '',
+            '',
+            'For-',
+            'ev-',
+            'er',
+            'trust-',
+            'ing',
+            'who',
+            'we',
+            'are.',
+            '',
+            '',
+            '',
+            '',
+            '',
+            '',
+            'And',
+            'noth-',
+            'ing',
+            'else',
+            '',
+            'mat-',
+            'ters.',
+            '',
+            ''
         ];
 
         let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
@@ -227,5 +270,207 @@ describe('Gp5ImporterTest', () => {
         }
 
         expect(actualChunks.join(';')).to.equal(expectedChunks.join(';'));
+    });
+
+    it('layout-configuration', async () => {
+        const track1 = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1.gp5')
+        ).readScore();
+        const track2 = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-2.gp5')
+        ).readScore();
+        const trackAll = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-all.gp5')
+        ).readScore();
+        const track1And3 = (
+            await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/layout-configuration-multi-track-1-3.gp5')
+        ).readScore();
+
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(track1, track2, trackAll, track1And3);
+    });
+
+    it('hide-tuning', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hide-tuning.gp5')).readScore();
+
+        expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
+        expect(score.stylesheet.perTrackDisplayTuning!.has(0)).to.be.true;
+        expect(score.stylesheet.perTrackDisplayTuning!.get(0)).to.equal(false);
+
+        expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
+        expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.equal(true);
+    });
+
+    it('staves', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/staves.gp5')).readScore();
+
+        expect(score.tracks[0].staves[0].showNumbered).to.be.false;
+        expect(score.tracks[0].staves[0].showSlash).to.be.false;
+        expect(score.tracks[0].staves[0].showTablature).to.be.true;
+        expect(score.tracks[0].staves[0].showStandardNotation).to.be.true;
+
+        expect(score.tracks[1].staves[0].showNumbered).to.be.false;
+        expect(score.tracks[1].staves[0].showSlash).to.be.false;
+        expect(score.tracks[1].staves[0].showTablature).to.be.false;
+        expect(score.tracks[1].staves[0].showStandardNotation).to.be.true;
+
+        expect(score.tracks[2].staves[0].showNumbered).to.be.false;
+        expect(score.tracks[2].staves[0].showSlash).to.be.false;
+        expect(score.tracks[2].staves[0].showTablature).to.be.true;
+        expect(score.tracks[2].staves[0].showStandardNotation).to.be.false;
+    });
+
+    it('hide-diagram', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hide-diagrams.gp5')).readScore();
+
+        expect(score.stylesheet.perTrackChordDiagramsOnTop).to.be.ok;
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(0)).to.be.true;
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(0)).to.equal(false);
+
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.has(1)).to.be.true;
+        expect(score.stylesheet.perTrackChordDiagramsOnTop!.get(1)).to.equal(true);
+    });
+
+    it('directions', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/directions.gp5')).readScore();
+
+        // order just top down as in GP5, every direction on one bar.
+        const expectedDirections = [
+            Direction.TargetCoda,
+            Direction.TargetDoubleCoda,
+            Direction.TargetSegno,
+            Direction.TargetSegnoSegno,
+            Direction.TargetFine,
+
+            Direction.JumpDaCapo,
+            Direction.JumpDaCapoAlCoda,
+            Direction.JumpDaCapoAlDoubleCoda,
+            Direction.JumpDaCapoAlFine,
+
+            Direction.JumpDalSegno,
+            Direction.JumpDalSegnoSegno,
+
+            Direction.JumpDalSegnoAlCoda,
+            Direction.JumpDalSegnoAlDoubleCoda,
+
+            Direction.JumpDalSegnoSegnoAlCoda,
+            Direction.JumpDalSegnoSegnoAlDoubleCoda,
+
+            Direction.JumpDalSegnoAlFine,
+            Direction.JumpDalSegnoSegnoAlFine,
+
+            Direction.JumpDaCoda,
+            Direction.JumpDaDoubleCoda
+        ];
+
+        for (let i = 0; i < expectedDirections.length; i++) {
+            expect(score.masterBars[i].directions).to.be.ok;
+            expect(score.masterBars[i].directions!.has(expectedDirections[i])).to.be.true;
+        }
+    });
+
+    it('beaming-mode', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/beaming-mode.gp5')).readScore();
+
+        // auto
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        // force
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.Auto // already has beam, no need to force
+        );
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].beamingMode).to.equal(
+            BeatBeamingMode.ForceMergeWithNext
+        );
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].beamingMode).to.equal(
+            BeatBeamingMode.Auto // already has beam, no need to force
+        );
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].preferredBeamDirection).to.not.be.ok;
+
+        // break
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitToNext
+        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].beamingMode).to.equal(
+            BeatBeamingMode.Auto // already has no beam, no need to break
+        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitToNext
+        );
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[3].preferredBeamDirection).to.not.be.ok;
+
+        // break secondary
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].beamingMode).to.equal(
+            BeatBeamingMode.ForceSplitOnSecondaryToNext
+        );
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].preferredBeamDirection).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[2].preferredBeamDirection).to.not.be.ok;
+
+        // invert to down
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+
+        // invert to up
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].invertBeamDirection).to.be.false;
+        expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
+    });
+
+    
+    it('ottavia', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/ottavia.gp5')).readScore();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._8va);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].ottava).to.equal(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].ottava).to.equal(Ottavia._15mb);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].ottava).to.equal(Ottavia.Regular);
+    });
+    
+    it('wah-wah', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/wah-wah.gp5')).readScore();
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].wahPedal).to.equal(WahPedal.None);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].wahPedal).to.equal(WahPedal.Open);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].wahPedal).to.equal(WahPedal.Closed);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].wahPedal).to.equal(WahPedal.Open);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].wahPedal).to.equal(WahPedal.Closed);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].wahPedal).to.equal(WahPedal.None);
     });
 });

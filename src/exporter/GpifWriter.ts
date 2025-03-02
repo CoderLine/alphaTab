@@ -2,16 +2,20 @@ import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Bar, SustainPedalMarkerType } from '@src/model/Bar';
+import { BarreShape } from '@src/model/BarreShape';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
+import { Direction } from '@src/model/Direction';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
+import { FadeType } from '@src/model/FadeType';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
+import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignatureType } from '@src/model/KeySignatureType';
@@ -20,10 +24,12 @@ import { MasterBar } from '@src/model/MasterBar';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
+import { Rasgueado } from '@src/model/Rasgueado';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
@@ -34,6 +40,7 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
+import { WahPedal } from '@src/model/WahPedal';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { XmlDocument } from '@src/xml/XmlDocument';
@@ -312,6 +319,9 @@ export class GpifWriter {
             case AccentuationType.Heavy:
                 accentFlags |= 0x04;
                 break;
+            case AccentuationType.Tenuto:
+                accentFlags |= 0x10;
+                break;
         }
 
         if (accentFlags > 0) {
@@ -375,6 +385,10 @@ export class GpifWriter {
         } else {
             noteNode.addElement('InstrumentArticulation').innerText = '0';
         }
+
+        if (note.ornament !== NoteOrnament.None) {
+            noteNode.addElement('Ornament').innerText = NoteOrnament[note.ornament];
+        }
     }
 
     private writeNoteProperties(parent: XmlNode, note: Note) {
@@ -387,6 +401,9 @@ export class GpifWriter {
             this.writeSimplePropertyNode(properties, 'String', 'String', (note.string - 1).toString());
             this.writeSimplePropertyNode(properties, 'Fret', 'Fret', note.fret.toString());
             this.writeSimplePropertyNode(properties, 'Midi', 'Number', note.realValue.toString());
+            if (note.showStringNumber) {
+                this.writeSimplePropertyNode(properties, 'ShowStringNumber', 'Enable', null);
+            }
         }
 
         if (note.isPiano) {
@@ -665,8 +682,8 @@ export class GpifWriter {
         beatNode.attributes.set('id', beat.id.toString());
 
         beatNode.addElement('Dynamic').innerText = DynamicValue[beat.dynamics];
-        if (beat.fadeIn) {
-            beatNode.addElement('Fadding').innerText = 'FadeIn';
+        if (beat.fade !== FadeType.None) {
+            beatNode.addElement('Fadding').innerText = FadeType[beat.fade];
         }
         if (beat.isTremolo) {
             switch (beat.tremoloSpeed) {
@@ -723,16 +740,36 @@ export class GpifWriter {
             switch (beat.preferredBeamDirection) {
                 case BeamDirection.Up:
                     beatNode.addElement('TransposedPitchStemOrientation').innerText = 'Upward';
+                    beatNode.addElement('UserTransposedPitchStemOrientation').innerText = 'Upward';
                     break;
                 case BeamDirection.Down:
                     beatNode.addElement('TransposedPitchStemOrientation').innerText = 'Downward';
+                    beatNode.addElement('UserTransposedPitchStemOrientation').innerText = 'Downward';
                     break;
             }
         }
 
         beatNode.addElement('ConcertPitchStemOrientation').innerText = 'Undefined';
-        if (!beat.isRest) {
+        if (beat.slashed) {
+            beatNode.addElement('Slashed');
+        }
+        if (beat.deadSlapped) {
+            beatNode.addElement('DeadSlapped');
+        }
+        if (beat.notes.length > 0) {
             beatNode.addElement('Notes').innerText = beat.notes.map(n => n.id).join(' ');
+        }
+
+        if (beat.golpe !== GolpeType.None) {
+            beatNode.addElement('Golpe').innerText = GolpeType[beat.golpe];
+        }
+
+        if (beat.wahPedal !== WahPedal.None) {
+            beatNode.addElement('Wah').innerText = WahPedal[beat.wahPedal];
+        }
+
+        if(beat.showTimer) {
+            beatNode.addElement('Timer').innerText = (beat.timer ?? 0).toString();
         }
 
         this.writeBeatProperties(beatNode, beat);
@@ -756,6 +793,18 @@ export class GpifWriter {
 
         if (beat.brushDuration > 0) {
             this.writeSimpleXPropertyNode(beatProperties, '687935489', 'Int', beat.brushDuration.toString());
+        }
+
+        switch(beat.beamingMode) {
+            case BeatBeamingMode.ForceSplitToNext:
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "2");
+                break;
+            case BeatBeamingMode.ForceMergeWithNext:
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "1");
+                break;
+            case BeatBeamingMode.ForceSplitOnSecondaryToNext:
+                this.writeSimpleXPropertyNode(beatProperties, '1124204552', 'Int', "1");
+            break;
         }
     }
 
@@ -795,6 +844,80 @@ export class GpifWriter {
             case VibratoType.Slight:
                 this.writeSimplePropertyNode(beatProperties, 'VibratoWTremBar', 'Strength', 'Slight');
                 break;
+        }
+
+        if (beat.isBarre) {
+            this.writeSimplePropertyNode(beatProperties, 'BarreFret', 'Fret', beat.barreFret.toString());
+            switch (beat.barreShape) {
+                case BarreShape.Full:
+                    this.writeSimplePropertyNode(beatProperties, 'BarreString', 'String', '0');
+                    break;
+                case BarreShape.Half:
+                    this.writeSimplePropertyNode(beatProperties, 'BarreString', 'String', '1');
+                    break;
+            }
+        }
+
+        if (beat.rasgueado != Rasgueado.None) {
+            let rasgueado = '';
+            switch (beat.rasgueado) {
+                case Rasgueado.Ii:
+                    rasgueado = 'ii_1';
+                    break;
+                case Rasgueado.Mi:
+                    rasgueado = 'mi_1';
+                    break;
+                case Rasgueado.MiiTriplet:
+                    rasgueado = 'mii_1';
+                    break;
+                case Rasgueado.MiiAnapaest:
+                    rasgueado = 'mii_2';
+                    break;
+                case Rasgueado.PmpTriplet:
+                    rasgueado = 'pmp_1';
+                    break;
+                case Rasgueado.PmpAnapaest:
+                    rasgueado = 'pmp_2';
+                    break;
+                case Rasgueado.PeiTriplet:
+                    rasgueado = 'pei_1';
+                    break;
+                case Rasgueado.PeiAnapaest:
+                    rasgueado = 'pei_2';
+                    break;
+                case Rasgueado.PaiTriplet:
+                    rasgueado = 'pai_1';
+                    break;
+                case Rasgueado.PaiAnapaest:
+                    rasgueado = 'pai_2';
+                    break;
+                case Rasgueado.AmiTriplet:
+                    rasgueado = 'ami_1';
+                    break;
+                case Rasgueado.AmiAnapaest:
+                    rasgueado = 'ami_2';
+                    break;
+                case Rasgueado.Ppp:
+                    rasgueado = 'ppp_1';
+                    break;
+                case Rasgueado.Amii:
+                    rasgueado = 'amii_1';
+                    break;
+                case Rasgueado.Amip:
+                    rasgueado = 'amip_1';
+                    break;
+                case Rasgueado.Eami:
+                    rasgueado = 'eami_1';
+                    break;
+                case Rasgueado.Eamii:
+                    rasgueado = 'eamii_1';
+                    break;
+                case Rasgueado.Peami:
+                    rasgueado = 'peami_1';
+                    break;
+            }
+
+            this.writeSimplePropertyNode(beatProperties, 'Rasgueado', 'Rasgueado', rasgueado);
         }
     }
 
@@ -944,28 +1067,30 @@ export class GpifWriter {
             masterTrackNode.addElement('Anacrusis');
         }
 
-        const initialTempoAutomation = automations.addElement('Automation');
-        initialTempoAutomation.addElement('Type').innerText = 'Tempo';
-        initialTempoAutomation.addElement('Linear').innerText = 'false';
-        initialTempoAutomation.addElement('Bar').innerText = '0';
-        initialTempoAutomation.addElement('Position').innerText = '0';
-        initialTempoAutomation.addElement('Visible').innerText = 'true';
-        initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
-        if (score.tempoLabel) {
-            initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
+        if (score.masterBars[0].tempoAutomations.length === 0) {
+            const initialTempoAutomation = automations.addElement('Automation');
+            initialTempoAutomation.addElement('Type').innerText = 'Tempo';
+            initialTempoAutomation.addElement('Linear').innerText = 'false';
+            initialTempoAutomation.addElement('Bar').innerText = '0';
+            initialTempoAutomation.addElement('Position').innerText = '0';
+            initialTempoAutomation.addElement('Visible').innerText = 'true';
+            initialTempoAutomation.addElement('Value').innerText = `${score.tempo} 2`;
+            if (score.tempoLabel) {
+                initialTempoAutomation.addElement('Text').innerText = score.tempoLabel;
+            }
         }
 
         for (const mb of score.masterBars) {
-            if (mb.index > 0 && mb.tempoAutomation) {
+            for (const automation of mb.tempoAutomations) {
                 const tempoAutomation = automations.addElement('Automation');
                 tempoAutomation.addElement('Type').innerText = 'Tempo';
-                tempoAutomation.addElement('Linear').innerText = mb.tempoAutomation.isLinear ? 'true' : 'false';
+                tempoAutomation.addElement('Linear').innerText = automation.isLinear ? 'true' : 'false';
                 tempoAutomation.addElement('Bar').innerText = mb.index.toString();
-                tempoAutomation.addElement('Position').innerText = mb.tempoAutomation.ratioPosition.toString();
+                tempoAutomation.addElement('Position').innerText = automation.ratioPosition.toString();
                 tempoAutomation.addElement('Visible').innerText = 'true';
-                tempoAutomation.addElement('Value').innerText = `${mb.tempoAutomation.value} 2`;
-                if (mb.tempoAutomation.text) {
-                    tempoAutomation.addElement('Text').innerText = mb.tempoAutomation.text;
+                tempoAutomation.addElement('Value').innerText = `${automation.value} 2`;
+                if (automation.text) {
+                    tempoAutomation.addElement('Text').innerText = automation.text;
                 }
             }
         }
@@ -1124,6 +1249,29 @@ export class GpifWriter {
                 }
             }
         }
+
+        for (const s of track.staves) {
+            for (const b of s.bars) {
+                for (const sustainPedal of b.sustainPedals) {
+                    if (sustainPedal.pedalType !== SustainPedalMarkerType.Hold) {
+                        const automation = automationsNode.addElement('Automation');
+                        automation.addElement('Type').innerText = 'SustainPedal';
+                        automation.addElement('Linear').innerText = 'false';
+                        automation.addElement('Bar').innerText = b.index.toString();
+                        automation.addElement('Position').innerText = sustainPedal.ratioPosition.toString();
+                        automation.addElement('Visible').innerText = 'true';
+                        switch (sustainPedal.pedalType) {
+                            case SustainPedalMarkerType.Down:
+                                automation.addElement('Value').innerText = `0 1`;
+                                break;
+                            case SustainPedalMarkerType.Up:
+                                automation.addElement('Value').innerText = `0 3`;
+                                break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private writeMidiConnectionNode(trackNode: XmlNode, track: Track) {
@@ -1255,7 +1403,7 @@ export class GpifWriter {
                     let chordFret = chord.strings[i];
                     if (chordFret !== -1) {
                         const fretNode = diagram.addElement('Fret');
-                        const chordString = (chord.strings.length - 1 - i);
+                        const chordString = chord.strings.length - 1 - i;
                         fretNode.attributes.set('string', chordString.toString());
                         fretNode.attributes.set('fret', (chordFret - chord.firstFret + 1).toString());
                         if (!fretToStrings.has(chordFret)) {
@@ -1275,7 +1423,7 @@ export class GpifWriter {
                         Fingers.LittleFinger,
                         Fingers.AnnularFinger,
                         Fingers.MiddleFinger,
-                        Fingers.IndexFinger,
+                        Fingers.IndexFinger
                     ];
 
                     for (const fret of frets) {
@@ -1305,22 +1453,20 @@ export class GpifWriter {
                     }
                 }
 
-
                 const showName = diagram.addElement('Property');
                 showName.attributes.set('name', 'ShowName');
                 showName.attributes.set('type', 'bool');
-                showName.attributes.set('value', chord.showName ? "true" : "false");
+                showName.attributes.set('value', chord.showName ? 'true' : 'false');
 
                 const showDiagram = diagram.addElement('Property');
                 showDiagram.attributes.set('name', 'ShowDiagram');
                 showDiagram.attributes.set('type', 'bool');
-                showDiagram.attributes.set('value', chord.showDiagram ? "true" : "false");
+                showDiagram.attributes.set('value', chord.showDiagram ? 'true' : 'false');
 
                 const showFingering = diagram.addElement('Property');
                 showFingering.attributes.set('name', 'ShowFingering');
                 showFingering.attributes.set('type', 'bool');
-                showFingering.attributes.set('value', chord.showFingering ? "true" : "false");
-
+                showFingering.attributes.set('value', chord.showFingering ? 'true' : 'false');
 
                 // TODO Chord details
                 const chordNode = diagram.addElement('Chord');
@@ -1439,8 +1585,8 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
-            let currentElementType: string = "";
-            let currentElementName: string = "";
+            let currentElementType: string = '';
+            let currentElementName: string = '';
             let currentArticulations: XmlNode = new XmlNode();
             let counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
@@ -1548,6 +1694,10 @@ export class GpifWriter {
             'Time'
         ).innerText = `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
 
+        if (masterBar.isFreeTime) {
+            masterBarNode.addElement('FreeTime');
+        }
+
         let bars: string[] = [];
         for (const tracks of masterBar.score.tracks) {
             for (const staves of tracks.staves) {
@@ -1596,11 +1746,81 @@ export class GpifWriter {
             masterBarNode.addElement('TripletFeel').innerText = TripletFeel[masterBar.tripletFeel];
         }
 
+        if (masterBar.directions && masterBar.directions.size > 0) {
+            const directions = masterBarNode.addElement('Directions');
+
+            for (const d of masterBar.directions) {
+                switch (d) {
+                    case Direction.TargetFine:
+                        directions.addElement('Target').innerText = 'Fine';
+                        break;
+                    case Direction.TargetSegno:
+                        directions.addElement('Target').innerText = 'Segno';
+                        break;
+                    case Direction.TargetSegnoSegno:
+                        directions.addElement('Target').innerText = 'SegnoSegno';
+                        break;
+                    case Direction.TargetCoda:
+                        directions.addElement('Target').innerText = 'Coda';
+                        break;
+                    case Direction.TargetDoubleCoda:
+                        directions.addElement('Target').innerText = 'DoubleCoda';
+                        break;
+
+                    case Direction.JumpDaCapo:
+                        directions.addElement('Jump').innerText = 'DaCapo';
+                        break;
+                    case Direction.JumpDaCapoAlCoda:
+                        directions.addElement('Jump').innerText = 'DaCapoAlCoda';
+                        break;
+                    case Direction.JumpDaCapoAlDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaCapoAlDoubleCoda';
+                        break;
+                    case Direction.JumpDaCapoAlFine:
+                        directions.addElement('Jump').innerText = 'DaCapoAlFine';
+                        break;
+
+                    case Direction.JumpDalSegno:
+                        directions.addElement('Jump').innerText = 'DaSegno';
+                        break;
+                    case Direction.JumpDalSegnoAlCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoAlCoda';
+                        break;
+                    case Direction.JumpDalSegnoAlDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoAlDoubleCoda';
+                        break;
+                    case Direction.JumpDalSegnoAlFine:
+                        directions.addElement('Jump').innerText = 'DaSegnoAlFine';
+                        break;
+
+                    case Direction.JumpDalSegnoSegno:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegno';
+                        break;
+                    case Direction.JumpDalSegnoSegnoAlCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegnoAlCoda';
+                        break;
+                    case Direction.JumpDalSegnoSegnoAlDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegnoAlDoubleCoda';
+                        break;
+                    case Direction.JumpDalSegnoSegnoAlFine:
+                        directions.addElement('Jump').innerText = 'DaSegnoSegnoAlFine';
+                        break;
+
+                    case Direction.JumpDaCoda:
+                        directions.addElement('Jump').innerText = 'DaCoda';
+                        break;
+                    case Direction.JumpDaDoubleCoda:
+                        directions.addElement('Jump').innerText = 'DaDoubleCoda';
+                        break;
+                }
+            }
+        }
+
         this.writeFermatas(masterBarNode, masterBar);
     }
 
     private writeFermatas(parent: XmlNode, masterBar: MasterBar) {
-        const fermataCount = (masterBar.fermata?.size ?? 0);
+        const fermataCount = masterBar.fermata?.size ?? 0;
         if (fermataCount === 0) {
             return;
         }

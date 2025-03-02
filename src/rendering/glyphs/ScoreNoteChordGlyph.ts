@@ -14,10 +14,12 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
     private _notes: Note[] = [];
+    private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: Glyph | null = null;
 
     public aboveBeatEffects: Map<string, EffectGlyph> = new Map();
@@ -99,16 +101,96 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public override doLayout(): void {
         super.doLayout();
+        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+
+        if (this.beat.deadSlapped) {
+            this._deadSlapped = new DeadSlappedBeatGlyph();
+            this._deadSlapped.renderer = this.renderer;
+            this._deadSlapped.doLayout();
+            this.width = this._deadSlapped.width;
+        }
+
         let direction: BeamDirection = this.direction;
+        let aboveBeatEffectsY = 0;
+        let belowBeatEffectsY = 0;
+        let belowEffectSpacing = 1;
+        let aboveEffectSpacing = -belowEffectSpacing;
+
+        let belowEffectSpacingShiftBefore = false;
+        let aboveEffectSpacingShiftBefore = false;
+
+        if (this.beat.deadSlapped) {
+            belowBeatEffectsY = scoreRenderer.getScoreY(0);
+            aboveBeatEffectsY = scoreRenderer.getScoreY(scoreRenderer.heightLineCount);
+        } else {
+            if (this.direction === BeamDirection.Up) {
+                belowEffectSpacingShiftBefore = false;
+                aboveEffectSpacingShiftBefore = true;
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 2);
+                aboveBeatEffectsY =
+                    scoreRenderer.getScoreY(this.minNote!.line) - scoreRenderer.getStemSize(this.beamingHelper, true);
+            } else {
+                belowEffectSpacingShiftBefore = true;
+                aboveEffectSpacingShiftBefore = false;
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line - 1);
+                belowEffectSpacing *= -1;
+                aboveEffectSpacing *= -1;
+                aboveBeatEffectsY =
+                    scoreRenderer.getScoreY(this.maxNote!.line) + scoreRenderer.getStemSize(this.beamingHelper, true);
+            }
+        }
+
+        let minEffectY: number | null = null;
+        let maxEffectY: number | null = null;
+
         for (const effect of this.aboveBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
+
+            if (aboveEffectSpacingShiftBefore) {
+                aboveBeatEffectsY += aboveEffectSpacing * effect.height;
+            }
+
+            effect.y = aboveBeatEffectsY;
+            if (minEffectY === null || minEffectY > aboveBeatEffectsY) {
+                minEffectY = aboveBeatEffectsY;
+            }
+            if (maxEffectY === null || maxEffectY < aboveBeatEffectsY) {
+                maxEffectY = aboveBeatEffectsY;
+            }
+
+            if (!aboveEffectSpacingShiftBefore) {
+                aboveBeatEffectsY += aboveEffectSpacing * effect.height;
+            }
         }
+
         for (const effect of this.belowBeatEffects.values()) {
             effect.renderer = this.renderer;
             effect.doLayout();
+
+            if (belowEffectSpacingShiftBefore) {
+                belowBeatEffectsY += belowEffectSpacing * effect.height;
+            }
+
+            effect.y = belowBeatEffectsY;
+
+            if (minEffectY === null || minEffectY > belowBeatEffectsY) {
+                minEffectY = belowBeatEffectsY;
+            }
+            if (maxEffectY === null || maxEffectY < belowBeatEffectsY) {
+                maxEffectY = belowBeatEffectsY;
+            }
+
+            if (!belowEffectSpacingShiftBefore) {
+                belowBeatEffectsY += belowEffectSpacing * effect.height;
+            }
         }
-        if (this.beat.isTremolo) {
+
+        if (minEffectY !== null) {
+            scoreRenderer.registerBeatEffectOverflows(minEffectY, maxEffectY ?? 0);
+        }
+
+        if (this.beat.isTremolo && !this.beat.deadSlapped) {
             let offset: number = 0;
             let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
             let tremoloX: number = direction === BeamDirection.Up ? this.displacedX : 0;
@@ -127,12 +209,16 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     offset = direction === BeamDirection.Up ? -10 : 15;
                     break;
             }
-            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + offset * this.scale, speed);
+
+            if (this.beat.duration < Duration.Half) {
+                tremoloX = this.width / 2;
+            }
+
+            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + offset, speed);
             this._tremoloPicking.renderer = this.renderer;
             this._tremoloPicking.doLayout();
         }
     }
-
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         for (let note of this._notes) {
@@ -151,38 +237,18 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        // TODO: this method seems to be quite heavy according to the profiler, why?
-        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        //
-        // Note Effects only painted once
-        //
-        let aboveBeatEffectsY = 0;
-        let belowBeatEffectsY = 0;
-        let belowEffectSpacing = 1;
-        let aboveEffectSpacing = -belowEffectSpacing;
-
-        if (this.beamingHelper.direction === BeamDirection.Up) {
-            belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line);
-            aboveBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 2);
-        } else {
-            belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line - 1);
-            aboveBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line + 1);
-            aboveEffectSpacing *= -1;
-            belowEffectSpacing *= -1;
-        }
-
         for (const g of this.aboveBeatEffects.values()) {
-            aboveBeatEffectsY += aboveEffectSpacing * g.height;
-            g.paint(cx + this.x + 2 * this.scale, cy + this.y + aboveBeatEffectsY, canvas);
+            g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
-
         for (const g of this.belowBeatEffects.values()) {
-            belowBeatEffectsY += belowEffectSpacing * g.height;
-            g.paint(cx + this.x + 2 * this.scale, cy + this.y + belowBeatEffectsY, canvas);
+            g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
         super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {
             this._tremoloPicking.paint(cx, cy, canvas);
+        }
+        if (this._deadSlapped) {
+            this._deadSlapped.paint(cx, cy, canvas);
         }
     }
 }

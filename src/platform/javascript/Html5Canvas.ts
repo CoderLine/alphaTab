@@ -2,7 +2,7 @@ import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 
 /**
@@ -40,14 +40,15 @@ export class Html5Canvas implements ICanvas {
         this._measureContext.textBaseline = 'hanging';
     }
 
-    public destroy() {
-    }
+    public destroy() {}
 
     public onRenderFinished(): unknown {
         return null;
     }
 
     public beginRender(width: number, height: number): void {
+        const scale = this.settings.display.scale;
+
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
         this._canvas.height = (height * Environment.HighDpiFactor) | 0;
@@ -55,7 +56,7 @@ export class Html5Canvas implements ICanvas {
         this._canvas.style.height = height + 'px';
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
-        this._context.scale(Environment.HighDpiFactor, Environment.HighDpiFactor);
+        this._context.scale(Environment.HighDpiFactor * scale, Environment.HighDpiFactor * scale);
         this._context.lineWidth = this._lineWidth;
     }
 
@@ -91,12 +92,13 @@ export class Html5Canvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._context.fillRect((x | 0), (y | 0), w, h);
+            this._context.fillRect(x | 0, y | 0, w, h);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
-        this._context.strokeRect((x | 0), (y | 0), w, h);
+        const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
+        this._context.strokeRect((x | 0) + blurOffset, (y | 0) + blurOffset, w, h);
     }
 
     public beginPath(): void {
@@ -125,27 +127,13 @@ export class Html5Canvas implements ICanvas {
 
     public fillCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
-        this._context.arc(
-            x,
-            y,
-            radius,
-            0,
-            Math.PI * 2,
-            true
-        );
+        this._context.arc(x, y, radius, 0, Math.PI * 2, true);
         this.fill();
     }
 
     public strokeCircle(x: number, y: number, radius: number): void {
         this._context.beginPath();
-        this._context.arc(
-            x,
-            y,
-            radius,
-            0,
-            Math.PI * 2,
-            true
-        );
+        this._context.arc(x, y, radius, 0, Math.PI * 2, true);
         this.stroke();
     }
 
@@ -166,9 +154,9 @@ export class Html5Canvas implements ICanvas {
     public set font(value: Font) {
         this._font = value;
         if (this._context) {
-            this._context.font = value.toCssString(this.settings.display.scale);
+            this._context.font = value.toCssString(1);
         }
-        this._measureContext.font = value.toCssString(this.settings.display.scale);
+        this._measureContext.font = value.toCssString(1);
     }
 
     public get textAlign(): TextAlign {
@@ -237,27 +225,28 @@ export class Html5Canvas implements ICanvas {
         this._context.fillText(text, x, y);
     }
 
-    public measureText(text: string): number {
-        return this._measureContext.measureText(text).width;
+    public measureText(text: string): TextMetrics {
+        const metrics = this._measureContext.measureText(text);
+        return new TextMetrics(metrics.width, metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent);
     }
 
     public fillMusicFontSymbol(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbol: MusicFontSymbol,
         centerAtPosition: boolean = false
     ): void {
         if (symbol === MusicFontSymbol.None) {
             return;
         }
-        this.fillMusicFontSymbolText(x, y, scale, String.fromCharCode(symbol), centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, String.fromCharCode(symbol), centerAtPosition);
     }
 
     public fillMusicFontSymbols(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: MusicFontSymbol[],
         centerAtPosition: boolean = false
     ): void {
@@ -267,20 +256,20 @@ export class Html5Canvas implements ICanvas {
                 s += String.fromCharCode(symbol);
             }
         }
-        this.fillMusicFontSymbolText(x, y, scale, s, centerAtPosition);
+        this.fillMusicFontSymbolText(x, y, relativeScale, s, centerAtPosition);
     }
 
     private fillMusicFontSymbolText(
         x: number,
         y: number,
-        scale: number,
+        relativeScale: number,
         symbols: string,
-        centerAtPosition: boolean = false
+        centerAtPosition: boolean
     ): void {
         let textAlign = this._context.textAlign;
         let baseLine = this._context.textBaseline;
         let font: string = this._context.font;
-        this._context.font = this._musicFont.toCssString(scale);
+        this._context.font = this._musicFont.toCssString(relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
