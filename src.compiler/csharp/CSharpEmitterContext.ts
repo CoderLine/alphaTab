@@ -654,7 +654,7 @@ export default class CSharpEmitterContext {
                     );
                 }
                 fallbackToObject = true;
-            } else if(actualType !== t) {
+            } else if (actualType !== t) {
                 if (t.symbol?.name === 'PromiseLike') {
                     this.addCsNodeDiagnostics(
                         parent,
@@ -960,6 +960,11 @@ export default class CSharpEmitterContext {
         } else {
             this.addCsNodeDiagnostics(node, 'Could not register symbol', ts.DiagnosticCategory.Error);
         }
+    }
+
+    public resolveSymbol(symbol: ts.Symbol): (cs.NamedElement & cs.Node) | undefined {
+        const symbolKey = this.getSymbolKey(symbol);
+        return this._symbolLookup.get(symbolKey);
     }
 
     public isConst(declaration: cs.FieldDeclaration) {

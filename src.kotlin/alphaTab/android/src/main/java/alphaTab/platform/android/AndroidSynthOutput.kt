@@ -128,26 +128,24 @@ internal class AndroidSynthOutput(
     override val samplesPlayed: IEventEmitterOfT<Double> = EventEmitterOfT()
     override val sampleRequest: IEventEmitter = EventEmitter()
 
-    override fun enumerateOutputDevices(): Deferred<List<ISynthOutputDevice>> {
+    override suspend fun enumerateOutputDevices(): List<ISynthOutputDevice> {
         val audioService = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager?
-            ?: return CompletableDeferred(List())
+            ?: return List()
 
-        return CompletableDeferred(List(
+        return List(
             audioService.getDevices(AudioManager.GET_DEVICES_OUTPUTS).filter {
                 it.isSink
             }.map { AndroidOutputDevice(it) }
-        ))
-
+        )
     }
 
-    override fun setOutputDevice(device: ISynthOutputDevice?): Deferred<Unit> {
+    override suspend fun setOutputDevice(device: ISynthOutputDevice?): Unit {
         _audioContext.setOutputDevice((device as AndroidOutputDevice?)?.device)
         _device = device
-        return CompletableDeferred()
     }
 
-    override fun getOutputDevice(): Deferred<ISynthOutputDevice?> {
-        return CompletableDeferred(_device)
+    override suspend fun getOutputDevice(): ISynthOutputDevice? {
+        return _device
     }
 }
 

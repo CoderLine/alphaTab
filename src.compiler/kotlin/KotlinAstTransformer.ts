@@ -15,15 +15,21 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return '.kt';
     }
 
-    public override get targetTag(): string {
-        return 'kotlin';
-    }
-
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
     private _paramsWithAssignment: Set<string>[] = [];
 
     private getMethodLocalParameterName(name: string) {
         return 'param' + name;
+    }
+
+    protected override visitMethodSignature(parent: cs.ClassDeclaration | cs.InterfaceDeclaration, classElement: ts.MethodSignature) {
+        const csMethod = super.visitMethodSignature(parent, classElement);
+
+        if(!!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'async')) {
+            csMethod.isAsync = true;
+        }
+
+        return csMethod;
     }
 
     protected override buildFileName(fileName: string, context: CSharpEmitterContext): string {
@@ -238,7 +244,12 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             const method = this._context.typeChecker.getSymbolAtLocation(expression.expression);
 
             if (returnType?.symbol?.name === 'Promise' && (method as any)?.parent?.name !== 'Promise') {
-                if (!ts.isAwaitExpression(expression.parent)) {
+                const isSuspend = method?.valueDeclaration && (
+                    (method.valueDeclaration as ts.MethodDeclaration).modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword) ||
+                    ts.getJSDocTags(method.valueDeclaration!).find(t => t.tagName.text === 'async')
+                );
+
+                if (!ts.isAwaitExpression(expression.parent) && isSuspend) {
                     const suspendToDeferred = {
                         nodeType: cs.SyntaxKind.InvocationExpression
                     } as cs.InvocationExpression;
@@ -263,26 +274,21 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                     ];
 
                     return suspendToDeferred;
-                } else {
-                    const isSuspend = (method?.valueDeclaration as ts.MethodDeclaration).modifiers?.some(
-                        m => m.kind === ts.SyntaxKind.AsyncKeyword
-                    );
-                    if (!isSuspend) {
-                        const deferredToSuspend = {
-                            nodeType: cs.SyntaxKind.InvocationExpression
-                        } as cs.InvocationExpression;
+                } else if (ts.isAwaitExpression(expression.parent) && !isSuspend) {
+                    const deferredToSuspend = {
+                        nodeType: cs.SyntaxKind.InvocationExpression
+                    } as cs.InvocationExpression;
 
-                        deferredToSuspend.expression = {
-                            expression: invocation,
-                            member: 'await',
-                            parent: parent,
-                            nodeType: cs.SyntaxKind.MemberAccessExpression
-                        } as cs.MemberAccessExpression;
+                    deferredToSuspend.expression = {
+                        expression: invocation,
+                        member: 'await',
+                        parent: parent,
+                        nodeType: cs.SyntaxKind.MemberAccessExpression
+                    } as cs.MemberAccessExpression;
 
-                        deferredToSuspend.arguments = [];
+                    deferredToSuspend.arguments = [];
 
-                        return deferredToSuspend;
-                    }
+                    return deferredToSuspend;
                 }
             }
         }

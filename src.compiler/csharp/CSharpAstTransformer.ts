@@ -2,7 +2,6 @@ import * as ts from 'typescript';
 import * as cs from './CSharpAst';
 import * as path from 'path';
 import CSharpEmitterContext from './CSharpEmitterContext';
-import exp from 'constants';
 
 export default class CSharpAstTransformer {
     protected _typeScriptFile: ts.SourceFile;
@@ -1888,7 +1887,7 @@ export default class CSharpAstTransformer {
     protected visitMethodSignature(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.MethodSignature
-    ) {
+    ): cs.MethodDeclaration {
         const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
         const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
 
@@ -1939,6 +1938,8 @@ export default class CSharpAstTransformer {
         }
 
         this._context.registerSymbol(csMethod);
+
+        return csMethod;
     }
     protected mapVisibility(node: ts.Node, fallback: cs.Visibility): cs.Visibility {
         if (this._context.isInternal(node)) {
