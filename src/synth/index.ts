@@ -1,7 +1,7 @@
 export { AlphaSynth } from '@src/synth/AlphaSynth';
 export { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 export { PlaybackRange } from '@src/synth/PlaybackRange';
-export { type ISynthOutput } from '@src/synth/ISynthOutput';
+export type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 export { type IAlphaSynth } from '@src/synth/IAlphaSynth';
 export { PlayerState } from '@src/synth/PlayerState';
 export { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
