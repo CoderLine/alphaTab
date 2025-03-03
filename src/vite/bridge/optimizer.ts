@@ -6,9 +6,9 @@ import { DepOptimizationMetadata, DevEnvironment, OptimizedDepInfo, normalizePat
 import { ResolvedConfig } from './config';
 import { tryFsResolve } from './resolve';
 import { cleanUrl } from './utils';
-import * as path from 'path';
+import * as path from 'node:path';
 import { METADATA_FILENAME } from './constants';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 
 // https://github.com/Danielku15/vite/blob/88b7def341f12d07d7d4f83cbe3dc73cc8c6b7be/packages/vite/src/node/optimizer/index.ts#L1356
 export function tryOptimizedDepResolve(

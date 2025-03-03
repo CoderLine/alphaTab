@@ -55,7 +55,7 @@ describe('Vite', () => {
 
                 if (file.name.startsWith('index-')) {
                     // ensure new worker has worker import
-                    expect(text).to.include('alphaTabWorker(new URL');
+                    expect(text.match(/new [^ ]+\.alphaTabWorker\(new [^ ]+\.alphaTabUrl/)).to.be.ok;
                     // ensure worker bootstrapping script is references
                     expect(text).to.include('assets/alphaTab.worker-');
                     // ensure worklet bootstrapper script is references

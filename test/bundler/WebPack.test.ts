@@ -45,6 +45,10 @@ describe('WebPack', () => {
                         }
                     },
                     (err, stats) => {
+                        if(stats) {
+                            console.log(stats.toString());
+                        }
+
                         process.chdir(cwd);
                         if (err) {
                             reject(err);
@@ -87,7 +91,7 @@ describe('WebPack', () => {
 
                 if (file.name.startsWith('app-')) {
                     // ensure new worker has worker import
-                    expect(text).to.include('new Environment.alphaTabWorker(new URL(/* worker import */');
+                    expect(text).to.include('new Environment.alphaTabWorker(new Environment.alphaTabUrl(/* worker import */');
                     // ensure worklet bootstrapper exists
                     expect(text).to.include('/* worklet bootstrap */ async function(__webpack_worklet__) {');
                     // without custom bundling the app will bundle alphatab directly

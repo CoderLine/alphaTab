@@ -1,7 +1,7 @@
 /**@target web */
-import * as fs from 'fs';
-import * as path from 'path';
-import * as url from 'url';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import * as url from 'node:url';
 
 // webpack doesn't defined properly types for all these internals
 // needed for the plugin

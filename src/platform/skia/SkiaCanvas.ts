@@ -80,7 +80,7 @@ export class SkiaCanvas implements ICanvas {
     private getTypeFace(): alphaSkia.AlphaSkiaTypeface {
         if (this._typeFaceCache != this.font.toCssString(this._scale)) {
             if (this._typeFaceIsSystem) {
-                using _ = this._typeFace!;
+                using _unused = this._typeFace!;
             }
 
             for (const family of this.font.families) {

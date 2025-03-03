@@ -49,7 +49,7 @@ import {
     WORKER_FILE_ID
 } from './bridge';
 import {} from './bridge';
-import * as path from 'path';
+import * as path from 'node:path';
 import MagicString from 'magic-string';
 
 const workerFileRE = new RegExp(`(?:\\?|&)${WORKER_FILE_ID}&type=(\\w+)(?:&|$)`);

@@ -22,7 +22,7 @@ export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 export { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@src/generated/VersionInfo';
-
+ 
 export * as importer from "./importer";
 export * as exporter from "./exporter";
 export * as midi from "./midi";

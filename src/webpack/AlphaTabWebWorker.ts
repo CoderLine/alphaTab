@@ -1,6 +1,6 @@
 /**@target web */
 
-import { type Expression, type CallExpression } from 'estree';
+import { type Expression, type CallExpression, NewExpression } from 'estree';
 import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
 import { getWorkerRuntime, parseModuleUrl, tapJavaScript, webPackWithAlphaTab, webpackTypes } from './Utils';
 
@@ -34,7 +34,7 @@ export function configureWebWorker(
 
     new webPackWithAlphaTab.webpack.javascript.EnableChunkLoadingPlugin('import-scripts').apply(compiler);
 
-    const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {
+    const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {       
         const [arg1, arg2] = expr.arguments;
         const parsedUrl = parseModuleUrl(parser, arg1 as Expression);
         if (!parsedUrl) {
@@ -75,13 +75,14 @@ export function configureWebWorker(
         parser.state.module.addPresentationalDependency(dep1);
 
         parser.walkExpression(expr.callee);
+        parser.walkExpression((arg1 as NewExpression).callee);
 
         return true;
     };
 
     const parserPlugin = (parser: any) => {
         parser.hooks.new
-            .for('alphaTab.Environment.alphaTabWorker')
+            .for('Environment.alphaTabWorker')
             .tap(pluginName, (expr: CallExpression) => handleAlphaTabWorker(parser, expr));
     };
 
