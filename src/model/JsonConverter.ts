@@ -19,7 +19,7 @@ export class JsonConverter {
     private static jsonReplacer(_: any, v: any) {
         if (v instanceof Map) {
             if ('fromEntries' in Object) {
-                return (Object as any).fromEntries(v);
+                return Object.fromEntries(v);
             } else {
                 const o: any = {};
                 for (const [k, mv] of v) { o[k] = mv; }

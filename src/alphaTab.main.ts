@@ -23,7 +23,7 @@ if (alphaTab.Environment.isRunningInWorker) {
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating webworker');
                 try {
-                    return new alphaTab.Environment.alphaTabWorker(new URL('./alphaTab.worker', import.meta.url), {
+                    return new alphaTab.Environment.alphaTabWorker(new alphaTab.Environment.alphaTabUrl('./alphaTab.worker', import.meta.url), {
                         type: 'module'
                     });
                 } catch (e) {
@@ -112,7 +112,7 @@ if (alphaTab.Environment.isRunningInWorker) {
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating Module worklet');
                 const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
-                return alphaTabWorklet.addModule(new URL('./alphaTab.worklet', import.meta.url));
+                return alphaTabWorklet.addModule(new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet', import.meta.url));
             }
 
             alphaTab.Logger.debug('AlphaTab', 'Creating Script worklet');

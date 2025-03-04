@@ -90,7 +90,7 @@ export function parseModuleUrl(parser: any, expr: Expression) {
     const [arg1, arg2] = newExpr.arguments;
     const callee = parser.evaluateExpression(newExpr.callee);
 
-    if (!callee.isIdentifier() || callee.identifier !== 'URL') {
+    if (!callee.isIdentifier() || !callee.identifier.includes('alphaTabUrl')) {
         return;
     }
 

@@ -2,7 +2,7 @@
 
 // index.ts for more details on contents and license of this file
 
-import * as fs from 'fs';
+import * as fs from 'node:fs';
 import { createHash } from 'node:crypto';
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1302

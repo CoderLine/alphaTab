@@ -1,4 +1,4 @@
-import * as alphaTab from '../dist/alphaTab.mjs';
+import * as alphaTab from '../src/alphaTab.main';
 
 const toDomElement = (function () {
     const parser = document.createElement('div');
@@ -12,9 +12,10 @@ const params = new URL(window.location.href).searchParams;
 
 const defaultSettings = {
     core: {
-        logLevel: params.get('loglevel') ?? 'info'
+        logLevel: params.get('loglevel') ?? 'info',
+        file: '/test-data/audio/full-song.gp5',
+        fontDirectory: '/font/bravura/'
     },
-    file: '/test-data/audio/full-song.gp5',
     player: {
         enablePlayer: true,
         scrollOffsetX: -10,

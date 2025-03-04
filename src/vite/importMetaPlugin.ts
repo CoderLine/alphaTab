@@ -47,11 +47,11 @@ import {
     AlphaTabWorkerTypes,
     WORKER_FILE_ID
 } from './bridge';
-import path from 'path';
+import path from 'node:path';
 
 const alphaTabWorkerPatterns = [
-    ['alphaTabWorker', 'new URL', 'import.meta.url'],
-    ['alphaTabWorklet.addModule', 'new URL', 'import.meta.url']
+    ['alphaTabWorker', 'new', 'alphaTabUrl', 'import.meta.url'],
+    ['alphaTabWorklet.addModule', 'new', 'alphaTabUrl', 'import.meta.url']
 ];
 
 function includesAlphaTabWorker(code: string): boolean {
@@ -142,7 +142,7 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
             let s: MagicString | undefined;
 
             const alphaTabWorkerPattern = new RegExp(
-                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+URL\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
+                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+[^ \(]+alphaTabUrl\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
                 "dg"
             );
             

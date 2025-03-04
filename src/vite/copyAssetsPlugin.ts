@@ -1,9 +1,9 @@
 /**@target web */
 
 import type { Plugin, ResolvedConfig } from './bridge';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as url from 'url';
+import * as path from 'node:path';
+import * as fs from 'node:fs';
+import * as url from 'node:url';
 
 import { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 

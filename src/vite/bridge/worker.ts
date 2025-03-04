@@ -5,7 +5,7 @@
 import { ResolvedConfig } from './config';
 import { cleanUrl, getHash } from './utils';
 import type { OutputChunk } from 'rollup';
-import * as path from 'path';
+import * as path from 'node:path';
 import { BuildEnvironment } from 'vite';
 import { injectEnvironmentToHooks } from './build';
 

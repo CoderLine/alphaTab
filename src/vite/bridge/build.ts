@@ -4,7 +4,7 @@
 
 import { MinimalPluginContext, PluginContext, type InternalModuleFormat } from 'rollup';
 import { joinUrlSegments, partialEncodeURIPath } from './utils';
-import * as path from 'path';
+import * as path from 'node:path';
 import { ResolvedConfig } from './config';
 import { BuildEnvironment, Plugin } from 'vite';
 import { RollupPluginHooks } from './typeUtils';
