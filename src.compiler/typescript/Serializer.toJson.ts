@@ -14,7 +14,6 @@ import {
 } from '../BuilderHelpers';
 import { findModule, findSerializerModule, isImmutable, JsonProperty, JsonSerializable } from './Serializer.common';
 
-
 function generateToJsonBody(
     program: ts.Program,
     serializable: JsonSerializable,
@@ -174,10 +173,10 @@ function generateToJsonBody(
             }
 
             let serializeBlock: ts.Block;
-            if (isPrimitiveToJson(setType.typeArguments![1], typeChecker)) {
+            if (isPrimitiveToJson(setType.typeArguments![0], typeChecker)) {
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
-                        const a:unknown[] = [];
+                        const a:${typeChecker.typeToString(setType.typeArguments![0])}[] = [];
                         o.set(${JSON.stringify(jsonName)}, a);
                         for(const v of obj.${fieldName}!) {
                             a.push(v);
@@ -197,7 +196,9 @@ function generateToJsonBody(
                     ts.SyntaxKind.Block
                 );
             } else {
-                throw new Error('only Set<Primitive> maps are supported, extend if needed!');
+                throw new Error(
+                    `only Set<Primitive> maps are supported, extend if needed! Found ${typeChecker.typeToString(setType)}`
+                );
             }
 
             if (type.isNullable) {

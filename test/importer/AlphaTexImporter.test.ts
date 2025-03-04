@@ -1820,4 +1820,20 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].clef).to.equal(Clef.C4);
         expect(score.tracks[0].staves[0].bars[1].clefOttava).to.equal(Ottavia._15ma);
     });
+
+    it('multibar-rest', () => {
+        let score = parseTex(`
+        \\multiBarRest
+        .
+        \\track A { multiBarRest }
+        3.3
+        \\track B
+        3.3
+        
+        `);
+        expect(score.stylesheet.multiTrackMultiBarRest).to.be.true;
+        expect(score.stylesheet.perTrackMultiBarRest).to.be.ok;
+        expect(score.stylesheet.perTrackMultiBarRest!.has(0)).to.be.true;
+        expect(score.stylesheet.perTrackMultiBarRest!.has(1)).to.be.false;
+    });
 });

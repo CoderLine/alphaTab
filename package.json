@@ -63,7 +63,8 @@
         "test": "mocha",
         "test-csharp": "cd src.csharp && dotnet test -c Release",
         "test-kotlin": "node scripts/gradlew.mjs testReleaseUnitTest --info",
-        "test-accept-reference": "tsx scripts/accept-new-reference-files.ts"
+        "test-accept-reference": "tsx scripts/accept-new-reference-files.ts",
+        "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
         "@coderline/alphaskia": "^2.3.120",

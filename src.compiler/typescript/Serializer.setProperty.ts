@@ -213,7 +213,7 @@ function generateSetPropertyBody(
             if (isPrimitiveFromJson(mapType.typeArguments![1], typeChecker)) {
                 mapValue = ts.factory.createAsExpression(
                     ts.factory.createIdentifier('v'),
-                    typeChecker.typeToTypeNode(mapType.typeArguments![1] , undefined, undefined)!
+                    typeChecker.typeToTypeNode(mapType.typeArguments![1], undefined, undefined)!
                 );
             } else {
                 itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
@@ -225,11 +225,10 @@ function generateSetPropertyBody(
                 mapValue = ts.factory.createIdentifier('i');
             }
 
-            const collectionAddMethod =
-                (ts
-                    .getJSDocTags(prop.property)
-                    .filter(t => t.tagName.text === 'json_add')
-                    .map(t => t.comment ?? '')[0] as string);
+            const collectionAddMethod = ts
+                .getJSDocTags(prop.property)
+                .filter(t => t.tagName.text === 'json_add')
+                .map(t => t.comment ?? '')[0] as string;
 
             caseStatements.push(
                 assignField(
@@ -280,15 +279,17 @@ function generateSetPropertyBody(
                                                           collectionAddMethod
                                                       )
                                                     : ts.factory.createPropertyAccessExpression(
-                                                          type.isNullable 
-                                                          ? ts.factory.createNonNullExpression(ts.factory.createPropertyAccessExpression(
-                                                              ts.factory.createIdentifier('obj'),
-                                                              ts.factory.createIdentifier(fieldName)
-                                                          ))
-                                                          : ts.factory.createPropertyAccessExpression(
-                                                                ts.factory.createIdentifier('obj'),
-                                                                ts.factory.createIdentifier(fieldName)
-                                                            ),
+                                                          type.isNullable
+                                                              ? ts.factory.createNonNullExpression(
+                                                                    ts.factory.createPropertyAccessExpression(
+                                                                        ts.factory.createIdentifier('obj'),
+                                                                        ts.factory.createIdentifier(fieldName)
+                                                                    )
+                                                                )
+                                                              : ts.factory.createPropertyAccessExpression(
+                                                                    ts.factory.createIdentifier('obj'),
+                                                                    ts.factory.createIdentifier(fieldName)
+                                                                ),
                                                           ts.factory.createIdentifier('set')
                                                       ),
                                                 undefined,
@@ -312,23 +313,25 @@ function generateSetPropertyBody(
             }
 
             const collectionAddMethod = ts
-            .getJSDocTags(prop.property)
-            .filter(t => t.tagName.text === 'json_add')
-            .map(t => t.comment ?? '')[0] as string;
+                .getJSDocTags(prop.property)
+                .filter(t => t.tagName.text === 'json_add')
+                .map(t => t.comment ?? '')[0] as string;
 
             if (isPrimitiveFromJson(setType.typeArguments![0], typeChecker)) {
-                importer(
-                    setType.typeArguments![0].symbol!.name,
-                    findModule(setType.typeArguments![0], program.getCompilerOptions())
-                );
+                if (setType.typeArguments![0].symbol) {
+                    importer(
+                        setType.typeArguments![0].symbol!.name,
+                        findModule(setType.typeArguments![0], program.getCompilerOptions())
+                    );
+                }
 
-                if(collectionAddMethod) {
+                const elementTypeName = typeChecker.typeToString(setType.typeArguments![0]);
+
+                if (collectionAddMethod) {
                     caseStatements.push(
                         createNodeFromSource<ts.ForOfStatement>(
                             `for (const i of (v as unknown[])) {
-                                obj.${collectionAddMethod}(i as  ${
-                                    setType.typeArguments![0].symbol!.name
-                                });
+                                obj.${collectionAddMethod}(i as  ${elementTypeName});
                             }`,
                             ts.SyntaxKind.ForOfStatement
                         )
@@ -337,15 +340,14 @@ function generateSetPropertyBody(
                     caseStatements.push(
                         assignField(
                             createNodeFromSource<ts.NewExpression>(
-                                `new Set<${setType.typeArguments![0].symbol!.name}>(v as ${
-                                    setType.typeArguments![0].symbol!.name
+                                `new Set<${elementTypeName}>(v as ${
+                                    elementTypeName
                                 }[])!`,
                                 ts.SyntaxKind.NewExpression
                             )
                         )
                     );
                 }
-
             } else if (isEnumType(setType.typeArguments![0])) {
                 importer(
                     setType.typeArguments![0].symbol!.name,
@@ -353,7 +355,7 @@ function generateSetPropertyBody(
                 );
                 importer('JsonHelper', '@src/io/JsonHelper');
 
-                if(collectionAddMethod) {
+                if (collectionAddMethod) {
                     caseStatements.push(
                         createNodeFromSource<ts.ForOfStatement>(
                             `for (const i of (v as number[]) ) {
