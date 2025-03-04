@@ -241,6 +241,7 @@ export default defineConfig(({ command, mode }) => {
                 break;
             case 'vite-cjs':
                 umd('alphaTab.vite', 'src/alphaTab.vite.ts', true, false);
+
                 break;
             case 'vite-esm':
                 esm('alphaTab.vite', 'src/alphaTab.vite.ts', false);
@@ -261,7 +262,7 @@ export default defineConfig(({ command, mode }) => {
                             const modifiedCode = new MagicString(code);
                             const extension = min ? '.min.mjs' : '.mjs';
                             modifiedCode
-                                .replaceAll("alphaTab.core'", `$alphaTab.core${extension}'`)
+                                .replaceAll("alphaTab.core'", `alphaTab.core${extension}'`)
                                 .replaceAll("alphaTab.worker'", `alphaTab.worker${extension}'`)
                                 .replaceAll("alphaTab.worklet'", `alphaTab.worklet${extension}'`);
 
