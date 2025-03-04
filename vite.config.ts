@@ -8,7 +8,7 @@ import server from './vite.plugin.server';
 import license from 'rollup-plugin-license';
 import copy from 'rollup-plugin-copy';
 import type { OutputOptions } from 'rollup';
-import typescript from '@rollup/plugin-typescript';
+import typescript, { RollupTypescriptOptions } from '@rollup/plugin-typescript';
 import terser from '@rollup/plugin-terser';
 import ts from 'typescript';
 import generateDts from './vite.plugin.dts';
@@ -98,20 +98,6 @@ export default defineConfig(({ command, mode }) => {
         const config: UserConfig = {
             esbuild: false,
             plugins: [
-                tsconfigPaths(),
-                typescript({
-                    tsconfig: './tsconfig.json',
-                    declaration: true,
-                    declarationMap: true,
-                    declarationDir: './dist/types',
-                    transformers: {
-                        afterDeclarations: [
-                            dtsPathsTransformer({
-                                '@src/': path.resolve(__dirname, 'src')
-                            })
-                        ]
-                    }
-                }),
                 license({
                     banner: {
                         content: {
@@ -159,7 +145,39 @@ export default defineConfig(({ command, mode }) => {
             }
         };
 
-        const umd = (name: string, entry: string, cjs?: boolean, withMin?: boolean) => {
+        const enableTypeScript = (o: Partial<RollupTypescriptOptions> = {}, types: boolean = false) => {
+            config.plugins!.unshift(
+                tsconfigPaths(),
+                typescript({
+                    tsconfig: './tsconfig.json',
+                    ...(types
+                        ? {
+                              declaration: true,
+                              declarationMap: true,
+                              declarationDir: './dist/types'
+                          }
+                        : {}),
+                    ...o,
+                    transformers: {
+                        afterDeclarations: [
+                            dtsPathsTransformer({
+                                '@src/': path.resolve(__dirname, 'src')
+                            })
+                        ]
+                    }
+                })
+            );
+        };
+
+        const umd = (
+            name: string,
+            entry: string,
+            tsOptions: RollupTypescriptOptions,
+            cjs?: boolean,
+            withMin?: boolean
+        ) => {
+            enableTypeScript(tsOptions, false);
+
             lib.entry = {
                 [name]: path.resolve(__dirname, entry)
             };
@@ -191,7 +209,9 @@ export default defineConfig(({ command, mode }) => {
             }
         };
 
-        const esm = (name: string, entry: string, withMin: boolean = true) => {
+        const esm = (name: string, entry: string, tsOptions: RollupTypescriptOptions, withMin: boolean = true) => {
+            enableTypeScript(tsOptions, true);
+
             lib.entry = {
                 [name]: path.resolve(__dirname, entry)
             };
@@ -212,7 +232,12 @@ export default defineConfig(({ command, mode }) => {
 
                             for (const file of files) {
                                 const chunk = bundle[file];
-                                if (file.endsWith('.mjs') && chunk.type === 'chunk' && chunk.isEntry) {
+                                if (
+                                    file.endsWith('.mjs') &&
+                                    chunk.type === 'chunk' &&
+                                    chunk.isEntry &&
+                                    !chunk.facadeModuleId!.endsWith('alphaTab.core.ts')
+                                ) {
                                     this.info(`Creating types for bundle ${file}`);
                                     generateDts(__dirname, chunk.facadeModuleId!, file.replace('.mjs', '.d.ts'));
                                 }
@@ -235,22 +260,31 @@ export default defineConfig(({ command, mode }) => {
         };
 
         const lib = config.build!.lib! as LibraryOptions;
-        switch (mode) {
-            case 'umd':
-                umd('alphaTab', 'src/alphaTab.main.ts');
-                break;
-            case 'vite-cjs':
-                umd('alphaTab.vite', 'src/alphaTab.vite.ts', true, false);
 
+        // TODO: move to a monorepo style repository and isolate packages
+        const viteOptions: RollupTypescriptOptions = {
+            include: ['src/*.vite.ts', 'src/vite/**']
+        };
+
+        const webpackOptions: RollupTypescriptOptions = {
+            include: ['src/*.webpack.ts', 'src/webpack/**']
+        };
+
+        switch (mode) {
+            case 'vite-cjs':
+                umd('alphaTab.vite', 'src/alphaTab.vite.ts', viteOptions, true, false);
                 break;
             case 'vite-esm':
-                esm('alphaTab.vite', 'src/alphaTab.vite.ts', false);
+                esm('alphaTab.vite', 'src/alphaTab.vite.ts', viteOptions, false);
                 break;
             case 'webpack-cjs':
-                umd('alphaTab.webpack', 'src/alphaTab.webpack.ts', true, false);
+                umd('alphaTab.webpack', 'src/alphaTab.webpack.ts', webpackOptions, true, false);
                 break;
             case 'webpack-esm':
-                esm('alphaTab.webpack', 'src/alphaTab.webpack.ts', false);
+                esm('alphaTab.webpack', 'src/alphaTab.webpack.ts', webpackOptions, false);
+                break;
+            case 'umd':
+                umd('alphaTab', 'src/alphaTab.main.ts', {});
                 break;
             default:
             case 'esm':
@@ -274,14 +308,14 @@ export default defineConfig(({ command, mode }) => {
                     };
                 };
 
-                esm('alphaTab', 'src/alphaTab.main.ts');
+                esm('alphaTab', 'src/alphaTab.main.ts', {});
                 lib.entry['alphaTab.core'] = path.resolve(__dirname, 'src/alphaTab.core.ts');
                 lib.entry['alphaTab.worker'] = path.resolve(__dirname, 'src/alphaTab.worker.ts');
                 lib.entry['alphaTab.worklet'] = path.resolve(__dirname, 'src/alphaTab.worklet.ts');
 
-                for(const output of (config.build!.rollupOptions!.output as OutputOptions[])) {
+                for (const output of config.build!.rollupOptions!.output as OutputOptions[]) {
                     const isMin = (output.entryFileNames as string).includes('.min');
-                    (output.plugins as Plugin[]).push(adjustScriptPathsPlugin(isMin))
+                    (output.plugins as Plugin[]).push(adjustScriptPathsPlugin(isMin));
                 }
                 break;
         }
