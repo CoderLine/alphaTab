@@ -82,7 +82,7 @@ export function configureWebWorker(
 
     const parserPlugin = (parser: any) => {
         parser.hooks.new
-            .for('Environment.alphaTabWorker')
+            .for('alphaTab.Environment.alphaTabWorker')
             .tap(pluginName, (expr: CallExpression) => handleAlphaTabWorker(parser, expr));
     };
 
