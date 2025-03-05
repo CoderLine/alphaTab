@@ -51,14 +51,20 @@
 
         function setupEditor(api, selector) {
             const element = document.querySelector(selector);
-            element.innerHTML = trimCode(element.innerHTML);
+
+            const initialCode = sessionStorage.getItem('alphatex-editor.code') ?? trimCode(element.innerHTML);
+            element.innerHTML = initialCode;
             const editor = ace.edit(element, {
                 mode: 'ace/mode/tex'
             });
             editor.session.on('change', () => {
+                const tex = editor.getSession().getDocument().getAllLines().join('\n');
                 api.tex(editor.getSession().getDocument().getAllLines().join('\n'), 'all');
+                sessionStorage.setItem('alphatex-editor.code', tex)
             });
         }
+
+
 
         const req = new XMLHttpRequest();
         req.onload = data => {
