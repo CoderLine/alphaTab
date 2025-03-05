@@ -2,7 +2,11 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 
 import { MidiFile } from '@src/midi/MidiFile';
-import { MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi/MidiTickLookup';
+import {
+    MidiTickLookup,
+    MidiTickLookupFindBeatResult,
+    MidiTickLookupFindBeatResultCursorMode
+} from '@src/midi/MidiTickLookup';
 import { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
@@ -857,7 +861,7 @@ export class AlphaTabApiBase<TSettings> {
             this.player.positionChanged.on(e => {
                 this._previousTick = e.currentTick;
                 this.uiFacade.beginInvoke(() => {
-                    this.cursorUpdateTick(e.currentTick, false);
+                    this.cursorUpdateTick(e.currentTick, false, false, e.isSeek);
                 });
             });
             this.player.stateChanged.on(e => {
@@ -879,14 +883,14 @@ export class AlphaTabApiBase<TSettings> {
      * @param stop
      * @param shouldScroll whether we should scroll to the bar (if scrolling is active)
      */
-    private cursorUpdateTick(tick: number, stop: boolean, shouldScroll: boolean = false): void {
+    private cursorUpdateTick(tick: number, stop: boolean, shouldScroll: boolean = false, forceUpdate:boolean = false): void {
         let cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
             let tracks = this._trackIndexLookup;
             if (tracks != null && tracks.size > 0) {
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
-                    this.cursorUpdateBeat(beat, stop, shouldScroll);
+                    this.cursorUpdateBeat(beat, stop, shouldScroll, forceUpdate || this.playerState === PlayerState.Paused);
                 }
             }
         }
@@ -945,7 +949,8 @@ export class AlphaTabApiBase<TSettings> {
                 beatsToHighlight,
                 cache!,
                 beatBoundings!,
-                shouldScroll
+                shouldScroll,
+                lookupResult.cursorMode
             );
         });
     }
@@ -1031,7 +1036,8 @@ export class AlphaTabApiBase<TSettings> {
         beatsToHighlight: BeatTickLookupItem[],
         cache: BoundsLookup,
         beatBoundings: BeatBounds,
-        shouldScroll: boolean
+        shouldScroll: boolean,
+        cursorMode: MidiTickLookupFindBeatResultCursorMode
     ) {
         const barCursor = this._barCursor;
         const beatCursor = this._beatCursor;
@@ -1045,12 +1051,29 @@ export class AlphaTabApiBase<TSettings> {
             barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
 
+        let currentBeatX: number = beatBoundings.onNotesX;
+        let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+        if (beatCursor) {
+            // get position of next beat on same system
+            if (nextBeat && cursorMode == MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
+                // if we are moving within the same bar or to the next bar
+                // transition to the next beat, otherwise transition to the end of the bar.
+                const nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+                if (
+                    nextBeatBoundings &&
+                    nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
+                ) {
+                    nextBeatX = nextBeatBoundings.onNotesX;
+                }
+            }
+        }
+
         if (beatCursor) {
             // move beat to start position immediately
             if (this.settings.player.enableAnimatedBeatCursor) {
                 beatCursor.stopAnimation();
             }
-            beatCursor.setBounds(beatBoundings.onNotesX, barBounds.y, 1, barBounds.h);
+            beatCursor.setBounds(currentBeatX, barBounds.y, 1, barBounds.h);
         }
 
         // if playing, animate the cursor to the next beat
@@ -1060,7 +1083,8 @@ export class AlphaTabApiBase<TSettings> {
 
         // actively playing? -> animate cursor and highlight items
         let shouldNotifyBeatChange = false;
-        if (this._playerState === PlayerState.Playing && !stop) {
+        const isPlayingUpdate = this._playerState === PlayerState.Playing && !stop;
+        if (isPlayingUpdate) {
             if (this.settings.player.enableElementHighlighting) {
                 for (let highlight of beatsToHighlight) {
                     let className: string = BeatContainerGlyph.getGroupId(highlight.beat);
@@ -1068,31 +1092,32 @@ export class AlphaTabApiBase<TSettings> {
                 }
             }
 
-            if (this.settings.player.enableAnimatedBeatCursor) {
-                let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-                // get position of next beat on same system
-                if (nextBeat) {
-                    // if we are moving within the same bar or to the next bar
-                    // transition to the next beat, otherwise transition to the end of the bar.
-                    let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                    if (
-                        nextBeatBoundings &&
-                        nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
-                    ) {
-                        nextBeatX = nextBeatBoundings.onNotesX;
-                    }
+            shouldScroll = !stop;
+            shouldNotifyBeatChange = true;
+        }
+
+        if (this.settings.player.enableAnimatedBeatCursor && beatCursor) {
+            let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+            // get position of next beat on same system
+            if (nextBeat && cursorMode == MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
+                // if we are moving within the same bar or to the next bar
+                // transition to the next beat, otherwise transition to the end of the bar.
+                let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+                if (
+                    nextBeatBoundings &&
+                    nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
+                ) {
+                    nextBeatX = nextBeatBoundings.onNotesX;
                 }
+            }
+
+            if (isPlayingUpdate) {
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
-                    if (beatCursor) {
-                        beatCursor.transitionToX(duration / this.playbackSpeed, nextBeatX);
-                    }
+                    beatCursor!.transitionToX(duration / this.playbackSpeed, nextBeatX);
                 });
             }
-
-            shouldScroll = !stop;
-            shouldNotifyBeatChange = true;
         }
 
         if (shouldScroll && !this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {

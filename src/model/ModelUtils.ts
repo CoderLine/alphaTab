@@ -389,7 +389,7 @@ export class ModelUtils {
     public static buildMultiBarRestInfo(
         tracks: Track[] | null,
         startIndex: number,
-        endIndex: number
+        endIndexInclusive: number
     ): Map<number, number[]> | null {
         if (!tracks) {
             return null;
@@ -408,11 +408,11 @@ export class ModelUtils {
         const score = tracks[0].score;
 
         let currentIndex = startIndex;
-        while (currentIndex <= endIndex) {
+        while (currentIndex <= endIndexInclusive) {
             let currentGroupStartIndex = currentIndex;
             let currentGroup: number[] | null = null;
 
-            while (currentIndex <= endIndex) {
+            while (currentIndex <= endIndexInclusive) {
                 const masterBar = score.masterBars[currentIndex];
 
                 // check if masterbar breaks multibar rests, it must be fully empty with no annotations
