@@ -19,6 +19,7 @@ import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { LineBarRenderer } from './LineBarRenderer';
 import { GraceType } from '@src/model/GraceType';
 import { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
+import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -33,6 +34,12 @@ export class TabBarRenderer extends LineBarRenderer {
     public showRests: boolean = false;
     public showTiedNotes: boolean = false;
 
+    private _showMultiBarRest: boolean = false;
+
+    public override get showMultiBarRest(): boolean {
+        return this._showMultiBarRest;
+    }
+
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
 
@@ -40,6 +47,7 @@ export class TabBarRenderer extends LineBarRenderer {
             this.showTimeSignature = true;
             this.showRests = true;
             this.showTiedNotes = true;
+            this._showMultiBarRest = true;
         }
     }
 
@@ -51,7 +59,7 @@ export class TabBarRenderer extends LineBarRenderer {
         return this.bar.staff.tuning.length;
     }
 
-    public override get drawnLineCount(): number {  
+    public override get drawnLineCount(): number {
         return this.bar.staff.tuning.length;
     }
 
@@ -170,11 +178,17 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        for (const b of v.beats) {
-            let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = new TabBeatPreNotesGlyph();
-            container.onNotes = new TabBeatGlyph();
+        // multibar rest
+        if (this.additionalMultiRestBars) {
+            let container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
             this.addBeatGlyph(container);
+        } else {
+            for (const b of v.beats) {
+                let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+                container.preNotes = new TabBeatPreNotesGlyph();
+                container.onNotes = new TabBeatGlyph();
+                this.addBeatGlyph(container);
+            }
         }
     }
 

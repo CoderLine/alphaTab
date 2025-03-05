@@ -7,6 +7,7 @@ import { FingeringMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 import { NoteAccidentalMode } from './NoteAccidentalMode';
 import { MasterBar } from './MasterBar';
+import { Track } from './Track';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -383,5 +384,131 @@ export class ModelUtils {
             return max;
         }
         return value;
+    }
+
+    public static buildMultiBarRestInfo(
+        tracks: Track[] | null,
+        startIndex: number,
+        endIndex: number
+    ): Map<number, number[]> | null {
+        if (!tracks) {
+            return null;
+        }
+        const stylesheet = tracks[0].score.stylesheet;
+        const shouldDrawMultiBarRests: boolean =
+            tracks.length > 1
+                ? stylesheet.multiTrackMultiBarRest
+                : stylesheet.perTrackMultiBarRest?.has(tracks[0].index) === true;
+        if (!shouldDrawMultiBarRests) {
+            return null;
+        }
+
+        const lookup = new Map<number, number[]>();
+
+        const score = tracks[0].score;
+
+        let currentIndex = startIndex;
+        while (currentIndex <= endIndex) {
+            let currentGroupStartIndex = currentIndex;
+            let currentGroup: number[] | null = null;
+
+            while (currentIndex <= endIndex) {
+                const masterBar = score.masterBars[currentIndex];
+
+                // check if masterbar breaks multibar rests, it must be fully empty with no annotations
+                if (
+                    masterBar.alternateEndings ||
+                    (masterBar.isRepeatStart && masterBar.index !== currentGroupStartIndex) ||
+                    masterBar.isDoubleBar ||
+                    masterBar.isFreeTime ||
+                    masterBar.isAnacrusis ||
+                    masterBar.section !== null ||
+                    masterBar.tempoAutomations.length > 0 ||
+                    (masterBar.fermata !== null && masterBar.fermata.size > 0) ||
+                    (masterBar.directions !== null && masterBar.directions.size > 0)
+                ) {
+                    break;
+                }
+
+                // check if masterbar breaks multibar rests because of change to previous
+                if (
+                    currentGroupStartIndex > startIndex &&
+                    masterBar.previousMasterBar &&
+                    (masterBar.timeSignatureCommon !== masterBar.previousMasterBar!.timeSignatureCommon ||
+                        masterBar.timeSignatureNumerator !== masterBar.previousMasterBar!.timeSignatureNumerator ||
+                        masterBar.timeSignatureDenominator !== masterBar.previousMasterBar!.timeSignatureDenominator ||
+                        masterBar.tripletFeel !== masterBar.previousMasterBar!.tripletFeel ||
+                        masterBar.keySignature !== masterBar.previousMasterBar!.keySignature ||
+                        masterBar.keySignatureType !== masterBar.previousMasterBar!.keySignatureType)
+                ) {
+                    break;
+                }
+
+
+                // masterbar is good, now check bars across staves
+                let areAllBarsSuitable = true;
+                for (const t of tracks) {
+                    for (const s of t.staves) {
+                        const bar = s.bars[masterBar.index];
+
+                        if (!bar.isRestOnly) {
+                            areAllBarsSuitable = false;
+                            break;
+                        }
+                    }
+
+                    if(!areAllBarsSuitable) {
+                        break;
+                    }
+                }
+
+                if (!areAllBarsSuitable) {
+                    break;
+                }
+
+
+                // skip initial bar as it is not "additional" but we are checking it
+                currentIndex++;
+                if (masterBar.index > currentGroupStartIndex) {
+                    if (currentGroup === null) {
+                        currentGroup = [masterBar.index];
+                    } else {
+                        currentGroup.push(masterBar.index);
+                    }
+                }
+
+                // special scenario -> repeat ends are included but then we stop
+                if (masterBar.isRepeatEnd) {
+                    break;
+                }
+            }
+
+            if (currentGroup) {
+                lookup.set(currentGroupStartIndex, currentGroup);
+            } else {
+                currentIndex++;
+            }
+        }
+
+        return lookup;
+    }
+
+    public static computeFirstDisplayedBarIndex(score: Score, settings: Settings) {
+        let startIndex: number = settings.display.startBar;
+        startIndex--; // map to array index
+
+        startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
+        return startIndex;
+    }
+
+    public static computeLastDisplayedBarIndex(score: Score, settings: Settings, startIndex: number) {
+        let endBarIndex: number = settings.display.barCount;
+        if (endBarIndex < 0) {
+            endBarIndex = score.masterBars.length;
+        }
+        endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+
+        endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
+        return endBarIndex;
     }
 }

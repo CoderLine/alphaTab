@@ -9,6 +9,7 @@ import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves
@@ -104,11 +105,7 @@ export class EffectBarRenderer extends BarRendererBase {
                 }
             }
         }
-        for (let voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(voice);
-            }
-        }
+        super.createBeatGlyphs();
         for (let effectBand of this._bands) {
             if (effectBand.isLinkedToPrevious) {
                 this.isLinkedToPrevious = true;

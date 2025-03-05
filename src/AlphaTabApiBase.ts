@@ -67,6 +67,8 @@ export class AlphaTabApiBase<TSettings> {
     private _trackIndexes: number[] | null = null;
     private _trackIndexLookup: Set<number> | null = null;
     private _isDestroyed: boolean = false;
+    private _score: Score | null = null;
+    private _tracks: Track[] = [];
     /**
      * Gets the UI facade to use for interacting with the user interface.
      */
@@ -85,7 +87,9 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * Gets the score holding all information about the song being rendered.
      */
-    public score: Score | null = null;
+    public get score(): Score | null {
+        return this._score;
+    }
 
     /**
      * Gets the settings that are used for rendering the music notation.
@@ -95,7 +99,9 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * Gets a list of the tracks that are currently rendered;
      */
-    public tracks: Track[] = [];
+    public get tracks(): Track[] {
+        return this._tracks;
+    }
 
     /**
      * Gets the UI container that will hold all rendered results.
@@ -287,8 +293,9 @@ export class AlphaTabApiBase<TSettings> {
     private internalRenderTracks(score: Score, tracks: Track[]): void {
         ModelUtils.applyPitchOffsets(this.settings, score);
         if (score !== this.score) {
-            this.score = score;
-            this.tracks = tracks;
+            this._score = score;
+            this._tracks = tracks;
+            this._tickCache = null;
             this._trackIndexes = [];
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
@@ -298,12 +305,20 @@ export class AlphaTabApiBase<TSettings> {
             this.loadMidiForScore();
             this.render();
         } else {
-            this.tracks = tracks;
+            this._tracks = tracks;
+
+            const startIndex = ModelUtils.computeFirstDisplayedBarIndex(this.score!, this.settings);
+            const endIndex = ModelUtils.computeLastDisplayedBarIndex(this.score, this.settings, startIndex);
+            if (this._tickCache) {
+                this._tickCache.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(this.tracks, startIndex, endIndex);
+            }
+
             this._trackIndexes = [];
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
+
             this.render();
         }
     }
@@ -620,6 +635,10 @@ export class AlphaTabApiBase<TSettings> {
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
         let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
 
+        const startIndex = ModelUtils.computeFirstDisplayedBarIndex(this.score!, this.settings);
+        const endIndex = ModelUtils.computeLastDisplayedBarIndex(this.score, this.settings, startIndex);
+        generator.tickLookup.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(this.tracks, startIndex, endIndex);
+
         // we pass the transposition pitches separately to alphaSynth.
         generator.applyTranspositionPitches = false;
 
@@ -901,7 +920,8 @@ export class AlphaTabApiBase<TSettings> {
             !forceUpdate &&
             beat === previousBeat?.beat &&
             cache === previousCache &&
-            previousState === this._playerState
+            previousState === this._playerState &&
+            previousBeat?.start === lookupResult.start
         ) {
             return;
         }

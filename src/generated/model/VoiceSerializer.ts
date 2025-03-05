@@ -21,7 +21,6 @@ export class VoiceSerializer {
         const o = new Map<string, unknown>();
         o.set("id", obj.id);
         o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i)));
-        o.set("isempty", obj.isEmpty);
         return o;
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
@@ -36,9 +35,6 @@ export class VoiceSerializer {
                     BeatSerializer.fromJson(i, o);
                     obj.addBeat(i);
                 }
-                return true;
-            case "isempty":
-                obj.isEmpty = v! as boolean;
                 return true;
         }
         return false;

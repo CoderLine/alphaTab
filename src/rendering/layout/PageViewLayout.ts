@@ -293,6 +293,7 @@ export class PageViewLayout extends ScoreLayout {
         let startIndex: number = this.firstBarIndex;
         let currentBarIndex: number = startIndex;
         let endBarIndex: number = this.lastBarIndex;
+
         this._systems = [];
         while (currentBarIndex <= endBarIndex) {
             // create system and align set proper coordinates
@@ -385,13 +386,22 @@ export class PageViewLayout extends ScoreLayout {
             if (this._barsFromPreviousSystem.length > 0) {
                 for (let renderer of this._barsFromPreviousSystem) {
                     system.addMasterBarRenderers(this.renderer.tracks!, renderer);
-                    barIndex = renderer.masterBar.index;
+                    barIndex = renderer.lastMasterBarIndex;
                 }
             } else {
-                let renderers: MasterBarsRenderers | null = system.addBars(this.renderer.tracks!, barIndex);
-                if (renderers) {
-                    this._allMasterBarRenderers.push(renderers);
-                }
+                const multiBarRestInfo = this.multiBarRestInfo;
+                const additionalMultiBarsRestBarIndices: number[] | null =
+                    multiBarRestInfo !== null && multiBarRestInfo.has(barIndex)
+                        ? multiBarRestInfo.get(barIndex)!
+                        : null;
+
+                let renderers: MasterBarsRenderers | null = system.addBars(
+                    this.renderer.tracks!,
+                    barIndex,
+                    additionalMultiBarsRestBarIndices
+                );
+                this._allMasterBarRenderers.push(renderers);
+                barIndex = renderers.lastMasterBarIndex;
             }
             this._barsFromPreviousSystem = [];
             let systemIsFull: boolean = false;
@@ -425,6 +435,6 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private get maxWidth(): number {
-        return (this.scaledWidth - this._pagePadding![0] - this._pagePadding![2]) 
+        return this.scaledWidth - this._pagePadding![0] - this._pagePadding![2];
     }
 }

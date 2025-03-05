@@ -44,6 +44,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         this.accidentalHelper = new AccidentalHelper(this);
     }
 
+    public override get showMultiBarRest(): boolean {
+        return true;
+    }
+
     public override get lineSpacing(): number {
         return BarRendererBase.RawLineSpacing;
     }

@@ -137,9 +137,6 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        if (this.beat.voice.isEmpty) {
-            return;
-        }
         // var c = canvas.color;
         // var ta = canvas.textAlign;
         // canvas.color = new Color(255, 0, 0);

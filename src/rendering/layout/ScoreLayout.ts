@@ -18,6 +18,7 @@ import { Logger } from '@src/Logger';
 import { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationSettings, NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 class LazyPartial {
     public args: RenderFinishedEventArgs;
@@ -60,6 +61,8 @@ export abstract class ScoreLayout {
     public width: number = 0;
     public height: number = 0;
 
+    public multiBarRestInfo: Map<number, number[]> | null = null;
+
     public get scaledWidth() {
         return this.width / this.renderer.settings.display.scale;
     }
@@ -87,19 +90,14 @@ export abstract class ScoreLayout {
         this._lazyPartials.clear();
 
         let score: Score = this.renderer.score!;
-        let startIndex: number = this.renderer.settings.display.startBar;
-        startIndex--; // map to array index
 
-        startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
-        this.firstBarIndex = startIndex;
-        let endBarIndex: number = this.renderer.settings.display.barCount;
-        if (endBarIndex < 0) {
-            endBarIndex = score.masterBars.length;
-        }
-        endBarIndex = startIndex + endBarIndex - 1; // map count to array index
-
-        endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
-        this.lastBarIndex = endBarIndex;
+        this.firstBarIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.renderer.settings);
+        this.lastBarIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.renderer.settings, this.firstBarIndex);
+        this.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(
+            this.renderer.tracks,
+            this.firstBarIndex,
+            this.lastBarIndex
+        );
         this.createScoreInfoGlyphs();
         this.doLayoutAndRender();
     }
@@ -300,12 +298,22 @@ export abstract class ScoreLayout {
             this._barRendererLookup.set(key, new Map<number, BarRendererBase>());
         }
         this._barRendererLookup.get(key)!.set(renderer.bar.id, renderer);
+        if (renderer.additionalMultiRestBars) {
+            for (const b of renderer.additionalMultiRestBars) {
+                this._barRendererLookup.get(key)!.set(b.id, renderer);
+            }
+        }
     }
 
     public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
         if (this._barRendererLookup.has(key)) {
             let lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
             lookup.delete(renderer.bar.id);
+            if (renderer.additionalMultiRestBars) {
+                for (const b of renderer.additionalMultiRestBars) {
+                    lookup.delete(b.id);
+                }
+            }
         }
     }
 

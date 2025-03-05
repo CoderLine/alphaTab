@@ -524,9 +524,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected override createPostBeatGlyphs(): void {
         super.createPostBeatGlyphs();
-        if (this.bar.masterBar.isRepeatEnd) {
+        const lastBar = this.lastBar;
+        if (lastBar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
-            if (this.bar.masterBar.repeatCount > 2) {
+            if (lastBar.masterBar.repeatCount > 2) {
                 this.addPostBeatGlyph(
                     new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
                 );
