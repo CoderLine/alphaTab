@@ -2,10 +2,19 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
-import { AlphaSynthMidiFileHandler, MasterBarTickLookup, MidiFile, MidiFileGenerator, MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi';
+import {
+    AlphaSynthMidiFileHandler,
+    MasterBarTickLookup,
+    MidiFile,
+    MidiFileGenerator,
+    MidiTickLookup,
+    MidiTickLookupFindBeatResult
+} from '@src/midi';
 import { MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
+import { MidiTickLookupFindBeatResultCursorMode } from '@src/midi/MidiTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat, Duration, MasterBar, Note, Score } from '@src/model';
+import { ModelUtils } from '@src/model/ModelUtils';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
@@ -37,7 +46,7 @@ describe('MidiTickLookupTest', () => {
         expect(masterBarLookup.firstBeat!.end).to.equal(MidiUtils.QuarterTime);
         expect(masterBarLookup.firstBeat!.highlightedBeats.length).to.equal(1);
         expect(masterBarLookup.firstBeat!.highlightedBeats[0].beat).to.equal(nb);
-    })
+    });
 
     function prepareVariantTest(): MidiTickLookup {
         const lookup = new MidiTickLookup();
@@ -86,7 +95,7 @@ describe('MidiTickLookupTest', () => {
         expect(l1).to.equal(masterBar.firstBeat!);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2.nextBeat).to.equal(n1);
-    })
+    });
 
     it('variant-c', () => {
         const lookup = prepareVariantTest();
@@ -108,8 +117,7 @@ describe('MidiTickLookupTest', () => {
         expect(l1.nextBeat).to.equal(l2);
         expect(l2.nextBeat).to.equal(n1);
         expect(n1).to.equal(masterBar.lastBeat!);
-    })
-
+    });
 
     it('variant-d', () => {
         const lookup = prepareVariantTest();
@@ -131,7 +139,7 @@ describe('MidiTickLookupTest', () => {
         expect(n1.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-e', () => {
         const lookup = prepareVariantTest();
@@ -153,7 +161,7 @@ describe('MidiTickLookupTest', () => {
         expect(n1.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-f', () => {
         const lookup = prepareVariantTest();
@@ -187,7 +195,7 @@ describe('MidiTickLookupTest', () => {
         expect(n2.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-g', () => {
         const lookup = prepareVariantTest();
@@ -214,7 +222,7 @@ describe('MidiTickLookupTest', () => {
         expect(n1.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-h-variant-m', () => {
         const lookup = prepareVariantTest();
@@ -253,7 +261,7 @@ describe('MidiTickLookupTest', () => {
         expect(l1.nextBeat).to.equal(n2);
         expect(n2.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-i', () => {
         const lookup = prepareVariantTest();
@@ -284,8 +292,7 @@ describe('MidiTickLookupTest', () => {
         expect(n1.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
-
+    });
 
     it('variant-j', () => {
         const lookup = prepareVariantTest();
@@ -323,7 +330,7 @@ describe('MidiTickLookupTest', () => {
         expect(n2.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-k-variant-m', () => {
         const lookup = prepareVariantTest();
@@ -361,7 +368,7 @@ describe('MidiTickLookupTest', () => {
         expect(n2.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-l', () => {
         const lookup = prepareVariantTest();
@@ -378,7 +385,7 @@ describe('MidiTickLookupTest', () => {
         expect(l1).to.equal(masterBar.firstBeat!);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-m', () => {
         const lookup = prepareVariantTest();
@@ -409,7 +416,7 @@ describe('MidiTickLookupTest', () => {
         expect(n1.nextBeat).to.equal(l1);
         expect(l1.nextBeat).to.equal(l2);
         expect(l2).to.equal(masterBar.lastBeat!);
-    })
+    });
 
     it('variant-h-variant-n-variant-b', () => {
         const lookup = prepareVariantTest();
@@ -448,9 +455,7 @@ describe('MidiTickLookupTest', () => {
         expect(l1.nextBeat).to.equal(l2);
         expect(l2.nextBeat).to.equal(n2);
         expect(n2).to.equal(masterBar.lastBeat!);
-    })
-
-
+    });
 
     function beatWithFret(fret: number) {
         const b = new Beat();
@@ -459,8 +464,8 @@ describe('MidiTickLookupTest', () => {
         return b;
     }
 
-    function fretOfBeat(beat: Beat | null) {
-        return beat && beat.notes.length > 0 ? beat.notes[0].fret : -1;
+    function idOfBeat(beat: Beat | null) {
+        return beat ? beat.id : -1;
     }
 
     function prepareGraceMultiVoice(graceNoteOverlap: number, graceNoteDuration: number): MidiTickLookup {
@@ -497,7 +502,7 @@ describe('MidiTickLookupTest', () => {
         // grace note
         lookup.addBeat(beatWithFret(3), -graceNoteOverlap, graceNoteDuration);
         // normal note
-        const onNoteSteal = (-graceNoteOverlap) + graceNoteDuration;
+        const onNoteSteal = -graceNoteOverlap + graceNoteDuration;
         lookup.addBeat(beatWithFret(4), onNoteSteal, MidiUtils.QuarterTime - onNoteSteal);
 
         return lookup;
@@ -510,19 +515,19 @@ describe('MidiTickLookupTest', () => {
         // validate first bar
         let current = lookup.masterBars[0].firstBeat!;
 
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("0,2");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('0,2');
         expect(current.start).to.equal(0);
         expect(current.duration).to.equal(1920);
 
         current = current.nextBeat!;
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("1,2");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('1,2');
         expect(current.start).to.equal(1920);
         // quarter note ends earlier due to grace note
         expect(current.duration).to.equal(840);
 
         current = current.nextBeat!;
         // on last slice we have the grace note but not the quarter note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("2,3");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('2,3');
         expect(current.start).to.equal(2760);
         expect(current.duration).to.equal(120);
 
@@ -531,10 +536,10 @@ describe('MidiTickLookupTest', () => {
         current = lookup.masterBars[1].firstBeat!;
 
         // no grace note, normal quarter note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("4");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('4');
         expect(current.start).to.equal(0);
         expect(current.duration).to.equal(960);
-    })
+    });
 
     it('grace-multivoice-with-overlap', () => {
         const lookup = prepareGraceMultiVoice(120, 240);
@@ -543,19 +548,19 @@ describe('MidiTickLookupTest', () => {
         // validate first bar
         let current = lookup.masterBars[0].firstBeat!;
 
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("0,2");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('0,2');
         expect(current.start).to.equal(0);
         expect(current.duration).to.equal(1920);
 
         current = current.nextBeat!;
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("1,2");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('1,2');
         expect(current.start).to.equal(1920);
         // quarter note ends earlier due to grace note
         expect(current.duration).to.equal(840);
 
         current = current.nextBeat!;
         // on last slice we have the grace note but not the quarter note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("2,3");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('2,3');
         expect(current.start).to.equal(2760);
         expect(current.duration).to.equal(120);
 
@@ -564,17 +569,16 @@ describe('MidiTickLookupTest', () => {
         current = lookup.masterBars[1].firstBeat!;
 
         // half the grace note
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("3");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('3');
         expect(current.start).to.equal(0);
         expect(current.duration).to.equal(120);
 
         // no grace note, normal quarter note
         current = current.nextBeat!;
-        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("4");
+        expect(current.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('4');
         expect(current.start).to.equal(120);
         expect(current.duration).to.equal(840);
-    })
-
+    });
 
     it('cursor-snapping', async () => {
         const buffer = await TestPlatform.loadFile('test-data/audio/cursor-snapping.gp');
@@ -584,7 +588,7 @@ describe('MidiTickLookupTest', () => {
 
         const tracks = new Set<number>([0]);
 
-        // initial lookup should detect correctly first rest on first voice 
+        // initial lookup should detect correctly first rest on first voice
         // with the quarter rest on the second voice as next beat
         const firstBeat = lookup.findBeat(tracks, 0, null);
 
@@ -593,7 +597,7 @@ describe('MidiTickLookupTest', () => {
         expect(firstBeat!.beat.duration).to.equal(Duration.Whole);
         expect(firstBeat!.nextBeat!.beat.duration).to.equal(Duration.Quarter);
 
-        // Duration must only go to the next rest on the second voice despite the whole note 
+        // Duration must only go to the next rest on the second voice despite the whole note
         expect(firstBeat!.duration).to.equal(750);
         expect(firstBeat!.beatLookup.duration).to.equal(960);
 
@@ -616,7 +620,6 @@ describe('MidiTickLookupTest', () => {
         expect(secondBeat!.beatLookup.duration).to.equal(960);
     });
 
-    
     it('before-beat-grace-later-bars', () => {
         const settings = new Settings();
         const importer = new AlphaTexImporter();
@@ -624,89 +627,110 @@ describe('MidiTickLookupTest', () => {
         const score = importer.readScore();
         const lookup = buildLookup(score, settings);
 
-        // bar 2 contains the grace notes which stole duration from fret 3 beat. 
+        // bar 2 contains the grace notes which stole duration from fret 3 beat.
         const bar2 = lookup.masterBars[1];
-        
+
         let current = bar2.firstBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("2");
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('2');
         expect(current!.start).to.equal(0);
         expect(current!.duration).to.equal(960);
 
         current = current!.nextBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("3");
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('3');
         expect(current!.start).to.equal(960);
-        expect(current!.duration).to.equal(840); // 120 ticks stolen by grace beats 
-        
+        expect(current!.duration).to.equal(840); // 120 ticks stolen by grace beats
+
         current = current!.nextBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("4");
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('4');
         expect(current!.start).to.equal(960 + 840);
         expect(current!.duration).to.equal(60);
 
         current = current!.nextBeat;
-        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal("5");
+        expect(current!.highlightedBeats.map(b => b.beat.notes[0].fret).join(',')).to.equal('5');
         expect(current!.start).to.equal(960 + 840 + 60);
         expect(current!.duration).to.equal(60);
     });
-
 
     function lookupTest(
         tex: string,
         ticks: number[],
         trackIndexes: number[],
         durations: number[],
-        currentBeatFrets: number[],
-        nextBeatFrets: number[],
+        currentBeatIds: number[],
+        nextBeatIds: number[],
+        expectedCursorModes: MidiTickLookupFindBeatResultCursorMode[] | null = null,
         skipClean: boolean = false
     ) {
         const buffer = ByteBuffer.fromString(tex);
         const settings = new Settings();
+        Beat.resetIds();
         const score = ScoreLoader.loadScoreFromBytes(buffer.getBuffer(), settings);
         const lookup = buildLookup(score, settings);
 
         const tracks = new Set<number>(trackIndexes);
 
+        if (
+            (trackIndexes.length === 1 &&
+                score.stylesheet.perTrackMultiBarRest &&
+                score.stylesheet.perTrackMultiBarRest!.has(trackIndexes[0])) ||
+            score.stylesheet.multiTrackMultiBarRest
+        ) {
+            lookup.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(
+                score.tracks.filter(t => tracks.has(t.index)),
+                0,
+                score.masterBars.length - 1
+            );
+        }
+
         let currentLookup: MidiTickLookupFindBeatResult | null = null;
 
-        const actualIncrementalFrets: number[] = [];
-        const actualIncrementalNextFrets: number[] = [];
+        const actualIncrementalIds: number[] = [];
+        const actualIncrementalNextIds: number[] = [];
         const actualIncrementalTickDurations: number[] = [];
 
-        const actualCleanFrets: number[] = [];
-        const actualCleanNextFrets: number[] = [];
+        const actualCleanIds: number[] = [];
+        const actualCleanNextIds: number[] = [];
         const actualCleanTickDurations: number[] = [];
+        const actualCursorModes: MidiTickLookupFindBeatResultCursorMode[] = [];
 
         for (let i = 0; i < ticks.length; i++) {
             currentLookup = lookup.findBeat(tracks, ticks[i], currentLookup);
 
-            Logger.debug("Test", `Checking index ${i} with tick ${ticks[i]}`)
+            Logger.info('Test', `Checking index ${i} with tick ${ticks[i]}`);
             expect(currentLookup).to.be.ok;
-            actualIncrementalFrets.push(fretOfBeat(currentLookup!.beat));
-            actualIncrementalNextFrets.push(fretOfBeat(currentLookup!.nextBeat?.beat ?? null))
-            actualIncrementalTickDurations.push(currentLookup!.tickDuration)
+            actualIncrementalIds.push(idOfBeat(currentLookup!.beat));
+            actualIncrementalNextIds.push(idOfBeat(currentLookup!.nextBeat?.beat ?? null));
+            actualIncrementalTickDurations.push(currentLookup!.tickDuration);
+            actualCursorModes.push(currentLookup!.cursorMode);
 
             if (!skipClean) {
                 const cleanLookup = lookup.findBeat(tracks, ticks[i], null);
 
-                actualCleanFrets.push(fretOfBeat(cleanLookup!.beat));
-                actualCleanNextFrets.push(fretOfBeat(cleanLookup!.nextBeat?.beat ?? null))
-                actualCleanTickDurations.push(cleanLookup!.tickDuration)
+                actualCleanIds.push(idOfBeat(cleanLookup?.beat ?? null));
+                actualCleanNextIds.push(idOfBeat(cleanLookup?.nextBeat?.beat ?? null));
+                actualCleanTickDurations.push(cleanLookup?.tickDuration ?? -1);
             }
         }
 
-        expect(actualIncrementalFrets.join(',')).to.equal(currentBeatFrets.join(','));
-        expect(actualIncrementalNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
-        expect(actualIncrementalTickDurations.join(',')).to.equal(durations.join(','));
+        expect(actualIncrementalIds.join(',')).to.equal(currentBeatIds.join(','), 'currentBeatIds mismatch');
+        expect(actualIncrementalNextIds.join(',')).to.equal(nextBeatIds.join(','), 'nextBeatIds mismatch');
+        expect(actualIncrementalTickDurations.join(',')).to.equal(durations.join(','), 'durations mismatch');
+        if (expectedCursorModes) {
+            expect(expectedCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(',')).to.equal(
+                actualCursorModes.map(m => MidiTickLookupFindBeatResultCursorMode[m]).join(','),
+                'cursorModes mismatch'
+            );
+        }
 
         if (!skipClean) {
-            expect(actualCleanFrets.join(',')).to.equal(currentBeatFrets.join(','));
-            expect(actualCleanNextFrets.join(',')).to.equal(nextBeatFrets.join(','));
-            expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','));
+            expect(actualCleanIds.join(',')).to.equal(currentBeatIds.join(','), 'cleanIds mismatch');
+            expect(actualCleanNextIds.join(',')).to.equal(nextBeatIds.join(','), 'cleanNextIds mismatch');
+            expect(actualCleanTickDurations.join(',')).to.equal(durations.join(','), 'cleanTickDurations mismatch');
         }
     }
 
-
-
-    function nextBeatSearchTest(trackIndexes: number[],
+    function nextBeatSearchTest(
+        trackIndexes: number[],
         durations: number[],
         currentBeatFrets: number[],
         nextBeatFrets: number[]
@@ -720,100 +744,54 @@ describe('MidiTickLookupTest', () => {
             \\track "T02"
             3.1.16 4.1.16 5.1.8 | 8.1.16 9.1.16 10.1.8
         `,
-            [
-                0, 120, 240, 360, 480, 600, 720, 840, 960,
-                1080, 1200, 1320, 1440, 1560, 1680, 1800
-            ],
+            [0, 120, 240, 360, 480, 600, 720, 840, 960, 1080, 1200, 1320, 1440, 1560, 1680, 1800],
             trackIndexes,
             durations,
             currentBeatFrets,
             nextBeatFrets
-        )
+        );
     }
-
 
     it('next-beat-search-multi-track', () => {
         nextBeatSearchTest(
             [0, 1],
-            [
-                240, 240, 240, 240, 480, 480, 480, 480,
-                240, 240, 240, 240, 480, 480, 480, 480
-            ],
-            [
-                1, 1, 4, 4, 2, 2, 2, 2,
-                6, 6, 9, 9, 7, 7, 7, 7
-            ],
-            [
-                4, 4, 2, 2, 6, 6, 6, 6,
-                9, 9, 7, 7, -1, -1, -1, -1
-            ]
-        )
+            [240, 240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 480, 480, 480, 480],
+            [0, 0, 5, 5, 1, 1, 1, 1, 2, 2, 8, 8, 3, 3, 3, 3],
+            [5, 5, 1, 1, 2, 2, 2, 2, 8, 8, 3, 3, -1, -1, -1, -1]
+        );
     });
 
     it('next-beat-search-track-1', () => {
         nextBeatSearchTest(
             [0],
-            [
-                480, 480, 480, 480, 480, 480, 480, 480,
-                480, 480, 480, 480, 480, 480, 480, 480
-            ],
-            [
-                1, 1, 1, 1, 2, 2, 2, 2,
-                6, 6, 6, 6, 7, 7, 7, 7
-            ],
-            [
-                2, 2, 2, 2, 6, 6, 6, 6,
-                7, 7, 7, 7, -1, -1, -1, -1
-            ]
-        )
+            [480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480, 480],
+            [0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3],
+            [1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, -1, -1, -1, -1]
+        );
     });
 
     it('lookup-triplet-feel-reference', () => {
         lookupTest(
             `\\ts 2 4
             1.1.4{tu 3} 2.1.8{tu 3} 3.1.4{tu 3} 4.1.8{tu 3} | 5.1.4{tu 3} 6.1.8{tu 3} 7.1.4{tu 3} 8.1.8{tu 3}`,
-            [
-                0, 640, 960, 1600,
-                1920, 2560, 2880, 3520
-            ],
+            [0, 640, 960, 1600, 1920, 2560, 2880, 3520],
             [0],
-            [
-                640, 320, 640, 320,
-                640, 320, 640, 320
-            ],
-            [
-                1, 2, 3, 4,
-                5, 6, 7, 8
-            ],
-            [
-                2, 3, 4, 5,
-                6, 7, 8, -1
-            ]
-        )
+            [640, 320, 640, 320, 640, 320, 640, 320],
+            [0, 1, 2, 3, 4, 5, 6, 7],
+            [1, 2, 3, 4, 5, 6, 7, -1]
+        );
     });
 
     it('lookup-triplet-feel-test', () => {
         lookupTest(
             `\\tf triplet-8th \\ts 2 4
             1.1.8 2.1.8 3.1.8 4.1.8 | 5.1.8 6.1.8 7.1.8 8.1.8`,
-            [
-                0, 640, 960, 1600,
-                1920, 2560, 2880, 3520
-            ],
+            [0, 640, 960, 1600, 1920, 2560, 2880, 3520],
             [0],
-            [
-                640, 320, 640, 320,
-                640, 320, 640, 320
-            ],
-            [
-                1, 2, 3, 4,
-                5, 6, 7, 8
-            ],
-            [
-                2, 3, 4, 5,
-                6, 7, 8, -1
-            ]
-        )
+            [640, 320, 640, 320, 640, 320, 640, 320],
+            [0, 1, 2, 3, 4, 5, 6, 7],
+            [1, 2, 3, 4, 5, 6, 7, -1]
+        );
     });
 
     it('incomplete', () => {
@@ -833,33 +811,29 @@ describe('MidiTickLookupTest', () => {
                 5760, 6240, 6720, 7200
             ],
             [0],
-            [
-                960, 960, 2880, 2880,
-                2880, 2880, 2880, 2880,
-                960, 960, 2880, 2880,
-                2880, 2880, 2880, 2880
-            ],
+            [960, 960, 2880, 2880, 2880, 2880, 2880, 2880, 960, 960, 2880, 2880, 2880, 2880, 2880, 2880],
             [
                 // first bar, real playback
-                1, 1, 2, 2,
+                0, 0, 1, 1,
                 // gap
-                2, 2, 2, 2,
+                1, 1, 1, 1,
                 // second bar, real playback
-                3, 3, 4, 4,
+                2, 2, 3, 3,
                 // second gap
-                4, 4, 4, 4
+                3, 3, 3, 3
             ],
             [
-                2, 2, -1, -1,
+                1, 1, 2, 2,
 
-                -1, -1, -1, -1,
+                2, 2, 2, 2,
 
-                4, 4, -1, -1,
+                3, 3, -1, -1,
 
                 -1, -1, -1, -1
             ],
+            null,
             true
-        )
+        );
     });
 
     it('empty-bar', () => {
@@ -875,20 +849,266 @@ describe('MidiTickLookupTest', () => {
                 1920, 2400, 2880, 3360
             ],
             [0],
-            [
-                1920, 1920, 1920, 1920,
-                1920, 1920, 1920, 1920
-            ],
+            [1920, 1920, 1920, 1920, 1920, 1920, 1920, 1920],
             [
                 // first bar (empty)
-                -1, -1, -1, -1,
+                0, 0, 0, 0,
                 // second bar, real playback
                 1, 1, 1, 1
             ],
+            [1, 1, 1, 1, -1, -1, -1, -1]
+        );
+    });
+
+    it('multibar-rest-single-rest', () => {
+        lookupTest(
+            `
+            \\track { multiBarRest }
+            \\ts 2 4
+            1.1.4 2.1.4 | 
+            r | r | r | r | 
+            3.1.4 | 
+            r | r | r |
+            \\ro r | r | r | \\rc 2 r |
+            r
+            `,
+            // prettier-ignore
             [
-                1, 1, 1, 1,
+                // 1st bar (two quarters)
+                0, 480, 960, 1440,
+                // 2nd bar (multirest start)
+                1920, 2400, 2880, 3360,
+                // 3rd bar (multirest with 2nd bar)
+                3840, 4320, 4800, 5280,
+                // 4th bar (multirest with 2nd bar)
+                5760, 6240, 6720, 7200,
+                // 5th bar (multirest with 2nd bar)
+                7680, 8160, 8640, 9120,
+                // 6th bar 
+                9600, 10080, 10560, 11040,
+                // 7th bar (multirest start)
+                11520, 12000, 12480, 12960,
+                // 8th bar (multirest with 7th bar)
+                13440, 13920, 14400, 14880,
+                // 9th bar (multirest with 7th bar)
+                15360, 15840, 16320, 16800,
+
+                // 10th bar (multirest start - repeat open)
+                17280, 17760, 18240, 18720,
+                // 11th bar (multirest with 10th bar)
+                19200, 19680, 20160, 20640,
+                // 12th bar (multirest with 10th bar)
+                21120, 21600, 22080, 22560,
+                // 13th bar (multirest with 10th bar -  repeat close)
+                23040, 23520, 24000, 24480,
+
+                // 10th bar repated (multirest start - repeat open)
+                24960, 25440, 25920, 26400,
+                // 11th bar repated (multirest with 10th bar)
+                26880, 27360, 27840, 28320,
+                // 12th bar repated (multirest with 10th bar)
+                28800, 29280, 29760, 30240,
+                // 13th bar repated (multirest with 10th bar -  repeat close)
+                30720, 31200, 31680, 32160,
+                
+                // 14th bar 
+                32640, 33120, 33600, 34080
+            ],
+            [0],
+            // prettier-ignore
+            [
+                // 1st bar
+                960, 960, 960, 960,
+                // 2nd bar - 5th bar (4 bars 2/4)
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                // 6th bar
+                960 * 2, 960 * 2, 960 * 2, 960 * 2,
+                // 7th bar - 9th bar
+                960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3,
+                960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3,
+                960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3,
+                // 10th - 13th bar
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                // 10th - 13th bar (repeated)
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                // 14th bar
+                960 * 2, 960 * 2, 960 * 2, 960 * 2
+            ],
+            // prettier-ignore
+            [
+                // first bar (empty)
+                0, 0, 1, 1,
+                // 2nd bar - 5th bar (4 bars 2/4)
+                2, 2, 2, 2,
+                2, 2, 2, 2,
+                2, 2, 2, 2,
+                2, 2, 2, 2,
+                // 6th bar
+                6, 6, 6, 6,
+                // 7th bar - 9th bar
+                7, 7, 7, 7,
+                7, 7, 7, 7,
+                7, 7, 7, 7,
+                // 10th-13th bar
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                // 10th-13th bar (repeated)
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                // 14th bar
+                14, 14, 14, 14
+            ],
+            // prettier-ignore
+            [
+                // first bar (empty)
+                1, 1, 2, 2,
+                // 2nd bar - 5th bar (4 bars 2/4)
+                6, 6, 6, 6,
+                6, 6, 6, 6,
+                6, 6, 6, 6,
+                6, 6, 6, 6,
+                // 6th bar
+                7, 7, 7, 7,
+                // 7th bar - 9th bar
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10,
+                // 10th-13th bar 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                10, 10, 10, 10, 
+                // 10th-13th bar (repeated)
+                14, 14, 14, 14, 
+                14, 14, 14, 14, 
+                14, 14, 14, 14, 
+                14, 14, 14, 14, 
+                // 14th bar
                 -1, -1, -1, -1
-            ]
-        )
+            ],
+            undefined,
+            true
+        );
+    });
+
+    it('multibar-rest-repeat', () => {
+        lookupTest(
+            `
+            \\track { multiBarRest }
+            \\ts 2 4
+            \\ro r | r | \\rc 2 r |
+            r
+            `,
+            // prettier-ignore
+            [
+                // 1st bar
+                0, 960, 
+                // 2nd bar                    
+                1920, 2880,
+                // 3rd bar
+                3840, 4800,
+                // 1st bar (repated)
+                5760, 6720,
+                // 2nd bar (repeated)
+                7680, 8640,
+                // 3rd bar (repeated)
+                9600, 10560,
+                // 4th bar
+                11520, 12480
+            ],
+            [0],
+            // prettier-ignore
+            [
+                // 1st bar
+                5760, 5760, 
+                // 2nd bar                    
+                5760, 5760,
+                // 3rd bar
+                5760, 5760,
+                // 1st bar (repated)
+                5760, 5760,
+                // 2nd bar (repeated)
+                5760, 5760,
+                // 3rd bar (repeated)
+                5760, 5760,
+                // 4th bar
+                1920, 1920
+            ],
+            // prettier-ignore
+            [
+                 // 1st bar
+                 0, 0, 
+                 // 2nd bar                    
+                 0, 0,
+                 // 3rd bar
+                 0, 0,
+                 // 1st bar (repated)
+                 0, 0,
+                 // 2nd bar (repeated)
+                 0, 0,
+                 // 3rd bar (repeated)
+                 0, 0,
+                 // 4th bar
+                 3, 3
+            ],
+            // prettier-ignore
+            [
+                // 1st bar
+                0, 0, 
+                // 2nd bar                    
+                0, 0,
+                // 3rd bar
+                0, 0,
+                // 1st bar (repated)
+                3, 3,
+                // 2nd bar (repeated)
+                3, 3,
+                // 3rd bar (repeated)
+                3, 3,
+                // 4th bar
+                -1, -1
+            ],
+            [
+                // 1st bar
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+
+                // 2nd bar
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+
+                // 3rd bar
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+
+                // 1st bar (repated)
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                // 2nd bar (repeated)
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                // 3rd bar (repeated)
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                MidiTickLookupFindBeatResultCursorMode.ToNextBext,
+                
+                // 4th bar
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
+                MidiTickLookupFindBeatResultCursorMode.ToEndOfBar
+            ],
+            true
+        );
     });
 });

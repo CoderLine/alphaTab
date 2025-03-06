@@ -423,7 +423,7 @@ export class ModelUtils {
                     masterBar.isFreeTime ||
                     masterBar.isAnacrusis ||
                     masterBar.section !== null ||
-                    masterBar.tempoAutomations.length > 0 ||
+                    (masterBar.index !== currentGroupStartIndex && masterBar.tempoAutomations.length > 0) ||
                     (masterBar.fermata !== null && masterBar.fermata.size > 0) ||
                     (masterBar.directions !== null && masterBar.directions.size > 0)
                 ) {
