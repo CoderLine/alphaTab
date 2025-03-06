@@ -48,6 +48,13 @@ export class Voice {
     }
 
     /**
+     * @internal
+     */
+    public forceNonEmpty() {
+        this._isEmpty = false;
+    }
+
+    /**
      * Gets or sets a value indicating whether this voice is empty.
      */
     public get isRestOnly() {
@@ -141,10 +148,10 @@ export class Voice {
                 }
                 currentGraceGroup.addBeat(beat);
             }
-            if(!beat.isEmpty) {
+            if (!beat.isEmpty) {
                 this._isEmpty = false;
             }
-            if(!beat.isRest) {
+            if (!beat.isRest) {
                 this._isRestOnly = false;
             }
         }

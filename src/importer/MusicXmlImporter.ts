@@ -765,6 +765,9 @@ export class MusicXmlImporter extends ScoreImporter {
             this._currentDirection = null;
         }
         let note: Note = new Note();
+        // TODO: getOrCreateBeat relies on voice.isEmpty, we should eliminate forceNonEmpty
+        // and improve this importer
+        beat.voice.forceNonEmpty();
         beat.isEmpty = false;
         beat.addNote(note);
         beat.dots = 0;
