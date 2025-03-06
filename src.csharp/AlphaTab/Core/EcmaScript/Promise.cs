@@ -7,8 +7,9 @@ namespace AlphaTab.Core.EcmaScript;
 internal static class Promise
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Task Race(IList<Task> tasks)
+    public static async Task Race(IList<Task> tasks)
     {
-        return Task.WhenAny(tasks);
+        var completed = await Task.WhenAny(tasks);
+        await completed;
     }
 }

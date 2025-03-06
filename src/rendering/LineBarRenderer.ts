@@ -110,7 +110,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             spaces.push([]);
         }
 
-        this.collectSpaces(spaces);
+        // on multibar rest glyphs we don't have spaces as they are empty
+        if (!this.additionalMultiRestBars) {
+            this.collectSpaces(spaces);
+        }
 
         // if we have multiple voices we need to sort by X-position, otherwise have a wild mix in the list
         // but painting relies on ascending X-position
