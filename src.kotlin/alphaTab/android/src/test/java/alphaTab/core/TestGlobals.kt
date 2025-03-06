@@ -42,8 +42,7 @@ class NotExpector<T>(private val actual: T) {
 class Expector<T>(private val actual: T) {
     val to
         get() = this
-    val not
-        get() = NotExpector(actual)
+    fun not() = NotExpector(actual)
 
     val be
         get() = this

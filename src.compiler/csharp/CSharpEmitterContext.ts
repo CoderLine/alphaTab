@@ -93,6 +93,10 @@ export default class CSharpEmitterContext {
                 expr.tsSymbol.flags & ts.SymbolFlags.ConstEnum ||
                 expr.tsSymbol.flags & ts.SymbolFlags.RegularEnum
             ) {
+                if (expr.tsSymbol.name === 'Error') {
+                    return this.makeExceptionType();
+                }
+
                 return this.buildCoreNamespace(expr.tsSymbol) + this.toCoreTypeName(expr.tsSymbol.name);
             } else if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
                 if (this.isTestFunction(expr.tsSymbol)) {
@@ -368,6 +372,13 @@ export default class CSharpEmitterContext {
                 }
 
                 return this.createMapType(tsSymbol, node, mapKeyType!, mapValueType!);
+            case 'Error':
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    isAsync: false,
+                    isNullable: false,
+                    reference: this.makeExceptionType()
+                } as cs.TypeReference;
             case 'Array':
                 const arrayType = tsType as ts.TypeReference;
                 let arrayElementType: cs.TypeNode | null = null;
@@ -865,8 +876,9 @@ export default class CSharpEmitterContext {
         return null;
     }
 
-    public makeExceptionType(): cs.TypeReferenceType {
-        return this.makeTypeName('system.Exception');
+    public makeExceptionType(): string {
+        // global alias
+        return this.makeTypeName('Error');
     }
 
     public makeTypeName(tsName: string): string {
@@ -890,6 +902,10 @@ export default class CSharpEmitterContext {
 
         if (aliasSymbol.name === 'Map') {
             return this.toPascalCase('alphaTab.collections') + suffix + '.';
+        }
+
+        if (aliasSymbol.name === 'Error') {
+            return '';
         }
 
         if (aliasSymbol.declarations) {

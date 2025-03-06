@@ -311,8 +311,8 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             this._tracks = tracks;
 
-            const startIndex = ModelUtils.computeFirstDisplayedBarIndex(this.score!, this.settings);
-            const endIndex = ModelUtils.computeLastDisplayedBarIndex(this.score, this.settings, startIndex);
+            const startIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.settings);
+            const endIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.settings, startIndex);
             if (this._tickCache) {
                 this._tickCache.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(this.tracks, startIndex, endIndex);
             }
@@ -634,13 +634,15 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
+        const score = this.score!;
+
         Logger.debug('AlphaTab', 'Generating Midi');
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, this.settings, handler);
 
-        const startIndex = ModelUtils.computeFirstDisplayedBarIndex(this.score!, this.settings);
-        const endIndex = ModelUtils.computeLastDisplayedBarIndex(this.score, this.settings, startIndex);
+        const startIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.settings);
+        const endIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.settings, startIndex);
         generator.tickLookup.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(this.tracks, startIndex, endIndex);
 
         // we pass the transposition pitches separately to alphaSynth.

@@ -395,7 +395,7 @@ export class PageViewLayout extends ScoreLayout {
                         ? multiBarRestInfo.get(barIndex)!
                         : null;
 
-                let renderers: MasterBarsRenderers | null = system.addBars(
+                const renderers = system.addBars(
                     this.renderer.tracks!,
                     barIndex,
                     additionalMultiBarsRestBarIndices

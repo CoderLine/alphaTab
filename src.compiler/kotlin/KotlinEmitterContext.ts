@@ -31,23 +31,21 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
     }
 
     protected override toCoreTypeName(s: string) {
-        if(s === 'String') {
+        if (s === 'String') {
             return 'CoreString';
         }
-        if(s === 'Map') {
-            return 'Map<*, *>'
+        if (s === 'Map') {
+            return 'Map<*, *>';
         }
         return s;
     }
 
     public override getDefaultUsings(): string[] {
-        return [
-            this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')
-        ];
+        return [this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')];
     }
 
-    public override makeExceptionType(): cs.TypeReferenceType {
-        return this.makeTypeName('kotlin.Throwable')
+    public override makeExceptionType(): string {
+        return this.makeTypeName('kotlin.Throwable');
     }
 
     private isSymbolPartial(tsSymbol: ts.Symbol): boolean {
@@ -58,18 +56,23 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return !!ts.getJSDocTags(tsSymbol.valueDeclaration).find(t => t.tagName.text === 'partial');
     }
 
-
     protected override getOverriddenMembers(classType: ts.InterfaceType, classElement: ts.ClassElement): ts.Symbol[] {
         const symbols: ts.Symbol[] = [];
         this.collectOverriddenMembersByName(symbols, classType, classElement.name!.getText(), false, true);
         return symbols;
     }
 
-    protected override collectOverriddenMembersByName(symbols: ts.Symbol[], classType: ts.InterfaceType, memberName: string, includeOwnMembers: boolean = false, allowInterfaces: boolean = false) {
+    protected override collectOverriddenMembersByName(
+        symbols: ts.Symbol[],
+        classType: ts.InterfaceType,
+        memberName: string,
+        includeOwnMembers: boolean = false,
+        allowInterfaces: boolean = false
+    ) {
         super.collectOverriddenMembersByName(symbols, classType, memberName, includeOwnMembers, allowInterfaces);
 
         if (
-            classType.symbol.valueDeclaration && 
+            classType.symbol.valueDeclaration &&
             ts.isClassDeclaration(classType.symbol.valueDeclaration) &&
             classType.symbol.valueDeclaration.heritageClauses
         ) {
@@ -80,7 +83,13 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
             if (implementsClause) {
                 for (const typeSyntax of implementsClause.types) {
                     const type = this.typeChecker.getTypeFromTypeNode(typeSyntax);
-                    super.collectOverriddenMembersByName(symbols, type as ts.InterfaceType, memberName, true, allowInterfaces);
+                    super.collectOverriddenMembersByName(
+                        symbols,
+                        type as ts.InterfaceType,
+                        memberName,
+                        true,
+                        allowInterfaces
+                    );
                 }
             }
         }
