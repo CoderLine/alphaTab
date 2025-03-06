@@ -22,10 +22,13 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return 'param' + name;
     }
 
-    protected override visitMethodSignature(parent: cs.ClassDeclaration | cs.InterfaceDeclaration, classElement: ts.MethodSignature) {
+    protected override visitMethodSignature(
+        parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
+        classElement: ts.MethodSignature
+    ) {
         const csMethod = super.visitMethodSignature(parent, classElement);
 
-        if(!!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'async')) {
+        if (!!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'async')) {
             csMethod.isAsync = true;
         }
 
@@ -244,10 +247,12 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             const method = this._context.typeChecker.getSymbolAtLocation(expression.expression);
 
             if (returnType?.symbol?.name === 'Promise' && (method as any)?.parent?.name !== 'Promise') {
-                const isSuspend = method?.valueDeclaration && (
-                    (method.valueDeclaration as ts.MethodDeclaration).modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword) ||
-                    ts.getJSDocTags(method.valueDeclaration!).find(t => t.tagName.text === 'async')
-                );
+                const isSuspend =
+                    method?.valueDeclaration &&
+                    ((method.valueDeclaration as ts.MethodDeclaration).modifiers?.some(
+                        m => m.kind === ts.SyntaxKind.AsyncKeyword
+                    ) ||
+                        ts.getJSDocTags(method.valueDeclaration!).find(t => t.tagName.text === 'async'));
 
                 if (!ts.isAwaitExpression(expression.parent) && isSuspend) {
                     const suspendToDeferred = {
@@ -585,5 +590,14 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             return 'Boolean';
         }
         return null;
+    }
+
+    protected override convertPropertyToInvocation(parentSymbol: ts.Symbol, symbol: ts.Symbol): boolean {
+        switch (parentSymbol.name) {
+            // chai assertions
+            case 'Assertion':
+                return true;
+        }
+        return false;
     }
 }

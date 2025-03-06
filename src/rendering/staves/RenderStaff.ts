@@ -106,13 +106,9 @@ export class RenderStaff {
         this.system.layout.registerBarRenderer(this.staveId, renderer);
     }
 
-    public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo): void {
-        let renderer: BarRendererBase;
-        if (!bar) {
-            renderer = new BarRendererBase(this.system.layout.renderer, bar);
-        } else {
-            renderer = this._factory.create(this.system.layout.renderer, bar);
-        }
+    public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
+        let renderer = this._factory.create(this.system.layout.renderer, bar);
+        renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
         renderer.staff = this;
         renderer.index = this.barRenderers.length;
         renderer.layoutingInfo = layoutingInfo;
@@ -231,7 +227,7 @@ export class RenderStaff {
         this.topSpacing = this._factory.getStaffPaddingTop(this);
         this.bottomSpacing = this._factory.getStaffPaddingBottom(this);
 
-        this.height = (this.barRenderers.length > 0) ? this.barRenderers[0].height : 0;
+        this.height = this.barRenderers.length > 0 ? this.barRenderers[0].height : 0;
 
         if (this.height > 0) {
             this.height += this.topSpacing + this.topOverflow + this.bottomOverflow + this.bottomSpacing;

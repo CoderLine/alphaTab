@@ -2,7 +2,11 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 
 import { MidiFile } from '@src/midi/MidiFile';
-import { MidiTickLookup, MidiTickLookupFindBeatResult } from '@src/midi/MidiTickLookup';
+import {
+    MidiTickLookup,
+    MidiTickLookupFindBeatResult,
+    MidiTickLookupFindBeatResultCursorMode
+} from '@src/midi/MidiTickLookup';
 import { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
@@ -67,6 +71,8 @@ export class AlphaTabApiBase<TSettings> {
     private _trackIndexes: number[] | null = null;
     private _trackIndexLookup: Set<number> | null = null;
     private _isDestroyed: boolean = false;
+    private _score: Score | null = null;
+    private _tracks: Track[] = [];
     /**
      * Gets the UI facade to use for interacting with the user interface.
      */
@@ -85,7 +91,9 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * Gets the score holding all information about the song being rendered.
      */
-    public score: Score | null = null;
+    public get score(): Score | null {
+        return this._score;
+    }
 
     /**
      * Gets the settings that are used for rendering the music notation.
@@ -95,7 +103,9 @@ export class AlphaTabApiBase<TSettings> {
     /**
      * Gets a list of the tracks that are currently rendered;
      */
-    public tracks: Track[] = [];
+    public get tracks(): Track[] {
+        return this._tracks;
+    }
 
     /**
      * Gets the UI container that will hold all rendered results.
@@ -287,8 +297,9 @@ export class AlphaTabApiBase<TSettings> {
     private internalRenderTracks(score: Score, tracks: Track[]): void {
         ModelUtils.applyPitchOffsets(this.settings, score);
         if (score !== this.score) {
-            this.score = score;
-            this.tracks = tracks;
+            this._score = score;
+            this._tracks = tracks;
+            this._tickCache = null;
             this._trackIndexes = [];
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
@@ -298,12 +309,20 @@ export class AlphaTabApiBase<TSettings> {
             this.loadMidiForScore();
             this.render();
         } else {
-            this.tracks = tracks;
+            this._tracks = tracks;
+
+            const startIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.settings);
+            const endIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.settings, startIndex);
+            if (this._tickCache) {
+                this._tickCache.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(this.tracks, startIndex, endIndex);
+            }
+
             this._trackIndexes = [];
             for (let track of tracks) {
                 this._trackIndexes.push(track.index);
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
+
             this.render();
         }
     }
@@ -615,10 +634,16 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
+        const score = this.score!;
+
         Logger.debug('AlphaTab', 'Generating Midi');
         let midiFile: MidiFile = new MidiFile();
         let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
+        let generator: MidiFileGenerator = new MidiFileGenerator(score, this.settings, handler);
+
+        const startIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.settings);
+        const endIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.settings, startIndex);
+        generator.tickLookup.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(this.tracks, startIndex, endIndex);
 
         // we pass the transposition pitches separately to alphaSynth.
         generator.applyTranspositionPitches = false;
@@ -838,7 +863,7 @@ export class AlphaTabApiBase<TSettings> {
             this.player.positionChanged.on(e => {
                 this._previousTick = e.currentTick;
                 this.uiFacade.beginInvoke(() => {
-                    this.cursorUpdateTick(e.currentTick, false);
+                    this.cursorUpdateTick(e.currentTick, false, false, e.isSeek);
                 });
             });
             this.player.stateChanged.on(e => {
@@ -860,14 +885,14 @@ export class AlphaTabApiBase<TSettings> {
      * @param stop
      * @param shouldScroll whether we should scroll to the bar (if scrolling is active)
      */
-    private cursorUpdateTick(tick: number, stop: boolean, shouldScroll: boolean = false): void {
+    private cursorUpdateTick(tick: number, stop: boolean, shouldScroll: boolean = false, forceUpdate:boolean = false): void {
         let cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
             let tracks = this._trackIndexLookup;
             if (tracks != null && tracks.size > 0) {
                 let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
-                    this.cursorUpdateBeat(beat, stop, shouldScroll);
+                    this.cursorUpdateBeat(beat, stop, shouldScroll, forceUpdate || this.playerState === PlayerState.Paused);
                 }
             }
         }
@@ -901,7 +926,8 @@ export class AlphaTabApiBase<TSettings> {
             !forceUpdate &&
             beat === previousBeat?.beat &&
             cache === previousCache &&
-            previousState === this._playerState
+            previousState === this._playerState &&
+            previousBeat?.start === lookupResult.start
         ) {
             return;
         }
@@ -925,7 +951,8 @@ export class AlphaTabApiBase<TSettings> {
                 beatsToHighlight,
                 cache!,
                 beatBoundings!,
-                shouldScroll
+                shouldScroll,
+                lookupResult.cursorMode
             );
         });
     }
@@ -1011,7 +1038,8 @@ export class AlphaTabApiBase<TSettings> {
         beatsToHighlight: BeatTickLookupItem[],
         cache: BoundsLookup,
         beatBoundings: BeatBounds,
-        shouldScroll: boolean
+        shouldScroll: boolean,
+        cursorMode: MidiTickLookupFindBeatResultCursorMode
     ) {
         const barCursor = this._barCursor;
         const beatCursor = this._beatCursor;
@@ -1040,7 +1068,8 @@ export class AlphaTabApiBase<TSettings> {
 
         // actively playing? -> animate cursor and highlight items
         let shouldNotifyBeatChange = false;
-        if (this._playerState === PlayerState.Playing && !stop) {
+        const isPlayingUpdate = this._playerState === PlayerState.Playing && !stop;
+        if (isPlayingUpdate) {
             if (this.settings.player.enableElementHighlighting) {
                 for (let highlight of beatsToHighlight) {
                     let className: string = BeatContainerGlyph.getGroupId(highlight.beat);
@@ -1048,31 +1077,32 @@ export class AlphaTabApiBase<TSettings> {
                 }
             }
 
-            if (this.settings.player.enableAnimatedBeatCursor) {
-                let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-                // get position of next beat on same system
-                if (nextBeat) {
-                    // if we are moving within the same bar or to the next bar
-                    // transition to the next beat, otherwise transition to the end of the bar.
-                    let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                    if (
-                        nextBeatBoundings &&
-                        nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
-                    ) {
-                        nextBeatX = nextBeatBoundings.onNotesX;
-                    }
+            shouldScroll = !stop;
+            shouldNotifyBeatChange = true;
+        }
+
+        if (this.settings.player.enableAnimatedBeatCursor && beatCursor) {
+            let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+            // get position of next beat on same system
+            if (nextBeat && cursorMode == MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
+                // if we are moving within the same bar or to the next bar
+                // transition to the next beat, otherwise transition to the end of the bar.
+                let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+                if (
+                    nextBeatBoundings &&
+                    nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
+                ) {
+                    nextBeatX = nextBeatBoundings.onNotesX;
                 }
+            }
+
+            if (isPlayingUpdate) {
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
-                    if (beatCursor) {
-                        beatCursor.transitionToX(duration / this.playbackSpeed, nextBeatX);
-                    }
+                    beatCursor!.transitionToX(duration / this.playbackSpeed, nextBeatX);
                 });
             }
-
-            shouldScroll = !stop;
-            shouldNotifyBeatChange = true;
         }
 
         if (shouldScroll && !this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {

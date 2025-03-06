@@ -1519,30 +1519,6 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        // chai property statements like "expected(false).to.be.ok;"
-        if (
-            ts.isPropertyAccessExpression(s.expression) &&
-            ts.isPropertyAccessExpression(s.expression.expression) &&
-            ts.isPropertyAccessExpression(s.expression.expression.expression) &&
-            ts.isIdentifier(s.expression.expression.name) &&
-            s.expression.expression.name.text == 'be' &&
-            ts.isIdentifier(s.expression.expression.expression.name) &&
-            (s.expression.expression.expression.name.text == 'to' ||
-                s.expression.expression.expression.name.text == 'not')
-        ) {
-            const access = expressionStatement.expression;
-
-            expressionStatement.expression = {
-                nodeType: cs.SyntaxKind.InvocationExpression,
-                parent: expressionStatement,
-                arguments: [],
-                expression: access,
-                tsNode: s.expression,
-                skipEmit: access.skipEmit
-            } as cs.InvocationExpression;
-            access.parent = expressionStatement.expression;
-        }
-
         return expressionStatement;
     }
 
@@ -3193,6 +3169,8 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.MemberAccessExpression
         } as cs.MemberAccessExpression;
 
+        let convertToInvocation = false;
+
         if (memberAccess.tsSymbol) {
             if (this._context.isMethodSymbol(memberAccess.tsSymbol)) {
                 memberAccess.member = this._context.toMethodName(expression.name.text);
@@ -3212,10 +3190,12 @@ export default class CSharpAstTransformer {
         if (memberAccess.tsSymbol) {
             const parentSymbol = (memberAccess.tsSymbol as any).parent as ts.Symbol;
             if (parentSymbol) {
-                const renamed = this.getSymbolName(parentSymbol!, memberAccess.tsSymbol!, memberAccess);
+                const renamed = this.getSymbolName(parentSymbol!, memberAccess.tsSymbol!);
                 if (renamed) {
                     memberAccess.member = renamed;
                 }
+
+                convertToInvocation = this.convertPropertyToInvocation(parentSymbol!, memberAccess.tsSymbol!);
             }
         }
 
@@ -3228,10 +3208,42 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        return this.wrapToSmartCast(parent, memberAccess, expression);
+        if (convertToInvocation && !ts.isCallExpression(expression.parent)) {
+            const invocation: cs.InvocationExpression = {
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                expression: memberAccess,
+                arguments: [],
+                tsNode: memberAccess.tsNode,
+                tsSymbol: memberAccess.tsSymbol,
+                parent: memberAccess.parent,
+                skipEmit: memberAccess.skipEmit
+            };
+
+            memberAccess.parent = invocation;
+
+            return this.wrapToSmartCast(parent, invocation, expression);
+        } else {
+            return this.wrapToSmartCast(parent, memberAccess, expression);
+        }
     }
 
-    protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
+    protected convertPropertyToInvocation(parentSymbol: ts.Symbol, symbol: ts.Symbol): boolean {
+        switch (parentSymbol.name) {
+            case 'Error':
+                switch (symbol.name) {
+                    case 'stack':
+                    case 'cause':
+                        return true;
+                }
+                break;
+            // chai assertions
+            case 'Assertion':
+                return true;
+        }
+        return false;
+    }
+
+    protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol): string | null {
         switch (parentSymbol.name) {
             case 'Array':
                 switch (symbol.name) {

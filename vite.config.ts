@@ -292,20 +292,20 @@ export default defineConfig(({ command, mode }) => {
                 const adjustScriptPathsPlugin = (min: boolean) => {
                     return {
                         name: 'adjust-script-paths',
-                        renderChunk(code) {
+                        renderChunk(code, chunk) {
                             const modifiedCode = new MagicString(code);
                             const extension = min ? '.min.mjs' : '.mjs';
                             modifiedCode
-                                .replaceAll("alphaTab.core'", `alphaTab.core${extension}'`)
-                                .replaceAll("alphaTab.worker'", `alphaTab.worker${extension}'`)
-                                .replaceAll("alphaTab.worklet'", `alphaTab.worklet${extension}'`);
+                                .replaceAll(/alphaTab.core(.ts)?'/g, `alphaTab.core${extension}'`)
+                                .replaceAll(/alphaTab.worker(.ts)?'/g, `alphaTab.worker${extension}'`)
+                                .replaceAll(/alphaTab.worklet(.ts)?'/g, `alphaTab.worklet${extension}'`);
 
                             return {
                                 code: modifiedCode.toString(),
                                 map: modifiedCode.generateMap()
                             };
                         }
-                    };
+                    } satisfies Plugin;
                 };
 
                 esm('alphaTab', 'src/alphaTab.main.ts', {});

@@ -272,4 +272,17 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[8].voices[0].beats[0].timer).to.equal(0);
         expect(score.tracks[0].staves[0].bars[8].voices[0].beats[1].showTimer).to.be.false;
     });
+
+    it('multibar-rest', async () => {
+        const enabled = (await prepareImporterWithFile('guitarpro8/multibar-rest.gp')).readScore();
+        const disabled = (await prepareImporterWithFile('guitarpro8/timer.gp')).readScore();
+
+        expect(disabled.stylesheet.multiTrackMultiBarRest).to.be.false;
+        expect(disabled.stylesheet.perTrackMultiBarRest).to.equal(null);
+        expect(enabled.stylesheet.multiTrackMultiBarRest).to.be.true;
+        expect(enabled.stylesheet.perTrackMultiBarRest).to.be.ok;
+        expect(enabled.stylesheet.perTrackMultiBarRest!.has(0)).to.be.false;
+        expect(enabled.stylesheet.perTrackMultiBarRest!.has(1)).to.be.true;
+        expect(enabled.stylesheet.perTrackMultiBarRest!.has(2)).to.be.true;
+    });
 });

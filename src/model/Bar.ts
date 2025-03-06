@@ -145,13 +145,21 @@ export class Bar {
         return this.staff.track.score.masterBars[this.index];
     }
 
+    private _isEmpty: boolean = true;
+    private _isRestOnly: boolean = true;
+
+    /**
+     * Whether this bar is fully empty (not even having rests).
+     */
     public get isEmpty(): boolean {
-        for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
-            if (!this.voices[i].isEmpty) {
-                return false;
-            }
-        }
-        return true;
+        return this._isEmpty;
+    }
+
+    /**
+     * Whether this bar is empty or has only rests. 
+     */
+    public get isRestOnly(): boolean {
+        return this._isRestOnly;
     }
 
     public addVoice(voice: Voice): void {
@@ -162,11 +170,21 @@ export class Bar {
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
         this.isMultiVoice = false;
+        this._isEmpty = true;
+        this._isRestOnly = true;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             let voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
             if (i > 0 && !voice.isEmpty) {
                 this.isMultiVoice = true;
+            }
+
+            if (!voice.isEmpty) {
+                this._isEmpty = false;
+            }
+
+            if (!voice.isRestOnly) {
+                this._isRestOnly = false;
             }
         }
 

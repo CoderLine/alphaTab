@@ -98,41 +98,50 @@ export class HorizontalScreenLayout extends ScoreLayout {
         let currentPartial: HorizontalScreenLayoutPartialInfo = new HorizontalScreenLayoutPartialInfo();
         let renderX = 0;
         while (currentBarIndex <= endBarIndex) {
-            let result = this._system.addBars(this.renderer.tracks!, currentBarIndex);
+            const multiBarRestInfo = this.multiBarRestInfo;
+            const additionalMultiBarsRestBarIndices: number[] | null =
+                multiBarRestInfo !== null && multiBarRestInfo.has(currentBarIndex)
+                    ? multiBarRestInfo.get(currentBarIndex)!
+                    : null;
 
-            if (result) {
-                // if we detect that the new renderer is linked to the previous
-                // renderer, we need to put it into the previous partial
-                if (currentPartial.masterBars.length === 0 && result.isLinkedToPrevious && partials.length > 0) {
-                    let previousPartial: HorizontalScreenLayoutPartialInfo = partials[partials.length - 1];
-                    previousPartial.masterBars.push(score.masterBars[currentBarIndex]);
-                    previousPartial.width += result.width;
-                    renderX += result.width;
-                    currentPartial.x += renderX;
-                } else {
-                    currentPartial.masterBars.push(score.masterBars[currentBarIndex]);
-                    currentPartial.width += result.width;
-                    // no targetPartial here because previous partials already handled this code
-                    if (currentPartial.masterBars.length >= countPerPartial) {
-                        if (partials.length === 0) {
-                            // respect accolade and on first partial
-                            currentPartial.width += this._system.accoladeWidth + this._pagePadding[0];
-                        }
-                        renderX += currentPartial.width;
-                        partials.push(currentPartial);
-                        Logger.debug(
-                            this.name,
-                            'Finished partial from bar ' +
-                                currentPartial.masterBars[0].index +
-                                ' to ' +
-                                currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
-                            null
-                        );
-                        currentPartial = new HorizontalScreenLayoutPartialInfo();
-                        currentPartial.x = renderX;
+            const result = this._system.addBars(
+                this.renderer.tracks!,
+                currentBarIndex,
+                additionalMultiBarsRestBarIndices
+            );
+
+            // if we detect that the new renderer is linked to the previous
+            // renderer, we need to put it into the previous partial
+            if (currentPartial.masterBars.length === 0 && result.isLinkedToPrevious && partials.length > 0) {
+                const previousPartial: HorizontalScreenLayoutPartialInfo = partials[partials.length - 1];
+                previousPartial.masterBars.push(score.masterBars[currentBarIndex]);
+                previousPartial.width += result.width;
+                renderX += result.width;
+                currentPartial.x += renderX;
+            } else {
+                currentPartial.masterBars.push(score.masterBars[currentBarIndex]);
+                currentPartial.width += result.width;
+                // no targetPartial here because previous partials already handled this code
+                if (currentPartial.masterBars.length >= countPerPartial) {
+                    if (partials.length === 0) {
+                        // respect accolade and on first partial
+                        currentPartial.width += this._system.accoladeWidth + this._pagePadding[0];
                     }
+                    renderX += currentPartial.width;
+                    partials.push(currentPartial);
+                    Logger.debug(
+                        this.name,
+                        'Finished partial from bar ' +
+                            currentPartial.masterBars[0].index +
+                            ' to ' +
+                            currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                        null
+                    );
+                    currentPartial = new HorizontalScreenLayoutPartialInfo();
+                    currentPartial.x = renderX;
                 }
             }
+
             currentBarIndex++;
         }
         // don't miss the last partial if not empty
@@ -155,8 +164,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         const scale = this.renderer.settings.display.scale;
 
         this.height = Math.floor(this._system.y + this._system.height) * scale;
-        this.width =
-            (this._system.x + this._system.width + this._pagePadding[2]) * scale;
+        this.width = (this._system.x + this._system.width + this._pagePadding[2]) * scale;
         currentBarIndex = 0;
 
         let x = 0;

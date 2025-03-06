@@ -12,6 +12,8 @@ import { GraceGroup } from '@src/model/GraceGroup';
  */
 export class Voice {
     private _beatLookup!: Map<number, Beat>;
+    private _isEmpty: boolean = true;
+    private _isRestOnly: boolean = true;
 
     private static _globalBarId: number = 0;
 
@@ -41,7 +43,23 @@ export class Voice {
     /**
      * Gets or sets a value indicating whether this voice is empty.
      */
-    public isEmpty: boolean = true;
+    public get isEmpty(): boolean {
+        return this._isEmpty;
+    }
+
+    /**
+     * @internal
+     */
+    public forceNonEmpty() {
+        this._isEmpty = false;
+    }
+
+    /**
+     * Gets or sets a value indicating whether this voice is empty.
+     */
+    public get isRestOnly() {
+        return this._isRestOnly;
+    }
 
     public insertBeat(after: Beat, newBeat: Beat): void {
         newBeat.nextBeat = after.nextBeat;
@@ -59,7 +77,10 @@ export class Voice {
         beat.index = this.beats.length;
         this.beats.push(beat);
         if (!beat.isEmpty) {
-            this.isEmpty = false;
+            this._isEmpty = false;
+        }
+        if (!beat.isRest) {
+            this._isRestOnly = false;
         }
     }
 
@@ -95,7 +116,8 @@ export class Voice {
         this.addBeat(beat);
         // reinsert last beat
         this.addBeat(lastBeat);
-        this.isEmpty = false;
+        this._isEmpty = false;
+        this._isRestOnly = false;
     }
 
     public getBeatAtPlaybackStart(playbackStart: number): Beat | null {
@@ -106,6 +128,8 @@ export class Voice {
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
+        this._isEmpty = true;
+        this._isRestOnly = true;
         this._beatLookup = new Map<number, Beat>();
         let currentGraceGroup: GraceGroup | null = null;
         for (let index: number = 0; index < this.beats.length; index++) {
@@ -123,6 +147,12 @@ export class Voice {
                     currentGraceGroup = new GraceGroup();
                 }
                 currentGraceGroup.addBeat(beat);
+            }
+            if (!beat.isEmpty) {
+                this._isEmpty = false;
+            }
+            if (!beat.isRest) {
+                this._isRestOnly = false;
             }
         }
 

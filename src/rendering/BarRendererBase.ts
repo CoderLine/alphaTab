@@ -24,6 +24,7 @@ import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
 import { BeamDirection } from './utils/BeamDirection';
+import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -104,6 +105,14 @@ export class BarRendererBase {
     public staff!: RenderStaff;
     public layoutingInfo!: BarLayoutingInfo;
     public bar: Bar;
+    public additionalMultiRestBars: Bar[] | null = null;
+
+    public get lastBar(): Bar {
+        if (this.additionalMultiRestBars) {
+            return this.additionalMultiRestBars[this.additionalMultiRestBars.length - 1];
+        }
+        return this.bar;
+    }
 
     public x: number = 0;
     public y: number = 0;
@@ -127,6 +136,10 @@ export class BarRendererBase {
      * (e.g. when having double bar repeats we must not separate the 2 bars)
      */
     public canWrap: boolean = true;
+
+    public get showMultiBarRest(): boolean {
+        return false;
+    }
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         this.scoreRenderer = renderer;
@@ -331,7 +344,15 @@ export class BarRendererBase {
             this.canWrap = false;
         }
         this.createPreBeatGlyphs();
-        this.createBeatGlyphs();
+
+        // multibar rest
+        if (this.additionalMultiRestBars) {
+            let container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(this.bar.voices[0])!);
+            this.addBeatGlyph(container);
+        } else {
+            this.createBeatGlyphs();
+        }
+
         this.createPostBeatGlyphs();
         this.updateSizes();
 
@@ -346,7 +367,10 @@ export class BarRendererBase {
     }
 
     protected hasVoiceContainer(voice: Voice): boolean {
-        return !voice.isEmpty || voice.index === 0;
+        if (this.additionalMultiRestBars || voice.index === 0) {
+            return true;
+        }
+        return !voice.isEmpty;
     }
 
     protected updateSizes(): void {

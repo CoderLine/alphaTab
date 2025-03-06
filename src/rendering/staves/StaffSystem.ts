@@ -174,20 +174,29 @@ export class StaffSystem {
         return renderers;
     }
 
-    public addBars(tracks: Track[], barIndex: number): MasterBarsRenderers | null {
-        if (tracks.length === 0) {
-            return null;
-        }
+    public addBars(
+        tracks: Track[],
+        barIndex: number,
+        additionalMultiBarRestIndexes: number[] | null
+    ): MasterBarsRenderers {
         let result: MasterBarsRenderers = new MasterBarsRenderers();
+        result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
         result.layoutingInfo = new BarLayoutingInfo();
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);
+
         // add renderers
         let barLayoutingInfo: BarLayoutingInfo = result.layoutingInfo;
         for (let g of this.staves) {
             for (let s of g.staves) {
-                let bar: Bar = g.track.staves[s.modelStaff.index].bars[barIndex];
-                s.addBar(bar, barLayoutingInfo);
+                const bar: Bar = g.track.staves[s.modelStaff.index].bars[barIndex];
+
+                const additionalMultiBarsRestBars: Bar[] | null =
+                    additionalMultiBarRestIndexes == null
+                        ? null
+                        : additionalMultiBarRestIndexes.map(b => g.track.staves[s.modelStaff.index].bars[b]);
+
+                s.addBar(bar, barLayoutingInfo, additionalMultiBarsRestBars);
                 let renderer: BarRendererBase = s.barRenderers[s.barRenderers.length - 1];
                 result.renderers.push(renderer);
                 if (renderer.isLinkedToPrevious) {

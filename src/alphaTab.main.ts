@@ -23,7 +23,7 @@ if (alphaTab.Environment.isRunningInWorker) {
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating webworker');
                 try {
-                    return new alphaTab.Environment.alphaTabWorker(new alphaTab.Environment.alphaTabUrl('./alphaTab.worker', import.meta.url), {
+                    return new alphaTab.Environment.alphaTabWorker(new alphaTab.Environment.alphaTabUrl('./alphaTab.worker.ts', import.meta.url), {
                         type: 'module'
                     });
                 } catch (e) {
@@ -35,7 +35,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 let workerUrl: URL | string = '';
                 try {
                     // Note: prevent bundlers to copy worker as asset via alphaTabUrl
-                    workerUrl = new alphaTab.Environment.alphaTabUrl('./alphaTab.worker', import.meta.url);
+                    workerUrl = new alphaTab.Environment.alphaTabUrl('./alphaTab.worker.ts', import.meta.url);
                     const script: string = `import ${JSON.stringify(workerUrl)}`;
                     const blob: Blob = new Blob([script], {
                         type: 'application/javascript'
@@ -112,7 +112,7 @@ if (alphaTab.Environment.isRunningInWorker) {
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating Module worklet');
                 const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
-                return alphaTabWorklet.addModule(new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet', import.meta.url));
+                return alphaTabWorklet.addModule(new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet.ts', import.meta.url));
             }
 
             alphaTab.Logger.debug('AlphaTab', 'Creating Script worklet');

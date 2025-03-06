@@ -46,6 +46,14 @@ export class RenderStylesheetSerializer {
         o.set("othersystemstracknamemode", obj.otherSystemsTrackNameMode as number);
         o.set("firstsystemtracknameorientation", obj.firstSystemTrackNameOrientation as number);
         o.set("othersystemstracknameorientation", obj.otherSystemsTrackNameOrientation as number);
+        o.set("multitrackmultibarrest", obj.multiTrackMultiBarRest);
+        if (obj.perTrackMultiBarRest !== null) {
+            const a: number[] = [];
+            o.set("pertrackmultibarrest", a);
+            for (const v of obj.perTrackMultiBarRest!) {
+                a.push(v);
+            }
+        }
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -94,6 +102,12 @@ export class RenderStylesheetSerializer {
                 return true;
             case "othersystemstracknameorientation":
                 obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
+                return true;
+            case "multitrackmultibarrest":
+                obj.multiTrackMultiBarRest = v! as boolean;
+                return true;
+            case "pertrackmultibarrest":
+                obj.perTrackMultiBarRest = new Set<number>(v as number[]);
                 return true;
         }
         return false;

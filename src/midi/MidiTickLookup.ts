@@ -1,8 +1,29 @@
+import { Logger } from '@src/Logger';
 import { BeatTickLookup } from '@src/midi/BeatTickLookup';
 import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Beat } from '@src/model/Beat';
 import { MasterBar } from '@src/model/MasterBar';
+
+/**
+ * Describes how a cursor should be moving.
+ */
+export enum MidiTickLookupFindBeatResultCursorMode {
+    /**
+     * Unknown/Undetermined mode. Should not happen on user level.
+     */
+    Unknown,
+
+    /**
+     * The cursor should animate to the next beat.
+     */
+    ToNextBext,
+
+    /**
+     * The cursor should animate to the end of the bar (typically on repeats and jumps)
+     */
+    ToEndOfBar
+}
 
 /**
  * Represents the results of searching the currently played beat.
@@ -40,6 +61,11 @@ export class MidiTickLookupFindBeatResult {
      */
     public duration: number = 0;
 
+    /**
+     * The mode how the cursor should be handled.
+     */
+    public cursorMode: MidiTickLookupFindBeatResultCursorMode = MidiTickLookupFindBeatResultCursorMode.Unknown;
+
     public get start(): number {
         return this.masterBar.start + this.beatLookup.start;
     }
@@ -57,7 +83,7 @@ export class MidiTickLookupFindBeatResult {
         if (this.masterBar.tempoChanges.length === 1) {
             this.duration = MidiUtils.ticksToMillis(this.tickDuration, this.masterBar.tempoChanges[0].tempo);
         } else {
-            // Performance Note: I still wonder if we cannot calculate these slices efficiently ahead-of-time. 
+            // Performance Note: I still wonder if we cannot calculate these slices efficiently ahead-of-time.
             // the sub-slicing in the lookup across beats makes it a bit tricky to do on-the-fly
             // but maybe on finalizing the tick lookup?
 
@@ -77,7 +103,7 @@ export class MidiTickLookupFindBeatResult {
                 // next change is after beat, we can stop looking at changes
                 else if (change.tick > endTick) {
                     break;
-                } 
+                }
                 // change while beat is playing
                 else {
                     millis += MidiUtils.ticksToMillis(change.tick - currentTick, currentTempo);
@@ -87,7 +113,7 @@ export class MidiTickLookupFindBeatResult {
             }
 
             // last slice
-            if(endTick > currentTick) {
+            if (endTick > currentTick) {
                 millis += MidiUtils.ticksToMillis(endTick - currentTick, currentTempo);
             }
 
@@ -146,6 +172,13 @@ export class MidiTickLookup {
     public readonly masterBars: MasterBarTickLookup[] = [];
 
     /**
+     * The information about which bars are displayed via multi-bar rests.
+     * The key is the start bar, and the value is the additional bars in sequential order.
+     * This info allows building the correct "next" beat and duration.
+     */
+    public multiBarRestInfo: Map<number, number[]> | null = null;
+
+    /**
      * Finds the currently played beat given a list of tracks and the current time.
      * @param trackLookup The tracks indices in which to search the played beat for.
      * @param tick The current time in midi ticks.
@@ -193,13 +226,79 @@ export class MidiTickLookup {
         return null;
     }
 
+    private fillNextBeatMultiBarRest(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
+        const group = this.multiBarRestInfo!.get(current.masterBar.masterBar.index)!;
+
+        // this is a bit sensitive. we assume that the sequence of multi-rest bars and the
+        // chained nextMasterBar equal. so we just jump over X bars
+        let endMasterBar: MasterBarTickLookup | null = current.masterBar;
+        for (let i = 0; i < group.length; i++) {
+            if (!endMasterBar) {
+                break;
+            } else {
+                endMasterBar = endMasterBar.nextMasterBar;
+            }
+        }
+
+        if (endMasterBar) {
+            // one more following -> use start of next
+            if (endMasterBar.nextMasterBar) {
+                current.nextBeat = this.firstBeatInMasterBar(
+                    trackLookup,
+                    endMasterBar.nextMasterBar!,
+                    endMasterBar.nextMasterBar!.start,
+                    true
+                );
+
+                // if we have the next beat take the difference between the times as duration
+                if (current.nextBeat) {
+                    current.tickDuration = current.nextBeat.start - current.start;
+                    current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToNextBext;
+
+                    if (
+                        current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index + 1 &&
+                        current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index
+                    ) {
+                        current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+                    }
+                }
+                // no next beat, animate to the end of the bar (could be an incomplete bar)
+                else {
+                    current.tickDuration = endMasterBar.nextMasterBar.end - current.start;
+                    current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+                }
+            } else {
+                current.tickDuration = endMasterBar.end - current.start;
+                current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+            }
+        } else {
+            Logger.warning(
+                'Synth',
+                'MultiBar Rest Info and the nextMasterBar are out of sync, this is an unexpected error. Please report it as bug.  (broken chain fill-next)'
+            );
+            // this is wierd, we  have a masterbar without known tick?
+            // make a best guess with the number of bars
+            current.tickDuration = (current.masterBar.end - current.masterBar.start) * (group.length + 1);
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+        }
+
+        current.calculateDuration();
+    }
+
     private fillNextBeat(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
+        // on multibar rests take the duration until the end.
+        if (this.isMultiBarRestResult(current)) {
+            this.fillNextBeatMultiBarRest(current, trackLookup);
+        } else {
+            this.fillNextBeatDefault(current, trackLookup);
+        }
+    }
+    private fillNextBeatDefault(current: MidiTickLookupFindBeatResult, trackLookup: Set<number>) {
         current.nextBeat = this.findBeatInMasterBar(
             current.masterBar,
             current.beatLookup.nextBeat,
             current.end,
             trackLookup,
-            false,
             true
         );
 
@@ -210,14 +309,38 @@ export class MidiTickLookup {
         // if we have the next beat take the difference between the times as duration
         if (current.nextBeat) {
             current.tickDuration = current.nextBeat.start - current.start;
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToNextBext;
+            current.calculateDuration();
+        }
+        // no next beat, animate to the end of the bar (could be an incomplete bar)
+        else {
+            current.tickDuration = current.masterBar.end - current.start;
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
             current.calculateDuration();
         }
 
-        // no next beat, animate to the end of the bar (could be an incomplete bar)
-        if (!current.nextBeat) {
-            current.tickDuration = current.masterBar.end - current.start;
-            current.calculateDuration();
+        // if the next beat is not directly the next master bar (e.g. jumping back or forth)
+        // we report no next beat and animate to the end
+        if (
+            current.nextBeat &&
+            current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index + 1 &&
+            current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index
+        ) {
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
         }
+    }
+
+    private isMultiBarRestResult(current: MidiTickLookupFindBeatResult) {
+        return this.internalIsMultiBarRestResult(current.masterBar.masterBar.index, current.beat);
+    }
+
+    private internalIsMultiBarRestResult(masterBarIndex: number, beat: Beat) {
+        return (
+            this.multiBarRestInfo &&
+            this.multiBarRestInfo!.has(masterBarIndex) &&
+            beat.isRest &&
+            beat.voice.bar.isRestOnly
+        );
     }
 
     private findBeatSlow(
@@ -253,17 +376,20 @@ export class MidiTickLookup {
             return null;
         }
 
+        return this.firstBeatInMasterBar(trackLookup, masterBar, tick, isNextSearch);
+    }
+
+    private firstBeatInMasterBar(
+        trackLookup: Set<number>,
+        startMasterBar: MasterBarTickLookup,
+        tick: number,
+        isNextSearch: boolean
+    ) {
+        let masterBar: MasterBarTickLookup | null = startMasterBar;
         // scan through beats and find first one which has a beat visible
         while (masterBar) {
             if (masterBar.firstBeat) {
-                let beat = this.findBeatInMasterBar(
-                    masterBar,
-                    masterBar.firstBeat,
-                    tick,
-                    trackLookup,
-                    true,
-                    isNextSearch
-                );
+                let beat = this.findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, trackLookup, isNextSearch);
 
                 if (beat) {
                     return beat;
@@ -272,7 +398,6 @@ export class MidiTickLookup {
 
             masterBar = masterBar.nextMasterBar;
         }
-
         return null;
     }
 
@@ -290,7 +415,6 @@ export class MidiTickLookup {
         currentStartLookup: BeatTickLookup | null,
         tick: number,
         visibleTracks: Set<number>,
-        fillNext: boolean,
         isNextSeach: boolean
     ): MidiTickLookupFindBeatResult | null {
         if (!currentStartLookup) {
@@ -303,7 +427,12 @@ export class MidiTickLookup {
         const relativeTick = tick - masterBar.start;
 
         while (currentStartLookup != null && startBeat == null) {
-            if (currentStartLookup.start <= relativeTick && relativeTick < currentStartLookup.end) {
+            if (
+                // either within exact range or if we're in the "next search" also allow using the first beat
+                // of the next bars
+                (currentStartLookup.start <= relativeTick || (isNextSeach && relativeTick < 0)) &&
+                relativeTick < currentStartLookup.end
+            ) {
                 startBeatLookup = currentStartLookup;
                 startBeat = currentStartLookup.getVisibleBeatAtStart(visibleTracks);
 
@@ -363,7 +492,7 @@ export class MidiTickLookup {
             return null;
         }
 
-        const result = this.createResult(masterBar, startBeatLookup!, startBeat, fillNext, visibleTracks);
+        const result = this.createResult(masterBar, startBeatLookup!, startBeat, isNextSeach, visibleTracks);
 
         return result;
     }
@@ -372,7 +501,7 @@ export class MidiTickLookup {
         masterBar: MasterBarTickLookup,
         beatLookup: BeatTickLookup,
         beat: Beat,
-        fillNext: boolean,
+        isNextSearch: boolean,
         visibleTracks: Set<number>
     ) {
         const result = new MidiTickLookupFindBeatResult(masterBar);
@@ -382,8 +511,40 @@ export class MidiTickLookup {
 
         result.tickDuration = beatLookup!.end - beatLookup!.start;
 
-        if (fillNext) {
+        if (!isNextSearch) {
+            // the next beat filling will adjust this result with the respective durations
             this.fillNextBeat(result, visibleTracks);
+        }
+        // if we do not search for the next beat, we need to still stretch multi-bar-rest
+        // otherwise the fast path will not work correctly
+        else if (this.isMultiBarRestResult(result)) {
+            const multiRest = this.multiBarRestInfo!.get(masterBar.masterBar.index)!;
+            // this is a bit sensitive. we assume that the sequence of multi-rest bars and the
+            // chained nextMasterBar equal. so we just jump over X bars
+            let endMasterBar: MasterBarTickLookup | null = masterBar;
+            for (let i = 0; i < multiRest.length; i++) {
+                if (!endMasterBar) {
+                    break;
+                } else {
+                    endMasterBar = endMasterBar.nextMasterBar;
+                }
+            }
+
+            if (endMasterBar) {
+                // one more following -> use start of next
+                if (endMasterBar.nextMasterBar) {
+                    result.tickDuration = endMasterBar.nextMasterBar.start - beatLookup!.start;
+                }
+                // no more following -> use end
+                else {
+                    result.tickDuration = endMasterBar.end - beatLookup!.start;
+                }
+            } else {
+                Logger.warning(
+                    'Synth',
+                    'MultiBar Rest Info and the nextMasterBar are out of sync, this is an unexpected error. Please report it as bug.  (broken chain stretch-result)'
+                );
+            }
         }
 
         result.calculateDuration();

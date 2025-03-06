@@ -11,6 +11,15 @@ export class MasterBarsRenderers {
     public isLinkedToPrevious: boolean = false;
     public canWrap: boolean = true;
     public masterBar!: MasterBar;
+    public additionalMultiBarRestIndexes: number[] | null = null;
+
+    public get lastMasterBarIndex(): number {
+        if (this.additionalMultiBarRestIndexes) {
+            return this.additionalMultiBarRestIndexes[this.additionalMultiBarRestIndexes.length - 1];
+        }
+        return this.masterBar.index;
+    }
+
     public renderers: BarRendererBase[] = [];
     public layoutingInfo!: BarLayoutingInfo;
 }

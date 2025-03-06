@@ -104,11 +104,7 @@ export class EffectBarRenderer extends BarRendererBase {
                 }
             }
         }
-        for (let voice of this.bar.voices) {
-            if (this.hasVoiceContainer(voice)) {
-                this.createVoiceGlyphs(voice);
-            }
-        }
+        super.createBeatGlyphs();
         for (let effectBand of this._bands) {
             if (effectBand.isLinkedToPrevious) {
                 this.isLinkedToPrevious = true;

@@ -8,5 +8,8 @@
         "no-warnings"
     ],
     "spec": "test/**/*.test.ts",
-    "timeout": "10000"
+    "timeout": "10000",
+    "require": [
+        "test/global-hooks.ts"
+    ]
 }

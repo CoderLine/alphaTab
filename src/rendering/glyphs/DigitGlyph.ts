@@ -34,7 +34,7 @@ export class DigitGlyph extends MusicFontGlyph {
         }
     }
 
-    private static getSymbol(digit: number): MusicFontSymbol {
+    public static getSymbol(digit: number): MusicFontSymbol {
         switch (digit) {
             case 0:
                 return MusicFontSymbol.TimeSig0;

@@ -110,7 +110,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             spaces.push([]);
         }
 
-        this.collectSpaces(spaces);
+        // on multibar rest glyphs we don't have spaces as they are empty
+        if (!this.additionalMultiRestBars) {
+            this.collectSpaces(spaces);
+        }
 
         // if we have multiple voices we need to sort by X-position, otherwise have a wild mix in the list
         // but painting relies on ascending X-position
@@ -524,9 +527,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected override createPostBeatGlyphs(): void {
         super.createPostBeatGlyphs();
-        if (this.bar.masterBar.isRepeatEnd) {
+        const lastBar = this.lastBar;
+        if (lastBar.masterBar.isRepeatEnd) {
             this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
-            if (this.bar.masterBar.repeatCount > 2) {
+            if (lastBar.masterBar.repeatCount > 2) {
                 this.addPostBeatGlyph(
                     new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
                 );

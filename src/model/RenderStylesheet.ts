@@ -140,4 +140,15 @@ export class RenderStylesheet {
      * The orientation of the the track names on other systems
      */
     public otherSystemsTrackNameOrientation: TrackNameOrientation = TrackNameOrientation.Vertical;
+
+    /**
+     * If multi track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
+     */
+    public multiTrackMultiBarRest:boolean = false;
+
+    /**
+     * If single track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
+     */
+    public perTrackMultiBarRest: Set<number> | null = null;
+
 }

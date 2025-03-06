@@ -97,7 +97,7 @@ internal fun IAlphaTabEnum.toInvariantString(): String {
 }
 
 internal fun Double.toFixed(decimals: Double): String {
-    return String.format("%.${decimals}f", this);
+    return String.format("%.${decimals.toInt()}f", this);
 }
 
 internal fun String.lastIndexOfInDouble(item: String): Double {

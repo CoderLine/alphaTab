@@ -130,6 +130,10 @@ export enum MusicFontSymbol {
     RestOneHundredTwentyEighth = 0xe4ea,
     RestTwoHundredFiftySixth = 0xe4eb,
 
+    RestHBarLeft = 0xE4EF,
+    RestHBarMiddle = 0xE4F0,
+    RestHBarRight = 0xE4F1,
+
     Repeat1Bar = 0xe500,
     Repeat2Bars = 0xe501,
 

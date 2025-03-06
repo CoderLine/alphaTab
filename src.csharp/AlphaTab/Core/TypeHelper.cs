@@ -430,10 +430,9 @@ namespace AlphaTab.Core
         {
             s.ContinueWith(x =>
             {
-                if (x.Exception?.InnerExceptions.Count == 1 &&
-                    x.Exception.InnerExceptions[0] is Error e)
+                if (x.Exception?.InnerExceptions.Count == 1)
                 {
-                    after(e);
+                    after(x.Exception.InnerExceptions[0]);
                 }
                 else
                 {
@@ -480,6 +479,18 @@ namespace AlphaTab.Core
         public static IEnumerable<T> SetInitializer<T>(params T[] items)
         {
             return items;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Stack(this Error e)
+        {
+            return e.StackTrace;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Error? Cause(this Error e)
+        {
+            return e.InnerException;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -532,10 +543,10 @@ namespace AlphaTab.Core
                         taskCompletionSource.SetException(e);
                         break;
                     case string s:
-                        taskCompletionSource.SetException(new PromiseRejectedException(s));
+                        taskCompletionSource.SetException(new PromiseRejectedError(s));
                         break;
                     default:
-                        taskCompletionSource.SetException(new PromiseRejectedException("Promise was rejected", o));
+                        taskCompletionSource.SetException(new PromiseRejectedError("Promise was rejected", o));
                         break;
                 }
             }
@@ -547,20 +558,20 @@ namespace AlphaTab.Core
     }
 }
 
-public class PromiseRejectedException : Exception
+public class PromiseRejectedError : Error
 {
     public object? RejectData { get; }
 
-    public PromiseRejectedException()
+    public PromiseRejectedError()
     {
     }
 
-    public PromiseRejectedException(string message) : base(message)
+    public PromiseRejectedError(string message) : base(message)
     {
 
     }
 
-    public PromiseRejectedException(string message, object rejectData) : base(message)
+    public PromiseRejectedError(string message, object rejectData) : base(message)
     {
         RejectData = rejectData;
     }

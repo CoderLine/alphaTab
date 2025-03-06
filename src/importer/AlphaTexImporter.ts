@@ -693,7 +693,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._ch = this.nextChar();
                 this._sy = AlphaTexSymbols.MetaCommand;
                 // allow double backslash (easier to test when copying from escaped Strings)
-                if(this._ch === 0x5c /* \ */) {
+                if (this._ch === 0x5c /* \ */) {
                     this._ch = this.nextChar();
                 }
 
@@ -930,6 +930,11 @@ export class AlphaTexImporter extends ScoreImporter {
                     break;
                 case 'usesystemsignseparator':
                     this._score.stylesheet.useSystemSignSeparator = true;
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'multibarrest':
+                    this._score.stylesheet.multiTrackMultiBarRest = true;
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
@@ -1534,6 +1539,13 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     this._currentTrack.playbackInfo.isSolo = true;
                     break;
+                case 'multibarrest':
+                    this._sy = this.newSy();
+                    if (!this._score.stylesheet.perTrackMultiBarRest) {
+                        this._score.stylesheet.perTrackMultiBarRest = new Set<number>();
+                    }
+                    this._score.stylesheet.perTrackMultiBarRest!.add(this._currentTrack.index);
+                    break;
                 default:
                     this.error('track-properties', AlphaTexSymbols.String, false);
                     break;
@@ -1723,7 +1735,7 @@ export class AlphaTexImporter extends ScoreImporter {
         // need new bar
         const newBar: Bar = new Bar();
         staff.addBar(newBar);
-        if(newBar.previousBar) {
+        if (newBar.previousBar) {
             newBar.clef = newBar.previousBar.clef;
             newBar.clefOttava = newBar.previousBar.clefOttava;
         }

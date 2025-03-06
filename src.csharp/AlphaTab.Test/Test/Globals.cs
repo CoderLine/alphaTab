@@ -64,7 +64,11 @@ public class Expector<T>
     }
 
     public Expector<T> To => this;
-    public NotExpector<T> Not => new(_actual);
+
+    public NotExpector<T> Not()
+    {
+        return new NotExpector<T>(_actual);
+    }
     public Expector<T> Be => this;
     public Expector<T> Have => this;
 

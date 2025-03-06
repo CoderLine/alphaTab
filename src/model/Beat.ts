@@ -61,6 +61,13 @@ export class Beat {
     private static _globalBeatId: number = 0;
 
     /**
+     * @internal
+     */
+    public static resetIds() {
+        this._globalBeatId = 0;
+    }
+
+    /**
      * Gets or sets the unique id of this beat.
      * @clone_ignore
      */
