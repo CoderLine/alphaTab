@@ -30,6 +30,11 @@ internal class TypeHelper {
             return s != null
         }
 
+        @ExperimentalContracts
+        public fun isTruthy(s: Double): Boolean {
+            return !s.isNaN() && s != 0.0
+        }
+
         @ExperimentalUnsignedTypes
         public fun typeOf(s: Any?): String {
             return when (s) {
