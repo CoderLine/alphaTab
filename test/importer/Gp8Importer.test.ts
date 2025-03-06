@@ -278,7 +278,7 @@ describe('Gp8ImporterTest', () => {
         const disabled = (await prepareImporterWithFile('guitarpro8/timer.gp')).readScore();
 
         expect(disabled.stylesheet.multiTrackMultiBarRest).to.be.false;
-        expect(disabled.stylesheet.perTrackMultiBarRest).to.be.null;
+        expect(disabled.stylesheet.perTrackMultiBarRest).to.equal(null);
         expect(enabled.stylesheet.multiTrackMultiBarRest).to.be.true;
         expect(enabled.stylesheet.perTrackMultiBarRest).to.be.ok;
         expect(enabled.stylesheet.perTrackMultiBarRest!.has(0)).to.be.false;
