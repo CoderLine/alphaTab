@@ -77,7 +77,7 @@ export class PartConfiguration {
                         score.stylesheet.perTrackMultiBarRest = new Set<number>();
                     }
 
-                    const trackIndex = scoreViewIndex - 1;
+                    trackIndex = scoreViewIndex - 1;
                     score.stylesheet.perTrackMultiBarRest!.add(trackIndex);
                 }
             }
