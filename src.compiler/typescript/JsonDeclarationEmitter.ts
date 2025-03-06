@@ -74,7 +74,13 @@ function createJsonTypeNode(
             ts.factory.createTypeOperatorNode(
                 ts.SyntaxKind.KeyOfKeyword,
                 ts.factory.createTypeQueryNode(ts.factory.createIdentifier(typeInfo.type.symbol.name))
-            )
+            ),
+            ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Lowercase'), [
+                ts.factory.createTypeOperatorNode(
+                    ts.SyntaxKind.KeyOfKeyword,
+                    ts.factory.createTypeQueryNode(ts.factory.createIdentifier(typeInfo.type.symbol.name))
+                )
+            ])
         ]);
     } else if (checker.isArrayType(typeInfo.type)) {
         const arrayItemType = unwrapArrayItemType(typeInfo.type, checker);

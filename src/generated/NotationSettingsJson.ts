@@ -17,20 +17,20 @@ export interface NotationSettingsJson {
     /**
      * Gets or sets the mode to use for display and play music notation elements.
      */
-    notationMode?: NotationMode | keyof typeof NotationMode;
+    notationMode?: NotationMode | keyof typeof NotationMode | Lowercase<keyof typeof NotationMode>;
     /**
      * Gets or sets the fingering mode to use.
      */
-    fingeringMode?: FingeringMode | keyof typeof FingeringMode;
+    fingeringMode?: FingeringMode | keyof typeof FingeringMode | Lowercase<keyof typeof FingeringMode>;
     /**
      * Gets or sets the configuration on whether music notation elements are visible or not.
      * If notation elements are not specified, the default configuration will be applied.
      */
-    elements?: Map<NotationElement | keyof typeof NotationElement, boolean>;
+    elements?: Map<NotationElement | keyof typeof NotationElement | Lowercase<keyof typeof NotationElement>, boolean>;
     /**
      * Whether to show rhythm notation in the guitar tablature.
      */
-    rhythmMode?: TabRhythmMode | keyof typeof TabRhythmMode;
+    rhythmMode?: TabRhythmMode | keyof typeof TabRhythmMode | Lowercase<keyof typeof TabRhythmMode>;
     /**
      * The height of the rythm bars.
      */

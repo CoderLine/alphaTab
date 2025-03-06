@@ -28,7 +28,7 @@ export interface PlayerSettingsJson {
      * Gets or sets which output mode alphaTab should use.
      * @target web
      */
-    outputMode?: PlayerOutputMode | keyof typeof PlayerOutputMode;
+    outputMode?: PlayerOutputMode | keyof typeof PlayerOutputMode | Lowercase<keyof typeof PlayerOutputMode>;
     /**
      * Gets or sets whether the player should be enabled.
      */
@@ -62,7 +62,7 @@ export interface PlayerSettingsJson {
     /**
      * Gets or sets the mode how to scroll.
      */
-    scrollMode?: ScrollMode | keyof typeof ScrollMode;
+    scrollMode?: ScrollMode | keyof typeof ScrollMode | Lowercase<keyof typeof ScrollMode>;
     /**
      * Gets or sets how fast the scrolling to the new position should happen (in milliseconds)
      */
