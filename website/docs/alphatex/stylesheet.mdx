@@ -116,3 +116,31 @@ To configure the mode how to show [track names](/docs/showcase/general.mdx#track
     C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 | C4 D4 E4 F4 |
 `}</AlphaTexSample>
 
+## Multi-Bar Rests
+
+To configure whether [multibar rests](/docs/showcase/layouts.mdx#multi-bar-rests) should be enabled use:
+
+* `\multiBarRest` - On top level for configuring the use on multi-track renderings
+* `\track { multiBarRest }` - On track level for single track renderings
+
+<AlphaTexSample tracks="all">{`
+\\title "Multi Track"
+\\multiBarRest
+.
+\\track "Piano 1" "pno1"
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | C4
+
+\\track "Piano 2" "pno1"
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | r |
+`}</AlphaTexSample>
+
+<AlphaTexSample tracks="all">{`
+\\title "Single Track"
+.
+\\track "Piano 1" "pno1" { multiBarRest }
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | C4
+`}</AlphaTexSample>
+

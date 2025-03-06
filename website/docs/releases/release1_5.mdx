@@ -1,0 +1,53 @@
+---
+title: v1.5
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab/';
+
+## 1.5.0
+
+:::info
+alphaTab 1.5.0 is still work-in-progress and only available as pre-release version. This document collects already newly
+added features.
+:::
+
+### Music Notation
+
+#### rendering: Multi-Bar Rests
+https://github.com/CoderLine/alphaTab/pull/1934
+
+We added support for merging rests spanning multi-bars together (aka. multi.bar rests).
+Supported for alphaTex and Guitar Pro.
+
+<AlphaTab tex={true} tracks="all" player={true}>{`
+\\multiBarRest
+.
+\\track "Piano 1" "pno1"
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | C4
+
+\\track "Piano 2" "pno1"
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | r |
+`}</AlphaTab>
+
+### Player
+
+### alphaTex Extensions
+
+### Guitar Pro Extensions
+
+### MusicXML Extensions
+
+### Improvements & Bugfixes
+
+#### player: Broken Cursor Display for repeats
+https://github.com/CoderLine/alphaTab/pull/1934
+
+On repeats the bar cursor could behave rather strange moving back to the repeat start instead of transitioning to the end of the bar to the repeat end sign.
+With this fix the beat cursor should correctly move again in such scenarios.
+
+#### player: Wrong beat cursor placement when scaling score
+https://github.com/CoderLine/alphaTab/pull/1934
+
+When drawing scores at non 100%, the beat cursor was placed wrongly.

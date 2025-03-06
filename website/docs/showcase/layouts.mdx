@@ -70,3 +70,25 @@ You can also filter the rendered bars using this layout.
 		barCount: 4
 	}
 } } />
+
+
+## Multi-Bar Rests
+
+alphaTab can load the information whether Multi-Bar rests should be used from input files and then merge the bars when displaying accordingly. 
+The bars are automatically merged if they are empty or contain only rests. 
+
+For Guitar Pro files the format is loaded from the files and for alphaTex it can be specified with a range of metadata options.
+The available options on the stylesheet are: 
+
+
+<AlphaTab tex="true" tracks="all">{`
+\\multiBarRest
+.
+\\track "Piano 1" "pno1"
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | C4
+
+\\track "Piano 2" "pno1"
+    \\staff {score}
+    C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | r |
+`}</AlphaTab>
