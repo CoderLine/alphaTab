@@ -765,7 +765,6 @@ export class MusicXmlImporter extends ScoreImporter {
             this._currentDirection = null;
         }
         let note: Note = new Note();
-        beat.voice.isEmpty = false;
         beat.isEmpty = false;
         beat.addNote(note);
         beat.dots = 0;

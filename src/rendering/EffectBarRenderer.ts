@@ -9,7 +9,6 @@ import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves

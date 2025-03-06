@@ -339,7 +339,7 @@ export class MidiTickLookup {
             this.multiBarRestInfo &&
             this.multiBarRestInfo!.has(masterBarIndex) &&
             beat.isRest &&
-            beat.voice.beats.length == 1
+            beat.voice.bar.isRestOnly
         );
     }
 

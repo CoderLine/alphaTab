@@ -81,6 +81,7 @@ export class BeatBounds {
     public finish(scale: number = 1) {
         this.realBounds.scaleWith(scale);
         this.visualBounds.scaleWith(scale);
+        this.onNotesX *= scale;
 
         if(this.notes){
             for(const n of this.notes!){

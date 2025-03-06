@@ -1051,29 +1051,12 @@ export class AlphaTabApiBase<TSettings> {
             barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
 
-        let currentBeatX: number = beatBoundings.onNotesX;
-        let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-        if (beatCursor) {
-            // get position of next beat on same system
-            if (nextBeat && cursorMode == MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
-                // if we are moving within the same bar or to the next bar
-                // transition to the next beat, otherwise transition to the end of the bar.
-                const nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                if (
-                    nextBeatBoundings &&
-                    nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
-                ) {
-                    nextBeatX = nextBeatBoundings.onNotesX;
-                }
-            }
-        }
-
         if (beatCursor) {
             // move beat to start position immediately
             if (this.settings.player.enableAnimatedBeatCursor) {
                 beatCursor.stopAnimation();
             }
-            beatCursor.setBounds(currentBeatX, barBounds.y, 1, barBounds.h);
+            beatCursor.setBounds(beatBoundings.onNotesX, barBounds.y, 1, barBounds.h);
         }
 
         // if playing, animate the cursor to the next beat
