@@ -6,10 +6,32 @@ import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Settings } from '@src/Settings';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { ElementStyle } from './ElementStyle';
+
+/**
+ * Lists all graphical sub elements within a {@link Track} which can be styled via {@link Track.style}
+ */
+export enum TrackSubElement {
+    /**
+     * The track names shown before the staves.
+     */
+    TrackName,
+
+    /**
+     * The braces and brackets grouping the staves.
+     * If a bracket spans multiple tracks, the color of the first track counts.
+     */
+    BracesAndBrackets,
+
+    /**
+     * The line spanning vertically all staves.
+     */
+    StaffLine
+}
 
 /**
  * This public class describes a single track or instrument of score.
- * It is bascially a list of staffs containing individual music notation kinds.
+ * It is primarily a list of staves containing individual music notation kinds.
  * @json
  * @json_strict
  */
@@ -28,7 +50,7 @@ export class Track {
     public score!: Score;
 
     /**
-     * Gets or sets the list of staffs that are defined for this track.
+     * Gets or sets the list of staves that are defined for this track.
      * @json_add addStaff
      */
     public staves: Staff[] = [];
@@ -78,6 +100,11 @@ export class Track {
      * should be shown.
      */
     public percussionArticulations: InstrumentArticulation[] = [];
+
+    /**
+     * The style customizations for this item.
+     */
+    public style?:ElementStyle<TrackSubElement>;
 
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {

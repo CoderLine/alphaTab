@@ -3,6 +3,17 @@ import { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
 import { Settings } from '@src/Settings';
 import { GraceGroup } from '@src/model/GraceGroup';
+import { ElementStyle } from './ElementStyle';
+
+/**
+ * Lists all graphical sub elements within a {@link Voice} which can be styled via {@link Voice.style}
+ */
+export enum VoiceSubElement {
+    /**
+     * All general glyphs (like notes heads and rests).
+     */
+    Glyphs
+}
 
 /**
  * A voice represents a group of beats
@@ -46,6 +57,11 @@ export class Voice {
     public get isEmpty(): boolean {
         return this._isEmpty;
     }
+
+    /**
+     * The style customizations for this item.
+     */
+    public style?: ElementStyle<VoiceSubElement>;
 
     /**
      * @internal
