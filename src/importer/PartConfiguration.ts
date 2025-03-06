@@ -119,6 +119,8 @@ export class PartConfiguration {
             new PartConfigurationScoreView() // Multi Track Score View
         ];
 
+        scoreViews[0].isMultiRest = score.stylesheet.multiTrackMultiBarRest;
+
         for (const track of score.tracks) {
             const trackConfiguration = new PartConfigurationTrackViewGroup();
             // NOTE: unclear how multi staff settings are meant in this format
@@ -131,6 +133,7 @@ export class PartConfiguration {
             scoreViews[0].trackViewGroups.push(trackConfiguration);
 
             const singleTrackScoreView = new PartConfigurationScoreView();
+            singleTrackScoreView.isMultiRest = score.stylesheet.perTrackMultiBarRest?.has(track.index) === true;
             singleTrackScoreView.trackViewGroups.push(trackConfiguration);
             scoreViews.push(singleTrackScoreView);
         }
