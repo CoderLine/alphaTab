@@ -142,6 +142,18 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 }`,
                     ts.SyntaxKind.Block
                 );
+            } else if(prop.type.typeArguments![1].isJsonImmutable) {
+                const notNull = !prop.type.typeArguments![1].isNullable ? '!' : '';
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                    const m = new Map<string, unknown>();
+                    o.set(${JSON.stringify(jsonName)}, m);
+                    for(const [k, v] of obj.${fieldName}!) {
+                        m.set(k.toString(), ${prop.type.typeArguments![1].typeAsString}.toJson(v)${notNull});
+                    }
+                }`,
+                    ts.SyntaxKind.Block
+                );
             } else {
                 const itemSerializer = prop.type.typeArguments![1].typeAsString + 'Serializer';
                 importer(itemSerializer, findSerializerModule(prop.type.typeArguments![1]));
@@ -224,10 +236,11 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
             }
         } else if (prop.type.isJsonImmutable) {
             importer(prop.type.typeAsString, prop.type.modulePath);
+            const notNull = !prop.type.isNullable ? '!' : '';
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `
-                    o.set(${JSON.stringify(jsonName)}, ${prop.type.typeAsString}.toJson(obj.${fieldName}));
+                    o.set(${JSON.stringify(jsonName)}, ${prop.type.typeAsString}.toJson(obj.${fieldName})${notNull});
                 `,
                     ts.SyntaxKind.ExpressionStatement
                 )

@@ -27,7 +27,7 @@ export class TrackSerializer {
         const o = new Map<string, unknown>();
         o.set("staves", obj.staves.map(i => StaffSerializer.toJson(i)));
         o.set("playbackinfo", PlaybackInformationSerializer.toJson(obj.playbackInfo));
-        o.set("color", Color.toJson(obj.color));
+        o.set("color", Color.toJson(obj.color)!);
         o.set("name", obj.name);
         o.set("isvisibleonmultitrack", obj.isVisibleOnMultiTrack);
         o.set("shortname", obj.shortName);

@@ -95,7 +95,7 @@ export function isPrimitiveType(type: ts.Type | null) {
         return true;
     }
 
-    return isEnumType(type);
+    return false;
 }
 
 export function isNumberType(type: ts.Type | null) {
@@ -114,7 +114,7 @@ export function isEnumType(type: ts.Type) {
     // if for some reason this returns true...
     if (hasFlag(type, ts.TypeFlags.Enum)) return true;
     // it's not an enum type if it's an enum literal type
-    if (hasFlag(type, ts.TypeFlags.EnumLiteral) && !type.isUnion()) return false;
+    if (hasFlag(type, ts.TypeFlags.EnumLiteral)) return true;
     // get the symbol and check if its value declaration is an enum declaration
     const symbol = type.getSymbol();
     if (!symbol) return false;

@@ -132,7 +132,7 @@ export function getTypeWithNullableInfo(
 ): TypeWithNullableInfo {
     const checker = program.getTypeChecker();
 
-    const typeInfo: Writeable<TypeWithNullableInfo> = {
+    let typeInfo: Writeable<TypeWithNullableInfo> = {
         isNullable: false,
         isOptional: isOptionalFromDeclaration,
         isUnionType: false,
@@ -235,7 +235,19 @@ export function getTypeWithNullableInfo(
                     );
                     break;
                 default:
-                    if (tsType.flags & ObjectFlags.Reference) {
+                    if (tsType.isTypeParameter()) {
+                        if (typeArgumentMapping?.has(typeInfo.typeAsString)) {
+                            typeInfo = getTypeWithNullableInfo(
+                                program,
+                                typeArgumentMapping.get(typeInfo.typeAsString)!,
+                                allowUnion,
+                                false,
+                                typeArgumentMapping
+                            );
+                        } else {
+                            throw new Error('Unresolved type parameters ' + typeInfo.typeAsString);
+                        }
+                    } else if ((tsType as ts.Type).flags & ObjectFlags.Reference) {
                         typeInfo.typeArguments = (tsType as ts.TypeReference).typeArguments?.map(p =>
                             getTypeWithNullableInfo(program, p, allowUnion, false, typeArgumentMapping)
                         );
@@ -259,12 +271,12 @@ export function getTypeWithNullableInfo(
                 } else if (!mainType) {
                     mainType = checker.getTypeFromTypeNode(t);
                 } else if (allowUnion) {
-                    if(!typeInfo.unionTypes) {
+                    if (!typeInfo.unionTypes) {
                         typeInfo.unionTypes = [
                             getTypeWithNullableInfo(program, mainType, false, false, typeArgumentMapping)
                         ];
                     }
-                    
+
                     (typeInfo.unionTypes as TypeWithNullableInfo[]).push(
                         getTypeWithNullableInfo(program, t, false, false, typeArgumentMapping)
                     );
@@ -278,10 +290,9 @@ export function getTypeWithNullableInfo(
                 }
             }
 
-            if(!typeInfo.unionTypes && mainType) {
+            if (!typeInfo.unionTypes && mainType) {
                 fillBaseInfoFrom(mainType);
             }
-
         } else {
             fillBaseInfoFrom(checker.getTypeFromTypeNode(node));
         }
