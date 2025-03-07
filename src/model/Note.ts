@@ -84,6 +84,13 @@ export enum NoteSubElement {
 }
 
 /**
+ * Defines the custom styles for notes.
+ * @json
+ * @json_strict
+ */
+export class NoteStyle extends ElementStyle<NoteSubElement> {}
+
+/**
  * A note is a single played sound on a fretted instrument.
  * It consists of a fret offset and a string on which the note is played on.
  * It also can be modified by a lot of different effects.
@@ -562,7 +569,7 @@ export class Note {
      * The style customizations for this item.
      * @clone_ignore
      */
-    public style?: ElementStyle<NoteSubElement>;
+    public style?: NoteStyle;
 
     public get stringTuning(): number {
         return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);

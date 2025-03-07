@@ -166,6 +166,14 @@ export enum BarSubElement {
     NumberedTimeSignature
 }
 
+
+/**
+ * Defines the custom styles for bars.
+ * @json
+ * @json_strict
+ */
+export class BarStyle extends ElementStyle<BarSubElement> {}
+
 /**
  * A bar is a single block within a track, also known as Measure.
  * @json
@@ -271,7 +279,7 @@ export class Bar {
     /**
      * The style customizations for this item.
      */
-    public style?: ElementStyle<BarSubElement>;
+    public style?: BarStyle;
 
     public addVoice(voice: Voice): void {
         voice.bar = this;

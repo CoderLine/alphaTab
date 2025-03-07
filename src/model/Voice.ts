@@ -15,6 +15,14 @@ export enum VoiceSubElement {
     Glyphs
 }
 
+
+/**
+ * Defines the custom styles for voices.
+ * @json
+ * @json_strict
+ */
+export class VoiceStyle extends ElementStyle<VoiceSubElement> {}
+
 /**
  * A voice represents a group of beats
  * that can be played during a bar.
@@ -61,7 +69,7 @@ export class Voice {
     /**
      * The style customizations for this item.
      */
-    public style?: ElementStyle<VoiceSubElement>;
+    public style?: VoiceStyle;
 
     /**
      * @internal

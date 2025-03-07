@@ -36,7 +36,7 @@ export interface CoreSettingsJson {
      * @target web
      * @json_raw
      */
-    tracks?: null | number | number[] | "all";
+    tracks?: number | number[] | "all" | null;
     /**
      * Gets or sets whether lazy loading for displayed elements is enabled.
      */

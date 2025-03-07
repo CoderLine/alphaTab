@@ -22,6 +22,7 @@ export interface PlayerSettingsJson {
      * Gets or sets the element that should be used for scrolling.
      * @target web
      * @json_read_only
+     * @json_raw
      */
     scrollElement?: string | HTMLElement;
     /**

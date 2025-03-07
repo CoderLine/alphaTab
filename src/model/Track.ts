@@ -29,6 +29,14 @@ export enum TrackSubElement {
     StaffLine
 }
 
+
+/**
+ * Defines the custom styles for tracks.
+ * @json
+ * @json_strict
+ */
+export class TrackStyle extends ElementStyle<TrackSubElement> {}
+
 /**
  * This public class describes a single track or instrument of score.
  * It is primarily a list of staves containing individual music notation kinds.
@@ -104,7 +112,7 @@ export class Track {
     /**
      * The style customizations for this item.
      */
-    public style?:ElementStyle<TrackSubElement>;
+    public style?:TrackStyle;
 
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {

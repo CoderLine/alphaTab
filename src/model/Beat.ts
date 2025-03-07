@@ -165,6 +165,14 @@ export enum BeatSubElement {
     NumberedRests
 }
 
+
+/**
+ * Defines the custom styles for beats.
+ * @json
+ * @json_strict
+ */
+export class BeatStyle extends ElementStyle<BeatSubElement> {}
+
 /**
  * A beat is a single block within a bar. A beat is a combination
  * of several notes played at the same time.
@@ -646,7 +654,7 @@ export class Beat {
      * The style customizations for this item.
      * @clone_ignore
      */
-    public style?: ElementStyle<BeatSubElement>;
+    public style?: BeatStyle;
 
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;

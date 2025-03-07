@@ -7,11 +7,13 @@ import { Bar } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { SustainPedalMarkerSerializer } from "@src/generated/model/SustainPedalMarkerSerializer";
+import { BarStyleSerializer } from "@src/generated/model/BarStyleSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 import { SustainPedalMarker } from "@src/model/Bar";
+import { BarStyle } from "@src/model/Bar";
 export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
         if (!m) {
@@ -32,6 +34,9 @@ export class BarSerializer {
         o.set("displayscale", obj.displayScale);
         o.set("displaywidth", obj.displayWidth);
         o.set("sustainpedals", obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJson(i)));
+        if (obj.style) {
+            o.set("style", BarStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
@@ -68,6 +73,15 @@ export class BarSerializer {
                     const i = new SustainPedalMarker();
                     SustainPedalMarkerSerializer.fromJson(i, o);
                     obj.sustainPedals.push(i);
+                }
+                return true;
+            case "style":
+                if (v) {
+                    obj.style = new BarStyle();
+                    BarStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
                 }
                 return true;
         }

@@ -55,7 +55,7 @@ export class CoreSettingsSerializer {
                 return true;
             /*@target web*/
             case "tracks":
-                obj.tracks = v! as number | number[] | "all" | null;
+                obj.tracks = v as number | number[] | "all" | null;
                 return true;
             case "enablelazyloading":
                 obj.enableLazyLoading = v! as boolean;

@@ -123,6 +123,7 @@ export class PlayerSettings {
      * Gets or sets the element that should be used for scrolling.
      * @target web
      * @json_read_only
+     * @json_raw
      */
     public scrollElement: string | HTMLElement = 'html,body';
 

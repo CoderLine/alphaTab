@@ -2,88 +2,43 @@
  * This file contains an emitter which generates classes to clone
  * any data models following certain rules.
  */
-import * as path from 'path';
-import * as url from 'url';
+
 import * as ts from 'typescript';
 import createEmitter, { generateFile } from './EmitterBase';
-import {
-    cloneTypeNode,
-    getTypeWithNullableInfo,
-    isEnumType,
-    isPrimitiveType,
-    unwrapArrayItemType
-} from '../BuilderHelpers';
+import { getTypeWithNullableInfo, TypeWithNullableInfo } from './TypeSchema';
 
-function removeExtension(fileName: string) {
-    return fileName.substring(0, fileName.lastIndexOf('.'));
-}
-
-const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
-const root = path.resolve(__dirname, '..', '..');
-
-function toImportPath(fileName: string) {
-    return '@' + removeExtension(path.relative(root, fileName)).split('\\').join('/');
-}
-
-function createDefaultJsonTypeNode(checker: ts.TypeChecker, type: ts.Type, isNullable: boolean) {
+function createDefaultJsonTypeNode(checker: ts.TypeChecker, type: TypeWithNullableInfo, isNullable: boolean) {
     if (isNullable) {
         const notNullable = createDefaultJsonTypeNode(checker, type, false);
         return ts.factory.createUnionTypeNode([notNullable, ts.factory.createLiteralTypeNode(ts.factory.createNull())]);
     }
 
-    if (isPrimitiveType(type)) {
-        if ('intrinsicName' in type) {
-            return ts.factory.createTypeReferenceNode(type.intrinsicName as string);
-        } else {
-            return ts.factory.createTypeReferenceNode('TODO');
-        }
-    } else if (checker.isArrayType(type)) {
-        return ts.factory.createTypeReferenceNode(type.symbol.name);
-    } else if (type.symbol) {
-        return ts.factory.createTypeReferenceNode(type.symbol.name);
-    } else if (type.isStringLiteral()) {
-        return ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(type.value));
-    } else if (type.isLiteral()) {
-        if (typeof type.value === 'string') {
-            return ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(type.value));
-        } else {
-            return ts.factory.createTypeReferenceNode('TODO');
-        }
-    } else if ('intrinsicName' in type) {
-        return ts.factory.createTypeReferenceNode(type.intrinsicName as string);
-    } else {
-        return ts.factory.createTypeReferenceNode('TODO');
-    }
+    return type.createTypeNode();
 }
 
 function createJsonTypeNode(
     checker: ts.TypeChecker,
-    type: ts.TypeNode | ts.Type,
+    typeInfo: TypeWithNullableInfo,
     importer: (name: string, module: string) => void
 ): ts.TypeNode | undefined {
-    const typeInfo = getTypeWithNullableInfo(checker, type!, true);
-
-    if (isEnumType(typeInfo.type)) {
-        const sourceFile = typeInfo.type.symbol.valueDeclaration?.getSourceFile();
-        if (sourceFile) {
-            importer(typeInfo.type.symbol.name, toImportPath(sourceFile.fileName));
-        }
+    if (typeInfo.isEnumType) {
+        importer(typeInfo.typeAsString, typeInfo.modulePath);
 
         return ts.factory.createUnionTypeNode([
-            ts.factory.createTypeReferenceNode(typeInfo.type.symbol.name),
+            typeInfo.createTypeNode(),
             ts.factory.createTypeOperatorNode(
                 ts.SyntaxKind.KeyOfKeyword,
-                ts.factory.createTypeQueryNode(ts.factory.createIdentifier(typeInfo.type.symbol.name))
+                ts.factory.createTypeQueryNode(ts.factory.createIdentifier(typeInfo.typeAsString))
             ),
             ts.factory.createTypeReferenceNode(ts.factory.createIdentifier('Lowercase'), [
                 ts.factory.createTypeOperatorNode(
                     ts.SyntaxKind.KeyOfKeyword,
-                    ts.factory.createTypeQueryNode(ts.factory.createIdentifier(typeInfo.type.symbol.name))
+                    ts.factory.createTypeQueryNode(ts.factory.createIdentifier(typeInfo.typeAsString))
                 )
             ])
         ]);
-    } else if (checker.isArrayType(typeInfo.type)) {
-        const arrayItemType = unwrapArrayItemType(typeInfo.type, checker);
+    } else if (typeInfo.isArray) {
+        const arrayItemType = typeInfo.arrayItemType;
         if (arrayItemType) {
             const result = createJsonTypeNode(checker, arrayItemType, importer);
             if (result) {
@@ -93,9 +48,9 @@ function createJsonTypeNode(
             }
         }
         return undefined;
-    } else if (!isPrimitiveType(typeInfo.type) && typeInfo.type.isUnion()) {
+    } else if (!typeInfo.isPrimitiveType && typeInfo.isUnionType) {
         const types: ts.TypeNode[] = [];
-        for (const type of typeInfo.type.types) {
+        for (const type of typeInfo.unionTypes!) {
             const mapped = createJsonTypeNode(checker, type, importer);
             if (mapped) {
                 types.push(mapped);
@@ -104,48 +59,37 @@ function createJsonTypeNode(
             }
         }
         return ts.factory.createUnionTypeNode(types);
-    } else if (typeInfo.type.symbol) {
-        const sourceFile = typeInfo.type.symbol.valueDeclaration?.getSourceFile();
-        if (sourceFile) {
-            const isOwnType = !sourceFile.fileName.includes('node_modules');
+    } else {
+        if (typeInfo.modulePath) {
+            const isOwnType = typeInfo.isOwnType;
 
             if (isOwnType) {
-                const isGeneratedJsonDeclaration = ts
-                    .getJSDocTags(typeInfo.type.symbol.valueDeclaration!)
-                    .some(t => t.tagName.text === 'json_declaration');
+                const isGeneratedJsonDeclaration = typeInfo.jsDocTags?.some(t => t.tagName.text === 'json_declaration');
                 if (isGeneratedJsonDeclaration) {
-                    importer(typeInfo.type.symbol.name + 'Json', './' + typeInfo.type.symbol.name + 'Json');
+                    importer(typeInfo.typeAsString + 'Json', './' + typeInfo.typeAsString + 'Json');
                 } else {
-                    importer(typeInfo.type.symbol.name + 'Json', toImportPath(sourceFile.fileName));
+                    importer(typeInfo.typeAsString + 'Json', typeInfo.modulePath);
                 }
             }
 
             let args: ts.TypeNode[] | undefined = undefined;
-            if ('typeArguments' in typeInfo.type) {
+            if (typeInfo.typeArguments) {
                 args = [];
-                for (const arg of (typeInfo.type as ts.TypeReference).typeArguments ?? []) {
+                for (const arg of typeInfo.typeArguments) {
                     const mapped = createJsonTypeNode(checker, arg, importer);
 
                     if (mapped) {
                         args.push(mapped);
                     } else {
-                        const argTypeInfo = getTypeWithNullableInfo(checker, arg, true);
-                        args.push(createDefaultJsonTypeNode(checker, argTypeInfo.type, argTypeInfo.isNullable));
+                        args.push(createDefaultJsonTypeNode(checker, arg, arg.isNullable));
                     }
                 }
             }
 
             let symbolType: ts.TypeNode = ts.factory.createTypeReferenceNode(
-                typeInfo.type.symbol.name + (isOwnType ? 'Json' : ''),
+                typeInfo.typeAsString + (isOwnType ? 'Json' : ''),
                 args
             );
-
-            if (typeInfo.type.symbol.name === 'Map' && args && args.length === 2) {
-                // symbolType = ts.factory.createUnionTypeNode([
-                //     symbolType,
-                //     ts.factory.createTypeReferenceNode('Record'
-                // ]);
-            }
 
             return symbolType;
         }
@@ -186,8 +130,8 @@ function createJsonMember(
     input: ts.PropertyDeclaration,
     importer: (name: string, module: string) => void
 ): ts.TypeElement {
-    const checker = program.getTypeChecker();
-    let type = createJsonTypeNode(checker, input.type!, importer) ?? cloneTypeNode(input.type!);
+    const typeInfo = getTypeWithNullableInfo(program, input.type!, true, false, undefined);
+    let type = createJsonTypeNode(program.getTypeChecker(), typeInfo, importer) ?? typeInfo.createTypeNode();
 
     let prop = ts.factory.createPropertySignature(
         undefined,

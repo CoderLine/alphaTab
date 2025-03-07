@@ -101,10 +101,9 @@ export class ScoreSerializer {
             case "systemslayout":
                 obj.systemsLayout = v! as number[];
                 return true;
-        }
-        if (["stylesheet"].indexOf(property) >= 0) {
-            RenderStylesheetSerializer.fromJson(obj.stylesheet, v as Map<string, unknown>);
-            return true;
+            case "stylesheet":
+                RenderStylesheetSerializer.fromJson(obj.stylesheet, v);
+                return true;
         }
         return false;
     }
