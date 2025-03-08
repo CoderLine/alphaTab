@@ -3,7 +3,7 @@ import { Bar } from '@src/model/Bar';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score, ScoreSubElement } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
+import { Track, TrackSubElement } from '@src/model/Track';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
@@ -20,6 +20,7 @@ import { NotationSettings, NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { TuningGlyph } from '../glyphs/TuningGlyph';
 
 class LazyPartial {
     public args: RenderFinishedEventArgs;
@@ -264,7 +265,7 @@ export abstract class ScoreLayout {
         }
 
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
-            let tunings: Staff[] = [];
+            let stavesWithTuning: Staff[] = [];
             for (let track of this.renderer.tracks!) {
                 for (let staff of track.staves) {
                     let showTuning =
@@ -279,17 +280,28 @@ export abstract class ScoreLayout {
                     }
 
                     if (showTuning) {
-                        tunings.push(staff);
+                        stavesWithTuning.push(staff);
                         break;
                     }
                 }
             }
             // tuning info
-            if (tunings.length > 0 && score.stylesheet.globalDisplayTuning) {
+            if (stavesWithTuning.length > 0 && score.stylesheet.globalDisplayTuning) {
                 this.tuningGlyph = new TuningContainerGlyph(0, 0);
                 this.tuningGlyph.renderer = fakeBarRenderer;
-                for (const t of tunings) {
-                    this.tuningGlyph.addTuning(t.stringTuning, tunings.length > 1 ? t.track.name : '');
+                for (const staff of stavesWithTuning) {
+                    if (staff.stringTuning.tunings.length > 0) {
+                        const trackLabel = stavesWithTuning.length > 1 ? staff.track.name : '';
+                        let item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
+                        item.colorOverride = ElementStyleHelper.trackColor(
+                            res,
+                            TrackSubElement.StringTuning,
+                            staff.track
+                        );
+                        item.renderer = fakeBarRenderer;
+                        item.doLayout();
+                        this.tuningGlyph.addGlyph(item);
+                    }
                 }
             }
         }
