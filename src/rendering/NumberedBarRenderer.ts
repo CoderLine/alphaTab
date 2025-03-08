@@ -19,6 +19,7 @@ import { NumberedKeySignatureGlyph } from './glyphs/NumberedKeySignatureGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { Duration } from '@src/model';
 import { BeatXPosition } from './BeatXPosition';
+import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -99,9 +100,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
                 let dotOverflow = 0;
                 const lowestOctave = this.lowestOctave;
-                if (lowestOctave  !== null) {
-                    dotOverflow =
-                        (Math.abs(lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize);
+                if (lowestOctave !== null) {
+                    dotOverflow = Math.abs(lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize;
                 }
 
                 this.registerOverflowBottom(barOverflow + dotOverflow);
@@ -110,7 +110,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             const highestOctave = this.highestOctave;
             if (highestOctave !== null) {
                 const dotOverflow =
-                    (Math.abs(highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize);
+                    Math.abs(highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize;
                 this.registerOverflowTop(dotOverflow);
             }
         }
@@ -173,7 +173,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             let dotsOffset = 0;
             if (dotCount > 0) {
                 dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
-                dotsOffset = NumberedBarRenderer.DotSpacing * (-1);
+                dotsOffset = NumberedBarRenderer.DotSpacing * -1;
             } else if (dotCount < 0) {
                 dotsY = barStart + beamY + barCount * barSpacing;
                 dotsOffset = NumberedBarRenderer.DotSpacing;
@@ -227,32 +227,38 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
+    }
+
+    protected override createPreBeatGlyphs(): void {
+        this.wasFirstOfLine = this.isFirstOfLine;
+        if (this.bar.masterBar.isRepeatStart && this._isOnlyNumbered) {
+            this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
+        }
+        this.createLinePreBeatGlyphs();
+        this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
     }
 
     protected override createLinePreBeatGlyphs(): void {
         // Key signature
-        if (
-            !this.bar.previousBar ||
-            (this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
-        ) {
+        if (!this.bar.previousBar || this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature) {
             this.createStartSpacing();
             this.createKeySignatureGlyphs();
         }
 
-        if (this._isOnlyNumbered && 
-            ( 
-                !this.bar.previousBar ||
+        if (
+            this._isOnlyNumbered &&
+            (!this.bar.previousBar ||
                 (this.bar.previousBar &&
-                    this.bar.masterBar.timeSignatureNumerator !== this.bar.previousBar.masterBar.timeSignatureNumerator) ||
+                    this.bar.masterBar.timeSignatureNumerator !==
+                        this.bar.previousBar.masterBar.timeSignatureNumerator) ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.timeSignatureDenominator !==
                         this.bar.previousBar.masterBar.timeSignatureDenominator) ||
                 (this.bar.previousBar &&
                     this.bar.masterBar.isFreeTime &&
-                    this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime)
-
-            )) {
+                    this.bar.masterBar.isFreeTime !== this.bar.previousBar.masterBar.isFreeTime))
+        ) {
             this.createStartSpacing();
             this.createTimeSignatureGlyphs();
         }
