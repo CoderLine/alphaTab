@@ -1,4 +1,4 @@
-import { Bar } from '@src/model/Bar';
+import { Bar, BarSubElement } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Voice } from '@src/model/Voice';
@@ -39,6 +39,19 @@ export class TabBarRenderer extends LineBarRenderer {
     public override get showMultiBarRest(): boolean {
         return this._showMultiBarRest;
     }
+
+    public override get repeatsBarSubElement(): BarSubElement {
+        return BarSubElement.GuitarTabsRepeats;
+    }
+
+    public override get barNumberBarSubElement(): BarSubElement {
+        return BarSubElement.GuitarTabsBarNumber;
+    }
+
+    public override get barSeparatorBarSubElement(): BarSubElement {
+        return BarSubElement.GuitarTabsBarSeparator;
+    }
+
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);

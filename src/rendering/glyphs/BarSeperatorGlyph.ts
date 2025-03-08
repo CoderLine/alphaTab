@@ -1,5 +1,7 @@
 import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { LineBarRenderer } from '../LineBarRenderer';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class BarSeperatorGlyph extends Glyph {
     private static readonly DashSize: number = 4;
@@ -26,6 +28,13 @@ export class BarSeperatorGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(
+            canvas,
+            (this.renderer as LineBarRenderer).barSeparatorBarSubElement,
+            this.renderer.bar,
+            true
+        );
+
         let blockWidth: number = 4;
         let top: number = cy + this.y + this.renderer.topPadding;
         let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;

@@ -1,4 +1,4 @@
-import { Bar, Beat, Duration, GraceType, TupletGroup } from '@src/model';
+import { Bar, BarSubElement, Beat, Duration, GraceType, TupletGroup } from '@src/model';
 import { BarRendererBase } from './BarRendererBase';
 import { ScoreRenderer } from './ScoreRenderer';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
@@ -514,6 +514,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public calculateBeamY(h: BeamingHelper, x: number): number {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
+    
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
         if (this.bar.masterBar.isRepeatStart) {
@@ -539,6 +540,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
         }
     }
+
+    public abstract get repeatsBarSubElement():BarSubElement;
+    public abstract get barNumberBarSubElement():BarSubElement;
+    public abstract get barSeparatorBarSubElement():BarSubElement;
 
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {

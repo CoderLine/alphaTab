@@ -1,4 +1,4 @@
-import { Bar } from '@src/model/Bar';
+import { Bar, BarSubElement } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { Voice } from '@src/model/Voice';
@@ -30,6 +30,18 @@ export class SlashBarRenderer extends LineBarRenderer {
         // ignore numbered notation here
         this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
         this.helpers.preferredBeamDirection = BeamDirection.Up;
+    }
+
+    public override get repeatsBarSubElement(): BarSubElement {
+        return BarSubElement.SlashRepeats;
+    }
+
+    public override get barNumberBarSubElement(): BarSubElement {
+        return BarSubElement.SlashBarNumber;
+    }
+
+    public override get barSeparatorBarSubElement(): BarSubElement {
+        return BarSubElement.SlashBarSeparator;
     }
 
     public override get lineSpacing(): number {
@@ -76,11 +88,11 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -100,7 +112,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -127,18 +139,18 @@ export class SlashBarRenderer extends LineBarRenderer {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const masterBar = this.bar.masterBar;
-        this.addPreBeatGlyph(
-            new ScoreTimeSignatureGlyph(
-                0,
-                this.getLineY(0),
-                masterBar.timeSignatureNumerator,
-                masterBar.timeSignatureDenominator,
-                masterBar.timeSignatureCommon,
-                masterBar.isFreeTime &&
-                    (masterBar.previousMasterBar == null ||
-                        masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
-            )
+        const g = new ScoreTimeSignatureGlyph(
+            0,
+            this.getLineY(0),
+            masterBar.timeSignatureNumerator,
+            masterBar.timeSignatureDenominator,
+            masterBar.timeSignatureCommon,
+            masterBar.isFreeTime &&
+                (masterBar.previousMasterBar == null ||
+                    masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
         );
+        g.barSubElement = BarSubElement.SlashTimeSignature;
+        this.addPreBeatGlyph(g);
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

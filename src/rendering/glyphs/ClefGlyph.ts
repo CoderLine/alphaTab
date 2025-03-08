@@ -4,6 +4,8 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { BarSubElement } from '@src/model';
 
 export class ClefGlyph extends MusicFontGlyph {
     private _clef: Clef;
@@ -47,6 +49,12 @@ export class ClefGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(
+            canvas,
+            BarSubElement.StandardNotationClef,
+            this.renderer.bar
+        );
+
         super.paint(cx, cy, canvas);
         let numberGlyph: Glyph;
         let top: boolean = false;

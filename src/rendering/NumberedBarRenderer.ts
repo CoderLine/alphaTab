@@ -1,4 +1,4 @@
-import { Bar } from '@src/model/Bar';
+import { Bar, BarSubElement } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { Voice } from '@src/model/Voice';
@@ -20,6 +20,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { Duration } from '@src/model';
 import { BeatXPosition } from './BeatXPosition';
 import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
+import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -31,8 +32,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     private _isOnlyNumbered: boolean;
     public shortestDuration = Duration.QuadrupleWhole;
-    public lowestOctave:number | null = null;
-    public highestOctave:number | null = null;
+    public lowestOctave: number | null = null;
+    public highestOctave: number | null = null;
 
     public registerOctave(octave: number) {
         if (this.lowestOctave === null) {
@@ -46,6 +47,18 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 this.highestOctave = octave;
             }
         }
+    }
+
+    public override get repeatsBarSubElement(): BarSubElement {
+        return BarSubElement.NumberedRepeats;
+    }
+
+    public override get barNumberBarSubElement(): BarSubElement {
+        return BarSubElement.NumberedBarNumber;
+    }
+
+    public override get barSeparatorBarSubElement(): BarSubElement {
+        return BarSubElement.NumberedBarSeparator;
     }
 
     public constructor(renderer: ScoreRenderer, bar: Bar) {
@@ -194,15 +207,15 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get tupletOffset(): number {
-        return super.tupletOffset + this.resources.numberedNotationFont.size; 
+        return super.tupletOffset + this.resources.numberedNotationFont.size;
     }
 
-    protected override getFlagTopY(_beat: Beat, _direction:BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+    protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction:BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -278,16 +291,18 @@ export class NumberedBarRenderer extends LineBarRenderer {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const masterBar = this.bar.masterBar;
-        this.addPreBeatGlyph(
-            new ScoreTimeSignatureGlyph(
-                0,
-                this.getLineY(0),
-                masterBar.timeSignatureNumerator,
-                masterBar.timeSignatureDenominator,
-                masterBar.timeSignatureCommon,
-                masterBar.isFreeTime && (masterBar.previousMasterBar == null || masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime),
-            )
+        const g = new ScoreTimeSignatureGlyph(
+            0,
+            this.getLineY(0),
+            masterBar.timeSignatureNumerator,
+            masterBar.timeSignatureDenominator,
+            masterBar.timeSignatureCommon,
+            masterBar.isFreeTime &&
+                (masterBar.previousMasterBar == null ||
+                    masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
         );
+        g.barSubElement = BarSubElement.NumberedTimeSignature;
+        this.addPreBeatGlyph(g);
     }
 
     protected override createPostBeatGlyphs(): void {
