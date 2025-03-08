@@ -24,9 +24,14 @@ export enum TrackSubElement {
     BracesAndBrackets,
 
     /**
-     * The line spanning vertically all staves.
+     * The system separator.
      */
-    StaffLine
+    SystemSeparator,
+
+    /**
+     * The tuning of the strings.
+     */
+    StringTuning,
 }
 
 
