@@ -1,7 +1,7 @@
 import { Environment } from '@src/Environment';
 import { Bar } from '@src/model/Bar';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { Score } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
@@ -19,6 +19,7 @@ import { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationSettings, NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 class LazyPartial {
     public args: RenderFinishedEventArgs;
@@ -154,25 +155,57 @@ export abstract class ScoreLayout {
         if (score.title && notation.isNotationElementVisible(NotationElement.ScoreTitle)) {
             this.scoreInfoGlyphs.set(
                 NotationElement.ScoreTitle,
-                new TextGlyph(0, 0, score.title, res.titleFont, TextAlign.Center)
+                new TextGlyph(
+                    0,
+                    0,
+                    score.title,
+                    res.titleFont,
+                    TextAlign.Center,
+                    undefined,
+                    ElementStyleHelper.scoreColor(res, ScoreSubElement.Title, score)
+                )
             );
         }
         if (score.subTitle && notation.isNotationElementVisible(NotationElement.ScoreSubTitle)) {
             this.scoreInfoGlyphs.set(
                 NotationElement.ScoreSubTitle,
-                new TextGlyph(0, 0, score.subTitle, res.subTitleFont, TextAlign.Center)
+                new TextGlyph(
+                    0,
+                    0,
+                    score.subTitle,
+                    res.subTitleFont,
+                    TextAlign.Center,
+                    undefined,
+                    ElementStyleHelper.scoreColor(res, ScoreSubElement.SubTitle, score)
+                )
             );
         }
         if (score.artist && notation.isNotationElementVisible(NotationElement.ScoreArtist)) {
             this.scoreInfoGlyphs.set(
                 NotationElement.ScoreArtist,
-                new TextGlyph(0, 0, score.artist, res.subTitleFont, TextAlign.Center)
+                new TextGlyph(
+                    0,
+                    0,
+                    score.artist,
+                    res.subTitleFont,
+                    TextAlign.Center,
+                    undefined,
+                    ElementStyleHelper.scoreColor(res, ScoreSubElement.Artist, score)
+                )
             );
         }
         if (score.album && notation.isNotationElementVisible(NotationElement.ScoreAlbum)) {
             this.scoreInfoGlyphs.set(
                 NotationElement.ScoreAlbum,
-                new TextGlyph(0, 0, score.album, res.subTitleFont, TextAlign.Center)
+                new TextGlyph(
+                    0,
+                    0,
+                    score.album,
+                    res.subTitleFont,
+                    TextAlign.Center,
+                    undefined,
+                    ElementStyleHelper.scoreColor(res, ScoreSubElement.Album, score)
+                )
             );
         }
         if (
@@ -182,19 +215,43 @@ export abstract class ScoreLayout {
         ) {
             this.scoreInfoGlyphs.set(
                 NotationElement.ScoreWordsAndMusic,
-                new TextGlyph(0, 0, 'Music and Words by ' + score.words, res.wordsFont, TextAlign.Center)
+                new TextGlyph(
+                    0,
+                    0,
+                    'Music and Words by ' + score.words,
+                    res.wordsFont,
+                    TextAlign.Center,
+                    undefined,
+                    ElementStyleHelper.scoreColor(res, ScoreSubElement.WordsAndMusic, score)
+                )
             );
         } else {
             if (score.music && notation.isNotationElementVisible(NotationElement.ScoreMusic)) {
                 this.scoreInfoGlyphs.set(
                     NotationElement.ScoreMusic,
-                    new TextGlyph(0, 0, 'Music by ' + score.music, res.wordsFont, TextAlign.Right)
+                    new TextGlyph(
+                        0,
+                        0,
+                        'Music by ' + score.music,
+                        res.wordsFont,
+                        TextAlign.Right,
+                        undefined,
+                        ElementStyleHelper.scoreColor(res, ScoreSubElement.Music, score)
+                    )
                 );
             }
             if (score.words && notation.isNotationElementVisible(NotationElement.ScoreWords)) {
                 this.scoreInfoGlyphs.set(
                     NotationElement.ScoreWords,
-                    new TextGlyph(0, 0, 'Words by ' + score.words, res.wordsFont, TextAlign.Left)
+                    new TextGlyph(
+                        0,
+                        0,
+                        'Words by ' + score.words,
+                        res.wordsFont,
+                        TextAlign.Left,
+                        undefined,
+                        ElementStyleHelper.scoreColor(res, ScoreSubElement.Words, score)
+                    )
                 );
             }
         }
