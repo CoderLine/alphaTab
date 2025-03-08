@@ -15,6 +15,7 @@ import { RepeatCloseGlyph } from './glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from './glyphs/RepeatCountGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
 import { BeatBeamingMode } from '@src/model/Beat';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This is a base class for any bar renderer which renders music notation on a staff
@@ -96,13 +97,19 @@ export abstract class LineBarRenderer extends BarRendererBase {
     // private static readonly Random Random = new Random();
     protected override paintBackground(cx: number, cy: number, canvas: ICanvas): void {
         super.paintBackground(cx, cy, canvas);
-        const res = this.resources;
         // canvas.color = Color.random(100);
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         //
         // draw string lines
         //
-        canvas.color = res.staffLineColor;
+
+        this.paintStaffLines(cx, cy, canvas);
+
+        this.paintSimileMark(cx, cy, canvas);
+    }
+
+    private paintStaffLines(cx: number, cy: number, canvas: ICanvas) {
+        using _ = ElementStyleHelper.bar(canvas, this.staffLineBarSubElement, this.bar, true);
 
         // collect tab note position for spaces
         const spaces: Float32Array[][] = [];
@@ -143,9 +150,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 BarRendererBase.StaffLineThickness
             );
         }
-        canvas.color = res.mainGlyphColor;
-
-        this.paintSimileMark(cx, cy, canvas);
     }
 
     protected collectSpaces(spaces: Float32Array[][]) {
@@ -514,7 +518,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public calculateBeamY(h: BeamingHelper, x: number): number {
         return this.calculateBeamYWithDirection(h, x, this.getBeamDirection(h));
     }
-    
+
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
         if (this.bar.masterBar.isRepeatStart) {
@@ -541,9 +545,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    public abstract get repeatsBarSubElement():BarSubElement;
-    public abstract get barNumberBarSubElement():BarSubElement;
-    public abstract get barSeparatorBarSubElement():BarSubElement;
+    public abstract get repeatsBarSubElement(): BarSubElement;
+    public abstract get barNumberBarSubElement(): BarSubElement;
+    public abstract get barSeparatorBarSubElement(): BarSubElement;
+    public abstract get staffLineBarSubElement(): BarSubElement;
 
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {

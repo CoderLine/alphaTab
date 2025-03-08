@@ -44,6 +44,10 @@ export class SlashBarRenderer extends LineBarRenderer {
         return BarSubElement.SlashBarSeparator;
     }
 
+    public override get staffLineBarSubElement(): BarSubElement {
+        return BarSubElement.SlashStaffLine;
+    }
+
     public override get lineSpacing(): number {
         return BarRendererBase.RawLineSpacing;
     }

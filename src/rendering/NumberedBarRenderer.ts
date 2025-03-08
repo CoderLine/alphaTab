@@ -61,6 +61,10 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return BarSubElement.NumberedBarSeparator;
     }
 
+    public override get staffLineBarSubElement(): BarSubElement {
+        return BarSubElement.NumberedStaffLine;
+    }
+
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
         this._isOnlyNumbered = !bar.staff.showSlash && !bar.staff.showTablature && !bar.staff.showStandardNotation;

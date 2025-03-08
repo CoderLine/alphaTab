@@ -163,9 +163,28 @@ export enum BarSubElement {
     /**
      * The time signature on the numbered notation staff.
      */
-    NumberedTimeSignature
-}
+    NumberedTimeSignature,
 
+    /**
+     * The staff lines on the standard notation staff.
+     */
+    StandardNotationStaffLine,
+
+    /**
+     * The staff lines on the guitar tab staff.
+     */
+    GuitarTabsStaffLine,
+
+    /**
+     * The staff lines on the slash staff.
+     */
+    SlashStaffLine,
+
+    /**
+     * The staff lines on the numbered notation staff.
+     */
+    NumberedStaffLine
+}
 
 /**
  * Defines the custom styles for bars.
