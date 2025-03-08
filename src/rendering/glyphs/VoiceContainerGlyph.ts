@@ -1,11 +1,12 @@
 import { GraceType } from '@src/model/GraceType';
 import { TupletGroup } from '@src/model/TupletGroup';
-import { Voice } from '@src/model/Voice';
+import { Voice, VoiceSubElement } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 /**
  * This glyph acts as container for handling
@@ -150,10 +151,12 @@ export class VoiceContainerGlyph extends GlyphGroup {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
-        canvas.color =
-            this.voice.index === 0
-                ? this.renderer.resources.mainGlyphColor
-                : this.renderer.resources.secondaryGlyphColor;
+        using _ = ElementStyleHelper.voice(canvas, 
+            VoiceSubElement.Glyphs,
+            this.voice,
+            true
+        )
+
         for (let i: number = 0, j: number = this.beatGlyphs.length; i < j; i++) {
             this.beatGlyphs[i].paint(cx + this.x, cy + this.y, canvas);
         }
