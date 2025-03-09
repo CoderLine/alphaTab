@@ -145,8 +145,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             return;
         }
         let w: number = 0;
-        for (let i: number = 0, j: number = this.allGlyphs.length; i < j; i++) {
-            let g: Glyph = this.allGlyphs[i];
+        for (let i: number = 0, j: number = this.glyphs!.length; i < j; i++) {
+            let g: Glyph = this.glyphs![i];
             g.x = w;
             g.renderer = this.renderer;
             g.doLayout();

@@ -1,21 +1,17 @@
 import { BeatSubElement } from '@src/model';
 import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
+import { ICanvas } from '@src/platform';
 
-export class BeatGlyphBase extends Glyph {
-    public allGlyphs: Glyph[] = [];
+export class BeatGlyphBase extends GlyphGroup {
     private _effectGlyphs: Glyph[] = [];
     private _normalGlyphs: Glyph[] = [];
 
     public container!: BeatContainerGlyph;
     public computedWidth: number = 0;
-
-    public get isEmpty() {
-        return this.allGlyphs.length === 0;
-    }
 
     public constructor() {
         super(0, 0);
@@ -24,9 +20,9 @@ export class BeatGlyphBase extends Glyph {
     public override doLayout(): void {
         // left to right layout
         let w: number = 0;
-        if (this.allGlyphs) {
-            for (let i: number = 0, j: number = this.allGlyphs.length; i < j; i++) {
-                let g: Glyph = this.allGlyphs[i];
+        if (this.glyphs) {
+            for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
+                let g: Glyph = this.glyphs[i];
                 g.x = w;
                 g.renderer = this.renderer;
                 g.doLayout();
@@ -43,20 +39,18 @@ export class BeatGlyphBase extends Glyph {
         }
     }
 
-    protected get effectElement(): BeatSubElement | undefined {
-        return undefined;
-    }
-
     public addEffect(g: Glyph) {
-        g.renderer = this.renderer;
-        this.allGlyphs.push(g);
+        super.addGlyph(g);
         this._effectGlyphs.push(g);
     }
 
     public addNormal(g: Glyph) {
-        g.renderer = this.renderer;
-        this.allGlyphs.push(g);
+        super.addGlyph(g);
         this._normalGlyphs.push(g);
+    }
+
+    protected get effectElement(): BeatSubElement | undefined {
+        return undefined;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -66,7 +60,7 @@ export class BeatGlyphBase extends Glyph {
 
     private paintNormal(cx: number, cy: number, canvas: ICanvas) {
         for (const g of this._normalGlyphs) {
-            g.paint(cx, cy, canvas);
+            g.paint(cx + this.x, cy + this.y, canvas);
         }
     }
 
@@ -75,7 +69,7 @@ export class BeatGlyphBase extends Glyph {
             ? ElementStyleHelper.beat(canvas, this.effectElement, this.container.beat)
             : undefined;
         for (const g of this._normalGlyphs) {
-            g.paint(cx, cy, canvas);
+            g.paint(cx + this.x, cy + this.y, canvas);
         }
     }
 }
