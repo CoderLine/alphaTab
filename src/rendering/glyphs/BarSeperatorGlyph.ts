@@ -28,12 +28,13 @@ export class BarSeperatorGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(
-            canvas,
-            (this.renderer as LineBarRenderer).barSeparatorBarSubElement,
-            this.renderer.bar,
-            true
-        );
+        const renderer = this.renderer as LineBarRenderer;
+
+        if (renderer.nextRenderer && renderer.nextRenderer.bar.masterBar.isRepeatStart) {
+            return;
+        }
+
+        using _ = ElementStyleHelper.bar(canvas, renderer.barSeparatorBarSubElement, this.renderer.bar, true);
 
         let blockWidth: number = 4;
         let top: number = cy + this.y + this.renderer.topPadding;

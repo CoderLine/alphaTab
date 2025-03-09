@@ -582,7 +582,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
                 );
             }
-        } else {
+        } else if(this.lastBar) {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
         }
     }

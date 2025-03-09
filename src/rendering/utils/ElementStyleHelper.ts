@@ -90,6 +90,13 @@ export class ElementStyleHelper {
             case BarSubElement.GuitarTabsBarNumber:
                 defaultColor = canvas.settings.display.resources.barNumberColor;
                 break;
+
+            case BarSubElement.StandardNotationStaffLine:
+            case BarSubElement.GuitarTabsStaffLine:
+            case BarSubElement.SlashStaffLine:
+            case BarSubElement.NumberedStaffLine:
+                defaultColor = canvas.settings.display.resources.staffLineColor;
+                break;
         }
 
         return new ElementStyleScope<BarSubElement>(canvas, element, bar.style, defaultColor);

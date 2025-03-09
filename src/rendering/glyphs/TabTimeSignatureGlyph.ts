@@ -6,6 +6,7 @@ import { BarSubElement } from '@src/model';
 export class TabTimeSignatureGlyph extends TimeSignatureGlyph {
     public override doLayout(): void {
         this.barSubElement = BarSubElement.GuitarTabsTimeSignature;
+        super.doLayout();
     }
 
     protected get commonScale(): number {
