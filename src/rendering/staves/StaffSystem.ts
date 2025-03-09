@@ -557,7 +557,7 @@ export class StaffSystem {
                                     break;
                             }
                             
-                            using _ = ElementStyleHelper.track(
+                            using _trackNameStyle = ElementStyleHelper.track(
                                 canvas,
                                 TrackSubElement.TrackName,
                                 g.track

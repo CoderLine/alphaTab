@@ -27,7 +27,7 @@ export class ElementStyleHelper {
         forceDefault: boolean = false
     ): Disposable | undefined {
         if (!score.style && !forceDefault) {
-            return;
+            return undefined;
         }
 
         let defaultColor: Color = ElementStyleHelper.scoreDefaultColor(canvas.settings.display.resources, element);
@@ -58,7 +58,7 @@ export class ElementStyleHelper {
         forceDefault: boolean = false
     ): Disposable | undefined {
         if (!bar.style && !forceDefault) {
-            return;
+            return undefined;
         }
 
         let defaultColor: Color = canvas.settings.display.resources.mainGlyphColor;
@@ -109,7 +109,7 @@ export class ElementStyleHelper {
         forceDefault: boolean = false
     ): Disposable | undefined {
         if (!voice.style && !forceDefault) {
-            return;
+            return undefined;
         }
 
         let defaultColor: Color =
@@ -152,7 +152,7 @@ export class ElementStyleHelper {
         forceDefault: boolean = false
     ): Disposable | undefined {
         if (!track.style && !forceDefault) {
-            return;
+            return undefined;
         }
 
         let defaultColor = ElementStyleHelper.trackDefaultColor(canvas.settings.display.resources, element);
@@ -182,7 +182,7 @@ export class ElementStyleHelper {
         forceDefault: boolean = false
     ): Disposable | undefined {
         if (!beat.style && !forceDefault) {
-            return;
+            return undefined;
         }
 
         let defaultColor = ElementStyleHelper.beatDefaultColor(canvas.settings.display.resources, element, beat);
@@ -213,7 +213,7 @@ export class ElementStyleHelper {
         forceDefault: boolean = false
     ): Disposable | undefined {
         if (!note.style && !forceDefault) {
-            return;
+            return undefined;
         }
 
         let defaultColor: Color =

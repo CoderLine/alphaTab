@@ -195,7 +195,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             }
 
             const onNotes = this.getBeatContainer(beat)!.onNotes;
-            let dotCount = (onNotes as NumberedBeatGlyph).octaveDots;
+            let dotCount = onNotes instanceof NumberedBeatGlyph ? (onNotes as NumberedBeatGlyph).octaveDots : 0;
             let dotsY = 0;
             let dotsOffset = 0;
             if (dotCount > 0) {
