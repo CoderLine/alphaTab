@@ -1,5 +1,5 @@
 import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
@@ -20,6 +20,7 @@ import { LineBarRenderer } from './LineBarRenderer';
 import { GraceType } from '@src/model/GraceType';
 import { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
 import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -211,8 +212,8 @@ export class TabBarRenderer extends LineBarRenderer {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
-            this.paintBeams(cx, cy, canvas);
-            this.paintTuplets(cx, cy, canvas);
+            this.paintBeams(cx, cy, canvas, BeatSubElement.GuitarTabFlags, BeatSubElement.GuitarTabBeams);
+            this.paintTuplets(cx, cy, canvas, BeatSubElement.GuitarTabTuplet);
         }
     }
 
@@ -287,6 +288,12 @@ export class TabBarRenderer extends LineBarRenderer {
             bottomY = topY;
             topY = t;
         }
+
+        using _ = ElementStyleHelper.beat(
+            canvas, 
+            BeatSubElement.GuitarTabStem,
+            beat
+        );
 
         canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();

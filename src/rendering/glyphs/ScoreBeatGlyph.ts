@@ -32,6 +32,7 @@ import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { StringNumberContainerGlyph } from './StringNumberContainerGlyph';
 import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
+import { BeatSubElement } from '@src/model';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
@@ -40,6 +41,10 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
+
+    protected override get effectElement() {
+        return BeatSubElement.StandardNotationEffects;
+    }
 
     public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteX(note, requestedPosition) : 0;
@@ -101,7 +106,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.slash = slashNoteHead;
                     slashNoteHead.beat = this.container.beat;
                     slashNoteHead.beamingHelper = this.beamingHelper;
-                    this.addGlyph(slashNoteHead);
+                    this.addNormal(slashNoteHead);
                 } else {
                     //
                     // Note heads
@@ -118,16 +123,16 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                             ghost.addParenthesis(note);
                         }
                     }
-                    this.addGlyph(noteHeads);
+                    this.addNormal(noteHeads);
                     if (!ghost.isEmpty) {
-                        this.addGlyph(
+                        this.addNormal(
                             new SpacingGlyph(
                                 0,
                                 0,
                                 4 * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                             )
                         );
-                        this.addGlyph(ghost);
+                        this.addEffect(ghost);
                     }
                 }
 
@@ -143,14 +148,14 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Note dots
                 //
                 if (this.container.beat.dots > 0) {
-                    this.addGlyph(new SpacingGlyph(0, 0, 5));
+                    this.addNormal(new SpacingGlyph(0, 0, 5));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         for (let note of this.container.beat.notes) {
                             this.createBeatDot(sr.getNoteLine(note), group);
                         }
-                        this.addGlyph(group);
+                        this.addEffect(group);
                     }
                 }
             } else {
@@ -171,7 +176,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
                 restGlyph.beamingHelper = this.beamingHelper;
-                this.addGlyph(restGlyph);
+                this.addNormal(restGlyph);
 
                 if (this.renderer.bar.isMultiVoice) {
                     if (this.container.beat.voice.index === 0) {
@@ -192,12 +197,12 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Note dots
                 //
                 if (this.container.beat.dots > 0) {
-                    this.addGlyph(new SpacingGlyph(0, 0, 5));
+                    this.addNormal(new SpacingGlyph(0, 0, 5));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         let group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         this.createBeatDot(line, group);
-                        this.addGlyph(group);
+                        this.addEffect(group);
                     }
                 }
             }

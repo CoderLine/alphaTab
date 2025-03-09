@@ -1,6 +1,6 @@
 import { AccidentalType } from '@src/model/AccidentalType';
 import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
 import { Note } from '@src/model/Note';
@@ -24,6 +24,7 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { KeySignature } from '@src/model/KeySignature';
 import { LineBarRenderer } from './LineBarRenderer';
 import { KeySignatureGlyph } from './glyphs/KeySignatureGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -160,8 +161,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas, BeatSubElement.StandardNotationFlags, BeatSubElement.StandardNotationBeams);
+        this.paintTuplets(cx, cy, canvas, BeatSubElement.StandardNotationTuplet);
     }
 
     private getSlashFlagY(duration: Duration, direction: BeamDirection) {
@@ -487,7 +488,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             hasClef = true;
         }
         // Key signature
-        if ( hasClef || 
+        if (
+            hasClef ||
             (this.index === 0 && this.bar.masterBar.keySignature !== KeySignature.C) ||
             (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
         ) {
@@ -644,6 +646,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
         canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);

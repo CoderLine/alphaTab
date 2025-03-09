@@ -153,6 +153,21 @@ export class ElementStyleHelper {
         return new ElementStyleScope<TrackSubElement>(canvas, element, track.style, defaultColor);
     }
 
+    public static beatColor(res: RenderingResources, element: BeatSubElement, beat: Beat): Color | undefined {
+        let defaultColor = ElementStyleHelper.beatDefaultColor(res, element, beat);
+
+        if (beat.style && beat.style!.colors.has(element)) {
+            return beat.style!.colors.get(element) ?? defaultColor;
+        }
+
+        return undefined;
+    }
+
+    private static beatDefaultColor(res: RenderingResources, element: BeatSubElement, beat: Beat) {
+        let defaultColor: Color = beat.voice.index === 0 ? res.mainGlyphColor : res.secondaryGlyphColor;
+
+        return defaultColor;
+    }
     public static beat(
         canvas: ICanvas,
         element: BeatSubElement,
@@ -163,10 +178,7 @@ export class ElementStyleHelper {
             return;
         }
 
-        let defaultColor: Color =
-            beat.voice.index === 0
-                ? canvas.settings.display.resources.mainGlyphColor
-                : canvas.settings.display.resources.secondaryGlyphColor;
+        let defaultColor = ElementStyleHelper.beatDefaultColor(canvas.settings.display.resources, element, beat);
 
         return new ElementStyleScope<BeatSubElement>(canvas, element, beat.style, defaultColor);
     }

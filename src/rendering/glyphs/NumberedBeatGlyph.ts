@@ -6,7 +6,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { NoteBounds } from '../utils/NoteBounds';
 import { Bounds } from '../utils/Bounds';
 import { NumberedNoteHeadGlyph } from './NumberedNoteHeadGlyph';
-import { AccidentalType, Duration, KeySignatureType, NoteAccidentalMode } from '@src/model';
+import { AccidentalType, BeatSubElement, Duration, KeySignatureType, NoteAccidentalMode } from '@src/model';
 import { NumberedBarRenderer } from '../NumberedBarRenderer';
 import { AccidentalHelper } from '../utils/AccidentalHelper';
 import { BeatGlyphBase } from './BeatGlyphBase';
@@ -23,6 +23,10 @@ import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
     public accidental: AccidentalType = AccidentalType.None;
+
+    protected override get effectElement() {
+        return BeatSubElement.NumberedEffects;
+    }
 
     public override doLayout(): void {
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
@@ -77,8 +81,8 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     );
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
-                    this.addGlyph(accidentals);
-                    this.addGlyph(new SpacingGlyph(0, 0, 4));
+                    this.addNormal(accidentals);
+                    this.addNormal(new SpacingGlyph(0, 0, 4));
                 }
             }
         }
@@ -91,6 +95,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
 
     public octaveDots: number = 0;
+
+    protected override get effectElement() {
+        return BeatSubElement.NumberedEffects;
+    }
 
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         let g: Glyph | null = null;
@@ -264,23 +272,29 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 deadSlapped.renderer = this.renderer;
                 deadSlapped.doLayout();
                 this.deadSlapped = deadSlapped;
-                this.addGlyph(deadSlapped);
+                this.addEffect(deadSlapped);
             } else {
                 const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
-                const noteHeadGlyph = new NumberedNoteHeadGlyph(0, glyphY, numberWithinOctave, isGrace);
+                const noteHeadGlyph = new NumberedNoteHeadGlyph(
+                    0,
+                    glyphY,
+                    numberWithinOctave,
+                    isGrace,
+                    this.container.beat
+                );
                 this.noteHeads = noteHeadGlyph;
 
-                this.addGlyph(noteHeadGlyph);
+                this.addNormal(noteHeadGlyph);
             }
 
             //
             // Note dots
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
-                this.addGlyph(new SpacingGlyph(0, 0, 5));
+                this.addNormal(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     const dot = new CircleGlyph(0, sr.getLineY(0), 1.5);
                     dot.renderer = this.renderer;
-                    this.addGlyph(dot);
+                    this.addEffect(dot);
                 }
             }
 
@@ -310,7 +324,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             for (let i = 0; i < numberOfQuarterNotes - 1; i++) {
                 const dash = new NumberedDashGlyph(0, sr.getLineY(0));
                 dash.renderer = this.renderer;
-                this.addGlyph(dash);
+                this.addNormal(dash);
             }
         }
 

@@ -14,7 +14,7 @@ import { BarSeperatorGlyph } from './glyphs/BarSeperatorGlyph';
 import { RepeatCloseGlyph } from './glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from './glyphs/RepeatCountGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
-import { BeatBeamingMode } from '@src/model/Beat';
+import { BeatBeamingMode, BeatSubElement } from '@src/model/Beat';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
@@ -166,12 +166,25 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this._startSpacing = true;
     }
 
-    protected paintTuplets(cx: number, cy: number, canvas: ICanvas, bracketsAsArcs: boolean = false): void {
+    protected paintTuplets(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        beatElement: BeatSubElement,
+        bracketsAsArcs: boolean = false
+    ): void {
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const container = this.getVoiceContainer(voice)!;
                 for (const tupletGroup of container.tupletGroups) {
-                    this.paintTupletHelper(cx + this.beatGlyphsStart, cy, canvas, tupletGroup, bracketsAsArcs);
+                    this.paintTupletHelper(
+                        cx + this.beatGlyphsStart,
+                        cy,
+                        canvas,
+                        tupletGroup,
+                        beatElement,
+                        bracketsAsArcs
+                    );
                 }
             }
         }
@@ -184,7 +197,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected abstract calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number;
 
-    private paintTupletHelper(cx: number, cy: number, canvas: ICanvas, h: TupletGroup, bracketsAsArcs: boolean): void {
+    private paintTupletHelper(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: TupletGroup,
+        beatElement: BeatSubElement,
+        bracketsAsArcs: boolean
+    ): void {
         const res = this.resources;
         let oldAlign: TextAlign = canvas.textAlign;
         let oldBaseLine = canvas.textBaseline;
@@ -224,6 +244,12 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // check if we need to paint simple footer
         let offset: number = this.tupletOffset;
         let size: number = 5;
+
+        using _ = ElementStyleHelper.beat(canvas,
+            beatElement,
+            h.beats[0],
+        );
+
 
         if (h.beats.length === 1 || !h.isFull) {
             for (const beat of h.beats) {
@@ -356,10 +382,16 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas.textBaseline = oldBaseLine;
     }
 
-    protected paintBeams(cx: number, cy: number, canvas: ICanvas): void {
+    protected paintBeams(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
         for (const v of this.helpers.beamHelpers) {
             for (const h of v) {
-                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h);
+                this.paintBeamHelper(cx + this.beatGlyphsStart, cy, canvas, h, flagsElement, beamsElement);
             }
         }
     }
@@ -368,15 +400,22 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return h.beats.length === 1;
     }
 
-    private paintBeamHelper(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    private paintBeamHelper(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement,
+        beamsElement: BeatSubElement
+    ): void {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         // TODO: draw stem at least at the center of the score staff.
         // check if we need to paint simple footer
         if (!h.isRestBeamHelper) {
             if (this.drawBeamHelperAsFlags(h)) {
-                this.paintFlag(cx, cy, canvas, h);
+                this.paintFlag(cx, cy, canvas, h, flagsElement);
             } else {
-                this.paintBar(cx, cy, canvas, h);
+                this.paintBar(cx, cy, canvas, h, beamsElement);
             }
         }
     }
@@ -415,7 +454,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         return true;
     }
 
-    protected paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
         for (const beat of h.beats) {
             if (!this.shouldPaintFlag(beat, h)) {
                 continue;
@@ -453,6 +492,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 canvas
             );
 
+            using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
+
             if (beat.graceType === GraceType.BeforeBeat) {
                 let graceSizeY: number = 15;
                 let graceSizeX: number = 12;
@@ -466,6 +507,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 }
                 canvas.stroke();
             }
+
             //
             // Draw flag
             //
@@ -550,7 +592,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public abstract get barSeparatorBarSubElement(): BarSubElement;
     public abstract get staffLineBarSubElement(): BarSubElement;
 
-    protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, beamsElement: BeatSubElement): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
             if (!h.hasBeatLineX(beat) || beat.deadSlapped) {
@@ -575,6 +617,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // canvas.lineWidth = 1;
 
             this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
+
+            using _ = ElementStyleHelper.beat(canvas, beamsElement, beat);
 
             let fingeringY: number = y2;
             if (direction === BeamDirection.Down) {

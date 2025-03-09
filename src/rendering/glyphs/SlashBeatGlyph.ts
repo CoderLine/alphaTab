@@ -12,11 +12,16 @@ import { Bounds } from '../utils/Bounds';
 import { SlashRestGlyph } from './SlashRestGlyph';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 import { Glyph } from './Glyph';
+import { BeatSubElement } from '@src/model';
 
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: SlashNoteHeadGlyph | null = null;
     public deadSlapped: DeadSlappedBeatGlyph | null = null;
     public restGlyph: SlashRestGlyph | null = null;
+
+    protected override get effectElement() {
+        return BeatSubElement.SlashEffects;
+    }
 
     public override getNoteX(_note: Note, requestedPosition: NoteXPosition): number {
         let g: Glyph | null = null;
@@ -114,7 +119,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             deadSlapped.renderer = this.renderer;
             deadSlapped.doLayout();
             this.deadSlapped = deadSlapped;
-            this.addGlyph(deadSlapped);
+            this.addEffect(deadSlapped);
         } else if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
                 const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
@@ -122,13 +127,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 this.noteHeads = noteHeadGlyph;
                 noteHeadGlyph.beat = this.container.beat;
                 noteHeadGlyph.beamingHelper = this.beamingHelper;
-                this.addGlyph(noteHeadGlyph);
+                this.addNormal(noteHeadGlyph);
             } else {
                 const restGlyph = new SlashRestGlyph(0, glyphY, this.container.beat.duration);
                 this.restGlyph = restGlyph;
                 restGlyph.beat = this.container.beat;
                 restGlyph.beamingHelper = this.beamingHelper;
-                this.addGlyph(restGlyph);
+                this.addNormal(restGlyph);
 
                 if (this.beamingHelper) {
                     this.beamingHelper.applyRest(this.container.beat, 0);
@@ -140,11 +145,9 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         // Note dots
         //
         if (this.container.beat.dots > 0) {
-            this.addGlyph(new SpacingGlyph(0, 0, 5));
+            this.addNormal(new SpacingGlyph(0, 0, 5));
             for (let i: number = 0; i < this.container.beat.dots; i++) {
-                this.addGlyph(
-                    new CircleGlyph(0, sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5), 1.5)
-                );
+                this.addEffect(new CircleGlyph(0, sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5), 1.5));
             }
         }
 
@@ -156,7 +159,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             this.centerX = this.restGlyph.x + this.restGlyph.width / 2;
         } else if (this.noteHeads) {
             this.centerX = this.noteHeads.x + this.noteHeads.width / 2;
-        } else if(this.deadSlapped) {
+        } else if (this.deadSlapped) {
             this.centerX = this.deadSlapped.x + this.deadSlapped.width / 2;
         }
     }

@@ -15,11 +15,16 @@ import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { FingeringGroupGlyph } from './FingeringGroupGlyph';
+import { BeatSubElement } from '@src/model';
 
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;
     public get prebendNoteHeadOffset(): number {
         return this._prebends ? this._prebends.x + this._prebends.noteHeadOffset : 0;
+    }
+
+    protected override get effectElement() {
+        return BeatSubElement.StandardNotationEffects;
     }
 
     public accidentals: AccidentalGroupGlyph | null = null;
@@ -65,8 +70,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 }
             }
             if (!preBends.isEmpty) {
-                this.addGlyph(preBends);
-                this.addGlyph(
+                this.addEffect(preBends);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -75,12 +80,12 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 );
             }
             if (this.container.beat.brushType !== BrushType.None) {
-                this.addGlyph(new ScoreBrushGlyph(this.container.beat));
-                this.addGlyph(new SpacingGlyph(0, 0, 4));
+                this.addEffect(new ScoreBrushGlyph(this.container.beat));
+                this.addNormal(new SpacingGlyph(0, 0, 4));
             }
             if (!fingering.isEmpty) {
                 if (!this.isEmpty) {
-                    this.addGlyph(
+                    this.addNormal(
                         new SpacingGlyph(
                             0,
                             0,
@@ -89,8 +94,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     );
                 }
 
-                this.addGlyph(fingering);
-                this.addGlyph(
+                this.addEffect(fingering);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -100,8 +105,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             }
 
             if (!ghost.isEmpty) {
-                this.addGlyph(ghost);
-                this.addGlyph(
+                this.addEffect(ghost);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -112,7 +117,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;
                 if (!this.isEmpty) {
-                    this.addGlyph(
+                    this.addNormal(
                         new SpacingGlyph(
                             0,
                             0,
@@ -120,9 +125,9 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         )
                     );
                 }
-                
-                this.addGlyph(accidentals);
-                this.addGlyph(
+
+                this.addNormal(accidentals);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,

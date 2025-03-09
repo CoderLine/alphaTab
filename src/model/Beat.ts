@@ -160,11 +160,20 @@ export enum BeatSubElement {
     NumberedDuration,
 
     /**
+     * The effects and annotations applied to this beat on the numbered notation staff (e.g. brushes).
+     * Only applies to items which are on beat level but not any individual note level effects.
+     */
+    NumberedEffects,
+
+    /**
      * The rest (0) on the numbered notation staff.
      */
-    NumberedRests
+    NumberedRests,
+    /**
+     * The tuplet drawn on the numbered notation staff (the first beat affects the whole tuplet if grouped).
+     */
+    NumberedTuplet
 }
-
 
 /**
  * Defines the custom styles for beats.

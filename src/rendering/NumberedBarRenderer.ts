@@ -1,5 +1,5 @@
 import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { Voice } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
@@ -21,6 +21,7 @@ import { Duration } from '@src/model';
 import { BeatXPosition } from './BeatXPosition';
 import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -88,8 +89,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas, true);
+        this.paintBeams(cx, cy, canvas, BeatSubElement.NumberedDuration, BeatSubElement.NumberedDuration);
+        this.paintTuplets(cx, cy, canvas, BeatSubElement.NumberedTuplet, true);
     }
 
     public override doLayout(): void {
@@ -139,15 +140,24 @@ export class NumberedBarRenderer extends LineBarRenderer {
     private static DotSpacing = 5;
     public static DotSize = 2;
 
-    protected override paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
-        this.paintBar(cx, cy, canvas, h);
+    protected override paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
+        this.paintBar(cx, cy, canvas, h, flagsElement);
     }
 
-    protected override paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper): void {
+    protected override paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
+        if(h.beats.length === 0){
+            return;
+        }
         const res = this.resources;
-
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             let beat: Beat = h.beats[i];
+
+            using _ = ElementStyleHelper.beat(
+                canvas,
+                flagsElement,
+                beat    
+            )
+    
             //
             // draw line
             //
@@ -332,11 +342,5 @@ export class NumberedBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
-        canvas.lineWidth = BarRendererBase.StemWidth;
-        canvas.beginPath();
-        canvas.moveTo(x, topY);
-        canvas.lineTo(x, bottomY);
-        canvas.stroke();
-        canvas.lineWidth = 1;
     }
 }

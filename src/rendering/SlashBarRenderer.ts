@@ -1,5 +1,5 @@
 import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { Voice } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
@@ -15,6 +15,7 @@ import { SlashBeatGlyph } from './glyphs/SlashBeatGlyph';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
@@ -66,8 +67,8 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas, BeatSubElement.SlashFlags, BeatSubElement.SlashBeams);
+        this.paintTuplets(cx, cy, canvas, BeatSubElement.SlashTuplet);
     }
 
     public override doLayout(): void {
@@ -167,13 +168,14 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override paintBeamingStem(
-        _beat: Beat,
+        beat: Beat,
         _cy: number,
         x: number,
         topY: number,
         bottomY: number,
         canvas: ICanvas
     ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
         canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);
