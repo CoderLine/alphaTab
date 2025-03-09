@@ -250,6 +250,14 @@ internal class Globals {
                 action()
             }
         }
+
+        val performance = Performance()
+    }
+}
+
+internal class Performance {
+    fun now(): Double {
+        return System.currentTimeMillis().toDouble()
     }
 }
 
@@ -285,11 +293,11 @@ internal fun <T> Deferred<T>.catch(callback: (alphaTab.core.ecmaScript.Error) ->
 internal val ArrayBuffer.byteLength: Int
     get() = this.size
 
-internal fun String.repeat(count:Double): String {
+internal fun String.repeat(count: Double): String {
     return this.repeat(count.toInt())
 }
 
-internal fun String.padStart(length:Double, pad:String): String {
+internal fun String.padStart(length: Double, pad: String): String {
     return this.padStart(length.toInt(), pad[0])
 }
 

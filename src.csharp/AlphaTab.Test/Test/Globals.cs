@@ -4,6 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test;
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
+// ReSharper disable once InconsistentNaming
 public static class assert
 #pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 {
@@ -84,6 +85,14 @@ public class Expector<T>
         }
 
         Assert.AreEqual(expected, _actual, message);
+    }
+
+    public void LessThan(double expected)
+    {
+        if (_actual is IComparable d)
+        {
+            Assert.IsTrue(d.CompareTo(expected) < 0, $"Expected Expected[{d}] < Actual[{_actual}]");
+        }
     }
 
     public void GreaterThan(double expected)
