@@ -18,7 +18,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let offset: number = this._isGrace ? 1 : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
+        super.paint(cx, cy + offset, canvas);
     }
 
     public override doLayout(): void {

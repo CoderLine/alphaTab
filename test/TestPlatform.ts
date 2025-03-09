@@ -12,7 +12,7 @@ export class TestPlatform {
      */
     public static async saveFile(name: string, data: Uint8Array): Promise<void> {
         const directory = path.dirname(name);
-        await fs.promises.mkdir(directory, { recursive: true })
+        await fs.promises.mkdir(directory, { recursive: true });
         await fs.promises.writeFile(name, data);
     }
 
@@ -21,7 +21,7 @@ export class TestPlatform {
      * @partial
      */
     public static async deleteFile(name: string): Promise<void> {
-        await fs.promises.rm(name, { force: true })
+        await fs.promises.rm(name, { force: true });
     }
 
     /**
@@ -53,12 +53,20 @@ export class TestPlatform {
             return file.substr(0, lastDot) + extension;
         }
     }
-    
+
     /**
      * @target web
      * @partial
      */
     public static joinPath(...parts: string[]): string {
         return path.join(...parts);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static enumValues<T>(enumType: any): T[] {
+        return Object.values(enumType).filter(k => typeof k === 'number') as T[];
     }
 }
