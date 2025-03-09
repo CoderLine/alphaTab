@@ -79,7 +79,8 @@ export enum SyntaxKind {
 
     Attribute,
 
-    SpreadExpression
+    SpreadExpression,
+    LocalFunction
 }
 
 export interface Node {
@@ -325,6 +326,13 @@ export interface ConditionalExpression extends Node {
 export interface LambdaExpression extends Node {
     parameters: ParameterDeclaration[];
     body: Block | Expression;
+    returnType: TypeNode;
+}
+
+export interface LocalFunctionDeclaration extends Node {
+    name: string;
+    parameters: ParameterDeclaration[];
+    body: Block;
     returnType: TypeNode;
 }
 
@@ -737,11 +745,12 @@ export function isToDoExpression(node: Node): node is ToDoExpression {
 export function isTypeOfExpression(node: Node): node is TypeOfExpression {
     return node.nodeType === SyntaxKind.TypeOfExpression;
 }
-
 export function isAttribute(node: Node): node is Attribute {
     return node.nodeType === SyntaxKind.Attribute;
 }
-
 export function isSpreadExpression(node: Node): node is SpreadExpression {
     return node.nodeType === SyntaxKind.SpreadExpression;
+}
+export function isLocalFunction(node: Node): node is LocalFunctionDeclaration {
+    return node.nodeType === SyntaxKind.LocalFunction;
 }

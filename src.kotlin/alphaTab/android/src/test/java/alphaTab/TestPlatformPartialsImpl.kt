@@ -8,6 +8,7 @@ import java.io.InputStream
 import java.io.OutputStream
 import java.nio.file.Paths
 import kotlin.contracts.ExperimentalContracts
+import kotlin.reflect.KClass
 
 @ExperimentalUnsignedTypes
 @ExperimentalContracts
@@ -68,6 +69,12 @@ class TestPlatformPartials {
                 .listFiles()
                 ?.filter { it.isFile }
                 ?.map { it.name } ?: emptyList())
+        }
+
+        internal inline fun <reified T : Enum<T>> enumValues(
+            @Suppress("UNUSED_PARAMETER") type: KClass<T>
+        ): alphaTab.collections.List<T> {
+            return alphaTab.collections.List(enumValues<T>().toMutableList())
         }
     }
 }

@@ -100,4 +100,15 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
     public override isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
         return undefined;
     }
+
+    public override getMethodNameFromSymbol(symbol: ts.Symbol): string {
+        const parent = 'parent' in symbol ? (symbol.parent as ts.Symbol) : undefined;
+
+        if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {
+            return "close";
+        }
+
+        return '';
+    }
+    
 }

@@ -379,10 +379,27 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return method;
     }
 
+    protected visitFunctionDeclaration(parent: cs.Node, expression: ts.FunctionDeclaration): cs.LocalFunctionDeclaration {
+        this._paramReferences.push(new Map<string, cs.Identifier[]>());
+        this._paramsWithAssignment.push(new Set<string>());
+
+
+        const fun = super.visitFunctionDeclaration(parent, expression);
+
+        if (fun.body) {
+            this.injectParametersAsLocal(fun.body);
+        }
+
+        this._paramReferences.pop();
+        this._paramsWithAssignment.pop();
+
+
+        return fun;
+    }
+
     protected override getSymbolName(
         parentSymbol: ts.Symbol,
-        symbol: ts.Symbol,
-        expression: cs.Expression
+        symbol: ts.Symbol
     ): string | null {
         switch (parentSymbol.name) {
             case 'String':
@@ -599,5 +616,14 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 return true;
         }
         return false;
+    }
+
+    protected applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
+        super.applyMethodOverride(csMethod, classElement);
+        if(!csMethod.isOverride) {
+            if(ts.isComputedPropertyName(classElement.name) && classElement.name.getText().includes('Symbol.dispose')) {
+                csMethod.isOverride = true;
+            }
+        }
     }
 }

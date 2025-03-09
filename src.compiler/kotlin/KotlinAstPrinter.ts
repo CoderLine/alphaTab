@@ -430,14 +430,20 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             nodeType: cs.SyntaxKind.Identifier,
                             text: p.name,
                             tsNode: defaultConstructor.tsNode
-                        } as cs.Identifier)
+                        }) as cs.Identifier
                 );
                 this.writeMember(defaultConstructor);
             } else {
                 this.writeLine('public constructor()');
+                if (d.baseClass) {
+                    this.writeLine(': super()');
+                }
             }
         } else if (!hasConstuctor) {
             this.writeLine('public constructor()');
+            if (d.baseClass) {
+                this.writeLine(': super()');
+            }
         }
 
         this.endBlock();
@@ -582,6 +588,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write(': ');
         this.writeType(d.type);
 
+        let needsInitializer =
+            isAutoProperty && d.type.isNullable && d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration;
+
         let initializerWritten = false;
         if (d.initializer && !isLateInit) {
             this.write(' = ');
@@ -589,22 +598,23 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             initializerWritten = true;
             this.writeLine();
         } else if (writeAsField) {
+            if (needsInitializer && !initializerWritten) {
+                this.write(' = null');
+            }
             this.writeLine();
         }
 
         if (!writeAsField) {
-            if(isAutoProperty && d.type.isNullable && !initializerWritten && 
-                d.parent!.nodeType !== cs.SyntaxKind.InterfaceDeclaration
-            ) {
+            if (needsInitializer && !initializerWritten) {
                 this.write(' = null');
             }
             this.writeLine();
 
-            if(!isAutoProperty) {
+            if (!isAutoProperty) {
                 if (d.getAccessor) {
                     this.writePropertyAccessor(d.getAccessor);
                 }
-    
+
                 if (d.setAccessor) {
                     this.writePropertyAccessor(d.setAccessor);
                 }
@@ -681,7 +691,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                         case cs.PrimitiveType.Bool:
                         case cs.PrimitiveType.Int:
                         case cs.PrimitiveType.Double:
-                            this.write('struct');
+                            this.write('IAlphaTabEnum');
                             break;
                         case cs.PrimitiveType.Object:
                         case cs.PrimitiveType.Dynamic:
@@ -838,7 +848,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if ((type.isNullable) && !forNew && !forTypeConstraint) {
+        if (type.isNullable && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }
@@ -1289,7 +1299,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         let hasDefault = false;
 
-        for(let i = 0; i < s.caseClauses.length; i++) {
+        for (let i = 0; i < s.caseClauses.length; i++) {
             const c = s.caseClauses[i];
             if (cs.isDefaultClause(c)) {
                 hasDefault = true;
@@ -1298,17 +1308,17 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                 // avoid "value", "value2", else ->
                 // but write directly else ->
                 let hasNonElseStatement = false;
-                for(let j = i; j < s.caseClauses.length; j++) {
+                for (let j = i; j < s.caseClauses.length; j++) {
                     const c2 = s.caseClauses[j];
-                    if(cs.isDefaultClause(c2)) {
+                    if (cs.isDefaultClause(c2)) {
                         break;
-                    } else if((c2 as cs.CaseClause).statements.length > 0) {
+                    } else if ((c2 as cs.CaseClause).statements.length > 0) {
                         hasNonElseStatement = true;
                         break;
                     }
                 }
 
-                if(hasNonElseStatement) {
+                if (hasNonElseStatement) {
                     this.writeCaseClause(c as cs.CaseClause);
                 }
             }
@@ -1773,5 +1783,13 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         ) {
             this.write('.spread()');
         }
+    }
+
+    protected writeLocalFunction(expr: cs.LocalFunctionDeclaration) {
+        this.write(`fun ${expr.name}`);
+        this.writeParameters(expr.parameters);
+        this.write(': ');
+        this.writeType(expr.returnType);
+        this.writeBlock(expr.body);
     }
 }
