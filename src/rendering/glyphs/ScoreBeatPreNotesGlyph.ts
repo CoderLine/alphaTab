@@ -3,7 +3,7 @@ import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { WhammyType } from '@src/model/WhammyType';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { AccidentalGroupGlyph } from '@src/rendering/glyphs/AccidentalGroupGlyph';
@@ -16,6 +16,7 @@ import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { FingeringGroupGlyph } from './FingeringGroupGlyph';
 import { BeatSubElement } from '@src/model';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;
@@ -44,13 +45,22 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             this._prebends = preBends;
             preBends.renderer = this.renderer;
             for (let note of this.container.beat.notes) {
+                const color = ElementStyleHelper.noteColor(
+                    this.renderer.resources,
+                    NoteSubElement.StandardNotationEffects,
+                    note
+                );
                 if (note.isVisible) {
                     if (note.hasBend) {
                         switch (note.bendType) {
                             case BendType.PrebendBend:
                             case BendType.Prebend:
                             case BendType.PrebendRelease:
-                                preBends.addGlyph(note.displayValue - ((note.bendPoints![0].value / 2) | 0), false);
+                                preBends.addGlyph(
+                                    note.displayValue - ((note.bendPoints![0].value / 2) | 0),
+                                    false,
+                                    color
+                                );
                                 break;
                         }
                     } else if (note.beat.hasWhammyBar) {
@@ -59,7 +69,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             case WhammyType.Predive:
                                 this._prebends.addGlyph(
                                     note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
-                                    false
+                                    false,
+                                    color
                                 );
                                 break;
                         }
@@ -144,9 +155,11 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidental(n);
         let noteLine: number = sr.getNoteLine(n);
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+        const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationAccidentals, n);
         const graceScale = isGrace ? NoteHeadGlyph.GraceScale : 1;
         if (accidental !== AccidentalType.None) {
             let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
+            g.colorOverride = color;
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }
@@ -155,6 +168,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace, false);
             noteLine = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
             let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
+            g.colorOverride = color;
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }

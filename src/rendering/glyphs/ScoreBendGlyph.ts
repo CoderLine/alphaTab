@@ -3,7 +3,7 @@ import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { BendType } from '@src/model/BendType';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupGlyph';
@@ -14,6 +14,7 @@ import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
@@ -22,7 +23,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _middleNoteGlyph: BendNoteHeadGroupGlyph | null = null;
 
     public constructor(beat: Beat) {
-        super(0,0);
+        super(0, 0);
         this._beat = beat;
     }
 
@@ -31,6 +32,13 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         if (note.isTieOrigin) {
             return;
         }
+
+        const color = ElementStyleHelper.noteColor(
+            this.renderer.resources,
+            NoteSubElement.StandardNotationEffects,
+            note
+        );
+
         switch (note.bendType) {
             case BendType.Bend:
             case BendType.PrebendRelease:
@@ -44,7 +52,11 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads.push(endGlyphs);
                     }
                     let lastBendPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
-                    endGlyphs.addGlyph(this.getBendNoteValue(note, lastBendPoint), lastBendPoint.value % 2 !== 0);
+                    endGlyphs.addGlyph(
+                        this.getBendNoteValue(note, lastBendPoint),
+                        lastBendPoint.value % 2 !== 0,
+                        color
+                    );
                 }
                 break;
             case BendType.Release:
@@ -54,11 +66,15 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                         if (!endGlyphs) {
                             endGlyphs = new BendNoteHeadGroupGlyph(note.beat, false);
                             endGlyphs.renderer = this.renderer;
-                            this._endNoteGlyph  = endGlyphs;
+                            this._endNoteGlyph = endGlyphs;
                             this.BendNoteHeads.push(endGlyphs);
                         }
                         let lastBendPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
-                        endGlyphs.addGlyph(this.getBendNoteValue(note, lastBendPoint), lastBendPoint.value % 2 !== 0);
+                        endGlyphs.addGlyph(
+                            this.getBendNoteValue(note, lastBendPoint),
+                            lastBendPoint.value % 2 !== 0,
+                            color
+                        );
                     }
                 }
                 break;
@@ -74,7 +90,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                     let middleBendPoint: BendPoint = note.bendPoints![1];
                     middleGlyphs.addGlyph(
                         this.getBendNoteValue(note, note.bendPoints![1]),
-                        middleBendPoint.value % 2 !== 0
+                        middleBendPoint.value % 2 !== 0,
+                        color
                     );
                     let endGlyphs = this._endNoteGlyph;
                     if (!endGlyphs) {
@@ -84,7 +101,11 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads.push(endGlyphs);
                     }
                     let lastBendPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
-                    endGlyphs.addGlyph(this.getBendNoteValue(note, lastBendPoint), lastBendPoint.value % 2 !== 0);
+                    endGlyphs.addGlyph(
+                        this.getBendNoteValue(note, lastBendPoint),
+                        lastBendPoint.value % 2 !== 0,
+                        color
+                    );
                 }
                 break;
         }
@@ -125,6 +146,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         // draw slurs
         for (let i: number = 0; i < this._notes.length; i++) {
             let note: Note = this._notes[i];
+            using _ = ElementStyleHelper.note(canvas, NoteSubElement.StandardNotationEffects, note);
             if (i > 0 && i >= ((this._notes.length / 2) | 0)) {
                 direction = BeamDirection.Down;
             }
@@ -138,10 +160,10 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 let endNote: Note = note.tieDestination!;
                 let endNoteRenderer: ScoreBarRenderer | null = !endNote
                     ? null
-                    : this.renderer.scoreRenderer.layout!.getRendererForBar(
+                    : (this.renderer.scoreRenderer.layout!.getRendererForBar(
                           this.renderer.staff.staveId,
                           endNote.beat.voice.bar
-                      ) as ScoreBarRenderer;
+                      ) as ScoreBarRenderer);
                 // if we have a line break we draw only a line until the end
                 if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                     let endX: number = cx + startNoteRenderer.x + startNoteRenderer.width;
@@ -227,15 +249,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                                 )
                             ) +
                             heightOffset;
-                        this.drawBendSlur(
-                            canvas,
-                            preX,
-                            preY,
-                            startX,
-                            startY,
-                            direction === BeamDirection.Down,
-                            1
-                        );
+                        this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, 1);
                         break;
                 }
             } else {
@@ -318,15 +332,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                                 )
                             ) +
                             heightOffset;
-                        this.drawBendSlur(
-                            canvas,
-                            preX,
-                            preY,
-                            startX,
-                            startY,
-                            direction === BeamDirection.Down,
-                            1
-                        );
+                        this.drawBendSlur(canvas, preX, preY, startX, startY, direction === BeamDirection.Down, 1);
                         if (this.BendNoteHeads.length > 0) {
                             endValue = this.getBendNoteValue(note, note.bendPoints![note.bendPoints!.length - 1]);
                             endY = this.BendNoteHeads[0].getNoteValueY(endValue) + heightOffset;

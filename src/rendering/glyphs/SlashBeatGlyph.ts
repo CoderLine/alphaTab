@@ -123,7 +123,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         } else if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
                 const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
-                const noteHeadGlyph = new SlashNoteHeadGlyph(0, glyphY, this.container.beat.duration, isGrace);
+                const noteHeadGlyph = new SlashNoteHeadGlyph(0, glyphY, this.container.beat.duration, isGrace, this.container.beat);
                 this.noteHeads = noteHeadGlyph;
                 noteHeadGlyph.beat = this.container.beat;
                 noteHeadGlyph.beamingHelper = this.beamingHelper;

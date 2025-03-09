@@ -406,7 +406,9 @@ export class BeamingHelper {
             !b2 ||
             b1.graceType !== b2.graceType ||
             b1.graceType === GraceType.BendGrace ||
-            b2.graceType === GraceType.BendGrace
+            b2.graceType === GraceType.BendGrace ||
+            b1.deadSlapped ||
+            b2.deadSlapped
         ) {
             return false;
         }

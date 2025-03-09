@@ -169,6 +169,7 @@ export enum BeatSubElement {
      * The rest (0) on the numbered notation staff.
      */
     NumberedRests,
+    
     /**
      * The tuplet drawn on the numbered notation staff (the first beat affects the whole tuplet if grouped).
      */

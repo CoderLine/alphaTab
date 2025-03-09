@@ -54,6 +54,7 @@ export enum NoteSubElement {
 
     /**
      * The effects and annotations applied to this note on the standard notation staff (e.g. bends).
+     * If effects on beats result in individual note elements shown, this color will apply.
      */
     StandardNotationEffects,
 
@@ -64,6 +65,7 @@ export enum NoteSubElement {
 
     /**
      * The effects and annotations applied to this note on the guitar tab staff (e.g. bends).
+     * If effects on beats result in individual note elements shown, this color will apply.
      */
     GuitarTabEffects,
 
@@ -73,14 +75,26 @@ export enum NoteSubElement {
     SlashNoteHead,
 
     /**
-     * The effects and annotations applied to this note on the slash notation staff (e.g. bends).
+     * The effects and annotations applied to this note on the slash notation staff (e.g. dots).
+     * If effects on beats result in individual note elements shown, this color will apply.
      */
     SlashEffects,
 
     /**
      * The note number on the numbered notation staff.
      */
-    NumberedNumber
+    NumberedNumber,
+
+    /**
+     * The accidentals on the numbered notation staff.
+     */
+    NumberedAccidentals,
+
+    /**
+     * The effects and annotations applied to this note on the number notation staff (e.g. dots).
+     * If effects on beats result in individual note elements shown, this color will apply.
+     */
+    NumberedEffects
 }
 
 /**

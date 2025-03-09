@@ -1,6 +1,6 @@
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { TabRhythmMode } from '@src/NotationSettings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
@@ -54,7 +54,15 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
                 const slashY = tabRenderer.getLineY(line);
-                const slashNoteHead = new SlashNoteHeadGlyph(0, slashY, this.container.beat.duration, isGrace);
+                const slashNoteHead = new SlashNoteHeadGlyph(
+                    0,
+                    slashY,
+                    this.container.beat.duration,
+                    isGrace,
+                    this.container.beat
+                );
+                slashNoteHead.noteHeadElement = NoteSubElement.GuitarTabFretNumber;
+                slashNoteHead.effectElement = BeatSubElement.GuitarTabEffects;
                 this.slash = slashNoteHead;
                 slashNoteHead.beat = this.container.beat;
                 slashNoteHead.beamingHelper = this.beamingHelper;

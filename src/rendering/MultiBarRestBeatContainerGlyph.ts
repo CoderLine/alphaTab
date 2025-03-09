@@ -15,7 +15,7 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyph {
 
     public override doLayout(): void {
         if (this.renderer.showMultiBarRest) {
-            this.onNotes.addGlyph(new MultiBarRestGlyph());
+            this.onNotes.addNormal(new MultiBarRestGlyph());
         }
 
         super.doLayout();

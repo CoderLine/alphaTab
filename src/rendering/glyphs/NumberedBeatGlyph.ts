@@ -1,5 +1,5 @@
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
@@ -19,6 +19,7 @@ import { CircleGlyph } from './CircleGlyph';
 import { NumberedDashGlyph } from './NumberedDashGlyph';
 import { Glyph } from './Glyph';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
     public isNaturalizeAccidental = false;
@@ -70,6 +71,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                 if (accidentalToSet !== AccidentalType.None) {
                     this.accidental = accidentalToSet;
                     let sr: NumberedBarRenderer = this.renderer as NumberedBarRenderer;
+                    const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.NumberedAccidentals, note);
 
                     let g = new AccidentalGlyph(
                         0,
@@ -79,6 +81,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                             ? NoteHeadGlyph.GraceScale * NoteHeadGlyph.GraceScale
                             : NoteHeadGlyph.GraceScale
                     );
+                    g.colorOverride = color;
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
                     this.addNormal(accidentals);
@@ -322,7 +325,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 numberOfQuarterNotes += numberOfAddedQuarters;
             }
             for (let i = 0; i < numberOfQuarterNotes - 1; i++) {
-                const dash = new NumberedDashGlyph(0, sr.getLineY(0));
+                const dash = new NumberedDashGlyph(0, sr.getLineY(0), this.container.beat);
                 dash.renderer = this.renderer;
                 this.addNormal(dash);
             }

@@ -1,3 +1,4 @@
+import { Color } from '@src/model';
 import { AccidentalType } from '@src/model/AccidentalType';
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
@@ -49,7 +50,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         return 0;
     }
 
-    public addGlyph(noteValue: number, quarterBend: boolean = false): void {
+    public addGlyph(noteValue: number, quarterBend: boolean, color: Color | undefined): void {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let noteHeadGlyph: NoteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidentalForValue(

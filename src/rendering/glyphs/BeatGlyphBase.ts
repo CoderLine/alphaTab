@@ -68,7 +68,7 @@ export class BeatGlyphBase extends GlyphGroup {
         using _ = this.effectElement
             ? ElementStyleHelper.beat(canvas, this.effectElement, this.container.beat)
             : undefined;
-        for (const g of this._normalGlyphs) {
+        for (const g of this._effectGlyphs) {
             g.paint(cx + this.x, cy + this.y, canvas);
         }
     }

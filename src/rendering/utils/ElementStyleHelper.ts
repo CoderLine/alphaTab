@@ -183,6 +183,22 @@ export class ElementStyleHelper {
         return new ElementStyleScope<BeatSubElement>(canvas, element, beat.style, defaultColor);
     }
 
+    public static noteColor(res: RenderingResources, element: NoteSubElement, note: Note): Color | undefined {
+        let defaultColor = ElementStyleHelper.noteDefaultColor(res, element, note);
+
+        if (note.style && note.style!.colors.has(element)) {
+            return note.style!.colors.get(element) ?? defaultColor;
+        }
+
+        return undefined;
+    }
+
+    private static noteDefaultColor(res: RenderingResources, element: NoteSubElement, note: Note) {
+        let defaultColor: Color = note.beat.voice.index === 0 ? res.mainGlyphColor : res.secondaryGlyphColor;
+
+        return defaultColor;
+    }
+
     public static note(
         canvas: ICanvas,
         element: NoteSubElement,
