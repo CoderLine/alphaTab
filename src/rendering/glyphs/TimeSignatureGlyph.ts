@@ -3,12 +3,16 @@ import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
 import { GhostParenthesisGlyph } from './GhostParenthesisGlyph';
+import { BarSubElement } from '@src/model';
+import { ICanvas } from '@src/platform';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export abstract class TimeSignatureGlyph extends GlyphGroup {
     private _numerator: number = 0;
     private _denominator: number = 0;
     private _isCommon: boolean;
     private _isFreeTime: boolean;
+    public barSubElement: BarSubElement = BarSubElement.StandardNotationTimeSignature;
 
     public constructor(
         x: number,
@@ -27,6 +31,11 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
 
     protected abstract get commonScale(): number;
     protected abstract get numberScale(): number;
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(canvas, this.barSubElement, this.renderer.bar);
+        super.paint(cx, cy, canvas);
+    }
 
 
     public override doLayout(): void {

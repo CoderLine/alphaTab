@@ -6,7 +6,9 @@
 import { Voice } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
+import { VoiceStyleSerializer } from "@src/generated/model/VoiceStyleSerializer";
 import { Beat } from "@src/model/Beat";
+import { VoiceStyle } from "@src/model/Voice";
 export class VoiceSerializer {
     public static fromJson(obj: Voice, m: unknown): void {
         if (!m) {
@@ -21,6 +23,9 @@ export class VoiceSerializer {
         const o = new Map<string, unknown>();
         o.set("id", obj.id);
         o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i)));
+        if (obj.style) {
+            o.set("style", VoiceStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
@@ -34,6 +39,15 @@ export class VoiceSerializer {
                     const i = new Beat();
                     BeatSerializer.fromJson(i, o);
                     obj.addBeat(i);
+                }
+                return true;
+            case "style":
+                if (v) {
+                    obj.style = new VoiceStyle();
+                    VoiceStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
                 }
                 return true;
         }

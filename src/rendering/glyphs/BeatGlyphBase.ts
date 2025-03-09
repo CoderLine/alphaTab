@@ -1,9 +1,15 @@
+import { BeatSubElement } from '@src/model';
 import { Note } from '@src/model/Note';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
+import { ICanvas } from '@src/platform';
 
 export class BeatGlyphBase extends GlyphGroup {
+    private _effectGlyphs: Glyph[] = [];
+    private _normalGlyphs: Glyph[] = [];
+
     public container!: BeatContainerGlyph;
     public computedWidth: number = 0;
 
@@ -30,6 +36,40 @@ export class BeatGlyphBase extends GlyphGroup {
     protected noteLoop(action: (note: Note) => void): void {
         for (let i: number = this.container.beat.notes.length - 1; i >= 0; i--) {
             action(this.container.beat.notes[i]);
+        }
+    }
+
+    public addEffect(g: Glyph) {
+        super.addGlyph(g);
+        this._effectGlyphs.push(g);
+    }
+
+    public addNormal(g: Glyph) {
+        super.addGlyph(g);
+        this._normalGlyphs.push(g);
+    }
+
+    protected get effectElement(): BeatSubElement | undefined {
+        return undefined;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.paintEffects(cx, cy, canvas);
+        this.paintNormal(cx, cy, canvas);
+    }
+
+    private paintNormal(cx: number, cy: number, canvas: ICanvas) {
+        for (const g of this._normalGlyphs) {
+            g.paint(cx + this.x, cy + this.y, canvas);
+        }
+    }
+
+    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+        using _ = this.effectElement
+            ? ElementStyleHelper.beat(canvas, this.effectElement!, this.container.beat)
+            : undefined;
+        for (const g of this._effectGlyphs) {
+            g.paint(cx + this.x, cy + this.y, canvas);
         }
     }
 }

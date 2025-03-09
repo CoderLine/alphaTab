@@ -1,9 +1,9 @@
 export { AccentuationType } from '@src/model/AccentuationType';
 export { AccidentalType } from '@src/model/AccidentalType';
 export { AutomationType, Automation } from '@src/model/Automation';
-export { Bar, SustainPedalMarkerType, SustainPedalMarker } from '@src/model/Bar';
+export { Bar, SustainPedalMarkerType, SustainPedalMarker, BarSubElement, BarStyle } from '@src/model/Bar';
 export { BarreShape } from '@src/model/BarreShape';
-export { Beat, BeatBeamingMode } from '@src/model/Beat';
+export { Beat, BeatBeamingMode, BeatSubElement, BeatStyle } from '@src/model/Beat';
 export { BendPoint } from '@src/model/BendPoint';
 export { BendStyle } from '@src/model/BendStyle';
 export { BendType } from '@src/model/BendType';
@@ -27,7 +27,7 @@ export { KeySignatureType } from '@src/model/KeySignatureType';
 export { Lyrics } from '@src/model/Lyrics';
 export { MasterBar } from '@src/model/MasterBar';
 export { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-export { Note } from '@src/model/Note';
+export { Note, NoteSubElement, NoteStyle } from '@src/model/Note';
 export { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 export { NoteOrnament } from '@src/model/NoteOrnament';
 export { Ottavia } from '@src/model/Ottavia';
@@ -42,17 +42,17 @@ export {
     TrackNameOrientation
 } from '@src/model/RenderStylesheet';
 export { RepeatGroup } from '@src/model/RepeatGroup';
-export { Score } from '@src/model/Score';
+export { Score, ScoreSubElement, ScoreStyle } from '@src/model/Score';
 export { Section } from '@src/model/Section';
 export { SimileMark } from '@src/model/SimileMark';
 export { SlideInType } from '@src/model/SlideInType';
 export { SlideOutType } from '@src/model/SlideOutType';
 export { Staff } from '@src/model/Staff';
-export { Track } from '@src/model/Track';
+export { Track, TrackSubElement, TrackStyle } from '@src/model/Track';
 export { TripletFeel } from '@src/model/TripletFeel';
 export { Tuning } from '@src/model/Tuning';
 export { TupletGroup } from '@src/model/TupletGroup';
 export { VibratoType } from '@src/model/VibratoType';
-export { Voice } from '@src/model/Voice';
+export { Voice, VoiceSubElement, VoiceStyle } from '@src/model/Voice';
 export { WahPedal } from '@src/model/WahPedal'
 export { WhammyType } from '@src/model/WhammyType';

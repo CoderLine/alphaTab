@@ -1,10 +1,11 @@
 import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
-import { Color } from '@src/model/Color';
+import { BarSubElement } from '@src/model';
 import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
@@ -105,13 +106,23 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         cx += this.x;
         cy += this.y;
         // TODO: this method seems to be quite heavy according to the profiler, why?
-        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         // TODO: Take care of beateffects in overflow
+        this.paintLedgerLines(cx, cy, canvas);
+        let infos: ScoreNoteGlyphInfo[] = this._infos;
+        let x: number = cx + this._noteHeadPadding;
+        for (let g of infos) {
+            g.glyph.renderer = this.renderer;
+            g.glyph.paint(x, cy, canvas);
+        }
+    }
+    private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
+        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+
+        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
+
         let linePadding: number = 3;
         let lineWidth: number = this.width - this.noteStartX + linePadding * 2;
         if (this.hasTopOverflow) {
-            let color: Color = canvas.color;
-            canvas.color = scoreRenderer.resources.staffLineColor;
             let l: number = -2;
             while (l >= this.minNote!.line) {
                 // + 1 Because we want to place the line in the center of the note, not at the top
@@ -119,24 +130,14 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, 1);
                 l -= 2;
             }
-            canvas.color = color;
         }
         if (this.hasBottomOverflow) {
-            let color: Color = canvas.color;
-            canvas.color = scoreRenderer.resources.staffLineColor;
             let l: number = 10;
             while (l <= this.maxNote!.line) {
                 let lY: number = cy + scoreRenderer.getScoreY(l);
                 canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, 1);
                 l += 2;
             }
-            canvas.color = color;
-        }
-        let infos: ScoreNoteGlyphInfo[] = this._infos;
-        let x: number = cx + this._noteHeadPadding;
-        for (let g of infos) {
-            g.glyph.renderer = this.renderer;
-            g.glyph.paint(x, cy, canvas);
         }
     }
 }

@@ -7,6 +7,10 @@ export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
         this.glyphs = [];
     }
 
+    public override doLayout(): void {
+        // skip
+    }
+
     public override addGlyph(g: Glyph): void {
         g.x =
             this.glyphs!.length === 0

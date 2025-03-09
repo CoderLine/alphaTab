@@ -1,7 +1,8 @@
 import { ICanvas, TextBaseline } from '@src/platform';
 import { Glyph } from './Glyph';
-import { AccidentalType, KeySignature, KeySignatureType } from '@src/model';
+import { AccidentalType, BarSubElement, KeySignature, KeySignatureType } from '@src/model';
 import { AccidentalGlyph } from './AccidentalGlyph';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class NumberedKeySignatureGlyph extends Glyph {
     private _keySignature: KeySignature;
@@ -161,6 +162,8 @@ export class NumberedKeySignatureGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(canvas, BarSubElement.NumberedKeySignature, this.renderer.bar);
+        
         const res = this.renderer.resources;
         canvas.font = res.numberedNotationFont;
         canvas.textBaseline = TextBaseline.Middle;

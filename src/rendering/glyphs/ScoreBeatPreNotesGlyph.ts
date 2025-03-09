@@ -3,7 +3,7 @@ import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { WhammyType } from '@src/model/WhammyType';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { AccidentalGroupGlyph } from '@src/rendering/glyphs/AccidentalGroupGlyph';
@@ -15,11 +15,17 @@ import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { FingeringGroupGlyph } from './FingeringGroupGlyph';
+import { BeatSubElement } from '@src/model';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;
     public get prebendNoteHeadOffset(): number {
         return this._prebends ? this._prebends.x + this._prebends.noteHeadOffset : 0;
+    }
+
+    protected override get effectElement() {
+        return BeatSubElement.StandardNotationEffects;
     }
 
     public accidentals: AccidentalGroupGlyph | null = null;
@@ -39,13 +45,22 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             this._prebends = preBends;
             preBends.renderer = this.renderer;
             for (let note of this.container.beat.notes) {
+                const color = ElementStyleHelper.noteColor(
+                    this.renderer.resources,
+                    NoteSubElement.StandardNotationEffects,
+                    note
+                );
                 if (note.isVisible) {
                     if (note.hasBend) {
                         switch (note.bendType) {
                             case BendType.PrebendBend:
                             case BendType.Prebend:
                             case BendType.PrebendRelease:
-                                preBends.addGlyph(note.displayValue - ((note.bendPoints![0].value / 2) | 0), false);
+                                preBends.addGlyph(
+                                    note.displayValue - ((note.bendPoints![0].value / 2) | 0),
+                                    false,
+                                    color
+                                );
                                 break;
                         }
                     } else if (note.beat.hasWhammyBar) {
@@ -54,7 +69,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                             case WhammyType.Predive:
                                 this._prebends.addGlyph(
                                     note.displayValue - ((note.beat.whammyBarPoints![0].value / 2) | 0),
-                                    false
+                                    false,
+                                    color
                                 );
                                 break;
                         }
@@ -65,8 +81,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 }
             }
             if (!preBends.isEmpty) {
-                this.addGlyph(preBends);
-                this.addGlyph(
+                this.addEffect(preBends);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -75,12 +91,12 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                 );
             }
             if (this.container.beat.brushType !== BrushType.None) {
-                this.addGlyph(new ScoreBrushGlyph(this.container.beat));
-                this.addGlyph(new SpacingGlyph(0, 0, 4));
+                this.addEffect(new ScoreBrushGlyph(this.container.beat));
+                this.addNormal(new SpacingGlyph(0, 0, 4));
             }
             if (!fingering.isEmpty) {
                 if (!this.isEmpty) {
-                    this.addGlyph(
+                    this.addNormal(
                         new SpacingGlyph(
                             0,
                             0,
@@ -89,8 +105,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     );
                 }
 
-                this.addGlyph(fingering);
-                this.addGlyph(
+                this.addEffect(fingering);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -100,8 +116,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             }
 
             if (!ghost.isEmpty) {
-                this.addGlyph(ghost);
-                this.addGlyph(
+                this.addEffect(ghost);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -112,7 +128,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;
                 if (!this.isEmpty) {
-                    this.addGlyph(
+                    this.addNormal(
                         new SpacingGlyph(
                             0,
                             0,
@@ -120,9 +136,9 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         )
                     );
                 }
-                
-                this.addGlyph(accidentals);
-                this.addGlyph(
+
+                this.addNormal(accidentals);
+                this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
@@ -139,9 +155,11 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidental(n);
         let noteLine: number = sr.getNoteLine(n);
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+        const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationAccidentals, n);
         const graceScale = isGrace ? NoteHeadGlyph.GraceScale : 1;
         if (accidental !== AccidentalType.None) {
             let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
+            g.colorOverride = color;
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }
@@ -150,6 +168,7 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace, false);
             noteLine = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
             let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
+            g.colorOverride = color;
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }

@@ -6,7 +6,7 @@ import { Tuning } from '@src/model/Tuning';
 
 /**
  * This class describes a single staff within a track. There are instruments like pianos
- * where a single track can contain multiple staffs.
+ * where a single track can contain multiple staves.
  * @json
  * @json_strict
  */

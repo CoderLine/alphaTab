@@ -69,6 +69,9 @@ export class StaffSerializer {
             case "displaytranspositionpitch":
                 obj.displayTranspositionPitch = v! as number;
                 return true;
+            case "stringtuning":
+                TuningSerializer.fromJson(obj.stringTuning, v);
+                return true;
             case "showslash":
                 obj.showSlash = v! as boolean;
                 return true;
@@ -87,10 +90,6 @@ export class StaffSerializer {
             case "standardnotationlinecount":
                 obj.standardNotationLineCount = v! as number;
                 return true;
-        }
-        if (["stringtuning"].indexOf(property) >= 0) {
-            TuningSerializer.fromJson(obj.stringTuning, v as Map<string, unknown>);
-            return true;
         }
         return false;
     }

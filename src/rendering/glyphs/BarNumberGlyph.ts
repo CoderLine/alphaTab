@@ -1,7 +1,8 @@
-import { Color } from '@src/model/Color';
 import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { RenderingResources } from '@src/RenderingResources';
+import { LineBarRenderer } from '../LineBarRenderer';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class BarNumberGlyph extends Glyph {
     private _number: number = 0;
@@ -20,15 +21,19 @@ export class BarNumberGlyph extends Glyph {
         if (!this.renderer.staff.isFirstInSystem) {
             return;
         }
+
+        using _ = ElementStyleHelper.bar(
+            canvas,
+            (this.renderer as LineBarRenderer).barNumberBarSubElement,
+            this.renderer.bar,
+            true
+        );
+
         let res: RenderingResources = this.renderer.resources;
-        let c: Color = canvas.color;
         const baseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Top;
-        canvas.color = res.barNumberColor;
         canvas.font = res.barNumberFont;
         canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
-        canvas.color = c;
         canvas.textBaseline = baseline;
     }
-
 }

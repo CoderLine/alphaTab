@@ -1,24 +1,9 @@
 import * as ts from 'typescript';
-import {
-    createNodeFromSource,
-    setMethodBody,
-    isPrimitiveType,
-    hasFlag,
-    getTypeWithNullableInfo,
-    isTypedArray,
-    unwrapArrayItemType,
-    isMap,
-    isEnumType,
-    isSet,
-    isPrimitiveToJson
-} from '../BuilderHelpers';
-import { findModule, findSerializerModule, isImmutable, JsonProperty, JsonSerializable } from './Serializer.common';
+import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
+import { findSerializerModule } from './Serializer.common';
+import { TypeSchema } from './TypeSchema';
 
-function generateToJsonBody(
-    program: ts.Program,
-    serializable: JsonSerializable,
-    importer: (name: string, module: string) => void
-) {
+function generateToJsonBody(serializable: TypeSchema, importer: (name: string, module: string) => void) {
     const statements: ts.Statement[] = [];
 
     statements.push(
@@ -42,7 +27,7 @@ function generateToJsonBody(
     );
 
     for (let prop of serializable.properties) {
-        const fieldName = (prop.property.name as ts.Identifier).text;
+        const fieldName = prop.name;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
         if (!jsonName || prop.isReadOnly) {
@@ -51,11 +36,7 @@ function generateToJsonBody(
 
         let propertyStatements: ts.Statement[] = [];
 
-        const typeChecker = program.getTypeChecker();
-        const type = getTypeWithNullableInfo(typeChecker, prop.property.type!, prop.asRaw);
-        const isArray = isTypedArray(type.type!);
-
-        if (prop.asRaw || isPrimitiveToJson(type.type!, typeChecker)) {
+        if (prop.asRaw || prop.type.isPrimitiveType) {
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `
@@ -64,12 +45,21 @@ function generateToJsonBody(
                     ts.SyntaxKind.ExpressionStatement
                 )
             );
-        } else if (isEnumType(type.type!)) {
-            if (type.isNullable) {
+        } else if (prop.type.isEnumType) {
+            if (prop.type.isNullable) {
                 propertyStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
                         `
                         o.set(${JSON.stringify(jsonName)}, obj.${fieldName} as number|null);
+                    `,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            } else if (prop.type.isOptional) {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `
+                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName} as number|undefined);
                     `,
                         ts.SyntaxKind.ExpressionStatement
                     )
@@ -84,37 +74,53 @@ function generateToJsonBody(
                     )
                 );
             }
-        } else if (isArray) {
-            const arrayItemType = unwrapArrayItemType(type.type!, typeChecker)!;
-            let itemSerializer = arrayItemType.symbol.name + 'Serializer';
-            importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
-            if (type.isNullable) {
-                propertyStatements.push(
-                    createNodeFromSource<ts.IfStatement>(
-                        `if(obj.${fieldName} !== null) {
+        } else if (prop.type.isArray) {
+            const arrayItemType = prop.type.arrayItemType!;
+            if (arrayItemType.isOwnType && !arrayItemType.isEnumType) {
+                let itemSerializer = arrayItemType.typeAsString + 'Serializer';
+                importer(itemSerializer, findSerializerModule(arrayItemType));
+                if (prop.type.isNullable) {
+                    propertyStatements.push(
+                        createNodeFromSource<ts.IfStatement>(
+                            `if(obj.${fieldName} !== null) {
                             o.set(${JSON.stringify(jsonName)}, obj.${fieldName}?.map(i => ${itemSerializer}.toJson(i)));
                         }`,
-                        ts.SyntaxKind.IfStatement
-                    )
-                );
+                            ts.SyntaxKind.IfStatement
+                        )
+                    );
+                } else if (prop.type.isOptional) {
+                    propertyStatements.push(
+                        createNodeFromSource<ts.IfStatement>(
+                            `if(obj.${fieldName} !== undefined) {
+                            o.set(${JSON.stringify(jsonName)}, obj.${fieldName}?.map(i => ${itemSerializer}.toJson(i)));
+                        }`,
+                            ts.SyntaxKind.IfStatement
+                        )
+                    );
+                } else {
+                    propertyStatements.push(
+                        createNodeFromSource<ts.ExpressionStatement>(
+                            `
+                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName}.map(i => ${itemSerializer}.toJson(i)));
+                    `,
+                            ts.SyntaxKind.ExpressionStatement
+                        )
+                    );
+                }
             } else {
                 propertyStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
                         `
-                        o.set(${JSON.stringify(jsonName)}, obj.${fieldName}.map(i => ${itemSerializer}.toJson(i)));
-                    `,
+                    o.set(${JSON.stringify(jsonName)}, obj.${fieldName});
+                `,
                         ts.SyntaxKind.ExpressionStatement
                     )
                 );
             }
-        } else if (isMap(type.type)) {
-            const mapType = type.type as ts.TypeReference;
-            if (!isPrimitiveType(mapType.typeArguments![0])) {
-                throw new Error('only Map<Primitive, *> maps are supported extend if needed!');
-            }
+        } else if (prop.type.isMap) {
 
             let serializeBlock: ts.Block;
-            if (isPrimitiveToJson(mapType.typeArguments![1], typeChecker)) {
+            if (prop.type.typeArguments![1].isPrimitiveType) {
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
@@ -125,7 +131,7 @@ function generateToJsonBody(
                 }`,
                     ts.SyntaxKind.Block
                 );
-            } else if (isEnumType(mapType.typeArguments![1])) {
+            } else if (prop.type.typeArguments![1].isEnumType) {
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                     const m = new Map<string, unknown>();
@@ -136,9 +142,21 @@ function generateToJsonBody(
                 }`,
                     ts.SyntaxKind.Block
                 );
+            } else if(prop.type.typeArguments![1].isJsonImmutable) {
+                const notNull = !prop.type.typeArguments![1].isNullable ? '!' : '';
+                serializeBlock = createNodeFromSource<ts.Block>(
+                    `{
+                    const m = new Map<string, unknown>();
+                    o.set(${JSON.stringify(jsonName)}, m);
+                    for(const [k, v] of obj.${fieldName}!) {
+                        m.set(k.toString(), ${prop.type.typeArguments![1].typeAsString}.toJson(v)${notNull});
+                    }
+                }`,
+                    ts.SyntaxKind.Block
+                );
             } else {
-                const itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
-                importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
+                const itemSerializer = prop.type.typeArguments![1].typeAsString + 'Serializer';
+                importer(itemSerializer, findSerializerModule(prop.type.typeArguments![1]));
 
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
@@ -152,13 +170,16 @@ function generateToJsonBody(
                 );
             }
 
-            if (type.isNullable) {
+            if (prop.type.isNullable || prop.type.isOptional) {
+                const nullOrUndefined = prop.type.isNullable
+                    ? ts.factory.createNull()
+                    : ts.factory.createIdentifier('undefined');
                 propertyStatements.push(
                     ts.factory.createIfStatement(
                         ts.factory.createBinaryExpression(
                             ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
                             ts.SyntaxKind.ExclamationEqualsEqualsToken,
-                            ts.factory.createNull()
+                            nullOrUndefined
                         ),
                         serializeBlock
                     )
@@ -166,17 +187,12 @@ function generateToJsonBody(
             } else {
                 propertyStatements.push(serializeBlock);
             }
-        } else if (isSet(type.type)) {
-            const setType = type.type as ts.TypeReference;
-            if (!isPrimitiveType(setType.typeArguments![0])) {
-                throw new Error('only Set<Primitive> maps are supported, extend if needed!');
-            }
-
+        } else if (prop.type.isSet) {
             let serializeBlock: ts.Block;
-            if (isPrimitiveToJson(setType.typeArguments![0], typeChecker)) {
+            if (prop.type.typeArguments![0].isPrimitiveType) {
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
-                        const a:${typeChecker.typeToString(setType.typeArguments![0])}[] = [];
+                        const a:${prop.type.typeArguments![0].typeAsString}[] = [];
                         o.set(${JSON.stringify(jsonName)}, a);
                         for(const v of obj.${fieldName}!) {
                             a.push(v);
@@ -184,7 +200,7 @@ function generateToJsonBody(
                     }`,
                     ts.SyntaxKind.Block
                 );
-            } else if (isEnumType(setType.typeArguments![0])) {
+            } else if (prop.type.typeArguments![0].isEnumType) {
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{
                         const a:number[] = [];
@@ -197,17 +213,20 @@ function generateToJsonBody(
                 );
             } else {
                 throw new Error(
-                    `only Set<Primitive> maps are supported, extend if needed! Found ${typeChecker.typeToString(setType)}`
+                    `only Set<Primitive> and Set<Enum> sets are supported, extend if needed! Found ${prop.type.typeAsString}`
                 );
             }
 
-            if (type.isNullable) {
+            if (prop.type.isNullable || prop.type.isOptional) {
+                const nullOrUndefined = prop.type.isNullable
+                    ? ts.factory.createNull()
+                    : ts.factory.createIdentifier('undefined');
                 propertyStatements.push(
                     ts.factory.createIfStatement(
                         ts.factory.createBinaryExpression(
                             ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('obj'), fieldName),
                             ts.SyntaxKind.ExclamationEqualsEqualsToken,
-                            ts.factory.createNull()
+                            nullOrUndefined
                         ),
                         serializeBlock
                     )
@@ -215,20 +234,45 @@ function generateToJsonBody(
             } else {
                 propertyStatements.push(serializeBlock);
             }
-        } else if (isImmutable(type.type)) {
-            let itemSerializer = type.type.symbol.name;
-            importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
+        } else if (prop.type.isJsonImmutable) {
+            importer(prop.type.typeAsString, prop.type.modulePath);
+            const notNull = !prop.type.isNullable ? '!' : '';
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `
-                    o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                    o.set(${JSON.stringify(jsonName)}, ${prop.type.typeAsString}.toJson(obj.${fieldName})${notNull});
                 `,
                     ts.SyntaxKind.ExpressionStatement
                 )
             );
+        } else if (serializable.isStrict) {
+            let itemSerializer = prop.type.typeAsString + 'Serializer';
+            importer(itemSerializer, findSerializerModule(prop.type));
+
+            if (prop.type.isNullable || prop.type.isOptional) {
+                propertyStatements.push(
+                    createNodeFromSource<ts.IfStatement>(
+                        `
+                        if(obj.${fieldName}) {
+                            o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                        }
+                    `,
+                        ts.SyntaxKind.IfStatement
+                    )
+                );
+            } else {
+                propertyStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `
+                        o.set(${JSON.stringify(jsonName)}, ${itemSerializer}.toJson(obj.${fieldName}));
+                    `,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            }
         } else {
-            let itemSerializer = type.type.symbol.name + 'Serializer';
-            importer(itemSerializer, findSerializerModule(type.type, program.getCompilerOptions()));
+            let itemSerializer = prop.type.typeAsString + 'Serializer';
+            importer(itemSerializer, findSerializerModule(prop.type));
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `
@@ -260,9 +304,8 @@ function generateToJsonBody(
 }
 
 export function createToJsonMethod(
-    program: ts.Program,
     input: ts.ClassDeclaration,
-    serializable: JsonSerializable,
+    serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
@@ -272,5 +315,5 @@ export function createToJsonMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateToJsonBody(program, serializable, importer));
+    return setMethodBody(methodDecl, generateToJsonBody(serializable, importer));
 }

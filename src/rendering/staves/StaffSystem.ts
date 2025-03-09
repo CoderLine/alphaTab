@@ -1,6 +1,6 @@
 import { Bar } from '@src/model/Bar';
 import { Font } from '@src/model/Font';
-import { Track } from '@src/model/Track';
+import { Track, TrackSubElement } from '@src/model/Track';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
@@ -16,6 +16,7 @@ import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { MusicFontSymbol } from '@src/model';
 import { Environment } from '@src/Environment';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -464,6 +465,12 @@ export class StaffSystem {
         this.paintPartial(cx + this.x, cy + this.y, canvas, 0, this.masterBarsRenderers.length);
 
         if (this._hasSystemSeparator) {
+            using _ = ElementStyleHelper.track(
+                canvas,
+                TrackSubElement.SystemSeparator,
+                this._allStaves[0].modelStaff.track
+            );
+
             canvas.fillMusicFontSymbol(
                 cx + this.x,
                 cy + this.y + this.height - 10,
@@ -486,27 +493,15 @@ export class StaffSystem {
             this._allStaves[i].paint(cx, cy, canvas, startIndex, count);
         }
         let res: RenderingResources = this.layout.renderer.settings.display.resources;
+
         if (this.staves.length > 0 && startIndex === 0) {
             //
             // Draw start grouping
             //
             canvas.color = res.barSeparatorColor;
-
+           
             const firstStaffInBracket = this._firstStaffInBrackets;
             const lastStaffInBracket = this._lastStaffInBrackets;
-
-            if (firstStaffInBracket && lastStaffInBracket) {
-                //
-                // draw grouping line for all staves
-                //
-                let firstStart: number = cy + firstStaffInBracket.contentTop;
-                let lastEnd: number = cy + lastStaffInBracket.contentBottom;
-                let acooladeX: number = cx + firstStaffInBracket.x;
-                canvas.beginPath();
-                canvas.moveTo(acooladeX, firstStart);
-                canvas.lineTo(acooladeX, lastEnd);
-                canvas.stroke();
-            }
 
             //
             // Draw track names
@@ -561,7 +556,14 @@ export class StaffSystem {
                                     trackNameText = g.track.shortName;
                                     break;
                             }
-
+                            
+                            using _trackNameStyle = ElementStyleHelper.track(
+                                canvas,
+                                TrackSubElement.TrackName,
+                                g.track
+                            );
+                    
+                            
                             if (trackNameText.length > 0) {
                                 const textEndX =
                                     // start at beginning of first renderer
@@ -602,6 +604,25 @@ export class StaffSystem {
                     canvas.textBaseline = oldBaseLine;
                     canvas.textAlign = oldTextAlign;
                 }
+            }
+
+            using _ = ElementStyleHelper.track(
+                canvas,
+                TrackSubElement.BracesAndBrackets,
+                this.staves[0].track
+            );
+
+            if (firstStaffInBracket && lastStaffInBracket) {
+                //
+                // draw grouping line for all staves
+                //
+                let firstStart: number = cy + firstStaffInBracket.contentTop;
+                let lastEnd: number = cy + lastStaffInBracket.contentBottom;
+                let acooladeX: number = cx + firstStaffInBracket.x;
+                canvas.beginPath();
+                canvas.moveTo(acooladeX, firstStart);
+                canvas.lineTo(acooladeX, lastEnd);
+                canvas.stroke();
             }
 
             //

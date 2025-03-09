@@ -4,10 +4,13 @@ import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { Color } from '@src/model';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
     private _trackLabel: string;
+
+    public colorOverride?: Color;
 
     public constructor(x: number, y: number, tuning: Tuning, trackLabel: string) {
         super(x, y);
@@ -29,7 +32,12 @@ export class TuningGlyph extends GlyphGroup {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.textBaseline = TextBaseline.Middle;
+        const c = canvas.color;
+        if (this.colorOverride) {
+            canvas.color = this.colorOverride!;
+        }
         super.paint(cx, cy, canvas);
+        canvas.color = c;
     }
 
     /**

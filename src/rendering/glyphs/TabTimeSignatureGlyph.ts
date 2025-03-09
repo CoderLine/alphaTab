@@ -1,8 +1,14 @@
 import { TimeSignatureGlyph } from '@src/rendering/glyphs/TimeSignatureGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { BarSubElement } from '@src/model';
 
 export class TabTimeSignatureGlyph extends TimeSignatureGlyph {
+    public override doLayout(): void {
+        this.barSubElement = BarSubElement.GuitarTabsTimeSignature;
+        super.doLayout();
+    }
+
     protected get commonScale(): number {
         return 1;
     }

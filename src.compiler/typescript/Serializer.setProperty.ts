@@ -1,88 +1,37 @@
 import * as ts from 'typescript';
-import { cloneTypeNode, createNodeFromSource, isPrimitiveToJson, isSet, setMethodBody } from '../BuilderHelpers';
-import { isPrimitiveType } from '../BuilderHelpers';
-import { hasFlag } from '../BuilderHelpers';
-import { getTypeWithNullableInfo } from '../BuilderHelpers';
-import { isTypedArray } from '../BuilderHelpers';
-import { unwrapArrayItemType } from '../BuilderHelpers';
-import { isMap } from '../BuilderHelpers';
-import { isEnumType } from '../BuilderHelpers';
-import { isNumberType } from '../BuilderHelpers';
-import { wrapToNonNull } from '../BuilderHelpers';
-import {
-    createStringUnknownMapNode,
-    findModule,
-    findSerializerModule,
-    isImmutable,
-    JsonProperty,
-    JsonSerializable
-} from './Serializer.common';
+import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
+import { findSerializerModule } from './Serializer.common';
+import { TypeSchema, TypeWithNullableInfo } from './TypeSchema';
 
-function isPrimitiveFromJson(type: ts.Type, typeChecker: ts.TypeChecker) {
-    if (!type) {
-        return false;
-    }
-
-    const isArray = isTypedArray(type);
-    const arrayItemType = unwrapArrayItemType(type, typeChecker);
-
-    if (hasFlag(type, ts.TypeFlags.Unknown)) {
-        return true;
-    }
-    if (hasFlag(type, ts.TypeFlags.Number)) {
-        return true;
-    }
-    if (hasFlag(type, ts.TypeFlags.String)) {
-        return true;
-    }
-    if (hasFlag(type, ts.TypeFlags.Boolean)) {
-        return true;
-    }
-
-    if (arrayItemType) {
-        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Number)) {
-            return true;
-        }
-        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.String)) {
-            return true;
-        }
-        if (isArray && hasFlag(arrayItemType, ts.TypeFlags.Boolean)) {
-            return true;
-        }
-    } else if (type.symbol) {
-        switch (type.symbol.name) {
-            case 'Uint8Array':
-            case 'Uint16Array':
-            case 'Uint32Array':
-            case 'Int8Array':
-            case 'Int16Array':
-            case 'Int32Array':
-            case 'Float32Array':
-            case 'Float64Array':
-                return true;
-        }
-    }
-
-    return null;
+export function createStringUnknownMapNode(): ts.TypeNode {
+    return ts.factory.createTypeReferenceNode('Map', [
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.StringKeyword),
+        ts.factory.createKeywordTypeNode(ts.SyntaxKind.UnknownKeyword)
+    ]);
 }
 
-function generateSetPropertyBody(
-    program: ts.Program,
-    serializable: JsonSerializable,
-    importer: (name: string, module: string) => void
-) {
+function isPrimitiveForSerialization(type: TypeWithNullableInfo) {
+    if (type.isPrimitiveType) {
+        return true;
+    } else if (type.arrayItemType?.isPrimitiveType) {
+        return true;
+    } else if (type.isTypedArray) {
+        return true;
+    }
+
+    return false;
+}
+
+function generateSetPropertyBody(serializable: TypeSchema, importer: (name: string, module: string) => void) {
     const statements: ts.Statement[] = [];
     const cases: ts.CaseOrDefaultClause[] = [];
 
-    const typeChecker = program.getTypeChecker();
     for (const prop of serializable.properties) {
         const jsonNames = prop.jsonNames.map(j => j.toLowerCase());
         const caseValues: string[] = jsonNames.filter(j => j !== '');
-        const fieldName = (prop.property.name as ts.Identifier).text;
+        const fieldName = prop.name;
 
         const caseStatements: ts.Statement[] = [];
-
-        const type = getTypeWithNullableInfo(typeChecker, prop.property.type, true);
 
         const assignField = function (expr: ts.Expression): ts.Statement {
             return ts.factory.createExpressionStatement(
@@ -93,56 +42,61 @@ function generateSetPropertyBody(
             );
         };
 
-        if (!prop.asRaw && type.isUnionType) {
+        if (!prop.asRaw && prop.type.isUnionType) {
             caseStatements.push(
                 assignField(
                     ts.factory.createAsExpression(
-                        type.isNullable
+                        prop.type.isNullable || prop.type.isOptional
                             ? ts.factory.createIdentifier('v')
                             : ts.factory.createNonNullExpression(ts.factory.createIdentifier('v')),
-                        cloneTypeNode(prop.property.type!)
+                        prop.type.createTypeNode()
                     )
                 )
             );
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
-        } else if (prop.asRaw || isPrimitiveFromJson(type.type!, typeChecker)) {
+        } else if (prop.asRaw || isPrimitiveForSerialization(prop.type)) {
             caseStatements.push(
                 assignField(
                     ts.factory.createAsExpression(
-                        type.isNullable
+                        prop.type.isNullable || prop.type.isOptional
                             ? ts.factory.createIdentifier('v')
                             : ts.factory.createNonNullExpression(ts.factory.createIdentifier('v')),
-                        cloneTypeNode(prop.property.type!)
+                        prop.type.createTypeNode()
                     )
                 )
             );
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
-        } else if (isEnumType(type.type)) {
-            importer(type.type.symbol!.name, findModule(type.type, program.getCompilerOptions()));
+        } else if (prop.type.isEnumType) {
+            importer(prop.type.typeAsString, prop.type.modulePath);
             importer('JsonHelper', '@src/io/JsonHelper');
-            if (type.isNullable) {
+            if (prop.type.isNullable) {
                 caseStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
-                        `obj.${fieldName} = JsonHelper.parseEnum<${type.type.symbol.name}>(v, ${type.type.symbol.name});`,
+                        `obj.${fieldName} = JsonHelper.parseEnum<${prop.type.typeAsString}>(v, ${prop.type.typeAsString}) ?? null;`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+            } else if (prop.type.isOptional) {
+                caseStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `obj.${fieldName} = JsonHelper.parseEnum<${prop.type.typeAsString}>(v, ${prop.type.typeAsString});`,
                         ts.SyntaxKind.ExpressionStatement
                     )
                 );
             } else {
                 caseStatements.push(
                     createNodeFromSource<ts.ExpressionStatement>(
-                        `obj.${fieldName} = JsonHelper.parseEnum<${type.type.symbol.name}>(v, ${type.type.symbol.name})!;`,
+                        `obj.${fieldName} = JsonHelper.parseEnum<${prop.type.typeAsString}>(v, ${prop.type.typeAsString})!;`,
                         ts.SyntaxKind.ExpressionStatement
                     )
                 );
             }
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
-        } else if (isTypedArray(type.type!)) {
-            const arrayItemType = unwrapArrayItemType(type.type!, typeChecker)!;
+        } else if (prop.type.isArray) {
+            const arrayItemType = prop.type.arrayItemType!;
             const collectionAddMethod =
-                (ts
-                    .getJSDocTags(prop.property)
-                    .filter(t => t.tagName.text === 'json_add')
-                    .map(t => t.comment ?? '')[0] as string) ?? `${fieldName}.push`;
+                (prop.jsDocTags.filter(t => t.tagName.text === 'json_add').map(t => t.comment ?? '')[0] as string) ??
+                `${fieldName}.push`;
 
             // obj.fieldName = [];
             // for(const i of value) {
@@ -153,9 +107,9 @@ function generateSetPropertyBody(
             //    obj.fieldName.push(Type.FromJson(__li));
             // }
 
-            let itemSerializer = arrayItemType.symbol.name + 'Serializer';
-            importer(itemSerializer, findSerializerModule(arrayItemType, program.getCompilerOptions()));
-            importer(arrayItemType.symbol.name, findModule(arrayItemType, program.getCompilerOptions()));
+            let itemSerializer = arrayItemType.typeAsString + 'Serializer';
+            importer(itemSerializer, findSerializerModule(arrayItemType));
+            importer(arrayItemType.typeAsString, arrayItemType.modulePath);
 
             const loopItems = [
                 createNodeFromSource<ts.ExpressionStatement>(
@@ -164,7 +118,7 @@ function generateSetPropertyBody(
                 ),
                 createNodeFromSource<ts.ForOfStatement>(
                     `for(const o of (v as (Map<string, unknown> | null)[])) {
-                        const i = new ${arrayItemType.symbol.name}();
+                        const i = new ${arrayItemType.typeAsString}();
                         ${itemSerializer}.fromJson(i, o);
                         obj.${collectionAddMethod}(i)
                     }`,
@@ -172,7 +126,7 @@ function generateSetPropertyBody(
                 )
             ];
 
-            if (type.isNullable) {
+            if (prop.type.isNullable || prop.type.isOptional) {
                 caseStatements.push(
                     ts.factory.createIfStatement(
                         ts.factory.createIdentifier('v'),
@@ -183,50 +137,46 @@ function generateSetPropertyBody(
                 caseStatements.push(...loopItems);
             }
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
-        } else if (isMap(type.type)) {
-            const mapType = type.type as ts.TypeReference;
-            if (!isPrimitiveType(mapType.typeArguments![0])) {
-                throw new Error('only Map<EnumType, *> maps are supported extend if needed!');
-            }
-
+        } else if (prop.type.isMap) {
             let mapKey: ts.Expression;
-            if (isEnumType(mapType.typeArguments![0])) {
-                importer(
-                    mapType.typeArguments![0].symbol!.name,
-                    findModule(mapType.typeArguments![0], program.getCompilerOptions())
-                );
+            if (prop.type.typeArguments![0].isEnumType) {
+                importer(prop.type.typeArguments![0].typeAsString, prop.type.typeArguments![0].modulePath);
                 importer('JsonHelper', '@src/io/JsonHelper');
                 mapKey = createNodeFromSource<ts.NonNullExpression>(
-                    `JsonHelper.parseEnum<${mapType.typeArguments![0].symbol!.name}>(k, ${
-                        mapType.typeArguments![0].symbol!.name
+                    `JsonHelper.parseEnum<${prop.type.typeArguments![0].typeAsString}>(k, ${
+                        prop.type.typeArguments![0].typeAsString
                     })!`,
                     ts.SyntaxKind.NonNullExpression
                 );
-            } else if (isNumberType(mapType.typeArguments![0])) {
+            } else if (prop.type.typeArguments![0].isNumberType) {
                 mapKey = createNodeFromSource<ts.CallExpression>(`parseInt(k)`, ts.SyntaxKind.CallExpression);
             } else {
                 mapKey = ts.factory.createIdentifier('k');
             }
 
+            const mapValueTypeInfo = prop.type.typeArguments![1];
+
             let mapValue;
             let itemSerializer: string = '';
-            if (isPrimitiveFromJson(mapType.typeArguments![1], typeChecker)) {
+            if (isPrimitiveForSerialization(mapValueTypeInfo)) {
                 mapValue = ts.factory.createAsExpression(
                     ts.factory.createIdentifier('v'),
-                    typeChecker.typeToTypeNode(mapType.typeArguments![1], undefined, undefined)!
+                    mapValueTypeInfo.createTypeNode()
+                );
+            } else if (mapValueTypeInfo.isJsonImmutable) {
+                importer(mapValueTypeInfo.typeAsString, mapValueTypeInfo.modulePath);
+                mapValue = createNodeFromSource<ts.CallExpression>(
+                    `${mapValueTypeInfo.typeAsString}.fromJson(v)`,
+                    ts.SyntaxKind.CallExpression
                 );
             } else {
-                itemSerializer = mapType.typeArguments![1].symbol.name + 'Serializer';
-                importer(itemSerializer, findSerializerModule(mapType.typeArguments![1], program.getCompilerOptions()));
-                importer(
-                    mapType.typeArguments![1]!.symbol.name,
-                    findModule(mapType.typeArguments![1], program.getCompilerOptions())
-                );
+                itemSerializer = mapValueTypeInfo.typeAsString + 'Serializer';
+                importer(itemSerializer, findSerializerModule(mapValueTypeInfo));
+                importer(mapValueTypeInfo.typeAsString, mapValueTypeInfo.modulePath);
                 mapValue = ts.factory.createIdentifier('i');
             }
 
-            const collectionAddMethod = ts
-                .getJSDocTags(prop.property)
+            const collectionAddMethod = prop.jsDocTags
                 .filter(t => t.tagName.text === 'json_add')
                 .map(t => t.comment ?? '')[0] as string;
 
@@ -234,10 +184,7 @@ function generateSetPropertyBody(
                 assignField(
                     ts.factory.createNewExpression(
                         ts.factory.createIdentifier('Map'),
-                        [
-                            typeChecker.typeToTypeNode(mapType.typeArguments![0], undefined, undefined)!,
-                            typeChecker.typeToTypeNode(mapType.typeArguments![1], undefined, undefined)!
-                        ],
+                        prop.type.typeArguments!.map(t => t.createTypeNode()),
                         []
                     )
                 )
@@ -263,7 +210,7 @@ function generateSetPropertyBody(
                                     [
                                         itemSerializer.length > 0 &&
                                             createNodeFromSource<ts.VariableStatement>(
-                                                `const i = new ${mapType.typeArguments![1].symbol.name}();`,
+                                                `const i = new ${mapValueTypeInfo.typeAsString}();`,
                                                 ts.SyntaxKind.VariableStatement
                                             ),
                                         itemSerializer.length > 0 &&
@@ -279,7 +226,7 @@ function generateSetPropertyBody(
                                                           collectionAddMethod
                                                       )
                                                     : ts.factory.createPropertyAccessExpression(
-                                                          type.isNullable
+                                                          prop.type.isNullable || prop.type.isOptional
                                                               ? ts.factory.createNonNullExpression(
                                                                     ts.factory.createPropertyAccessExpression(
                                                                         ts.factory.createIdentifier('obj'),
@@ -306,26 +253,13 @@ function generateSetPropertyBody(
             );
 
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
-        } else if (isSet(type.type)) {
-            const setType = type.type as ts.TypeReference;
-            if (!isPrimitiveType(setType.typeArguments![0])) {
-                throw new Error('only Set<Primitive> maps are supported extend if needed!');
-            }
-
-            const collectionAddMethod = ts
-                .getJSDocTags(prop.property)
+        } else if (prop.type.isSet) {
+            const collectionAddMethod = prop.jsDocTags
                 .filter(t => t.tagName.text === 'json_add')
                 .map(t => t.comment ?? '')[0] as string;
 
-            if (isPrimitiveFromJson(setType.typeArguments![0], typeChecker)) {
-                if (setType.typeArguments![0].symbol) {
-                    importer(
-                        setType.typeArguments![0].symbol!.name,
-                        findModule(setType.typeArguments![0], program.getCompilerOptions())
-                    );
-                }
-
-                const elementTypeName = typeChecker.typeToString(setType.typeArguments![0]);
+            if (isPrimitiveForSerialization(prop.type.typeArguments![0])) {
+                const elementTypeName = prop.type.typeArguments![0].typeAsString;
 
                 if (collectionAddMethod) {
                     caseStatements.push(
@@ -340,19 +274,14 @@ function generateSetPropertyBody(
                     caseStatements.push(
                         assignField(
                             createNodeFromSource<ts.NewExpression>(
-                                `new Set<${elementTypeName}>(v as ${
-                                    elementTypeName
-                                }[])!`,
+                                `new Set<${elementTypeName}>(v as ${elementTypeName}[])!`,
                                 ts.SyntaxKind.NewExpression
                             )
                         )
                     );
                 }
-            } else if (isEnumType(setType.typeArguments![0])) {
-                importer(
-                    setType.typeArguments![0].symbol!.name,
-                    findModule(setType.typeArguments![0], program.getCompilerOptions())
-                );
+            } else if (prop.type.typeArguments![0].isEnumType) {
+                importer(prop.type.typeArguments![0].typeAsString, prop.type.typeArguments![0].modulePath);
                 importer('JsonHelper', '@src/io/JsonHelper');
 
                 if (collectionAddMethod) {
@@ -360,8 +289,8 @@ function generateSetPropertyBody(
                         createNodeFromSource<ts.ForOfStatement>(
                             `for (const i of (v as number[]) ) {
                                 obj.${collectionAddMethod}(JsonHelper.parseEnum<${
-                                    setType.typeArguments![0].symbol!.name
-                                }>(i, ${setType.typeArguments![0].symbol!.name})!);
+                                    prop.type.typeArguments![0].typeAsString
+                                }>(i, ${prop.type.typeArguments![0].typeAsString})!);
                             }`,
                             ts.SyntaxKind.ForOfStatement
                         )
@@ -372,45 +301,78 @@ function generateSetPropertyBody(
                         assignField(
                             createNodeFromSource<ts.NewExpression>(
                                 `new Set<${
-                                    setType.typeArguments![0].symbol!.name
+                                    prop.type.typeArguments![0].typeAsString
                                 }>( (v! as number[]).map(i => JsonHelper.parseEnum<${
-                                    setType.typeArguments![0].symbol!.name
-                                }>(v,  ${setType.typeArguments![0].symbol!.name})!`,
+                                    prop.type.typeArguments![0].typeAsString
+                                }>(v,  ${prop.type.typeArguments![0].typeAsString})!`,
                                 ts.SyntaxKind.NewExpression
                             )
                         )
                     );
                 }
+            } else {
+                throw new Error('Unsupported set type: ' + prop.type.typeAsString);
             }
 
             caseStatements.push(ts.factory.createReturnStatement(ts.factory.createTrue()));
-        } else if (isImmutable(type.type)) {
-            let itemSerializer = type.type.symbol.name;
-            importer(itemSerializer, findModule(type.type, program.getCompilerOptions()));
+        } else if (prop.type.isJsonImmutable) {
+            importer(prop.type.typeAsString, prop.type.modulePath);
 
             // obj.fieldName = TypeName.fromJson(value)!
             // return true;
             caseStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
-                    `obj.${fieldName} = ${itemSerializer}.fromJson(v)!;`,
+                    `obj.${fieldName} = ${prop.type.typeAsString}.fromJson(v)!;`,
                     ts.SyntaxKind.ExpressionStatement
                 )
             );
             caseStatements.push(
                 createNodeFromSource<ts.ReturnStatement>(`return true;`, ts.SyntaxKind.ReturnStatement)
             );
+        } else if (serializable.isStrict) {
+            let itemSerializer = prop.type.typeAsString + 'Serializer';
+            importer(itemSerializer, findSerializerModule(prop.type));
+
+            if (prop.type.isNullable || prop.type.isOptional) {
+                importer(prop.type.typeAsString, prop.type.modulePath);
+                caseStatements.push(
+                    createNodeFromSource<ts.IfStatement>(
+                        `
+                        if (v) { 
+                            obj.${fieldName} = new ${prop.type.typeAsString}(); 
+                            ${itemSerializer}.fromJson(obj.${fieldName}, v); 
+                        } else {
+                            obj.${fieldName} = ${prop.type.isNullable ? 'null' : 'undefined'}
+                        }`,
+                        ts.SyntaxKind.IfStatement
+                    )
+                );
+                caseStatements.push(
+                    createNodeFromSource<ts.ReturnStatement>(`return true;`, ts.SyntaxKind.ReturnStatement)
+                );
+            } else {
+                caseStatements.push(
+                    createNodeFromSource<ts.ExpressionStatement>(
+                        `${itemSerializer}.fromJson(obj.${fieldName},v);`,
+                        ts.SyntaxKind.ExpressionStatement
+                    )
+                );
+                caseStatements.push(
+                    createNodeFromSource<ts.ReturnStatement>(`return true;`, ts.SyntaxKind.ReturnStatement)
+                );
+            }
         } else {
-            // for complex types it is a bit more tricky
+            // for complex types in non-strict mode it is a bit more tricky
             // if the property matches exactly, we use fromJson
             // if the property starts with the field name, we try to set a sub-property
             const jsonNameArray = ts.factory.createArrayLiteralExpression(
                 jsonNames.map(n => ts.factory.createStringLiteral(n))
             );
 
-            let itemSerializer = type.type.symbol.name + 'Serializer';
-            importer(itemSerializer, findSerializerModule(type.type, program.getCompilerOptions()));
-            if (type.isNullable) {
-                importer(type.type.symbol!.name, findModule(type.type, program.getCompilerOptions()));
+            let itemSerializer = prop.type.typeAsString + 'Serializer';
+            importer(itemSerializer, findSerializerModule(prop.type));
+            if (prop.type.isNullable || prop.type.isOptional) {
+                importer(prop.type.typeAsString, prop.type.modulePath);
             }
 
             // TODO if no partial name support, simply generate cases
@@ -427,7 +389,7 @@ function generateSetPropertyBody(
                         ts.factory.createNumericLiteral('0')
                     ),
                     ts.factory.createBlock(
-                        !type.isNullable
+                        !prop.type.isNullable && !prop.type.isOptional
                             ? [
                                   ts.factory.createExpressionStatement(
                                       ts.factory.createCallExpression(
@@ -458,7 +420,7 @@ function generateSetPropertyBody(
                                           [
                                               assignField(
                                                   ts.factory.createNewExpression(
-                                                      ts.factory.createIdentifier(type.type.symbol.name),
+                                                      ts.factory.createIdentifier(prop.type.typeAsString),
                                                       undefined,
                                                       []
                                                   )
@@ -526,27 +488,28 @@ function generateSetPropertyBody(
                                                   ),
                                                   ts.factory.createBlock(
                                                       [
-                                                          type.isNullable &&
-                                                              ts.factory.createIfStatement(
-                                                                  ts.factory.createPrefixUnaryExpression(
-                                                                      ts.SyntaxKind.ExclamationToken,
-                                                                      ts.factory.createPropertyAccessExpression(
-                                                                          ts.factory.createIdentifier('obj'),
-                                                                          fieldName
-                                                                      )
-                                                                  ),
-                                                                  ts.factory.createBlock([
-                                                                      assignField(
-                                                                          ts.factory.createNewExpression(
-                                                                              ts.factory.createIdentifier(
-                                                                                  type.type!.symbol!.name
-                                                                              ),
-                                                                              [],
-                                                                              []
+                                                          prop.type.isNullable ||
+                                                              (prop.type.isOptional &&
+                                                                  ts.factory.createIfStatement(
+                                                                      ts.factory.createPrefixUnaryExpression(
+                                                                          ts.SyntaxKind.ExclamationToken,
+                                                                          ts.factory.createPropertyAccessExpression(
+                                                                              ts.factory.createIdentifier('obj'),
+                                                                              fieldName
                                                                           )
-                                                                      )
-                                                                  ])
-                                                              ),
+                                                                      ),
+                                                                      ts.factory.createBlock([
+                                                                          assignField(
+                                                                              ts.factory.createNewExpression(
+                                                                                  ts.factory.createIdentifier(
+                                                                                      prop.type.typeAsString
+                                                                                  ),
+                                                                                  [],
+                                                                                  []
+                                                                              )
+                                                                          )
+                                                                      ])
+                                                                  )),
                                                           ts.factory.createIfStatement(
                                                               ts.factory.createCallExpression(
                                                                   ts.factory.createPropertyAccessExpression(
@@ -641,9 +604,8 @@ function generateSetPropertyBody(
 }
 
 export function createSetPropertyMethod(
-    program: ts.Program,
     input: ts.ClassDeclaration,
-    serializable: JsonSerializable,
+    serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
@@ -653,5 +615,5 @@ export function createSetPropertyMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateSetPropertyBody(program, serializable, importer));
+    return setMethodBody(methodDecl, generateSetPropertyBody(serializable, importer));
 }

@@ -1,3 +1,4 @@
+import { Color } from '@src/model';
 import { Font } from '@src/model/Font';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
@@ -10,19 +11,23 @@ export class TextGlyph extends EffectGlyph {
     public textAlign: TextAlign;
     public textBaseline: TextBaseline | null;
 
+    public colorOverride?: Color;
+
     public constructor(
         x: number,
         y: number,
         text: string,
         font: Font,
         textAlign: TextAlign = TextAlign.Left,
-        testBaseline: TextBaseline | null = null
+        testBaseline: TextBaseline | null = null,
+        color?: Color
     ) {
         super(x, y);
         this._lines = text.split('\n');
         this.font = font;
         this.textAlign = textAlign;
         this.textBaseline = testBaseline;
+        this.colorOverride = color;
     }
 
     public override doLayout(): void {
@@ -42,7 +47,7 @@ export class TextGlyph extends EffectGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         let color = canvas.color;
-        canvas.color = color;
+        canvas.color = this.colorOverride ?? color;;
         canvas.font = this.font;
         let old = canvas.textAlign;
         let oldBaseLine = canvas.textBaseline;
@@ -57,5 +62,6 @@ export class TextGlyph extends EffectGlyph {
         }
         canvas.textAlign = old;
         canvas.textBaseline = oldBaseLine;
+        canvas.color = color;
     }
 }

@@ -1,5 +1,5 @@
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Bar, BarSubElement } from '@src/model/Bar';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { Voice } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
@@ -15,6 +15,7 @@ import { SlashBeatGlyph } from './glyphs/SlashBeatGlyph';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
@@ -30,6 +31,22 @@ export class SlashBarRenderer extends LineBarRenderer {
         // ignore numbered notation here
         this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
         this.helpers.preferredBeamDirection = BeamDirection.Up;
+    }
+
+    public override get repeatsBarSubElement(): BarSubElement {
+        return BarSubElement.SlashRepeats;
+    }
+
+    public override get barNumberBarSubElement(): BarSubElement {
+        return BarSubElement.SlashBarNumber;
+    }
+
+    public override get barSeparatorBarSubElement(): BarSubElement {
+        return BarSubElement.SlashBarSeparator;
+    }
+
+    public override get staffLineBarSubElement(): BarSubElement {
+        return BarSubElement.SlashStaffLine;
     }
 
     public override get lineSpacing(): number {
@@ -50,8 +67,8 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas, BeatSubElement.SlashFlags, BeatSubElement.SlashBeams);
+        this.paintTuplets(cx, cy, canvas, BeatSubElement.SlashTuplet);
     }
 
     public override doLayout(): void {
@@ -76,11 +93,11 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -100,7 +117,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -127,18 +144,18 @@ export class SlashBarRenderer extends LineBarRenderer {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const masterBar = this.bar.masterBar;
-        this.addPreBeatGlyph(
-            new ScoreTimeSignatureGlyph(
-                0,
-                this.getLineY(0),
-                masterBar.timeSignatureNumerator,
-                masterBar.timeSignatureDenominator,
-                masterBar.timeSignatureCommon,
-                masterBar.isFreeTime &&
-                    (masterBar.previousMasterBar == null ||
-                        masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
-            )
+        const g = new ScoreTimeSignatureGlyph(
+            0,
+            this.getLineY(0),
+            masterBar.timeSignatureNumerator,
+            masterBar.timeSignatureDenominator,
+            masterBar.timeSignatureCommon,
+            masterBar.isFreeTime &&
+                (masterBar.previousMasterBar == null ||
+                    masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
         );
+        g.barSubElement = BarSubElement.SlashTimeSignature;
+        this.addPreBeatGlyph(g);
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
@@ -151,13 +168,14 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override paintBeamingStem(
-        _beat: Beat,
+        beat: Beat,
         _cy: number,
         x: number,
         topY: number,
         bottomY: number,
         canvas: ICanvas
     ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
         canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);

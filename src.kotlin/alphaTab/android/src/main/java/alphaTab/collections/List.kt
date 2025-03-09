@@ -27,7 +27,7 @@ public class List<T> : Iterable<T> {
         _data = items.toMutableList()
     }
 
-    private constructor(items: MutableList<T>) {
+    internal constructor(items: MutableList<T>) {
         _data = items
     }
 

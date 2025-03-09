@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Voice } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
 import { EffectBandSlot } from '@src/rendering/EffectBandSlot';
@@ -8,6 +8,7 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 export class EffectBand extends Glyph {
     private _uniqueEffectGlyphs: EffectGlyph[][] = [];
@@ -161,6 +162,12 @@ export class EffectBand extends Glyph {
             let v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
                 let g: EffectGlyph = v[k];
+                using _ = ElementStyleHelper.beat(
+                    canvas,
+                    BeatSubElement.Effects,
+                    g.beat!,
+                    false
+                );
                 g.paint(cx + this.x, cy + this.y, canvas);
             }
         }

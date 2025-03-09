@@ -3,6 +3,57 @@ import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
+import { ElementStyle } from './ElementStyle';
+
+/**
+ * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
+ */
+export enum ScoreSubElement {
+    /**
+     * The title of the song
+     */
+    Title,
+    /**
+     * The subtitle of the song
+     */
+    SubTitle,
+    /**
+     * The artist of the song
+     */
+    Artist,
+    /**
+     * The album of the song
+     */
+    Album,
+    /**
+     * The word author of the song
+     */
+    Words,
+    /**
+     * The Music author of the song
+     */
+    Music,
+    /**
+     * The Words&Music author of the song
+     */
+    WordsAndMusic,
+    /**
+     * The copyright holder of the song
+     */
+    Copyright,
+
+    /**
+     * The chord diagram list shown on top of the score.
+     */
+    ChordDiagramList,
+}
+
+/**
+ * Defines the custom styles for Scores.
+ * @json
+ * @json_strict
+ */
+export class ScoreStyle extends ElementStyle<ScoreSubElement> {}
 
 /**
  * The score is the root node of the complete
@@ -100,11 +151,15 @@ export class Score {
      */
     public systemsLayout: number[] = [];
 
-
     /**
      * Gets or sets the rendering stylesheet for this song.
      */
     public stylesheet: RenderStylesheet = new RenderStylesheet();
+
+    /**
+     * The style customizations for this item.
+     */
+    public style?: ScoreStyle;
 
     public rebuildRepeatGroups(): void {
         this._currentRepeatGroup = null;
@@ -178,7 +233,7 @@ export class Score {
                         ? this._openedRepeatGroups[this._openedRepeatGroups.length - 1]
                         : null;
             }
-            // else: if only one group is opened, this group stays active for 
+            // else: if only one group is opened, this group stays active for
             // scenarios like open close bar close
         }
     }

@@ -1,6 +1,6 @@
 import { AccidentalType } from '@src/model/AccidentalType';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { Bar, BarSubElement } from '@src/model/Bar';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Clef } from '@src/model/Clef';
 import { Duration } from '@src/model/Duration';
 import { Note } from '@src/model/Note';
@@ -23,6 +23,8 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { KeySignature } from '@src/model/KeySignature';
 import { LineBarRenderer } from './LineBarRenderer';
+import { KeySignatureGlyph } from './glyphs/KeySignatureGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -42,6 +44,22 @@ export class ScoreBarRenderer extends LineBarRenderer {
     public constructor(renderer: ScoreRenderer, bar: Bar) {
         super(renderer, bar);
         this.accidentalHelper = new AccidentalHelper(this);
+    }
+
+    public override get repeatsBarSubElement(): BarSubElement {
+        return BarSubElement.StandardNotationRepeats;
+    }
+
+    public override get barNumberBarSubElement(): BarSubElement {
+        return BarSubElement.StandardNotationBarNumber;
+    }
+
+    public override get barSeparatorBarSubElement(): BarSubElement {
+        return BarSubElement.StandardNotationBarSeparator;
+    }
+
+    public override get staffLineBarSubElement(): BarSubElement {
+        return BarSubElement.StandardNotationStaffLine;
     }
 
     public override get showMultiBarRest(): boolean {
@@ -143,8 +161,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas, BeatSubElement.StandardNotationFlags, BeatSubElement.StandardNotationBeams);
+        this.paintTuplets(cx, cy, canvas, BeatSubElement.StandardNotationTuplet);
     }
 
     private getSlashFlagY(duration: Duration, direction: BeamDirection) {
@@ -433,6 +451,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     protected override createLinePreBeatGlyphs(): void {
         // Clef
+        let hasClef = false;
         if (
             this.isFirstOfLine ||
             this.bar.clef !== this.bar.previousBar!.clef ||
@@ -466,9 +485,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     this.bar.clefOttava
                 )
             );
+            hasClef = true;
         }
         // Key signature
         if (
+            hasClef ||
             (this.index === 0 && this.bar.masterBar.keySignature !== KeySignature.C) ||
             (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
         ) {
@@ -513,6 +534,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 offsetClef = 0;
                 break;
         }
+
+        const glyph = new KeySignatureGlyph();
+        glyph.renderer = this;
+
         let newLines: Map<number, boolean> = new Map<number, boolean>();
         let newGlyphs: Glyph[] = [];
         // how many symbols do we need to get from a C-keysignature
@@ -541,7 +566,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             for (let i: number = 0; i < naturalizeSymbols; i++) {
                 let step: number = previousKeyPositions[i] + offsetClef;
                 if (!newLines.has(step)) {
-                    this.addPreBeatGlyph(
+                    glyph.addGlyph(
                         new AccidentalGlyph(
                             0,
                             this.getScoreY(previousKeyPositions[i] + offsetClef),
@@ -554,8 +579,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         for (let newGlyph of newGlyphs) {
-            this.addPreBeatGlyph(newGlyph);
+            glyph.addGlyph(newGlyph);
         }
+
+        this.addPreBeatGlyph(glyph);
     }
 
     private createTimeSignatureGlyphs(): void {
@@ -619,6 +646,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
         canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);

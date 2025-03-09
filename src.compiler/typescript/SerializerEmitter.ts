@@ -6,11 +6,10 @@
 import * as path from 'path';
 import * as ts from 'typescript';
 import createEmitter from './EmitterBase';
-import { JsonProperty, JsonSerializable, toImportPath } from './Serializer.common';
 import { createSetPropertyMethod } from './Serializer.setProperty';
 import { createFromJsonMethod } from './Serializer.fromJson';
 import { createToJsonMethod } from './Serializer.toJson';
-
+import { buildTypeSchema, getTypeWithNullableInfo, toImportPath, TypeSchema } from './TypeSchema';
 
 export default createEmitter('json', (program, input) => {
     console.log(`Writing Serializer for ${input.name!.text}`);
@@ -19,50 +18,7 @@ export default createEmitter('json', (program, input) => {
         path.resolve(input.getSourceFile().fileName)
     );
 
-    const serializable: JsonSerializable = {
-        properties: [],
-        isStrict: !!ts.getJSDocTags(input).find(t => t.tagName.text === 'json_strict'),
-        hasToJsonExtension: false,
-        hasSetPropertyExtension: false
-    };
-
-    input.members.forEach(member => {
-        if (ts.isPropertyDeclaration(member)) {
-            const propertyDeclaration = member as ts.PropertyDeclaration;
-            if (
-                !propertyDeclaration.modifiers!.find(
-                    m => m.kind === ts.SyntaxKind.StaticKeyword || m.kind === ts.SyntaxKind.PrivateKeyword
-                )
-            ) {
-                const jsonNames = [(member.name as ts.Identifier).text.toLowerCase()];
-
-                if (ts.getJSDocTags(member).find(t => t.tagName.text === 'json_on_parent')) {
-                    jsonNames.push('');
-                }
-
-                if (!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_ignore')) {
-                    serializable.properties.push({
-                        property: propertyDeclaration,
-                        jsonNames: jsonNames,
-                        asRaw: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_raw'),
-                        partialNames: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_partial_names'),
-                        target: ts.getJSDocTags(member).find(t => t.tagName.text === 'target')?.comment as string,
-                        isReadOnly: !!ts.getJSDocTags(member).find(t => t.tagName.text === 'json_read_only')
-                    });
-                }
-            }
-        }
-        else if (ts.isMethodDeclaration(member)) {
-            switch ((member.name as ts.Identifier).text) {
-                case 'toJson':
-                    serializable.hasToJsonExtension = true;
-                    break;
-                case 'setProperty':
-                    serializable.hasSetPropertyExtension = true;
-                    break;
-            }
-        }
-    });
+    const serializable = buildTypeSchema(program, input);
 
     const statements: ts.Statement[] = [];
 
@@ -95,8 +51,8 @@ export default createEmitter('json', (program, input) => {
             undefined,
             [
                 createFromJsonMethod(input, serializable, importer),
-                createToJsonMethod(program, input, serializable, importer),
-                createSetPropertyMethod(program, input, serializable, importer)
+                createToJsonMethod(input, serializable, importer),
+                createSetPropertyMethod(input, serializable, importer)
             ]
         )
     );
@@ -109,7 +65,11 @@ export default createEmitter('json', (program, input) => {
                     false,
                     undefined,
                     ts.factory.createNamedImports([
-                        ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(input.name!.text))
+                        ts.factory.createImportSpecifier(
+                            false,
+                            undefined,
+                            ts.factory.createIdentifier(input.name!.text)
+                        )
                     ])
                 ),
                 ts.factory.createStringLiteral(toImportPath(sourceFileName))

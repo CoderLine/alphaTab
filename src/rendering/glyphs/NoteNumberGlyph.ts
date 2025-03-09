@@ -1,7 +1,7 @@
 import { BendType } from '@src/model/BendType';
 import { Font } from '@src/model/Font';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { Bounds } from '@src/rendering/utils/Bounds';
@@ -9,6 +9,7 @@ import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NotationElement, NotationMode } from '@src/NotationSettings';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class NoteNumberGlyph extends Glyph {
     private _note: Note;
@@ -97,11 +98,18 @@ export class NoteNumberGlyph extends Glyph {
         }
         let textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
         let x: number = cx + this.x + (this.width - textWidth) / 2;
+
+        this.paintTrill(x, cy, canvas);
+
+        using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
+        canvas.fillText(this._noteString!, x, cy + this.y);
+    }
+    paintTrill(x: number, cy: number, canvas: ICanvas) {
+        using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
         let prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
         canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + 3, cy + this.y);
         this.renderer.scoreRenderer.canvas!.font = prevFont;
-        canvas.fillText(this._noteString!, x, cy + this.y);
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
@@ -109,7 +117,7 @@ export class NoteNumberGlyph extends Glyph {
         noteBounds.note = this._note;
         noteBounds.noteHeadBounds = new Bounds();
         noteBounds.noteHeadBounds.x = cx + this.x;
-        noteBounds.noteHeadBounds.y = cy + this.y - this.height/2;
+        noteBounds.noteHeadBounds.y = cy + this.y - this.height / 2;
         noteBounds.noteHeadBounds.w = this.width;
         noteBounds.noteHeadBounds.h = this.height;
         beatBounds.addNote(noteBounds);

@@ -13,6 +13,7 @@ import terser from '@rollup/plugin-terser';
 import ts from 'typescript';
 import generateDts from './vite.plugin.dts';
 import MagicString from 'magic-string';
+import { elementStyleUsingTransformer } from './scripts/element-style-transformer';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 
@@ -78,15 +79,26 @@ function dtsPathsTransformer(mapping: Record<string, string>) {
 export default defineConfig(({ command, mode }) => {
     if (command === 'serve') {
         return {
-            plugins: [tsconfigPaths(), server()],
+            plugins: [
+                tsconfigPaths(),
+                typescript({
+                    tsconfig: './tsconfig.json',
+                    transformers: {
+                        before: [elementStyleUsingTransformer()]
+                    }
+                }),
+                server()
+            ],
             server: {
                 open: '/playground/control.html'
             },
-            esbuild: {
-                supported: {
-                    using: false
-                }
-            }
+            esbuild: false
+            // esbuild: {
+            //     supported: {
+            //         using: false
+            //     },
+
+            // }
         };
     } else {
         const commonOutput: Partial<OutputOptions> = {

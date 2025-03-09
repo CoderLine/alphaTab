@@ -5,7 +5,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
  * Describes a color for rendering.
  * If provided as string one of these formats needs to be used: #RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a)
  * If provided as number a raw RGBA value needs to be used.
- * 
+ *
  * @target web
  */
 export type ColorJson = Color | string | number;
@@ -151,7 +151,7 @@ export class Color {
         throw new FormatError('Unsupported format for color');
     }
 
-    public static toJson(obj: Color): number {
-        return obj.raw;
+    public static toJson(obj: Color | null): number | null {
+        return obj === null ? null : obj.raw;
     }
 }

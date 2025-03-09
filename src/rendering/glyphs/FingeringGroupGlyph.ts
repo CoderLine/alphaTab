@@ -1,14 +1,16 @@
-import { Note } from '@src/model';
+import { Color, Note, NoteSubElement } from '@src/model';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { ScoreBarRenderer } from '../ScoreBarRenderer';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { FingeringMode } from '@src/NotationSettings';
 import { TextGlyph } from './TextGlyph';
 import { TextAlign, TextBaseline } from '@src/platform';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class FingeringInfo {
     public line: number = 0;
     public text: string;
+    public color: Color | undefined;
 
     public constructor(line: number, text: string) {
         this.line = line;
@@ -52,6 +54,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
 
         if (!this._infos.has(line)) {
             const info = new FingeringInfo(line, text);
+            info.color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationEffects, note);
             this._infos.set(line, info);
         } else {
             const info = this._infos.get(line)!;
@@ -71,6 +74,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
                 TextAlign.Left,
                 TextBaseline.Middle
             );
+            g.colorOverride = info.color;
             g.renderer = sr;
             g.y = sr.getScoreY(info.line);
             g.doLayout();

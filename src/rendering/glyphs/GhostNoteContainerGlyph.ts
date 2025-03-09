@@ -1,17 +1,21 @@
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
 import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NotationElement } from '@src/NotationSettings';
+import { Color } from '@src/model';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class GhostNoteInfo {
     public line: number = 0;
     public isGhost: boolean;
+    public color: Color | undefined;
 
-    public constructor(line: number, isGhost: boolean) {
+    public constructor(line: number, isGhost: boolean, color: Color | undefined) {
         this.line = line;
         this.isGhost = isGhost;
+        this.color = color;
     }
 }
 
@@ -30,14 +34,23 @@ export class GhostNoteContainerGlyph extends Glyph {
         let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let line: number = sr.getNoteLine(n);
         let hasParenthesis: boolean =
-            n.isGhost || (this.isTiedBend(n) && sr.settings.notation.isNotationElementVisible(NotationElement.ParenthesisOnTiedBends));
-        this.addParenthesisOnLine(line, hasParenthesis);
+            n.isGhost ||
+            (this.isTiedBend(n) &&
+                sr.settings.notation.isNotationElementVisible(NotationElement.ParenthesisOnTiedBends));
+
+        const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.Effects, n);
+
+        this.add(new GhostNoteInfo(line, hasParenthesis, color));
     }
 
     public addParenthesisOnLine(line: number, hasParenthesis: boolean): void {
-        let info: GhostNoteInfo = new GhostNoteInfo(line, hasParenthesis);
+        let info: GhostNoteInfo = new GhostNoteInfo(line, hasParenthesis, undefined);
+        this.add(info);
+    }
+
+    private add(info: GhostNoteInfo): void {
         this._infos.push(info);
-        if (hasParenthesis) {
+        if (info.isGhost) {
             this.isEmpty = false;
         }
     }
@@ -59,12 +72,14 @@ export class GhostNoteContainerGlyph extends Glyph {
         });
         let previousGlyph: GhostParenthesisGlyph | null = null;
         let sizePerLine: number = sr.getScoreHeight(1);
+
         for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
             let g: GhostParenthesisGlyph;
             if (!this._infos[i].isGhost) {
                 previousGlyph = null;
             } else if (!previousGlyph) {
                 g = new GhostParenthesisGlyph(this._isOpen);
+                g.colorOverride = this._infos[i].color;
                 g.renderer = this.renderer;
                 g.y = sr.getScoreY(this._infos[i].line) - sizePerLine;
                 g.height = sizePerLine * 2;

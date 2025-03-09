@@ -207,7 +207,7 @@ export class BarRendererBase {
         return this.staff.system.staves.length > 1 ? this.bar.masterBar.displayWidth : this.bar.displayWidth;
     }
 
-    private _wasFirstOfLine: boolean = false;
+    protected wasFirstOfLine: boolean = false;
 
     public get isFirstOfLine(): boolean {
         return this.index === 0;
@@ -423,12 +423,14 @@ export class BarRendererBase {
 
     public paint(cx: number, cy: number, canvas: ICanvas): void {
         this.paintBackground(cx, cy, canvas);
+
         canvas.color = this.resources.mainGlyphColor;
         this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
+        
         for (const c of this._voiceContainers.values()) {
-            canvas.color = c.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
             c.paint(cx + this.x, cy + this.y, canvas);
         }
+
         canvas.color = this.resources.mainGlyphColor;
         this._postBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
     }
@@ -475,7 +477,7 @@ export class BarRendererBase {
     }
 
     protected createPreBeatGlyphs(): void {
-        this._wasFirstOfLine = this.isFirstOfLine;
+        this.wasFirstOfLine = this.isFirstOfLine;
     }
 
     protected createBeatGlyphs(): void {
@@ -559,7 +561,7 @@ export class BarRendererBase {
     public reLayout(): void {
         // there are some glyphs which are shown only for renderers at the line start, so we simply recreate them
         // but we only need to recreate them for the renderers that were the first of the line or are now the first of the line
-        if ((this._wasFirstOfLine && !this.isFirstOfLine) || (!this._wasFirstOfLine && this.isFirstOfLine)) {
+        if ((this.wasFirstOfLine && !this.isFirstOfLine) || (!this.wasFirstOfLine && this.isFirstOfLine)) {
             this.recreatePreBeatGlyphs();
         }
         this.updateSizes();

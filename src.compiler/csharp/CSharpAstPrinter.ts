@@ -660,7 +660,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
                 break;
         }
-        if ((type.isNullable) && !forNew && !forTypeConstraint) {
+        if (type.isNullable && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }
@@ -966,5 +966,12 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeUsing(using: cs.UsingDeclaration) {
         this.writeLine(`using ${using.namespaceOrTypeName};`);
+    }
+
+    protected writeLocalFunction(expr: cs.LocalFunctionDeclaration) {
+        this.writeType(expr.returnType);
+        this.write(` ${expr.name}`);
+        this.writeParameters(expr.parameters);
+        this.writeBlock(expr.body);
     }
 }

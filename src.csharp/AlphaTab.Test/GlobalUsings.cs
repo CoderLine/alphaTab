@@ -4,3 +4,4 @@ global using AlphaTab.Core.EcmaScript;
 global using AlphaTab.Test;
 
 global using Error = System.Exception;
+global using Disposable = System.IDisposable;

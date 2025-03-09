@@ -1,6 +1,6 @@
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
+import { Note, NoteSubElement } from '@src/model/Note';
 import { TabRhythmMode } from '@src/NotationSettings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
@@ -15,11 +15,16 @@ import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
+import { BeatSubElement } from '@src/model';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;
     public noteNumbers: TabNoteChordGlyph | null = null;
     public restGlyph: TabRestGlyph | null = null;
+
+    protected override get effectElement() {
+        return BeatSubElement.GuitarTabEffects;
+    }
 
     public override getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         return this.noteNumbers ? this.noteNumbers.getNoteX(note, requestedPosition) : 0;
@@ -49,11 +54,19 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
                 const slashY = tabRenderer.getLineY(line);
-                const slashNoteHead = new SlashNoteHeadGlyph(0, slashY, this.container.beat.duration, isGrace);
+                const slashNoteHead = new SlashNoteHeadGlyph(
+                    0,
+                    slashY,
+                    this.container.beat.duration,
+                    isGrace,
+                    this.container.beat
+                );
+                slashNoteHead.noteHeadElement = NoteSubElement.GuitarTabFretNumber;
+                slashNoteHead.effectElement = BeatSubElement.GuitarTabEffects;
                 this.slash = slashNoteHead;
                 slashNoteHead.beat = this.container.beat;
                 slashNoteHead.beamingHelper = this.beamingHelper;
-                this.addGlyph(slashNoteHead);
+                this.addNormal(slashNoteHead);
                 beatEffects = slashNoteHead.beatEffects;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
@@ -65,7 +78,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                         this.createNoteGlyph(note);
                     }
                 }
-                this.addGlyph(tabNoteNumbers);
+                this.addNormal(tabNoteNumbers);
                 beatEffects = tabNoteNumbers.beatEffects;
             }
 
@@ -105,9 +118,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
-                this.addGlyph(new SpacingGlyph(0, 0, 5));
+                this.addNormal(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    this.addGlyph(
+                    this.addEffect(
                         new CircleGlyph(
                             0,
                             tabRenderer.lineOffset * tabRenderer.bar.staff.tuning.length +
@@ -124,24 +137,24 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             this.restGlyph = restGlyph;
             restGlyph.beat = this.container.beat;
             restGlyph.beamingHelper = this.beamingHelper;
-            this.addGlyph(restGlyph);
+            this.addNormal(restGlyph);
             //
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.showRests) {
-                this.addGlyph(new SpacingGlyph(0, 0, 5));
+                this.addNormal(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    this.addGlyph(new CircleGlyph(0, y, 1.5));
+                    this.addEffect(new CircleGlyph(0, y, 1.5));
                 }
             }
         }
         // left to right layout
-        if (!this.glyphs) {
+        if (this.isEmpty) {
             return;
         }
         let w: number = 0;
-        for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
-            let g: Glyph = this.glyphs[i];
+        for (let i: number = 0, j: number = this.glyphs!.length; i < j; i++) {
+            let g: Glyph = this.glyphs![i];
             g.x = w;
             g.renderer = this.renderer;
             g.doLayout();

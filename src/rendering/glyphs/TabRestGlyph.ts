@@ -1,8 +1,10 @@
+import { BeatSubElement } from '@src/model';
 import { Duration } from '@src/model/Duration';
 import { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class TabRestGlyph extends MusicFontGlyph {
     private _isVisibleRest: boolean;
@@ -35,6 +37,7 @@ export class TabRestGlyph extends MusicFontGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isVisibleRest) {
+            using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabRests, this.beat!);
             super.paint(cx, cy, canvas);
         }
     }
