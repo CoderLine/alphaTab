@@ -144,21 +144,36 @@ describe('GeneralTests', () => {
     });
 
     it('color-performance', async () => {
-        const coloredStart = performance.now();
-        await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
-            enableColoring(o.score);
-        });
-        const coloredEnd = performance.now();
+        // warm-up
+        for (let i = 0; i < 5; i++) {
+            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
+                enableColoring(o.score);
+            });
+        }
 
-        const defaultStart = performance.now();
-        await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
-            o.runs[0].referenceFileName = 'general/colors-disabled.png';
-        });
-        const defaultEnd = performance.now();
+        for (let i = 0; i < 10; i++) {
+            let coloredStart: number = 0;
+            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
+                enableColoring(o.score);
+                coloredStart = performance.now();
+            });
+            const coloredEnd = performance.now();
 
-        const coloredDuration = coloredEnd - coloredStart;
-        const defaultDuration = defaultEnd - defaultStart;
+            let defaultStart: number = 0;
 
-        expect(coloredDuration - defaultDuration).to.be.lessThan(120);
+            await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
+                o.runs[0].referenceFileName = 'general/colors-disabled.png';
+                defaultStart = performance.now();
+            });
+            const defaultEnd = performance.now();
+
+            const coloredDuration = coloredEnd - coloredStart;
+            const defaultDuration = defaultEnd - defaultStart;
+
+            expect(coloredDuration - defaultDuration).to.be.lessThan(120);
+
+            console.log('Colored', i, coloredDuration);
+            console.log('Default', i, defaultDuration);
+        }
     });
 });
