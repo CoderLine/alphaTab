@@ -19,6 +19,7 @@ import {
     VoiceSubElement
 } from '@src/model';
 import { expect } from 'chai';
+import { Logger } from '@src/Logger';
 
 describe('GeneralTests', () => {
     it('song-details', async () => {
@@ -172,8 +173,8 @@ describe('GeneralTests', () => {
 
             expect(coloredDuration - defaultDuration).to.be.lessThan(120);
 
-            console.log('Colored', i, coloredDuration);
-            console.log('Default', i, defaultDuration);
+            Logger.info('Test-color-performance', 'Colored', i, coloredDuration);
+            Logger.info('Test-color-performance', 'Default', i, defaultDuration);
         }
     });
 });
