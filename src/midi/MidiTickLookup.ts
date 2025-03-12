@@ -5,6 +5,26 @@ import { Beat } from '@src/model/Beat';
 import { MasterBar } from '@src/model/MasterBar';
 
 /**
+ * Describes how a cursor should be moving.
+ */
+export enum MidiTickLookupFindBeatResultCursorMode {
+    /**
+     * Unknown/Undetermined mode. Should not happen on user level.
+     */
+    Unknown,
+
+    /**
+     * The cursor should animate to the next beat.
+     */
+    ToNextBext,
+
+    /**
+     * The cursor should animate to the end of the bar (typically on repeats and jumps)
+     */
+    ToEndOfBar
+}
+
+/**
  * Represents the results of searching the currently played beat.
  * @see MidiTickLookup.FindBeat
  */
@@ -40,6 +60,11 @@ export class MidiTickLookupFindBeatResult {
      */
     public duration: number = 0;
 
+    /**
+     * The mode how the cursor should be handled.
+     */
+    public cursorMode: MidiTickLookupFindBeatResultCursorMode = MidiTickLookupFindBeatResultCursorMode.Unknown;    
+
     public get start(): number {
         return this.masterBar.start + this.beatLookup.start;
     }
@@ -57,7 +82,7 @@ export class MidiTickLookupFindBeatResult {
         if (this.masterBar.tempoChanges.length === 1) {
             this.duration = MidiUtils.ticksToMillis(this.tickDuration, this.masterBar.tempoChanges[0].tempo);
         } else {
-            // Performance Note: I still wonder if we cannot calculate these slices efficiently ahead-of-time. 
+            // Performance Note: I still wonder if we cannot calculate these slices efficiently ahead-of-time.
             // the sub-slicing in the lookup across beats makes it a bit tricky to do on-the-fly
             // but maybe on finalizing the tick lookup?
 
@@ -77,7 +102,7 @@ export class MidiTickLookupFindBeatResult {
                 // next change is after beat, we can stop looking at changes
                 else if (change.tick > endTick) {
                     break;
-                } 
+                }
                 // change while beat is playing
                 else {
                     millis += MidiUtils.ticksToMillis(change.tick - currentTick, currentTempo);
@@ -87,7 +112,7 @@ export class MidiTickLookupFindBeatResult {
             }
 
             // last slice
-            if(endTick > currentTick) {
+            if (endTick > currentTick) {
                 millis += MidiUtils.ticksToMillis(endTick - currentTick, currentTempo);
             }
 
@@ -199,7 +224,6 @@ export class MidiTickLookup {
             current.beatLookup.nextBeat,
             current.end,
             trackLookup,
-            false,
             true
         );
 
@@ -210,14 +234,29 @@ export class MidiTickLookup {
         // if we have the next beat take the difference between the times as duration
         if (current.nextBeat) {
             current.tickDuration = current.nextBeat.start - current.start;
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToNextBext;
             current.calculateDuration();
         }
 
         // no next beat, animate to the end of the bar (could be an incomplete bar)
         if (!current.nextBeat) {
             current.tickDuration = current.masterBar.end - current.start;
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
             current.calculateDuration();
         }
+
+        // if the next beat is not directly the next master bar (e.g. jumping back or forth)
+        // we report no next beat and animate to the end
+        if (
+            current.nextBeat &&
+            current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index + 1 &&
+            (
+                current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index ||
+                current.nextBeat.beat.playbackStart <= current.beat.playbackStart
+            )
+        ) {
+            current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
+        }        
     }
 
     private findBeatSlow(
@@ -261,7 +300,6 @@ export class MidiTickLookup {
                     masterBar.firstBeat,
                     tick,
                     trackLookup,
-                    true,
                     isNextSearch
                 );
 
@@ -282,7 +320,7 @@ export class MidiTickLookup {
      * @param currentStartLookup
      * @param tick
      * @param visibleTracks
-     * @param fillNext
+     * @param isNextSearch
      * @returns
      */
     private findBeatInMasterBar(
@@ -290,8 +328,7 @@ export class MidiTickLookup {
         currentStartLookup: BeatTickLookup | null,
         tick: number,
         visibleTracks: Set<number>,
-        fillNext: boolean,
-        isNextSeach: boolean
+        isNextSearch: boolean
     ): MidiTickLookupFindBeatResult | null {
         if (!currentStartLookup) {
             return null;
@@ -310,7 +347,7 @@ export class MidiTickLookup {
                 // found the matching beat lookup but none of the beats are visible
                 // in this case scan further to the next lookup which has any visible beat
                 if (!startBeat) {
-                    if (isNextSeach) {
+                    if (isNextSearch) {
                         let currentMasterBar: MasterBarTickLookup | null = masterBar;
                         while (currentMasterBar != null && startBeat == null) {
                             while (currentStartLookup != null) {
@@ -363,7 +400,7 @@ export class MidiTickLookup {
             return null;
         }
 
-        const result = this.createResult(masterBar, startBeatLookup!, startBeat, fillNext, visibleTracks);
+        const result = this.createResult(masterBar, startBeatLookup!, startBeat, isNextSearch, visibleTracks);
 
         return result;
     }
@@ -372,7 +409,7 @@ export class MidiTickLookup {
         masterBar: MasterBarTickLookup,
         beatLookup: BeatTickLookup,
         beat: Beat,
-        fillNext: boolean,
+        isNextSearch: boolean,
         visibleTracks: Set<number>
     ) {
         const result = new MidiTickLookupFindBeatResult(masterBar);
@@ -382,7 +419,7 @@ export class MidiTickLookup {
 
         result.tickDuration = beatLookup!.end - beatLookup!.start;
 
-        if (fillNext) {
+        if (!isNextSearch) {
             this.fillNextBeat(result, visibleTracks);
         }
 
