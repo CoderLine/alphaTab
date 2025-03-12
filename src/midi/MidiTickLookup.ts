@@ -257,7 +257,10 @@ export class MidiTickLookup {
 
                     if (
                         current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index + 1 &&
-                        current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index
+                        (
+                            current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index ||
+                            current.nextBeat.beat.playbackStart <= current.beat.playbackStart
+                        )
                     ) {
                         current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
                     }
@@ -324,7 +327,8 @@ export class MidiTickLookup {
         if (
             current.nextBeat &&
             current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index + 1 &&
-            current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index
+            (current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index ||
+                current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
         ) {
             current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
         }
@@ -407,7 +411,7 @@ export class MidiTickLookup {
      * @param currentStartLookup
      * @param tick
      * @param visibleTracks
-     * @param fillNext
+     * @param isNextSearch
      * @returns
      */
     private findBeatInMasterBar(
@@ -415,7 +419,7 @@ export class MidiTickLookup {
         currentStartLookup: BeatTickLookup | null,
         tick: number,
         visibleTracks: Set<number>,
-        isNextSeach: boolean
+        isNextSearch: boolean
     ): MidiTickLookupFindBeatResult | null {
         if (!currentStartLookup) {
             return null;
@@ -430,7 +434,7 @@ export class MidiTickLookup {
             if (
                 // either within exact range or if we're in the "next search" also allow using the first beat
                 // of the next bars
-                (currentStartLookup.start <= relativeTick || (isNextSeach && relativeTick < 0)) &&
+                (currentStartLookup.start <= relativeTick || (isNextSearch && relativeTick < 0)) &&
                 relativeTick < currentStartLookup.end
             ) {
                 startBeatLookup = currentStartLookup;
@@ -439,7 +443,7 @@ export class MidiTickLookup {
                 // found the matching beat lookup but none of the beats are visible
                 // in this case scan further to the next lookup which has any visible beat
                 if (!startBeat) {
-                    if (isNextSeach) {
+                    if (isNextSearch) {
                         let currentMasterBar: MasterBarTickLookup | null = masterBar;
                         while (currentMasterBar != null && startBeat == null) {
                             while (currentStartLookup != null) {
@@ -492,7 +496,7 @@ export class MidiTickLookup {
             return null;
         }
 
-        const result = this.createResult(masterBar, startBeatLookup!, startBeat, isNextSeach, visibleTracks);
+        const result = this.createResult(masterBar, startBeatLookup!, startBeat, isNextSearch, visibleTracks);
 
         return result;
     }
