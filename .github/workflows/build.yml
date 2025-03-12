@@ -62,14 +62,7 @@ jobs:
         with:
           java-version: '19'
           distribution: 'temurin'
-      - uses: actions/cache@v4
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-cache-v5-${{ github.job }}-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-cache-v5-${{ github.job }}-
+      - uses: gradle/actions/setup-gradle@v4
       - run: npm install
       - run: npm run build-kotlin
       - run: npm run test-kotlin
