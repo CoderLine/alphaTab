@@ -17,8 +17,6 @@ export const AlphaTexSample: React.FC<AlphaTexSampleProps> = ({
   player,
   settings,
 }) => {
-  const doc = useDoc();
-  debugger;
   return (
     <>
       <AlphaTab tex={true} player={player} tracks={tracks} settings={settings}>

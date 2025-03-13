@@ -32,7 +32,7 @@ function getSortValue(
   prop: string,
   docs: Map<string, SidebarItemsGeneratorDoc>,
   item: NormalizedSidebarItem
-): string | number {
+): string | number | undefined {
   if (prop in item) {
     return item[prop];
   }
@@ -76,8 +76,8 @@ function getSortValue(
     }
   }
 
-  console.warn(`Could not get sort prop '${prop}' on sidebar item`, item);
-  return "";
+  // console.warn(`Could not get sort prop '${prop}' on sidebar item`, item);
+  return undefined;
 }
 
 const config: Config = {
@@ -115,8 +115,12 @@ const config: Config = {
             const sidebarItems = await defaultSidebarItemsGenerator(args);
 
             if (Array.isArray(args.item.customProps?.["sort"])) {
-              const ascending = args.item.customProps?.["sort"][1] !== "desc";
-              const prop = args.item.customProps?.["sort"][0];
+              let props = args.item.customProps?.["sort"] as
+                | [string, string]
+                | [string, string][];
+              if (!Array.isArray(props[0])) {
+                props = [props as [string, string]];
+              }
 
               const docsLookup = new Map<string, SidebarItemsGeneratorDoc>(
                 args.docs.map((d) => [d.id, d])
@@ -125,27 +129,45 @@ const config: Config = {
               // Reverse items in categories
 
               sidebarItems.sort((a, b) => {
-                let av = getSortValue(prop, docsLookup, a);
-                let bv = getSortValue(prop, docsLookup, b);
+                for (const prop of props) {
+                  const ascending = prop[1] !== "desc";
 
-                if (typeof av !== typeof bv) {
-                  av = String(av);
-                  bv = String(bv);
+                  let av = getSortValue(prop[0], docsLookup, a);
+                  let bv = getSortValue(prop[0], docsLookup, b);
+
+                  if (typeof av !== typeof bv) {
+                    av = av === undefined ? av : String(av);
+                    bv = bv === undefined ? bv : String(bv);
+                  }
+
+                  var result = 0;
+
+                  if (av === undefined && bv === undefined) {
+                    // continue
+                  } else if (av === undefined) {
+                    return -1;
+                  } else if (bv === undefined) {
+                    return 1;
+                  } else if (typeof av === "string") {
+                    if (ascending) {
+                      result = av.localeCompare(bv as string);
+                    } else {
+                      result = (bv as string).localeCompare(av);
+                    }
+                  } else {
+                    if (ascending) {
+                      result = av - (bv as number);
+                    } else {
+                      result = (bv as number) - av;
+                    }
+                  }
+
+                  if (result !== 0) {
+                    return result;
+                  }
                 }
 
-                if (typeof av === "string") {
-                  if (ascending) {
-                    return av.localeCompare(bv as string);
-                  } else {
-                    return (bv as string).localeCompare(av);
-                  }
-                } else {
-                  if (ascending) {
-                    return av - (bv as number);
-                  } else {
-                    return (bv as number) - av;
-                  }
-                }
+                return 0;
               });
             }
 
@@ -319,16 +341,14 @@ const config: Config = {
         const sassLoader = sassRule!.use[sassLoaderIndex] as RuleSetRule;
         sassLoader.options = {
           ...((sassLoader.options as object | undefined) ?? {}),
-          sourceMap: true // force sourcemaps
+          sourceMap: true, // force sourcemaps
         };
-
 
         // insert resolve-url-loader before SASS loader to fix relative URLs
         sassRule!.use.splice(sassLoaderIndex, 0, {
           loader: "resolve-url-loader",
         });
 
-        
         return {
           plugins: [
             // Copy the Font and SoundFont Files to the output

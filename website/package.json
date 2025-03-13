@@ -12,7 +12,8 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "generate-alphatabdoc": "tsx scripts/generate-alphatabdoc.mts"
   },
   "dependencies": {
     "@coderline/alphatab": "^1.4.0-alpha.1326",
@@ -42,6 +43,7 @@
     "docusaurus-plugin-sass": "^0.2.6",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.85.1",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },
   "browserslist": {
