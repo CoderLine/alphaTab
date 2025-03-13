@@ -73,11 +73,21 @@ class Expector<T>(private val actual: T) {
         Assert.assertEquals(message, expectedTyped, actualToCheck as Any?)
     }
 
+
+    fun lessThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertTrue("Expected $actual to be less than $expected", actual.toDouble() < expected)
+        } else {
+            Assert.fail("lessThan can only be used with numeric operands");
+        }
+    }
+
+
     fun greaterThan(expected: Double) {
         if (actual is Number) {
             Assert.assertTrue("Expected $actual to be greater than $expected", actual.toDouble() > expected)
         } else {
-            Assert.fail("toBeCloseTo can only be used with numeric operands");
+            Assert.fail("greaterThan can only be used with numeric operands");
         }
     }
     fun closeTo(expected: Double, delta: Double, message: String? = null) {

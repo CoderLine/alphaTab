@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -67,5 +68,16 @@ internal static class Globals
             await Task.Delay((int)timeout);
             action();
         });
+    }
+
+    public static readonly PerformanceInstance Performance = new();
+
+    public class PerformanceInstance
+    {
+        public double Now()
+        {
+            var seconds = Stopwatch.GetTimestamp() / Stopwatch.Frequency;
+            return (int)(seconds / 1000);
+        }
     }
 }

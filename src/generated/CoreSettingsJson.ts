@@ -36,7 +36,7 @@ export interface CoreSettingsJson {
      * @target web
      * @json_raw
      */
-    tracks?: null | number | number[] | "all";
+    tracks?: number | number[] | "all" | null;
     /**
      * Gets or sets whether lazy loading for displayed elements is enabled.
      */
@@ -52,7 +52,7 @@ export interface CoreSettingsJson {
     /**
      * The log level to use within alphaTab
      */
-    logLevel?: LogLevel | keyof typeof LogLevel;
+    logLevel?: LogLevel | keyof typeof LogLevel | Lowercase<keyof typeof LogLevel>;
     /**
      * Gets or sets whether the rendering should be done in a worker if possible.
      */

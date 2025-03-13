@@ -439,6 +439,9 @@ export default abstract class AstPrinterBase {
             case cs.SyntaxKind.TryStatement:
                 this.writeTryStatement(s as cs.TryStatement);
                 break;
+            case cs.SyntaxKind.LocalFunction:
+                this.writeLocalFunction(s as cs.LocalFunctionDeclaration);
+                break;
         }
     }
 
@@ -597,4 +600,6 @@ export default abstract class AstPrinterBase {
         this.writeExpression(expr.value);
         this.writeLine(',');
     }
+
+    protected abstract writeLocalFunction(expr: cs.LocalFunctionDeclaration);
 }

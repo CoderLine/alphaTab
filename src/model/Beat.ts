@@ -27,6 +27,7 @@ import { FadeType } from './FadeType';
 import { WahPedal } from './WahPedal';
 import { BarreShape } from './BarreShape';
 import { Rasgueado } from './Rasgueado';
+import { ElementStyle } from './ElementStyle';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.
@@ -49,6 +50,138 @@ export enum BeatBeamingMode {
      */
     ForceSplitOnSecondaryToNext
 }
+
+/**
+ * Lists all graphical sub elements within a {@link Beat} which can be styled via {@link Beat.style}
+ */
+export enum BeatSubElement {
+    /**
+     * The effects and annotations shown in dedicated effect bands above the staves (e.g. fermata).
+     * Only applies to items which are on beat level but not any individual note level effects.
+     */
+    Effects,
+
+    /**
+     * The stems drawn for note heads in this beat on the standard notation staff.
+     */
+    StandardNotationStem,
+
+    /**
+     * The flags drawn for note heads in this beat on the standard notation staff.
+     */
+    StandardNotationFlags,
+
+    /**
+     * The beams drawn between this and the next beat on the standard notation staff.
+     */
+    StandardNotationBeams,
+
+    /**
+     * The tuplet drawn on the standard notation staff (the first beat affects the whole tuplet if grouped).
+     */
+    StandardNotationTuplet,
+
+    /**
+     * The effects and annotations applied to this beat on the standard notation staff (e.g. brushes).
+     * Only applies to items which are on beat level but not any individual note level effects.
+     */
+    StandardNotationEffects,
+
+    /**
+     * The rest symbol on the standard notation staff.
+     */
+    StandardNotationRests,
+
+    /**
+     * The stems drawn for note heads in this beat on the guitar tab staff.
+     */
+    GuitarTabStem,
+
+    /**
+     * The flags drawn for note heads in this beat on the guitar tab staff.
+     */
+    GuitarTabFlags,
+
+    /**
+     * The beams drawn between this and the next beat on the guitar tab staff.
+     */
+    GuitarTabBeams,
+
+    /**
+     * The tuplet drawn on the guitar tab staff (the first beat affects the whole tuplet if grouped).
+     */
+    GuitarTabTuplet,
+
+    /**
+     * The effects and annotations applied to this beat on the guitar tab staff (e.g. brushes).
+     * Only applies to items which are on beat level but not any individual note level effects.
+     */
+    GuitarTabEffects,
+
+    /**
+     * The rest symbol on the guitar tab staff.
+     */
+    GuitarTabRests,
+
+    /**
+     * The stems drawn for note heads in this beat on the slash staff.
+     */
+    SlashStem,
+
+    /**
+     * The flags drawn for note heads in this beat on the slash staff.
+     */
+    SlashFlags,
+
+    /**
+     * The beams drawn between this and the next beat on the slash staff.
+     */
+    SlashBeams,
+
+    /**
+     * The tuplet drawn on the slash staff (the first beat affects the whole tuplet if grouped).
+     */
+    SlashTuplet,
+
+    /**
+     * The rest symbol on the slash staff.
+     */
+    SlashRests,
+
+    /**
+     * The effects and annotations applied to this beat on the slash staff (e.g. brushes).
+     * Only applies to items which are on beat level but not any individual note level effects.
+     */
+    SlashEffects,
+
+    /**
+     * The duration lines drawn for this beat on the numbered notation staff.
+     */
+    NumberedDuration,
+
+    /**
+     * The effects and annotations applied to this beat on the numbered notation staff (e.g. brushes).
+     * Only applies to items which are on beat level but not any individual note level effects.
+     */
+    NumberedEffects,
+
+    /**
+     * The rest (0) on the numbered notation staff.
+     */
+    NumberedRests,
+    
+    /**
+     * The tuplet drawn on the numbered notation staff (the first beat affects the whole tuplet if grouped).
+     */
+    NumberedTuplet
+}
+
+/**
+ * Defines the custom styles for beats.
+ * @json
+ * @json_strict
+ */
+export class BeatStyle extends ElementStyle<BeatSubElement> {}
 
 /**
  * A beat is a single block within a bar. A beat is a combination
@@ -520,12 +653,18 @@ export class Beat {
      * (requires that the midi for the song is generated so that times are calculated).
      * If no midi is generated the timer value might be filled from the input file (or manually).
      */
-    public showTimer:boolean = false;
+    public showTimer: boolean = false;
 
     /**
      * The absolute time in milliseconds when this beat will be played the first time.
      */
     public timer: number | null = null;
+
+    /**
+     * The style customizations for this item.
+     * @clone_ignore
+     */
+    public style?: BeatStyle;
 
     public addWhammyBarPoint(point: BendPoint): void {
         let points = this.whammyBarPoints;

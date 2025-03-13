@@ -8,8 +8,10 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
+import { ScoreStyleSerializer } from "@src/generated/model/ScoreStyleSerializer";
 import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
+import { ScoreStyle } from "@src/model/Score";
 export class ScoreSerializer {
     public static fromJson(obj: Score, m: unknown): void {
         if (!m) {
@@ -39,6 +41,9 @@ export class ScoreSerializer {
         o.set("defaultsystemslayout", obj.defaultSystemsLayout);
         o.set("systemslayout", obj.systemsLayout);
         o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet));
+        if (obj.style) {
+            o.set("style", ScoreStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Score, property: string, v: unknown): boolean {
@@ -101,10 +106,18 @@ export class ScoreSerializer {
             case "systemslayout":
                 obj.systemsLayout = v! as number[];
                 return true;
-        }
-        if (["stylesheet"].indexOf(property) >= 0) {
-            RenderStylesheetSerializer.fromJson(obj.stylesheet, v as Map<string, unknown>);
-            return true;
+            case "stylesheet":
+                RenderStylesheetSerializer.fromJson(obj.stylesheet, v);
+                return true;
+            case "style":
+                if (v) {
+                    obj.style = new ScoreStyle();
+                    ScoreStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
+                }
+                return true;
         }
         return false;
     }

@@ -9,8 +9,10 @@ import { StaffSerializer } from "@src/generated/model/StaffSerializer";
 import { PlaybackInformationSerializer } from "@src/generated/model/PlaybackInformationSerializer";
 import { Color } from "@src/model/Color";
 import { InstrumentArticulationSerializer } from "@src/generated/model/InstrumentArticulationSerializer";
+import { TrackStyleSerializer } from "@src/generated/model/TrackStyleSerializer";
 import { Staff } from "@src/model/Staff";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
+import { TrackStyle } from "@src/model/Track";
 export class TrackSerializer {
     public static fromJson(obj: Track, m: unknown): void {
         if (!m) {
@@ -25,13 +27,16 @@ export class TrackSerializer {
         const o = new Map<string, unknown>();
         o.set("staves", obj.staves.map(i => StaffSerializer.toJson(i)));
         o.set("playbackinfo", PlaybackInformationSerializer.toJson(obj.playbackInfo));
-        o.set("color", Color.toJson(obj.color));
+        o.set("color", Color.toJson(obj.color)!);
         o.set("name", obj.name);
         o.set("isvisibleonmultitrack", obj.isVisibleOnMultiTrack);
         o.set("shortname", obj.shortName);
         o.set("defaultsystemslayout", obj.defaultSystemsLayout);
         o.set("systemslayout", obj.systemsLayout);
         o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i)));
+        if (obj.style) {
+            o.set("style", TrackStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Track, property: string, v: unknown): boolean {
@@ -43,6 +48,9 @@ export class TrackSerializer {
                     StaffSerializer.fromJson(i, o);
                     obj.addStaff(i);
                 }
+                return true;
+            case "playbackinfo":
+                PlaybackInformationSerializer.fromJson(obj.playbackInfo, v);
                 return true;
             case "color":
                 obj.color = Color.fromJson(v)!;
@@ -70,10 +78,15 @@ export class TrackSerializer {
                     obj.percussionArticulations.push(i);
                 }
                 return true;
-        }
-        if (["playbackinfo"].indexOf(property) >= 0) {
-            PlaybackInformationSerializer.fromJson(obj.playbackInfo, v as Map<string, unknown>);
-            return true;
+            case "style":
+                if (v) {
+                    obj.style = new TrackStyle();
+                    TrackStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
+                }
+                return true;
         }
         return false;
     }

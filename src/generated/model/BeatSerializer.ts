@@ -8,6 +8,7 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { NoteSerializer } from "@src/generated/model/NoteSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
+import { BeatStyleSerializer } from "@src/generated/model/BeatStyleSerializer";
 import { Note } from "@src/model/Note";
 import { BendStyle } from "@src/model/BendStyle";
 import { Ottavia } from "@src/model/Ottavia";
@@ -28,6 +29,7 @@ import { BeatBeamingMode } from "@src/model/Beat";
 import { WahPedal } from "@src/model/WahPedal";
 import { BarreShape } from "@src/model/BarreShape";
 import { Rasgueado } from "@src/model/Rasgueado";
+import { BeatStyle } from "@src/model/Beat";
 export class BeatSerializer {
     public static fromJson(obj: Beat, m: unknown): void {
         if (!m) {
@@ -87,6 +89,9 @@ export class BeatSerializer {
         o.set("rasgueado", obj.rasgueado as number);
         o.set("showtimer", obj.showTimer);
         o.set("timer", obj.timer);
+        if (obj.style) {
+            o.set("style", BeatStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Beat, property: string, v: unknown): boolean {
@@ -193,7 +198,7 @@ export class BeatSerializer {
                 obj.pickStroke = JsonHelper.parseEnum<PickStroke>(v, PickStroke)!;
                 return true;
             case "tremolospeed":
-                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration);
+                obj.tremoloSpeed = JsonHelper.parseEnum<Duration>(v, Duration) ?? null;
                 return true;
             case "crescendo":
                 obj.crescendo = JsonHelper.parseEnum<CrescendoType>(v, CrescendoType)!;
@@ -220,7 +225,7 @@ export class BeatSerializer {
                 obj.invertBeamDirection = v! as boolean;
                 return true;
             case "preferredbeamdirection":
-                obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection);
+                obj.preferredBeamDirection = JsonHelper.parseEnum<BeamDirection>(v, BeamDirection) ?? null;
                 return true;
             case "beamingmode":
                 obj.beamingMode = JsonHelper.parseEnum<BeatBeamingMode>(v, BeatBeamingMode)!;
@@ -242,6 +247,15 @@ export class BeatSerializer {
                 return true;
             case "timer":
                 obj.timer = v as number | null;
+                return true;
+            case "style":
+                if (v) {
+                    obj.style = new BeatStyle();
+                    BeatStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
+                }
                 return true;
         }
         return false;

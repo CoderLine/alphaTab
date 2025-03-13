@@ -8,7 +8,7 @@ export class JsonHelper {
      * @target web
      * @partial
      */
-    public static parseEnum<T>(s: unknown, enumType: any): T | null {
+    public static parseEnum<T>(s: unknown, enumType: any): T | undefined {
         switch (typeof s) {
             case 'string':
                 const num = parseInt(s);
@@ -19,7 +19,7 @@ export class JsonHelper {
                 return s as unknown as T;
             case 'undefined':
             case 'object':
-                return null;
+                return undefined;
         }
         throw new AlphaTabError(AlphaTabErrorType.Format, `Could not parse enum value '${s}'`);
     }

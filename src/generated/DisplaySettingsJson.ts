@@ -25,11 +25,11 @@ export interface DisplaySettingsJson {
     /**
      * The layouting mode used to arrange the the notation.
      */
-    layoutMode?: LayoutMode | keyof typeof LayoutMode;
+    layoutMode?: LayoutMode | keyof typeof LayoutMode | Lowercase<keyof typeof LayoutMode>;
     /**
      * The stave profile to use.
      */
-    staveProfile?: StaveProfile | keyof typeof StaveProfile;
+    staveProfile?: StaveProfile | keyof typeof StaveProfile | Lowercase<keyof typeof StaveProfile>;
     /**
      * Limit the displayed bars per row.
      */
@@ -115,5 +115,5 @@ export interface DisplaySettingsJson {
     /**
      * Gets how the systems should be layed out.
      */
-    systemsLayoutMode?: SystemsLayoutMode | keyof typeof SystemsLayoutMode;
+    systemsLayoutMode?: SystemsLayoutMode | keyof typeof SystemsLayoutMode | Lowercase<keyof typeof SystemsLayoutMode>;
 }

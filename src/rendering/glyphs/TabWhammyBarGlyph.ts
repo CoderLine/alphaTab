@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { WhammyType } from '@src/model/WhammyType';
@@ -10,6 +10,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { RenderingResources } from '@src/RenderingResources';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class TabWhammyBarGlyph extends Glyph {
     private static readonly TopOffsetSharedDataKey: string = 'tab.whammy.topoffset';
@@ -96,8 +97,7 @@ export class TabWhammyBarGlyph extends Glyph {
             return 0;
         }
         let offset: number =
-            TabWhammyBarGlyph.PerHalfSize +
-            Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize;
+            TabWhammyBarGlyph.PerHalfSize + Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize;
         if (value < 0) {
             offset = -offset;
         }
@@ -105,6 +105,8 @@ export class TabWhammyBarGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, this._beat);
+
         let startNoteRenderer: BarRendererBase = this.renderer;
         let endBeat: Beat | null = this._beat.nextBeat;
         let endNoteRenderer: TabBarRenderer | null = null;
@@ -132,16 +134,8 @@ export class TabWhammyBarGlyph extends Glyph {
         let startX: number = 0;
         let endX: number = 0;
         if (this._isSimpleDip) {
-            startX =
-                cx +
-                startNoteRenderer.x +
-                startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) -
-                2;
-            endX =
-                cx +
-                startNoteRenderer.x +
-                startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) +
-                2;
+            startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) - 2;
+            endX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) + 2;
         } else {
             startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
             endX = !endNoteRenderer
@@ -239,7 +233,9 @@ export class TabWhammyBarGlyph extends Glyph {
         }
         let dV: number = Math.abs(secondPt.value);
         if (
-            (dV !== 0 || (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys) && !this._isSimpleDip)) &&
+            (dV !== 0 ||
+                (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys) &&
+                    !this._isSimpleDip)) &&
             firstPt.value !== secondPt.value
         ) {
             let s: string = '';

@@ -5,6 +5,7 @@ import { SimileMark } from '@src/model/SimileMark';
 import { Staff } from '@src/model/Staff';
 import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
+import { ElementStyle } from './ElementStyle';
 
 /**
  * The different pedal marker types.
@@ -59,6 +60,138 @@ export class SustainPedalMarker {
      */
     public previousPedalMarker: SustainPedalMarker | null = null;
 }
+
+/**
+ * Lists all graphical sub elements within a {@link Bar} which can be styled via {@link Bar.style}
+ */
+export enum BarSubElement {
+    /**
+     * The repeat signs on the standard notation staff.
+     */
+    StandardNotationRepeats,
+
+    /**
+     * The repeat signs on the guitar tab staff.
+     */
+    GuitarTabsRepeats,
+
+    /**
+     * The repeat signs on the slash staff.
+     */
+    SlashRepeats,
+
+    /**
+     * The repeat signs on the numbered notation staff.
+     */
+    NumberedRepeats,
+
+    /**
+     * The bar numbers on the standard notation staff.
+     */
+    StandardNotationBarNumber,
+
+    /**
+     * The bar numbers on the guitar tab staff.
+     */
+    GuitarTabsBarNumber,
+
+    /**
+     * The bar numbers on the slash staff.
+     */
+    SlashBarNumber,
+
+    /**
+     * The bar numbers on the numbered notation staff.
+     */
+    NumberedBarNumber,
+
+    /**
+     * The bar separator lines on the standard notation staff.
+     */
+    StandardNotationBarSeparator,
+
+    /**
+     * The bar separator lines on the guitar tab staff.
+     */
+    GuitarTabsBarSeparator,
+
+    /**
+     * The bar separator lines on the slash staff.
+     */
+    SlashBarSeparator,
+
+    /**
+     * The bar separator lines on the numbered notation staff.
+     */
+    NumberedBarSeparator,
+
+    /**
+     * The clefs on the standard notation staff.
+     */
+    StandardNotationClef,
+
+    /**
+     * The clefs on the guitar tab staff.
+     */
+    GuitarTabsClef,
+
+    /**
+     * The key signatures on the standard notation staff.
+     */
+    StandardNotationKeySignature,
+
+    /**
+     * The key signatures on the numbered notation staff.
+     */
+    NumberedKeySignature,
+
+    /**
+     * The time signatures on the standard notation staff.
+     */
+    StandardNotationTimeSignature,
+
+    /**
+     * The time signatures on the guitar tab staff.
+     */
+    GuitarTabsTimeSignature,
+
+    /**
+     * The time signatures on the slash staff.
+     */
+    SlashTimeSignature,
+
+    /**
+     * The time signature on the numbered notation staff.
+     */
+    NumberedTimeSignature,
+
+    /**
+     * The staff lines on the standard notation staff.
+     */
+    StandardNotationStaffLine,
+
+    /**
+     * The staff lines on the guitar tab staff.
+     */
+    GuitarTabsStaffLine,
+
+    /**
+     * The staff lines on the slash staff.
+     */
+    SlashStaffLine,
+
+    /**
+     * The staff lines on the numbered notation staff.
+     */
+    NumberedStaffLine
+}
+
+/**
+ * Defines the custom styles for bars.
+ * @json
+ * @json_strict
+ */
+export class BarStyle extends ElementStyle<BarSubElement> {}
 
 /**
  * A bar is a single block within a track, also known as Measure.
@@ -156,11 +289,16 @@ export class Bar {
     }
 
     /**
-     * Whether this bar is empty or has only rests. 
+     * Whether this bar is empty or has only rests.
      */
     public get isRestOnly(): boolean {
         return this._isRestOnly;
     }
+
+    /**
+     * The style customizations for this item.
+     */
+    public style?: BarStyle;
 
     public addVoice(voice: Voice): void {
         voice.bar = this;

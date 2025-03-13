@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import { Beat, BeatSubElement } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Note } from '@src/model/Note';
 import { ICanvas } from '@src/platform/ICanvas';
@@ -15,6 +15,7 @@ import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
@@ -237,13 +238,19 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.paintEffects(cx, cy, canvas);
+
+        super.paint(cx, cy, canvas);
+    }
+
+    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, this.beat);
         for (const g of this.aboveBeatEffects.values()) {
             g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
         for (const g of this.belowBeatEffects.values()) {
             g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
-        super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {
             this._tremoloPicking.paint(cx, cy, canvas);
         }

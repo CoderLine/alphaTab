@@ -21,6 +21,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteOrnament } from './NoteOrnament';
+import { ElementStyle } from './ElementStyle';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
@@ -30,6 +31,78 @@ class NoteIdBag {
     public hammerPullDestinationNoteId: number = -1;
     public hammerPullOriginNoteId: number = -1;
 }
+
+/**
+ * Lists all graphical sub elements within a {@link Note} which can be styled via {@link Note.style}
+ */
+export enum NoteSubElement {
+    /**
+     * The effects and annotations shown in dedicated effect bands above the staves (e.g. vibrato).
+     * The style of the first note with the effect wins.
+     */
+    Effects,
+
+    /**
+     * The note head on the standard notation staff.
+     */
+    StandardNotationNoteHead,
+
+    /**
+     * The accidentals on the standard notation staff.
+     */
+    StandardNotationAccidentals,
+
+    /**
+     * The effects and annotations applied to this note on the standard notation staff (e.g. bends).
+     * If effects on beats result in individual note elements shown, this color will apply.
+     */
+    StandardNotationEffects,
+
+    /**
+     * The fret number on the guitar tab staff.
+     */
+    GuitarTabFretNumber,
+
+    /**
+     * The effects and annotations applied to this note on the guitar tab staff (e.g. bends).
+     * If effects on beats result in individual note elements shown, this color will apply.
+     */
+    GuitarTabEffects,
+
+    /**
+     * The note head on the slash notation staff.
+     */
+    SlashNoteHead,
+
+    /**
+     * The effects and annotations applied to this note on the slash notation staff (e.g. dots).
+     * If effects on beats result in individual note elements shown, this color will apply.
+     */
+    SlashEffects,
+
+    /**
+     * The note number on the numbered notation staff.
+     */
+    NumberedNumber,
+
+    /**
+     * The accidentals on the numbered notation staff.
+     */
+    NumberedAccidentals,
+
+    /**
+     * The effects and annotations applied to this note on the number notation staff (e.g. dots).
+     * If effects on beats result in individual note elements shown, this color will apply.
+     */
+    NumberedEffects
+}
+
+/**
+ * Defines the custom styles for notes.
+ * @json
+ * @json_strict
+ */
+export class NoteStyle extends ElementStyle<NoteSubElement> {}
 
 /**
  * A note is a single played sound on a fretted instrument.
@@ -403,7 +476,7 @@ export class Note {
     /**
      * Gets the desination of the tie.
      * @clone_ignore
-     * @json_ignore 
+     * @json_ignore
      */
     public tieDestination: Note | null = null;
 
@@ -506,6 +579,12 @@ export class Note {
      */
     public ornament: NoteOrnament = NoteOrnament.None;
 
+    /**
+     * The style customizations for this item.
+     * @clone_ignore
+     */
+    public style?: NoteStyle;
+
     public get stringTuning(): number {
         return this.beat.voice.bar.staff.capo + Note.getStringTuning(this.beat.voice.bar.staff, this.string);
     }
@@ -527,8 +606,8 @@ export class Note {
 
     /**
      * Calculates the real note value of this note as midi key respecting the given options.
-     * @param applyTranspositionPitch Whether or not to apply the transposition pitch of the current staff. 
-     * @param applyHarmonic Whether or not to apply harmonic pitches to the note. 
+     * @param applyTranspositionPitch Whether or not to apply the transposition pitch of the current staff.
+     * @param applyHarmonic Whether or not to apply harmonic pitches to the note.
      * @returns The calculated note value as midi key.
      */
     public calculateRealValue(applyTranspositionPitch: boolean, applyHarmonic: boolean): number {
@@ -544,8 +623,7 @@ export class Note {
                 }
             }
             return realValue;
-        }
-        else {
+        } else {
             if (this.isPercussion) {
                 return this.percussionArticulation;
             }
@@ -645,11 +723,15 @@ export class Note {
         } else if (this.bendOrigin) {
             return Math.floor(this.bendOrigin.bendPoints![this.bendOrigin.bendPoints!.length - 1].value / 2);
         } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
-            return Math.floor(this.tieOrigin!.bendOrigin.bendPoints![this.tieOrigin!.bendOrigin.bendPoints!.length - 1].value / 2);
+            return Math.floor(
+                this.tieOrigin!.bendOrigin.bendPoints![this.tieOrigin!.bendOrigin.bendPoints!.length - 1].value / 2
+            );
         } else if (this.beat.hasWhammyBar) {
             return Math.floor(this.beat.whammyBarPoints![0].value / 2);
         } else if (this.beat.isContinuedWhammy) {
-            return Math.floor(this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value / 2);
+            return Math.floor(
+                this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value / 2
+            );
         }
         return 0;
     }
@@ -711,7 +793,7 @@ export class Note {
         if (this.beat.isContinuedWhammy) {
             return (
                 this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value %
-                2 !==
+                    2 !==
                 0
             );
         }
@@ -1016,13 +1098,15 @@ export class Note {
 
             // if this note is a source note for any effect, remember it for later
             // the destination note will look it up for linking
-            if (this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
+            if (
+                this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
                 this._noteIdBag.tieDestinationNoteId !== -1 ||
-                this._noteIdBag.slurDestinationNoteId !== -1) {
+                this._noteIdBag.slurDestinationNoteId !== -1
+            ) {
                 noteIdLookup.set(this.id, this);
             }
 
-            // on any effect destiniation, lookup the origin which should already be 
+            // on any effect destiniation, lookup the origin which should already be
             // registered
             if (this._noteIdBag.hammerPullOriginNoteId !== -1) {
                 this.hammerPullOrigin = noteIdLookup.get(this._noteIdBag.hammerPullOriginNoteId)!;
@@ -1090,39 +1174,39 @@ export class Note {
      */
     public setProperty(property: string, v: unknown): boolean {
         switch (property) {
-            case "tiedestinationnoteid":
+            case 'tiedestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.tieDestinationNoteId = v as number;
                 return true;
-            case "tieoriginnoteid":
+            case 'tieoriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.tieOriginNoteId = v as number;
                 return true;
 
-            case "slurdestinationnoteid":
+            case 'slurdestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.slurDestinationNoteId = v as number;
                 return true;
-            case "sluroriginnoteid":
+            case 'sluroriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.slurOriginNoteId = v as number;
                 return true;
 
-            case "hammerpulloriginnoteid":
+            case 'hammerpulloriginnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.hammerPullOriginNoteId = v as number;
                 return true;
-            case "hammerpulldestinationnoteid":
+            case 'hammerpulldestinationnoteid':
                 if (this._noteIdBag == null) {
                     this._noteIdBag = new NoteIdBag();
                 }

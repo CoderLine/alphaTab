@@ -8,6 +8,8 @@ import kotlinx.coroutines.async
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
+typealias Disposable = AutoCloseable
+
 internal class TypeHelper {
     companion object {
         public fun createRegex(pattern: String, flags: String): RegExp {
