@@ -99,6 +99,11 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
         if (ctx.state === 'suspended') {
             this.registerResumeHandler();
         }
+
+        this._buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);
+        this._source = ctx.createBufferSource();
+        this._source!.buffer = this._buffer;
+        this._source!.loop = true;
     }
 
     private registerResumeHandler() {
@@ -120,21 +125,16 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     public play(): void {
-        let ctx = this._context!;
         this.activate();
-        // create an empty buffer source (silence)
-        this._buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);
-        this._source = ctx.createBufferSource();
-        this._source.buffer = this._buffer;
-        this._source.loop = true;
+        this.reconnectSourceNode();
     }
+
+    protected abstract reconnectSourceNode(): void;
 
     public pause(): void {
         if (this._source) {
-            this._source.stop(0);
             this._source.disconnect();
         }
-        this._source = null;
     }
 
     public destroy(): void {

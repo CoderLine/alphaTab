@@ -219,4 +219,15 @@ export class PlayerSettings {
      * Smaller buffers can cause audio crackling due to constant buffering that is happening.
      */
     public bufferTimeInMilliseconds:number = 500;
+
+    /**
+     * Whether alphaTab should seek back to the start of the currently played beat when the playback is paused. 
+     * This will properly play the whole beat again when playback is restarted.
+     * When set to false the player will remain on the exact playback position which can result in slightly strange audio 
+     * due buffering and the way samples are creating physical sound on speakers.
+     * When {@link enableAnimatedBeatCursor} is enabled, it is attempted to place the cursor at the relative position matching
+     * the exact playback position.
+     * @json_read_only
+     */
+    public seekToBeatStartOnPause: boolean = true;
 }

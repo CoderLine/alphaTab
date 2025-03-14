@@ -19,7 +19,7 @@ interface AudioWorkletProcessor {
  */
 declare var AudioWorkletProcessor: {
     prototype: AudioWorkletProcessor;
-    new(options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
+    new (options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
 };
 
 // Bug 646: Safari 14.1 is buggy regarding audio worklets
@@ -64,8 +64,8 @@ export class AlphaSynthWebWorklet {
 
                     this._bufferCount = Math.floor(
                         (options.processorOptions.bufferTimeInMilliseconds * sampleRate) /
-                        1000 /
-                        AlphaSynthWebWorkletProcessor.BufferSize
+                            1000 /
+                            AlphaSynthWebWorkletProcessor.BufferSize
                     );
                     this._circularBuffer = new CircularSampleBuffer(
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
@@ -126,13 +126,13 @@ export class AlphaSynthWebWorklet {
                         right[i] = buffer[s++];
                     }
 
-                    if(samplesFromBuffer < left.length) {
-                        for(let i = samplesFromBuffer; i < left.length; i++) {
+                    if (samplesFromBuffer < left.length) {
+                        for (let i = samplesFromBuffer; i < left.length; i++) {
                             left[i] = 0;
                             right[i] = 0;
                         }
                     }
-                 
+
                     this.port.postMessage({
                         cmd: AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
                         samples: samplesFromBuffer / SynthConstants.AudioChannels
@@ -185,11 +185,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     public override open(bufferTimeInMilliseconds: number) {
         super.open(bufferTimeInMilliseconds);
         this._bufferTimeInMilliseconds = bufferTimeInMilliseconds;
-        this.onReady();
-    }
 
-    public override play(): void {
-        super.play();
         let ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
         Environment.createAudioWorklet(ctx, this._settings).then(
@@ -202,14 +198,29 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                     }
                 });
                 this._worklet.port.onmessage = this.handleMessage.bind(this);
-                this._source!.connect(this._worklet);
                 this._source!.start(0);
                 this._worklet.connect(ctx!.destination);
+                this.onReady();
             },
             reason => {
                 Logger.error('WebAudio', `Audio Worklet creation failed: reason=${reason}`);
             }
         );
+    }
+
+    protected override reconnectSourceNode(): void {
+        this._source!.connect(this._worklet!);
+    }
+
+    public override destroy(): void {
+        if (this._worklet) {
+            this._worklet.port.postMessage({
+                cmd: AlphaSynthWorkerSynthOutput.CmdOutputStop
+            });
+            this._worklet.port.onmessage = null;
+            this._worklet.disconnect();
+        }
+        super.destroy();
     }
 
     private handleMessage(e: MessageEvent) {
@@ -223,18 +234,6 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
                 this.onSampleRequest();
                 break;
         }
-    }
-
-    public override pause(): void {
-        super.pause();
-        if (this._worklet) {
-            this._worklet.port.postMessage({
-                cmd: AlphaSynthWorkerSynthOutput.CmdOutputStop
-            });
-            this._worklet.port.onmessage = null;
-            this._worklet.disconnect();
-        }
-        this._worklet = null;
     }
 
     public addSamples(f: Float32Array): void {

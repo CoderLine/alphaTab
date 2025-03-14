@@ -99,6 +99,9 @@ export class PlayerSettingsSerializer {
             case "buffertimeinmilliseconds":
                 obj.bufferTimeInMilliseconds = v! as number;
                 return true;
+            case "seektobeatstartonpause":
+                obj.seekToBeatStartOnPause = v! as boolean;
+                return true;
         }
         if (["vibrato"].indexOf(property) >= 0) {
             VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, v as Map<string, unknown>);
