@@ -6,10 +6,7 @@ export function isElementStyleHelper(node: ts.Statement): boolean {
         node.declarationList.flags & ts.NodeFlags.Using &&
         node.declarationList.declarations.length === 1 &&
         node.declarationList.declarations[0].initializer &&
-        ts.isCallExpression(node.declarationList.declarations[0].initializer) &&
-        ts.isPropertyAccessExpression(node.declarationList.declarations[0].initializer.expression) &&
-        ts.isIdentifier(node.declarationList.declarations[0].initializer.expression.expression) &&
-        node.declarationList.declarations[0].initializer.expression.expression.text === 'ElementStyleHelper'
+        node.declarationList.declarations[0].initializer.getText().includes('ElementStyleHelper')
     );
 };
 
