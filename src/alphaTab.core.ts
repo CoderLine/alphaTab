@@ -19,6 +19,7 @@ export { Environment, LayoutEngineFactory, RenderEngineFactory } from '@src/Envi
 export type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 
 export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
+export { AlphaTabApiBase } from '@src/AlphaTabApiBase';
 export { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@src/generated/VersionInfo';
