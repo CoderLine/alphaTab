@@ -22,10 +22,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         );
         this._circularBuffer = new CircularSampleBuffer(AlphaSynthWebAudioOutputBase.BufferSize * this._bufferCount);
         this.onReady();
-    }
 
-    public override play(): void {
-        super.play();
         let ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
         this._audioNode = ctx.createScriptProcessor(4096, 0, 2);
@@ -35,17 +32,12 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         this._source = ctx.createBufferSource();
         this._source.buffer = this._buffer;
         this._source.loop = true;
-        this._source.connect(this._audioNode, 0, 0);
         this._source.start(0);
         this._audioNode.connect(ctx.destination, 0, 0);
     }
 
-    public override pause(): void {
-        super.pause();
-        if (this._audioNode) {
-            this._audioNode.disconnect(0);
-        }
-        this._audioNode = null;
+    protected override reconnectSourceNode(): void {
+        this._source!.connect(this._audioNode!, 0, 0);
     }
 
     public addSamples(f: Float32Array): void {
