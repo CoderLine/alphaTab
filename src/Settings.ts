@@ -44,7 +44,7 @@ export class Settings {
      * Contains all player related settings
      * @json_partial_names
      */
-    public player: PlayerSettings = new PlayerSettings();
+    public readonly player: PlayerSettings = new PlayerSettings();
 
     public setSongBookModeSettings(): void {
         this.notation.notationMode = NotationMode.SongBook;

@@ -28,6 +28,7 @@ export class CoreSettingsSerializer {
         o.set("tex", obj.tex);
         /*@target web*/
         o.set("tracks", obj.tracks);
+        /*@target web*/
         o.set("enablelazyloading", obj.enableLazyLoading);
         o.set("engine", obj.engine);
         o.set("loglevel", obj.logLevel as number);
@@ -57,6 +58,7 @@ export class CoreSettingsSerializer {
             case "tracks":
                 obj.tracks = v as number | number[] | "all" | null;
                 return true;
+            /*@target web*/
             case "enablelazyloading":
                 obj.enableLazyLoading = v! as boolean;
                 return true;

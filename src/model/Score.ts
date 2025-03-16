@@ -118,7 +118,7 @@ export class Score {
     public tab: string = '';
 
     /**
-     * Gets or sets the global tempo of the song in BPM. The tempo might change via {@link MasterBar.tempo}.
+     * Gets or sets the global tempo of the song in BPM. The tempo might change via {@link MasterBar.tempoAutomations}.
      */
     public tempo: number = 120;
 

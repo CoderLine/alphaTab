@@ -3,11 +3,11 @@
  */
  export enum LayoutMode {
     /**
-     * Bars are aligned in rows using a fixed width.
+     * The bars are aligned in an [vertically endless page-style fashion](https://alphatab.net/docs/showcase/layouts#page-layout)
      */
     Page,
     /**
-     * Bars are aligned horizontally in one row
+     * Bars are aligned horizontally in [one horizontally endless system (row)](https://alphatab.net/docs/showcase/layouts#horizontal-layout)
      */
     Horizontal
 }

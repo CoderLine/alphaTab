@@ -81,6 +81,7 @@ export abstract class MidiEvent {
     }
 
     /**
+     * The 32-bit encoded raw midi message. Deprecated {@since 1.3.0}. Use the properties of the subclasses instead. 
      * @deprecated Use individual properties to access data.
      */
     public get message(): number {
@@ -88,12 +89,14 @@ export abstract class MidiEvent {
     }
 
     /**
+     * The first data byte. Meaning depends on midi event type. (Deprecated {@since 1.3.0}, use the specific properties of the midi event depending on type)
      * @deprecated Use individual properties to access data.
      */
     public get data1(): number {
         return 0;
     }
     /**
+     * The second data byte Meaning depends on midi event type. (Deprecated {@since 1.3.0}, use the specific properties of the midi event depending on type)
      * @deprecated Use individual properties to access data.
      */
     public get data2(): number {

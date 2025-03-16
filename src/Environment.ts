@@ -131,16 +131,19 @@ export class Environment {
 
     /**
      * The font size of the music font in pixel.
+     * @internal
      */
     public static readonly MusicFontSize = 34;
 
     /**
      * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays.
+     * @internal
      */
     public static HighDpiFactor = 1;
 
     /**
      * @target web
+     * @internal
      */
     public static createStyleElement(elementDocument: HTMLDocument, fontDirectory: string | null) {
         let styleElement: HTMLStyleElement = elementDocument.getElementById('alphaTabStyle') as HTMLStyleElement;
@@ -201,6 +204,7 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static get globalThis(): any {
         if (Environment._globalThis === undefined) {
@@ -230,32 +234,33 @@ export class Environment {
     /**
      * @target web
      */
-    public static webPlatform: WebPlatform = Environment.detectWebPlatform();
+    public static readonly webPlatform: WebPlatform = Environment.detectWebPlatform();
 
     /**
      * @target web
      */
-    public static isWebPackBundled: boolean = Environment.detectWebPack();
+    public static readonly isWebPackBundled: boolean = Environment.detectWebPack();
 
     /**
      * @target web
      */
-    public static isViteBundled: boolean = Environment.detectVite();
+    public static readonly isViteBundled: boolean = Environment.detectVite();
 
     /**
      * @target web
      */
-    public static scriptFile: string | null = Environment.detectScriptFile();
+    public static readonly scriptFile: string | null = Environment.detectScriptFile();
 
     /**
      * @target web
      */
-    public static fontDirectory: string | null = Environment.detectFontDirectory();
+    public static readonly fontDirectory: string | null = Environment.detectFontDirectory();
 
     /**
      * @target web
+     * @internal
      */
-    public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
+    public static readonly bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
 
     /**
      * @target web
@@ -332,6 +337,7 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static ensureFullUrl(relativeUrl: string | null): string {
         if (!relativeUrl) {
@@ -425,9 +431,9 @@ export class Environment {
         }
     }
 
-    public static renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
-    public static layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
-    public static staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
+    public static readonly renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
+    public static readonly layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
+    public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
@@ -735,6 +741,7 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static get alphaTabWorker(): any {
         return this.globalThis.Worker;
@@ -742,6 +749,7 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static get alphaTabUrl(): any {
         return this.globalThis.URL;

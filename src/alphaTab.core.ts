@@ -4,7 +4,7 @@ export { LayoutMode } from '@src/LayoutMode';
 export { StaveProfile } from '@src/StaveProfile';
 export { ImporterSettings } from '@src/ImporterSettings';
 export { FingeringMode, NotationMode, NotationSettings, TabRhythmMode, NotationElement } from '@src/NotationSettings';
-export { PlayerSettings, ScrollMode, VibratoPlaybackSettings, PlayerOutputMode } from '@src/PlayerSettings';
+export { PlayerSettings, ScrollMode, SlidePlaybackSettings, VibratoPlaybackSettings, PlayerOutputMode } from '@src/PlayerSettings';
 export { ProgressEventArgs } from '@src/ProgressEventArgs';
 export { RenderingResources } from '@src/RenderingResources';
 export { ResizeEventArgs } from '@src/ResizeEventArgs';
