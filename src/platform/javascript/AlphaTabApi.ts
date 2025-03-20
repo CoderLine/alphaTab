@@ -27,14 +27,6 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'), { display: { scale: 1.2 }});
      * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab({
-     *     scale: 1.5
-     * });
-     * ```
      */
     public constructor(element: HTMLElement, options: SettingsJson | Settings) {
         super(new BrowserUiFacade(element), options);
@@ -70,11 +62,6 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.print();
      * api.print(undefined, { display: { barsPerRow: 5 } });
-     * ```
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('print');
      * ```
      */         
     public print(width?: string, additionalSettings: unknown = null): void {
@@ -271,23 +258,6 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      *     updateProgress(e.loaded, e.total);
      * });
      * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoad', () => {
-     *     updateProgress(e.detail.loaded, e.detail.total);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.soundFontLoad', (e, args) {
-     *     updateProgress(args.loaded, args.total);
-     * });
-     * ```
-     *
      */    
     public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
 

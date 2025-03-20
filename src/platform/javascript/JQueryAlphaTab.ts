@@ -30,6 +30,7 @@ export declare class jQuery extends Array<HTMLElement> {
 
 /**
  * @target web
+ * @deprecated Migrate to {@link AlphaTabApi}.
  */
 export class JQueryAlphaTab {
     public exec(element: HTMLElement, method: string, args: any[]): unknown {

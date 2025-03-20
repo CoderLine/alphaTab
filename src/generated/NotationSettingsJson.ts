@@ -100,12 +100,6 @@ export interface NotationSettingsJson {
      * api.settings.notation.elements.set(alphaTab.NotationElement.EffectWhammyBar, false);
      * ```
      * @example
-     * HTML
-     * For data attributes currently a full object must be embedded in the attribute value.
-     * ```html
-     * <div id="alphaTab" data-notation-elements='{"ScoreTitle": false, "TrackNames": false}'></div>
-     * ```
-     * @example
      * C#
      * ```cs
      * var settings = new AlphaTab.Settings();

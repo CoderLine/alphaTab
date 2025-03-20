@@ -117,12 +117,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * const container = $('#alphaTab').alphaTab('container');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -161,12 +155,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * updateScoreInfo($('#alphaTab').alphaTab('score'));
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -199,12 +187,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * showSettingsModal($('#alphaTab').alphaTab('settings'));
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -230,12 +212,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * highlightCurrentTracksInTrackSelector(api.tracks);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * highlightCurrentTracksInTrackSelector($('#alphaTab').alphaTab('tracks'));
      * ```
      *
      * @example
@@ -348,12 +324,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('destroy');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -392,15 +362,6 @@ export class AlphaTabApiBase<TSettings> {
      * api.settings.display.scale = 2.0;
      * api.updateSettings();
      * api.render();
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * at.alphaTab('settings').display.scale = 2.0;
-     * at.alphaTab('updateSettings');
-     * at.alphaTab('render');
      * ```
      *
      * @example
@@ -465,12 +426,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('load', '/assets/MyFile.gp');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -516,14 +471,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.RenderScore(generateScore(),[ 2, 3 ]);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * const score = at.alphaTab('score');
-     * at.alphaTab('renderScore', generateScore(), [ 2, 3 ]);
      * ```
      *
      * @example
@@ -577,17 +524,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * const score = at.alphaTab('score');
-     * at.alphaTab('renderTracks', [
-     *     api.score.tracks[2],
-     *     api.score.tracks[3]
-     * ]);
      * ```
      *
      * @example
@@ -725,13 +661,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-     * $('#alphaTab').alphaTab('tex', "\\title 'Test' . 3.3.4");
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -780,12 +709,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('loadSoundFont', '/assets/MyFile.sf2');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -829,16 +752,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('loadSoundFont', '/assets/guitars.sf2', true);
-     * $('#alphaTab').alphaTab('loadSoundFont', '/assets/pianos.sf2', true);
-     * ...
-     * $('#alphaTab').alphaTab('resetSoundFonts');
-     * $('#alphaTab').alphaTab('loadSoundFont', '/assets/synths.sf2', true);
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      *var api = new AlphaTabApi<MyControl>(...);
@@ -879,12 +792,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.render();
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('render');
      * ```
      *
      * @example
@@ -1007,12 +914,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * setupPlayerEvents($('#alphaTab').alphaTab('player'));
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1040,13 +941,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * if(api.isReadyForPlayback)) api.play();
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * if(at.alphaTab('isReadyForPlayback')) at.alphaTab('play');
      * ```
      *
      * @example
@@ -1084,13 +978,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * if(at.alphaTab('playerState') != alphaTab.synth.PlayerState.Playing) at.alphaTab('play');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1122,12 +1009,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.masterVolume = 0.5;
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('masterVolume', 0.5)
      * ```
      *
      * @example
@@ -1172,12 +1053,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('metronomeVolume', 0.5)
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1216,12 +1091,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.countInVolume = 0.5;
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('countInVolume', 0.5)
      * ```
      *
      * @example
@@ -1274,20 +1143,6 @@ export class AlphaTabApiBase<TSettings> {
      *     }
      *   }
      * });
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab')
-     *   .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.AlphaTabMetronome])
-     *   .on('alphaTab.midiEventsPlayed', (e, args) => {
-     *     for(const midi of args.events) {
-     *       if(midi.isMetronome) {
-     *         console.log('Metronome tick ' + midi.metronomeNumerator);
-     *       }
-     *     }
-     *   });
      * ```
      *
      * @example
@@ -1346,12 +1201,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('tickPosition', 4000)
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1387,12 +1236,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.timePosition = 4000;
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('timePosition', 4000)
      * ```
      *
      * @example
@@ -1434,12 +1277,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.playbackRange = { startTick: 1000, endTick: 50000 };
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('playbackRange', { startTick: 1000, endTick: 50000 })
      * ```
      *
      * @example
@@ -1490,12 +1327,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('playbackSpeed', 0.5)
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1534,12 +1365,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.isLooping = true;
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('looping', true)
      * ```
      *
      * @example
@@ -1668,15 +1493,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * const tracks = at.alphaTab('tracks');
-     * at.alphaTab('trackVolume', [tracks[0], tracks[1]], 1.5);
-     * at.alphaTab('trackVolume', [tracks[0], tracks[1]], 0.5);
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1722,14 +1538,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * const tracks = at.alphaTab('tracks');
-     * at.alphaTab('soloTracks', [tracks[0], tracks[1]], true);
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1769,14 +1577,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * const tracks = at.alphaTab('tracks');
-     * at.alphaTab('muteTracks', [tracks[0], tracks[1]], true);
      * ```
      *
      * @example
@@ -1861,12 +1661,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('play');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1897,12 +1691,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.pause();
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('pause');
      * ```
      *
      * @example
@@ -1941,12 +1729,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('playPause');
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -1979,12 +1761,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.stop();
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').alphaTab('stop');
      * ```
      *
      * @example
@@ -2025,13 +1801,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.playBeat(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0]);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const beat = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0];
-     * $('#alphaTab').alphaTab('playBeat', beat);
      * ```
      *
      * @example
@@ -2082,13 +1851,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.playNote(api.score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0]);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const note = $('#alphaTab').alphaTab('score').tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-     * $('#alphaTab').alphaTab('playNote', beat);
      * ```
      *
      * @example
@@ -2462,23 +2224,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.playedBeatChanged', (e) => {
-     *     const beat = e.detail;
-     *     updateFretboard(beat);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.playedBeatChanged', (e, beat) => {
-     *     updateFretboard(beat);
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -2523,23 +2268,6 @@ export class AlphaTabApiBase<TSettings> {
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.activeBeatsChanged.on(args => {
      *    updateHighlights(args.activeBeats);
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.activeBeatsChanged', (e) => {
-     *     const args = e.detail;
-     *     updateHighlights(args.activeBeats);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.activeBeatsChanged', (e, args) => {
-     *  updateHighlights(args.activeBeats);
      * });
      * ```
      *
@@ -2595,25 +2323,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseDown', (e) => {
-     *     const beat = e.detail;
-     *     e.originalEvent.preventDefault();
-     *     startSelectionOnBeat(beat);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.beatMouseDown', (e, beat) => {
-     *     originalEvent.preventDefault();
-     *     startSelectionOnBeat(beat);
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -2645,25 +2354,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.beatMouseMove.on((beat) => {
-     *     expandSelectionToBeat(beat);
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseMove', (e) => {
-     *     var beat = e.detail;
-     *     e.originalEvent.preventDefault();
-     *     expandSelectionToBeat(beat);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.beatMouseMove', (e, beat) => {
-     *     originalEvent.preventDefault();
      *     expandSelectionToBeat(beat);
      * });
      * ```
@@ -2704,25 +2394,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.beatMouseUp.on((beat) => {
-     *     hideSelection(beat);
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseUp', (e) => {
-     *     const beat = e.detail;
-     *     e.originalEvent.preventDefault();
-     *     hideSelection(beat);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.beatMouseUp', (e, beat) => {
-     *     originalEvent.preventDefault();
      *     hideSelection(beat);
      * });
      * ```
@@ -2769,15 +2440,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.noteMouseDown', (e) => {
-     *     const note = e.detail;
-     *     api.playNote(beat);
-     * }, false);
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -2817,15 +2479,6 @@ export class AlphaTabApiBase<TSettings> {
      * api.noteMouseMove.on((note) => {
      *     changeNote(note)
      * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.noteMouseMove', (e) => {
-     *     var note = e.detail;
-     *     changeNote(note)
-     * }, false);
      * ```
      *
      * @example
@@ -2870,15 +2523,6 @@ export class AlphaTabApiBase<TSettings> {
      * api.noteMouseUp.on((note) => {
      *     api.playNote(note);
      * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.noteMouseUp', (e) => {
-     *     const note = e.detail;
-     *     api.playNote(note);
-     * }, false);
      * ```
      *
      * @example
@@ -3228,22 +2872,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.scoreLoaded', (e) => {
-     *     updateSongInformationInUi(e.detail);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.scoreLoaded', (e, score) => {
-     *     updateSongInformationInUi(score);
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -3289,26 +2917,6 @@ export class AlphaTabApiBase<TSettings> {
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.resize.on((args) => {
      *     args.settings.scale = args.newWidth > 1300
-     *         ? 1.5
-     *         : (args.newWidth > 800) ? 1.3 : 1;
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.resize', function(e) {
-     *     e.detail.settings.display.scale = e.detail.newWidth > 1300
-     *         ? 1.5
-     *         : (args.newWidth > 800) ? 1.3 : 1;
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.resize', (e, args) => {
-     *     args.settings.display.scale = args.newWidth > 1300
      *         ? 1.5
      *         : (args.newWidth > 800) ? 1.3 : 1;
      * });
@@ -3366,22 +2974,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.renderStarted', () => {
-     *     updateProgressBar("Rendering");
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.renderStarted', () => {
-     *     updateProgressBar("Rendering");
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -3425,22 +3017,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.renderFinished.on(() => {
-     *     updateProgressBar("Finishing");
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.renderFinished', (e) => {
-     *     updateProgressBar("Finishing");
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.renderFinished', () => {
      *     updateProgressBar("Finishing");
      * });
      * ```
@@ -3497,22 +3073,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.postRendered', (e) => {
-     *    hideLoadingIndicator();
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.postRendered', () => {
-     *     hideLoadingIndicator();
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -3558,22 +3118,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.error.on((error) {
-     *     displayError(error);
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.error', (e) => {
-     *     displayError(e.detail);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.error', (e, error) => {
      *     displayError(error);
      * });
      * ```
@@ -3631,22 +3175,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.playerReady', () => {
-     *     enablePlayerControls();
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.playerReady', (e) => {
-     *     enablePlayerControls();
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -3694,34 +3222,6 @@ export class AlphaTabApiBase<TSettings> {
      * api.isLooping = true;
      * api.playbackSpeed = 0.5;
      * api.play()
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * const at = document.querySelector('#alphaTab');
-     * let api = null;
-     * at.addEventListener('alphaTab.finished', (e) => {
-     *     api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
-     * }, false);
-     *
-     *
-     * api = new alphaTab.AlphaTabApi(at);
-     * api.isLooping = true;
-     * api.playbackSpeed = 0.5;
-     * api.play()
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * const at = $('#alphaTab');
-     * at.on('alphaTab.finished', (e, args) => {
-     *     at.alphaTab('playbackSpeed', Math.min(1.0, at.alphaTab('playbackSpeed') + 0.1)
-     * });
-     * at.alphaTab('loop', true);
-     * at.alphaTab('playbackSpeed', 0.5);
-     * at.alphaTab('play');
      * ```
      *
      * @example
@@ -3773,22 +3273,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.soundFontLoaded.on(() => {
-     *     hideSoundFontLoadingIndicator();
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoaded', () => {
-     *     hideSoundFontLoadingIndicator();
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.soundFontLoaded', (e) => {
      *     hideSoundFontLoadingIndicator();
      * });
      * ```
@@ -3849,24 +3333,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.midiLoad', e => {
-     *     const file = e.detail;
-     *     initializePianoPractice(file);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.midiLoad', (e) => {
-     *     const file = e.detail;
-     *     initializePianoPractice(file);
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -3909,25 +3375,6 @@ export class AlphaTabApiBase<TSettings> {
      * api.midiLoaded.on(e => {
      *     hideGeneratingAudioIndicator();
      *     updateSongDuration(e.endTime);
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.midiFileLoaded', e => {
-     *     hideGeneratingAudioIndicator();
-     *     updateSongDuration(e.endTime);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.midiFileLoaded', (e) => {
-     *     var args = e.detail;
-     *     hideGeneratingAudioIndicator();
-     *     updateSongDuration(args.endTime);
      * });
      * ```
      *
@@ -3979,23 +3426,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.playerStateChanged', (e) => {
-     *     const args = e.detail;
-     *     updatePlayerControls(args.state, args.stopped);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.playerStateChanged', (e, args) => {
-     *     updatePlayerControls(args.state, args.stopped);
-     * });
-     * ```
-     *
-     * @example
      * C#
      * ```cs
      * var api = new AlphaTabApi<MyControl>(...);
@@ -4037,23 +3467,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.playerPositionChanged.on((args) => {
-     *     updatePlayerPosition(args);
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.positionChanged', (e) => {
-     *     var args = e.detail;
-     *     updatePlayerPosition(args);
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.positionChanged', (e, args) => {
      *     updatePlayerPosition(args);
      * });
      * ```
@@ -4118,20 +3531,6 @@ export class AlphaTabApiBase<TSettings> {
      *     }
      *   }
      * });
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab')
-     *   .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.AlphaTabMetronome])
-     *   .on('alphaTab.midiEventsPlayed', (e, args) => {
-     *     for(const midi of args.events) {
-     *       if(midi.isMetronome) {
-     *         console.log('Metronome tick ' + midi.tick);
-     *       }
-     *     }
-     *   });
      * ```
      *
      * @example
@@ -4205,31 +3604,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```js
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.playbackRangeChanged.on((args) => {
-     *     if (args.playbackRange) {
-     *         highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
-     *     } else {
-     *         clearHighlightInProgressBar();
-     *     }
-     * });
-     * ```
-     *
-     * @example
-     * HTML
-     * ```js
-     * document.querySelector('#alphaTab').addEventListener('alphaTab.playbackRangeChanged', (e) => {
-     *     const args = e.detail;
-     *     if (args.playbackRange) {
-     *         highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
-     *     } else {
-     *         clearHighlightInProgressBar();
-     *     }
-     * }, false);
-     * ```
-     *
-     * @example
-     * jQuery
-     * ```js
-     * $('#alphaTab').on('alphaTab.playbackRangeChanged', (e, args) => {
      *     if (args.playbackRange) {
      *         highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
      *     } else {

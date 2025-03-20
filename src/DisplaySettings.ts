@@ -153,8 +153,6 @@ export class DisplaySettings {
      * | JavaScript | `display.resources.`      | `settings.display.resources.wordsFont = ...`                       |
      * | JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
      * | JSON       | `resources.`              | `var settings = { resources: { wordsFonts: '...'} };`              |
-     * | HTML       | `data-display-resources-` | `<div data-display-resources-wordsfont="...">`                     |
-     * | HTML       | `data-resources-`         | `<div data-resources-wordsfont="...">`                             |
      * | .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
      * | Android    | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
      * ## Types
