@@ -11,35 +11,43 @@
  */
 export interface VibratoPlaybackSettingsJson {
     /**
-     * Gets or sets the wavelength of the note-wide vibrato in midi ticks.
+     * The wavelength of the note-wide vibrato in midi ticks.
+     * @defaultValue `240`
      */
     noteWideLength?: number;
     /**
-     * Gets or sets the amplitude for the note-wide vibrato in semitones.
+     * The amplitude for the note-wide vibrato in semitones.
+     * @defaultValue `1`
      */
     noteWideAmplitude?: number;
     /**
-     * Gets or sets the wavelength of the note-slight vibrato in midi ticks.
+     * The wavelength of the note-slight vibrato in midi ticks.
+     * @defaultValue `360`
      */
     noteSlightLength?: number;
     /**
-     * Gets or sets the amplitude for the note-slight vibrato in semitones.
+     * The amplitude for the note-slight vibrato in semitones.
+     * @defaultValue `0.5`
      */
     noteSlightAmplitude?: number;
     /**
-     * Gets or sets the wavelength of the beat-wide vibrato in midi ticks.
+     * The wavelength of the beat-wide vibrato in midi ticks.
+     * @defaultValue `480`
      */
     beatWideLength?: number;
     /**
-     * Gets or sets the amplitude for the beat-wide vibrato in semitones.
+     * The amplitude for the beat-wide vibrato in semitones.
+     * @defaultValue `2`
      */
     beatWideAmplitude?: number;
     /**
-     * Gets or sets the wavelength of the beat-slight vibrato in midi ticks.
+     * The wavelength of the beat-slight vibrato in midi ticks.
+     * @defaultValue `480`
      */
     beatSlightLength?: number;
     /**
-     * Gets or sets the amplitude for the beat-slight vibrato in semitones.
+     * The amplitude for the beat-slight vibrato in semitones.
+     * @defaultValue `2`
      */
     beatSlightAmplitude?: number;
 }

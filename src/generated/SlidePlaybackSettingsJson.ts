@@ -13,20 +13,23 @@ export interface SlidePlaybackSettingsJson {
     /**
      * Gets or sets 1/4 tones (bend value) offset that
      * simple slides like slide-out-below or slide-in-above use.
+     * @defaultValue `6`
      */
     simpleSlidePitchOffset?: number;
     /**
-     * Gets or sets the percentage which the simple slides should take up
+     * The percentage which the simple slides should take up
      * from the whole note. for "slide into" effects the slide will take place
      * from time 0 where the note is plucked to 25% of the overall note duration.
      * For "slide out" effects the slide will start 75% and finish at 100% of the overall
      * note duration.
+     * @defaultValue `0.25`
      */
     simpleSlideDurationRatio?: number;
     /**
-     * Gets or sets the percentage which the legato and shift slides should take up
+     * The percentage which the legato and shift slides should take up
      * from the whole note. For a value 0.5 the sliding will start at 50% of the overall note duration
      * and finish at 100%
+     * @defaultValue `0.5`
      */
     shiftSlideDurationRatio?: number;
 }

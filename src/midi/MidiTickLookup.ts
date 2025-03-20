@@ -182,6 +182,7 @@ export class MidiTickLookup {
      * Finds the currently played beat given a list of tracks and the current time.
      * @param trackLookup The tracks indices in which to search the played beat for.
      * @param tick The current time in midi ticks.
+     * @param currentBeatHint Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
      * @returns The information about the current beat or null if no beat could be found.
      */
     public findBeat(

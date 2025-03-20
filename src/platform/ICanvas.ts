@@ -38,9 +38,9 @@ export enum TextBaseline {
 }
 
 /**
- * The TextMetrics class represents the dimensions of a piece of text in the canvas;
+ * The MeasuredText class represents the dimensions of a piece of text in the canvas;
  */
-export class TextMetrics {
+export class MeasuredText {
     /**
      * Returns the width of a segment of inline text in CSS pixels.
      */
@@ -86,7 +86,7 @@ export interface ICanvas {
 
     fillText(text: string, x: number, y: number): void;
 
-    measureText(text: string): TextMetrics;
+    measureText(text: string): MeasuredText;
 
     fillMusicFontSymbol(x: number, y: number, relativeScale: number, symbol: MusicFontSymbol, centerAtPosition?: boolean): void;
 

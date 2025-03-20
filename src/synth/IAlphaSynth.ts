@@ -72,6 +72,7 @@ export interface IAlphaSynth {
 
     /**
      * Gets or sets volume of the metronome during count-in. (range: 0.0-3.0, default 0.0 - no count in)
+     * @since 1.1.0
      */
     countInVolume: number;
 
@@ -87,6 +88,7 @@ export interface IAlphaSynth {
 
     /**
      * Destroys the synthesizer and all related components
+     * @since 0.9.6
      */
     destroy(): void;
 
@@ -187,46 +189,55 @@ export interface IAlphaSynth {
 
     /**
      * This event is fired when the playback of the whole song finished.
+     * @eventProperty
      */
     readonly finished: IEventEmitter;
 
     /**
      * This event is fired when the SoundFont needed for playback was loaded.
+     * @eventProperty
      */
     readonly soundFontLoaded: IEventEmitter;
 
     /**
      * This event is fired when the loading of the SoundFont failed.
+     * @eventProperty
      */
     readonly soundFontLoadFailed: IEventEmitterOfT<Error>;
 
     /**
      * This event is fired when the Midi file needed for playback was loaded.
+     * @eventProperty
      */
     readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
 
     /**
      * This event is fired when the loading of the Midi file failed.
+     * @eventProperty
      */
     readonly midiLoadFailed: IEventEmitterOfT<Error>
 
     /**
      * This event is fired when the playback state changed.
+     * @eventProperty
      */
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs>;
 
     /**
      * This event is fired when the current playback position of/ the song changed.
+     * @eventProperty
      */
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
 
     /**
      * The event is fired when certain midi events were sent to the audio output device for playback.
+     * @eventProperty
      */
     readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs>;
 
     /**
      * The event is fired when the playback range within the player was updated.
+     * @eventProperty
      */
     readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
 }

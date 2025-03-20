@@ -128,6 +128,7 @@ describe('JsonConverterTest', () => {
         expected.importer.encoding = 'enc';
         expected.importer.mergePartGroupsInMusicXml = false;
 
+        /**@target web*/
         expected.player.soundFont = 'soundfont';
         /**@target web*/
         expected.player.scrollElement = 'scroll';

@@ -9,7 +9,7 @@ import { MasterBar } from '@src/model/MasterBar';
  */
 export class MasterBarTickLookupTempoChange {
     /**
-     * Gets or sets the tick position within the {@link MasterBarTickLookup#start} and  {@link MasterBarTickLookup#end} range.
+     * Gets or sets the tick position within the {@link MasterBarTickLookup.start} and  {@link MasterBarTickLookup.end} range.
      */
     public tick: number;
 

@@ -2,7 +2,7 @@ import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import { Settings } from '@src/Settings';
 
 /**
@@ -225,9 +225,9 @@ export class Html5Canvas implements ICanvas {
         this._context.fillText(text, x, y);
     }
 
-    public measureText(text: string): TextMetrics {
+    public measureText(text: string): MeasuredText {
         const metrics = this._measureContext.measureText(text);
-        return new TextMetrics(metrics.width, metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent);
+        return new MeasuredText(metrics.width, metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent);
     }
 
     public fillMusicFontSymbol(
