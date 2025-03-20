@@ -6,20 +6,21 @@ on:
   workflow_dispatch:
   schedule:
     - cron:  '0 1 * * 0'
-          
+
 jobs:
   build:
     runs-on: ubuntu-latest
       
     steps:
     - uses: actions/checkout@v4
+      with: 
+        ref: 'main'
     - uses: montudor/action-zip@v1
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
     - run: npm install
     - run: npm install @coderline/alphatab@latest
-    - run: npm run generate-alphatabdoc
     - run: npm run build
     - run: cp web.config ./build
     - name: Package Zip
