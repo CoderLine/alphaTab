@@ -1,6 +1,6 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
+import { ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import { FontSizes } from '@src/platform/svg/FontSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Settings } from '@src/Settings';
@@ -200,7 +200,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public measureText(text: string) {
         if (!text) {
-            return new TextMetrics(0, 0);
+            return new MeasuredText(0, 0);
         }
         return FontSizes.measureString(
             text,

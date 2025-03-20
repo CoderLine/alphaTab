@@ -30,7 +30,7 @@ export class CoreSettings {
      * where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects
      * them to be in a `font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path.
      * Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab.
-     * @defaultValue `${AlphaTabScriptFolder}/font/`
+     * @defaultValue `"${AlphaTabScriptFolder}/font/"`
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
@@ -90,9 +90,9 @@ export class CoreSettings {
      * appended to the DOM due to performance reasons. AlphaTab tries to detect which elements are visible on the screen, and only
      * appends those elements to the DOM. This reduces the load of the browser heavily but is not working for all layouts and use cases.
      * This setting set to false, ensures that all rendered items are instantly appended to the DOM.
+     * The lazy rendering of partial might not be available on all platforms.
      * @defaultValue `true`
-     * @category Core - JavaScript Specific
-     * @target web
+     * @category Core
      * @since 0.9.6
      */
     public enableLazyLoading: boolean = true;
@@ -107,7 +107,7 @@ export class CoreSettings {
      * - `skia` - Uses [Skia](https://skia.org/) for rendering (all non-browser platforms via [alphaSkia](https://github.com/CoderLine/alphaSkia), default for non-web)
      * - `gdi` - Uses [GDI+](https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms) for rendering (only on .net)
      * - `android` - Uses [android.graphics.Canvas](https://developer.android.com/reference/android/graphics/Canvas) for rendering (only on Android)
-     * @defaultValue `default`
+     * @defaultValue `"default"`
      * @category Core
      * @since 0.9.6
      */

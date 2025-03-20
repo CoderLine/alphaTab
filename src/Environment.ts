@@ -432,7 +432,15 @@ export class Environment {
     }
 
     public static readonly renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
+
+    /**
+     * @internal
+     */
     public static readonly layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
+    
+    /**
+     * @internal
+     */
     public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
@@ -442,6 +450,9 @@ export class Environment {
         return Environment.renderEngines.get(engine)!;
     }
 
+    /**
+     * @internal
+     */
     public static getLayoutEngineFactory(layoutMode: LayoutMode): LayoutEngineFactory {
         if (!layoutMode || !Environment.layoutEngines.has(layoutMode)) {
             return Environment.layoutEngines.get(LayoutMode.Page)!;

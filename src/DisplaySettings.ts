@@ -57,7 +57,7 @@ export class DisplaySettings {
      *
      * @since 0.9.6
      * @category Display
-     * @defaultValue {@link LayoutMode.Page}
+     * @defaultValue `LayoutMode.Page`
      */
     public layoutMode: LayoutMode = LayoutMode.Page;
 
@@ -73,10 +73,10 @@ export class DisplaySettings {
     public staveProfile: StaveProfile = StaveProfile.Default;
 
     /**
-     * Limit the displayed bars per system (row).
+     * Limit the displayed bars per system (row). (-1 for automatic mode)
      * @since 0.9.6
      * @category Display
-     * @defaultValue `-1` (automatic)
+     * @defaultValue `-1`
      * @remarks
      * This setting sets the number of bars that should be put into one row during layouting. This setting is only respected
      * when using the {@link LayoutMode.Page} where bars are aligned in systems. [Demo](https://alphatab.net/docs/showcase/layouts#page-layout-5-bars-per-row).
@@ -97,10 +97,10 @@ export class DisplaySettings {
     public startBar: number = 1;
 
     /**
-     * The total number of bars that should be rendered from the song.
+     * The total number of bars that should be rendered from the song. (-1 for all bars)
      * @since 0.9.6
      * @category Display
-     * @defaultValue `-1` (All bars)
+     * @defaultValue `-1`
      * @remarks
      * This setting sets the number of bars that should be rendered from the overall song. This setting can be used to
      * achieve a paging system or to only show partial bars of the same file. By this a tutorial alike display can be achieved
@@ -163,7 +163,7 @@ export class DisplaySettings {
      * Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded.
      * Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
      *
-     * <span class="badge badge--info badge--header">Since 1.2.3</span> Multiple fonts are also supported for the Web version. alphaTab will check if any of the fonts in the list is loaded instead of all. If none is available at the time alphaTab is initialized, it will try to initiate the load of the specified fonts individual through the Browser Font APIs.
+     * {@since 1.2.3} Multiple fonts are also supported for the Web version. alphaTab will check if any of the fonts in the list is loaded instead of all. If none is available at the time alphaTab is initialized, it will try to initiate the load of the specified fonts individual through the Browser Font APIs.
      *
      * For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts.
      *

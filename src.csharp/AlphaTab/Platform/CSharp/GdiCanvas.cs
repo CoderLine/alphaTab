@@ -462,12 +462,12 @@ internal sealed class GdiCanvas : ICanvas
         _graphics.DrawString(text, _font, _brush, new PointF((float)x, (float)y), _stringFormat);
     }
 
-    public TextMetrics MeasureText(string text)
+    public MeasuredText MeasureText(string text)
     {
         lock (MeasurementGraphics)
         {
             var measured = MeasurementGraphics.MeasureString(text, _font, new PointF(0, 0), _stringFormat);
-            return new TextMetrics(measured.Width, measured.Height);
+            return new MeasuredText(measured.Width, measured.Height);
         }
     }
 

@@ -15,7 +15,7 @@ export { LogLevel } from '@src/LogLevel';
 export { Logger, ConsoleLogger } from '@src/Logger';
 export type { ILogger } from '@src/Logger';
 export { FileLoadError } from '@src/FileLoadError';
-export { Environment, LayoutEngineFactory, RenderEngineFactory } from '@src/Environment';
+export { Environment, RenderEngineFactory } from '@src/Environment';
 export type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 
 export { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
@@ -25,6 +25,7 @@ export { WebPlatform } from '@src/platform/javascript/WebPlatform';
 export { VersionInfo as meta } from '@src/generated/VersionInfo';
  
 export * as importer from "./importer";
+export * as io from "./io";
 export * as exporter from "./exporter";
 export * as midi from "./midi";
 export * as model from "./model";

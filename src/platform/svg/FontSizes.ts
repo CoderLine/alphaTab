@@ -1,6 +1,6 @@
 import { FontStyle, FontWeight } from '@src/model/Font';
 import { Environment } from '@src/Environment';
-import { TextMetrics } from '../ICanvas';
+import { MeasuredText } from '../ICanvas';
 import { WebPlatform } from '../javascript/WebPlatform';
 
 /**
@@ -75,7 +75,7 @@ export class FontSizes {
         size: number,
         style: FontStyle,
         weight: FontWeight
-    ): TextMetrics {
+    ): MeasuredText {
         let data: FontSizeDefinition;
         let dataSize: number = 11;
         let family = families[0]; // default to first font
@@ -112,6 +112,6 @@ export class FontSizes {
         // we really need to improve the width calculation, maybe by using offscreencanvas? 
         factor *= 1.07; 
 
-        return new TextMetrics(stringSize * factor, size * data.fontSizeToHeight);
+        return new MeasuredText(stringSize * factor, size * data.fontSizeToHeight);
     }
 }
