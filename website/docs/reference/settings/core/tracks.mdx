@@ -1,41 +1,29 @@
 ---
 title: core.tracks
-description: The tracks to display for the initally loaded file.
+description: "The tracks to display for the initally loaded file."
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
   category: Core - JavaScript Specific
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-
-This setting can be used in combinition with the `file` or `tex` option. It controls which of the tracks
+### Description
+The tracks to display for the initally loaded file. This setting can be used in combinition with the <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/settings/core/file"}>{"file"}</Link></code> or <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/settings/core/tex"}>{"tex"}</Link></code> option. It controls which of the tracks
 of the initially loaded file should be displayed.
 
-<PropertyDescription showJson={true} />
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"number"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"number"}</span><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"'all'"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"null"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-## Types
-
-<TypeTable>
-    <TypeRow type="all" name="'all'">
-        If the `all` string is provided, all tracks of the song will be displayed. 
-    </TypeRow>
-    <TypeRow type="all" name="int">
-        If a single number is provided, the value represents the 0-based index of the track to display. 
-    </TypeRow>
-    <TypeRow type="all" name="int[]">
-        If a number array is provided, the values represent the 0-based indexes of the tracks to display.
-    </TypeRow>
-</TypeTable>
-
-
-## Default Value
-
-`null`

@@ -1,53 +1,37 @@
 ---
 title: notation.rhythmMode
-description: Controls how the rhythm notation is rendered for tab staves. 
+description: "Controls how the rhythm notation is rendered for tab staves."
 sidebar_custom_props:
   category: Notation
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
+### Description
+Controls how the rhythm notation is rendered for tab staves. This setting enables the display of rhythm notation on tab staffs. [Demo](/docs/showcase/guitar-tabs)
+<SinceBadge inline={true} since={"1.4.0"} /> its automatically detected whether rhythm notation should be shown on tabs (based on the visibility of other staves).
 
-This setting enables the display of rhythm notation on tab staffs. [Demo](/docs/showcase/guitar-tabs)
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"rhythmMode"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/tabrhythmmode"}>{"TabRhythmMode"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"TabRhythmMode.Automatic"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/tabrhythmmode"}>{"TabRhythmMode"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"RhythmMode"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"TabRhythmMode.Automatic"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"rhythmMode"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/tabrhythmmode"}>{"TabRhythmMode"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"TabRhythmMode.Automatic"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<PropertyDescription showJson={true} />
-
-## Types
-
-<TypeTable>
-    <TypeRow name="alphaTab.TabRhythmMode" type="js">
-        `Hidden` -  No rhythm notation is shown<br />
-        `ShowWithBeams` - Rhythm notation is rendered with all beats having individual beams<br />
-        `ShowWithBars` - Rhythm notation is rendered with normal bars like on standard notation
-    </TypeRow>
-    <TypeRow name="string" type="json-js-html">
-        `hidden`<br />
-        `showwithbeams`<br />
-        `showwithbars`
-    </TypeRow>
-    <TypeRow name="int" type="json-js-html">
-        `0` - Hidden<br />
-        `1` - ShowWithBeams<br />
-        `2` - ShowWithBars
-    </TypeRow>
-    <TypeRow name="AlphaTab.TabRhythmMode" type="net">
-        `Hidden`<br />
-        `ShowWithBeams`<br />
-        `ShowWithBars`
-    </TypeRow>
-    <TypeRow name="alphaTab.TabRhythmMode" type="android">
-        `Hidden`<br />
-        `ShowWithBeams`<br />
-        `ShowWithBars`
-    </TypeRow>
-</TypeTable>
-
-## Default Value
-
-`hidden`

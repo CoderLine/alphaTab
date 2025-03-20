@@ -1,93 +1,27 @@
 ---
 title: player.slide
-description: The slide settings allow control how the different slide types are generated for audio. 
+description: "The slide settings allow control how the different slide types are generated for audio."
 sidebar_custom_props:
-  domWildCard: true
+  domWildcard: true
   category: Player
-  since: 0.9.9
+  since: 0.9.6
 ---
-import { SinceBadge } from '@site/src/components/SinceBadge';
 
-<SinceBadge since="0.9.6" />
-
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 import { CodeBadge } from '@site/src/components/CodeBadge';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-export var SlideSettings = [
-    {
-        name: 'simpleSlidePitchOffset',
-        defaultValue: 6,
-        type: 'int',
-        description: 'The 1/4 tones (bend value) offset that simple slides like slide-out-below or slide-in-above use.'
-    },
-    {
-        name: 'simpleSlideDurationRatio',
-        defaultValue: 0.25,
-        type: 'double',
-        description: 
-            'The percentage which the simple slides should take up from the whole note. for "slide into" ' +
-            'effects the slide will take place from time 0 where the note is plucked to 25% of the overall ' +
-            'note duration. For "slide out" effects the slide will start 75% and finish at 100% of the overall note duration.'
-    },
-    {
-        name: 'shiftSlideDurationRatio',
-        defaultValue: 0.5,
-        type: 'double',
-        description: 'The percentage which the legato and shift slides should take up ' +
-                    ' from the whole note. For a value 0.5 the sliding will start at 50% of the overall note duration ' +
-                    ' and finish at 100%.'
-    }
-];
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-export function toPascalCase(v) {
-    return v.substr(0, 1).toUpperCase() + v.substr(1);
-}
+<SettingsHeader />
 
-export function SlideRow({setting}) {  
-    return (
-        <tr>
-            <td>
-                <CodeBadge type="js" name={setting.name} /><br />
-                <CodeBadge type="json" name={setting.name} /><br />
-                <CodeBadge type="html" name={'data-player-' + setting.name.toLowerCase()} /> <br />
-                <CodeBadge type="net" name={toPascalCase(setting.name)} />
-                <CodeBadge type="android" name={setting.name} />
-            </td>
-            <td>
-                <CodeBadge type="all" name={setting.type} />
-            </td>
-            <td>{setting.defaultValue}</td>
-            <td>
-                {setting.description}
-            </td>
-        </tr>
-    );
-}
-
-export function SlideTable() {
-    const settings = SlideSettings.map(c => <SlideRow setting={c} />);
-    return (
-        <table className="table table-striped table-condensed type-table">
-            <thead>
-                <tr>
-                    <th>Setting</th>
-                    <th>Type</th>
-                    <th>Default</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>    
-            <tbody> 
-                {settings}
-            </tbody>
-        </table>
-    );
-}
-
-
-## Description
-
-AlphaTab supports various types of slides which can be grouped into 3 types: 
+### Description
+The slide settings allow control how the different slide types are generated for audio. AlphaTab supports various types of slides which can be grouped into 3 types:
 
 * Shift Slides
 * Legato Slides
@@ -96,18 +30,31 @@ AlphaTab supports various types of slides which can be grouped into 3 types:
 * Slide into from below
 * Slide into from above
 * Slide out to below
-* Slide out to above 
+* Slide out to above
 
 
 * Pick Slide out to above
 * Pick Slide out to below
 
 For the first 2 groups the audio generation can be adapted. For the pick slide the audio generation cannot be adapted
-as there is no mechanism yet in alphaTab to play pick slides to make them sound real. 
+as there is no mechanism yet in alphaTab to play pick slides to make them sound real.
 
 For the first group only the duration or start point of the slide can be configured while for the second group
-the duration/start-point and the pitch offset can be configured. 
+the duration/start-point and the pitch offset can be configured.
 
-## Slide Settings
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"readonly"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"slide"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/slideplaybacksettings"}>{"SlidePlaybackSettings"}</Link><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/slideplaybacksettings"}>{"SlidePlaybackSettings"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Slide"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"val"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"slide"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/slideplaybacksettings"}>{"SlidePlaybackSettings"}</Link></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<SlideTable />
+
+import ManualDocs from './_slide.mdx';
+
+<ManualDocs />

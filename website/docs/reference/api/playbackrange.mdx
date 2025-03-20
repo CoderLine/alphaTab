@@ -1,119 +1,71 @@
 ---
 title: playbackRange
-description: The range of the song that should be played
+description: "The range of the song that should be played."
 sidebar_custom_props:
+  kind: property
   category: Properties - Player
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
-
-import { CodeBadge } from '@site/src/components/CodeBadge';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
-Gets or sets the range of the song that should be played. The range is defined in midi ticks or the whole song is played if the range is set to null
-
 import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 <PropertyDescription />
 
+### Description
+The range of the song that should be played. Gets or sets the range of the song that should be played. The range is defined in midi ticks or the whole song is played if the range is set to null
 
-## Types
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"playbackRange"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/playbackrange"}>{"PlaybackRange"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"null"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/playbackrange"}>{"PlaybackRange"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"PlaybackRange"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"null"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"playbackRange"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/playbackrange"}>{"PlaybackRange"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"null"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="js" name="alphaTab.synth.PlaybackRange" />
-    <TypeRow type="net" name="AlphaTab.Synth.PlaybackRange" />
-    <TypeRow type="android" name="alphaTab.synth.PlaybackRange" />
-</TypeTable>
-
-## PlaybackRange Properties
-
-<table class="table table-striped table-condensed type-table">
-    <thead>
-        <tr>
-            <th>Property</th>
-            <th>Type</th>
-            <th>Summary</th>
-        </tr>
-    </thead>
-    <tbody>    
-        <tr>
-            <td>
-                <CodeBadge type="js" name="startTick" /><br />
-                <CodeBadge type="net" name="StartTick" /><br />
-                <CodeBadge type="android" name="startTick" />
-            </td>
-            <td><code>int</code></td>
-            <td>
-                The position in midi ticks from where the song should start
-            </td>
-        </tr>  
-        <tr>
-            <td>
-                <CodeBadge type="js" name="endTick" /><br />
-                <CodeBadge type="net" name="EndTick" /><br />
-                <CodeBadge type="android" name="endTick" />
-            </td>
-            <td><code>int</code></td>
-            <td>
-                The position in midi ticks to where the song should be played.
-            </td>
-        </tr> 
-    </tbody>
-</table>
-
-## Default Value
-
-`null`
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playbackRange = { startTick: 1000, endTick: 50000 };
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').alphaTab('playbackRange', { startTick: 1000, endTick: 50000 })
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.PlaybackRange = new PlaybackRange { StartTick = 1000, EndTick = 50000 };
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
-api.playbackRange = PlaybackRange.apply { 
+api.playbackRange = PlaybackRange.apply {
     startTick = 1000
     endTick = 50000
 }
 ```
-
 </TabItem>
 </Tabs>

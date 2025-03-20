@@ -1,64 +1,59 @@
 ---
 title: setOutputDevice
-description: Changes the output device which should be used for playing the audio.
+description: "Changes the output device which should be used for playing the audio (player must be enabled)."
 sidebar_custom_props:
+  kind: method
   category: Methods - Player
-  since:  1.5.0
+  since: 1.5.0
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.5.0" />
 
-import { TypeTable, TypeRow } from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
-Changes the output device which should be used for playing the audio (player must be enabled).
-
-Use [`enumerateOutputDevices`](./enumerateoutputdevices.mdx) to load the list of available devices.
+### Description
+Changes the output device which should be used for playing the audio (player must be enabled). Use <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/enumerateoutputdevices"}>{"enumerateOutputDevices"}</Link></code> to load the list of available devices.
 
 In the web version this functionality relies on experimental APIs and might not yet be available in all browsers. https://caniuse.com/mdn-api_audiocontext_sinkid
 
-## Signatures
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"setOutputDevice"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"device"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"ISynthOutputDevice"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Promise"}</span><span style={{"color":"#393A34"}}>{"<"}</span><span style={{"color":"#36acaa"}}>{"void"}</span><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1"}>{"System.Threading.Task"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"SetOutputDevice"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"ISynthOutputDevice"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"device"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"suspend"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"setOutputDevice"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"device"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/isynthoutputdevice"}>{"ISynthOutputDevice"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="js" name="async function setOutputDevice(outputDevice)" />
-    <TypeRow type="net" name="Task SetOutputDevice(ISynthOutputDevice outputDevice)" />
-    <TypeRow type="android" name="fun setOutputDevice(ISynthOutputDevice outputDevice): Deferred<Unit>" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js" name="outputDevice" type="ISynthOutputDevice|null">
-        The output device to use, or null to switch to the default device.
-    </ParameterRow>
-    <ParameterRow platform="net" name="outputDevice" type="ISynthOutputDevice?">
-        The output device to use, or null to switch to the default device.
-    </ParameterRow>
-    <ParameterRow platform="android" name="outputDevice" type="ISynthOutputDevice?">
+    <ParameterRow platform="all" name="device">
         The output device to use, or null to switch to the default device.
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Returns an awaitable, which completes when the output device is changed.
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 const devices = await api.enumerateOutputDevices();
@@ -67,11 +62,9 @@ buildDeviceSelector(devices, async selectedDevice => {
   await api.setOutputDevice(selectedDevice);
 });
 ```
-
 </TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 var devices = await api.EnumerateOutputDevices();
 
@@ -79,10 +72,8 @@ BuildDeviceSelector(devices, async selectedDevice => {
   await api.SetOutputDevice(selectedDevice);
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 fun init() = kotlinx.coroutines.runBlocking {
   val api = AlphaTabApi<MyControl>(...)
@@ -94,8 +85,6 @@ fun init() = kotlinx.coroutines.runBlocking {
     }
   });
 }
-
 ```
-
 </TabItem>
 </Tabs>

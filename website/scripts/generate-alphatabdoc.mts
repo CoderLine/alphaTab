@@ -1,9 +1,11 @@
 import path from "path";
 import url from "url";
-import fs from "fs";
-import ts from "typescript";
-
-const __dirname = url.fileURLToPath(new URL(".", import.meta.url));
+import ts, { JSDocParsingMode } from "typescript";
+import { generateSettings } from "./generate-settings.mjs";
+import { GenerateContext } from "./typeschema.mjs";
+import { generateTypeDocs } from "./generate-typedocs.mjs";
+import { cconsole } from "./generate-common.mjs";
+import { generateApiDocs } from "./generate-api.mjs";
 
 const alphaTabEntryFile = url.fileURLToPath(
   import.meta.resolve("@coderline/alphatab")
@@ -11,154 +13,38 @@ const alphaTabEntryFile = url.fileURLToPath(
 const alphaTabDir = path.resolve(alphaTabEntryFile, "..", "..");
 
 const dts = path.resolve(alphaTabDir, "dist", "alphaTab.d.ts");
-const ast = ts.createSourceFile(
-  dts,
-  await fs.promises.readFile(dts, "utf-8"),
-  {
-    jsDocParsingMode: ts.JSDocParsingMode.ParseAll,
-    languageVersion: ts.ScriptTarget.Latest,
-  },
-  true,
-  ts.ScriptKind.TS
-);
+const host = ts.createCompilerHost({}, true);
+host.jsDocParsingMode = JSDocParsingMode.ParseAll;
+
+const program = ts.createProgram({
+  rootNames: [dts],
+  options: {},
+  host: host,
+});
+
+const ast = program.getSourceFile(dts);
 
 const lookup = new Map<string, ts.DeclarationStatement>();
 
-const outDir = path.resolve(__dirname, "..", "src", "alphatabdoc");
+const context: GenerateContext = {
+  checker: program.getTypeChecker(),
+  dts: dts,
+  flatExports: new Map(),
+  nameToExportName: new Map(),
+  settings: null!,
+};
 
-async function writeType(exportedName: string, schema: any) {
-  const parts = exportedName.replace("alphaTab.", "").split(".");
-  parts[parts.length - 1] = parts[parts.length - 1] + ".ts";
-
-  const full = path.resolve(outDir, ...parts);
-  await fs.promises.mkdir(path.dirname(full), { recursive: true });
-
-  console.log("writing", full);
-  try {
-    await fs.promises.writeFile(
-      full,
-      `export default ${JSON.stringify(schema, null, 2)};`
-    );
-  } catch (e) {
-    console.error("error writing", full, e, schema);
-  }
-}
-
-function jsDocCommentSchema(
-  d?: ts.NodeArray<ts.JSDocComment> | ts.JSDocComment | string
-) {
-  if (!d) {
-    return undefined;
-  }
-
-  if (typeof d === "string") {
-    return [{
-      kind: "text",
-      text: d,
-    }];
-  }
-
-  if ("kind" in d) {
-    switch (d.kind) {
-      case ts.SyntaxKind.JSDocText:
-        return [{
-          kind: "text",
-          text: (d as ts.JSDocText).text,
-        }];
-      case ts.SyntaxKind.JSDocLink:
-        return [{
-          kind: "link",
-          name: (d as ts.JSDocLink).name?.getText(),
-          text: (d as ts.JSDocLink).text,
-        }];
-      case ts.SyntaxKind.JSDocLinkPlain:
-        return [{
-          kind: "link",
-          name: (d as ts.JSDocLinkPlain).name?.getText(),
-          text: (d as ts.JSDocLinkPlain).text,
-        }];
-      case ts.SyntaxKind.JSDocLinkCode:
-        return [{
-          kind: "link",
-          name: (d as ts.JSDocLinkCode).name?.getText(),
-          text: (d as ts.JSDocLinkCode).text,
-        }];
-    }
-
-    return [{
-      kind: "unknown",
-    }];
-  }
-
-  return d.reduce((d, x) => [d, ...jsDocCommentSchema(x)], []);
-}
-
-function jsDocSchema(d: ts.Node) {
-  const comments = ts.getJSDocCommentsAndTags(d);
-  return comments.map((m) => {
-    if (ts.isJSDoc(m)) {
-      return {
-        kind: "jsdoc",
-        comment: jsDocCommentSchema(m.comment),
-        tags: m.tags?.map((t) => {
-          return {
-            kind: "jsdoctag",
-            tagName: t.tagName.text,
-            comment: jsDocCommentSchema(t.comment),
-          };
-        }),
-      };
-    } else {
-      return {
-        kind: "jsdoctag",
-        tagName: m.tagName.text,
-        comment: jsDocCommentSchema(m.comment),
-      };
-    }
-  });
-}
-
-async function writeEnumDeclaration(
-  d: ts.EnumDeclaration,
-  exportedName: string
-) {
-  await writeType(exportedName, {
-    name: exportedName,
-    tsdoc: jsDocSchema(d),
-    members: d.members.map((m) => {
-      return {
-        name: m.name.getText(),
-        tsdoc: jsDocSchema(m),
-      };
-    }),
-  });
-}
-async function writeClassDeclaration(
-  d: ts.ClassDeclaration,
-  exportedName: string
-) {
-  await writeType(exportedName, {
-    name: exportedName,
-    tsdoc: jsDocSchema(d),
-  });
-}
-
-async function writeInterfaceDeclaration(
-  d: ts.InterfaceDeclaration,
-  exportedName: string
-) {
-  await writeType(exportedName, {
-    name: exportedName,
-    tsdoc: jsDocSchema(d),
-  });
-}
-
-async function writeModuleDeclaration(
+function walkModuleDeclaration(
   d: ts.ModuleDeclaration,
-  exportedName: string
+  exportedName: string,
+  handler: (
+    exportName: string,
+    internalName: string,
+    d: ts.DeclarationStatement
+  ) => void
 ) {
   if (!d.body || !ts.isModuleBlock(d.body)) {
-    console.warn("Unsupported module declaration", exportedName);
+    cconsole.warn("Unsupported module declaration", exportedName);
     return;
   }
 
@@ -180,13 +66,18 @@ async function writeModuleDeclaration(
         }
 
         if (lookup.has(typeName)) {
-          walkExports(lookup.get(typeName)!, exportedName + "." + exportName);
+          walkExports(
+            lookup.get(typeName)!,
+            exportedName + "." + exportName,
+            typeName,
+            handler
+          );
         } else {
-          console.warn("Unresolved export", typeName, "in", exportedName);
+          cconsole.warn("Unresolved export", typeName, "in", exportedName);
         }
       }
     } else {
-      console.warn(
+      cconsole.warn(
         "Unsupported statement",
         ts.SyntaxKind[s.kind],
         "in",
@@ -196,19 +87,24 @@ async function writeModuleDeclaration(
   }
 }
 
-async function walkExports(d: ts.DeclarationStatement, identifier: string) {
+async function walkExports(
+  d: ts.DeclarationStatement,
+  exportName: string,
+  internalName: string,
+  handler: (
+    exportName: string,
+    internalName: string,
+    d: ts.DeclarationStatement
+  ) => void
+) {
   if (!d.name || !ts.isIdentifier(d.name)) {
     return;
   }
 
-  if (ts.isEnumDeclaration(d)) {
-    await writeEnumDeclaration(d, identifier);
-  } else if (ts.isClassDeclaration(d)) {
-    await writeClassDeclaration(d, identifier);
-  } else if (ts.isInterfaceDeclaration(d)) {
-    await writeInterfaceDeclaration(d, identifier);
-  } else if (ts.isModuleDeclaration(d)) {
-    await writeModuleDeclaration(d, identifier);
+  if (ts.isModuleDeclaration(d)) {
+    walkModuleDeclaration(d, exportName, handler);
+  } else {
+    handler(exportName, internalName, d);
   }
 }
 
@@ -238,5 +134,24 @@ for (const d of ast!.statements) {
 }
 
 for (const { d, identifier } of exports) {
-  walkExports(d, "alphaTab." + identifier);
+  walkExports(d, "alphaTab." + identifier, identifier, async (e, i, d) => {
+    if (
+      ts.isEnumDeclaration(d) ||
+      ts.isClassDeclaration(d) ||
+      ts.isInterfaceDeclaration(d) ||
+      ts.isTypeAliasDeclaration(d) 
+    ) {
+      context.flatExports.set(e, d);
+      context.nameToExportName.set(i, e);
+    }
+  });
 }
+
+context.settings = context.flatExports.get(
+  "alphaTab.Settings"
+) as ts.ClassDeclaration;
+await generateSettings(context);
+await generateTypeDocs(context);
+await generateApiDocs(context);
+
+// TODO: run prettier on MDX files

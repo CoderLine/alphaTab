@@ -1,79 +1,51 @@
 ---
 title: print
-description: Opens a popup window with the rendered music notation for printing.
+description: "Opens a popup window with the rendered music notation for printing."
 sidebar_custom_props:
+  kind: method
   javaScriptOnly: true
   category: Methods - Core
-  since:  0.9.4
+  since: 0.9.4
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
-Opens a popup window with the rendered music notation for printing. The default display of alphaTab in the browser is not very 
+### Description
+Opens a popup window with the rendered music notation for printing. Opens a popup window with the rendered music notation for printing. The default display of alphaTab in the browser is not very
 suitable for printing. The items are lazy loaded, the width can be dynamic, and the scale might be better suitable for screens.
-This function opens a popup window which is filled with a by-default A4 optimized view of the rendered score: 
+This function opens a popup window which is filled with a by-default A4 optimized view of the rendered score:
 
 * Lazy loading is disabled
 * The scale is reduced to 0.8
 * The stretch force is reduced to 0.8
 * The width is optimized to A4. Portrait if the page-layout is used, landscape if the horizontal-layout is used.
 
-## Signatures
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"print"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"width"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"additionalSettings"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"unknown"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
 
-<TypeTable>
-    <TypeRow type="js" name="function print()" />
-    <TypeRow type="js" name="function print(width)" />
-    <TypeRow type="js" name="function print(width, additionalSettings)" />
-    <TypeRow type="jquery" name="alphaTab('print')" />
-    <TypeRow type="jquery" name="alphaTab('print', width, additionalSettings)" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js-jquery" name="width" type="string">
+    <ParameterRow platform="all" name="width">
         An optional custom width as CSS width that should be used. Best is to use a CSS width that is suitable for your preferred page size.
     </ParameterRow>
-    <ParameterRow platform="js-jquery" name="additionalSettings" type="object">
-        An optional parameter to specify additional setting values which should be respected during printing. 
-        <span class="badge badge--info">since 1.2.0-alpha.79</span>
+    <ParameterRow platform="all" name="additionalSettings">
+        An optional parameter to specify additional setting values which should be respected during printing (<SinceBadge inline={true} since={"1.2.0"} />)
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Nothing
 
-## Examples
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', }
-  ]
-}>
-<TabItem value="js">
+## Example - JavaScript
 
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.print();
 api.print(undefined, { display: { barsPerRow: 5 } });
 ```
-
-</TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').alphaTab('print');
-```
-
-</TabItem>
-</Tabs>

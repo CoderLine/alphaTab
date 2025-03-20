@@ -1,52 +1,57 @@
 ---
 title: importer.beatTextAsLyrics
-description: Enables detecting lyrics from beat texts
+description: "Enables detecting lyrics from beat texts"
 sidebar_custom_props:
   category: Importer
   since: 1.2.0
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="1.2.0" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
+### Description
+Enables detecting lyrics from beat texts On various old Guitar Pro 3-5 files tab authors often used the "beat text" feature to add lyrics to the individual tracks.
+This was easier and quicker than using the lyrics feature.
 
-On various old Guitar Pro 3-5 files tab authors often used the "beat text" feature to add lyrics to the individual tracks. 
-This was easier and quicker than using the lyrics feature. 
-
-These texts were optimized to align correctly when viewed in Guitar Pro with the default layout but can lead to 
-disturbed display in alphaTab. When `beatTextAsLyrics` is set to true, alphaTab will try to rather parse beat text 
-values as lyrics using typical text patterns like dashes, underscores and spaces. 
+These texts were optimized to align correctly when viewed in Guitar Pro with the default layout but can lead to
+disturbed display in alphaTab. When `beatTextAsLyrics` is set to true, alphaTab will try to rather parse beat text
+values as lyrics using typical text patterns like dashes, underscores and spaces.
 
 The lyrics are only detected if not already proper lyrics are applied to the track.
 
 Enable this option for input files which suffer from this practice.
 
-:::note
-
-alphaTab tries to relate the texts and chunks to the beats but this is not perfect. 
-Errors are likely to happen with such kind of files.
-
-:::
-
-<PropertyDescription showJson={true} />
-
-## Types
-
-<TypeTable>
-    <TypeRow name="bool" />
-</TypeTable>
-
-## Default Value
-`false`
-
-## Example
+> [!NOTE]
+> alphaTab tries to relate the texts and chunks to the beats but this is not perfect.
+> Errors are likely to happen with such kind of files.
 
 **Enabled**
+
 ![Enabled](/img/reference/property/beattextaslyrics-enabled.png)
 
 **Disabled**
- ![Disabled](/img/reference/property/beattextaslyrics-disabled.png)
+
+![Disabled](/img/reference/property/beattextaslyrics-disabled.png)
+
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"beatTextAsLyrics"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"BeatTextAsLyrics"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"beatTextAsLyrics"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
+

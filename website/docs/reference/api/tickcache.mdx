@@ -1,122 +1,75 @@
 ---
 title: tickCache
-description: The tick cache allowing lookup of midi ticks to beats.
+description: "The tick cache allowing lookup of midi ticks to beats."
 sidebar_custom_props:
+  kind: property
   category: Properties - Player
-  since:  1.2.3
+  since: 1.2.3
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.2.3" />
-
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
-Gets the tick cache allowing lookup of midi ticks to beats. If the player is enabled, a midi file will be generated
-for the loaded `alphaTab.model.Score` for later playback. During this generation this tick cache is filled with the 
-exact midi ticks when beats are played. 
-
-The `MidiTickLookup.findBeat` method allows a lookup of the beat related to a given input midi tick.
-
 import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 <PropertyDescription />
 
+### Description
+The tick cache allowing lookup of midi ticks to beats. Gets the tick cache allowing lookup of midi ticks to beats. If the player is enabled, a midi file will be generated
+for the loaded <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/score"}>{"Score"}</Link></code> for later playback. During this generation this tick cache is filled with the
+exact midi ticks when beats are played.
 
-## Types
+The <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/miditicklookup/findbeat"}>{"findBeat"}</Link></code> method allows a lookup of the beat related to a given input midi tick.
 
-<TypeTable>
-    <TypeRow type="js" name="alphaTab.midi.MidiTickLookup" />
-    <TypeRow type="net" name="AlphaTab.Midi.MidiTickLookup" />
-    <TypeRow type="android" name="alphaTab.midi.MidiTickLookup" />
-</TypeTable>
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"readonly"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tickCache"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/miditicklookup"}>{"MidiTickLookup"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/miditicklookup"}>{"MidiTickLookup"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"TickCache"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"val"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tickCache"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/miditicklookup"}>{"MidiTickLookup"}</Link><span style={{"color":"#393A34"}}>{"?"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-
-## MidiTickLookup.findBeat Signatures
-
-<TypeTable>
-    <TypeRow type="js" name="findBeat(trackLookup: Set<number>, tick: number, currentBeatHint: MidiTickLookupFindBeatResult | null): MidiTickLookupFindBeatResult | null">
-        Find the beat played at a given midi tick. 
-    </TypeRow>
-    <TypeRow type="net" name="MidiTickLookupFindBeatResult? FindBeat(AlphaTab.Core.EcmaScript.Set<double> trackLookup, double tick, AlphaTab.Midi.MidiTickLookupFindBeatResult? currentBeatHint = null)">
-        Find the beat played at a given midi tick. 
-    </TypeRow>
-    <TypeRow type="android" name="MidiTickLookupFindBeatResult? findBeat(trackLookup: alphaTab.core.ecmaScript.Set<Double>, tick: Double, currentBeatHint: alphaTab.midi.MidiTickLookupFindBeatResult? = null)">
-        Find the beat played at a given midi tick. 
-    </TypeRow>
-</TypeTable>
-
-## MidiTickLookup.findBeat Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="trackLookup" type="Set<number>">
-        The tracks indices in which to search the played beat for.
-    </ParameterRow>
-    <ParameterRow platform="net" name="trackLookup" type="AlphaTab.Core.EcmaScript.Set<double>">
-        The tracks indices in which to search the played beat for.
-    </ParameterRow>
-    <ParameterRow platform="android" name="trackLookup" type="alphaTab.core.ecmaScript.Set<Double>">
-        The tracks indices in which to search the played beat for.
-    </ParameterRow>
-    <ParameterRow platform="js" name="tick" type="double">
-        The midi tick for which the beat should be looked up. 
-    </ParameterRow>
-    <ParameterRow platform="net" name="tick" type="number">
-        The midi tick for which the beat should be looked up. 
-    </ParameterRow>
-    <ParameterRow platform="js" name="currentBeatHint" type="AlphaTab.Midi.MidiTickLookupFindBeatResult">
-        Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
-    </ParameterRow>
-    <ParameterRow platform="net" name="currentBeatHint" type="alphaTab.midi.MidiTickLookupFindBeatResult">
-        Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
-    </ParameterRow>
-    <ParameterRow platform="android" name="currentBeatHint" type="alphaTab.midi.MidiTickLookupFindBeatResult">
-        Used for optimized lookup during playback. By passing in a previous result lookup of the next one can be optimized using heuristics. (optional).
-    </ParameterRow>
-</ParameterTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 const lookupResult = api.tickCache.findBeat(new Set([0, 1]), 100);
 const currentBeat = lookupResult?.currentBeat;
 ```
-
 </TabItem>
-<TabItem value="jq">
-Not available
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 var lookupResult = api.TickCache.FindBeat(new AlphaTab.Core.EcmaScript.Set(0, 1), 100);
 var currentBeat = lookupResult?.CurrentBeat;
 ```
-
 </TabItem>
 <TabItem value="android">
-
-```csharp
+```kotlin
 val api = AlphaTabApi<MyControl>(...)
 val lookupResult = api.tickCache.findBeat(alphaTab.core.ecmaScript.Set(0, 1), 100);
 val currentBeat = lookupResult?.CurrentBeat;
 ```
-
 </TabItem>
 </Tabs>

@@ -1,50 +1,50 @@
 ---
 title: playerFinished
-description: This event is fired when the playback of the whole song finished.
+description: "This event is fired when the playback of the whole song finished."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
-  since:  0.9.4
+  since: 0.9.4
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-## Description
+### Description
 This event is fired when the playback of the whole song finished. This event is finished regardless on whether looping is enabled or not.
 
-<EventDescription />
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"playerFinished"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitter"}>{"IEventEmitter"}</Link><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitter"}>{"IEventEmitter"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"PlayerFinished"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"playerFinished"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitter"}>{"IEventEmitter"}</Link></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function()" />    
-    <TypeRow type="net" name="Action" />    
-    <TypeRow type="Android" name="() -> Unit" />    
-</TypeTable>
-
-## Parameters
-None
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playerFinished.on((args) => {
@@ -55,43 +55,11 @@ api.isLooping = true;
 api.playbackSpeed = 0.5;
 api.play()
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const at = $('#alphaTab');
-at.on('alphaTab.finished', (e, args) => {
-    at.alphaTab('playbackSpeed', Math.min(1.0, at.alphaTab('playbackSpeed') + 0.1)
-});
-at.alphaTab('loop', true);
-at.alphaTab('playbackSpeed', 0.5);
-at.alphaTab('play');
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-const at = document.querySelector('#alphaTab');
-let api = null;
-at.addEventListener('alphaTab.finished', (e) => {
-    api.playbackSpeed = Math.min(1.0, api.playbackSpeed + 0.1);
-}, false);
-
-
-api = new alphaTab.AlphaTabApi(at);
-api.isLooping = true;
-api.playbackSpeed = 0.5;
-api.play()
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PlayerFinished.On(() => 
+api.PlayerFinished.On(() =>
 {
     // speed trainer
     api.PlaybackSpeed = Math.Min(1.0, api.PlaybackSpeed + 0.1);
@@ -100,13 +68,11 @@ api.IsLooping = true;
 api.PlaybackSpeed = 0.5;
 api.Play();
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
-api.playerFinished.on { 
+api.playerFinished.on {
     // speed trainer
     api.playbackSpeed = min(1.0, api.playbackSpeed + 0.1);
 }
@@ -114,6 +80,5 @@ api.isLooping = true
 api.playbackSpeed = 0.5
 api.play()
 ```
-
 </TabItem>
 </Tabs>

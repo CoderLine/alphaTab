@@ -1,100 +1,79 @@
 ---
 title: changeTrackVolume
-description: Changes the volume of the given tracks.
+description: "Changes the volume of the given tracks."
 sidebar_custom_props:
-  jQueryName: alphaTab('trackVolume')
+  kind: method
   category: Methods - Player
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
-Changes the volume of the given tracks. This will result in a volume change of the primary and secondary midi channel that the track uses for playback. 
+### Description
+Changes the volume of the given tracks. This will result in a volume change of the primary and secondary midi channel that the track uses for playback.
 If the track shares the channels with another track, all related tracks will be changed as they cannot be distinguished.
 
-## Signatures
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"changeTrackVolume"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"volume"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"number"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"ChangeTrackVolume"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"double"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"volume"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"changeTrackVolume"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.List"}</span><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"volume"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Double"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="js" name="function changeTrackVolume(tracks, volume)" />
-    <TypeRow type="net" name="void ChangeTrackVolume(Track[] tracks, double volume)" />
-    <TypeRow type="jquery" name="alphaTab('trackVolume', tracks, volume)" />
-    <TypeRow type="android" name="fun changeTrackVolume(tracks: alphaTab.collections.List<alphaTab.model.Track>, volume: Double): Unit" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Tracks[]">
-        The array of tracks that should be changed.
+    <ParameterRow platform="all" name="tracks">
+        The tracks for which the volume should be changed.
     </ParameterRow>
-    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
-        The array of tracks that should be changed.
-    </ParameterRow>
-    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
-        The array of tracks that should be changed.
-    </ParameterRow>
-    <ParameterRow platform="all" name="volume" type="double">
-        The volume multiplicator that should be added to the volume that the track normally has. e.g. 1.0 for no change on the volume,
-        2.0 for doubling the volume. Allowed range: 0.0 - 3.0.
+    <ParameterRow platform="all" name="volume">
+        The volume to set for all tracks in percent (0-1)
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Nothing
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackVolume([api.score.tracks[0], api.score.tracks[1]], 1.5);
 api.changeTrackVolume([api.score.tracks[2]], 0.5);
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const at = $('#alphaTab');
-const tracks = at.alphaTab('tracks');
-at.alphaTab('trackVolume', [tracks[0], tracks[1]], 1.5);
-at.alphaTab('trackVolume', [tracks[0], tracks[1]], 0.5);
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.ChangeTrackVolume(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, 1.5);
 api.ChangeTrackVolume(new Track[] { api.Score.Tracks[2] }, 0.5);
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...);
 api.changeTrackVolume(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), 1.5);
 api.changeTrackVolume(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[2]), 0.5);
 ```
-
 </TabItem>
 </Tabs>

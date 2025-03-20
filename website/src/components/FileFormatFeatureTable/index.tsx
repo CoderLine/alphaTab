@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import { SinceBadge } from "../SinceBadge";
+import { TooltipSinceBadge } from "../SinceBadge";
 import Details from "@theme/Details";
 import { Tooltip } from "react-tooltip";
 import ReactDOMServer from "react-dom/server";
@@ -52,7 +52,7 @@ export const FileFormatFeatureCell: React.FC<FileFormatFeatureCellProps> = ({
     status.since || status.tooltip
       ? ReactDOMServer.renderToStaticMarkup(
           <>
-            <SinceBadge since={status.since} inline={true} /> {status.tooltip}
+            <TooltipSinceBadge since={status.since} inline={true} /> {status.tooltip}
           </>
         )
       : "";

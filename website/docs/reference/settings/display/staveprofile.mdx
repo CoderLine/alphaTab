@@ -1,64 +1,38 @@
 ---
 title: display.staveProfile
-description: The stave profile defining which staves are shown for the music sheet. 
+description: "The stave profile defining which staves are shown for the music sheet."
 sidebar_custom_props:
   jsOnParent: true
   category: Display
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
+### Description
+The stave profile defining which staves are shown for the music sheet. AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks. Its recommended
+to keep this on <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/staveprofile#default"}>{"Default"}</Link></code> and rather rely on the options available ob <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/staff"}>{"Staff"}</Link></code> level
 
-AlphaTab has various stave profiles that define which staves will be shown in for the rendered tracks.
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"staveProfile"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/staveprofile"}>{"StaveProfile"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"StaveProfile.Default"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/staveprofile"}>{"StaveProfile"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"StaveProfile"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"StaveProfile.Default"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"staveProfile"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/staveprofile"}>{"StaveProfile"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"StaveProfile.Default"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<PropertyDescription showJson={true} />
-
-## Types
-
-<TypeTable>
-    <TypeRow name="alphaTab.StaveProfile" type="js">
-        `Default` -  The profile is auto detected by the track configurations.<br />
-        `ScoreTab` -  Standard music notation and guitar tablature are rendered.<br />
-        `Score` -  Only standard music notation is rendered.<br />
-        `Tab` -  Only guitar tablature is rendered.<br />
-        `TabMixed` -  Only guitar tablature is rendered, but also rests and time signatures are not shown. This profile is typically used in multi-track scenarios.<br />
-    </TypeRow>
-    <TypeRow name="string" type="json-js-html">
-        `default`<br />
-        `scoretab`<br />
-        `score`<br />
-        `tab`<br />
-        `tabmixed`    
-    </TypeRow>
-    <TypeRow name="int" type="json-js-html">
-        `0` - Default<br />
-        `1` - ScoreTab<br />
-        `2` - Score<br />
-        `3` - Tab<br />
-        `4` - TabMixed  
-    </TypeRow>
-    <TypeRow name="AlphaTab.StaveProfile" type="net">
-        `Default`<br />
-        `ScoreTab`<br />
-        `Score`<br />
-        `Tab`<br />
-        `TabMixed`<br />
-    </TypeRow>
-    <TypeRow name="alphaTab.StaveProfile" type="android">
-        `Default`<br />
-        `ScoreTab`<br />
-        `Score`<br />
-        `Tab`<br />
-        `TabMixed`<br />
-    </TypeRow>
-</TypeTable>
-
-## Default Value
-
-`Default`

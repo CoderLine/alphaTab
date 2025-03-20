@@ -1,113 +1,79 @@
 ---
 title: midiLoad
-description: This event is fired when a Midi file is being loaded.
+description: "This event is fired when a Midi file is being loaded."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
   since: 1.2.0
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.2.0" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-## Description
-This event is fired when a Midi file for the song was generated and is being loaded
-by the synthesizer. This event can be used to inspect or modify the midi events 
+### Description
+This event is fired when a Midi file is being loaded. This event is fired when a Midi file for the song was generated and is being loaded
+by the synthesizer. This event can be used to inspect or modify the midi events
 which will be played for the song. This can be used to generate other visual representations
 of the song.
 
-:::note
-The generated midi file will NOT contain any metronome and count-in related events. The metronome and
-count-in ticks are handled within the synthesizer. 
-:::
+> [!NOTE]
+> The generated midi file will NOT contain any metronome and count-in related events. The metronome and
+> count-in ticks are handled within the synthesizer.
 
-<EventDescription />
-
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(midiFile)" />    
-    <TypeRow type="net" name="Action<MidiFile>" />    
-    <TypeRow type="android" name="(file: MidiFile) -> Unit" />    
-</TypeTable>
-
-## Parameters
-<ParameterTable>
-    <ParameterRow platform="all" name="midiFile" type="alphaTab.midi.MidiFile">
-        The midi file containing all events which will be synthesized. 
-    </ParameterRow>
-</ParameterTable>
-
-## MidiFile Properties
-
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"midiLoad"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midifile"}>{"MidiFile"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midifile"}>{"MidiFile"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"MidiLoad"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"midiLoad"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midifile"}>{"MidiFile"}</Link><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.midiLoad.on(file => {
     initializePianoPractice(file);
 });
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').on('alphaTab.midiLoad', (e) => {
-    const file = e.detail;
-    initializePianoPractice(file);
-});
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.midiLoad', e => {
-    const file = e.detail;
-    initializePianoPractice(file);
-}, false);
-```
-
-</TabItem>
-<TabItem value="cs">
-
+<TabItem value="csharp">
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.MidiLoad.On(file => 
+api.MidiLoad.On(file =>
 {
     InitializePianoPractice(file);
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
-```cs
+```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.midiLoad.on { file ->
     initializePianoPractice(file)
 }
 ```
-
 </TabItem>
 </Tabs>

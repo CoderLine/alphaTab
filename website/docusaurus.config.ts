@@ -5,6 +5,7 @@ import type {
   NormalizedSidebarItem,
   SidebarItemsGeneratorDoc,
 } from "@docusaurus/plugin-content-docs/src/sidebars/types.js";
+import remarkGithubAdmonitionsToDirectives from "remark-github-admonitions-to-directives";
 
 import * as path from "path";
 import * as fs from "fs";
@@ -108,6 +109,7 @@ const config: Config = {
         docs: {
           sidebarPath: "./sidebars.ts",
           editUrl: "https://github.com/CoderLine/alphaTabWebsite/tree/main/",
+          beforeDefaultRemarkPlugins: [remarkGithubAdmonitionsToDirectives],
           async sidebarItemsGenerator({
             defaultSidebarItemsGenerator,
             ...args

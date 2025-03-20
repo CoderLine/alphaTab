@@ -1,141 +1,83 @@
 ---
 title: loadSoundFont
-description: Triggers a load of the soundfont from the given data.
+description: "Triggers a load of the soundfont from the given data."
 sidebar_custom_props:
+  kind: method
   category: Methods - Player
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
+### Description
+Triggers a load of the soundfont from the given data. AlphaTab only supports SoundFont2 and SoundFont3 <SinceBadge inline={true} since={"1.4.0"} /> encoded soundfonts for loading. To load a soundfont the player must be enabled in advance.
 
-## Description
-This function initiates a load of the soundfont using the given data. The supported data types is depending on the platform. AlphaTab only supports SoundFont2 and SoundFont3 (<SinceBadge since="1.4.0" inline="true" />) encoded soundfonts for loading. To load a soundfont the player must be enabled in advance. 	
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"loadSoundFont"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"data"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"unknown"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"append"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"LoadSoundFont"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"object"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"data"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"append"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"loadSoundFont"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"data"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Any"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"append"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Signatures
-
-<TypeTable>
-    <TypeRow type="js" name="function loadSoundFont(arraybuffer, append)">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="js" name="function loadSoundFont(uint8array, append)">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="js" name="function loadSoundFont(url, append)">
-        Load the soundfont from the given URL via AJAX.
-    </TypeRow>
-    <TypeRow type="js" name="alphaTab('loadSoundFont', arraybuffer, append)">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="js" name="alphaTab('loadSoundFont', uint8array, append)">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="js" name="alphaTab('loadSoundFont', url, append)">
-        Load the soundfont from the given URL via AJAX.
-    </TypeRow>
-    <TypeRow type="net" name="bool LoadSoundFont(byte[] raw, append)">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="net" name="bool LoadSoundFont(Stream raw, append)">
-        Load the soundfont from the given stream.
-    </TypeRow>
-    <TypeRow type="android" name="fun loadSoundFont(raw: ByteArray, append: Boolean = false): Boolean">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="android" name="fun loadSoundFont(raw: UByteArray, append: Boolean = false): Boolean">
-        Load the soundfont from the given raw bytes.
-    </TypeRow>
-    <TypeRow type="android" name="fun loadSoundFont(stream: java.io.InputStream, append: Boolean = false): Boolean">
-        Load the soundfont from the given stream.
-    </TypeRow>
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js-jquery" name="arraybuffer" type="ArrayBuffer">
-        The arraybuffer containing the raw bytes of a SoundFont file
+    <ParameterRow platform="all" name="data">
+        The data object to decode. The supported data types is depending on the platform.
+        
+        * A `ArrayBuffer` or `Uint8Array` (all platforms, native byte array or input streams on other platforms)
+        * A url from where to download the binary data of one of the supported file formats (browser only)
     </ParameterRow>
-    <ParameterRow platform="js-jquery" name="uint8array" type="Uint8Array">
-        The Uint8Array containing the raw bytes of a SoundFont file
-    </ParameterRow>
-    <ParameterRow platform="js-jquery" name="url" type="string">
-        A URL pointing to a SoundFont file that should be loaded via AJAX.
-    </ParameterRow>
-    <ParameterRow platform="net" name="raw" type="byte[]">
-        The raw bytes containing a SoundFont file.
-    </ParameterRow>
-    <ParameterRow platform="net" name="raw" type="System.IO.Stream">
-        The stream containing a SoundFont file.
-    </ParameterRow>
-    <ParameterRow platform="android" name="raw" type="ByteArray">
-        The raw bytes containing a SoundFont file.
-    </ParameterRow>
-    <ParameterRow platform="android" name="raw" type="ByteArray">
-        The raw bytes containing a SoundFont file.
-    </ParameterRow>
-    <ParameterRow platform="android" name="raw" type="UByteArray">
-        The raw bytes containing a SoundFont file.
-    </ParameterRow>
-    <ParameterRow platform="android" name="stream" type="java.io.InputStream">
-        The stream containing a SoundFont file.
-    </ParameterRow>
-    <ParameterRow platform="all" name="append" type="boolean">
-        Whether to append the presets of the new soundfont to the already loaded
-        ones. <span class="badge badge--info">Since: 1.1.0</span>
+    <ParameterRow platform="all" name="append">
+        Whether to fully replace or append the data from the given soundfont.
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-`true` if the passed in object is a supported format and loading was initiated, otherwise `false`.
+### Returns 
+`true` if the passed in object is a supported format and loading was initiated, otherwise `false`. 
+
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.loadSoundFont('/assets/MyFile.sf2');
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').alphaTab('loadSoundFont', '/assets/MyFile.sf2');
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.LoadSoundFont(System.IO.File.OpenRead("MyFile.sf2"));
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 contentResolver.openInputStream(uri).use {
     api.loadSoundFont(it)
 }
 ```
-
 </TabItem>
 </Tabs>

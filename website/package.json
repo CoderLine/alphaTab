@@ -41,6 +41,8 @@
     "babel-plugin-macros": "^3.1.0",
     "copy-webpack-plugin": "^12.0.2",
     "docusaurus-plugin-sass": "^0.2.6",
+    "prettier": "^3.5.3",
+    "remark-github-admonitions-to-directives": "^2.1.0",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.85.1",
     "tsx": "^4.19.3",

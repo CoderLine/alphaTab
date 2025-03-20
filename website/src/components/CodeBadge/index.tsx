@@ -1,5 +1,6 @@
 import React from "react";
 import styles from "./styles.module.scss";
+import Link from "@docusaurus/Link";
 
 export type Platform =
   | "all"
@@ -19,14 +20,15 @@ export type Platform =
 export type CodeBadgeProps = {
   type?: Platform;
   name?: string;
+  link?: string;
 };
 
-export const CodeBadge: React.FC<CodeBadgeProps> = ({ type, name }) => {
+export const CodeBadge: React.FC<CodeBadgeProps> = ({ type, name, link }) => {
   if (!name) {
     return <></>;
   }
 
-  type ??= 'all';
+  type ??= "all";
 
   let title: string = type;
   let typeStyle = styles[type];
@@ -79,10 +81,22 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({ type, name }) => {
       break;
   }
   const css = `${styles["code-badge"]} ${typeStyle}`;
-  return (
-    <code className={css}>
-      {name}
-      <span>{title}</span>
-    </code>
-  );
+
+  if (link) {
+    return (
+      <Link to={link}>
+        <code className={css}>
+          {name}
+          <span>{title}</span>
+        </code>
+      </Link>
+    );
+  } else {
+    return (
+      <code className={css}>
+        {name}
+        <span>{title}</span>
+      </code>
+    );
+  }
 };

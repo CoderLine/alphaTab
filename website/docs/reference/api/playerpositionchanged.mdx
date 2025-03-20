@@ -1,157 +1,72 @@
 ---
 title: playerPositionChanged
-description: This event is fired when the playback state changed.
+description: "This event is fired when the current playback position of the song changed."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
   since: 0.9.4
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+### Description
+This event is fired when the current playback position of the song changed.
 
-## Description
-This event is fired when the current playback position of the song changed. 
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"playerPositionChanged"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/positionchangedeventargs"}>{"PositionChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/positionchangedeventargs"}>{"PositionChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"PlayerPositionChanged"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"playerPositionChanged"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/positionchangedeventargs"}>{"PositionChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<EventDescription />
-
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(args)" />    
-    <TypeRow type="net" name="Action<PositionChangedEventArgs>" />    
-    <TypeRow type="android" name="(e: PositionChangedEventArgs) -> Unit" />    
-</TypeTable>
-
-## Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="args" type="alphaTab.synth.PositionChangedEventArgs">
-        The information about the player position. 
-    </ParameterRow>
-    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PositionChangedEventArgs">
-        The information about the player position. 
-    </ParameterRow>
-    <ParameterRow platform="android" name="args" type="alphaTab.synth.PositionChangedEventArgs">
-        The information about the player position. 
-    </ParameterRow>
-</ParameterTable>
-
-## PositionChangedEventArgs Properties
-
-<ParameterTable>
-    <ParameterRow platform="js" name="currentTime" type="number">
-        The current time position within the song in milliseconds.
-    </ParameterRow>
-    <ParameterRow platform="net" name="CurrentTime" type="double">
-        The current time position within the song in milliseconds.
-    </ParameterRow>
-    <ParameterRow platform="android" name="currentTime" type="double">
-        The current time position within the song in milliseconds.
-    </ParameterRow>
-    <ParameterRow platform="js" name="endTime" type="number">
-        The total length of the song in milliseconds.
-    </ParameterRow>
-    <ParameterRow platform="net" name="EndTime" type="double">
-        The current time position within the song in milliseconds.
-    </ParameterRow>
-    <ParameterRow platform="android" name="endTime" type="double">
-        The current time position within the song in milliseconds.
-    </ParameterRow>
-    <ParameterRow platform="js" name="currentTick" type="number">
-        The current time position within the song in midi ticks.
-    </ParameterRow>
-    <ParameterRow platform="net" name="CurrentTick" type="double">
-        The current time position within the song in midi ticks.
-    </ParameterRow>
-    <ParameterRow platform="android" name="currentTick" type="double">
-        The current time position within the song in midi ticks.
-    </ParameterRow>
-    <ParameterRow platform="js" name="endTick" type="number">
-        The total length of the song in midi ticks.
-    </ParameterRow>
-    <ParameterRow platform="net" name="EndTick" type="double">
-        The current time position within the song in midi ticks.
-    </ParameterRow>
-    <ParameterRow platform="android" name="endTick" type="double">
-        The current time position within the song in midi ticks.
-    </ParameterRow>
-    <ParameterRow platform="js" name="isSeek" type="boolean">
-        Whether the position changed because of time seeking and not due to playback. <span class="badge badge--info">since 1.2.0-alpha.97</span>
-    </ParameterRow>
-    <ParameterRow platform="net" name="IsSeek" type="bool">
-        Whether the position changed because of time seeking and not due to playback. <span class="badge badge--info">since 1.2.0-alpha.97</span>
-    </ParameterRow>
-    <ParameterRow platform="android" name="isSeek" type="bool">
-        Whether the position changed because of time seeking and not due to playback. <span class="badge badge--info">since 1.2.0-alpha.97</span>
-    </ParameterRow>
-</ParameterTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playerPositionChanged.on((args) => {
     updatePlayerPosition(args);
 });
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').on('alphaTab.positionChanged', (e, args) => {
-    updatePlayerPosition(args);
-});
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.positionChanged', (e) => {
-    var args = e.detail;
-    updatePlayerPosition(args);
-}, false);
-```
-
-</TabItem>
-<TabItem value="cs">
-
+<TabItem value="csharp">
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PlayerPositionChanged.On(args => 
+api.PlayerPositionChanged.On(args =>
 {
     UpdatePlayerPosition(args);
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.playerPositionChanged.on { args ->
     updatePlayerPosition(args)
 }
 ```
-
 </TabItem>
 </Tabs>

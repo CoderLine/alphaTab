@@ -1,118 +1,47 @@
 ---
 title: player.vibrato
-description: The Vibrato settings allow control how the different vibrato types are generated for audio. 
+description: "The Vibrato settings allow control how the different vibrato types are generated for audio."
 sidebar_custom_props:
-  domWildCard: true
   category: Player
   since: 0.9.6
 ---
-import { SinceBadge } from '@site/src/components/SinceBadge';
 
-<SinceBadge since="0.9.6" />
-
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 import { CodeBadge } from '@site/src/components/CodeBadge';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-export var VibratoSettings = [
-    {
-        name: 'beatSlightAmplitude',
-        defaultValue: 2,
-        description: 'The amplitude for the beat-slight vibrato in semitones.'
-    },
-    {
-        name: 'beatSlightLength',
-        defaultValue: 480,
-        description: 'The wavelength of the beat-slight vibrato in midi ticks.'
-    },
-    {
-        name: 'beatWideAmplitude',
-        defaultValue: 2,
-        description: 'The amplitude for the beat-wide vibrato in semitones.'
-    },
-    {
-        name: 'beatWideLength',
-        defaultValue: 480,
-        description: 'The wavelength of the beat-wide vibrato in midi ticks.'
-    },
-    {
-        name: 'noteSlightAmplitude',
-        defaultValue: 0.5,
-        description: 'The amplitude for the note-slight vibrato in semitones.'
-    },
-    {
-        name: 'noteSlightLength',
-        defaultValue: 360,
-        description: 'The wavelength of the note-slight vibrato in midi ticks.'
-    },
-    {
-        name: 'noteWideAmplitude',
-        defaultValue: 1,
-        description: 'The amplitude for the note-wide vibrato in semitones.'
-    },
-    {
-        name: 'noteWideLength',
-        defaultValue: 240,
-        description: 'The wavelength of the note-wide vibrato in midi ticks.'
-    }
-];
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-export function toPascalCase(v) {
-    return v.substr(0, 1).toUpperCase() + v.substr(1);
-}
+<SettingsHeader />
 
-export function VibratoRow({setting}) {  
-    return (
-        <tr>
-            <td>
-                <CodeBadge type="js" name={setting.name} /><br />
-                <CodeBadge type="json" name={setting.name} /><br />
-                <CodeBadge type="html" name={setting.name.toLowerCase()} /><br />
-                <CodeBadge type="net" name={toPascalCase(setting.name)} /><br />
-                <CodeBadge type="android" name={setting.name} />
-            </td>
-            <td>
-                <CodeBadge type="all" name="int" />
-            </td>
-            <td>{setting.defaultValue}</td>
-            <td>
-                {setting.description}
-            </td>
-        </tr>
-    );
-}
-
-export function VibratoTable() {
-    const settings = VibratoSettings.map(c => <VibratoRow setting={c} />);
-    return (
-        <table className="table table-striped table-condensed type-table">
-            <thead>
-                <tr>
-                    <th>Setting</th>
-                    <th>Type</th>
-                    <th>Default</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>    
-            <tbody> 
-                {settings}
-            </tbody>
-        </table>
-    );
-}
-
-
-## Description
-
-AlphaTab supports 4 types of vibratos, for each vibrato the amplitude and the wavelength can be configured. The amplitude controls how many semitones
+### Description
+The Vibrato settings allow control how the different vibrato types are generated for audio. AlphaTab supports 4 types of vibratos, for each vibrato the amplitude and the wavelength can be configured. The amplitude controls how many semitones
 the vibrato changes the pitch up and down while playback. The wavelength controls how many midi ticks it will take to complete one up and down vibrato.
-The 4 vibrato types are: 
+The 4 vibrato types are:
 
 1. Beat Slight - A fast vibrato on the whole beat. This vibrato is usually done with the whammy bar.
 2. Beat Wide - A slow vibrato on the whole beat. This vibrato is usually done with the whammy bar.
 3. Note Slight - A fast vibrato on a single note. This vibrato is usually done with the finger on the fretboard.
 4. Note Wide - A slow vibrato on a single note. This vibrato is usually done with the finger on the fretboard.
 
-## Vibrato Settings
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"readonly"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"vibrato"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/vibratoplaybacksettings"}>{"VibratoPlaybackSettings"}</Link><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/vibratoplaybacksettings"}>{"VibratoPlaybackSettings"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Vibrato"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"val"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"vibrato"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/vibratoplaybacksettings"}>{"VibratoPlaybackSettings"}</Link></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<VibratoTable />
+
+import ManualDocs from './_vibrato.mdx';
+
+<ManualDocs />

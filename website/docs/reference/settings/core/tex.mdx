@@ -1,39 +1,38 @@
 ---
 title: core.tex
-description: Whether the contents of the DOM element should be loaded as alphaTex.
+description: "Whether the contents of the DOM element should be loaded as alphaTex."
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
   category: Core - JavaScript Specific
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-
-This setting allows you to fill alphaTex code into the DOM element and make alphaTab automatically 
+### Description
+Whether the contents of the DOM element should be loaded as alphaTex. This setting allows you to fill alphaTex code into the DOM element and make alphaTab automatically
 load it when initializing. Note that this setting is only interpreted once on initialization.
 
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+
+
+## Example - JavaScript
+
 ```html
-<div id="alphaTab" data-tex="true">\title "Simple alphaTex init" . 3.3*4</div>
+<div id="alphaTab">\title "Simple alphaTex init" . 3.3*4</div>
 <script>
-const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'));
+const api = new alphaTab.AlphaTabApi(document.getElementById('alphaTab'), { core: { tex: true }});
 </script>
 ```
-
-<PropertyDescription showJson={true} />
-
-## Types
-
-<TypeTable>
-    <TypeRow name="boolean" />
-</TypeTable>
-
-## Default Value
-
-`false`

@@ -1,58 +1,42 @@
 ---
 title: downloadMidi
-description: Generates an SMF1.0 file and downloads it
+description: "Generates an SMF1.0 file and downloads it"
 sidebar_custom_props:
+  kind: method
   javaScriptOnly: true
   category: Methods - Core
-  since:  1.3.0
+  since: 1.3.0
 ---
 
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.3.0" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
-Generates a SMF1.0 compliant MIDI file of the currently loaded song and starts the download of it. 
+### Description
+Generates an SMF1.0 file and downloads it Generates a SMF1.0 compliant MIDI file of the currently loaded song and starts the download of it.
 Please be aware that SMF1.0 does not support bends per note which might result in wrong bend effects
 in case multiple bends are applied on the same beat (e.g. two notes bending or vibrato + bends).
 
-## Signatures
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"downloadMidi"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"format"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midifileformat"}>{"MidiFileFormat"}</Link><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
 
-<TypeTable>
-    <TypeRow type="js" name="function downloadMidi()" />
-    <TypeRow type="js" name="function downloadMidi(format)" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js" name="format" type="alphaTab.midi.MidiFileFormat">
-        The SMF file format to which the song should be exported. (default: `SingleTrackMultiChannel`)
+    <ParameterRow platform="all" name="format">
+        (no description)
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Nothing
 
-## Examples
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', }
-  ]
-}>
-<TabItem value="js">
+## Example - JavaScript
 
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.downloadMidi();
 ```
-
-</TabItem>
-</Tabs>

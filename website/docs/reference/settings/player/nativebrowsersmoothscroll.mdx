@@ -1,32 +1,29 @@
 ---
 title: player.nativeBrowserSmoothScroll
-description: Whether the native browser smooth scroll mechanism should be used over a custom animation.
+description: "Whether the native browser smooth scroll mechanism should be used over a custom animation."
 sidebar_custom_props:
   javaScriptOnly: true
   category: Player
   since: 1.2.3
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="1.2.3" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-
-This setting configures whether the [native browser feature](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo)
+### Description
+Whether the native browser smooth scroll mechanism should be used over a custom animation. This setting configures whether the [native browser feature](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollTo)
 for smooth scrolling should be used over a custom animation.
-If this setting is enabled, options like `player.scrollSpeed` will not have an effect anymore.
+If this setting is enabled, options like <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/settings/player/scrollspeed"}>{"scrollSpeed"}</Link></code> will not have an effect anymore.
 
-<PropertyDescription showJson={true} />
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"nativeBrowserSmoothScroll"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"true"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-## Types
-
-<TypeTable>
-    <TypeRow name="bool" />
-</TypeTable>
-
-## Default Value
-
-`true`

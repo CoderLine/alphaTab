@@ -9,21 +9,6 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 
 <SinceBadge since="1.5.0" />
 
-
-import * as alphaTab from '@coderline/alphatab';
-import { getDescriptionText } from '@site/src/alphatabdoc';
-
-export function EnumMemberList({ doc }) {
-    return (
-        <>
-            <code>{doc.name}</code>
-            <ul>
-                {doc.members.map(n => (<li key={n.name}><code>{n.name}</code> - {getDescriptionText(n.tsdoc)}</li>))}
-            </ul>
-        </>
-    )
-}
-
 alphaTab supports individual styling of music notation elements via a special `style` container which is available on
 most levels of the [Data Model](../reference/score.mdx). This means you can customize the colors of individual notes being rendered 
 base on custom logic. 
@@ -57,47 +42,46 @@ alphaTab tries to give fine grained access to coloring music notation elements. 
 
 On Score level initialize the `score.style = new alphaTab.model.ScoreStyle()` and then select the element to color via `alphaTab.model.ScoreSubElement`.
 
-import scoreSubElementDoc from '@site/src/alphatabdoc/model/ScoreSubElement';
+import ScoreSubElementDoc from '@site/docs/reference/types/model/scoresubelement/index.mdx';
 
-<EnumMemberList doc={scoreSubElementDoc} />
+<ScoreSubElementDoc inlined={true} />
 
 ### Track level
 
 On Track level initialize the `track.style = new alphaTab.model.TrackStyle()` and then select the element to color via `alphaTab.model.TrackSubElement`.
 
-import trackSubElementDoc from '@site/src/alphatabdoc/model/TrackSubElement';
+import TrackSubElementDoc from '@site/docs/reference/types/model/tracksubelement/index.mdx';
 
-<EnumMemberList doc={trackSubElementDoc} />
+<TrackSubElementDoc inlined={true} />
 
 ### Bar level
 
 On Bar level initialize the `bar.style = new alphaTab.model.BarStyle()` and then select the element to color via `alphaTab.model.BarSubElement`.
 
-import barSubElementDoc from '@site/src/alphatabdoc/model/BarSubElement';
+import BarSubElementDoc from '@site/docs/reference/types/model/barsubelement/index.mdx';
 
-<EnumMemberList doc={barSubElementDoc} />
-
+<BarSubElementDoc inlined={true} />
 
 ### Voice level
 
 On Bar level initialize the `voice.style = new alphaTab.model.VoiceStyle()` and then select the element to color via `alphaTab.model.VoiceSubElement`.
 
-import voiceSubElementDoc from '@site/src/alphatabdoc/model/VoiceSubElement';
+import VoiceSubElementDoc from '@site/docs/reference/types/model/voicesubelement/index.mdx';
 
-<EnumMemberList doc={voiceSubElementDoc} />
+<VoiceSubElementDoc inlined={true} />
 
 ### Beat level
 
 On Beat level initialize the `beat.style = new alphaTab.model.BeatStyle()` and then select the element to color via `alphaTab.model.BeatSubElement`.
 
-import beatSubElementDoc from '@site/src/alphatabdoc/model/BeatSubElement';
+import BeatSubElementDoc from '@site/docs/reference/types/model/beatsubelement/index.mdx';
 
-<EnumMemberList doc={beatSubElementDoc} />
+<BeatSubElementDoc inlined={true} />
 
 ### Note level
 
 On Note level initialize the `note.style = new alphaTab.model.NoteStyle()` and then select the element to color via `alphaTab.model.NoteSubElement`.
 
-import noteSubElementDoc from '@site/src/alphatabdoc/model/NoteSubElement';
+import NoteSubElementDoc from '@site/docs/reference/types/model/notesubelement/index.mdx';
 
-<EnumMemberList doc={noteSubElementDoc} />
+<NoteSubElementDoc inlined={true} />
