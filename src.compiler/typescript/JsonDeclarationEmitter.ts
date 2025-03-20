@@ -158,7 +158,7 @@ function createJsonMembers(
         .map(m => createJsonMember(program, m as ts.PropertyDeclaration, importer));
 }
 
-let allJsonTypes: string[] = [];
+let allJsonTypes: Map<string, string> = new Map<string, string>();
 const emit = createEmitter('json_declaration', (program, input) => {
     console.log(`Writing JSON Type Declaration for ${input.name!.text}`);
     const statements: ts.Statement[] = [];
@@ -169,6 +169,10 @@ const emit = createEmitter('json_declaration', (program, input) => {
             return;
         }
         imported.add(name);
+
+        if (name.endsWith('Json')) {
+            allJsonTypes.set(name, module);
+        }
 
         statements.push(
             ts.factory.createImportDeclaration(
@@ -199,7 +203,7 @@ const emit = createEmitter('json_declaration', (program, input) => {
         )
     );
 
-    allJsonTypes.push(input.name!.text + 'Json');
+    allJsonTypes.set(input.name!.text + 'Json', './' + input.name!.text + 'Json');
     const sourceFile = ts.factory.createSourceFile(
         [...statements],
         ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
@@ -209,18 +213,18 @@ const emit = createEmitter('json_declaration', (program, input) => {
     return sourceFile;
 });
 export default function emitWithIndex(program: ts.Program, _diagnostics: ts.Diagnostic[]) {
-    allJsonTypes = [];
+    allJsonTypes = new Map<string, string>();
 
     emit(program, _diagnostics);
 
-    const statements = allJsonTypes.map(type =>
+    const statements = Array.from(allJsonTypes.entries()).map(type =>
         ts.factory.createExportDeclaration(
             undefined,
             true,
             ts.factory.createNamedExports([
-                ts.factory.createExportSpecifier(false, undefined, ts.factory.createIdentifier(type))
+                ts.factory.createExportSpecifier(false, undefined, ts.factory.createIdentifier(type[0]))
             ]),
-            ts.factory.createStringLiteral(`./${type}`)
+            ts.factory.createStringLiteral(type[1])
         )
     );
 

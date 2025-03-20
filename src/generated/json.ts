@@ -4,11 +4,13 @@
 // the code is regenerated.
 // </auto-generated>
 export type { CoreSettingsJson } from "./CoreSettingsJson";
+export type { RenderingResourcesJson } from "./RenderingResourcesJson";
 export type { DisplaySettingsJson } from "./DisplaySettingsJson";
 export type { ImporterSettingsJson } from "./ImporterSettingsJson";
 export type { NotationSettingsJson } from "./NotationSettingsJson";
 export type { VibratoPlaybackSettingsJson } from "./VibratoPlaybackSettingsJson";
 export type { SlidePlaybackSettingsJson } from "./SlidePlaybackSettingsJson";
 export type { PlayerSettingsJson } from "./PlayerSettingsJson";
-export type { RenderingResourcesJson } from "./RenderingResourcesJson";
+export type { FontJson } from "@src/model/Font";
+export type { ColorJson } from "@src/model/Color";
 export type { SettingsJson } from "./SettingsJson";
