@@ -181,6 +181,7 @@ export default abstract class AstPrinterBase {
     protected abstract writeNewExpression(expr: cs.NewExpression);
     protected abstract writeCastExpression(expr: cs.CastExpression);
     protected abstract writeNonNullExpression(expr: cs.NonNullExpression);
+    protected abstract writeYieldExpression(expr: cs.YieldExpression);
 
     protected writeToDoExpression(expr: cs.ToDoExpression) {
         this.write('/* TODO */');
@@ -383,6 +384,9 @@ export default abstract class AstPrinterBase {
                 break;
             case cs.SyntaxKind.TypeOfExpression:
                 this.writeTypeOfExpression(expr as cs.TypeOfExpression);
+                break;
+            case cs.SyntaxKind.YieldExpression:
+                this.writeYieldExpression(expr as cs.YieldExpression);
                 break;
             case cs.SyntaxKind.TypeReference:
                 this.writeType(expr as cs.TypeReference);

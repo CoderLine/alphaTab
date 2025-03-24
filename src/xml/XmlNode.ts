@@ -27,7 +27,7 @@ export enum XmlNodeType {
     Text,
     CDATA,
     Document,
-    DocumentType,
+    DocumentType
 }
 
 export class XmlNode {
@@ -38,6 +38,14 @@ export class XmlNode {
     public attributes: Map<string, string> = new Map<string, string>();
     public firstChild: XmlNode | null = null;
     public firstElement: XmlNode | null = null;
+
+    public *childElements() {
+        for (const c of this.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                yield c;
+            }
+        }
+    }
 
     public addChild(node: XmlNode): void {
         this.childNodes.push(node);
@@ -90,7 +98,7 @@ export class XmlNode {
 
     public get innerText(): string {
         if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
-            if(this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
+            if (this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
                 return this.firstElement.innerText;
             }
             let txt: string = '';
@@ -103,7 +111,6 @@ export class XmlNode {
         return this.value ?? '';
     }
 
-
     public set innerText(value: string) {
         const textNode = new XmlNode();
         textNode.nodeType = XmlNodeType.Text;
@@ -111,7 +118,7 @@ export class XmlNode {
         this.childNodes = [textNode];
     }
 
-    public setCData(s:string) {
+    public setCData(s: string) {
         const textNode = new XmlNode();
         textNode.nodeType = XmlNodeType.CDATA;
         textNode.value = s;

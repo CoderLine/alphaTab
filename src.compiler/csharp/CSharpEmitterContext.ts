@@ -100,11 +100,15 @@ export default class CSharpEmitterContext {
                 expr.tsSymbol.flags & ts.SymbolFlags.ConstEnum ||
                 expr.tsSymbol.flags & ts.SymbolFlags.RegularEnum
             ) {
-                if (expr.tsSymbol.name === 'Error') {
-                    return this.makeExceptionType();
-                }
-                if (expr.tsSymbol.name === 'Disposable') {
-                    return 'Disposable';
+                switch (expr.tsSymbol.name) {
+                    case 'Error':
+                        return this.makeExceptionType();
+                    case 'Iterable':
+                        return this.makeIterableType();
+                    case 'Generator':
+                        return this.makeGeneratorType();
+                    case 'Disposable':
+                        return 'Disposable';
                 }
 
                 return this.buildCoreNamespace(expr.tsSymbol) + this.toCoreTypeName(expr.tsSymbol.name);
@@ -113,13 +117,13 @@ export default class CSharpEmitterContext {
                     return this.toPascalCase('alphaTab.test') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
                 }
 
-                if(expr.tsSymbol.valueDeclaration && expr.tsNode) {
-                    const sourceFile =  expr.tsSymbol.valueDeclaration.getSourceFile();
-                    if(sourceFile === expr.tsNode.getSourceFile()) {
+                if (expr.tsSymbol.valueDeclaration && expr.tsNode) {
+                    const sourceFile = expr.tsSymbol.valueDeclaration.getSourceFile();
+                    if (sourceFile === expr.tsNode.getSourceFile()) {
                         return expr.tsSymbol.name;
                     }
-                } 
-                
+                }
+
                 return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
             } else if (
                 (expr.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable && this.isGlobalVariable(expr.tsSymbol)) ||
@@ -412,6 +416,44 @@ export default class CSharpEmitterContext {
                 }
 
                 return this.createMapType(tsSymbol, node, mapKeyType!, mapValueType!);
+            case 'Iterable':
+                const iterableType = tsType as ts.TypeReference;
+
+                let iterableItemType: cs.TypeNode | null = null;
+
+                if (typeArguments) {
+                    iterableItemType = typeArguments[0];
+                } else if (iterableType.typeArguments) {
+                    iterableItemType = this.getTypeFromTsType(node, iterableType.typeArguments[0]);
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    reference: this.makeIterableType(),
+                    typeArguments: [iterableItemType]
+                } as cs.TypeReference;
+
+            case 'Generator':
+                const generatorType = tsType as ts.TypeReference;
+
+                let generatorItemType: cs.TypeNode | null = null;
+
+                if (typeArguments) {
+                    generatorItemType = typeArguments[0];
+                } else if (generatorType.typeArguments) {
+                    generatorItemType = this.getTypeFromTsType(node, generatorType.typeArguments[0]);
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    reference: this.makeGeneratorType(),
+                    typeArguments: [generatorItemType]
+                } as cs.TypeReference;
+
             case 'Disposable':
                 return {
                     nodeType: cs.SyntaxKind.TypeReference,
@@ -928,6 +970,14 @@ export default class CSharpEmitterContext {
         return this.makeTypeName('Error');
     }
 
+    public makeIterableType(): string {
+        return this.makeTypeName('System.Collections.Generic.IEnumerable');
+    }
+
+    public makeGeneratorType(): string {
+        return this.makeTypeName('System.Collections.Generic.IEnumerable');
+    }
+
     public makeTypeName(tsName: string): string {
         const parts = tsName.split('.');
         let result = '';
@@ -1280,13 +1330,14 @@ export default class CSharpEmitterContext {
         }
 
         // no smartcast on assignments
-        if (ts.isBinaryExpression(expression.parent) && 
-            (expression.parent.operatorToken.kind === ts.SyntaxKind.EqualsToken || expression.parent.operatorToken.kind  === ts.SyntaxKind.QuestionQuestionEqualsToken) &&
+        if (
+            ts.isBinaryExpression(expression.parent) &&
+            (expression.parent.operatorToken.kind === ts.SyntaxKind.EqualsToken ||
+                expression.parent.operatorToken.kind === ts.SyntaxKind.QuestionQuestionEqualsToken) &&
             expression.parent.left === expression
         ) {
             return null;
         }
-
 
         if (
             expression.parent.kind === ts.SyntaxKind.NonNullExpression &&
@@ -1543,8 +1594,10 @@ export default class CSharpEmitterContext {
         if (tsType.isUnion() && (tsType as ts.UnionType).types.length > 0) {
             let isEnum = true;
             for (const t of (tsType as ts.UnionType).types) {
-                if (!t.symbol ||
-                    (!(t.symbol.flags & ts.SymbolFlags.Enum) && !(t.symbol.flags & ts.SymbolFlags.EnumMember))) {
+                if (
+                    !t.symbol ||
+                    (!(t.symbol.flags & ts.SymbolFlags.Enum) && !(t.symbol.flags & ts.SymbolFlags.EnumMember))
+                ) {
                     isEnum = false;
                     break;
                 }

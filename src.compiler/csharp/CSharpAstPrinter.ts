@@ -974,4 +974,14 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeParameters(expr.parameters);
         this.writeBlock(expr.body);
     }
+
+    protected writeYieldExpression(expr: cs.YieldExpression) {
+        this.write('yield ');
+        if (expr.expression) {
+            this.write('return ');
+            this.writeExpression(expr.expression);
+        } else {
+            this.write('break');
+        }
+    }
 }

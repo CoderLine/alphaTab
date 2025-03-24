@@ -80,7 +80,8 @@ export enum SyntaxKind {
     Attribute,
 
     SpreadExpression,
-    LocalFunction
+    LocalFunction,
+    YieldExpression
 }
 
 export interface Node {
@@ -92,16 +93,19 @@ export interface Node {
 }
 
 export interface SourceFile extends Node {
+    nodeType: SyntaxKind.SourceFile;
     fileName: string;
     usings: UsingDeclaration[];
     namespace: NamespaceDeclaration;
 }
 
 export interface UsingDeclaration extends Node {
+    nodeType: SyntaxKind.UsingDeclaration;
     namespaceOrTypeName: string;
 }
 
 export interface NamespaceDeclaration extends Node {
+    nodeType: SyntaxKind.NamespaceDeclaration;
     namespace: string;
     declarations: NamespaceMember[];
 }
@@ -135,6 +139,7 @@ export interface NamedElement {
 // Declarations
 
 export interface TypeParameterDeclaration extends NamedElement, Node {
+    nodeType: SyntaxKind.TypeParameterDeclaration;
     constraint?: TypeNode;
 }
 
@@ -146,6 +151,7 @@ export interface NamedTypeDeclaration extends NamedElement, DocumentedElement, N
 }
 
 export interface ClassDeclaration extends NamedTypeDeclaration {
+    nodeType: SyntaxKind.ClassDeclaration;
     baseClass?: TypeNode;
     interfaces?: TypeNode[];
     isAbstract: boolean;
@@ -160,14 +166,17 @@ export type ClassMember =
     | NamedTypeDeclaration;
 
 export interface EnumDeclaration extends NamedTypeDeclaration {
+    nodeType: SyntaxKind.EnumDeclaration;
     members: EnumMember[];
 }
 
 export interface EnumMember extends Node, NamedElement, DocumentedElement {
+    nodeType: SyntaxKind.EnumMember;
     initializer?: Expression;
 }
 
 export interface InterfaceDeclaration extends NamedTypeDeclaration {
+    nodeType: SyntaxKind.InterfaceDeclaration;
     interfaces?: TypeNode[];
     members: InterfaceMember[];
 }
@@ -186,10 +195,12 @@ export interface MethodDeclarationBase extends MemberDeclaration {
 }
 
 export interface MethodDeclaration extends MethodDeclarationBase, AttributedElement {
+    nodeType: SyntaxKind.MethodDeclaration;
     isVirtual: boolean;
     isOverride: boolean;
     isAbstract: boolean;
     isTestMethod: boolean;
+    isGeneratorFunction: boolean;
     partial: boolean;
     returnType: TypeNode;
     parameters: ParameterDeclaration[];
@@ -198,16 +209,19 @@ export interface MethodDeclaration extends MethodDeclarationBase, AttributedElem
 }
 
 export interface ConstructorDeclaration extends MethodDeclarationBase {
+    nodeType: SyntaxKind.ConstructorDeclaration;
     baseConstructorArguments?: Expression[];
 }
 
 export interface FieldDeclaration extends MemberDeclaration {
+    nodeType: SyntaxKind.FieldDeclaration;
     isReadonly: boolean;
     type: TypeNode;
     initializer?: Expression;
 }
 
 export interface PropertyDeclaration extends MemberDeclaration {
+    nodeType: SyntaxKind.PropertyDeclaration;
     isVirtual: boolean;
     isOverride: boolean;
     isAbstract: boolean;
@@ -219,11 +233,13 @@ export interface PropertyDeclaration extends MemberDeclaration {
 }
 
 export interface PropertyAccessorDeclaration extends Node {
+    nodeType: SyntaxKind.PropertyAccessorDeclaration;
     keyword: string;
     body?: Block | Expression;
 }
 
 export interface ParameterDeclaration extends NamedElement, Node, DocumentedElement {
+    nodeType: SyntaxKind.ParameterDeclaration;
     type?: TypeNode;
     initializer?: Expression;
     params: boolean;
@@ -237,6 +253,7 @@ export interface TypeNode extends Node {
 }
 
 export interface UnresolvedTypeNode extends TypeNode {
+    nodeType: SyntaxKind.UnresolvedTypeNode;
     tsType?: ts.Type;
     tsSymbol?: ts.Symbol;
     typeArguments?: UnresolvedTypeNode[];
@@ -244,16 +261,19 @@ export interface UnresolvedTypeNode extends TypeNode {
 
 export type TypeReferenceType = NamedTypeDeclaration | TypeParameterDeclaration | TypeNode | string;
 export interface TypeReference extends TypeNode {
+    nodeType: SyntaxKind.TypeReference;
     reference: TypeReferenceType;
     isAsync: boolean;
     typeArguments?: TypeNode[];
 }
 
 export interface ArrayTypeNode extends TypeNode {
+    nodeType: SyntaxKind.ArrayTypeNode;
     elementType: TypeNode;
 }
 
 export interface MapTypeNode extends TypeNode {
+    nodeType: SyntaxKind.MapTypeNode;
     keyType: TypeNode;
     keyIsValueType: boolean;
     valueType: TypeNode;
@@ -261,6 +281,7 @@ export interface MapTypeNode extends TypeNode {
 }
 
 export interface FunctionTypeNode extends TypeNode {
+    nodeType: SyntaxKind.FunctionTypeNode;
     parameterTypes: TypeNode[];
     returnType: TypeNode;
 }
@@ -278,6 +299,7 @@ export enum PrimitiveType {
 }
 
 export interface PrimitiveTypeNode extends TypeNode {
+    nodeType: SyntaxKind.PrimitiveTypeNode;
     type: PrimitiveType;
 }
 
@@ -286,50 +308,64 @@ export interface PrimitiveTypeNode extends TypeNode {
 export interface Expression extends Node {}
 
 export interface PrefixUnaryExpression extends Node {
+    nodeType: SyntaxKind.PrefixUnaryExpression;
     operand: Expression;
     operator: string;
 }
 
 export interface PostfixUnaryExpression extends Node {
+    nodeType: SyntaxKind.PostfixUnaryExpression;
     operand: Expression;
     operator: string;
 }
 
-export interface NullLiteral extends Node {}
+export interface NullLiteral extends Node {
+    nodeType: SyntaxKind.NullLiteral;
+}
 
-export interface BooleanLiteral extends Node {}
+export interface BooleanLiteral extends Node {
+    nodeType: SyntaxKind.TrueLiteral | SyntaxKind.FalseLiteral;
+}
 
-export interface ThisLiteral extends Node {}
+export interface ThisLiteral extends Node {
+    nodeType: SyntaxKind.ThisLiteral;
+}
 
 export interface BaseLiteralExpression extends Node {}
 
 export interface StringLiteral extends Node {
+    nodeType: SyntaxKind.StringLiteral;
     text: string;
 }
 
 export interface AwaitExpression extends Node {
+    nodeType: SyntaxKind.AwaitExpression;
     expression: Expression;
 }
 
 export interface BinaryExpression extends Node {
+    nodeType: SyntaxKind.BinaryExpression;
     left: Expression;
     operator: string;
     right: Expression;
 }
 
 export interface ConditionalExpression extends Node {
+    nodeType: SyntaxKind.ConditionalExpression;
     condition: Expression;
     whenTrue: Expression;
     whenFalse: Expression;
 }
 
 export interface LambdaExpression extends Node {
+    nodeType: SyntaxKind.LambdaExpression;
     parameters: ParameterDeclaration[];
     body: Block | Expression;
     returnType: TypeNode;
 }
 
 export interface LocalFunctionDeclaration extends Node {
+    nodeType: SyntaxKind.LocalFunction;
     name: string;
     parameters: ParameterDeclaration[];
     body: Block;
@@ -337,95 +373,122 @@ export interface LocalFunctionDeclaration extends Node {
 }
 
 export interface NumericLiteral extends Node {
+    nodeType: SyntaxKind.NumericLiteral;
     value: string;
 }
 export interface StringTemplateExpression extends Node {
+    nodeType: SyntaxKind.StringTemplateExpression;
     chunks: (StringLiteral | Expression)[];
 }
 
 export interface IsExpression extends Node {
+    nodeType: SyntaxKind.IsExpression;
     expression: Expression;
     type: TypeNode;
     newName?: string;
 }
 export interface ParenthesizedExpression extends Node {
+    nodeType: SyntaxKind.ParenthesizedExpression;
     expression: Expression;
 }
 export interface SpreadExpression extends Node {
+    nodeType: SyntaxKind.SpreadExpression;
     expression: Expression;
 }
 export interface DefaultExpression extends Node {
+    nodeType: SyntaxKind.DefaultExpression;
     type?: TypeNode;
 }
 export interface ArrayCreationExpression extends Node {
+    nodeType: SyntaxKind.ArrayCreationExpression;
     type?: TypeNode;
     values?: Expression[];
     sizeExpression?: Expression;
 }
 export interface MemberAccessExpression extends Node {
+    nodeType: SyntaxKind.MemberAccessExpression;
     expression: Expression;
     member: string;
     nullSafe?: boolean;
 }
 
 export interface AnonymousObjectCreationExpression extends Node {
+    nodeType: SyntaxKind.AnonymousObjectCreationExpression;
     properties: AnonymousObjectProperty[];
 }
 
 export interface AnonymousObjectProperty extends Node {
+    nodeType: SyntaxKind.AnonymousObjectProperty;
     name: string;
     value: Expression;
 }
 
 export interface ElementAccessExpression extends Node {
+    nodeType: SyntaxKind.ElementAccessExpression;
     expression: Expression;
     argumentExpression: Expression;
     nullSafe: boolean;
 }
 
 export interface InvocationExpression extends Node {
+    nodeType: SyntaxKind.InvocationExpression;
     expression: Expression;
     arguments: Expression[];
     typeArguments?: TypeNode[];
 }
 
 export interface NewExpression extends Node {
+    nodeType: SyntaxKind.NewExpression;
     type: TypeNode;
     arguments: Expression[];
 }
 
 export interface CastExpression extends Node {
+    nodeType: SyntaxKind.CastExpression;
     type: TypeNode;
     expression: Expression;
 }
 
 export interface NonNullExpression extends Node {
+    nodeType: SyntaxKind.NonNullExpression;
     expression: Expression;
 }
 
 export interface TypeOfExpression extends Node {
+    nodeType: SyntaxKind.TypeOfExpression;
     expression: Expression;
 }
 
 export interface NullSafeExpression extends Node {
+    nodeType: SyntaxKind.NullSafeExpression;
     expression: Expression;
 }
 
 export interface Identifier extends Expression {
+    nodeType: SyntaxKind.Identifier;
     text: string;
 }
 
-export interface ToDoExpression extends Node {}
+export interface ToDoExpression extends Node {
+    nodeType: SyntaxKind.ToDoExpression;
+}
+export interface YieldExpression extends Node {
+    nodeType: SyntaxKind.YieldExpression;
+    expression: Expression | null;
+}
 
 // Statements
 
 export interface Statement extends Node {}
 
 export interface Block extends Statement {
+    nodeType: SyntaxKind.Block;
     statements: Statement[];
 }
 
-export interface EmptyStatement extends Statement {}
+export interface EmptyStatement extends Statement {
+    nodeType: SyntaxKind.EmptyStatement;
+}
 
 export enum VariableStatementKind {
     Normal,
@@ -435,36 +498,43 @@ export enum VariableStatementKind {
 }
 
 export interface VariableStatement extends Statement {
+    nodeType: SyntaxKind.VariableStatement;
     declarationList: VariableDeclarationList;
     variableStatementKind: VariableStatementKind;
 }
 
 export interface ExpressionStatement extends Statement {
+    nodeType: SyntaxKind.ExpressionStatement;
     expression: Expression;
 }
 
 export interface IfStatement extends Statement {
+    nodeType: SyntaxKind.IfStatement;
     expression: Expression;
     thenStatement: Statement;
     elseStatement?: Statement;
 }
 
 export interface DoStatement extends Statement {
+    nodeType: SyntaxKind.DoStatement;
     expression: Expression;
     statement: Statement;
 }
 
 export interface WhileStatement extends Statement {
+    nodeType: SyntaxKind.WhileStatement;
     expression: Expression;
     statement: Statement;
 }
 
 export interface VariableDeclarationList extends Node {
+    nodeType: SyntaxKind.VariableDeclarationList;
     declarations: VariableDeclaration[];
     isConst: boolean;
 }
 
 export interface VariableDeclaration extends Node {
+    nodeType: SyntaxKind.VariableDeclaration;
     type: TypeNode;
     name: string;
     deconstructNames?: string[];
@@ -472,10 +542,12 @@ export interface VariableDeclaration extends Node {
 }
 
 export interface DeconstructDeclaration extends Node {
+    nodeType: SyntaxKind.DeconstructDeclaration;
     names: string[];
 }
 
 export interface ForStatement extends Statement {
+    nodeType: SyntaxKind.ForStatement;
     initializer?: VariableDeclarationList | Expression;
     condition?: Expression;
     incrementor?: Expression;
@@ -483,44 +555,56 @@ export interface ForStatement extends Statement {
 }
 
 export interface ForEachStatement extends Statement {
+    nodeType: SyntaxKind.ForEachStatement;
     initializer: VariableDeclarationList | Expression;
     expression: Expression;
     statement: Statement;
 }
 
-export interface BreakStatement extends Statement {}
+export interface BreakStatement extends Statement {
+    nodeType: SyntaxKind.BreakStatement;
+}
 
-export interface ContinueStatement extends Statement {}
+export interface ContinueStatement extends Statement {
+    nodeType: SyntaxKind.ContinueStatement;
+}
 
 export interface ReturnStatement extends Statement {
+    nodeType: SyntaxKind.ReturnStatement;
     expression?: Expression;
 }
 
 export interface SwitchStatement extends Statement {
+    nodeType: SyntaxKind.SwitchStatement;
     expression: Expression;
     caseClauses: (CaseClause | DefaultClause)[];
 }
 
 export interface CaseClause extends Node {
+    nodeType: SyntaxKind.CaseClause;
     expression: Expression;
     statements: Statement[];
 }
 
 export interface DefaultClause extends Node {
+    nodeType: SyntaxKind.DefaultClause;
     statements: Statement[];
 }
 
 export interface ThrowStatement extends Statement {
+    nodeType: SyntaxKind.ThrowStatement;
     expression?: Expression;
 }
 
 export interface TryStatement extends Statement {
+    nodeType: SyntaxKind.TryStatement;
     tryBlock: Block;
     catchClauses?: CatchClause[];
     finallyBlock?: Block;
 }
 
 export interface CatchClause extends Node {
+    nodeType: SyntaxKind.CatchClause;
     variableDeclaration: VariableDeclaration;
     block: Block;
 }
@@ -753,4 +837,7 @@ export function isSpreadExpression(node: Node): node is SpreadExpression {
 }
 export function isLocalFunction(node: Node): node is LocalFunctionDeclaration {
     return node.nodeType === SyntaxKind.LocalFunction;
+}
+export function isYieldExpression(node: Node): node is YieldExpression {
+    return node.nodeType === SyntaxKind.YieldExpression;
 }
