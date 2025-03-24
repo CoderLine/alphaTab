@@ -580,6 +580,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
+            isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
             name: this._context.toPascalCase((d.name as ts.Identifier).text),
             parameters: [],
@@ -614,6 +615,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             isTestMethod: true,
+            isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
             name: this._context.toMethodName((d.arguments[0] as ts.StringLiteral).text),
             parameters: [],
@@ -679,6 +681,7 @@ export default class CSharpAstTransformer {
                     isStatic: false,
                     isVirtual: false,
                     isTestMethod: false,
+                    isGeneratorFunction: false,
                     partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
                     name: this._context.toPascalCase(d.name.getText()),
                     returnType: {} as cs.TypeNode,
@@ -1316,10 +1319,11 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             isTestMethod: false,
+            isGeneratorFunction: !!classElement.asteriskToken,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
             name: this._context.buildMethodName(classElement.name),
             parameters: [],
-            returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
+            returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType, returnType?.getSymbol()),
             visibility: this.mapVisibility(classElement, cs.Visibility.Public),
             tsNode: classElement,
             tsSymbol: this._context.getSymbolForDeclaration(classElement),
@@ -1941,6 +1945,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             isTestMethod: false,
+            isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
             name: this._context.buildMethodName(classElement.name),
             parameters: [],
@@ -2143,6 +2148,8 @@ export default class CSharpAstTransformer {
                 return this.visitStringLiteral(parent, expression as ts.Identifier);
             case ts.SyntaxKind.SpreadElement:
                 return this.visitSpreadElement(parent, expression as ts.SpreadElement);
+            case ts.SyntaxKind.YieldExpression:
+                return this.visitYieldExpression(parent, expression as ts.YieldExpression);
 
             case ts.SyntaxKind.SyntheticReferenceExpression:
             case ts.SyntaxKind.CommaListExpression:
@@ -2154,7 +2161,6 @@ export default class CSharpAstTransformer {
             case ts.SyntaxKind.ImportKeyword:
             case ts.SyntaxKind.DeleteExpression:
             case ts.SyntaxKind.VoidExpression:
-            case ts.SyntaxKind.YieldExpression:
             case ts.SyntaxKind.SyntheticExpression:
             case ts.SyntaxKind.TaggedTemplateExpression:
             default:
@@ -3876,6 +3882,26 @@ export default class CSharpAstTransformer {
 
             return nonNullExpression;
         }
+    }
+
+    protected visitYieldExpression(parent: cs.Node, expression: ts.YieldExpression) {
+        const yieldExpression = {
+            expression: {} as cs.Expression,
+            member: 'Value',
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.YieldExpression
+        } as cs.YieldExpression;
+
+        yieldExpression.expression = expression.expression
+            ? this.visitExpression(yieldExpression, expression.expression)
+            : null;
+
+        if (expression.expression && !yieldExpression.expression) {
+            return null;
+        }
+
+        return yieldExpression;
     }
 
     protected visitIdentifier(parent: cs.Node, expression: ts.Identifier) {

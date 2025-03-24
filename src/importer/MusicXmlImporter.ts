@@ -26,7 +26,7 @@ import { Voice } from '@src/model/Voice';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 import { XmlDocument } from '@src/xml/XmlDocument';
-import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { XmlNode } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
 import { ZipReader } from '@src/zip/ZipReader';
 import { ZipEntry } from '@src/zip/ZipEntry';
@@ -115,8 +115,8 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         let uncompressedFileFullPath: string = '';
-        for (const c of rootFiles.childNodes) {
-            if (c.nodeType == XmlNodeType.Element && c.localName === 'rootfile') {
+        for (const c of rootFiles.childElements()) {
+            if (c.localName === 'rootfile') {
                 // The MusicXML root must be described in the first <rootfile> element.
                 // https://www.w3.org/2021/06/musicxml40/tutorial/compressed-mxl-files/
                 uncompressedFileFullPath = c.getAttribute('full-path');
@@ -186,37 +186,33 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parsePartwise(element: XmlNode): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'work':
-                        this.parseWork(c);
-                        break;
-                    case 'movement-title':
-                        this._score.title = c.innerText;
-                        break;
-                    case 'identification':
-                        this.parseIdentification(c);
-                        break;
-                    case 'part-list':
-                        this.parsePartList(c);
-                        break;
-                    case 'part':
-                        this.parsePart(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'work':
+                    this.parseWork(c);
+                    break;
+                case 'movement-title':
+                    this._score.title = c.innerText;
+                    break;
+                case 'identification':
+                    this.parseIdentification(c);
+                    break;
+                case 'part-list':
+                    this.parsePartList(c);
+                    break;
+                case 'part':
+                    this.parsePart(c);
+                    break;
             }
         }
     }
 
     private parseWork(element: XmlNode): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'work-title':
-                        this._score.title = c.innerText;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'work-title':
+                    this._score.title = c.innerText;
+                    break;
             }
         }
     }
@@ -240,15 +236,13 @@ export class MusicXmlImporter extends ScoreImporter {
         let track: Track = this._trackById.get(id)!;
         let isFirstMeasure: boolean = true;
         this._maxVoices = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'measure':
-                        if (this.parseMeasure(c, track, isFirstMeasure)) {
-                            isFirstMeasure = false;
-                        }
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'measure':
+                    if (this.parseMeasure(c, track, isFirstMeasure)) {
+                        isFirstMeasure = false;
+                    }
+                    break;
             }
         }
         // ensure voices for all bars
@@ -309,34 +303,32 @@ export class MusicXmlImporter extends ScoreImporter {
         let chordsByIdForTrack = new Map<string, Chord>();
         if (masterBar) {
             let attributesParsed: boolean = false;
-            for (let c of element.childNodes) {
-                if (c.nodeType === XmlNodeType.Element) {
-                    switch (c.localName) {
-                        case 'note':
-                            this.parseNoteBeat(c, bars);
-                            break;
-                        case 'forward':
-                            this.parseForward(c, bars);
-                            break;
-                        case 'direction':
-                            this.parseDirection(c, masterBar);
-                            break;
-                        case 'attributes':
-                            if (!attributesParsed) {
-                                this.parseAttributes(c, bars, masterBar, track);
-                                attributesParsed = true;
-                            }
-                            break;
-                        case 'harmony':
-                            this.parseHarmony(c, track, chordsByIdForTrack);
-                            break;
-                        case 'sound':
-                            // TODO
-                            break;
-                        case 'barline':
-                            this.parseBarline(c, masterBar);
-                            break;
-                    }
+            for (let c of element.childElements()) {
+                switch (c.localName) {
+                    case 'note':
+                        this.parseNoteBeat(c, bars);
+                        break;
+                    case 'forward':
+                        this.parseForward(c, bars);
+                        break;
+                    case 'direction':
+                        this.parseDirection(c, masterBar);
+                        break;
+                    case 'attributes':
+                        if (!attributesParsed) {
+                            this.parseAttributes(c, bars, masterBar, track);
+                            attributesParsed = true;
+                        }
+                        break;
+                    case 'harmony':
+                        this.parseHarmony(c, track, chordsByIdForTrack);
+                        break;
+                    case 'sound':
+                        // TODO
+                        break;
+                    case 'barline':
+                        this.parseBarline(c, masterBar);
+                        break;
                 }
             }
         }
@@ -430,18 +422,16 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseStaffDetails(element: XmlNode, track: Track): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'staff-lines':
-                        for (let staff of track.staves) {
-                            staff.stringTuning.tunings = new Array<number>(parseInt(c.innerText)).fill(0);
-                        }
-                        break;
-                    case 'staff-tuning':
-                        this.parseStaffTuning(c, track);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'staff-lines':
+                    for (let staff of track.staves) {
+                        staff.stringTuning.tunings = new Array<number>(parseInt(c.innerText)).fill(0);
+                    }
+                    break;
+                case 'staff-tuning':
+                    this.parseStaffTuning(c, track);
+                    break;
             }
         }
         for (let staff of track.staves) {
@@ -456,19 +446,17 @@ export class MusicXmlImporter extends ScoreImporter {
         let tuningStep: string = 'C';
         let tuningOctave: string = '';
         let tuningAlter: number = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'tuning-step':
-                        tuningStep = c.innerText;
-                        break;
-                    case 'tuning-alter':
-                        tuningAlter = parseInt(c.innerText);
-                        break;
-                    case 'tuning-octave':
-                        tuningOctave = c.innerText;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'tuning-step':
+                    tuningStep = c.innerText;
+                    break;
+                case 'tuning-alter':
+                    tuningAlter = parseInt(c.innerText);
+                    break;
+                case 'tuning-octave':
+                    tuningOctave = c.innerText;
+                    break;
             }
         }
         let tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
@@ -482,19 +470,17 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseHarmony(element: XmlNode, track: Track, chordsByIdForTrack: Map<string, Chord>): void {
         let chord: Chord = new Chord();
-        for (let childNode of element.childNodes) {
-            if (childNode.nodeType === XmlNodeType.Element) {
-                switch (childNode.localName) {
-                    case 'root':
-                        chord.name = this.parseHarmonyRoot(childNode);
-                        break;
-                    case 'kind':
-                        chord.name = chord.name + this.parseHarmonyKind(childNode);
-                        break;
-                    case 'frame':
-                        this.parseHarmonyFrame(childNode, chord);
-                        break;
-                }
+        for (let childNode of element.childElements()) {
+            switch (childNode.localName) {
+                case 'root':
+                    chord.name = this.parseHarmonyRoot(childNode);
+                    break;
+                case 'kind':
+                    chord.name = chord.name + this.parseHarmonyKind(childNode);
+                    break;
+                case 'frame':
+                    this.parseHarmonyFrame(childNode, chord);
+                    break;
             }
         }
 
@@ -528,32 +514,30 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseHarmonyRoot(xmlNode: XmlNode): string {
         let rootStep: string = '';
         let rootAlter: string = '';
-        for (let rootChild of xmlNode.childNodes) {
-            if (rootChild.nodeType === XmlNodeType.Element) {
-                switch (rootChild.localName) {
-                    case 'root-step':
-                        rootStep = rootChild.innerText;
-                        break;
-                    case 'root-alter':
-                        switch (parseInt(xmlNode.innerText)) {
-                            case -2:
-                                rootAlter = 'bb';
-                                break;
-                            case -1:
-                                rootAlter = 'b';
-                                break;
-                            case 0:
-                                rootAlter = '';
-                                break;
-                            case 1:
-                                rootAlter = '#';
-                                break;
-                            case 2:
-                                rootAlter = '##';
-                                break;
-                        }
-                        break;
-                }
+        for (let rootChild of xmlNode.childElements()) {
+            switch (rootChild.localName) {
+                case 'root-step':
+                    rootStep = rootChild.innerText;
+                    break;
+                case 'root-alter':
+                    switch (parseInt(xmlNode.innerText)) {
+                        case -2:
+                            rootAlter = 'bb';
+                            break;
+                        case -1:
+                            rootAlter = 'b';
+                            break;
+                        case 0:
+                            rootAlter = '';
+                            break;
+                        case 1:
+                            rootAlter = '#';
+                            break;
+                        case 2:
+                            rootAlter = '##';
+                            break;
+                    }
+                    break;
             }
         }
         return rootStep + rootAlter;
@@ -671,58 +655,54 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseHarmonyFrame(xmlNode: XmlNode, chord: Chord) {
-        for (let frameChild of xmlNode.childNodes) {
-            if (frameChild.nodeType === XmlNodeType.Element) {
-                switch (frameChild.localName) {
-                    case 'frame-strings':
-                        const stringsCount: number = parseInt(frameChild.innerText);
-                        chord.strings = new Array<number>(stringsCount);
-                        for (let i = 0; i < stringsCount; i++) {
-                            // set strings unplayed as default
-                            chord.strings[i] = -1;
+        for (let frameChild of xmlNode.childElements()) {
+            switch (frameChild.localName) {
+                case 'frame-strings':
+                    const stringsCount: number = parseInt(frameChild.innerText);
+                    chord.strings = new Array<number>(stringsCount);
+                    for (let i = 0; i < stringsCount; i++) {
+                        // set strings unplayed as default
+                        chord.strings[i] = -1;
+                    }
+                    break;
+                case 'first-fret':
+                    chord.firstFret = parseInt(frameChild.innerText);
+                    break;
+                case 'frame-note':
+                    let stringNo: number | null = null;
+                    let fretNo: number | null = null;
+                    for (let noteChild of frameChild.childElements()) {
+                        switch (noteChild.localName) {
+                            case 'string':
+                                stringNo = parseInt(noteChild.innerText);
+                                break;
+                            case 'fret':
+                                fretNo = parseInt(noteChild.innerText);
+                                if (stringNo && fretNo >= 0) {
+                                    chord.strings[stringNo - 1] = fretNo;
+                                }
+                                break;
+                            case 'barre':
+                                if (stringNo && fretNo && noteChild.getAttribute('type') === 'start') {
+                                    chord.barreFrets.push(fretNo);
+                                }
+                                break;
                         }
-                        break;
-                    case 'first-fret':
-                        chord.firstFret = parseInt(frameChild.innerText);
-                        break;
-                    case 'frame-note':
-                        let stringNo: number | null = null;
-                        let fretNo: number | null = null;
-                        for (let noteChild of frameChild.childNodes) {
-                            switch (noteChild.localName) {
-                                case 'string':
-                                    stringNo = parseInt(noteChild.innerText);
-                                    break;
-                                case 'fret':
-                                    fretNo = parseInt(noteChild.innerText);
-                                    if (stringNo && fretNo >= 0) {
-                                        chord.strings[stringNo - 1] = fretNo;
-                                    }
-                                    break;
-                                case 'barre':
-                                    if (stringNo && fretNo && noteChild.getAttribute('type') === 'start') {
-                                        chord.barreFrets.push(fretNo);
-                                    }
-                                    break;
-                            }
-                        }
-                        break;
-                }
+                    }
+                    break;
             }
         }
     }
 
     private parseBarline(element: XmlNode, masterBar: MasterBar): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'repeat':
-                        this.parseRepeat(c, masterBar);
-                        break;
-                    case 'ending':
-                        this.parseEnding(c, masterBar);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'repeat':
+                    this.parseRepeat(c, masterBar);
+                    break;
+                case 'ending':
+                    this.parseEnding(c, masterBar);
+                    break;
             }
         }
     }
@@ -772,106 +752,104 @@ export class MusicXmlImporter extends ScoreImporter {
         beat.addNote(note);
         beat.dots = 0;
         let isFullBarRest = false;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'grace':
-                        // var slash = e.GetAttribute("slash");
-                        // var makeTime = Platform.ParseInt(e.GetAttribute("make-time"));
-                        // var stealTimePrevious = Platform.ParseInt(e.GetAttribute("steal-time-previous"));
-                        // var stealTimeFollowing = Platform.ParseInt(e.GetAttribute("steal-time-following"));
-                        beat.graceType = GraceType.BeforeBeat;
-                        beat.duration = Duration.ThirtySecond;
-                        break;
-                    case 'duration':
-                        if (beat.isRest && !isFullBarRest) {
-                            // unit: divisions per quarter note
-                            let duration: number = parseInt(c.innerText);
-                            switch (duration) {
-                                case 1:
-                                    beat.duration = Duration.Whole;
-                                    break;
-                                case 2:
-                                    beat.duration = Duration.Half;
-                                    break;
-                                case 4:
-                                    beat.duration = Duration.Quarter;
-                                    break;
-                                case 8:
-                                    beat.duration = Duration.Eighth;
-                                    break;
-                                case 16:
-                                    beat.duration = Duration.Sixteenth;
-                                    break;
-                                case 32:
-                                    beat.duration = Duration.ThirtySecond;
-                                    break;
-                                case 64:
-                                    beat.duration = Duration.SixtyFourth;
-                                    break;
-                                default:
-                                    beat.duration = Duration.Quarter;
-                                    break;
-                            }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'grace':
+                    // var slash = e.GetAttribute("slash");
+                    // var makeTime = Platform.ParseInt(e.GetAttribute("make-time"));
+                    // var stealTimePrevious = Platform.ParseInt(e.GetAttribute("steal-time-previous"));
+                    // var stealTimeFollowing = Platform.ParseInt(e.GetAttribute("steal-time-following"));
+                    beat.graceType = GraceType.BeforeBeat;
+                    beat.duration = Duration.ThirtySecond;
+                    break;
+                case 'duration':
+                    if (beat.isRest && !isFullBarRest) {
+                        // unit: divisions per quarter note
+                        let duration: number = parseInt(c.innerText);
+                        switch (duration) {
+                            case 1:
+                                beat.duration = Duration.Whole;
+                                break;
+                            case 2:
+                                beat.duration = Duration.Half;
+                                break;
+                            case 4:
+                                beat.duration = Duration.Quarter;
+                                break;
+                            case 8:
+                                beat.duration = Duration.Eighth;
+                                break;
+                            case 16:
+                                beat.duration = Duration.Sixteenth;
+                                break;
+                            case 32:
+                                beat.duration = Duration.ThirtySecond;
+                                break;
+                            case 64:
+                                beat.duration = Duration.SixtyFourth;
+                                break;
+                            default:
+                                beat.duration = Duration.Quarter;
+                                break;
                         }
-                        break;
-                    case 'tie':
-                        this.parseTied(c, note);
-                        break;
-                    case 'cue':
-                        // not supported
-                        break;
-                    case 'instrument':
-                        // not supported
-                        break;
-                    case 'type':
-                        beat.duration = this.getDuration(c.innerText);
-                        if (beat.graceType !== GraceType.None && beat.duration < Duration.Sixteenth) {
-                            beat.duration = Duration.Eighth;
-                        }
-                        break;
-                    case 'dot':
-                        beat.dots++;
-                        break;
-                    case 'accidental':
-                        this.parseAccidental(c, note);
-                        break;
-                    case 'time-modification':
-                        this.parseTimeModification(c, beat);
-                        break;
-                    case 'stem':
-                        // not supported
-                        break;
-                    case 'notehead':
-                        if (c.getAttribute('parentheses') === 'yes') {
-                            note.isGhost = true;
-                        }
-                        break;
-                    case 'beam':
-                        let beamMode: string = c.innerText;
-                        if (beamMode === 'continue') {
-                            this._isBeamContinue = true;
-                        }
-                        break;
-                    case 'notations':
-                        this.parseNotations(c, beat, note);
-                        break;
-                    case 'lyric':
-                        this.parseLyric(c, beat);
-                        break;
-                    case 'pitch':
-                        this.parsePitch(c, note);
-                        break;
-                    case 'unpitched':
-                        this.parseUnpitched(c, note);
-                        break;
-                    case 'rest':
-                        isFullBarRest = c.getAttribute('measure') === 'yes';
-                        beat.isEmpty = false;
-                        beat.notes = [];
-                        beat.duration = Duration.Whole;
-                        break;
-                }
+                    }
+                    break;
+                case 'tie':
+                    this.parseTied(c, note);
+                    break;
+                case 'cue':
+                    // not supported
+                    break;
+                case 'instrument':
+                    // not supported
+                    break;
+                case 'type':
+                    beat.duration = this.getDuration(c.innerText);
+                    if (beat.graceType !== GraceType.None && beat.duration < Duration.Sixteenth) {
+                        beat.duration = Duration.Eighth;
+                    }
+                    break;
+                case 'dot':
+                    beat.dots++;
+                    break;
+                case 'accidental':
+                    this.parseAccidental(c, note);
+                    break;
+                case 'time-modification':
+                    this.parseTimeModification(c, beat);
+                    break;
+                case 'stem':
+                    // not supported
+                    break;
+                case 'notehead':
+                    if (c.getAttribute('parentheses') === 'yes') {
+                        note.isGhost = true;
+                    }
+                    break;
+                case 'beam':
+                    let beamMode: string = c.innerText;
+                    if (beamMode === 'continue') {
+                        this._isBeamContinue = true;
+                    }
+                    break;
+                case 'notations':
+                    this.parseNotations(c, beat, note);
+                    break;
+                case 'lyric':
+                    this.parseLyric(c, beat);
+                    break;
+                case 'pitch':
+                    this.parsePitch(c, note);
+                    break;
+                case 'unpitched':
+                    this.parseUnpitched(c, note);
+                    break;
+                case 'rest':
+                    isFullBarRest = c.getAttribute('measure') === 'yes';
+                    beat.isEmpty = false;
+                    beat.notes = [];
+                    beat.duration = Duration.Whole;
+                    break;
             }
         }
         // check if new note is duplicate on string
@@ -910,17 +888,15 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseLyric(element: XmlNode, beat: Beat): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'text':
-                        if (beat.text) {
-                            beat.text += ' ' + c.innerText;
-                        } else {
-                            beat.text = c.innerText;
-                        }
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'text':
+                    if (beat.text) {
+                        beat.text += ' ' + c.innerText;
+                    } else {
+                        beat.text = c.innerText;
+                    }
+                    break;
             }
         }
     }
@@ -981,80 +957,76 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseNotations(element: XmlNode, beat: Beat, note: Note): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'articulations':
-                        this.parseArticulations(c, note);
-                        break;
-                    case 'tied':
-                        this.parseTied(c, note);
-                        break;
-                    case 'slide':
-                    case 'glissando':
-                        if (c.getAttribute('type') === 'start') {
-                            note.slideOutType = SlideOutType.Shift;
-                        }
-                        break;
-                    case 'dynamics':
-                        this.parseDynamics(c, beat);
-                        break;
-                    case 'technical':
-                        this.parseTechnical(c, note);
-                        break;
-                    case 'ornaments':
-                        this.parseOrnaments(c, note);
-                        break;
-                    case 'slur':
-                        let slurNumber: string = c.getAttribute('number');
-                        if (!slurNumber) {
-                            slurNumber = '1';
-                        }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'articulations':
+                    this.parseArticulations(c, note);
+                    break;
+                case 'tied':
+                    this.parseTied(c, note);
+                    break;
+                case 'slide':
+                case 'glissando':
+                    if (c.getAttribute('type') === 'start') {
+                        note.slideOutType = SlideOutType.Shift;
+                    }
+                    break;
+                case 'dynamics':
+                    this.parseDynamics(c, beat);
+                    break;
+                case 'technical':
+                    this.parseTechnical(c, note);
+                    break;
+                case 'ornaments':
+                    this.parseOrnaments(c, note);
+                    break;
+                case 'slur':
+                    let slurNumber: string = c.getAttribute('number');
+                    if (!slurNumber) {
+                        slurNumber = '1';
+                    }
 
-                        // slur numbers are unique in the way that they have the same ID across
-                        // staffs/tracks etc. as long they represent the logically same slur.
-                        // but in our case it must be globally unique to link the correct notes.
-                        // adding the staff ID should be enough to achieve this
-                        slurNumber = beat.voice.bar.staff.index + '_' + slurNumber;
+                    // slur numbers are unique in the way that they have the same ID across
+                    // staffs/tracks etc. as long they represent the logically same slur.
+                    // but in our case it must be globally unique to link the correct notes.
+                    // adding the staff ID should be enough to achieve this
+                    slurNumber = beat.voice.bar.staff.index + '_' + slurNumber;
 
-                        switch (c.getAttribute('type')) {
-                            case 'start':
-                                this._slurStarts.set(slurNumber, note);
-                                break;
-                            case 'stop':
-                                if (this._slurStarts.has(slurNumber)) {
-                                    note.isSlurDestination = true;
-                                    let slurStart: Note = this._slurStarts.get(slurNumber)!;
-                                    slurStart.slurDestination = note;
-                                    note.slurOrigin = slurStart;
-                                }
-                                break;
-                        }
-                        break;
-                }
+                    switch (c.getAttribute('type')) {
+                        case 'start':
+                            this._slurStarts.set(slurNumber, note);
+                            break;
+                        case 'stop':
+                            if (this._slurStarts.has(slurNumber)) {
+                                note.isSlurDestination = true;
+                                let slurStart: Note = this._slurStarts.get(slurNumber)!;
+                                slurStart.slurDestination = note;
+                                note.slurOrigin = slurStart;
+                            }
+                            break;
+                    }
+                    break;
             }
         }
     }
 
     private parseOrnaments(element: XmlNode, note: Note): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'tremolo':
-                        let tremoloSpeed: number = parseInt(c.innerText);
-                        switch (tremoloSpeed) {
-                            case 1:
-                                note.beat.tremoloSpeed = Duration.Eighth;
-                                break;
-                            case 2:
-                                note.beat.tremoloSpeed = Duration.Sixteenth;
-                                break;
-                            case 3:
-                                note.beat.tremoloSpeed = Duration.ThirtySecond;
-                                break;
-                        }
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'tremolo':
+                    let tremoloSpeed: number = parseInt(c.innerText);
+                    switch (tremoloSpeed) {
+                        case 1:
+                            note.beat.tremoloSpeed = Duration.Eighth;
+                            break;
+                        case 2:
+                            note.beat.tremoloSpeed = Duration.Sixteenth;
+                            break;
+                        case 3:
+                            note.beat.tremoloSpeed = Duration.ThirtySecond;
+                            break;
+                    }
+                    break;
             }
         }
     }
@@ -1062,28 +1034,26 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseTechnical(element: XmlNode, note: Note): void {
         let bends: XmlNode[] = [];
 
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'string':
-                        note.string = parseInt(c.innerText);
-                        if (note.string !== -2147483648) {
-                            note.string = note.beat.voice.bar.staff.tuning.length - note.string + 1;
-                        }
-                        break;
-                    case 'fret':
-                        note.fret = parseInt(c.innerText);
-                        break;
-                    case 'down-bow':
-                        note.beat.pickStroke = PickStroke.Down;
-                        break;
-                    case 'up-bow':
-                        note.beat.pickStroke = PickStroke.Up;
-                        break;
-                    case 'bend':
-                        bends.push(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'string':
+                    note.string = parseInt(c.innerText);
+                    if (note.string !== -2147483648) {
+                        note.string = note.beat.voice.bar.staff.tuning.length - note.string + 1;
+                    }
+                    break;
+                case 'fret':
+                    note.fret = parseInt(c.innerText);
+                    break;
+                case 'down-bow':
+                    note.beat.pickStroke = PickStroke.Down;
+                    break;
+                case 'up-bow':
+                    note.beat.pickStroke = PickStroke.Up;
+                    break;
+                case 'bend':
+                    bends.push(c);
+                    break;
             }
         }
 
@@ -1139,7 +1109,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseArticulations(element: XmlNode, note: Note): void {
-        for (let c of element.childNodes) {
+        for (let c of element.childElements()) {
             switch (c.localName) {
                 case 'accent':
                     note.accentuated = AccentuationType.Normal;
@@ -1159,49 +1129,45 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseDynamics(element: XmlNode, beat: Beat): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'p':
-                        beat.dynamics = DynamicValue.P;
-                        break;
-                    case 'pp':
-                        beat.dynamics = DynamicValue.PP;
-                        break;
-                    case 'ppp':
-                        beat.dynamics = DynamicValue.PPP;
-                        break;
-                    case 'f':
-                        beat.dynamics = DynamicValue.F;
-                        break;
-                    case 'ff':
-                        beat.dynamics = DynamicValue.FF;
-                        break;
-                    case 'fff':
-                        beat.dynamics = DynamicValue.FFF;
-                        break;
-                    case 'mp':
-                        beat.dynamics = DynamicValue.MP;
-                        break;
-                    case 'mf':
-                        beat.dynamics = DynamicValue.MF;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'p':
+                    beat.dynamics = DynamicValue.P;
+                    break;
+                case 'pp':
+                    beat.dynamics = DynamicValue.PP;
+                    break;
+                case 'ppp':
+                    beat.dynamics = DynamicValue.PPP;
+                    break;
+                case 'f':
+                    beat.dynamics = DynamicValue.F;
+                    break;
+                case 'ff':
+                    beat.dynamics = DynamicValue.FF;
+                    break;
+                case 'fff':
+                    beat.dynamics = DynamicValue.FFF;
+                    break;
+                case 'mp':
+                    beat.dynamics = DynamicValue.MP;
+                    break;
+                case 'mf':
+                    beat.dynamics = DynamicValue.MF;
+                    break;
             }
         }
     }
 
     private parseTimeModification(element: XmlNode, beat: Beat): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'actual-notes':
-                        beat.tupletNumerator = parseInt(c.innerText);
-                        break;
-                    case 'normal-notes':
-                        beat.tupletDenominator = parseInt(c.innerText);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'actual-notes':
+                    beat.tupletNumerator = parseInt(c.innerText);
+                    break;
+                case 'normal-notes':
+                    beat.tupletDenominator = parseInt(c.innerText);
+                    break;
             }
         }
     }
@@ -1210,20 +1176,18 @@ export class MusicXmlImporter extends ScoreImporter {
         let step: string = '';
         let semitones: number = 0;
         let octave: number = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'display-step':
-                        step = c.innerText;
-                        break;
-                    case 'display-alter':
-                        semitones = parseInt(c.innerText);
-                        break;
-                    case 'display-octave':
-                        // 0-9, 4 for middle C
-                        octave = parseInt(c.innerText);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'display-step':
+                    step = c.innerText;
+                    break;
+                case 'display-alter':
+                    semitones = parseInt(c.innerText);
+                    break;
+                case 'display-octave':
+                    // 0-9, 4 for middle C
+                    octave = parseInt(c.innerText);
+                    break;
             }
         }
         let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
@@ -1235,23 +1199,21 @@ export class MusicXmlImporter extends ScoreImporter {
         let step: string = '';
         let semitones: number = 0;
         let octave: number = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'step':
-                        step = c.innerText;
-                        break;
-                    case 'alter':
-                        semitones = parseFloat(c.innerText);
-                        if (isNaN(semitones)) {
-                            semitones = 0;
-                        }
-                        break;
-                    case 'octave':
-                        // 0-9, 4 for middle C
-                        octave = parseInt(c.innerText) + 1;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'step':
+                    step = c.innerText;
+                    break;
+                case 'alter':
+                    semitones = parseFloat(c.innerText);
+                    if (isNaN(semitones)) {
+                        semitones = 0;
+                    }
+                    break;
+                case 'octave':
+                    // 0-9, 4 for middle C
+                    octave = parseInt(c.innerText) + 1;
+                    break;
             }
         }
         let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + (semitones | 0);
@@ -1271,34 +1233,32 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseDirection(element: XmlNode, masterBar: MasterBar): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'sound':
-                        let tempo: string = c.getAttribute('tempo');
-                        if (tempo) {
-                            let tempoAutomation: Automation = new Automation();
-                            tempoAutomation.isLinear = true;
-                            tempoAutomation.type = AutomationType.Tempo;
-                            tempoAutomation.value = parseInt(tempo);
-                            masterBar.tempoAutomations.push(tempoAutomation);
-                            if (masterBar.index === 0) {
-                                masterBar.score.tempo = tempoAutomation.value;
-                            }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'sound':
+                    let tempo: string = c.getAttribute('tempo');
+                    if (tempo) {
+                        let tempoAutomation: Automation = new Automation();
+                        tempoAutomation.isLinear = true;
+                        tempoAutomation.type = AutomationType.Tempo;
+                        tempoAutomation.value = parseInt(tempo);
+                        masterBar.tempoAutomations.push(tempoAutomation);
+                        if (masterBar.index === 0) {
+                            masterBar.score.tempo = tempoAutomation.value;
                         }
-                        break;
-                    case 'direction-type':
-                        let directionType: XmlNode = c.firstElement!;
-                        switch (directionType.localName) {
-                            case 'words':
-                                this._currentDirection = directionType.innerText;
-                                break;
-                            case 'metronome':
-                                this.parseMetronome(directionType, masterBar);
-                                break;
-                        }
-                        break;
-                }
+                    }
+                    break;
+                case 'direction-type':
+                    let directionType: XmlNode = c.firstElement!;
+                    switch (directionType.localName) {
+                        case 'words':
+                            this._currentDirection = directionType.innerText;
+                            break;
+                        case 'metronome':
+                            this.parseMetronome(directionType, masterBar);
+                            break;
+                    }
+                    break;
             }
         }
     }
@@ -1306,16 +1266,14 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseMetronome(element: XmlNode, masterBar: MasterBar): void {
         let unit: Duration = Duration.Quarter;
         let perMinute: number = 120;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'beat-unit':
-                        unit = this.getDuration(c.innerText);
-                        break;
-                    case 'per-minute':
-                        perMinute = parseInt(c.innerText);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'beat-unit':
+                    unit = this.getDuration(c.innerText);
+                    break;
+                case 'per-minute':
+                    perMinute = parseInt(c.innerText);
+                    break;
             }
         }
         let tempoAutomation: Automation = new Automation();
@@ -1341,33 +1299,31 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {
         let num: number = 0;
         let hasTime: boolean = false;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'divisions':
-                        this._divisionsPerQuarterNote = parseInt(c.innerText);
-                        break;
-                    case 'key':
-                        this.parseKey(c, masterBar);
-                        break;
-                    case 'time':
-                        this.parseTime(c, masterBar);
-                        hasTime = true;
-                        break;
-                    case 'clef':
-                        num = parseInt(c.getAttribute('number'));
-                        if (isNaN(num)) {
-                            num = 1;
-                        }
-                        this.parseClef(c, bars[num - 1]);
-                        break;
-                    case 'staff-details':
-                        this.parseStaffDetails(c, track);
-                        break;
-                    case 'transpose':
-                        this.parseTranspose(c, track);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'divisions':
+                    this._divisionsPerQuarterNote = parseInt(c.innerText);
+                    break;
+                case 'key':
+                    this.parseKey(c, masterBar);
+                    break;
+                case 'time':
+                    this.parseTime(c, masterBar);
+                    hasTime = true;
+                    break;
+                case 'clef':
+                    num = parseInt(c.getAttribute('number'));
+                    if (isNaN(num)) {
+                        num = 1;
+                    }
+                    this.parseClef(c, bars[num - 1]);
+                    break;
+                case 'staff-details':
+                    this.parseStaffDetails(c, track);
+                    break;
+                case 'transpose':
+                    this.parseTranspose(c, track);
+                    break;
             }
         }
         if (!hasTime) {
@@ -1377,16 +1333,14 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseTranspose(element: XmlNode, track: Track): void {
         let semitones: number = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'chromatic':
-                        semitones += parseInt(c.innerText);
-                        break;
-                    case 'octave-change':
-                        semitones += parseInt(c.innerText) * 12;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'chromatic':
+                    semitones += parseInt(c.innerText);
+                    break;
+                case 'octave-change':
+                    semitones += parseInt(c.innerText) * 12;
+                    break;
             }
         }
         for (let staff of track.staves) {
@@ -1397,32 +1351,30 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseClef(element: XmlNode, bar: Bar): void {
         let sign: string = 's';
         let line: number = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'sign':
-                        sign = c.innerText.toLowerCase();
-                        break;
-                    case 'line':
-                        line = parseInt(c.innerText);
-                        break;
-                    case 'clef-octave-change':
-                        switch (parseInt(c.innerText)) {
-                            case -2:
-                                bar.clefOttava = Ottavia._15mb;
-                                break;
-                            case -1:
-                                bar.clefOttava = Ottavia._8vb;
-                                break;
-                            case 1:
-                                bar.clefOttava = Ottavia._8va;
-                                break;
-                            case 2:
-                                bar.clefOttava = Ottavia._15mb;
-                                break;
-                        }
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'sign':
+                    sign = c.innerText.toLowerCase();
+                    break;
+                case 'line':
+                    line = parseInt(c.innerText);
+                    break;
+                case 'clef-octave-change':
+                    switch (parseInt(c.innerText)) {
+                        case -2:
+                            bar.clefOttava = Ottavia._15mb;
+                            break;
+                        case -1:
+                            bar.clefOttava = Ottavia._8vb;
+                            break;
+                        case 1:
+                            bar.clefOttava = Ottavia._8va;
+                            break;
+                        case 2:
+                            bar.clefOttava = Ottavia._15mb;
+                            break;
+                    }
+                    break;
             }
         }
         switch (sign) {
@@ -1459,31 +1411,29 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         let beatsParsed: boolean = false;
         let beatTypeParsed: boolean = false;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                let v: string = c.innerText;
-                switch (c.localName) {
-                    case 'beats':
-                        if (!beatsParsed) {
-                            if (v.indexOf('+') === -1) {
-                                masterBar.timeSignatureNumerator = parseInt(v);
-                            } else {
-                                masterBar.timeSignatureNumerator = 4;
-                            }
-                            beatsParsed = true;
+        for (let c of element.childElements()) {
+            let v: string = c.innerText;
+            switch (c.localName) {
+                case 'beats':
+                    if (!beatsParsed) {
+                        if (v.indexOf('+') === -1) {
+                            masterBar.timeSignatureNumerator = parseInt(v);
+                        } else {
+                            masterBar.timeSignatureNumerator = 4;
                         }
-                        break;
-                    case 'beat-type':
-                        if (!beatTypeParsed) {
-                            if (v.indexOf('+') === -1) {
-                                masterBar.timeSignatureDenominator = parseInt(v);
-                            } else {
-                                masterBar.timeSignatureDenominator = 4;
-                            }
-                            beatTypeParsed = true;
+                        beatsParsed = true;
+                    }
+                    break;
+                case 'beat-type':
+                    if (!beatTypeParsed) {
+                        if (v.indexOf('+') === -1) {
+                            masterBar.timeSignatureDenominator = parseInt(v);
+                        } else {
+                            masterBar.timeSignatureDenominator = 4;
                         }
-                        break;
-                }
+                        beatTypeParsed = true;
+                    }
+                    break;
             }
         }
     }
@@ -1493,22 +1443,20 @@ export class MusicXmlImporter extends ScoreImporter {
         //let keyStep: number = -2147483648;
         //let keyAlter: number = -2147483648;
         let mode: string = '';
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'fifths':
-                        fifths = parseInt(c.innerText);
-                        break;
-                    case 'key-step':
-                        //keyStep = parseInt(c.innerText);
-                        break;
-                    case 'key-alter':
-                        //keyAlter = parseInt(c.innerText);
-                        break;
-                    case 'mode':
-                        mode = c.innerText;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'fifths':
+                    fifths = parseInt(c.innerText);
+                    break;
+                case 'key-step':
+                    //keyStep = parseInt(c.innerText);
+                    break;
+                case 'key-alter':
+                    //keyAlter = parseInt(c.innerText);
+                    break;
+                case 'mode':
+                    mode = c.innerText;
+                    break;
             }
         }
         if (-7 <= fifths && fifths <= 7) {
@@ -1544,36 +1492,32 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseIdentification(element: XmlNode): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'creator':
-                        if (c.getAttribute('type') === 'composer') {
-                            this._score.music = c.innerText;
-                        }
-                        break;
-                    case 'rights':
-                        if (this._score.copyright) {
-                            this._score.copyright += '\n';
-                        }
-                        this._score.copyright += c.innerText;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'creator':
+                    if (c.getAttribute('type') === 'composer') {
+                        this._score.music = c.innerText;
+                    }
+                    break;
+                case 'rights':
+                    if (this._score.copyright) {
+                        this._score.copyright += '\n';
+                    }
+                    this._score.copyright += c.innerText;
+                    break;
             }
         }
     }
 
     private parsePartList(element: XmlNode): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'part-group':
-                        this.parsePartGroup(c);
-                        break;
-                    case 'score-part':
-                        this.parseScorePart(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'part-group':
+                    this.parsePartGroup(c);
+                    break;
+                case 'score-part':
+                    this.parseScorePart(c);
+                    break;
             }
         }
     }
@@ -1602,19 +1546,17 @@ export class MusicXmlImporter extends ScoreImporter {
         if (this._currentPartGroup) {
             this._partGroups.get(this._currentPartGroup)!.push(track);
         }
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'part-name':
-                        track.name = c.innerText;
-                        break;
-                    case 'part-abbreviation':
-                        track.shortName = c.innerText;
-                        break;
-                    case 'midi-instrument':
-                        this.parseMidiInstrument(c, track);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'part-name':
+                    track.name = c.innerText;
+                    break;
+                case 'part-abbreviation':
+                    track.shortName = c.innerText;
+                    break;
+                case 'midi-instrument':
+                    this.parseMidiInstrument(c, track);
+                    break;
             }
         }
         if (this.isEmptyTuning(track.staves[0].tuning)) {
@@ -1635,25 +1577,23 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseMidiInstrument(element: XmlNode, track: Track): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'midi-channel':
-                        track.playbackInfo.primaryChannel = parseInt(c.innerText);
-                        break;
-                    case 'midi-program':
-                        track.playbackInfo.program = parseInt(c.innerText);
-                        break;
-                    case 'volume':
-                        track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
-                        break;
-                    case 'pan':
-                        track.playbackInfo.balance = Math.max(
-                            0,
-                            Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16))
-                        );
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'midi-channel':
+                    track.playbackInfo.primaryChannel = parseInt(c.innerText);
+                    break;
+                case 'midi-program':
+                    track.playbackInfo.program = parseInt(c.innerText);
+                    break;
+                case 'volume':
+                    track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
+                    break;
+                case 'pan':
+                    track.playbackInfo.balance = Math.max(
+                        0,
+                        Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16))
+                    );
+                    break;
             }
         }
     }

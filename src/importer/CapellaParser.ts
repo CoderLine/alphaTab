@@ -17,7 +17,7 @@ import { Voice } from '@src/model/Voice';
 import { Settings } from '@src/Settings';
 import { XmlDocument } from '@src/xml/XmlDocument';
 
-import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { XmlNode } from '@src/xml/XmlNode';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -53,9 +53,9 @@ class GuitarDrawObject extends DrawObject {
     public chord: Chord = new Chord();
 }
 
-class SlurDrawObject extends DrawObject { }
+class SlurDrawObject extends DrawObject {}
 
-class WavyLineDrawObject extends DrawObject { }
+class WavyLineDrawObject extends DrawObject {}
 
 class TupletBracketDrawObject extends DrawObject {
     public number: number = 0;
@@ -75,7 +75,7 @@ class OctaveClefDrawObject extends DrawObject {
     public octave: number = 1;
 }
 
-class TrillDrawObject extends DrawObject { }
+class TrillDrawObject extends DrawObject {}
 
 class StaffLayout {
     public defaultClef: Clef = Clef.G2;
@@ -176,7 +176,7 @@ export class CapellaParser {
         effects: Map<Beat, T>,
         applyEffect: (effect: T, beat: Beat) => void
     ) {
-        for(const [startBeat, effect] of effects) {
+        for (const [startBeat, effect] of effects) {
             const noteRange = effect.noteRange;
             let endBeat = startBeat;
             for (let i = 0; i < noteRange; i++) {
@@ -203,26 +203,24 @@ export class CapellaParser {
             this.score = new Score();
             this.score.tempo = 120;
             // parse all children
-            for (let n of root.childNodes) {
-                if (n.nodeType === XmlNodeType.Element) {
-                    switch (n.localName) {
-                        case 'info':
-                            this.parseInfo(n);
-                            break;
-                        case 'layout':
-                            this.parseLayout(n);
-                            break;
-                        case 'gallery':
-                            this.parseGallery(n);
-                            break;
-                        case 'pageObjects':
-                            this.parsePageObjects(n);
-                            break;
-                        // barCount ignored
-                        case 'systems':
-                            this.parseSystems(n);
-                            break;
-                    }
+            for (let n of root.childElements()) {
+                switch (n.localName) {
+                    case 'info':
+                        this.parseInfo(n);
+                        break;
+                    case 'layout':
+                        this.parseLayout(n);
+                        break;
+                    case 'gallery':
+                        this.parseGallery(n);
+                        break;
+                    case 'pageObjects':
+                        this.parsePageObjects(n);
+                        break;
+                    // barCount ignored
+                    case 'systems':
+                        this.parseSystems(n);
+                        break;
                 }
             }
         } else {
@@ -232,16 +230,14 @@ export class CapellaParser {
 
     private _staffLookup: Map<number, Staff> = new Map();
     private parseLayout(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'staves':
-                        this.parseLayoutStaves(c);
-                        break;
-                    case 'brackets':
-                        this.parseBrackets(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'staves':
+                    this.parseLayoutStaves(c);
+                    break;
+                case 'brackets':
+                    this.parseBrackets(c);
+                    break;
             }
         }
 
@@ -298,13 +294,11 @@ export class CapellaParser {
 
     private _brackets: Bracket[] = [];
     private parseBrackets(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'bracket':
-                        this.parseBracket(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'bracket':
+                    this.parseBracket(c);
+                    break;
             }
         }
     }
@@ -320,13 +314,11 @@ export class CapellaParser {
     }
 
     private parseLayoutStaves(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'staffLayout':
-                        this.parseStaffLayout(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'staffLayout':
+                    this.parseStaffLayout(c);
+                    break;
             }
         }
     }
@@ -338,30 +330,28 @@ export class CapellaParser {
         const layout = new StaffLayout();
         layout.description = element.getAttribute('description');
 
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'notation':
-                        if (c.attributes.has('defaultClef')) {
-                            layout.defaultClef = this.parseClef(c.attributes.get('defaultClef')!);
-                        }
-                        break;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'notation':
+                    if (c.attributes.has('defaultClef')) {
+                        layout.defaultClef = this.parseClef(c.attributes.get('defaultClef')!);
+                    }
+                    break;
 
-                    case 'sound':
-                        if (c.attributes.has('percussion')) {
-                            layout.percussion = c.attributes.get('percussion') === 'true';
-                        }
-                        if (c.attributes.has('instr')) {
-                            layout.instrument = parseInt(c.attributes.get('instr')!);
-                        }
-                        if (c.attributes.has('volume')) {
-                            layout.volume = parseInt(c.attributes.get('volume')!);
-                        }
-                        if (c.attributes.has('transpose')) {
-                            layout.transpose = parseInt(c.attributes.get('transpose')!);
-                        }
-                        break;
-                }
+                case 'sound':
+                    if (c.attributes.has('percussion')) {
+                        layout.percussion = c.attributes.get('percussion') === 'true';
+                    }
+                    if (c.attributes.has('instr')) {
+                        layout.instrument = parseInt(c.attributes.get('instr')!);
+                    }
+                    if (c.attributes.has('volume')) {
+                        layout.volume = parseInt(c.attributes.get('volume')!);
+                    }
+                    if (c.attributes.has('transpose')) {
+                        layout.transpose = parseInt(c.attributes.get('transpose')!);
+                    }
+                    break;
             }
         }
 
@@ -395,13 +385,11 @@ export class CapellaParser {
     }
 
     private parseSystems(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'system':
-                        this.parseSystem(c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'system':
+                    this.parseSystem(c);
+                    break;
             }
         }
     }
@@ -417,13 +405,11 @@ export class CapellaParser {
             this._beamingMode = BeatBeamingMode.ForceSplitToNext;
         }
 
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'staves':
-                        this.parseStaves(element, c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'staves':
+                    this.parseStaves(element, c);
+                    break;
             }
         }
 
@@ -432,13 +418,11 @@ export class CapellaParser {
 
     private parseStaves(systemElement: XmlNode, element: XmlNode) {
         let firstBarIndex = this.score.masterBars.length;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'staff':
-                        this.parseStaff(systemElement, firstBarIndex, c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'staff':
+                    this.parseStaff(systemElement, firstBarIndex, c);
+                    break;
             }
         }
     }
@@ -463,13 +447,11 @@ export class CapellaParser {
             this.addNewBar(staff);
         }
 
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'voices':
-                        this.parseVoices(staffId, staff, systemElement, firstBarIndex, c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'voices':
+                    this.parseVoices(staffId, staff, systemElement, firstBarIndex, c);
+                    break;
             }
         }
     }
@@ -504,14 +486,12 @@ export class CapellaParser {
         element: XmlNode
     ) {
         let voiceIndex = 0;
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'voice':
-                        this.parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
-                        voiceIndex++;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'voice':
+                    this.parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
+                    voiceIndex++;
+                    break;
             }
         }
     }
@@ -609,135 +589,126 @@ export class CapellaParser {
         const noteObjects = element.findChildElement('noteObjects');
 
         if (systemElement.attributes.has('tempo')) {
-            const automation = new Automation()
+            const automation = new Automation();
             automation.isLinear = true;
             automation.type = AutomationType.Tempo;
             automation.value = parseInt(systemElement.attributes.get('tempo')!);
-            automation.ratioPosition = this._currentVoiceState.currentPosition / this._currentVoiceState.currentBarDuration;
-            this._currentBar.masterBar.tempoAutomations.push(automation); 
+            automation.ratioPosition =
+                this._currentVoiceState.currentPosition / this._currentVoiceState.currentBarDuration;
+            this._currentBar.masterBar.tempoAutomations.push(automation);
         }
 
         if (noteObjects) {
-            for (let c of noteObjects.childNodes) {
-                if (c.nodeType === XmlNodeType.Element) {
-                    if (this._currentVoiceState.currentBarComplete && c.localName !== 'barline') {
-                        this.newBar(staff, voiceIndex);
-                    }
+            for (let c of noteObjects.childElements()) {
+                if (this._currentVoiceState.currentBarComplete && c.localName !== 'barline') {
+                    this.newBar(staff, voiceIndex);
+                }
 
-                    switch (c.localName) {
-                        case 'clefSign':
-                            this._currentBar.clef = this.parseClef(c.getAttribute('clef'));
-                            this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
-                            break;
-                        case 'keySign':
-                            this._currentBar.masterBar.keySignature = parseInt(
-                                c.getAttribute('fifths')
-                            ) as KeySignature;
-                            break;
-                        case 'timeSign':
-                            this.parseTime(c.getAttribute('time'));
-                            this._currentBar.masterBar.timeSignatureDenominator = this._timeSignature.timeSignatureDenominator;
-                            this._currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
-                            this._currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
-                            // NOTE: capella resets the current bar position to 0 whenever a timeSign is placed
-                            this._currentVoiceState.currentPosition = 0;
-                            this._currentVoiceState.currentBarDuration = this._currentBar.masterBar.calculateDuration(
-                                false
-                            );
-                            break;
-                        case 'barline':
-                            switch (c.getAttribute('type')) {
-                                case 'double':
-                                    this._currentBar.masterBar.isDoubleBar = true;
-                                    if (!this._currentVoiceState.currentBarComplete) {
-                                        this._currentBar.masterBar.isAnacrusis = true;
-                                    }
-                                    this._currentVoiceState.currentBarComplete = true;
-                                    break;
-                                case 'end':
-                                    if (!this._currentVoiceState.currentBarComplete) {
-                                        this._currentBar.masterBar.isAnacrusis = true;
-                                    }
-                                    break;
-                                case 'repEnd':
-                                    this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
-                                    if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
-                                        this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
-                                    }
-                                    this.parseBarDrawObject(c);
-                                    if (!this._currentVoiceState.currentBarComplete) {
-                                        this._currentBar.masterBar.isAnacrusis = true;
-                                    }
-                                    this._currentVoiceState.currentBarComplete = true;
-                                    break;
-                                case 'repBegin':
-                                    this.newBar(staff, voiceIndex); // repeat-start requires instant new bar
-                                    this._currentBar.masterBar.isRepeatStart = true;
-                                    this._currentVoiceState.repeatEnd = null;
-                                    this._currentVoiceState.repeatCount = 0;
-                                    break;
-                                case 'repEndBegin':
-                                    this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
-                                    if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
-                                        this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
-                                    }
-                                    this.parseBarDrawObject(c);
-                                    this.newBar(staff, voiceIndex); // end-begin requires instant new bar
-                                    this._currentBar.masterBar.isRepeatStart = true;
-                                    break;
-                                case 'dashed':
-                                    if (!this._currentVoiceState.currentBarComplete) {
-                                        this._currentBar.masterBar.isAnacrusis = true;
-                                    }
-                                    this._currentVoiceState.currentBarComplete = true;
-                                    break;
-                                // case 'single':
-                                default:
-                                    if (!this._currentVoiceState.currentBarComplete) {
-                                        this._currentBar.masterBar.isAnacrusis = true;
-                                    }
-                                    this._currentVoiceState.currentBarComplete = true;
-                                    break;
-                            }
-                            break;
-                        case 'chord':
-                            let chordBeat = new Beat();
-                            this.initFromPreviousBeat(chordBeat, this._currentVoice);
-                            chordBeat.beamingMode = this._beamingMode;
-                            if (this._currentVoiceState.voiceStemDir) {
-                                chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
-                            }
-                            this.parseDuration(this._currentBar, chordBeat, c.findChildElement('duration')!);
-                            chordBeat.updateDurations();
-                            this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
-                            this._currentVoice.addBeat(chordBeat);
+                switch (c.localName) {
+                    case 'clefSign':
+                        this._currentBar.clef = this.parseClef(c.getAttribute('clef'));
+                        this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
+                        break;
+                    case 'keySign':
+                        this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths')) as KeySignature;
+                        break;
+                    case 'timeSign':
+                        this.parseTime(c.getAttribute('time'));
+                        this._currentBar.masterBar.timeSignatureDenominator =
+                            this._timeSignature.timeSignatureDenominator;
+                        this._currentBar.masterBar.timeSignatureNumerator = this._timeSignature.timeSignatureNumerator;
+                        this._currentBar.masterBar.timeSignatureCommon = this._timeSignature.timeSignatureCommon;
+                        // NOTE: capella resets the current bar position to 0 whenever a timeSign is placed
+                        this._currentVoiceState.currentPosition = 0;
+                        this._currentVoiceState.currentBarDuration =
+                            this._currentBar.masterBar.calculateDuration(false);
+                        break;
+                    case 'barline':
+                        switch (c.getAttribute('type')) {
+                            case 'double':
+                                this._currentBar.masterBar.isDoubleBar = true;
+                                if (!this._currentVoiceState.currentBarComplete) {
+                                    this._currentBar.masterBar.isAnacrusis = true;
+                                }
+                                this._currentVoiceState.currentBarComplete = true;
+                                break;
+                            case 'end':
+                                if (!this._currentVoiceState.currentBarComplete) {
+                                    this._currentBar.masterBar.isAnacrusis = true;
+                                }
+                                break;
+                            case 'repEnd':
+                                this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
+                                if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
+                                    this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
+                                }
+                                this.parseBarDrawObject(c);
+                                if (!this._currentVoiceState.currentBarComplete) {
+                                    this._currentBar.masterBar.isAnacrusis = true;
+                                }
+                                this._currentVoiceState.currentBarComplete = true;
+                                break;
+                            case 'repBegin':
+                                this.newBar(staff, voiceIndex); // repeat-start requires instant new bar
+                                this._currentBar.masterBar.isRepeatStart = true;
+                                this._currentVoiceState.repeatEnd = null;
+                                this._currentVoiceState.repeatCount = 0;
+                                break;
+                            case 'repEndBegin':
+                                this._currentVoiceState.repeatEnd = this._currentBar.masterBar;
+                                if (this._currentBar.masterBar.repeatCount < this._currentVoiceState.repeatCount) {
+                                    this._currentBar.masterBar.repeatCount = this._currentVoiceState.repeatCount;
+                                }
+                                this.parseBarDrawObject(c);
+                                this.newBar(staff, voiceIndex); // end-begin requires instant new bar
+                                this._currentBar.masterBar.isRepeatStart = true;
+                                break;
+                            case 'dashed':
+                                if (!this._currentVoiceState.currentBarComplete) {
+                                    this._currentBar.masterBar.isAnacrusis = true;
+                                }
+                                this._currentVoiceState.currentBarComplete = true;
+                                break;
+                            // case 'single':
+                            default:
+                                if (!this._currentVoiceState.currentBarComplete) {
+                                    this._currentBar.masterBar.isAnacrusis = true;
+                                }
+                                this._currentVoiceState.currentBarComplete = true;
+                                break;
+                        }
+                        break;
+                    case 'chord':
+                        let chordBeat = new Beat();
+                        this.initFromPreviousBeat(chordBeat, this._currentVoice);
+                        chordBeat.beamingMode = this._beamingMode;
+                        if (this._currentVoiceState.voiceStemDir) {
+                            chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
+                        }
+                        this.parseDuration(this._currentBar, chordBeat, c.findChildElement('duration')!);
+                        chordBeat.updateDurations();
+                        this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
+                        this._currentVoice.addBeat(chordBeat);
 
-                            this.parseChord(chordBeat, c);
+                        this.parseChord(chordBeat, c);
+
+                        if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
+                            this._currentVoiceState.currentBarComplete = true;
+                        }
+                        break;
+                    case 'rest':
+                        const restBeat = this.parseRestDurations(this._currentBar, c.findChildElement('duration')!);
+                        if (restBeat) {
+                            this.initFromPreviousBeat(restBeat, this._currentVoice);
+                            restBeat.updateDurations();
+                            this._currentVoiceState.currentPosition += restBeat.playbackDuration;
+                            this._currentVoice.addBeat(restBeat);
 
                             if (this._currentVoiceState.currentPosition >= this._currentVoiceState.currentBarDuration) {
                                 this._currentVoiceState.currentBarComplete = true;
                             }
-                            break;
-                        case 'rest':
-                            const restBeat = this.parseRestDurations(
-                                this._currentBar,
-                                c.findChildElement('duration')!
-                            );
-                            if (restBeat) {
-                                this.initFromPreviousBeat(restBeat, this._currentVoice);
-                                restBeat.updateDurations();
-                                this._currentVoiceState.currentPosition += restBeat.playbackDuration;
-                                this._currentVoice.addBeat(restBeat);
-
-                                if (
-                                    this._currentVoiceState.currentPosition >=
-                                    this._currentVoiceState.currentBarDuration
-                                ) {
-                                    this._currentVoiceState.currentBarComplete = true;
-                                }
-                            }
-                            break;
-                    }
+                        }
+                        break;
                 }
             }
         }
@@ -780,65 +751,61 @@ export class CapellaParser {
 
     private parseChord(beat: Beat, element: XmlNode) {
         const articulation: Note = new Note();
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'stem':
-                        switch (c.getAttribute('dir')) {
-                            case 'up':
-                                beat.preferredBeamDirection = BeamDirection.Up;
-                                break;
-                            case 'down':
-                                beat.preferredBeamDirection = BeamDirection.Down;
-                                break;
-                        }
-                        break;
-                    case 'articulation':
-                        switch (c.getAttribute('type')) {
-                            case 'staccato':
-                                articulation.isStaccato = true;
-                                break;
-                            case 'normalAccent':
-                                articulation.accentuated = AccentuationType.Normal;
-                                break;
-                            case 'strongAccent':
-                                articulation.accentuated = AccentuationType.Heavy;
-                                break;
-                        }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'stem':
+                    switch (c.getAttribute('dir')) {
+                        case 'up':
+                            beat.preferredBeamDirection = BeamDirection.Up;
+                            break;
+                        case 'down':
+                            beat.preferredBeamDirection = BeamDirection.Down;
+                            break;
+                    }
+                    break;
+                case 'articulation':
+                    switch (c.getAttribute('type')) {
+                        case 'staccato':
+                            articulation.isStaccato = true;
+                            break;
+                        case 'normalAccent':
+                            articulation.accentuated = AccentuationType.Normal;
+                            break;
+                        case 'strongAccent':
+                            articulation.accentuated = AccentuationType.Heavy;
+                            break;
+                    }
 
-                        break;
-                    case 'lyric':
-                        this.parseLyric(beat, c);
-                        break;
-                    case 'drawObjects':
-                        this.parseBeatDrawObject(beat, c);
-                        break;
-                    case 'heads':
-                        this.parseHeads(beat, articulation, c);
-                        break;
-                    case 'beam':
-                        switch (c.getAttribute('group')) {
-                            case 'force':
-                                beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
-                                break;
-                            case 'divide':
-                                beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
-                                break;
-                        }
-                        break;
-                }
+                    break;
+                case 'lyric':
+                    this.parseLyric(beat, c);
+                    break;
+                case 'drawObjects':
+                    this.parseBeatDrawObject(beat, c);
+                    break;
+                case 'heads':
+                    this.parseHeads(beat, articulation, c);
+                    break;
+                case 'beam':
+                    switch (c.getAttribute('group')) {
+                        case 'force':
+                            beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
+                            break;
+                        case 'divide':
+                            beat.beamingMode = BeatBeamingMode.ForceSplitToNext;
+                            break;
+                    }
+                    break;
             }
         }
     }
 
     private parseHeads(beat: Beat, articulation: Note, element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'head':
-                        this.parseHead(beat, articulation, c);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'head':
+                    this.parseHead(beat, articulation, c);
+                    break;
             }
         }
     }
@@ -860,110 +827,104 @@ export class CapellaParser {
         // TODO: based on the shape attribute apply effects or
         // right percussion value
 
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'alter':
-                        if (c.attributes.has('step')) {
-                            note.tone += parseInt(c.attributes.get('step')!);
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'alter':
+                    if (c.attributes.has('step')) {
+                        note.tone += parseInt(c.attributes.get('step')!);
+                    }
+                    break;
+                case 'tie':
+                    if (c.attributes.has('begin')) {
+                        if (!this._tieStartIds.has(note.id)) {
+                            this._tieStartIds.set(note.id, true);
+                            this._tieStarts.push(note);
                         }
-                        break;
-                    case 'tie':
-                        if (c.attributes.has('begin')) {
-                            if (!this._tieStartIds.has(note.id)) {
-                                this._tieStartIds.set(note.id, true);
-                                this._tieStarts.push(note);
-                            }
-                        } else if (c.attributes.has('end') && this._tieStarts.length > 0 && !note.isTieDestination) {
-                            note.isTieDestination = true;
-                            note.tieOrigin = this._tieStarts[0];
-                            this._tieStarts.splice(0, 1);
-                            this._tieStartIds.delete(note.id);
-                        }
-                        break;
-                }
+                    } else if (c.attributes.has('end') && this._tieStarts.length > 0 && !note.isTieDestination) {
+                        note.isTieDestination = true;
+                        note.tieOrigin = this._tieStarts[0];
+                        this._tieStarts.splice(0, 1);
+                        this._tieStartIds.delete(note.id);
+                    }
+                    break;
             }
         }
     }
 
     private parseBeatDrawObject(beat: Beat, element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'drawObj':
-                        const obj = this.parseDrawObj(c);
-                        if (obj) {
-                            if (obj instanceof TextDrawObject) {
-                                if (obj.fontFace.startsWith('capella')) {
-                                    if (obj.text === 'u') {
-                                        beat.fermata = new Fermata();
-                                        beat.fermata.type = FermataType.Medium;
-                                    } else if (obj.text === 'f') {
-                                        beat.dynamics = DynamicValue.F;
-                                    } else if (obj.text === 'j') {
-                                        beat.dynamics = DynamicValue.MF;
-                                    }
-                                } else if (
-                                    this._isFirstSystem &&
-                                    this.score.title === '' &&
-                                    obj.align === TextAlign.Center &&
-                                    obj.height > 16 &&
-                                    obj.weight > 400
-                                ) {
-                                    // bold large centered text is very likely the title
-                                    this.score.title = obj.text;
-                                } else if (
-                                    this._isFirstSystem &&
-                                    this.score.artist === '' &&
-                                    obj.align === TextAlign.Center &&
-                                    obj.y < 0
-                                ) {
-                                    this.score.artist = obj.text;
-                                } else if (
-                                    this._isFirstSystem &&
-                                    this.score.music === '' &&
-                                    obj.align === TextAlign.Right &&
-                                    obj.y < 0
-                                ) {
-                                    this.score.music = obj.text;
-                                } else if (!obj.text.startsWith('by capella')) {
-                                    beat.text = obj.text;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'drawObj':
+                    const obj = this.parseDrawObj(c);
+                    if (obj) {
+                        if (obj instanceof TextDrawObject) {
+                            if (obj.fontFace.startsWith('capella')) {
+                                if (obj.text === 'u') {
+                                    beat.fermata = new Fermata();
+                                    beat.fermata.type = FermataType.Medium;
+                                } else if (obj.text === 'f') {
+                                    beat.dynamics = DynamicValue.F;
+                                } else if (obj.text === 'j') {
+                                    beat.dynamics = DynamicValue.MF;
                                 }
-                            } else if (obj instanceof GuitarDrawObject) {
-                                // TODO: Chord
-                            } else if (obj instanceof WavyLineDrawObject) {
-                                beat.vibrato = VibratoType.Slight;
-                            } else if (obj instanceof WedgeDrawObject) {
-                                beat.crescendo = obj.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
-                                obj.noteRange++;
-                                this._crescendo.set(beat, obj);
-                            } else if (obj instanceof SlurDrawObject) {
-                                // NOTE: casting needed for C#
-                                const slur = obj as any as SlurDrawObject;
-                                this._slurs.set(beat, slur);
-                            } else if (obj instanceof VoltaDrawObject) {
-                                this.applyVolta(obj);
+                            } else if (
+                                this._isFirstSystem &&
+                                this.score.title === '' &&
+                                obj.align === TextAlign.Center &&
+                                obj.height > 16 &&
+                                obj.weight > 400
+                            ) {
+                                // bold large centered text is very likely the title
+                                this.score.title = obj.text;
+                            } else if (
+                                this._isFirstSystem &&
+                                this.score.artist === '' &&
+                                obj.align === TextAlign.Center &&
+                                obj.y < 0
+                            ) {
+                                this.score.artist = obj.text;
+                            } else if (
+                                this._isFirstSystem &&
+                                this.score.music === '' &&
+                                obj.align === TextAlign.Right &&
+                                obj.y < 0
+                            ) {
+                                this.score.music = obj.text;
+                            } else if (!obj.text.startsWith('by capella')) {
+                                beat.text = obj.text;
                             }
+                        } else if (obj instanceof GuitarDrawObject) {
+                            // TODO: Chord
+                        } else if (obj instanceof WavyLineDrawObject) {
+                            beat.vibrato = VibratoType.Slight;
+                        } else if (obj instanceof WedgeDrawObject) {
+                            beat.crescendo = obj.decrescendo ? CrescendoType.Decrescendo : CrescendoType.Crescendo;
+                            obj.noteRange++;
+                            this._crescendo.set(beat, obj);
+                        } else if (obj instanceof SlurDrawObject) {
+                            // NOTE: casting needed for C#
+                            const slur = obj as any as SlurDrawObject;
+                            this._slurs.set(beat, slur);
+                        } else if (obj instanceof VoltaDrawObject) {
+                            this.applyVolta(obj);
                         }
-                        break;
-                }
+                    }
+                    break;
             }
         }
     }
 
     private parseBarDrawObject(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'drawObj':
-                        const obj = this.parseDrawObj(c);
-                        if (obj) {
-                            if (obj instanceof VoltaDrawObject) {
-                                this.applyVolta(obj);
-                            }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'drawObj':
+                    const obj = this.parseDrawObj(c);
+                    if (obj) {
+                        if (obj instanceof VoltaDrawObject) {
+                            this.applyVolta(obj);
                         }
-                        break;
-                }
+                    }
+                    break;
             }
         }
     }
@@ -971,14 +932,18 @@ export class CapellaParser {
     private applyVolta(obj: VoltaDrawObject) {
         if (obj.lastNumber > 0) {
             this._currentVoiceState.repeatCount = obj.lastNumber;
-            if (this._currentVoiceState.repeatEnd &&
-                this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount) {
+            if (
+                this._currentVoiceState.repeatEnd &&
+                this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount
+            ) {
                 this._currentVoiceState.repeatEnd.repeatCount = this._currentVoiceState.repeatCount;
             }
         } else if (obj.firstNumber > 0) {
             this._currentVoiceState.repeatCount = obj.firstNumber;
-            if (this._currentVoiceState.repeatEnd &&
-                this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount) {
+            if (
+                this._currentVoiceState.repeatEnd &&
+                this._currentVoiceState.repeatEnd.repeatCount < this._currentVoiceState.repeatCount
+            ) {
                 this._currentVoiceState.repeatEnd.repeatCount = this._currentVoiceState.repeatCount;
             }
         }
@@ -986,7 +951,7 @@ export class CapellaParser {
         if (obj.lastNumber > 0 && obj.firstNumber > 0) {
             let alternateEndings = 0;
             for (let i = obj.firstNumber; i <= obj.lastNumber; i++) {
-                alternateEndings = alternateEndings |  (0x01 << (i - 1));
+                alternateEndings = alternateEndings | (0x01 << (i - 1));
             }
             this._currentBar.masterBar.alternateEndings = alternateEndings;
         } else if (obj.lastNumber > 0) {
@@ -997,20 +962,18 @@ export class CapellaParser {
     }
 
     private parseLyric(beat: Beat, element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'verse':
-                        if (!beat.lyrics) {
-                            beat.lyrics = [];
-                        }
-                        let text = c.innerText;
-                        if (c.getAttribute('hyphen') === 'true') {
-                            text += '-';
-                        }
-                        beat.lyrics.push(text);
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'verse':
+                    if (!beat.lyrics) {
+                        beat.lyrics = [];
+                    }
+                    let text = c.innerText;
+                    if (c.getAttribute('hyphen') === 'true') {
+                        text += '-';
+                    }
+                    beat.lyrics.push(text);
+                    break;
             }
         }
     }
@@ -1087,47 +1050,43 @@ export class CapellaParser {
     }
 
     private parsePageObjects(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'drawObj':
-                        const obj = this.parseDrawObj(c);
-                        if (obj) {
-                            if (obj instanceof TextDrawObject) {
-                                switch (obj.align) {
-                                    case TextAlign.Center:
-                                        if (!this.score.title) {
-                                            this.score.title = c.innerText;
-                                        } else if (!this.score.subTitle) {
-                                            this.score.subTitle = c.innerText;
-                                        }
-                                        break;
-                                    case TextAlign.Right:
-                                        if (!this.score.artist) {
-                                            this.score.artist = c.innerText;
-                                        }
-                                        break;
-                                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'drawObj':
+                    const obj = this.parseDrawObj(c);
+                    if (obj) {
+                        if (obj instanceof TextDrawObject) {
+                            switch (obj.align) {
+                                case TextAlign.Center:
+                                    if (!this.score.title) {
+                                        this.score.title = c.innerText;
+                                    } else if (!this.score.subTitle) {
+                                        this.score.subTitle = c.innerText;
+                                    }
+                                    break;
+                                case TextAlign.Right:
+                                    if (!this.score.artist) {
+                                        this.score.artist = c.innerText;
+                                    }
+                                    break;
                             }
                         }
+                    }
 
-                        break;
-                }
+                    break;
             }
         }
     }
 
     private parseGallery(element: XmlNode) {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'drawObj':
-                        const obj = this.parseDrawObj(c);
-                        if (obj) {
-                            this._galleryObjects.set(c.getAttribute('name'), obj);
-                        }
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'drawObj':
+                    const obj = this.parseDrawObj(c);
+                    if (obj) {
+                        this._galleryObjects.set(c.getAttribute('name'), obj);
+                    }
+                    break;
             }
         }
     }
@@ -1137,42 +1096,40 @@ export class CapellaParser {
 
         let noteRange = 1;
 
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    case 'text':
-                        obj = this.parseText(c);
-                        break;
-                    case 'guitar':
-                        obj = this.parseGuitar(c);
-                        break;
-                    case 'slur':
-                        obj = this.parseSlur(c);
-                        break;
-                    case 'wavyLine':
-                        obj = this.parseWavyLine(c);
-                        break;
-                    case 'bracket':
-                        obj = this.parseTupletBracket(c);
-                        break;
-                    case 'wedge':
-                        obj = this.parseWedge(c);
-                        break;
-                    case 'volta':
-                        obj = this.parseVolta(c);
-                        break;
-                    case 'octaveClef':
-                        obj = this.parseOctaveClef(c);
-                        break;
-                    case 'trill':
-                        obj = this.parseTrill(c);
-                        break;
-                    case 'basic':
-                        if (c.attributes.has('noteRange')) {
-                            noteRange = parseInt(c.attributes.get('noteRange')!);
-                        }
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'text':
+                    obj = this.parseText(c);
+                    break;
+                case 'guitar':
+                    obj = this.parseGuitar(c);
+                    break;
+                case 'slur':
+                    obj = this.parseSlur(c);
+                    break;
+                case 'wavyLine':
+                    obj = this.parseWavyLine(c);
+                    break;
+                case 'bracket':
+                    obj = this.parseTupletBracket(c);
+                    break;
+                case 'wedge':
+                    obj = this.parseWedge(c);
+                    break;
+                case 'volta':
+                    obj = this.parseVolta(c);
+                    break;
+                case 'octaveClef':
+                    obj = this.parseOctaveClef(c);
+                    break;
+                case 'trill':
+                    obj = this.parseTrill(c);
+                    break;
+                case 'basic':
+                    if (c.attributes.has('noteRange')) {
+                        noteRange = parseInt(c.attributes.get('noteRange')!);
+                    }
+                    break;
             }
         }
 
@@ -1294,25 +1251,23 @@ export class CapellaParser {
         }
 
         if (element.firstElement) {
-            for (let c of element.childNodes) {
-                if (c.nodeType === XmlNodeType.Element) {
-                    switch (c.localName) {
-                        case 'font':
-                            obj.fontFace = c.getAttribute('face');
+            for (let c of element.childElements()) {
+                switch (c.localName) {
+                    case 'font':
+                        obj.fontFace = c.getAttribute('face');
 
-                            if (c.attributes.has('weight')) {
-                                obj.weight = parseInt(c.attributes.get('weight')!);
-                            }
+                        if (c.attributes.has('weight')) {
+                            obj.weight = parseInt(c.attributes.get('weight')!);
+                        }
 
-                            if (c.attributes.has('height')) {
-                                obj.height = parseInt(c.attributes.get('height')!);
-                            }
+                        if (c.attributes.has('height')) {
+                            obj.height = parseInt(c.attributes.get('height')!);
+                        }
 
-                            break;
-                        case 'content':
-                            obj.text = c.innerText;
-                            break;
-                    }
+                        break;
+                    case 'content':
+                        obj.text = c.innerText;
+                        break;
                 }
             }
         } else {
@@ -1323,18 +1278,16 @@ export class CapellaParser {
     }
 
     private parseInfo(element: XmlNode): void {
-        for (let c of element.childNodes) {
-            if (c.nodeType === XmlNodeType.Element) {
-                switch (c.localName) {
-                    // encodingSoftware ignored
-                    case 'author':
-                        this.score.tab = c.firstChild!.innerText;
-                        break;
-                    // keywords ignored
-                    case 'comment':
-                        this.score.notices = c.firstChild!.innerText;
-                        break;
-                }
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                // encodingSoftware ignored
+                case 'author':
+                    this.score.tab = c.firstChild!.innerText;
+                    break;
+                // keywords ignored
+                case 'comment':
+                    this.score.notices = c.firstChild!.innerText;
+                    break;
             }
         }
     }

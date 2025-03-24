@@ -6,6 +6,7 @@ import AstPrinterBase from '../AstPrinterBase';
 export default class KotlinAstPrinter extends AstPrinterBase {
     private _forceInteger: boolean = false;
     private _returnRunTest: boolean[] = [];
+    private _thisScope: string[] = [];
     private _useScopes: number[] = [];
 
     public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
@@ -333,6 +334,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.write('class ');
         this.writeIdentifier(d.name);
+
         this.writeTypeParameters(d.typeParameters);
 
         if (d.baseClass) {
@@ -499,8 +501,24 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             this.writeTypeParameterConstraints(d.typeParameters);
         }
 
+        if (d.isGeneratorFunction) {
+            this.write(' = iterator');
+            this._thisScope.push((d.parent as cs.NamedTypeDeclaration).name);
+        }
         this.writeBody(d.body);
+        if (d.isGeneratorFunction) {
+            this._thisScope.pop();
+        }
+
         this._returnRunTest.pop();
+    }
+
+    protected writeThisLiteral(expr: cs.ThisLiteral): void {
+        super.writeThisLiteral(expr);
+        const scope = this._thisScope.at(-1);
+        if (scope) {
+            this.write(`@${scope}`);
+        }
     }
 
     protected writeBody(body: cs.Expression | cs.Block | undefined) {
@@ -1791,5 +1809,15 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write(': ');
         this.writeType(expr.returnType);
         this.writeBlock(expr.body);
+    }
+
+    protected writeYieldExpression(expr: cs.YieldExpression) {
+        if (expr.expression) {
+            this.write('yield(');
+            this.writeExpression(expr.expression);
+            this.write(')');
+        } else {
+            this.write('return');
+        }
     }
 }

@@ -105,10 +105,18 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         const parent = 'parent' in symbol ? (symbol.parent as ts.Symbol) : undefined;
 
         if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {
-            return "close";
+            return 'close';
         }
 
         return '';
     }
+
+    public override makeIterableType(): string {
+        return this.makeTypeName('kotlin.collections.Iterable');
+    }
+
     
+    public override makeGeneratorType(): string {
+        return this.makeTypeName('kotlin.collections.Iterator');
+    }
 }
