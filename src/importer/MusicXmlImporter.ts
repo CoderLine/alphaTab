@@ -607,7 +607,6 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 case 'part':
                     this.parseTimewisePart(c, masterBar);
-                    this._score.title = c.innerText;
                     break;
             }
         }
@@ -665,7 +664,12 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTimewisePart(element: XmlNode, masterBar: MasterBar) {
-        const track = this._idToTrack.get(element.attributes.get('id')!)!;
+        const id = element.attributes.get('id');
+        if (!id || !this._idToTrack.has(id)!) {
+            return;
+        }
+
+        const track = this._idToTrack.get(id)!;
         this.parsePartMeasure(element, masterBar, track);
     }
 
@@ -685,6 +689,11 @@ export class MusicXmlImporter extends ScoreImporter {
     private parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track) {
         this._musicalPosition = 0;
         this._lastBeat = null;
+
+        // initial empty staff and voice
+        const staff = this.getOrCreateStaff(track, 0);
+        this.getOrCreateBar(staff, masterBar);
+        
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -1787,7 +1796,6 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        track.ensureStaveCount(staffIndex + 1);
         return track.staves[staffIndex];
     }
 
