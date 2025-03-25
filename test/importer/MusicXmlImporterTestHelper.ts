@@ -21,6 +21,14 @@ import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { assert, expect } from 'chai';
 
 export class MusicXmlImporterTestHelper {
+
+    public static async loadFile(file: string): Promise<Score> {
+        const fileData = await TestPlatform.loadFile(file);
+        const reader: MusicXmlImporter = new MusicXmlImporter();
+        reader.init(ByteBuffer.fromBuffer(fileData), new Settings());
+        return reader.readScore();
+    }
+
     public static prepareImporterWithBytes(buffer: Uint8Array): MusicXmlImporter {
         let readerBase: MusicXmlImporter = new MusicXmlImporter();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
@@ -50,9 +58,9 @@ export class MusicXmlImporterTestHelper {
 
             const deserialized = JsonConverter.jsObjectToScore(expectedJson);
             const actualJson = JsonConverter.scoreToJsObject(deserialized);
- 
+
             ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + file + '>', null);
-        } catch(e) {
+        } catch (e) {
             assert.fail((e as Error).message + (e as Error).stack);
         }
 
@@ -211,7 +219,10 @@ export class MusicXmlImporterTestHelper {
             expect(actual.octave).to.equal(expected.octave, 'Mismatch on Octave');
             expect(actual.tone).to.equal(expected.tone, 'Mismatch on Tone');
         }
-        expect(actual.percussionArticulation).to.equal(expected.percussionArticulation, 'Mismatch on percussionArticulation');
+        expect(actual.percussionArticulation).to.equal(
+            expected.percussionArticulation,
+            'Mismatch on percussionArticulation'
+        );
         expect(actual.isHammerPullOrigin).to.equal(expected.isHammerPullOrigin, 'Mismatch on IsHammerPullOrigin');
         expect(actual.harmonicType).to.equal(expected.harmonicType, 'Mismatch on HarmonicType');
         expect(actual.harmonicValue).to.equal(expected.harmonicValue, 'Mismatch on HarmonicValue');
@@ -242,8 +253,8 @@ export class MusicXmlImporterTestHelper {
     }
 
     protected expectBendPointsEqual(expected: BendPoint[] | null, actual: BendPoint[] | null): void {
-        if(expected == null || actual == null) {
-            expect(actual).to.equal(expected)
+        if (expected == null || actual == null) {
+            expect(actual).to.equal(expected);
             return;
         }
         expect(actual.length).to.equal(expected.length, 'Mismatch on Count');

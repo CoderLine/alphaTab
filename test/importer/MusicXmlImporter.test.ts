@@ -75,7 +75,7 @@ describe('MusicXmlImporterTests', () => {
         );
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.equal("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.equal('C');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[0]).to.equal(0);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[1]).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[2]).to.equal(0);
@@ -83,11 +83,10 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[4]).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[5]).to.equal(-1);
 
-
         score = JsonConverter.jsObjectToScore(JsonConverter.scoreToJsObject(score));
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.equal("C");
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.name).to.equal('C');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[0]).to.equal(0);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[1]).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[2]).to.equal(0);
@@ -96,14 +95,12 @@ describe('MusicXmlImporterTests', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].chord!.strings[5]).to.equal(-1);
     });
     it('compressed', async () => {
-        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml3/compressed.mxl'
-        );
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile('test-data/musicxml3/compressed.mxl');
 
-        expect(score.title).to.equal("Title");
+        expect(score.title).to.equal('Title');
         expect(score.tracks.length).to.equal(1);
         expect(score.masterBars.length).to.equal(1);
-    });    
+    });
     it('bend', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml-testsuite/100a-Guitare-Bends.xml'
@@ -143,7 +140,6 @@ describe('MusicXmlImporterTests', () => {
         expect(note.bendPoints![0].value).to.equal(2);
         expect(note.bendPoints![1].offset).to.equal(60);
         expect(note.bendPoints![1].value).to.equal(0);
-
 
         note = score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0];
         expect(note.bendType).to.equal(BendType.PrebendBend);
@@ -214,7 +210,7 @@ describe('MusicXmlImporterTests', () => {
         expect(note.bendPoints![0].offset).to.equal(0);
         expect(note.bendPoints![0].value).to.equal(8);
         expect(note.bendPoints![1].offset).to.equal(60);
-        expect(note.bendPoints![1].value).to.equal(0);  
+        expect(note.bendPoints![1].value).to.equal(0);
 
         note = score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0];
         expect(note.bendType).to.equal(BendType.Bend);
@@ -224,4 +220,14 @@ describe('MusicXmlImporterTests', () => {
         expect(note.bendPoints![1].offset).to.equal(30);
         expect(note.bendPoints![1].value).to.equal(2);
     });
+
+    it('partwise-basic', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-basic.xml`);
+        expect(score).toMatchSnapshot();
+    });
+
+    it('timewise-basic', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/timewise-basic.xml`);
+        expect(score).toMatchSnapshot();
+    });    
 });
