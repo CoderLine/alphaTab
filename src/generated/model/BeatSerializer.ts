@@ -78,6 +78,7 @@ export class BeatSerializer {
         o.set("playbackstart", obj.playbackStart);
         o.set("displayduration", obj.displayDuration);
         o.set("playbackduration", obj.playbackDuration);
+        o.set("overridedisplayduration", obj.overrideDisplayDuration);
         o.set("golpe", obj.golpe as number);
         o.set("dynamics", obj.dynamics as number);
         o.set("invertbeamdirection", obj.invertBeamDirection);
@@ -214,6 +215,9 @@ export class BeatSerializer {
                 return true;
             case "playbackduration":
                 obj.playbackDuration = v! as number;
+                return true;
+            case "overridedisplayduration":
+                obj.overrideDisplayDuration = v as number | undefined;
                 return true;
             case "golpe":
                 obj.golpe = JsonHelper.parseEnum<GolpeType>(v, GolpeType)!;

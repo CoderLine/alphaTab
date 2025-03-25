@@ -1,47 +1,79 @@
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { AccentuationType } from '@src/model/AccentuationType';
-import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { BendPoint } from '@src/model/BendPoint';
-import { Chord } from '@src/model/Chord';
-import { Clef } from '@src/model/Clef';
-import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { GraceType } from '@src/model/GraceType';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { Ottavia } from '@src/model/Ottavia';
-import { PickStroke } from '@src/model/PickStroke';
 import { Score } from '@src/model/Score';
-import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { Voice } from '@src/model/Voice';
-
-import { ModelUtils } from '@src/model/ModelUtils';
 
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
 import { ZipReader } from '@src/zip/ZipReader';
 import { ZipEntry } from '@src/zip/ZipEntry';
+import {
+    AccentuationType,
+    Automation,
+    AutomationType,
+    Bar,
+    Beat,
+    BendPoint,
+    BrushType,
+    Chord,
+    Clef,
+    CrescendoType,
+    Direction,
+    Duration,
+    DynamicValue,
+    Fermata,
+    FermataType,
+    Fingers,
+    GolpeType,
+    GraceType,
+    KeySignature,
+    KeySignatureType,
+    MasterBar,
+    Note,
+    NoteAccidentalMode,
+    NoteOrnament,
+    Ottavia,
+    PickStroke,
+    Section,
+    SimileMark,
+    SlideOutType,
+    Staff,
+    SustainPedalMarker,
+    SustainPedalMarkerType,
+    Track,
+    TripletFeel,
+    VibratoType,
+    Voice
+} from '@src/model';
+import { MidiUtils } from '@src/midi/MidiUtils';
+import { Logger } from '@src/Logger';
+import { BeamDirection } from '@src/rendering';
+import { ModelUtils } from '@src/model/ModelUtils';
+
+class StaffContext {
+    public slurStarts!: Map<string, Note>;
+    public currentDynamics = DynamicValue.F;
+    public tieStarts!: Set<Note>;
+    public tieStartIds!: Map<string, Note>;
+    public slideOrigins: Map<string, Note> = new Map<string, Note>();
+
+    constructor() {
+        this.tieStarts = new Set<Note>();
+        this.tieStartIds = new Map<string, Note>();
+        this.slideOrigins = new Map<string, Note>();
+        this.slurStarts = new Map<string, Note>();
+    }
+}
 
 export class MusicXmlImporter extends ScoreImporter {
     private _score!: Score;
-    private _trackById!: Map<string, Track>;
-    private _partGroups!: Map<string, Track[]>;
-    private _currentPartGroup: string | null = null;
-    private _trackFirstMeasureNumber: number = 0;
-    private _maxVoices: number = 0;
-    private _currentDirection: string | null = null;
-    private _tieStarts!: Note[];
-    private _tieStartIds!: Map<number, boolean>;
-    private _slurStarts!: Map<string, Note>;
+    private _idToTrack: Map<string, Track> = new Map<string, Track>();
+    private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
+
+    private _previousMasterBarNumber = -1;
+    private _implicitBars: number = 0;
+    private _divisionsPerQuarterNote: number = MidiUtils.QuarterTime;
+    private _currentDynamics = DynamicValue.F;
 
     public get name(): string {
         return 'MusicXML';
@@ -52,11 +84,11 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     public readScore(): Score {
-        this._trackById = new Map<string, Track>();
-        this._partGroups = new Map<string, Track[]>();
-        this._tieStarts = [];
-        this._tieStartIds = new Map<number, boolean>();
-        this._slurStarts = new Map<string, Note>();
+        this._idToTrack.clear();
+        this._staffToContext.clear();
+        this._implicitBars = 0;
+        this._divisionsPerQuarterNote = MidiUtils.QuarterTime;
+        this._currentDynamics = DynamicValue.F;
 
         let xml: string = this.extractMusicXml();
         let dom: XmlDocument = new XmlDocument();
@@ -67,14 +99,49 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         this._score = new Score();
         this._score.tempo = 120;
+
         this.parseDom(dom);
-        // merge partgroups into a single track with multiple staves
-        if (this.settings.importer.mergePartGroupsInMusicXml) {
-            this.mergePartGroups();
-        }
+        this.consolidate();
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
+
+        this._idToTrack.clear();
+        this._staffToContext.clear();
+
         return this._score;
+    }
+
+    private consolidate() {
+        for (let track of this._score.tracks) {
+            for (let staff of track.staves) {
+                // fill empty beats
+                for (const b of staff.bars) {
+                    for (const v of b.voices) {
+                        if (v.isEmpty && v.beats.length == 0) {
+                            const emptyBeat: Beat = new Beat();
+                            emptyBeat.isEmpty = true;
+                            v.addBeat(emptyBeat);
+                        }
+                    }
+                }
+
+                // fill missing bars
+                const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+                while (staff.bars.length < this._score.masterBars.length) {
+                    const bar: Bar = new Bar();
+                    staff.addBar(bar);
+
+                    for (let i = 0; i < voiceCount; i++) {
+                        const v = new Voice();
+                        bar.addVoice(v);
+
+                        const emptyBeat: Beat = new Beat();
+                        emptyBeat.isEmpty = true;
+                        v.addBeat(emptyBeat);
+                    }
+                }
+            }
+        }
     }
 
     extractMusicXml(): string {
@@ -104,7 +171,7 @@ export class MusicXmlImporter extends ScoreImporter {
             throw new UnsupportedFormatError('Malformed container.xml, could not parse as XML', e as Error);
         }
 
-        let root: XmlNode | null = containerDom.firstElement;
+        const root: XmlNode | null = containerDom.firstElement;
         if (!root || root.localName !== 'container') {
             throw new UnsupportedFormatError("Malformed container.xml, root element not 'container'");
         }
@@ -138,38 +205,8 @@ export class MusicXmlImporter extends ScoreImporter {
         return IOHelper.toString(file.data, this.settings.importer.encoding);
     }
 
-    private mergePartGroups(): void {
-        let anyMerged: boolean = false;
-        for (const tracks of this._partGroups.values()) {
-            if (tracks.length > 1) {
-                this.mergeGroup(tracks);
-                anyMerged = true;
-            }
-        }
-        // if any groups were merged, we need to rebuild the indexes
-        if (anyMerged) {
-            for (let i: number = 0; i < this._score.tracks.length; i++) {
-                this._score.tracks[i].index = i;
-            }
-        }
-    }
-
-    private mergeGroup(partGroup: Track[]): void {
-        let primaryTrack: Track = partGroup[0];
-        for (let i: number = 1; i < partGroup.length; i++) {
-            // merge staves over to primary track
-            let secondaryTrack: Track = partGroup[i];
-            for (let staff of secondaryTrack.staves) {
-                primaryTrack.addStaff(staff);
-            }
-            // remove track from score
-            let trackIndex: number = this._score.tracks.indexOf(secondaryTrack);
-            this._score.tracks.splice(trackIndex, 1);
-        }
-    }
-
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.firstElement;
+        const root: XmlNode | null = dom.firstElement;
         if (!root) {
             throw new UnsupportedFormatError('Unsupported format');
         }
@@ -178,7 +215,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 this.parsePartwise(root);
                 break;
             case 'score-timewise':
-                // ParseTimewise(root);
+                this.parseTimewise(root);
                 break;
             default:
                 throw new UnsupportedFormatError('Unsupported format');
@@ -186,30 +223,354 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parsePartwise(element: XmlNode): void {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'work':
-                    this.parseWork(c);
-                    break;
-                case 'movement-title':
-                    this._score.title = c.innerText;
-                    break;
+                // case 'credit': Ignored (see below)
+                // case 'defaults': Ignored (see below)
                 case 'identification':
                     this.parseIdentification(c);
+                    break;
+                // case 'movement-number': Ignored
+                case 'movement-title':
+                    this.parseMovementTitle(c);
+                    break;
+                case 'part':
+                    this.parsePartwisePart(c);
                     break;
                 case 'part-list':
                     this.parsePartList(c);
                     break;
-                case 'part':
-                    this.parsePart(c);
+                case 'work':
+                    this.parseWork(c);
                     break;
             }
         }
     }
 
-    private parseWork(element: XmlNode): void {
-        for (let c of element.childElements()) {
+    private parseTimewise(element: XmlNode): void {
+        for (const c of element.childElements()) {
             switch (c.localName) {
+                // case 'credit': Ignored (see below)
+                // case 'defaults': Ignored (see below)
+                case 'identification':
+                    this.parseIdentification(c);
+                    break;
+                // case 'movement-number': Ignored
+                case 'movement-title':
+                    this.parseMovementTitle(c);
+                    break;
+                case 'part-list':
+                    this.parsePartList(c);
+                    break;
+                case 'work':
+                    this.parseWork(c);
+                    break;
+                case 'measure':
+                    this.parseTimewiseMeasure(c);
+                    break;
+            }
+        }
+    }
+
+    // visual aspects of credits are ignored
+    // private parseCredit(element: XmlNode) { }
+
+    // visual aspects of music notation are ignored.
+    // with https://github.com/CoderLine/alphaTab/issues/1949 we could use some more information
+    // but we also need the "real" page layout (or parchment) for some alignment aspects.
+    // also for some styling stuff we need the settings as part of the renderstylesheet.
+    // private parseDefaults(element: XmlNode) {
+    //     for (const c of element.childElements()) {
+    //         switch (c.localName) {
+    //             // case 'scaling':
+    //             // case 'concert-score':
+    //             // case 'page-layout':
+    //             // case 'system-layout':
+    //             // case 'staff-layout':
+    //             // case 'appearance':
+    //             // case 'music-font':
+    //             // case 'word-font':
+    //             // case 'lyric-font':
+    //             // case 'lyric-language':
+    //         }
+    //     }
+    // }
+
+    private parseIdentification(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'creator':
+                    if (c.attributes.has('type')) {
+                        switch (c.attributes.get('type')!) {
+                            case 'composer':
+                                this._score.artist = c.innerText;
+                                break;
+                            case 'lyricist':
+                                this._score.words = c.innerText;
+                                break;
+                            case 'arranger':
+                                this._score.music = c.innerText;
+                                break;
+                        }
+                    } else {
+                        this._score.artist = c.innerText;
+                    }
+                    break;
+                case 'rights':
+                    if (this._score.copyright.length > 0) {
+                        this._score.copyright += ', ';
+                    }
+                    this._score.copyright += c.innerText;
+                    if (c.attributes.has('type')) {
+                        this._score.copyright += ` (${c.attributes.get('type')})`;
+                    }
+                    break;
+                case 'encoding':
+                    this.parseEncoding(c);
+                    break;
+                // case 'source': Ignored
+                // case 'relation': Ignored
+                // case 'miscellaneous': Ignored
+            }
+        }
+    }
+    private parseEncoding(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                // case 'encoding-date': Ignored
+                case 'encoder':
+                    if (this._score.copyright.length > 0) {
+                        this._score.tab += ', ';
+                    }
+                    this._score.tab += c.innerText;
+                    if (c.attributes.has('type')) {
+                        this._score.tab += ` (${c.attributes.get('type')})`;
+                    }
+                    break;
+                // case 'software': Ignored
+                case 'encoding-description':
+                    this._score.notices += c.innerText;
+                    break;
+                // case 'supports': Ignored
+            }
+        }
+    }
+
+    private parseMovementTitle(element: XmlNode) {
+        if (this._score.title.length == 0) {
+            // we have no "work title", then use the "movement title" as main title
+            this._score.title = element.innerText;
+        } else {
+            // we have a "work title", then use the "movement title" as subtitle
+            this._score.subTitle = element.innerText;
+        }
+    }
+
+    private parsePartList(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                // case 'part-group': Ignore
+                // We currently ignore information from part-group
+                // The Track > Staff structure is handled by the <staff /> element on measure level
+                // we only support automatic placement of brackets/braces, not explicit.
+                case 'score-part':
+                    this.parseScorePart(c);
+                    break;
+            }
+        }
+    }
+    private parseScorePart(element: XmlNode) {
+        const track = new Track();
+        track.ensureStaveCount(1);
+        this._score.addTrack(track);
+
+        const id = element.attributes.get('id')!;
+        this._idToTrack.set(id, track);
+
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                // case 'identification': Ignored, no part-wise information.
+                // case 'part-link': Not supported
+                case 'part-name':
+                    track.name = c.innerText;
+                    break;
+                case 'part-name-display':
+                    track.name = this.parsePartDisplayAsText(c);
+                    break;
+                case 'part-abbreviation':
+                    track.shortName = c.innerText;
+                    break;
+                case 'part-abbreviation-display':
+                    track.shortName = this.parsePartDisplayAsText(c);
+                    break;
+                // case 'group': Ignored
+                // case 'score-instrument': Not supported,
+                // case 'player': Ignored
+                case 'midi-device':
+                    if (c.attributes.has('port')) {
+                        track.playbackInfo.port = parseInt(c.attributes.get('port')!, 10);
+                    }
+                    break;
+                case 'midi-instrument':
+                    this.parseScorePartMidiInstrument(c, track);
+                    break;
+            }
+        }
+    }
+
+    private parseScorePartMidiInstrument(element: XmlNode, track: Track) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'midi-channel':
+                    track.playbackInfo.primaryChannel = parseInt(c.innerText);
+                    track.playbackInfo.secondaryChannel = parseInt(c.innerText);
+                    break;
+                // case 'midi-name': Ignored
+                // case 'midi-bank': Not supported
+                case 'midi-program':
+                    track.playbackInfo.program = parseInt(c.innerText);
+                    break;
+                // case 'midi-unpitched': Not supported
+                // TODO: percussion instrument articulations via <instrument id="P1-X1" />
+                // pointing then to <score part id="P1"><midi-instrument id="P1-X1"><midi-program>1</midi-program><midi-unpitched>57</midi-unpitched>
+                case 'volume':
+                    track.playbackInfo.volume = Math.floor(16 * (parseInt(c.innerText) / 100.0));
+                    break;
+                case 'pan':
+                    // -180 to 180 -> 0 - 360 -> 0 - 16
+                    track.playbackInfo.balance = Math.max(
+                        0,
+                        Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16))
+                    );
+                    break;
+                // case 'elevation': Not supported
+            }
+        }
+    }
+
+    private parsePartDisplayAsText(element: XmlNode): string {
+        let text = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'display-text':
+                    text += c.innerText;
+                    break;
+                case 'accidental-text':
+                    // to our best to have a plain text accidental using the unicode blocks
+                    // we don't have a SmuFL Text font in place there to use MusicFontSymbols
+                    switch (c.innerText) {
+                        case 'sharp':
+                            text += '♯';
+                            break;
+                        case 'natural':
+                            text += '♮';
+                            break;
+                        case 'flat':
+                            text += '♭';
+                            break;
+                        case 'double-sharp':
+                            text += '𝄪';
+                            break;
+                        case 'sharp-sharp':
+                            text += '♯♯';
+                            break;
+                        case 'flat-flat':
+                            text += '𝄫';
+                            break;
+                        case 'natural-sharp':
+                            text += '♮♯';
+                            break;
+                        case 'natural-flat':
+                            text += '♮♭';
+                            break;
+                        // case 'quarter-flat': Not supported
+                        // case 'quarter-sharp': Not supported
+                        // case 'three-quarters-flat': Not supported
+                        // case 'three-quarters-sharp': Not supported
+                        case 'sharp-down':
+                            text += '𝄱';
+                            break;
+                        case 'sharp-up':
+                            text += '𝄰';
+                            break;
+                        case 'natural-down':
+                            text += '𝄯';
+                            break;
+                        case 'natural-up':
+                            text += '𝄮';
+                            break;
+                        case 'flat-down':
+                            text += '𝄭';
+                            break;
+                        case 'flat-up':
+                            text += '𝄬';
+                            break;
+                        // case 'double-sharp-down': Not supported
+                        // case 'double-sharp-up': Not supported
+                        // case 'flat-flat-down': Not supported
+                        // case 'flat-flat-up': Not supported
+                        case 'arrow-down':
+                            text += '↓';
+                            break;
+                        case 'arrow-up':
+                            text += '↑';
+                            break;
+                        case 'triple-sharp':
+                            text += '♯𝄪';
+                            break;
+                        case 'triple-flat':
+                            text += '𝄬𝄬𝄬';
+                            break;
+                        // case 'slash-quarter-sharp': Not supported
+                        // case 'slash-sharp': Not supported
+                        // case 'slash-flat': Not supported
+                        // case 'double-slash-flat': Not supported
+                        case 'sharp-1':
+                            text += '♯¹';
+                            break;
+                        case 'sharp-2':
+                            text += '♯²';
+                            break;
+                        case 'sharp-3':
+                            text += '♯³';
+                            break;
+                        case 'sharp-4':
+                            text += '♯⁴';
+                            break;
+                        case 'sharp-5':
+                            text += '♯⁵';
+                            break;
+                        case 'flat-1':
+                            text += '♭¹';
+                            break;
+                        case 'flat-2':
+                            text += '♭²';
+                            break;
+                        case 'flat-3':
+                            text += '♭³';
+                            break;
+                        case 'flat-4':
+                            text += '♭⁴';
+                            break;
+                        case 'flat-5':
+                            text += '♭⁵';
+                            break;
+                        // case 'sori': Not supported
+                        // case 'kokon': Not supported
+                        // case 'other': Not supported
+                    }
+
+                    break;
+            }
+        }
+        return text;
+    }
+
+    private parseWork(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                // case 'work-number': Ignored
+                // case 'opus': Ignored
                 case 'work-title':
                     this._score.title = c.innerText;
                     break;
@@ -217,259 +578,376 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parsePart(element: XmlNode): void {
-        let id: string = element.getAttribute('id');
-        if (!this._trackById.has(id)) {
-            if (this._trackById.size === 1) {
-                for (const [x, t] of this._trackById) {
-                    if (t.staves.length === 0 || t.staves[0].bars.length === 0) {
-                        id = x;
-                    }
-                }
-                if (!this._trackById.has(id)) {
-                    return;
-                }
-            } else {
-                return;
-            }
+    private parsePartwisePart(element: XmlNode) {
+        const id = element.attributes.get('id');
+        if (!id || !this._idToTrack.has(id)!) {
+            return;
         }
-        let track: Track = this._trackById.get(id)!;
-        let isFirstMeasure: boolean = true;
-        this._maxVoices = 0;
-        for (let c of element.childElements()) {
+        const track = this._idToTrack.get(id)!;
+        this._previousMasterBarNumber = -1;
+
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'measure':
-                    if (this.parseMeasure(c, track, isFirstMeasure)) {
-                        isFirstMeasure = false;
-                    }
+                    this.parsePartwiseMeasure(c, track);
                     break;
             }
         }
-        // ensure voices for all bars
-        for (let staff of track.staves) {
-            for (let bar of staff.bars) {
-                this.ensureVoices(bar);
+    }
+
+    private parsePartwiseMeasure(element: XmlNode, track: Track) {
+        const masterBar = this.getOrCreateMasterBar(element);
+        this.parsePartMeasure(element, masterBar, track);
+    }
+
+    private parseTimewiseMeasure(element: XmlNode) {
+        const masterBar = this.getOrCreateMasterBar(element);
+
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'part':
+                    this.parseTimewisePart(c, masterBar);
+                    this._score.title = c.innerText;
+                    break;
             }
         }
     }
 
-    private parseMeasure(element: XmlNode, track: Track, isFirstMeasure: boolean): boolean {
-        if (element.getAttribute('implicit') === 'yes' && element.getElementsByTagName('note', false).length === 0) {
-            return false;
-        }
-        let barIndex: number = 0;
-        if (isFirstMeasure) {
-            this._divisionsPerQuarterNote = 0;
-            this._trackFirstMeasureNumber = parseInt(element.getAttribute('number'));
-            if (!this._trackFirstMeasureNumber) {
-                this._trackFirstMeasureNumber = 0;
+    private getOrCreateMasterBar(element: XmlNode) {
+        let number = parseInt(element.attributes.get('number')!);
+
+        // TODO: implicit bars somewhere in the middle mess with the numbers
+        // we need to build an own number -> index lookup
+        const implicit = element.attributes.get('implicit') === 'yes';
+
+        // non-controlling="" Ignored
+        // text="" Ignored
+        // width="" Ignored (we cannot handle the unit 'tenths' yet)
+
+        // no number specified, assume its the "next" one
+        if (isNaN(number)) {
+            if (this._previousMasterBarNumber === -1) {
+                number = 1;
+            } else {
+                number = this._previousMasterBarNumber + 1;
             }
-            barIndex = 0;
+        } else if (number === 0) {
+            // anacrusis
+            number++;
         } else {
-            barIndex = parseInt(element.getAttribute('number'));
-            if (!barIndex) {
-                return false;
-            }
-            barIndex -= this._trackFirstMeasureNumber;
+            number += this._implicitBars;
         }
-        // try to find out the number of staffs required
-        if (isFirstMeasure) {
-            let attributes: XmlNode[] = element.getElementsByTagName('attributes', false);
-            if (attributes.length > 0) {
-                let stavesElements: XmlNode[] = attributes[0].getElementsByTagName('staves', false);
-                if (stavesElements.length > 0) {
-                    let staves: number = parseInt(stavesElements[0].innerText);
-                    track.ensureStaveCount(staves);
+
+        let barsCreated = false;
+        while (this._score.masterBars.length < number) {
+            const masterBar = new MasterBar();
+            if (implicit) {
+                masterBar.isAnacrusis = true;
+                this._implicitBars++;
+            }
+            this._score.addMasterBar(masterBar);
+            barsCreated = true;
+        }
+
+        this._previousMasterBarNumber = number;
+        const masterBar = this._score.masterBars[number - 1];
+
+        // ensure we create directly bars for all staves for new masterbars
+        if (barsCreated) {
+            for (const t of this._score.tracks) {
+                for (const s of t.staves) {
+                    this.getOrCreateBar(s, masterBar);
                 }
             }
         }
-        // create empty bars to the current index
-        let bars: Bar[] = new Array<Bar>(track.staves.length);
-        let masterBar: MasterBar | null = null;
-        for (let b: number = track.staves[0].bars.length; b <= barIndex; b++) {
-            for (let s: number = 0; s < track.staves.length; s++) {
-                let bar: Bar = new Bar();
-                bars[s] = bar;
-                if (track.staves[s].bars.length > 0) {
-                    let previousBar: Bar = track.staves[s].bars[track.staves[s].bars.length - 1];
-                    bar.clef = previousBar.clef;
-                }
-                masterBar = this.getOrCreateMasterBar(barIndex);
-                track.staves[s].addBar(bar);
-                this.ensureVoices(bar);
-            }
-        }
 
-        let chordsByIdForTrack = new Map<string, Chord>();
-        if (masterBar) {
-            let attributesParsed: boolean = false;
-            for (let c of element.childElements()) {
-                switch (c.localName) {
-                    case 'note':
-                        this.parseNoteBeat(c, bars);
-                        break;
-                    case 'forward':
-                        this.parseForward(c, bars);
-                        break;
-                    case 'direction':
-                        this.parseDirection(c, masterBar);
-                        break;
-                    case 'attributes':
-                        if (!attributesParsed) {
-                            this.parseAttributes(c, bars, masterBar, track);
-                            attributesParsed = true;
-                        }
-                        break;
-                    case 'harmony':
-                        this.parseHarmony(c, track, chordsByIdForTrack);
-                        break;
-                    case 'sound':
-                        // TODO
-                        break;
-                    case 'barline':
-                        this.parseBarline(c, masterBar);
-                        break;
-                }
-            }
-        }
-        return true;
+        return masterBar;
     }
 
-    private ensureVoices(bar: Bar): void {
-        while (bar.voices.length < this._maxVoices) {
-            let emptyVoice: Voice = new Voice();
-            bar.addVoice(emptyVoice);
-            let emptyBeat: Beat = new Beat();
-            emptyBeat.isEmpty = true;
-            emptyBeat.chordId = this._currentChord;
-            emptyVoice.addBeat(emptyBeat);
+    private parseTimewisePart(element: XmlNode, masterBar: MasterBar) {
+        const track = this._idToTrack.get(element.attributes.get('id')!)!;
+        this.parsePartMeasure(element, masterBar, track);
+    }
+
+    // current measure state
+
+    /**
+     * The current musical position within the bar.
+     */
+    private _musicalPosition: number = 0;
+
+    /**
+     * The last known beat which was parsed. Might be used
+     * to access the current voice/staff (e.g. on rests when we don't have notes)
+     */
+    private _lastBeat: Beat | null = null;
+
+    private parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track) {
+        this._musicalPosition = 0;
+        this._lastBeat = null;
+
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'note':
+                    this.parseNote(c, masterBar, track);
+                    break;
+                case 'backup':
+                    this.parseBackup(c);
+                    break;
+                case 'forward':
+                    this.parseForward(c);
+                    break;
+                case 'direction':
+                    this.parseDirection(c, masterBar, track);
+                    break;
+                case 'attributes':
+                    this.parseAttributes(c, masterBar, track);
+                    break;
+                case 'harmony':
+                    this.parseHarmony(c, track);
+                    break;
+                // case 'figured-bass': Not supported
+                // case 'print': Ignored
+                case 'sound':
+                    this.parseSound(c, masterBar, track);
+                    break;
+                // case 'listening': Ignored
+                case 'barline':
+                    this.parseBarLine(c, masterBar);
+                    break;
+                // case 'grouping': Not supported
+                // case 'link': Not supported
+                // case 'bookmark': Not supported
+            }
         }
     }
 
-    private getOrCreateBeat(element: XmlNode, bars: Bar[], chord: boolean): Beat {
-        let voiceIndex: number = 0;
-        let voiceNodes: XmlNode[] = element.getElementsByTagName('voice', false);
-        if (voiceNodes.length > 0) {
-            voiceIndex = parseInt(voiceNodes[0].innerText) - 1;
-        }
-        let previousBeatWasPulled: boolean = this._previousBeatWasPulled;
-        this._previousBeatWasPulled = false;
-        let staffElement: XmlNode[] = element.getElementsByTagName('staff', false);
-        let staff: number = 1;
-        if (staffElement.length > 0) {
-            staff = parseInt(staffElement[0].innerText);
-            // in case we have a beam with a staff-jump we pull the note to the previous staff
-            if (
-                (this._isBeamContinue || previousBeatWasPulled) &&
-                this._previousBeat!.voice.bar.staff.index !== staff - 1
-            ) {
-                staff = this._previousBeat!.voice.bar.staff.index + 1;
-                this._previousBeatWasPulled = true;
+    private parseBarLine(element: XmlNode, masterBar: MasterBar) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'bar-style':
+                    this.parseBarStyle(c, masterBar);
+                    break;
+                // case 'footnote' Ignore
+                // case 'level' Ignore
+                // case 'wavy-line' Ignore
+                case 'segno':
+                    // TODO: if this is on "barline" is it actually the next bar with this direction?
+                    masterBar.addDirection(Direction.TargetSegno);
+                    break;
+                case 'coda':
+                    // TODO: if this is on "barline" is it actually the next bar with this direction?
+                    masterBar.addDirection(Direction.TargetCoda);
+                    break;
+                // case 'fermata': Not supported (on barline, they exist on beat notations)
+                case 'ending':
+                    this.parseEnding(c, masterBar);
+                    break;
+                case 'repeat':
+                    this.parseRepeat(c, masterBar);
+                    break;
             }
-            let staffId: string = bars[0].staff.track.index + '-' + staff;
-            if (!this._voiceOfStaff.has(staffId)) {
-                this._voiceOfStaff.set(staffId, voiceIndex);
-            }
         }
-        staff--;
-        let bar: Bar;
-        if (staff < 0) {
-            bar = bars[0];
-        } else if (staff >= bars.length) {
-            bar = bars[bars.length - 1];
-        } else {
-            bar = bars[staff];
-        }
-        let beat: Beat;
-        let voice: Voice = this.getOrCreateVoice(bar, voiceIndex);
-        if ((chord && voice.beats.length > 0) || (voice.beats.length === 1 && voice.isEmpty)) {
-            beat = voice.beats[voice.beats.length - 1];
-        } else {
-            beat = new Beat();
-            beat.isEmpty = false;
-            voice.addBeat(beat);
-        }
-        this._isBeamContinue = false;
-        this._previousBeat = beat;
-        return beat;
     }
 
-    private parseForward(element: XmlNode, bars: Bar[]): void {
-        let beat: Beat = this.getOrCreateBeat(element, bars, false);
-        let durationInDivisions: number = parseInt(element.findChildElement('duration')!.innerText);
-        let duration: number = (durationInDivisions * Duration.Quarter) / this._divisionsPerQuarterNote;
-        let durations = [
-            Duration.SixtyFourth,
-            Duration.ThirtySecond,
-            Duration.Sixteenth,
-            Duration.Eighth,
-            Duration.Quarter,
-            Duration.Half,
-            Duration.Whole
-        ];
-        for (let d of durations) {
-            if (duration >= d) {
-                beat.duration = d;
-                duration -= d;
+    private parseRepeat(element: XmlNode, masterBar: MasterBar): void {
+        let direction: string = element.getAttribute('direction');
+        let times: number = parseInt(element.getAttribute('times'));
+        if (times < 0 || isNaN(times)) {
+            times = 2;
+        }
+        if (direction === 'backward') {
+            masterBar.repeatCount = times;
+        } else if (direction === 'forward') {
+            masterBar.isRepeatStart = true;
+        }
+    }
+
+    private parseEnding(element: XmlNode, masterBar: MasterBar): void {
+        let num: number = parseInt(element.getAttribute('number'));
+        if (num > 0) {
+            --num;
+            masterBar.alternateEndings = masterBar.alternateEndings | ((0x01 << num) & 0xff);
+        }
+    }
+
+    private parseBarStyle(element: XmlNode, masterBar: MasterBar) {
+        switch (element.innerText) {
+            case 'dashed':
+                // NOTE: temporary until we have full support for custom styles
+                masterBar.isFreeTime = true;
                 break;
-            }
+
+            // case 'dotted': Not Supported
+            // case 'heavy': Not Supported
+            // case 'heavy-heavy': Not Supported
+            // case 'heavy-light': Not Supported
+            // case 'light-heavy': Not Supported
+            case 'light-light':
+                // NOTE: temporary until we have full support for custom styles
+                masterBar.isDoubleBar = true;
+                break;
+
+            // case 'none': Not Supported
+            // case 'regular': Default
+            // case 'short': Not Supported
+            // case 'tick': Not Supported
         }
-        if (duration > 0) {
-            // TODO: Handle remaining duration
-            // (additional beats, dotted durations,...)
-        }
-        beat.isEmpty = false;
     }
 
-    private parseStaffDetails(element: XmlNode, track: Track): void {
-        for (let c of element.childElements()) {
+    private parseSound(element: XmlNode, masterBar: MasterBar, track: Track) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'staff-lines':
-                    for (let staff of track.staves) {
-                        staff.stringTuning.tunings = new Array<number>(parseInt(c.innerText)).fill(0);
+                // case 'instrument-change': Ignored
+                // case 'midi-device': Ignored
+                case 'midi-instrument':
+                    this.parseSoundMidiInstrument(c, masterBar);
+                    break;
+                // case 'play': Ignored
+                case 'swing':
+                    this.parseSwing(c, masterBar);
+                    break;
+                case 'offset':
+                    break;
+            }
+        }
+
+        if (element.attributes.has('coda')) {
+            masterBar.addDirection(Direction.TargetCoda);
+        }
+
+        if (element.attributes.has('tocoda')) {
+            masterBar.addDirection(Direction.JumpDaCoda);
+        }
+
+        if (element.attributes.has('dacapo')) {
+            masterBar.addDirection(Direction.JumpDaCapo);
+        }
+
+        if (element.attributes.has('dalsegno')) {
+            masterBar.addDirection(Direction.JumpDalSegno);
+        }
+
+        if (element.attributes.has('fine')) {
+            masterBar.addDirection(Direction.TargetFine);
+        }
+
+        if (element.attributes.has('segno')) {
+            masterBar.addDirection(Direction.TargetSegno);
+        }
+
+        // damper-pedal="" Ignored -> Handled via pedal direction
+        // dynamics="" Ignored -> Handled via dynamics direction
+        // elevation="" Ignored
+        // forward-repeat="" Not supported
+        // pan="" Not supported
+        // pizzicato="" Not supported
+        // pizzicato="" Not supported
+        // soft-pedal="" Ignored
+        // sostenuto-pedal="" Ignored
+        // time-only="" Ignored
+
+        if (element.attributes.has('tempo')) {
+            if (!this._nextBeatAutomations) {
+                this._nextBeatAutomations = [];
+            }
+
+            const automation = new Automation();
+            automation.type = AutomationType.Tempo;
+            automation.value = parseInt(element.attributes.get('tempo')!);
+            this._nextBeatAutomations.push(automation);
+        }
+    }
+    private parseSwing(element: XmlNode, masterBar: MasterBar) {
+        let first = 0;
+        let second = 0;
+        let swingType: Duration | null = null;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'straight':
+                    masterBar.tripletFeel = TripletFeel.NoTripletFeel;
+                    return;
+                case 'first':
+                    first = parseInt(c.innerText);
+                    break;
+                case 'second':
+                    second = parseInt(c.innerText);
+                    break;
+                case 'swing-type':
+                    swingType = this.parseBeatDuration(c);
+                    break;
+                // case 'swing-style': Ignored
+            }
+        }
+
+        // spec is a bit vague here
+        if (!swingType) {
+            swingType = Duration.Eighth;
+        }
+
+        if (swingType === Duration.Eighth) {
+            if (first === 2 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Triplet8th;
+            } else if (first === 3 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Dotted8th;
+            } else if (first === 1 && second === 3) {
+                masterBar.tripletFeel = TripletFeel.Scottish8th;
+            }
+        } else if (swingType === Duration.Sixteenth) {
+            if (first === 2 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Triplet16th;
+            } else if (first === 3 && second === 1) {
+                masterBar.tripletFeel = TripletFeel.Dotted16th;
+            } else if (first === 1 && second === 3) {
+                masterBar.tripletFeel = TripletFeel.Scottish16th;
+            }
+        }
+    }
+
+    private _nextBeatAutomations: Automation[] | null = null;
+    private _nextBeatChord: Chord | null = null;
+    private _nextBeatCrescendo: CrescendoType | null = null;
+    private _nextBeatDynamics: DynamicValue | null = null;
+    private _nextBeatOttavia: Ottavia | null = null;
+
+    private parseSoundMidiInstrument(element: XmlNode, masterBar: MasterBar) {
+        let automation: Automation;
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                // case 'midi-channel': Ignored
+                // case 'midi-name': Ignored
+                // case 'midi-bank': Ignored
+                case 'midi-program':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
                     }
+
+                    automation = new Automation();
+                    automation.type = AutomationType.Instrument;
+                    automation.value = parseInt(c.innerText);
+                    this._nextBeatAutomations!.push(automation);
+
                     break;
-                case 'staff-tuning':
-                    this.parseStaffTuning(c, track);
+                // case 'midi-unpitched': Not Supported
+                case 'volume':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
+                    }
+
+                    automation = new Automation();
+                    automation.type = AutomationType.Volume;
+                    automation.value = parseInt(c.innerText);
+                    this._nextBeatAutomations!.push(automation);
+
                     break;
-            }
-        }
-        for (let staff of track.staves) {
-            if (this.isEmptyTuning(staff.tuning)) {
-                staff.stringTuning.tunings = [];
+                // case 'pan': Not supported
+                // case 'elevation': Not supported
             }
         }
     }
 
-    private parseStaffTuning(element: XmlNode, track: Track): void {
-        let line: number = parseInt(element.getAttribute('line'));
-        let tuningStep: string = 'C';
-        let tuningOctave: string = '';
-        let tuningAlter: number = 0;
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'tuning-step':
-                    tuningStep = c.innerText;
-                    break;
-                case 'tuning-alter':
-                    tuningAlter = parseInt(c.innerText);
-                    break;
-                case 'tuning-octave':
-                    tuningOctave = c.innerText;
-                    break;
-            }
-        }
-        let tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
-        for (let staff of track.staves) {
-            staff.tuning[staff.tuning.length - line] = tuning;
-        }
-    }
-
-    private _currentChord: string | null = null;
-    private _divisionsPerQuarterNote: number = 0;
-
-    private parseHarmony(element: XmlNode, track: Track, chordsByIdForTrack: Map<string, Chord>): void {
-        let chord: Chord = new Chord();
+    private parseHarmony(element: XmlNode, track: Track) {
+        let chord = new Chord();
         for (let childNode of element.childElements()) {
             switch (childNode.localName) {
                 case 'root':
@@ -499,16 +977,7 @@ export class MusicXmlImporter extends ScoreImporter {
         //        chord.Name += "#" + degreeValue;
         //    }
         // }
-        this._currentChord = ModelUtils.newGuid();
-        const chordKey: string = chord.uniqueId;
-        if (chordsByIdForTrack.has(chordKey)) {
-            // check if the chord is already present
-            chord.showDiagram = false;
-        }
-        for (let staff of track.staves) {
-            staff.addChord(this._currentChord, chord);
-        }
-        chordsByIdForTrack.set(chordKey, chord);
+        this._nextBeatChord = chord;
     }
 
     private parseHarmonyRoot(xmlNode: XmlNode): string {
@@ -694,640 +1163,120 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseBarline(element: XmlNode, masterBar: MasterBar): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'repeat':
-                    this.parseRepeat(c, masterBar);
-                    break;
-                case 'ending':
-                    this.parseEnding(c, masterBar);
-                    break;
+    private parseAttributes(element: XmlNode, masterBar: MasterBar, track: Track) {
+        let staffIndex: number;
+        let staff: Staff;
+        let bar: Bar;
+
+        if (this._lastBeat == null) {
+            // attributes directly at the start of the bar
+            for (const c of element.childElements()) {
+                switch (c.localName) {
+                    // case 'footnote': Ignored
+                    // case 'level': Ignored
+                    case 'divisions':
+                        this._divisionsPerQuarterNote = parseInt(c.innerText);
+                        break;
+                    case 'key':
+                        this.parseKey(c, masterBar);
+                        break;
+                    case 'time':
+                        this.parseTime(c, masterBar);
+                        break;
+                    case 'staves':
+                        // will create staves
+                        track.ensureStaveCount(parseInt(c.innerText));
+                        break;
+                    // case 'part-symbol': Not supported
+                    // case 'instruments': Ignored
+                    case 'clef':
+                        staffIndex = parseInt(c.getAttribute('number', '1')) - 1;
+                        staff = this.getOrCreateStaff(track, staffIndex);
+                        bar = this.getOrCreateBar(staff, masterBar);
+                        this.parseClef(c, bar);
+                        break;
+                    case 'staff-details':
+                        staffIndex = parseInt(c.getAttribute('number', '1')) - 1;
+                        staff = this.getOrCreateStaff(track, staffIndex);
+                        this.parseStaffDetails(c, staff);
+                        break;
+                    case 'transpose':
+                        this.parseTranspose(c, track);
+                        break;
+                    // case 'for-part': not supported
+                    // case 'directive': Ignored
+                    case 'measure-style':
+                        this.parseMeasureStyle(c, track);
+                        break;
+                }
             }
-        }
-    }
-
-    private parseEnding(element: XmlNode, masterBar: MasterBar): void {
-        let num: number = parseInt(element.getAttribute('number'));
-        if (num > 0) {
-            --num;
-            masterBar.alternateEndings = masterBar.alternateEndings | ((0x01 << num) & 0xff);
-        }
-    }
-
-    private parseRepeat(element: XmlNode, masterBar: MasterBar): void {
-        let direction: string = element.getAttribute('direction');
-        let times: number = parseInt(element.getAttribute('times'));
-        if (times < 0 || isNaN(times)) {
-            times = 2;
-        }
-        if (direction === 'backward') {
-            masterBar.repeatCount = times;
-        } else if (direction === 'forward') {
-            masterBar.isRepeatStart = true;
-        }
-    }
-
-    private _voiceOfStaff: Map<string, number> = new Map<string, number>();
-    private _isBeamContinue: boolean = false;
-    private _previousBeatWasPulled: boolean = false;
-    private _previousBeat: Beat | null = null;
-
-    private parseNoteBeat(element: XmlNode, bars: Bar[]): void {
-        let chord: boolean = element.getElementsByTagName('chord', false).length > 0;
-        let beat: Beat = this.getOrCreateBeat(element, bars, chord);
-        if (!beat.chordId && this._currentChord) {
-            beat.chordId = this._currentChord;
-            this._currentChord = null;
-        }
-        if (this._currentDirection) {
-            beat.text = this._currentDirection;
-            this._currentDirection = null;
-        }
-        let note: Note = new Note();
-        // TODO: getOrCreateBeat relies on voice.isEmpty, we should eliminate forceNonEmpty
-        // and improve this importer
-        beat.voice.forceNonEmpty();
-        beat.isEmpty = false;
-        beat.addNote(note);
-        beat.dots = 0;
-        let isFullBarRest = false;
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'grace':
-                    // var slash = e.GetAttribute("slash");
-                    // var makeTime = Platform.ParseInt(e.GetAttribute("make-time"));
-                    // var stealTimePrevious = Platform.ParseInt(e.GetAttribute("steal-time-previous"));
-                    // var stealTimeFollowing = Platform.ParseInt(e.GetAttribute("steal-time-following"));
-                    beat.graceType = GraceType.BeforeBeat;
-                    beat.duration = Duration.ThirtySecond;
-                    break;
-                case 'duration':
-                    if (beat.isRest && !isFullBarRest) {
-                        // unit: divisions per quarter note
-                        let duration: number = parseInt(c.innerText);
-                        switch (duration) {
-                            case 1:
-                                beat.duration = Duration.Whole;
-                                break;
-                            case 2:
-                                beat.duration = Duration.Half;
-                                break;
-                            case 4:
-                                beat.duration = Duration.Quarter;
-                                break;
-                            case 8:
-                                beat.duration = Duration.Eighth;
-                                break;
-                            case 16:
-                                beat.duration = Duration.Sixteenth;
-                                break;
-                            case 32:
-                                beat.duration = Duration.ThirtySecond;
-                                break;
-                            case 64:
-                                beat.duration = Duration.SixtyFourth;
-                                break;
-                            default:
-                                beat.duration = Duration.Quarter;
-                                break;
-                        }
-                    }
-                    break;
-                case 'tie':
-                    this.parseTied(c, note);
-                    break;
-                case 'cue':
-                    // not supported
-                    break;
-                case 'instrument':
-                    // not supported
-                    break;
-                case 'type':
-                    beat.duration = this.getDuration(c.innerText);
-                    if (beat.graceType !== GraceType.None && beat.duration < Duration.Sixteenth) {
-                        beat.duration = Duration.Eighth;
-                    }
-                    break;
-                case 'dot':
-                    beat.dots++;
-                    break;
-                case 'accidental':
-                    this.parseAccidental(c, note);
-                    break;
-                case 'time-modification':
-                    this.parseTimeModification(c, beat);
-                    break;
-                case 'stem':
-                    // not supported
-                    break;
-                case 'notehead':
-                    if (c.getAttribute('parentheses') === 'yes') {
-                        note.isGhost = true;
-                    }
-                    break;
-                case 'beam':
-                    let beamMode: string = c.innerText;
-                    if (beamMode === 'continue') {
-                        this._isBeamContinue = true;
-                    }
-                    break;
-                case 'notations':
-                    this.parseNotations(c, beat, note);
-                    break;
-                case 'lyric':
-                    this.parseLyric(c, beat);
-                    break;
-                case 'pitch':
-                    this.parsePitch(c, note);
-                    break;
-                case 'unpitched':
-                    this.parseUnpitched(c, note);
-                    break;
-                case 'rest':
-                    isFullBarRest = c.getAttribute('measure') === 'yes';
-                    beat.isEmpty = false;
-                    beat.notes = [];
-                    beat.duration = Duration.Whole;
-                    break;
-            }
-        }
-        // check if new note is duplicate on string
-        if (note.isStringed) {
-            for (let i: number = 0; i < beat.notes.length; i++) {
-                if (beat.notes[i].string === note.string && beat.notes[i] !== note) {
-                    beat.removeNote(note);
-                    break;
+        } else {
+            // attribute changes during bar
+            for (const c of element.childElements()) {
+                switch (c.localName) {
+                    // case 'footnote': Ignored
+                    // case 'level': Ignored
+                    case 'divisions':
+                        this._divisionsPerQuarterNote = parseInt(c.innerText);
+                        break;
+                    //  case 'key': Not supported
+                    // case 'time': Not supported
+                    // case 'part-symbol': Not supported
+                    // case 'instruments': Ignored
+                    // case 'clef': Not supported
+                    // case 'staff-details': Not supported
+                    // case 'transpose': Not supported
+                    // case 'for-part': not supported
+                    // case 'directive': Ignored
+                    // case 'measure-style': Not supported
                 }
             }
         }
     }
 
-    private getDuration(text: string): Duration {
-        switch (text) {
-            case '256th':
-            case '128th':
-            case '64th':
-                return Duration.SixtyFourth;
-            case '32nd':
-                return Duration.ThirtySecond;
-            case '16th':
-                return Duration.Sixteenth;
-            case 'eighth':
-                return Duration.Eighth;
-            case 'quarter':
-                return Duration.Quarter;
-            case 'half':
-                return Duration.Half;
-            case 'long':
-            case 'breve':
-            case 'whole':
-                return Duration.Whole;
-        }
-        return Duration.Quarter;
-    }
-
-    private parseLyric(element: XmlNode, beat: Beat): void {
+    private _simileMarkAllStaves: SimileMark | null = null;
+    private _simileMarkPerStaff: Map<number, SimileMark> | null = null;
+    parseMeasureStyle(element: XmlNode, track: Track) {
         for (let c of element.childElements()) {
             switch (c.localName) {
-                case 'text':
-                    if (beat.text) {
-                        beat.text += ' ' + c.innerText;
-                    } else {
-                        beat.text = c.innerText;
-                    }
-                    break;
-            }
-        }
-    }
-
-    private parseAccidental(element: XmlNode, note: Note): void {
-        switch (element.innerText) {
-            case 'sharp':
-                note.accidentalMode = NoteAccidentalMode.ForceSharp;
-                break;
-            case 'natural':
-                note.accidentalMode = NoteAccidentalMode.ForceNatural;
-                break;
-            case 'flat':
-                note.accidentalMode = NoteAccidentalMode.ForceFlat;
-                break;
-            case 'double-sharp':
-                break;
-            case 'sharp-sharp':
-                break;
-            case 'flat-flat':
-                break;
-            case 'natural-sharp':
-                break;
-            case 'natural-flat':
-                break;
-            case 'quarter-flat':
-                break;
-            case 'quarter-sharp':
-                break;
-            case 'three-quarters-flat':
-                break;
-            case 'three-quarters-sharp':
-                break;
-        }
-    }
-
-    private parseTied(element: XmlNode, note: Note): void {
-        if (element.getAttribute('type') === 'start') {
-            if (!this._tieStartIds.has(note.id)) {
-                this._tieStartIds.set(note.id, true);
-                this._tieStarts.push(note);
-            }
-        } else if (element.getAttribute('type') === 'stop' && this._tieStarts.length > 0 && !note.isTieDestination) {
-            const tieOrigin = this._tieStarts[0];
-            // no cross track/staff or voice ties supported for now
-            if (
-                tieOrigin.beat.voice.index === note.beat.voice.index &&
-                tieOrigin.beat.voice.bar.staff.index === note.beat.voice.bar.staff.index &&
-                tieOrigin.beat.voice.bar.staff.track.index === note.beat.voice.bar.staff.track.index
-            ) {
-                note.isTieDestination = true;
-                note.tieOrigin = this._tieStarts[0];
-            }
-
-            this._tieStarts.splice(0, 1);
-            this._tieStartIds.delete(note.id);
-        }
-    }
-
-    private parseNotations(element: XmlNode, beat: Beat, note: Note): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'articulations':
-                    this.parseArticulations(c, note);
-                    break;
-                case 'tied':
-                    this.parseTied(c, note);
-                    break;
-                case 'slide':
-                case 'glissando':
-                    if (c.getAttribute('type') === 'start') {
-                        note.slideOutType = SlideOutType.Shift;
-                    }
-                    break;
-                case 'dynamics':
-                    this.parseDynamics(c, beat);
-                    break;
-                case 'technical':
-                    this.parseTechnical(c, note);
-                    break;
-                case 'ornaments':
-                    this.parseOrnaments(c, note);
-                    break;
-                case 'slur':
-                    let slurNumber: string = c.getAttribute('number');
-                    if (!slurNumber) {
-                        slurNumber = '1';
-                    }
-
-                    // slur numbers are unique in the way that they have the same ID across
-                    // staffs/tracks etc. as long they represent the logically same slur.
-                    // but in our case it must be globally unique to link the correct notes.
-                    // adding the staff ID should be enough to achieve this
-                    slurNumber = beat.voice.bar.staff.index + '_' + slurNumber;
-
+                // case 'multiple-rest': Not supported, multi-rest can only be globally enabled
+                case 'measure-repeat':
+                    let simileMark: SimileMark | null = null;
                     switch (c.getAttribute('type')) {
                         case 'start':
-                            this._slurStarts.set(slurNumber, note);
-                            break;
-                        case 'stop':
-                            if (this._slurStarts.has(slurNumber)) {
-                                note.isSlurDestination = true;
-                                let slurStart: Note = this._slurStarts.get(slurNumber)!;
-                                slurStart.slurDestination = note;
-                                note.slurOrigin = slurStart;
+                            switch (parseInt(c.getAttribute('slashes', '1'))) {
+                                case 1:
+                                    simileMark = SimileMark.Simple;
+                                    break;
+                                case 2:
+                                    simileMark = SimileMark.FirstOfDouble;
+                                    break;
+                                default:
+                                    // not supported
+                                    break;
                             }
                             break;
-                    }
-                    break;
-            }
-        }
-    }
-
-    private parseOrnaments(element: XmlNode, note: Note): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'tremolo':
-                    let tremoloSpeed: number = parseInt(c.innerText);
-                    switch (tremoloSpeed) {
-                        case 1:
-                            note.beat.tremoloSpeed = Duration.Eighth;
-                            break;
-                        case 2:
-                            note.beat.tremoloSpeed = Duration.Sixteenth;
-                            break;
-                        case 3:
-                            note.beat.tremoloSpeed = Duration.ThirtySecond;
+                        case 'stop':
+                            simileMark = null;
                             break;
                     }
-                    break;
-            }
-        }
-    }
 
-    private parseTechnical(element: XmlNode, note: Note): void {
-        let bends: XmlNode[] = [];
-
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'string':
-                    note.string = parseInt(c.innerText);
-                    if (note.string !== -2147483648) {
-                        note.string = note.beat.voice.bar.staff.tuning.length - note.string + 1;
-                    }
-                    break;
-                case 'fret':
-                    note.fret = parseInt(c.innerText);
-                    break;
-                case 'down-bow':
-                    note.beat.pickStroke = PickStroke.Down;
-                    break;
-                case 'up-bow':
-                    note.beat.pickStroke = PickStroke.Up;
-                    break;
-                case 'bend':
-                    bends.push(c);
-                    break;
-            }
-        }
-
-        if (bends.length > 0) {
-            this.parseBends(bends, note);
-        }
-
-        if (note.string === -2147483648 || note.fret === -2147483648) {
-            note.string = -1;
-            note.fret = -1;
-        }
-    }
-
-    private parseBends(elements: XmlNode[], note: Note): void {
-        let baseOffset: number = BendPoint.MaxPosition / elements.length;
-        let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
-        let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
-        let isFirstBend: boolean = true;
-
-        for (let bend of elements) {
-            let bendAlterElement: XmlNode | null = bend.findChildElement('bend-alter');
-            if (bendAlterElement) {
-                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
-                if (bend.findChildElement('pre-bend')) {
-                    if (isFirstBend) {
-                        currentValue += absValue;
-                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                        currentOffset += baseOffset;
-                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                        isFirstBend = false;
-                    } else {
-                        currentOffset += baseOffset;
-                    }
-                } else if (bend.findChildElement('release')) {
-                    if (isFirstBend) {
-                        currentValue += absValue;
-                    }
-                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                    currentOffset += baseOffset;
-                    currentValue -= absValue;
-                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                    isFirstBend = false;
-                } else {
-                    // "regular" bend
-                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                    currentValue += absValue;
-                    currentOffset += baseOffset;
-                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
-                    isFirstBend = false;
-                }
-            }
-        }
-    }
-
-    private parseArticulations(element: XmlNode, note: Note): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'accent':
-                    note.accentuated = AccentuationType.Normal;
-                    break;
-                case 'strong-accent':
-                    note.accentuated = AccentuationType.Heavy;
-                    break;
-                case 'staccato':
-                case 'detached-legato':
-                    note.isStaccato = true;
-                    break;
-                case 'tenuto':
-                    note.accentuated = AccentuationType.Tenuto;
-                    break;
-            }
-        }
-    }
-
-    private parseDynamics(element: XmlNode, beat: Beat): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'p':
-                    beat.dynamics = DynamicValue.P;
-                    break;
-                case 'pp':
-                    beat.dynamics = DynamicValue.PP;
-                    break;
-                case 'ppp':
-                    beat.dynamics = DynamicValue.PPP;
-                    break;
-                case 'f':
-                    beat.dynamics = DynamicValue.F;
-                    break;
-                case 'ff':
-                    beat.dynamics = DynamicValue.FF;
-                    break;
-                case 'fff':
-                    beat.dynamics = DynamicValue.FFF;
-                    break;
-                case 'mp':
-                    beat.dynamics = DynamicValue.MP;
-                    break;
-                case 'mf':
-                    beat.dynamics = DynamicValue.MF;
-                    break;
-            }
-        }
-    }
-
-    private parseTimeModification(element: XmlNode, beat: Beat): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'actual-notes':
-                    beat.tupletNumerator = parseInt(c.innerText);
-                    break;
-                case 'normal-notes':
-                    beat.tupletDenominator = parseInt(c.innerText);
-                    break;
-            }
-        }
-    }
-
-    private parseUnpitched(element: XmlNode, note: Note): void {
-        let step: string = '';
-        let semitones: number = 0;
-        let octave: number = 0;
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'display-step':
-                    step = c.innerText;
-                    break;
-                case 'display-alter':
-                    semitones = parseInt(c.innerText);
-                    break;
-                case 'display-octave':
-                    // 0-9, 4 for middle C
-                    octave = parseInt(c.innerText);
-                    break;
-            }
-        }
-        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
-        note.octave = (value / 12) | 0;
-        note.tone = value - note.octave * 12;
-    }
-
-    private parsePitch(element: XmlNode, note: Note): void {
-        let step: string = '';
-        let semitones: number = 0;
-        let octave: number = 0;
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'step':
-                    step = c.innerText;
-                    break;
-                case 'alter':
-                    semitones = parseFloat(c.innerText);
-                    if (isNaN(semitones)) {
-                        semitones = 0;
-                    }
-                    break;
-                case 'octave':
-                    // 0-9, 4 for middle C
-                    octave = parseInt(c.innerText) + 1;
-                    break;
-            }
-        }
-        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + (semitones | 0);
-        note.octave = (value / 12) | 0;
-        note.tone = value - note.octave * 12;
-    }
-
-    private getOrCreateVoice(bar: Bar, index: number): Voice {
-        if (index < bar.voices.length) {
-            return bar.voices[index];
-        }
-        for (let i: number = bar.voices.length; i <= index; i++) {
-            bar.addVoice(new Voice());
-        }
-        this._maxVoices = Math.max(this._maxVoices, bar.voices.length);
-        return bar.voices[index];
-    }
-
-    private parseDirection(element: XmlNode, masterBar: MasterBar): void {
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'sound':
-                    let tempo: string = c.getAttribute('tempo');
-                    if (tempo) {
-                        let tempoAutomation: Automation = new Automation();
-                        tempoAutomation.isLinear = true;
-                        tempoAutomation.type = AutomationType.Tempo;
-                        tempoAutomation.value = parseInt(tempo);
-                        masterBar.tempoAutomations.push(tempoAutomation);
-                        if (masterBar.index === 0) {
-                            masterBar.score.tempo = tempoAutomation.value;
+                    if (element.attributes.has('number')) {
+                        this._simileMarkPerStaff = this._simileMarkPerStaff ?? new Map<number, SimileMark>();
+                        const staff = parseInt(element.attributes.get('number')!) - 1;
+                        if (simileMark == null) {
+                            this._simileMarkPerStaff!.delete(staff);
+                        } else {
+                            this._simileMarkPerStaff!.set(staff, simileMark);
                         }
+                    } else {
+                        this._simileMarkAllStaves = simileMark;
                     }
-                    break;
-                case 'direction-type':
-                    let directionType: XmlNode = c.firstElement!;
-                    switch (directionType.localName) {
-                        case 'words':
-                            this._currentDirection = directionType.innerText;
-                            break;
-                        case 'metronome':
-                            this.parseMetronome(directionType, masterBar);
-                            break;
-                    }
-                    break;
-            }
-        }
-    }
 
-    private parseMetronome(element: XmlNode, masterBar: MasterBar): void {
-        let unit: Duration = Duration.Quarter;
-        let perMinute: number = 120;
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'beat-unit':
-                    unit = this.getDuration(c.innerText);
                     break;
-                case 'per-minute':
-                    perMinute = parseInt(c.innerText);
-                    break;
+                // case 'double': Not supported
+                // case 'slash': Not supported
             }
-        }
-        let tempoAutomation: Automation = new Automation();
-        tempoAutomation.type = AutomationType.Tempo;
-        tempoAutomation.value = (perMinute * (unit / 4)) | 0;
-
-        if (!this.hasSameTempo(masterBar, tempoAutomation)) {
-            masterBar.tempoAutomations.push(tempoAutomation);
-            if (masterBar.index === 0) {
-                masterBar.score.tempo = tempoAutomation.value;
-            }
-        }
-    }
-    private hasSameTempo(masterBar: MasterBar, tempoAutomation: Automation) {
-        for (const existing of masterBar.tempoAutomations) {
-            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value == existing.value) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private parseAttributes(element: XmlNode, bars: Bar[], masterBar: MasterBar, track: Track): void {
-        let num: number = 0;
-        let hasTime: boolean = false;
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'divisions':
-                    this._divisionsPerQuarterNote = parseInt(c.innerText);
-                    break;
-                case 'key':
-                    this.parseKey(c, masterBar);
-                    break;
-                case 'time':
-                    this.parseTime(c, masterBar);
-                    hasTime = true;
-                    break;
-                case 'clef':
-                    num = parseInt(c.getAttribute('number'));
-                    if (isNaN(num)) {
-                        num = 1;
-                    }
-                    this.parseClef(c, bars[num - 1]);
-                    break;
-                case 'staff-details':
-                    this.parseStaffDetails(c, track);
-                    break;
-                case 'transpose':
-                    this.parseTranspose(c, track);
-                    break;
-            }
-        }
-        if (!hasTime) {
-            masterBar.timeSignatureCommon = true;
         }
     }
 
@@ -1335,17 +1284,73 @@ export class MusicXmlImporter extends ScoreImporter {
         let semitones: number = 0;
         for (let c of element.childElements()) {
             switch (c.localName) {
+                // case 'diatonic': Not supported
                 case 'chromatic':
                     semitones += parseInt(c.innerText);
                     break;
                 case 'octave-change':
                     semitones += parseInt(c.innerText) * 12;
                     break;
+                // case 'double': Not supported
             }
         }
-        for (let staff of track.staves) {
-            staff.transpositionPitch = semitones;
+
+        // TODO: we do not have a "playbackTranspositionPitch" on the data model
+        // we need to transpose down all notes inline and reverse the transpose via
+        // displayTranspositionPitch
+
+        // if (element.attributes.has('number')) {
+        //     const staff = this.getOrCreateStaff(track, parseInt(element.attributes.get('number')!) - 1);
+        //     staff.transpositionPitch = semitones;
+        // } else {
+        //     for (let staff of track.staves) {
+        //         staff.transpositionPitch = semitones;
+        //     }
+        // }
+    }
+
+    private parseStaffDetails(element: XmlNode, staff: Staff): void {
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                // case 'staff-type': Ignored
+                case 'staff-lines':
+                    staff.standardNotationLineCount = parseInt(c.innerText);
+                    break;
+                // case 'line-detail': Ignored
+                case 'staff-tuning':
+                    this.parseStaffTuning(c, staff);
+                    break;
+                case 'capo':
+                    staff.capo = parseInt(c.innerText);
+                    break;
+                // case 'staff-size': Not supported
+            }
         }
+    }
+
+    private parseStaffTuning(element: XmlNode, staff: Staff): void {
+        staff.showTablature = true;
+        staff.showStandardNotation = false;
+
+        let line: number = parseInt(element.getAttribute('line'));
+        let tuningStep: string = 'C';
+        let tuningOctave: string = '';
+        let tuningAlter: number = 0;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'tuning-step':
+                    tuningStep = c.innerText;
+                    break;
+                case 'tuning-alter':
+                    tuningAlter = parseInt(c.innerText);
+                    break;
+                case 'tuning-octave':
+                    tuningOctave = c.innerText;
+                    break;
+            }
+        }
+        let tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
+        staff.tuning[staff.tuning.length - line] = tuning;
     }
 
     private parseClef(element: XmlNode, bar: Bar): void {
@@ -1406,9 +1411,6 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTime(element: XmlNode, masterBar: MasterBar): void {
-        if (element.getAttribute('symbol') === 'common') {
-            masterBar.timeSignatureCommon = true;
-        }
         let beatsParsed: boolean = false;
         let beatTypeParsed: boolean = false;
         for (let c of element.childElements()) {
@@ -1434,37 +1436,49 @@ export class MusicXmlImporter extends ScoreImporter {
                         beatTypeParsed = true;
                     }
                     break;
+                case 'time-symbol':
+                    switch (c.innerText) {
+                        case 'common':
+                            masterBar.timeSignatureCommon = true;
+                            break;
+                        // case 'cut': Not supported
+                        // case 'dotted-note': Not supported
+                        // case 'normal': implicit
+                        // case 'note': Not supported
+                        // case 'single-number': Not supported
+                    }
+                    break;
+                // case 'interchangeable': Not supported
+                // case 'senza-misura': Not supported
             }
         }
     }
 
     private parseKey(element: XmlNode, masterBar: MasterBar): void {
-        let fifths: number = -2147483648;
-        //let keyStep: number = -2147483648;
-        //let keyAlter: number = -2147483648;
+        let fifths: number = -KeySignature.C;
         let mode: string = '';
+
         for (let c of element.childElements()) {
             switch (c.localName) {
+                // case 'cancel': not supported
                 case 'fifths':
                     fifths = parseInt(c.innerText);
-                    break;
-                case 'key-step':
-                    //keyStep = parseInt(c.innerText);
-                    break;
-                case 'key-alter':
-                    //keyAlter = parseInt(c.innerText);
                     break;
                 case 'mode':
                     mode = c.innerText;
                     break;
+
+                // case 'key-step': Not supported
+                // case 'key-alter': Not supported
+                // case 'key-accidental': Not supported
+                // case 'key-octave': Not supported
             }
         }
+
         if (-7 <= fifths && fifths <= 7) {
-            // TODO: check if this is conrrect
             masterBar.keySignature = fifths as KeySignature;
         } else {
             masterBar.keySignature = KeySignature.C;
-            // TODO: map keyStep/keyAlter to internal keysignature
         }
         if (mode === 'minor') {
             masterBar.keySignatureType = KeySignatureType.Minor;
@@ -1473,128 +1487,1329 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private getOrCreateMasterBar(index: number): MasterBar {
-        if (index < this._score.masterBars.length) {
-            return this._score.masterBars[index];
+    private parseDirection(element: XmlNode, masterBar: MasterBar, track: Track) {
+        const directionTypes: XmlNode[] = [];
+        // let offset = 0;
+        // let voiceIndex = -1;
+        let staffIndex = -1;
+
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'direction-type':
+                    directionTypes.push(c.firstElement!);
+                    break;
+                case 'offset':
+                    // offset = parseInt(c.innerText);
+                    break;
+                // case 'footnote': Ignored
+                // case 'level': Ignored
+                case 'voice':
+                    // voiceIndex = parseInt(c.innerText) - 1;
+                    break;
+                case 'staff':
+                    staffIndex = parseInt(c.innerText) - 1;
+                    break;
+                // case 'sound': Ignored
+                // case 'listening': Ignored
+            }
         }
-        for (let i: number = this._score.masterBars.length; i <= index; i++) {
-            let mb: MasterBar = new MasterBar();
+
+        let staff: Staff | null = null;
+        if (staffIndex >= 0) {
+            staff = this.getOrCreateStaff(track, staffIndex);
+        } else if (this._lastBeat !== null) {
+            staff = this._lastBeat.voice.bar.staff;
+        } else {
+            staff = this.getOrCreateStaff(track, 0);
+        }
+
+        const bar = staff ? this.getOrCreateBar(staff, masterBar) : null;
+
+        const ratioPosition = 0; // TODO
+
+        // let previousWords: string = '';
+
+        for (const direction of directionTypes) {
+            switch (direction.localName) {
+                case 'rehearsal':
+                    masterBar.section = new Section();
+                    masterBar.section.marker = direction.innerText;
+                    break;
+                case 'segno':
+                    masterBar.addDirection(Direction.TargetSegno);
+                    break;
+                case 'coda':
+                    masterBar.addDirection(Direction.TargetCoda);
+                    break;
+                case 'words':
+                    // previousWords = direction.innerText;
+                    break;
+                // case 'symbol': Not supported
+                case 'wedge':
+                    switch (direction.getAttribute('type')) {
+                        case 'crescendo':
+                            this._nextBeatCrescendo = CrescendoType.Crescendo;
+                            break;
+                        case 'diminuendo':
+                            this._nextBeatCrescendo = CrescendoType.Decrescendo;
+                            break;
+                        // case 'continue': Ignore
+                        case 'stop':
+                            this._nextBeatCrescendo = null;
+                            break;
+                    }
+                    break;
+                case 'dynamics':
+                    this._nextBeatDynamics = this.parseDynamics(direction);
+                    break;
+                // case 'dashes': Not supported, combine with previousWords to identify effects
+                // case 'bracket': Not supported, combine with previousWords to identify effects
+                case 'pedal':
+                    const pedal = this.parsePedal(direction);
+                    if (pedal && bar) {
+                        pedal.ratioPosition = ratioPosition;
+                        bar.sustainPedals.push(pedal);
+                    }
+                    break;
+                case 'metronome':
+                    this.parseMetronome(direction, masterBar, ratioPosition);
+                    break;
+                case 'octave-shift':
+                    this._nextBeatOttavia = this.parseOctaveShift(direction);
+                    break;
+                // case 'harp-pedals': Not supported
+                // case 'damp': Not supported
+                // case 'damp-all': Not supported
+                // case 'eyeglasses': Not supported
+                // case 'string-mute': Not supported
+                // case 'scordatura': Not supported
+                // case 'image': Not supported
+                // case 'principal-voice': Not supported
+                // case 'percussion': Not supported
+                // case 'accordion-registration': Not supported
+                // case 'staff-divide': Not supported
+                // case 'other-direction': Not supported
+            }
+        }
+    }
+    private parseOctaveShift(element: XmlNode): Ottavia | null {
+        const type = element.getAttribute('type');
+        const size = parseInt(element.getAttribute('size', '8'));
+
+        switch (size) {
+            case 15:
+                switch (type) {
+                    case 'up':
+                        return Ottavia._15mb;
+                    case 'down':
+                        return Ottavia._15ma;
+                    case 'stop':
+                        return Ottavia.Regular;
+                    case 'continue':
+                        return this._nextBeatOttavia;
+                }
+                break;
+            case 8:
+                switch (type) {
+                    case 'up':
+                        return Ottavia._8vb;
+                    case 'down':
+                        return Ottavia._8va;
+                    case 'stop':
+                        return Ottavia.Regular;
+                    case 'continue':
+                        return this._nextBeatOttavia;
+                }
+                break;
+        }
+
+        return null;
+    }
+    private parseMetronome(element: XmlNode, masterBar: MasterBar, ratioPosition: number) {
+        let unit: Duration | null = null;
+        let perMinute: number = -1;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'beat-unit':
+                    unit = this.parseBeatDuration(c);
+                    break;
+                //  case 'beat-unit-dot' not supported
+                //  case 'beat-unit-tied' not supported
+                case 'per-minute':
+                    perMinute = parseInt(c.innerText);
+                    break;
+                // case 'metronome-arrows': not supported
+                // case 'metronome-note': not supported
+                // case 'metronome-relation': not supported
+            }
+        }
+
+        if (unit !== null && perMinute > 0) {
+            const tempoAutomation: Automation = new Automation();
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = (perMinute * (unit / 4)) | 0;
+            tempoAutomation.ratioPosition = ratioPosition;
+
+            if (!this.hasSameTempo(masterBar, tempoAutomation)) {
+                masterBar.tempoAutomations.push(tempoAutomation);
+                if (masterBar.index === 0) {
+                    masterBar.score.tempo = tempoAutomation.value;
+                }
+            }
+        }
+    }
+
+    private hasSameTempo(masterBar: MasterBar, tempoAutomation: Automation) {
+        for (const existing of masterBar.tempoAutomations) {
+            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value == existing.value) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private parsePedal(element: XmlNode): SustainPedalMarker | null {
+        const marker = new SustainPedalMarker();
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'pedal-type':
+                    switch (c.innerText) {
+                        case 'start':
+                            marker.pedalType = SustainPedalMarkerType.Down;
+                            break;
+                        case 'stop':
+                            marker.pedalType = SustainPedalMarkerType.Up;
+                            break;
+                        // case 'sostenuto': Not supported
+                        // case 'change': Not supported
+                        case 'continue':
+                            marker.pedalType = SustainPedalMarkerType.Hold;
+                            break;
+                        // case 'discontinue': Not supported
+                        // case 'resume': Not supported
+                        default:
+                            return null;
+                    }
+                    break;
+            }
+        }
+        return marker;
+    }
+
+    private parseDynamics(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'p':
+                    return DynamicValue.P;
+                case 'pp':
+                    return DynamicValue.PP;
+                case 'ppp':
+                    return DynamicValue.PPP;
+                // case 'pppp': not supported
+                // case 'ppppp': not supported
+                // case 'pppppp': not supported
+
+                case 'f':
+                    return DynamicValue.F;
+                case 'ffp':
+                    return DynamicValue.FF;
+                case 'fff':
+                    return DynamicValue.FFF;
+                // case 'ffff': not supported
+                // case 'fffff': not supported
+                // case 'ffffff': not supported
+
+                case 'mp':
+                    return DynamicValue.MP;
+                case 'mf':
+                    return DynamicValue.MF;
+                // case 'sf': not supported
+                // case 'sfp': not supported
+                // case 'sfpp': not supported
+                // case 'fp': not supported
+                // case 'rf': not supported
+                // case 'rfz': not supported
+                // case 'sfz': not supported
+                // case 'sffz': not supported
+                // case 'fz': not supported
+                // case 'n': not supported
+                // case 'pf': not supported
+                // case 'sfzp': not supported
+                // case 'other-dynamics': not supported
+            }
+        }
+
+        return null;
+    }
+
+    private parseForward(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'duration':
+                    this._musicalPosition += parseInt(c.innerText);
+                    break;
+                // case 'footnote': Ignored
+                // case 'level': Ignored
+                // case 'voice': Not supported, spec is quite vague how to this should behave, we keep it simple for now
+                // case 'staff': Not supported, spec is quite vague how to this should behave, we keep it simple for now
+            }
+        }
+    }
+
+    private parseBackup(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'duration':
+                    const beat = this._lastBeat;
+                    if (beat) {
+                        let musicalPosition = this._musicalPosition;
+                        musicalPosition -= parseInt(c.innerText);
+                        if (musicalPosition < 0) {
+                            musicalPosition = 0;
+                        }
+                        this._musicalPosition = musicalPosition;
+                    }
+                    break;
+                // case 'footnote': Ignored
+                // case 'level': Ignored
+            }
+        }
+    }
+
+    private getOrCreateStaff(track: Track, staffIndex: number): Staff {
+        while (track.staves.length <= staffIndex) {
+            const staff = new Staff();
+            track.addStaff(staff);
+
+            // ensure bars on new staff
             if (this._score.masterBars.length > 0) {
-                let prev: MasterBar = this._score.masterBars[this._score.masterBars.length - 1];
-                mb.timeSignatureDenominator = prev.timeSignatureDenominator;
-                mb.timeSignatureNumerator = prev.timeSignatureNumerator;
-                mb.keySignature = prev.keySignature;
-                mb.keySignatureType = prev.keySignatureType;
+                this.getOrCreateBar(staff, this._score.masterBars[this._score.masterBars.length - 1]);
             }
-            this._score.addMasterBar(mb);
         }
-        return this._score.masterBars[index];
+
+        track.ensureStaveCount(staffIndex + 1);
+        return track.staves[staffIndex];
     }
 
-    private parseIdentification(element: XmlNode): void {
-        for (let c of element.childElements()) {
+    private getOrCreateBar(staff: Staff, masterBar: MasterBar): Bar {
+        const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+
+        while (staff.bars.length <= masterBar.index) {
+            const newBar = new Bar();
+
+            if (this._simileMarkPerStaff?.has(staff.index) === true) {
+                const simileMark = this._simileMarkPerStaff.get(staff.index)!;
+                newBar.simileMark = simileMark;
+                if (simileMark == SimileMark.FirstOfDouble) {
+                    this._simileMarkPerStaff.set(staff.index, SimileMark.SecondOfDouble);
+                } else if (simileMark == SimileMark.SecondOfDouble) {
+                    this._simileMarkPerStaff.set(staff.index, SimileMark.FirstOfDouble);
+                }
+            } else if (this._simileMarkAllStaves !== null) {
+                const simileMark = this._simileMarkAllStaves!;
+                newBar.simileMark = simileMark;
+                if (simileMark == SimileMark.FirstOfDouble) {
+                    this._simileMarkAllStaves = SimileMark.SecondOfDouble;
+                } else if (simileMark == SimileMark.SecondOfDouble) {
+                    this._simileMarkAllStaves = SimileMark.FirstOfDouble;
+                }
+            }
+
+            staff.addBar(newBar);
+
+            if (newBar.previousBar) {
+                newBar.clef = newBar.previousBar.clef;
+                newBar.clefOttava = newBar.previousBar.clefOttava;
+            }
+
+            for (let i = 0; i < voiceCount; i++) {
+                let voice: Voice = new Voice();
+                newBar.addVoice(voice);
+            }
+        }
+
+        return staff.bars[masterBar.index];
+    }
+
+    private getOrCreateVoice(bar: Bar, voiceIndex: number): Voice {
+        let voicesCreated = false;
+        while (bar.voices.length <= voiceIndex) {
+            bar.addVoice(new Voice());
+            voicesCreated = true;
+        }
+
+        // ensure voices on all bars
+        if (voicesCreated) {
+            for (const b of bar.staff.bars) {
+                while (b.voices.length <= voiceIndex) {
+                    b.addVoice(new Voice());
+                }
+            }
+        }
+
+        return bar.voices[voiceIndex];
+    }
+
+    private parseNote(element: XmlNode, masterBar: MasterBar, track: Track) {
+        // Beat level information
+        let beat: Beat | null = null;
+        let graceType = GraceType.None;
+        let graceDurationInDivisions = 0;
+        // let graceTimeStealPrevious = 0;
+        // let graceTimeStealFollowing = 0;
+
+        let isChord = false;
+
+        let staffIndex = 0;
+        let voiceIndex = 0;
+
+        let durationInTicks = 0;
+        let beatDuration: Duration | null = null;
+        let dots = 0;
+
+        let tupletNumerator = -1;
+        let tupletDenominator = -1;
+
+        let preferredBeamDirection: BeamDirection | null = null;
+
+        // Note level
+        let note: Note | null = null;
+
+        // will create new beat with all information in the correct tree
+        // or add the note to an existing beat if specified accordingly.
+        const ensureBeat = () => {
+            if (beat !== null) {
+                return;
+            }
+
+            if (isChord && !this._lastBeat) {
+                Logger.warning(
+                    'MusicXML',
+                    'Malformed MusicXML, <chord /> cannot be set on the first note of a measure'
+                );
+                isChord = false;
+            }
+
+            if (isChord && !note) {
+                Logger.warning('MusicXML', 'Cannot mix <chord /> and <rest />');
+                isChord = false;
+            }
+
+            const staff = this.getOrCreateStaff(track, staffIndex);
+            if (isChord) {
+                beat = this._lastBeat!;
+                beat.addNote(note!);
+                if (tieNode) {
+                    this.parseTie(tieNode, note!, staff);
+                }
+                return;
+            }
+
+            const bar = this.getOrCreateBar(staff, masterBar);
+            const voice = this.getOrCreateVoice(bar, voiceIndex);
+
+            const actualMusicalPosition = voice.beats.length === 0 ? 0 : voice.beats[voice.beats.length - 1].displayEnd;
+
+            const gap = this._musicalPosition - actualMusicalPosition;
+            if (gap > 0) {
+                // need an empty placeholder beat for the gap
+                const placeholder = new Beat();
+                placeholder.dynamics = this._currentDynamics;
+                placeholder.isEmpty = true;
+                placeholder.duration = Duration.TwoHundredFiftySixth; // smallest we have
+                placeholder.overrideDisplayDuration = gap;
+                voice.addBeat(placeholder);
+            } else if (gap < 0) {
+                Logger.error(
+                    'MusicXML',
+                    'Unsupported forward/backup detected. Cannot fill new beats into already filled area of voice'
+                );
+            }
+
+            const newBeat = new Beat();
+            beat = newBeat;
+            newBeat.isEmpty = false;
+            newBeat.dynamics = this._currentDynamics;
+
+            const automations = this._nextBeatAutomations;
+            this._nextBeatAutomations = null;
+            if (automations !== null) {
+                for (const automation of automations) {
+                    newBeat.automations.push(automation);
+                }
+            }
+
+            const chord = this._nextBeatChord;
+            this._nextBeatChord = null;
+            if (chord !== null) {
+                newBeat.chordId = chord.uniqueId;
+                if (!voice.bar.staff.hasChord(chord.uniqueId)) {
+                    voice.bar.staff.addChord(newBeat.chordId!, chord);
+                }
+            }
+
+            const crescendo = this._nextBeatCrescendo;
+            // Don't reset until 'stop' this._nextBeatCrescendo = null;
+            if (crescendo !== null) {
+                newBeat.crescendo = crescendo;
+            }
+
+            const dynamics = this._nextBeatDynamics;
+            // Don't reset until changed this._nextBeatDynamics = null;
+            if (dynamics !== null) {
+                newBeat.dynamics = dynamics;
+            }
+
+            const ottavia = this._nextBeatOttavia;
+            // Don't set until 'stop'
+            if (ottavia !== null) {
+                newBeat.ottava = ottavia;
+            }
+
+            if (note !== null) {
+                newBeat.addNote(note);
+
+                if (tieNode) {
+                    this.parseTie(tieNode, note!, staff);
+                }
+            }
+
+            // for handling the correct musical position we already need to do some basic beat linking
+            // and assignments of start/durations as we progress.
+            if (this._lastBeat) {
+                const lastBeat = this._lastBeat!;
+
+                // chain beats already
+                lastBeat.nextBeat = newBeat;
+                newBeat.previousBeat = lastBeat!;
+
+                // find display start from previous non-grace beat,
+                // reminder: we give grace a display position of 0, that's why we skip them.
+                // visually they 'stick' to their next beat.
+                let previousNonGraceBeat: Beat | null = lastBeat;
+                while (previousNonGraceBeat !== null) {
+                    if (previousNonGraceBeat.graceType === GraceType.None) {
+                        // found
+                        break;
+                    } else if (previousNonGraceBeat.index > 0) {
+                        previousNonGraceBeat = previousNonGraceBeat.previousBeat;
+                    } else {
+                        previousNonGraceBeat = null;
+                    }
+                }
+
+                if (previousNonGraceBeat !== null) {
+                    newBeat.displayStart = previousNonGraceBeat.displayEnd;
+                }
+            }
+
+            voice.addBeat(newBeat);
+
+            // duration only after we added it into the tree
+            if (graceType !== GraceType.None) {
+                newBeat.graceType = graceType;
+                this.applyBeatDurationFromTicks(newBeat, graceDurationInDivisions, null, false);
+            } else {
+                newBeat.tupletNumerator = tupletNumerator;
+                newBeat.tupletDenominator = tupletDenominator;
+                newBeat.dots = dots;
+                newBeat.preferredBeamDirection = preferredBeamDirection;
+                this.applyBeatDurationFromTicks(newBeat, durationInTicks, beatDuration, true);
+            }
+
+            this._musicalPosition += durationInTicks;
+            this._lastBeat = newBeat;
+        };
+
+        let tieNode: XmlNode | null = null;
+
+        for (const c of element.childElements()) {
             switch (c.localName) {
-                case 'creator':
-                    if (c.getAttribute('type') === 'composer') {
-                        this._score.music = c.innerText;
+                case 'grace':
+                    const makeTime = parseInt(c.getAttribute('make-time', '-1'));
+                    if (makeTime >= 0) {
+                        graceDurationInDivisions = this.musicXmlDivisionsToAlphaTabTicks(makeTime);
+                        graceType = GraceType.BeforeBeat;
+                    } else {
+                        graceType = GraceType.OnBeat;
+                    }
+
+                    if (c.getAttribute('slash') === 'yes') {
+                        graceType = GraceType.BeforeBeat;
+                    }
+
+                    // graceTimeStealPrevious = parseInt(c.getAttribute('steal-time-following', '0')) / 100.0;
+                    // graceTimeStealFollowing = parseInt(c.getAttribute('steal-time-previous', '0')) / 100.0;
+                    break;
+
+                case 'chord':
+                    isChord = true;
+                    break;
+
+                // case 'cue': not supported
+
+                case 'pitch':
+                    note = this.parsePitch(c);
+                    break;
+                case 'unpitched':
+                    note = this.parseUnpitched(c, track);
+                    break;
+                case 'rest':
+                    note = null; // rest beat
+                    if (beatDuration === null) {
+                        beatDuration = Duration.Whole;
                     }
                     break;
-                case 'rights':
-                    if (this._score.copyright) {
-                        this._score.copyright += '\n';
-                    }
-                    this._score.copyright += c.innerText;
+
+                case 'duration':
+                    durationInTicks = this.parseDuration(c);
                     break;
+                case 'tie':
+                    if (note === null) {
+                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
+                    } else {
+                        tieNode = c;
+                    }
+                    break;
+
+                // case 'instrument': Not supported
+
+                // case 'footnote': Ignored
+                // case 'level': Ignored
+                case 'voice':
+                    voiceIndex = parseInt(c.innerText);
+                    if (isNaN(voiceIndex)) {
+                        Logger.warning('MusicXML', 'Voices need to be specified as numbers');
+                        voiceIndex = 0;
+                    } else {
+                        voiceIndex = voiceIndex - 1;
+                    }
+                    break;
+                case 'type':
+                    beatDuration = this.parseBeatDuration(c);
+                    break;
+                case 'dot':
+                    dots++;
+                    break;
+                case 'accidental':
+                    if (note === null) {
+                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
+                    } else {
+                        this.parseAccidental(c, note);
+                    }
+                    break;
+                case 'time-modification':
+                    for (const tmc of c.childElements()) {
+                        switch (tmc.localName) {
+                            case 'actual-notes':
+                                tupletNumerator = parseInt(tmc.innerText);
+                                break;
+                            case 'normal-notes':
+                                tupletDenominator = parseInt(tmc.innerText);
+                                break;
+                            // case 'normal-type': not supported
+                            // case 'normal-dot': not supported
+                        }
+                    }
+                    break;
+                case 'stem':
+                    preferredBeamDirection = this.parseStem(c);
+                    break;
+                // case 'notehead': Not supported
+                // case 'notehead-text': Not supported
+                case 'staff':
+                    staffIndex = parseInt(c.innerText) - 1;
+                    break;
+                // case 'beam': not supported
+                case 'notations':
+                    ensureBeat();
+                    this.parseNotations(c, note, beat!);
+                    break;
+                case 'lyric':
+                    ensureBeat();
+                    this.parseLyric(c, beat!);
+                    break;
+                // case 'play': Ignored
+                // case 'listen': Ignored
             }
         }
+
+        // if not yet created do it befor we exit to ensure we created the beat/note
+        ensureBeat();
     }
 
-    private parsePartList(element: XmlNode): void {
+    private musicXmlDivisionsToAlphaTabTicks(divisions: number): number {
+        // we translate the Divisions-per-quarter-note of the MusicXML to our fixed MidiUtils.QuarterTime
+
+        return (divisions * MidiUtils.QuarterTime) / this._divisionsPerQuarterNote;
+    }
+
+    private parseBeatDuration(element: XmlNode): Duration | null {
+        switch (element.innerText) {
+            // case "1024th": not supported
+            // case "512th": not supported
+            case '256th':
+                return Duration.TwoHundredFiftySixth;
+            case '128th':
+                return Duration.OneHundredTwentyEighth;
+            case '64th':
+                return Duration.SixtyFourth;
+            case '32nd':
+                return Duration.ThirtySecond;
+            case '16th':
+                return Duration.Sixteenth;
+            case 'eighth':
+                return Duration.Eighth;
+            case 'quarter':
+                return Duration.Quarter;
+            case 'half':
+                return Duration.Half;
+            case 'whole':
+                return Duration.Whole;
+            case 'breve':
+                return Duration.DoubleWhole;
+            case 'long':
+                return Duration.QuadrupleWhole;
+            // case "maxima": not supported
+        }
+
+        return null;
+    }
+
+    private applyBeatDurationFromTicks(
+        newBeat: Beat,
+        ticks: number,
+        beatDuration: Duration | null,
+        applyDisplayDuration: boolean
+    ) {
+        if (!beatDuration) {
+            let durations = [
+                Duration.SixtyFourth,
+                Duration.ThirtySecond,
+                Duration.Sixteenth,
+                Duration.Eighth,
+                Duration.Quarter,
+                Duration.Half,
+                Duration.Whole
+            ].map(d => MidiUtils.toTicks(d));
+
+            for (let d of durations) {
+                if (ticks >= d) {
+                    beatDuration = d;
+                    break;
+                }
+            }
+        }
+
+        newBeat.duration = beatDuration ?? Duration.Sixteenth;
+        if (applyDisplayDuration) {
+            newBeat.overrideDisplayDuration = ticks;
+        }
+
+        newBeat.updateDurations();
+    }
+
+    private parseLyric(element: XmlNode, beat: Beat) {
         for (let c of element.childElements()) {
             switch (c.localName) {
-                case 'part-group':
-                    this.parsePartGroup(c);
+                // case 'syllabic' not supported
+                case 'text':
+                    if (beat.text) {
+                        beat.text += ' ' + c.innerText;
+                    } else {
+                        beat.text = c.innerText;
+                    }
                     break;
-                case 'score-part':
-                    this.parseScorePart(c);
+                case 'elision':
+                    beat.text += c.innerText;
                     break;
             }
         }
     }
 
-    private parsePartGroup(element: XmlNode): void {
-        let type: string = element.getAttribute('type');
+    private parseNotations(element: XmlNode, note: Note | null, beat: Beat) {
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                // case 'footnote': Ignored
+                // case 'level': Ignored
+                case 'tied':
+                    if (note) {
+                        this.parseTied(c, note, beat.voice.bar.staff);
+                    }
+                    break;
+                case 'slur':
+                    if (note) {
+                        this.parseSlur(c, note);
+                    }
+                    break;
+                // case 'tuplet': Handled via time-modification
+                case 'glissando':
+                    if (note) {
+                        this.parseGlissando(c, note);
+                    }
+                    break;
+                case 'slide':
+                    if (note) {
+                        this.parseSlide(c, note);
+                    }
+                    break;
+                case 'ornaments':
+                    if (note) {
+                        this.parseOrnaments(c, note);
+                    }
+                    break;
+                case 'technical':
+                    this.parseTechnical(c, note, beat);
+                    break;
+                case 'articulations':
+                    if (note) {
+                        this.parseArticulations(c, note);
+                    }
+                    break;
+                case 'dynamics':
+                    const dynamics = this.parseDynamics(c);
+                    if (dynamics !== null) {
+                        beat.dynamics = dynamics;
+                        this._currentDynamics = dynamics;
+                    }
+                    break;
+                case 'fermata':
+                    this.parseFermata(c, beat);
+                    break;
+                case 'arpeggiate':
+                    this.parseArpeggiate(c, beat);
+                    break;
+                // case 'non-arpeggiate': Not supported
+                // case 'accidental-mark': Not supported
+                // case 'other-notation': Not supported
+            }
+        }
+    }
+
+    private getStaffContext(staff: Staff) {
+        if (!this._staffToContext.has(staff)) {
+            const context = new StaffContext();
+            this._staffToContext.set(staff, context);
+            return context;
+        }
+        return this._staffToContext.get(staff)!;
+    }
+
+    private parseGlissando(element: XmlNode, note: Note) {
+        const type = element.getAttribute('type');
+        let number = element.getAttribute('number', '1');
+
+        const context = this.getStaffContext(note.beat.voice.bar.staff);
+
         switch (type) {
             case 'start':
-                this._currentPartGroup = element.getAttribute('number');
-                this._partGroups.set(this._currentPartGroup, []);
+                context.slideOrigins.set(number, note);
                 break;
             case 'stop':
-                this._currentPartGroup = null;
+                if (context.slideOrigins.has(number)) {
+                    const origin = context.slideOrigins.get(number)!;
+                    origin.slideTarget = note;
+                    note.slideOrigin = origin;
+                    origin.slideOutType = SlideOutType.Shift; // TODO: wavy lines
+                }
                 break;
         }
     }
 
-    private parseScorePart(element: XmlNode): void {
-        let id: string = element.getAttribute('id');
-        let track: Track = new Track();
-        track.ensureStaveCount(1);
-        let staff: Staff = track.staves[0];
-        staff.showStandardNotation = true;
-        this._trackById.set(id, track);
-        this._score.addTrack(track);
-        if (this._currentPartGroup) {
-            this._partGroups.get(this._currentPartGroup)!.push(track);
-        }
-        for (let c of element.childElements()) {
-            switch (c.localName) {
-                case 'part-name':
-                    track.name = c.innerText;
-                    break;
-                case 'part-abbreviation':
-                    track.shortName = c.innerText;
-                    break;
-                case 'midi-instrument':
-                    this.parseMidiInstrument(c, track);
-                    break;
-            }
-        }
-        if (this.isEmptyTuning(track.staves[0].tuning)) {
-            track.staves[0].stringTuning.tunings = [];
+    private parseSlur(element: XmlNode, note: Note) {
+        let slurNumber: string = element.getAttribute('number', '1');
+
+        const context = this.getStaffContext(note.beat.voice.bar.staff);
+
+        switch (element.getAttribute('type')) {
+            case 'start':
+                context.slurStarts.set(slurNumber, note);
+                break;
+            case 'stop':
+                if (context.slurStarts.has(slurNumber)) {
+                    note.isSlurDestination = true;
+                    const slurStart = context.slurStarts.get(slurNumber)!;
+                    slurStart.slurDestination = note;
+                    note.slurOrigin = slurStart;
+
+                    context.slurStarts.delete(slurNumber);
+                }
+                break;
         }
     }
 
-    private isEmptyTuning(tuning: number[]): boolean {
-        if (!tuning) {
-            return true;
+    private parseArpeggiate(element: XmlNode, beat: Beat) {
+        const direction = element.getAttribute('direction', 'down');
+        switch (direction) {
+            case 'down':
+                beat.brushType = BrushType.ArpeggioDown;
+                break;
+            case 'up':
+                beat.brushType = BrushType.ArpeggioUp;
+                break;
         }
-        for (let i: number = 0; i < tuning.length; i++) {
-            if (tuning[i] !== 0) {
-                return false;
-            }
-        }
-        return true;
     }
 
-    private parseMidiInstrument(element: XmlNode, track: Track): void {
+    private parseFermata(element: XmlNode, beat: Beat) {
+        let fermata: FermataType;
+        switch (element.innerText) {
+            case 'normal':
+                fermata = FermataType.Medium;
+                break;
+            case 'angled':
+                fermata = FermataType.Short;
+                break;
+            case 'square':
+                fermata = FermataType.Long;
+                break;
+            // case 'double-angled': Not Supported
+            // case 'double-square': Not Supported
+            // case 'double-dot': Not Supported
+            // case 'half-curve': Not Supported
+            // case 'curlew': Not Supported
+            default:
+                fermata = FermataType.Medium;
+                break;
+        }
+
+        beat.fermata = new Fermata();
+        beat.fermata.type = fermata;
+    }
+
+    private parseArticulations(element: XmlNode, note: Note) {
         for (let c of element.childElements()) {
             switch (c.localName) {
-                case 'midi-channel':
-                    track.playbackInfo.primaryChannel = parseInt(c.innerText);
+                case 'accent':
+                    note.accentuated = AccentuationType.Normal;
                     break;
-                case 'midi-program':
-                    track.playbackInfo.program = parseInt(c.innerText);
+                case 'strong-accent':
+                    note.accentuated = AccentuationType.Heavy;
                     break;
-                case 'volume':
-                    track.playbackInfo.volume = Math.floor((parseInt(c.innerText) / 100) * 16);
+                case 'staccato':
+                    note.isStaccato = true;
                     break;
-                case 'pan':
-                    track.playbackInfo.balance = Math.max(
-                        0,
-                        Math.min(16, Math.floor(((parseInt(c.innerText) + 90) / 180) * 16))
-                    );
+                case 'tenuto':
+                    note.accentuated = AccentuationType.Tenuto;
+                    break;
+                // case 'detached-legato': Not Supported
+                // case 'staccatissimo': Not Supported
+                // case 'spiccato': Not Supported
+                // case 'scoop': Not Supported
+                // case 'plop': Not Supported
+                // case 'doit': Not Supported
+                // case 'falloff': Not Supported
+                // case 'breath-mark': Not Supported
+                // case 'caesura': Not Supported
+                // case 'stress': Not Supported
+                // case 'unstress': Not Supported
+                // case 'soft-accent': Not Supported
+                // case 'other-articulation': Not Supported
+            }
+        }
+    }
+    private parseTechnical(element: XmlNode, note: Note | null, beat: Beat) {
+        let bends: XmlNode[] = [];
+
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'up-bow':
+                    beat.pickStroke = PickStroke.Up;
+                    break;
+                case 'down-bow':
+                    beat.pickStroke = PickStroke.Down;
+                    break;
+                case 'harmonic':
+                    break;
+                // case 'open-string': Not supported
+                // case 'thumb-position': Not supported
+                case 'fingering':
+                    if (note) {
+                        note.leftHandFinger = this.parseFingering(c);
+                    }
+                    break;
+                case 'pluck':
+                    if (note) {
+                        note.rightHandFinger = this.parseFingering(c);
+                    }
+                    break;
+                // case 'double-tongue': Not supported
+                // case 'triple-tongue': Not supported
+                // case 'stopped':  Not supported
+                // case 'snap-pizzicato':  Not supported
+                case 'fret':
+                    if (note) {
+                        note.fret = parseInt(c.innerText);
+                    }
+                    break;
+                case 'string':
+                    if (note) {
+                        note.string = parseInt(c.innerText);
+                    }
+                    break;
+                case 'hammer-on':
+                case 'pull-off':
+                    if (note) {
+                        note.isHammerPullOrigin = true;
+                    }
+                    break;
+                case 'bend':
+                    bends.push(c);
+                    break;
+                case 'tap':
+                    beat.tap = true;
+                    break;
+                // case 'heel': Not supported
+                // case 'toe': Not supported
+                // case 'fingernails': Not supported
+                // case 'hole': Not supported
+                // case 'arrow': Not supported
+                // case 'handbell': Not supported
+                // case 'brass-bend': Not supported
+                // case 'flip': Not supported
+                case 'smear':
+                    if (note) {
+                        note.vibrato = VibratoType.Slight;
+                    }
+                    break;
+                // case 'open': Not supported
+                // case 'half-muted': Not supported
+                // case 'harmon-mute': Not supported
+                case 'golpe':
+                    switch (c.getAttribute('placement', 'above')) {
+                        case 'above':
+                            beat.golpe = GolpeType.Finger;
+                            break;
+                        case 'below':
+                            beat.golpe = GolpeType.Thumb;
+                            break;
+                    }
+                    break;
+                // case 'other-technical': Not supported
+            }
+        }
+
+        if (note && bends.length > 0) {
+            this.parseBends(bends, note);
+        }
+    }
+
+    private parseBends(elements: XmlNode[], note: Note): void {
+        let baseOffset: number = BendPoint.MaxPosition / elements.length;
+        let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
+        let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
+        let isFirstBend: boolean = true;
+
+        for (let bend of elements) {
+            let bendAlterElement: XmlNode | null = bend.findChildElement('bend-alter');
+            if (bendAlterElement) {
+                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
+                if (bend.findChildElement('pre-bend')) {
+                    if (isFirstBend) {
+                        currentValue += absValue;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        currentOffset += baseOffset;
+                        note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                        isFirstBend = false;
+                    } else {
+                        currentOffset += baseOffset;
+                    }
+                } else if (bend.findChildElement('release')) {
+                    if (isFirstBend) {
+                        currentValue += absValue;
+                    }
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentOffset += baseOffset;
+                    currentValue -= absValue;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                } else {
+                    // "regular" bend
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    currentValue += absValue;
+                    currentOffset += baseOffset;
+                    note.addBendPoint(new BendPoint(currentOffset, currentValue));
+                    isFirstBend = false;
+                }
+            }
+        }
+    }
+
+    private parseFingering(c: XmlNode): Fingers {
+        switch (c.innerText) {
+            case '0':
+                return Fingers.NoOrDead;
+            case '1':
+            case 'p':
+            case 't':
+                return Fingers.Thumb;
+            case '2':
+            case 'i':
+                return Fingers.IndexFinger;
+            case '3':
+            case 'm':
+                return Fingers.MiddleFinger;
+            case '4':
+            case 'a':
+                return Fingers.AnnularFinger;
+            case '5':
+            case 'c':
+                return Fingers.LittleFinger;
+        }
+
+        return Fingers.Unknown;
+    }
+
+    private parseOrnaments(element: XmlNode, note: Note): void {
+        let previousIsTrill = false;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'trill-mark':
+                    const step = parseInt(c.getAttribute('trill-step', '2'));
+                    if (note.string >= 0) {
+                        note.trillValue = note.stringTuning + step;
+                    }
+                    previousIsTrill = true;
+                    break;
+                case 'turn':
+                    note.ornament = NoteOrnament.Turn;
+                    break;
+                // case 'delayed-turn': Not supported
+                case 'inverted-turn':
+                    note.ornament = NoteOrnament.InvertedTurn;
+                    break;
+                // case 'delayed-inverted-turn': Not supported
+                // case 'vertical-turn': Not supported
+                // case 'inverted-vertical-turn': Not supported
+                // case 'shake': Not supported
+                case 'wavy-line':
+                    if (!previousIsTrill) {
+                        note.vibrato = VibratoType.Slight;
+                    }
+                    break;
+                case 'mordent':
+                    note.ornament = NoteOrnament.LowerMordent;
+                    break;
+                case 'inverted-mordent':
+                    note.ornament = NoteOrnament.UpperMordent;
+                    break;
+                // case 'schleifer': Not supported
+                case 'tremolo':
+                    switch (c.innerText) {
+                        case '1':
+                            note.beat.tremoloSpeed = Duration.Eighth;
+                            break;
+                        case '2':
+                            note.beat.tremoloSpeed = Duration.Sixteenth;
+                            break;
+                        case '3':
+                            note.beat.tremoloSpeed = Duration.ThirtySecond;
+                            break;
+                    }
+                    break;
+                // case 'haydn': Not supported
+                // case 'other-element': Not supported
+            }
+
+            previousIsTrill = c.localName === 'trill-mark';
+        }
+    }
+
+    private parseSlide(element: XmlNode, note: Note) {
+        const type = element.getAttribute('type');
+        let number = element.getAttribute('number', '1');
+
+        const context = this.getStaffContext(note.beat.voice.bar.staff);
+
+        switch (type) {
+            case 'start':
+                context.slideOrigins.set(number, note);
+                break;
+            case 'stop':
+                if (context.slideOrigins.has(number)) {
+                    const origin = context.slideOrigins.get(number)!;
+                    origin.slideTarget = note;
+                    note.slideOrigin = origin;
+                    origin.slideOutType = SlideOutType.Shift;
+                }
+                break;
+        }
+    }
+
+    private parseTied(element: XmlNode, note: Note, staff:Staff): void {
+        this.parseTie(element, note, staff);
+    }
+
+    private parseStem(element: XmlNode): BeamDirection | null {
+        switch (element.innerText) {
+            case 'down':
+                return BeamDirection.Down;
+            case 'up':
+                return BeamDirection.Up;
+            case 'none':
+            default:
+                return null;
+        }
+    }
+
+    private parseAccidental(element: XmlNode, note: Note) {
+        switch (element.innerText) {
+            case 'sharp':
+                note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                break;
+            case 'natural':
+                note.accidentalMode = NoteAccidentalMode.ForceNatural;
+                break;
+            case 'flat':
+                note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                break;
+            case 'double-sharp':
+                note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
+                break;
+            case 'flat-flat':
+                note.accidentalMode = NoteAccidentalMode.ForceDoubleFlat;
+                break;
+            // case 'sharp-sharp': Not supported
+            // case 'natural-sharp': Not supported
+            // case 'natural-flat': Not supported
+            // case 'quarter-flat': Not supported
+            // case 'quarter-sharp': Not supported
+            // case 'three-quarters-flat': Not supported
+            // case 'three-quarters-sharp': Not supported
+            // case 'sharp-down':
+            // case 'sharp-up':
+            // case 'natural-down':
+            // case 'natural-up':
+            // case 'flat-down':
+            // case 'flat-up':
+            // case 'double-sharp-down': Not supported
+            // case 'double-sharp-up': Not supported
+            // case 'flat-flat-down': Not supported
+            // case 'flat-flat-up': Not supported
+            // case 'arrow-down':
+            // case 'arrow-up':
+            // case 'triple-sharp':
+            // case 'triple-flat':
+            // case 'slash-quarter-sharp': Not supported
+            // case 'slash-sharp': Not supported
+            // case 'slash-flat': Not supported
+            // case 'double-slash-flat': Not supported
+            // case 'sharp-1':
+            // case 'sharp-2':
+            // case 'sharp-3':
+            // case 'sharp-4':
+            // case 'sharp-5':
+            // case 'flat-1':
+            // case 'flat-2':
+            // case 'flat-3':
+            // case 'flat-4':
+            // case 'flat-5':
+            // case 'sori': Not supported
+            // case 'kokon': Not supported
+            // case 'other': Not supported
+            default:
+                Logger.warning('MusicXML', `Unsupported accidental ${element.innerText}`);
+                break;
+        }
+    }
+
+    private parseTie(element: XmlNode, note: Note, staff: Staff) {
+        const type = element.getAttribute('type');
+        let number = element.getAttribute('number', '');
+
+        const context = this.getStaffContext(staff);
+
+        if (type === 'start') {
+            if (number) {
+                context.tieStartIds.set(number, note);
+            }
+
+            context.tieStarts.add(note);
+        } else if (type === 'stop' && !note.isTieDestination) {
+            let tieOrigin: Note | null = null;
+            if (number) {
+                if (!context.tieStartIds.has(number)) {
+                    return;
+                }
+
+                tieOrigin = context.tieStartIds.get(number)!;
+                context.tieStartIds.delete(number);
+            } else {
+                const realValue = this.calculatePitchedNoteValue(note);
+                for (const t of context.tieStarts) {
+                    if (this.calculatePitchedNoteValue(t) === realValue) {
+                        tieOrigin = t;
+                        context.tieStarts.delete(tieOrigin);
+                        break;
+                    }
+                }
+            }
+
+            if (!tieOrigin) {
+                return;
+            }
+
+            note.isTieDestination = true;
+            note.tieOrigin = tieOrigin;
+        }
+    }
+
+    private calculatePitchedNoteValue(note: Note) {
+        return note.octave * 12 + note.tone;
+    }
+
+    private parseDuration(element: XmlNode): number {
+        return this.musicXmlDivisionsToAlphaTabTicks(parseInt(element.innerText));
+    }
+
+    private parseUnpitched(element: XmlNode, track: Track): Note {
+        // TODO: percussion - use instrument articulations
+        let step: string = '';
+        let octave: number = 0;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'display-step':
+                    step = c.innerText;
+                    break;
+                case 'display-octave':
+                    // 0-9, 4 for middle C
+                    octave = parseInt(c.innerText);
                     break;
             }
         }
+        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
+        const note = new Note();
+        note.octave = (value / 12) | 0;
+        note.tone = value - note.octave * 12;
+        return note;
+    }
+
+    private parsePitch(element: XmlNode): Note {
+        let step: string = '';
+        let semitones: number = 0;
+        let octave: number = 0;
+        for (let c of element.childElements()) {
+            switch (c.localName) {
+                case 'step':
+                    step = c.innerText;
+                    break;
+                case 'alter':
+                    semitones = parseFloat(c.innerText);
+                    if (isNaN(semitones)) {
+                        semitones = 0;
+                    }
+                    break;
+                case 'octave':
+                    // 0-9, 4 for middle C
+                    octave = parseInt(c.innerText) + 1;
+                    break;
+            }
+        }
+
+        semitones = semitones | 0; // no microtones supported
+        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue + semitones;
+        const note = new Note();
+        note.octave = (value / 12) | 0;
+        note.tone = value - note.octave * 12;
+        return note;
     }
 }

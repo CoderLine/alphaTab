@@ -209,7 +209,7 @@ describe('MusicXmlImporterTests', () => {
         expect(note.bendPoints![11].value).to.equal(8);
 
         note = score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0];
-        expect(note.bendType).to.equal(BendType.Release);
+        expect(note.bendType).to.equal(BendType.PrebendRelease);
         expect(note.bendPoints!.length).to.equal(2);
         expect(note.bendPoints![0].offset).to.equal(0);
         expect(note.bendPoints![0].value).to.equal(8);

@@ -53,7 +53,7 @@ export class MusicXmlImporterTestHelper {
  
             ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + file + '>', null);
         } catch(e) {
-            assert.fail(String(e));
+            assert.fail((e as Error).message + (e as Error).stack);
         }
 
         return score;

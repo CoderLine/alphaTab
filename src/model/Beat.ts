@@ -169,7 +169,7 @@ export enum BeatSubElement {
      * The rest (0) on the numbered notation staff.
      */
     NumberedRests,
-    
+
     /**
      * The tuplet drawn on the numbered notation staff (the first beat affects the whole tuplet if grouped).
      */
@@ -551,6 +551,13 @@ export class Beat {
     public displayStart: number = 0;
 
     /**
+     * The calculated visual end position of this beat in midi ticks.
+     */
+    public get displayEnd(): number {
+        return this.displayStart + this.displayDuration;
+    }
+
+    /**
      * The timeline position of the voice within the current bar as it is played. (unit: midi ticks)
      * This might differ from the actual playback time due to special grace types.
      */
@@ -566,6 +573,15 @@ export class Beat {
      * Gets or sets the duration that the note is played during the audio generation.
      */
     public playbackDuration: number = 0;
+
+    /**
+     * The duration in midi ticks to use for this beat on the {@link displayDuration}
+     * controlling the visual display of the beat.
+     * @remarks
+     * This is used in scenarios where the bar might not have 100% exactly
+     * a linear structure between the beats. e.g. in MusicXML when using `<forward />`.
+     */
+    public overrideDisplayDuration?: number;
 
     /**
      * The type of golpe to play.
@@ -752,6 +768,9 @@ export class Beat {
     }
 
     private calculateDuration(): number {
+        if (this.overrideDisplayDuration !== undefined) {
+            return this.overrideDisplayDuration!;
+        }
         if (this.isFullBarRest) {
             return this.voice.bar.masterBar.calculateDuration();
         }
