@@ -113,7 +113,18 @@ export class NoteStyle extends ElementStyle<NoteSubElement> {}
  * @json_strict
  */
 export class Note {
+    /**
+     * @internal
+     */
     public static GlobalNoteId: number = 0;
+
+    /**
+     * @internal
+     */
+    public static resetIds() {
+        Note.GlobalNoteId = 0;
+    }
+
     /**
      * Gets or sets the unique id of this note.
      * @clone_ignore

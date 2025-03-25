@@ -202,6 +202,13 @@ export class Bar {
     private static _globalBarId: number = 0;
 
     /**
+     * @internal
+     */
+    public static resetIds() {
+        Bar._globalBarId = 0;
+    }
+
+    /**
      * Gets or sets the unique id of this bar.
      */
     public id: number = Bar._globalBarId++;

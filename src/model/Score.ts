@@ -4,6 +4,10 @@ import { RepeatGroup } from '@src/model/RepeatGroup';
 import { Track } from '@src/model/Track';
 import { Settings } from '@src/Settings';
 import { ElementStyle } from './ElementStyle';
+import { Bar } from './Bar';
+import { Beat } from './Beat';
+import { Voice } from './Voice';
+import { Note } from './Note';
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
@@ -45,7 +49,7 @@ export enum ScoreSubElement {
     /**
      * The chord diagram list shown on top of the score.
      */
-    ChordDiagramList,
+    ChordDiagramList
 }
 
 /**
@@ -66,6 +70,16 @@ export class Score {
     private _currentRepeatGroup: RepeatGroup | null = null;
     private _openedRepeatGroups: RepeatGroup[] = [];
     private _properlyOpenedRepeatGroups: number = 0;
+
+    /**
+     * Resets all internal ID generators.
+     */
+    public static resetIds() {
+        Bar.resetIds();
+        Beat.resetIds();
+        Voice.resetIds();
+        Note.resetIds();
+    }
 
     /**
      * The album of this song.

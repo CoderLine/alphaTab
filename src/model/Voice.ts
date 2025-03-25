@@ -15,7 +15,6 @@ export enum VoiceSubElement {
     Glyphs
 }
 
-
 /**
  * Defines the custom styles for voices.
  * @json
@@ -34,12 +33,19 @@ export class Voice {
     private _isEmpty: boolean = true;
     private _isRestOnly: boolean = true;
 
-    private static _globalBarId: number = 0;
+    private static _globalVoiceId: number = 0;
+
+    /**
+     * @internal
+     */
+    public static resetIds() {
+        Voice._globalVoiceId = 0;
+    }
 
     /**
      * Gets or sets the unique id of this bar.
      */
-    public id: number = Voice._globalBarId++;
+    public id: number = Voice._globalVoiceId++;
 
     /**
      * Gets or sets the zero-based index of this voice within the bar.

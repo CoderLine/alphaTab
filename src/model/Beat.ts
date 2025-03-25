@@ -1050,7 +1050,7 @@ export class Beat {
                 cloneNote.maxBendPoint = null;
                 cloneNote.bendPoints = null;
                 cloneNote.bendStyle = BendStyle.Default;
-                cloneNote.id = Note.GlobalNoteId++;
+                cloneNote.id = Note._globalNoteId++;
 
                 // fix ties
                 if (note.isTieOrigin) {
