@@ -3,6 +3,7 @@
         "ts"
     ],
     "node-option": [
+        "env-file=.env",
         "experimental-specifier-resolution=node",
         "import=tsx/esm",
         "no-warnings"
