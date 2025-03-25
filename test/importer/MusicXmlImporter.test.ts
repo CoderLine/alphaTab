@@ -229,5 +229,15 @@ describe('MusicXmlImporterTests', () => {
     it('timewise-basic', async () => {
         const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/timewise-basic.xml`);
         expect(score).toMatchSnapshot();
-    });    
+    });
+
+    it('partwise-anacrusis', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-anacrusis.xml`);
+        expect(score).toMatchSnapshot();
+    });
+
+    it('timewise-anacrusis', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/timewise-anacrusis.xml`);
+        expect(score).toMatchSnapshot();
+    });
 });

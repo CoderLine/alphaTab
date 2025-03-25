@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<score-partwise version="4.0">
+  <work>
+    <work-title>Title</work-title>
+  </work>
+  <movement-number></movement-number>
+  <movement-title></movement-title>
+  <identification>
+    <creator type="lyricist">Words</creator>
+    <creator type="arranger">Music</creator>
+    <creator>Artist</creator>
+    <rights>Copyright</rights>
+    <encoding>
+      <encoder>Tab</encoder>
+      <encoding-description>Notices</encoding-description>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Track 1</part-name>
+      <part-abbreviation>T1</part-abbreviation>
+      <midi-device port="1" />
+      <score-instrument id="I1">
+        <instrument-name>I1</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I1">
+        <midi-channel>1</midi-channel>
+        <midi-program>1</midi-program>
+        <volume>0.5</volume>
+        <pan>0.25</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Track 2</part-name>
+      <part-abbreviation>T2</part-abbreviation>
+      <midi-device port="1" />
+      <score-instrument id="I2">
+        <instrument-name>I2</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I2">
+        <midi-channel>2</midi-channel>
+        <midi-program>2</midi-program>
+        <volume>0.25</volume>
+        <pan>0.5</pan>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="0" implicit="yes">
+    </measure>
+    <measure number="1">
+    </measure>
+    <measure number="2">
+    </measure>
+    <measure number="X1" implicit="yes">
+    </measure>
+    <measure number="3">
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="0" implicit="yes">
+    </measure>
+    <measure number="1">
+    </measure>
+    <measure number="2">
+    </measure>
+    <measure number="X1" implicit="yes">
+    </measure>
+    <measure number="3">
+    </measure>
+  </part>
+</score-partwise>
