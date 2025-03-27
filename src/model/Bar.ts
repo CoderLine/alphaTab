@@ -333,21 +333,36 @@ export class Bar {
             }
         }
 
-        // chain sustain pedal markers
-        if (this.sustainPedals.length > 0) {
+        // chain sustain pedal markers (and merge overlaps)
+        const sustainPedals = this.sustainPedals;
+        if (sustainPedals.length > 0) {
             let previousMarker: SustainPedalMarker | null = null;
+            this.sustainPedals = [];
 
             if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
                 previousMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
             }
 
-            for (const marker of this.sustainPedals) {
+            let isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
+
+            for (const marker of sustainPedals) {
                 if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
+
+                    //duplicate or out-of-order markers
+                    if(previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {
+                        continue;
+                    }
+
                     previousMarker.nextPedalMarker = marker;
                     marker.previousPedalMarker = previousMarker;
                 }
 
+                if(isDown && marker.pedalType === SustainPedalMarkerType.Down) {
+                    marker.pedalType = SustainPedalMarkerType.Hold;
+                }
+
                 marker.bar = this;
+                this.sustainPedals.push(marker)
                 previousMarker = marker;
             }
         } else if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
