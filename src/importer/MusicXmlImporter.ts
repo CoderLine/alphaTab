@@ -13,6 +13,7 @@ import {
     AutomationType,
     Bar,
     Beat,
+    BeatBeamingMode,
     BendPoint,
     BrushType,
     Chord,
@@ -49,6 +50,7 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { Lazy } from '@src/util/Lazy';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;
@@ -113,6 +115,8 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private consolidate() {
         for (let track of this._score.tracks) {
+            // TOOD: unique midi channels and generate secondary channels
+
             for (let staff of track.staves) {
                 // fill empty beats
                 for (const b of staff.bars) {
@@ -339,7 +343,7 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 // case 'encoding-date': Ignored
                 case 'encoder':
-                    if (this._score.copyright.length > 0) {
+                    if (this._score.tab.length > 0) {
                         this._score.tab += ', ';
                     }
                     this._score.tab += c.innerText;
@@ -615,8 +619,6 @@ export class MusicXmlImporter extends ScoreImporter {
     private getOrCreateMasterBar(element: XmlNode) {
         let number = parseInt(element.attributes.get('number')!);
 
-        // TODO: implicit bars somewhere in the middle mess with the numbers
-        // we need to build an own number -> index lookup
         const implicit = element.attributes.get('implicit') === 'yes';
 
         // non-controlling="" Ignored
@@ -645,6 +647,13 @@ export class MusicXmlImporter extends ScoreImporter {
                 this._implicitBars++;
             }
             this._score.addMasterBar(masterBar);
+            if (masterBar.index > 0) {
+                masterBar.keySignature = masterBar.previousMasterBar!.keySignature;
+                masterBar.keySignatureType = masterBar.previousMasterBar!.keySignatureType;
+                masterBar.timeSignatureDenominator = masterBar.previousMasterBar!.timeSignatureDenominator;
+                masterBar.timeSignatureNumerator = masterBar.previousMasterBar!.timeSignatureNumerator;
+                masterBar.tripletFeel = masterBar.previousMasterBar!.tripletFeel;
+            }
             barsCreated = true;
         }
 
@@ -693,7 +702,6 @@ export class MusicXmlImporter extends ScoreImporter {
         // initial empty staff and voice
         const staff = this.getOrCreateStaff(track, 0);
         this.getOrCreateBar(staff, masterBar);
-        
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -1498,9 +1506,10 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseDirection(element: XmlNode, masterBar: MasterBar, track: Track) {
         const directionTypes: XmlNode[] = [];
-        // let offset = 0;
+        let offset: number | null = null;
         // let voiceIndex = -1;
         let staffIndex = -1;
+        let tempo = -1;
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -1508,7 +1517,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     directionTypes.push(c.firstElement!);
                     break;
                 case 'offset':
-                    // offset = parseInt(c.innerText);
+                    offset = parseInt(c.innerText);
                     break;
                 // case 'footnote': Ignored
                 // case 'level': Ignored
@@ -1518,7 +1527,11 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'staff':
                     staffIndex = parseInt(c.innerText) - 1;
                     break;
-                // case 'sound': Ignored
+                case 'sound':
+                    if (c.attributes.has('tempo')) {
+                        tempo = parseInt(c.attributes.get('tempo')!);
+                    }
+                    break;
                 // case 'listening': Ignored
             }
         }
@@ -1534,7 +1547,29 @@ export class MusicXmlImporter extends ScoreImporter {
 
         const bar = staff ? this.getOrCreateBar(staff, masterBar) : null;
 
-        const ratioPosition = 0; // TODO
+        const ratioPosition = new Lazy<number>(() => {
+            let timelyPosition = this._musicalPosition;
+            if (offset !== null) {
+                timelyPosition += offset!;
+            }
+
+            const totalDuration = masterBar.calculateDuration(false);
+            return timelyPosition / totalDuration;
+        });
+
+        if (tempo > 0) {
+            const tempoAutomation = new Automation();
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = tempo;
+            tempoAutomation.ratioPosition = ratioPosition.value;
+
+            if (!this.hasSameTempo(masterBar, tempoAutomation)) {
+                masterBar.tempoAutomations.push(tempoAutomation);
+                if (masterBar.index === 0) {
+                    masterBar.score.tempo = tempoAutomation.value;
+                }
+            }
+        }
 
         // let previousWords: string = '';
 
@@ -1576,12 +1611,20 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'pedal':
                     const pedal = this.parsePedal(direction);
                     if (pedal && bar) {
-                        pedal.ratioPosition = ratioPosition;
-                        bar.sustainPedals.push(pedal);
+                        pedal.ratioPosition = ratioPosition.value;
+
+                        // up or holds without a previous down/hold?
+                        const canHaveUp =
+                            bar.sustainPedals.length > 0 &&
+                            bar.sustainPedals[bar.sustainPedals.length - 1].pedalType !== SustainPedalMarkerType.Up;
+
+                        if (pedal.pedalType !== SustainPedalMarkerType.Up || canHaveUp) {
+                            bar.sustainPedals.push(pedal);
+                        }
                     }
                     break;
                 case 'metronome':
-                    this.parseMetronome(direction, masterBar, ratioPosition);
+                    this.parseMetronome(direction, masterBar, ratioPosition.value);
                     break;
                 case 'octave-shift':
                     this._nextBeatOttavia = this.parseOctaveShift(direction);
@@ -1679,28 +1722,22 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parsePedal(element: XmlNode): SustainPedalMarker | null {
         const marker = new SustainPedalMarker();
-        for (const c of element.childElements()) {
-            switch (c.localName) {
-                case 'pedal-type':
-                    switch (c.innerText) {
-                        case 'start':
-                            marker.pedalType = SustainPedalMarkerType.Down;
-                            break;
-                        case 'stop':
-                            marker.pedalType = SustainPedalMarkerType.Up;
-                            break;
-                        // case 'sostenuto': Not supported
-                        // case 'change': Not supported
-                        case 'continue':
-                            marker.pedalType = SustainPedalMarkerType.Hold;
-                            break;
-                        // case 'discontinue': Not supported
-                        // case 'resume': Not supported
-                        default:
-                            return null;
-                    }
-                    break;
-            }
+        switch (element.getAttribute('type')) {
+            case 'start':
+                marker.pedalType = SustainPedalMarkerType.Down;
+                break;
+            case 'stop':
+                marker.pedalType = SustainPedalMarkerType.Up;
+                break;
+            // case 'sostenuto': Not supported
+            // case 'change': Not supported
+            case 'continue':
+                marker.pedalType = SustainPedalMarkerType.Hold;
+                break;
+            // case 'discontinue': Not supported
+            // case 'resume': Not supported
+            default:
+                return null;
         }
         return marker;
     }
@@ -1755,7 +1792,7 @@ export class MusicXmlImporter extends ScoreImporter {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'duration':
-                    this._musicalPosition += parseInt(c.innerText);
+                    this._musicalPosition += this.musicXmlDivisionsToAlphaTabTicks(parseInt(c.innerText));
                     break;
                 // case 'footnote': Ignored
                 // case 'level': Ignored
@@ -1772,7 +1809,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     const beat = this._lastBeat;
                     if (beat) {
                         let musicalPosition = this._musicalPosition;
-                        musicalPosition -= parseInt(c.innerText);
+                        musicalPosition -= this.musicXmlDivisionsToAlphaTabTicks(parseInt(c.innerText));
                         if (musicalPosition < 0) {
                             musicalPosition = 0;
                         }
@@ -1863,6 +1900,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let beat: Beat | null = null;
         let graceType = GraceType.None;
         let graceDurationInDivisions = 0;
+        let beamMode: BeatBeamingMode = BeatBeamingMode.ForceSplitToNext;
         // let graceTimeStealPrevious = 0;
         // let graceTimeStealFollowing = 0;
 
@@ -1918,15 +1956,47 @@ export class MusicXmlImporter extends ScoreImporter {
 
             const actualMusicalPosition = voice.beats.length === 0 ? 0 : voice.beats[voice.beats.length - 1].displayEnd;
 
-            const gap = this._musicalPosition - actualMusicalPosition;
+            let gap = this._musicalPosition - actualMusicalPosition;
             if (gap > 0) {
+                // we do not support cross staff beams yet and its a bigger thing to implement
+                // until then we try to detect whether we have a beam-group
+                // which starts at this staff, swaps to another, and comes back.
+                // then we create matching rests here
+
+                if (
+                    // Previously created beat has forced beams and is on another stuff
+                    this._lastBeat &&
+                    this._lastBeat.beamingMode === BeatBeamingMode.ForceMergeWithNext &&
+                    this._lastBeat.voice.bar.staff.index !== staffIndex &&
+                    // previous beat on this staff is also forced
+                    voice.beats.length > 0 &&
+                    voice.beats[voice.beats.length - 1].beamingMode === BeatBeamingMode.ForceMergeWithNext
+                ) {
+                    // chances are high that we have notes like this
+                    // staff1Note -> staff2Note -> staff2Note -> staff1Note
+                    // in this case we create rests for the gap caused by the staff2Notes
+                    let preferredDuration = voice.beats[voice.beats.length - 1].duration;
+                    while (gap > 0) {
+                        const restGap = this.createRestForGap(gap, preferredDuration);
+                        if (restGap !== null) {
+                            this.insertBeatToVoice(restGap, voice);
+                            gap -= restGap.playbackDuration;
+                        } else {
+                            break;
+                        }
+                    }
+                }
+
                 // need an empty placeholder beat for the gap
-                const placeholder = new Beat();
-                placeholder.dynamics = this._currentDynamics;
-                placeholder.isEmpty = true;
-                placeholder.duration = Duration.TwoHundredFiftySixth; // smallest we have
-                placeholder.overrideDisplayDuration = gap;
-                voice.addBeat(placeholder);
+                if (gap > 0) {
+                    const placeholder = new Beat();
+                    placeholder.dynamics = this._currentDynamics;
+                    placeholder.isEmpty = true;
+                    placeholder.duration = Duration.TwoHundredFiftySixth; // smallest we have
+                    placeholder.overrideDisplayDuration = gap;
+                    placeholder.updateDurations();
+                    this.insertBeatToVoice(placeholder, voice);
+                }
             } else if (gap < 0) {
                 Logger.error(
                     'MusicXML',
@@ -1936,6 +2006,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
             const newBeat = new Beat();
             beat = newBeat;
+            newBeat.beamingMode = beamMode;
             newBeat.isEmpty = false;
             newBeat.dynamics = this._currentDynamics;
 
@@ -1982,36 +2053,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 }
             }
 
-            // for handling the correct musical position we already need to do some basic beat linking
-            // and assignments of start/durations as we progress.
-            if (this._lastBeat) {
-                const lastBeat = this._lastBeat!;
-
-                // chain beats already
-                lastBeat.nextBeat = newBeat;
-                newBeat.previousBeat = lastBeat!;
-
-                // find display start from previous non-grace beat,
-                // reminder: we give grace a display position of 0, that's why we skip them.
-                // visually they 'stick' to their next beat.
-                let previousNonGraceBeat: Beat | null = lastBeat;
-                while (previousNonGraceBeat !== null) {
-                    if (previousNonGraceBeat.graceType === GraceType.None) {
-                        // found
-                        break;
-                    } else if (previousNonGraceBeat.index > 0) {
-                        previousNonGraceBeat = previousNonGraceBeat.previousBeat;
-                    } else {
-                        previousNonGraceBeat = null;
-                    }
-                }
-
-                if (previousNonGraceBeat !== null) {
-                    newBeat.displayStart = previousNonGraceBeat.displayEnd;
-                }
-            }
-
-            voice.addBeat(newBeat);
+            this.insertBeatToVoice(newBeat, voice);
 
             // duration only after we added it into the tree
             if (graceType !== GraceType.None) {
@@ -2025,7 +2067,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 this.applyBeatDurationFromTicks(newBeat, durationInTicks, beatDuration, true);
             }
 
-            this._musicalPosition += durationInTicks;
+            this._musicalPosition = newBeat.displayEnd;
             this._lastBeat = newBeat;
         };
 
@@ -2054,7 +2096,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     isChord = true;
                     break;
 
-                // case 'cue': not supported
+                case 'cue':
+                    // not supported
+                    // as they are meant to not be played, we skip them completely
+                    // instead of handling them wrong.
+                    return;
 
                 case 'pitch':
                     note = this.parsePitch(c);
@@ -2128,7 +2174,22 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'staff':
                     staffIndex = parseInt(c.innerText) - 1;
                     break;
-                // case 'beam': not supported
+                case 'beam':
+                    // use the first beam as indicator whether to beam or split
+                    if (c.getAttribute('number', '1') === '1') {
+                        switch (c.innerText) {
+                            case 'begin':
+                                beamMode = BeatBeamingMode.ForceMergeWithNext;
+                                break;
+                            case 'continue':
+                                beamMode = BeatBeamingMode.ForceMergeWithNext;
+                                break;
+                            case 'end':
+                                beamMode = BeatBeamingMode.ForceSplitToNext;
+                                break;
+                        }
+                    }
+                    break;
                 case 'notations':
                     ensureBeat();
                     this.parseNotations(c, note, beat!);
@@ -2144,6 +2205,62 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // if not yet created do it befor we exit to ensure we created the beat/note
         ensureBeat();
+    }
+
+    private createRestForGap(gap: number, preferredDuration: Duration): Beat | null {
+        let preferredDurationTicks = MidiUtils.toTicks(preferredDuration);
+
+        // shorten the beat duration until we fit
+        while (preferredDurationTicks > gap) {
+            if (preferredDuration === Duration.TwoHundredFiftySixth) {
+                return null; // cannot get shorter
+            }
+
+            preferredDuration = (preferredDuration * 2) as Duration;
+            preferredDurationTicks = MidiUtils.toTicks(preferredDuration);
+        }
+
+        const placeholder = new Beat();
+        placeholder.dynamics = this._currentDynamics;
+        placeholder.isEmpty = false;
+        placeholder.duration = preferredDuration;
+        placeholder.overrideDisplayDuration = preferredDurationTicks;
+        placeholder.updateDurations();
+        return placeholder;
+    }
+
+    private insertBeatToVoice(newBeat: Beat, voice: Voice) {
+        // for handling the correct musical position we already need to do some basic beat linking
+        // and assignments of start/durations as we progress.
+
+        if (voice.beats.length > 0) {
+            const lastBeat = voice.beats[voice.beats.length - 1];
+
+            // chain beats already
+            lastBeat.nextBeat = newBeat;
+            newBeat.previousBeat = lastBeat!;
+
+            // find display start from previous non-grace beat,
+            // reminder: we give grace a display position of 0, that's why we skip them.
+            // visually they 'stick' to their next beat.
+            let previousNonGraceBeat: Beat | null = lastBeat;
+            while (previousNonGraceBeat !== null) {
+                if (previousNonGraceBeat.graceType === GraceType.None) {
+                    // found
+                    break;
+                } else if (previousNonGraceBeat.index > 0) {
+                    previousNonGraceBeat = previousNonGraceBeat.previousBeat;
+                } else {
+                    previousNonGraceBeat = null;
+                }
+            }
+
+            if (previousNonGraceBeat !== null) {
+                newBeat.displayStart = previousNonGraceBeat.displayEnd;
+            }
+        }
+
+        voice.addBeat(newBeat);
     }
 
     private musicXmlDivisionsToAlphaTabTicks(divisions: number): number {
@@ -2184,6 +2301,22 @@ export class MusicXmlImporter extends ScoreImporter {
         return null;
     }
 
+    private static allDurations = [
+        Duration.TwoHundredFiftySixth,
+        Duration.OneHundredTwentyEighth,
+        Duration.SixtyFourth,
+        Duration.ThirtySecond,
+        Duration.Sixteenth,
+        Duration.Eighth,
+        Duration.Quarter,
+        Duration.Half,
+        Duration.Whole,
+        Duration.DoubleWhole,
+        Duration.QuadrupleWhole
+    ];
+
+    private static allDurationTicks = MusicXmlImporter.allDurations.map(d => MidiUtils.toTicks(d));
+
     private applyBeatDurationFromTicks(
         newBeat: Beat,
         ticks: number,
@@ -2191,19 +2324,11 @@ export class MusicXmlImporter extends ScoreImporter {
         applyDisplayDuration: boolean
     ) {
         if (!beatDuration) {
-            let durations = [
-                Duration.SixtyFourth,
-                Duration.ThirtySecond,
-                Duration.Sixteenth,
-                Duration.Eighth,
-                Duration.Quarter,
-                Duration.Half,
-                Duration.Whole
-            ].map(d => MidiUtils.toTicks(d));
-
-            for (let d of durations) {
-                if (ticks >= d) {
-                    beatDuration = d;
+            for(let i = 0; i < MusicXmlImporter.allDurations.length; i++) {
+                const dt = MusicXmlImporter.allDurationTicks[i];
+                if (ticks >= dt) {
+                    beatDuration = MusicXmlImporter.allDurations[i];
+                } else {
                     break;
                 }
             }
@@ -2643,7 +2768,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseTied(element: XmlNode, note: Note, staff:Staff): void {
+    private parseTied(element: XmlNode, note: Note, staff: Staff): void {
         this.parseTie(element, note, staff);
     }
 
@@ -2660,16 +2785,19 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseAccidental(element: XmlNode, note: Note) {
+        // NOTE: this can currently lead to wrong notes shown,
+        // TODO: check partwise-complex-measures.xml where accidentals and notes get wrong
+        // in combination with key signatures
         switch (element.innerText) {
-            case 'sharp':
-                note.accidentalMode = NoteAccidentalMode.ForceSharp;
-                break;
-            case 'natural':
-                note.accidentalMode = NoteAccidentalMode.ForceNatural;
-                break;
-            case 'flat':
-                note.accidentalMode = NoteAccidentalMode.ForceFlat;
-                break;
+            // case 'sharp':
+            //     note.accidentalMode = NoteAccidentalMode.ForceSharp;
+            //     break;
+            // case 'natural':
+            //     note.accidentalMode = NoteAccidentalMode.ForceNatural;
+            //     break;
+            // case 'flat':
+            //     note.accidentalMode = NoteAccidentalMode.ForceFlat;
+            //     break;
             case 'double-sharp':
                 note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
                 break;
@@ -2714,9 +2842,9 @@ export class MusicXmlImporter extends ScoreImporter {
             // case 'sori': Not supported
             // case 'kokon': Not supported
             // case 'other': Not supported
-            default:
-                Logger.warning('MusicXML', `Unsupported accidental ${element.innerText}`);
-                break;
+            // default:
+            //     Logger.warning('MusicXML', `Unsupported accidental ${element.innerText}`);
+            //     break;
         }
     }
 
