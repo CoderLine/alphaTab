@@ -240,4 +240,14 @@ describe('MusicXmlImporterTests', () => {
         const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/timewise-anacrusis.xml`);
         expect(score).toMatchSnapshot();
     });
+
+    it('partwise-complex-measures', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-complex-measures.xml`);
+        expect(score).toMatchSnapshot();
+    });
+
+    it('partwise-staff-change', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-staff-change.xml`);
+        expect(score).toMatchSnapshot();
+    });
 });
