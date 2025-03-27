@@ -58,6 +58,7 @@ class StaffContext {
     public tieStarts!: Set<Note>;
     public tieStartIds!: Map<string, Note>;
     public slideOrigins: Map<string, Note> = new Map<string, Note>();
+    public transpose: number = 0;
 
     constructor() {
         this.tieStarts = new Set<Note>();
@@ -748,14 +749,8 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'footnote' Ignore
                 // case 'level' Ignore
                 // case 'wavy-line' Ignore
-                case 'segno':
-                    // TODO: if this is on "barline" is it actually the next bar with this direction?
-                    masterBar.addDirection(Direction.TargetSegno);
-                    break;
-                case 'coda':
-                    // TODO: if this is on "barline" is it actually the next bar with this direction?
-                    masterBar.addDirection(Direction.TargetCoda);
-                    break;
+                // case 'segno': Ignore (use directions)
+                // case 'coda': Ignore (use directions)
                 // case 'fermata': Not supported (on barline, they exist on beat notations)
                 case 'ending':
                     this.parseEnding(c, masterBar);
@@ -1312,18 +1307,16 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        // TODO: we do not have a "playbackTranspositionPitch" on the data model
-        // we need to transpose down all notes inline and reverse the transpose via
-        // displayTranspositionPitch
-
-        // if (element.attributes.has('number')) {
-        //     const staff = this.getOrCreateStaff(track, parseInt(element.attributes.get('number')!) - 1);
-        //     staff.transpositionPitch = semitones;
-        // } else {
-        //     for (let staff of track.staves) {
-        //         staff.transpositionPitch = semitones;
-        //     }
-        // }
+        if (element.attributes.has('number')) {
+            const staff = this.getOrCreateStaff(track, parseInt(element.attributes.get('number')!) - 1);
+            this.getStaffContext(staff).transpose = semitones;
+            staff.displayTranspositionPitch = semitones;
+        } else {
+            for (let staff of track.staves) {
+                this.getStaffContext(staff).transpose = semitones;
+                staff.displayTranspositionPitch = semitones;
+            }
+        }
     }
 
     private parseStaffDetails(element: XmlNode, staff: Staff): void {
@@ -2073,6 +2066,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
         let tieNode: XmlNode | null = null;
 
+        let isPitched = false;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'grace':
@@ -2104,6 +2098,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
                 case 'pitch':
                     note = this.parsePitch(c);
+                    isPitched = true;
                     break;
                 case 'unpitched':
                     note = this.parseUnpitched(c, track);
@@ -2200,6 +2195,16 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'play': Ignored
                 // case 'listen': Ignored
+            }
+        }
+
+        if (isPitched) {
+            const staff = this.getOrCreateStaff(track, staffIndex);
+            const transpose = this.getStaffContext(staff).transpose;
+            if (transpose !== 0) {
+                const value = note!.octave * 12 + note!.tone + transpose;
+                note!.octave = (value / 12) | 0;
+                note!.tone = value - note!.octave * 12;
             }
         }
 
@@ -2324,7 +2329,7 @@ export class MusicXmlImporter extends ScoreImporter {
         applyDisplayDuration: boolean
     ) {
         if (!beatDuration) {
-            for(let i = 0; i < MusicXmlImporter.allDurations.length; i++) {
+            for (let i = 0; i < MusicXmlImporter.allDurations.length; i++) {
                 const dt = MusicXmlImporter.allDurationTicks[i];
                 if (ticks >= dt) {
                     beatDuration = MusicXmlImporter.allDurations[i];
@@ -2789,15 +2794,15 @@ export class MusicXmlImporter extends ScoreImporter {
         // TODO: check partwise-complex-measures.xml where accidentals and notes get wrong
         // in combination with key signatures
         switch (element.innerText) {
-            // case 'sharp':
-            //     note.accidentalMode = NoteAccidentalMode.ForceSharp;
-            //     break;
-            // case 'natural':
-            //     note.accidentalMode = NoteAccidentalMode.ForceNatural;
-            //     break;
-            // case 'flat':
-            //     note.accidentalMode = NoteAccidentalMode.ForceFlat;
-            //     break;
+            case 'sharp':
+                note.accidentalMode = NoteAccidentalMode.ForceSharp;
+                break;
+            case 'natural':
+                note.accidentalMode = NoteAccidentalMode.ForceNatural;
+                break;
+            case 'flat':
+                note.accidentalMode = NoteAccidentalMode.ForceFlat;
+                break;
             case 'double-sharp':
                 note.accidentalMode = NoteAccidentalMode.ForceDoubleSharp;
                 break;
