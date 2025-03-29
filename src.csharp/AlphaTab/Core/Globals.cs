@@ -43,6 +43,12 @@ internal static class Globals
             return d;
         }
 
+        if (radix == 10 && int.TryParse(s, NumberStyles.Integer, CultureInfo.InvariantCulture,
+                out d))
+        {
+            return d;
+        }
+
         return double.NaN;
     }
 

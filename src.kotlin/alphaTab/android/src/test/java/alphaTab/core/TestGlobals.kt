@@ -1,8 +1,10 @@
 package alphaTab.core
 
 import org.junit.Assert
-import kotlin.math.exp
 import kotlin.reflect.KClass
+
+annotation class TestName(val name: String)
+annotation class SnapshotFile(val path: String)
 
 typealias Test = org.junit.Test
 

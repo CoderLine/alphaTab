@@ -1,5 +1,7 @@
 package alphaTab.collections
 
+import alphaTab.core.ObjectDoubleArrayTuple
+
 public open class ObjectDoubleMapEntry<TKey> {
     private var _key: TKey
     public var key: TKey
@@ -50,9 +52,9 @@ public class ObjectDoubleMapEntryInternal<TKey> : ObjectDoubleMapEntry<TKey>(),
 public class ObjectDoubleMap<TKey> :
     MapBase<ObjectDoubleMapEntry<TKey>, ObjectDoubleMapEntryInternal<TKey>> {
     public constructor()
-    public constructor(iterable: Iterable<ObjectDoubleMapEntry<TKey>>) {
+    public constructor(iterable: Iterable<ObjectDoubleArrayTuple<TKey>>) {
         for (it in iterable) {
-            set(it.key, it.value)
+            set(it.v0, it.v1)
         }
     }
 

@@ -35,6 +35,15 @@ namespace AlphaTab.Core
             return list.FirstOrDefault(predicate);
         }
 
+        public static bool Includes<T>(this IList<T> list, T item)
+        {
+            return list.Contains(item);
+        }
+        public static bool Includes(this System.Collections.IList list, object item)
+        {
+            return list.Contains(item);
+        }
+
         public static bool Some<T>(this IList<T> list, Func<T, bool> predicate)
         {
             return list.Any(predicate);
@@ -300,26 +309,6 @@ namespace AlphaTab.Core
             return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
         }
 
-        public static KeyValuePair<double, TValue> CreateMapEntry<TValue>(int key, TValue value)
-        {
-            return new KeyValuePair<double, TValue>(key, value);
-        }
-
-        public static KeyValuePair<TKey, double> CreateMapEntry<TKey>(TKey key, int value)
-        {
-            return new KeyValuePair<TKey, double>(key, value);
-        }
-
-        public static KeyValuePair<TKey, TValue> CreateMapEntry<TKey, TValue>(TKey key, TValue value)
-        {
-            return new KeyValuePair<TKey, TValue>(key, value);
-        }
-
-        public static KeyValuePair<TKey, IList<TListItem>> CreateMapEntry<TKey, TListItem>(TKey key, AlphaTab.Collections.List<TListItem> value)
-        {
-            return new KeyValuePair<TKey, IList<TListItem>>(key, value);
-        }
-
         public static string ToInvariantString(this double num, int radix)
         {
             if (radix == 16)
@@ -419,6 +408,12 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string ReplaceAll(this string s, RegExp before, string after)
+        {
+            return s.Replace(before, after);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<T> Then<T>(this Task<T> s, Action<T> after)
         {
             s.ContinueWith(x => after(x.Result), TaskContinuationOptions.OnlyOnRanToCompletion);
@@ -494,7 +489,7 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IEnumerable<T> MapInitializer<T>(params T[] items)
+        public static IList<T> MapInitializer<T>(params T[] items)
         {
             return items;
         }
@@ -554,6 +549,22 @@ namespace AlphaTab.Core
             run(Resolve, Reject);
 
             return taskCompletionSource.Task;
+        }
+
+        public static string ToBoolString(this object? o)
+        {
+            if (o is bool b)
+            {
+                return b ? "true" : "false";
+            }
+
+            return "false";
+
+        }
+
+        public static IEnumerator<T> GetEnumerator<T>(this IEnumerator<T> enumerator)
+        {
+            return enumerator;
         }
     }
 }

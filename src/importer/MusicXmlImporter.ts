@@ -50,7 +50,6 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { Lazy } from '@src/util/Lazy';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;
@@ -585,7 +584,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parsePartwisePart(element: XmlNode) {
         const id = element.attributes.get('id');
-        if (!id || !this._idToTrack.has(id)!) {
+        if (!id || !this._idToTrack.has(id)) {
             return;
         }
         const track = this._idToTrack.get(id)!;
@@ -642,18 +641,18 @@ export class MusicXmlImporter extends ScoreImporter {
 
         let barsCreated = false;
         while (this._score.masterBars.length < number) {
-            const masterBar = new MasterBar();
+            const newMasterBar = new MasterBar();
             if (implicit) {
-                masterBar.isAnacrusis = true;
+                newMasterBar.isAnacrusis = true;
                 this._implicitBars++;
             }
-            this._score.addMasterBar(masterBar);
-            if (masterBar.index > 0) {
-                masterBar.keySignature = masterBar.previousMasterBar!.keySignature;
-                masterBar.keySignatureType = masterBar.previousMasterBar!.keySignatureType;
-                masterBar.timeSignatureDenominator = masterBar.previousMasterBar!.timeSignatureDenominator;
-                masterBar.timeSignatureNumerator = masterBar.previousMasterBar!.timeSignatureNumerator;
-                masterBar.tripletFeel = masterBar.previousMasterBar!.tripletFeel;
+            this._score.addMasterBar(newMasterBar);
+            if (newMasterBar.index > 0) {
+                newMasterBar.keySignature = newMasterBar.previousMasterBar!.keySignature;
+                newMasterBar.keySignatureType = newMasterBar.previousMasterBar!.keySignatureType;
+                newMasterBar.timeSignatureDenominator = newMasterBar.previousMasterBar!.timeSignatureDenominator;
+                newMasterBar.timeSignatureNumerator = newMasterBar.previousMasterBar!.timeSignatureNumerator;
+                newMasterBar.tripletFeel = newMasterBar.previousMasterBar!.tripletFeel;
             }
             barsCreated = true;
         }
@@ -675,7 +674,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseTimewisePart(element: XmlNode, masterBar: MasterBar) {
         const id = element.attributes.get('id');
-        if (!id || !this._idToTrack.has(id)!) {
+        if (!id || !this._idToTrack.has(id)) {
             return;
         }
 
@@ -1279,7 +1278,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         if (simileMark == null) {
                             this._simileMarkPerStaff!.delete(staff);
                         } else {
-                            this._simileMarkPerStaff!.set(staff, simileMark);
+                            this._simileMarkPerStaff!.set(staff, simileMark!);
                         }
                     } else {
                         this._simileMarkAllStaves = simileMark;
@@ -1465,7 +1464,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseKey(element: XmlNode, masterBar: MasterBar): void {
-        let fifths: number = -KeySignature.C;
+        let fifths: number = -(KeySignature.C as number);
         let mode: string = '';
 
         for (let c of element.childElements()) {
@@ -1540,7 +1539,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
         const bar = staff ? this.getOrCreateBar(staff, masterBar) : null;
 
-        const ratioPosition = new Lazy<number>(() => {
+        const getRatioPosition = () => {
             let timelyPosition = this._musicalPosition;
             if (offset !== null) {
                 timelyPosition += offset!;
@@ -1548,13 +1547,13 @@ export class MusicXmlImporter extends ScoreImporter {
 
             const totalDuration = masterBar.calculateDuration(false);
             return timelyPosition / totalDuration;
-        });
+        };
 
         if (tempo > 0) {
             const tempoAutomation = new Automation();
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tempo;
-            tempoAutomation.ratioPosition = ratioPosition.value;
+            tempoAutomation.ratioPosition = getRatioPosition();
 
             if (!this.hasSameTempo(masterBar, tempoAutomation)) {
                 masterBar.tempoAutomations.push(tempoAutomation);
@@ -1604,7 +1603,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'pedal':
                     const pedal = this.parsePedal(direction);
                     if (pedal && bar) {
-                        pedal.ratioPosition = ratioPosition.value;
+                        pedal.ratioPosition = getRatioPosition();
 
                         // up or holds without a previous down/hold?
                         const canHaveUp =
@@ -1617,7 +1616,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'metronome':
-                    this.parseMetronome(direction, masterBar, ratioPosition.value);
+                    this.parseMetronome(direction, masterBar, getRatioPosition());
                     break;
                 case 'octave-shift':
                     this._nextBeatOttavia = this.parseOctaveShift(direction);
@@ -1913,6 +1912,9 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // Note level
         let note: Note | null = null;
+        let tieNode: XmlNode | null = null;
+
+        let isPitched = false;
 
         // will create new beat with all information in the correct tree
         // or add the note to an existing beat if specified accordingly.
@@ -1937,9 +1939,9 @@ export class MusicXmlImporter extends ScoreImporter {
             const staff = this.getOrCreateStaff(track, staffIndex);
             if (isChord) {
                 beat = this._lastBeat!;
-                beat.addNote(note!);
+                beat!.addNote(note!);
                 if (tieNode) {
-                    this.parseTie(tieNode, note!, staff);
+                    this.parseTie(tieNode!, note!, staff);
                 }
                 return;
             }
@@ -2039,10 +2041,10 @@ export class MusicXmlImporter extends ScoreImporter {
             }
 
             if (note !== null) {
-                newBeat.addNote(note);
+                newBeat.addNote(note!);
 
                 if (tieNode) {
-                    this.parseTie(tieNode, note!, staff);
+                    this.parseTie(tieNode!, note!, staff);
                 }
             }
 
@@ -2064,9 +2066,6 @@ export class MusicXmlImporter extends ScoreImporter {
             this._lastBeat = newBeat;
         };
 
-        let tieNode: XmlNode | null = null;
-
-        let isPitched = false;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'grace':

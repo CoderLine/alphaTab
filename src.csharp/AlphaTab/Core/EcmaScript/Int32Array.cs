@@ -22,6 +22,11 @@ internal class Int32Array : IEnumerable<int>
         _data = new ArraySegment<int>(list.Select(i => (int)i).ToArray());
     }
 
+    public Int32Array(IList<int> list)
+    {
+        _data = new ArraySegment<int>(list.ToArray());
+    }
+
     private Int32Array(ArraySegment<int> data)
     {
         _data = data;

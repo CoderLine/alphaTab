@@ -5,7 +5,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace AlphaTab.Test;
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 // ReSharper disable once InconsistentNaming
-public static class assert
+internal static class assert
 #pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 {
     public static void Fail(string message)
@@ -14,7 +14,7 @@ public static class assert
     }
 }
 
-public static class TestGlobals
+internal static class TestGlobals
 {
     public static Expector<T> Expect<T>(T actual)
     {
@@ -32,7 +32,7 @@ public static class TestGlobals
     }
 }
 
-public class NotExpector<T>
+internal class NotExpector<T>
 {
     private readonly T _actual;
     public NotExpector<T> Be => this;
@@ -55,7 +55,7 @@ public class NotExpector<T>
     }
 }
 
-public class Expector<T>
+internal class Expector<T>
 {
     private readonly T _actual;
 
@@ -70,6 +70,7 @@ public class Expector<T>
     {
         return new NotExpector<T>(_actual);
     }
+
     public Expector<T> Be => this;
     public Expector<T> Have => this;
 
@@ -79,6 +80,7 @@ public class Expector<T>
         {
             expected = (double)i;
         }
+
         if (expected is double d && _actual is int)
         {
             expected = (int)d;
@@ -99,11 +101,14 @@ public class Expector<T>
     {
         if (_actual is int i)
         {
-            Assert.IsTrue(i.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+            Assert.IsTrue(i.CompareTo(expected) > 0,
+                $"Expected {expected} to be greater than {_actual}");
         }
+
         if (_actual is double d)
         {
-            Assert.IsTrue(d.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+            Assert.IsTrue(d.CompareTo(expected) > 0,
+                $"Expected {expected} to be greater than {_actual}");
         }
     }
 
@@ -134,9 +139,10 @@ public class Expector<T>
     {
         Assert.AreNotEqual(default!, _actual);
     }
+
     public void Length(int length)
     {
-        if(_actual is ICollection collection)
+        if (_actual is ICollection collection)
         {
             Assert.AreEqual(length, collection.Count);
         }
@@ -148,7 +154,7 @@ public class Expector<T>
 
     public void Contain(object element)
     {
-        if(_actual is ICollection collection)
+        if (_actual is ICollection collection)
         {
             CollectionAssert.Contains(collection, element);
         }

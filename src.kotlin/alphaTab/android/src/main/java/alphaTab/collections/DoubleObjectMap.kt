@@ -1,5 +1,8 @@
 package alphaTab.collections
 
+import alphaTab.core.DoubleObjectArrayTuple
+import alphaTab.core.ObjectBooleanArrayTuple
+
 public open class DoubleObjectMapEntry<TValue> {
     private var _key: Double
     public var key: Double
@@ -50,9 +53,9 @@ public class DoubleObjectMapEntryInternal<TValue> : DoubleObjectMapEntry<TValue>
 public class DoubleObjectMap<TValue> :
     MapBase<DoubleObjectMapEntry<TValue>, DoubleObjectMapEntryInternal<TValue>> {
     public constructor()
-    public constructor(iterable: Iterable<DoubleObjectMapEntry<TValue>>) {
+    public constructor(iterable: Iterable<DoubleObjectArrayTuple<TValue>>) {
         for (it in iterable) {
-            set(it.key, it.value)
+            set(it.v0, it.v1)
         }
     }
 

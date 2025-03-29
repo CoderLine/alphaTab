@@ -22,6 +22,7 @@ export enum SyntaxKind {
     EnumMember,
     ArrayTypeNode,
     MapTypeNode,
+    ArrayTupleNode,
 
     Block,
     EmptyStatement,
@@ -128,6 +129,7 @@ export interface AttributedElement {
 }
 
 export interface Attribute extends Node {
+    nodeType: SyntaxKind.Attribute;
     type: TypeNode;
     arguments?: Expression[];
 }
@@ -274,10 +276,15 @@ export interface ArrayTypeNode extends TypeNode {
 
 export interface MapTypeNode extends TypeNode {
     nodeType: SyntaxKind.MapTypeNode;
-    keyType: TypeNode;
+    keyType: TypeNode | null;
     keyIsValueType: boolean;
-    valueType: TypeNode;
+    valueType: TypeNode | null;
     valueIsValueType: boolean;
+}
+
+export interface ArrayTupleNode extends TypeNode {
+    nodeType: SyntaxKind.ArrayTupleNode;
+    types: TypeNode[];
 }
 
 export interface FunctionTypeNode extends TypeNode {
@@ -293,7 +300,6 @@ export enum PrimitiveType {
     Int,
     Void,
     Object,
-    Dynamic,
     Var,
     Long
 }

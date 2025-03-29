@@ -8,7 +8,7 @@ namespace AlphaTab;
 
 static partial class TestPlatform
 {
-    private static readonly Lazy<string> RepositoryRoot = new(() =>
+    public static readonly Lazy<string> RepositoryRoot = new(() =>
     {
         var currentDir = new DirectoryInfo(System.Environment.CurrentDirectory);
         while (currentDir != null)
@@ -31,6 +31,15 @@ static partial class TestPlatform
             new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
         await using var ms = new MemoryStream();
         await fs.CopyToAsync(ms);
+        return new Uint8Array(ms.ToArray());
+    }
+
+    public static Uint8Array LoadFileSync(string path)
+    {
+        using var fs =
+            new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
+        using var ms = new MemoryStream();
+        fs.CopyTo(ms);
         return new Uint8Array(ms.ToArray());
     }
 

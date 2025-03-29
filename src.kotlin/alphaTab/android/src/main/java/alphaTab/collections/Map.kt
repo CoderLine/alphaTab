@@ -1,5 +1,7 @@
 package alphaTab.collections
 
+import alphaTab.core.ArrayTuple
+
 public open class MapEntry<TKey, TValue> {
     private var _key: TKey
     public var key: TKey
@@ -51,9 +53,9 @@ public class MapEntryInternal<TKey, TValue> : MapEntry<TKey, TValue>(),
 public class Map<TKey, TValue>:
     MapBase<MapEntry<TKey, TValue>, MapEntryInternal<TKey, TValue>> {
     public constructor()
-    public constructor(iterable: Iterable<MapEntry<TKey, TValue>>) {
+    public constructor(iterable: Iterable<ArrayTuple<TKey, TValue>>) {
         for (it in iterable) {
-            set(it.key, it.value)
+            set(it.v0, it.v1)
         }
     }
 

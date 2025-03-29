@@ -3,12 +3,17 @@ import * as cs from '../csharp/CSharpAst';
 import * as path from 'path';
 import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
+import KotlinEmitterContext from './KotlinEmitterContext';
 
 export default class KotlinAstTransformer extends CSharpAstTransformer {
-    public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
+    protected override _context: KotlinEmitterContext;
+    public constructor(typeScript: ts.SourceFile, context: KotlinEmitterContext) {
         super(typeScript, context);
         this._testClassAttribute = '';
-        this._testMethodAttribute = 'Test';
+        this._testMethodAttribute = 'TestName';
+        this._snapshotFileAttribute = 'SnapshotFile';
+
+        this._context = context;
     }
 
     public override get extension(): string {
@@ -515,71 +520,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
     }
 
-    protected override createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
-        const csExpr = {
-            parent: parent,
-            tsNode: expression,
-            nodeType: cs.SyntaxKind.InvocationExpression,
-            arguments: [],
-            expression: {} as cs.Expression
-        } as cs.InvocationExpression;
-
-        const type: cs.TypeReference = {
-            nodeType: cs.SyntaxKind.TypeReference,
-            parent: csExpr,
-            reference: '',
-            isAsync: false,
-            tsNode: expression
-        };
-
-        type.reference = 'MapEntry';
-        if (expression.elements.length === 2) {
-            const keyType = this._context.getType(expression.elements[0]);
-            let keyTypeContainerName = this.getContainerTypeName(keyType);
-
-            const valueType = this._context.getType(expression.elements[1]);
-            let valueTypeContainerName = this.getContainerTypeName(valueType);
-
-            if (!keyTypeContainerName) {
-                type.typeArguments = type.typeArguments ?? [];
-                type.typeArguments.push({
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    isAsync: false,
-                    parent: type,
-                    reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
-                } as cs.TypeReference);
-            }
-
-            if (!valueTypeContainerName) {
-                type.typeArguments = type.typeArguments ?? [];
-                type.typeArguments.push({
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    isAsync: false,
-                    parent: type,
-                    reference: this.createUnresolvedTypeNode(type, expression.elements[1], valueType)
-                } as cs.TypeReference);
-            }
-
-            if (keyTypeContainerName || valueTypeContainerName) {
-                keyTypeContainerName = keyTypeContainerName || 'Object';
-                valueTypeContainerName = valueTypeContainerName || 'Object';
-                type.reference = keyTypeContainerName + valueTypeContainerName + type.reference;
-            }
-        }
-
-        type.reference = this._context.makeTypeName(`alphaTab.collections.${type.reference}`);
-        csExpr.expression = type;
-
-        expression.elements.forEach(e => {
-            const ex = this.visitExpression(csExpr, e);
-            if (ex) {
-                csExpr.arguments.push(ex);
-            }
-        });
-
-        return csExpr;
-    }
-
     override visitTestClass(d: ts.CallExpression): void {
         this._csharpFile.usings.push({
             nodeType: cs.SyntaxKind.UsingDeclaration,
@@ -587,26 +527,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             parent: this._csharpFile
         } as cs.UsingDeclaration);
         super.visitTestClass(d);
-    }
-
-    private getContainerTypeName(tsType: ts.Type): string | null {
-        if (this._context.isNullableType(tsType)) {
-            return null;
-        }
-        if (
-            (tsType.flags & ts.TypeFlags.Enum) !== 0 ||
-            (tsType.flags & ts.TypeFlags.EnumLike) !== 0 ||
-            (tsType.flags & ts.TypeFlags.EnumLiteral) !== 0
-        ) {
-            return null;
-        }
-        if ((tsType.flags & ts.TypeFlags.Number) !== 0 || (tsType.flags & ts.TypeFlags.NumberLiteral) !== 0) {
-            return 'Double';
-        }
-        if ((tsType.flags & ts.TypeFlags.Boolean) !== 0 || (tsType.flags & ts.TypeFlags.BooleanLiteral) !== 0) {
-            return 'Boolean';
-        }
-        return null;
     }
 
     protected override convertPropertyToInvocation(parentSymbol: ts.Symbol, symbol: ts.Symbol): boolean {
@@ -620,8 +540,11 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
     protected applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
         super.applyMethodOverride(csMethod, classElement);
-        if(!csMethod.isOverride) {
-            if(ts.isComputedPropertyName(classElement.name) && classElement.name.getText().includes('Symbol.dispose')) {
+        if (!csMethod.isOverride) {
+            if (
+                ts.isComputedPropertyName(classElement.name) &&
+                classElement.name.getText().includes('Symbol.dispose')
+            ) {
                 csMethod.isOverride = true;
             }
         }
