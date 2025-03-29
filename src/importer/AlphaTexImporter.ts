@@ -243,10 +243,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._score.tracks[track].applyLyrics(lyrics);
             }
             for (const [sustainPedal, beat] of this._sustainPedalToBeat) {
-                if (sustainPedal.ratioPosition === 0) {
-                    const duration = beat.voice.bar.masterBar.calculateDuration();
-                    sustainPedal.ratioPosition = beat.playbackStart / duration;
-                }
+                const duration = beat.voice.bar.masterBar.calculateDuration();
+                sustainPedal.ratioPosition = beat.playbackStart / duration;
             }
             return this._score;
         } catch (e) {
@@ -2114,6 +2112,7 @@ export class AlphaTexImporter extends ScoreImporter {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Down;
             // exact ratio position will be applied after .finish() when times are known
+            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
             this._sustainPedalToBeat.set(sustainPedal, beat);
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
@@ -2122,6 +2121,7 @@ export class AlphaTexImporter extends ScoreImporter {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
             // exact ratio position will be applied after .finish() when times are known
+            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
             this._sustainPedalToBeat.set(sustainPedal, beat);
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
@@ -2129,7 +2129,8 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'spe') {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
-            sustainPedal.ratioPosition = 1;
+            // exact ratio position will be applied after .finish() when times are known
+            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
             this._sustainPedalToBeat.set(sustainPedal, beat);
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
