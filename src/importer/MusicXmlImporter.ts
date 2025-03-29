@@ -97,7 +97,7 @@ export class MusicXmlImporter extends ScoreImporter {
         try {
             dom.parse(xml);
         } catch (e) {
-            throw new UnsupportedFormatError('Unsupported format');
+            throw new UnsupportedFormatError('Unsupported format', e as Error);
         }
         this._score = new Score();
         this._score.tempo = 120;
@@ -1340,6 +1340,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseStaffTuning(element: XmlNode, staff: Staff): void {
         staff.showTablature = true;
         staff.showStandardNotation = false;
+        staff.stringTuning.tunings = new Array<number>(staff.standardNotationLineCount).fill(0);
 
         let line: number = parseInt(element.getAttribute('line'));
         let tuningStep: string = 'C';
@@ -1913,9 +1914,8 @@ export class MusicXmlImporter extends ScoreImporter {
         // Note level
         let note: Note | null = null;
         let tieNode: XmlNode | null = null;
-
         let isPitched = false;
-
+        
         // will create new beat with all information in the correct tree
         // or add the note to an existing beat if specified accordingly.
         const ensureBeat = () => {

@@ -30,6 +30,13 @@ internal static class TestGlobals
     {
         Assert.Fail(Convert.ToString(message));
     }
+
+    internal static AsyncLocal<int> SnapshotAssertionCounter { get; }
+    static TestGlobals()
+    {
+        SnapshotAssertionCounter = new AsyncLocal<int>();
+        TestMethodAttribute.GlobalBeforeTest += () => { SnapshotAssertionCounter.Value = 0; };
+    }
 }
 
 internal class NotExpector<T>
@@ -189,7 +196,6 @@ internal class Expector<T>
     }
 
 
-
     public void Throw(Type expected)
     {
         if (_actual is Action d)
@@ -214,4 +220,41 @@ internal class Expector<T>
             Assert.Fail("ToThrowError can only be used with an exception");
         }
     }
+
+    public void ToMatchSnapshot(string hint = "")
+    {
+        var testMethodInfo = TestMethodAccessor.CurrentTest;
+        Assert.IsNotNull(testMethodInfo,
+            "No information about current test available, cannot find test snapshot");
+
+        var file = testMethodInfo.MethodInfo.GetCustomAttribute<SnapshotFileAttribute>()?.Path;
+        if (string.IsNullOrEmpty(file))
+        {
+            Assert.Fail("Missing SnapshotFileAttribute with path to .snap file");
+        }
+
+        var absoluteSnapFilePath = Path.GetFullPath(Path.Join(
+            TestPlatform.RepositoryRoot.Value,
+            file
+        ));
+        if (!File.Exists(absoluteSnapFilePath))
+        {
+            Assert.Fail("Could not find snapshot file at " + absoluteSnapFilePath);
+        }
+
+        var snapshotFile = SnapshotFileRepository.LoadSnapshortFile(absoluteSnapFilePath);
+
+        var testSuiteName = testMethodInfo.MethodInfo.DeclaringType!.Name;
+        var testName = testMethodInfo.MethodInfo.GetCustomAttribute<TestMethodAttribute>()!.DisplayName;
+
+        var snapshortName = $"{testSuiteName} {testName} {++TestGlobals.SnapshotAssertionCounter.Value}";
+
+        var error = snapshotFile.Match(snapshortName, _actual);
+        if (!string.IsNullOrEmpty(error))
+        {
+            Assert.Fail(error);
+        }
+    }
 }
+
+
