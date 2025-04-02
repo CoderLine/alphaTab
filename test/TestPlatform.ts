@@ -36,12 +36,25 @@ export class TestPlatform {
      * @target web
      * @partial
      */
+    public static loadFileSync(path: string): Uint8Array {
+        return fs.readFileSync(path);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
     public static async listDirectory(path: string): Promise<string[]> {
         return await fs.promises.readdir(path);
     }
 
     public static async loadFileAsString(path: string): Promise<string> {
         const data = await TestPlatform.loadFile(path);
+        return IOHelper.toString(data, 'UTF-8');
+    }
+
+    public static loadFileAsStringSync(path: string): string {
+        const data = TestPlatform.loadFileSync(path);
         return IOHelper.toString(data, 'UTF-8');
     }
 

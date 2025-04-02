@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<score-partwise version="4.0">
+  <part-list>
+    <score-part id="P1">
+      <part-name>Track 1</part-name>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Track 2</part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>480</divisions>
+        <!-- We do not advertise voices or staves here, needs to work dynamically-->
+      </attributes>
+
+      <!-- First note, no voice or staff provided -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>480</duration>
+        <type>quarter</type>
+      </note>
+
+      <!-- Add second note to chord -->
+      <note>
+        <chord />
+        <pitch>
+          <step>D</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>480</duration>
+        <type>quarter</type>
+      </note>
+
+      <!-- Second beat, with additional time than the type -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>720</duration>
+        <type>quarter</type>
+      </note>
+
+      <!-- Skip forward a 16th note -->
+      <forward>
+        <duration>120</duration>
+      </forward>
+
+      <!-- Add a note again -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>120</duration>
+        <type>16th</type>
+      </note>
+
+      <!-- Add a note to the second staff -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>480</duration>
+        <type>quarter</type>
+        <staff>2</staff>
+      </note>
+
+      <!-- Backup to the middle of the bar -->
+      <backup>
+        <duration>960</duration>
+      </backup>
+      <!--  Backup even more-->
+      <backup>
+        <duration>120</duration>
+      </backup>
+      <!--  Forward again -->
+      <backup>
+        <duration>90</duration>
+      </backup>
+
+      <!-- Add a half note to the second voice of the second staff -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>960</duration>
+        <!-- Skip the type -->
+        <voice>2</voice>
+        <staff>2</staff>
+      </note>
+    </measure>
+    <measure number="2">
+      <attributes>
+        <divisions>480</divisions>
+        <!-- We do not advertise voices or staves here, needs to work dynamically-->
+      </attributes>
+
+      <!-- First note, no voice or staff provided -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>480</duration>
+        <type>quarter</type>
+      </note>
+
+      <!-- Add second note to chord -->
+      <note>
+        <chord />
+        <pitch>
+          <step>D</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>480</duration>
+        <type>quarter</type>
+      </note>
+
+      <!-- Second beat, with additional time than the type -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>720</duration>
+        <type>quarter</type>
+      </note>
+
+      <!-- Skip forward a 16th note -->
+      <forward>
+        <duration>120</duration>
+      </forward>
+
+      <!-- Add a note again -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>120</duration>
+        <type>16th</type>
+      </note>
+
+      <!-- Add a note to the second staff -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>480</duration>
+        <type>quarter</type>
+        <staff>2</staff>
+      </note>
+
+      <!-- Backup to the middle of the bar -->
+      <backup>
+        <duration>960</duration>
+      </backup>
+      <!--  Backup even more-->
+      <backup>
+        <duration>120</duration>
+      </backup>
+      <!--  Forward again -->
+      <backup>
+        <duration>90</duration>
+      </backup>
+
+      <!-- Add a half note to the second voice of the second staff -->
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>960</duration>
+        <!-- Skip the type -->
+        <voice>2</voice>
+        <staff>2</staff>
+      </note>
+    </measure>
+  </part>
+  <part id="P2">
+    <measure number="1">
+      <attributes>
+        <divisions>240</divisions>
+        <key>
+          <fifths>4</fifths>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+      </attributes>
+
+      <!-- forward at start -->
+      <forward>
+        <duration>480</duration>
+      </forward>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>480</duration>
+      </note>
+
+      <backup>
+        <duration>720</duration>
+      </backup>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>240</duration>
+        <voice>2</voice>
+      </note>
+
+      <backup>
+        <duration>123</duration>
+      </backup>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>120</duration>
+        <voice>3</voice>
+      </note>
+    </measure>
+    <measure number="2">
+
+      <!-- forward at start -->
+      <forward>
+        <duration>480</duration>
+      </forward>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>480</duration>
+      </note>
+
+      <backup>
+        <duration>720</duration>
+      </backup>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>240</duration>
+        <voice>2</voice>
+      </note>
+
+      <backup>
+        <duration>123</duration>
+      </backup>
+
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>120</duration>
+        <voice>3</voice>
+      </note>
+    </measure>
+  </part>
+</score-partwise>

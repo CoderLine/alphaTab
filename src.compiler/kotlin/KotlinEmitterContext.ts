@@ -56,45 +56,13 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return !!ts.getJSDocTags(tsSymbol.valueDeclaration).find(t => t.tagName.text === 'partial');
     }
 
-    protected override getOverriddenMembers(classType: ts.InterfaceType, classElement: ts.ClassElement): ts.Symbol[] {
-        const symbols: ts.Symbol[] = [];
-        this.collectOverriddenMembersByName(symbols, classType, classElement.name!.getText(), false, true);
-        return symbols;
-    }
-
-    protected override collectOverriddenMembersByName(
-        symbols: ts.Symbol[],
-        classType: ts.InterfaceType,
-        memberName: string,
-        includeOwnMembers: boolean = false,
-        allowInterfaces: boolean = false
-    ) {
-        super.collectOverriddenMembersByName(symbols, classType, memberName, includeOwnMembers, allowInterfaces);
-
-        if (
-            classType.symbol.valueDeclaration &&
-            ts.isClassDeclaration(classType.symbol.valueDeclaration) &&
-            classType.symbol.valueDeclaration.heritageClauses
-        ) {
-            const implementsClause = classType.symbol.valueDeclaration.heritageClauses?.find(
-                c => c.token === ts.SyntaxKind.ImplementsKeyword
-            );
-
-            if (implementsClause) {
-                for (const typeSyntax of implementsClause.types) {
-                    const type = this.typeChecker.getTypeFromTypeNode(typeSyntax);
-                    super.collectOverriddenMembersByName(
-                        symbols,
-                        type as ts.InterfaceType,
-                        memberName,
-                        true,
-                        allowInterfaces
-                    );
-                }
-            }
-        }
-
-        return false;
+    protected getOverriddenMembers(
+        classType: ts.ClassDeclaration | ts.InterfaceDeclaration,
+        classElement: ts.ClassElement
+    ): (ts.ClassElement | ts.TypeElement)[] {
+        const overriddenItems: (ts.ClassElement | ts.TypeElement)[] = [];
+        super.collectOverriddenMembersByName(overriddenItems, classType, classElement.name!.getText(), false, true);
+        return overriddenItems;
     }
 
     public override isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
@@ -106,6 +74,8 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
 
         if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {
             return 'close';
+        } else if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
+            return this.toMethodName('iterator');
         }
 
         return '';
@@ -115,8 +85,11 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return this.makeTypeName('kotlin.collections.Iterable');
     }
 
-    
     public override makeGeneratorType(): string {
+        return this.makeTypeName('kotlin.collections.Iterator');
+    }
+
+    public makeIteratorType(): string {
         return this.makeTypeName('kotlin.collections.Iterator');
     }
 }

@@ -14,7 +14,7 @@ public interface IMap<TKey, TValue> : IMap, IEnumerable<MapEntry<TKey, TValue>>
     IEnumerable<TKey> Keys();
     IEnumerable<TValue> Values();
     bool Has(TKey key);
-    TValue Get(TKey key);
+    TValue? Get(TKey key);
     void Set(TKey key, TValue value);
     void Delete(TKey key);
 }
@@ -44,6 +44,14 @@ public class Map<TKey, TValue> : Dictionary<TKey, TValue>, IMap<TKey, TValue>
             this[entry.Key] = entry.Value;
         }
     }
+
+    public Map(IEnumerable<ArrayTuple<TKey, TValue>> entries)
+    {
+        foreach (var entry in entries)
+        {
+            this[entry.V0] = entry.V1;
+        }
+    }
     public Map(IEnumerable<KeyValuePair<TKey, TValue>> entries)
     {
         foreach (var entry in entries)
@@ -57,9 +65,10 @@ public class Map<TKey, TValue> : Dictionary<TKey, TValue>, IMap<TKey, TValue>
         return ContainsKey(key);
     }
 
-    public TValue Get(TKey key)
+    public TValue? Get(TKey key)
     {
-        return this[key];
+        TryGetValue(key, out var v);
+        return v;
     }
 
     public void Set(TKey key, TValue value)

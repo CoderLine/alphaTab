@@ -31,7 +31,7 @@ public open class DoubleDoubleMapEntry {
     public constructor(key: Double, value: Double) {
         _key = key
         _value = value
-    }    
+    }
 }
 
 public class DoubleDoubleMapEntryInternal : DoubleDoubleMapEntry(), IMapEntryInternal {
@@ -50,13 +50,13 @@ public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntr
             { entry, k -> entry.key == k }) >= 0
     }
 
-    public fun get(key: Double): Double {
+    public fun get(key: Double): Double? {
         val i = findEntryInternal(key,
             { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
         }
-        throw KeyNotFoundException()
+        return null
     }
 
     public fun set(key: Double, value: Double) {

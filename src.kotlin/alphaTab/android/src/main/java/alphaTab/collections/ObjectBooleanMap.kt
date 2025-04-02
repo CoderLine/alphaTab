@@ -1,5 +1,8 @@
 package alphaTab.collections
 
+import alphaTab.core.ArrayTuple
+import alphaTab.core.ObjectBooleanArrayTuple
+
 public open class ObjectBooleanMapEntry<TKey> {
     private var _key: TKey
     public var key: TKey
@@ -51,9 +54,9 @@ public class ObjectBooleanMapEntryInternal<TKey> : ObjectBooleanMapEntry<TKey>()
 public class ObjectBooleanMap<TKey> :
     MapBase<ObjectBooleanMapEntry<TKey>, ObjectBooleanMapEntryInternal<TKey>> {
     public constructor()
-    public constructor(iterable: Iterable<ObjectBooleanMapEntry<TKey>>) {
+    public constructor(iterable: Iterable<ObjectBooleanArrayTuple<TKey>>) {
         for (it in iterable) {
-            set(it.key, it.value)
+            set(it.v0, it.v1)
         }
     }
 
@@ -64,13 +67,13 @@ public class ObjectBooleanMap<TKey> :
     }
 
     @Suppress("UNCHECKED_CAST")
-    public fun get(key: TKey): Boolean {
+    public fun get(key: TKey): Boolean? {
         val i = findEntryInternal(key as Any,
             { entry, k -> entry.key == (k as TKey) })
         if (i >= 0) {
             return entries[i].value
         }
-        throw KeyNotFoundException()
+        return null
     }
 
     public fun set(key: TKey, value: Boolean) {

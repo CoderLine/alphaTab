@@ -55,11 +55,11 @@ export class XmlNode {
         }
     }
 
-    public getAttribute(name: string): string {
+    public getAttribute(name: string, defaultValue: string = ''): string {
         if (this.attributes.has(name)) {
             return this.attributes.get(name)!;
         }
-        return '';
+        return defaultValue;
     }
 
     public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {

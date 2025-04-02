@@ -19,7 +19,7 @@ internal class EnvironmentPartials {
             )
             engines.set(
                 "default",
-                engines.get("skia")
+                engines.get("skia")!!
             )
         }
 

@@ -1,7 +1,7 @@
 import * as cs from '../csharp/CSharpAst';
 import * as ts from 'typescript';
-import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import AstPrinterBase from '../AstPrinterBase';
+import KotlinEmitterContext from './KotlinEmitterContext';
 
 export default class KotlinAstPrinter extends AstPrinterBase {
     private _forceInteger: boolean = false;
@@ -9,8 +9,11 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     private _thisScope: string[] = [];
     private _useScopes: number[] = [];
 
-    public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
+    protected override _context: KotlinEmitterContext;
+
+    public constructor(sourceFile: cs.SourceFile, context: KotlinEmitterContext) {
         super(sourceFile, context);
+        this._context = context;
     }
 
     private keywords: Set<string> = new Set<string>([
@@ -189,9 +192,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         if (p.type) {
             this.write(': ');
             if (p.params) {
-                this.writeType((p.type as cs.ArrayTypeNode).elementType, false, false, false, true, false);
+                this.writeType((p.type as cs.ArrayTypeNode).elementType, false, false, false, true);
             } else {
-                this.writeType(p.type, false, false, false, true, false);
+                this.writeType(p.type, false, false, false, true);
             }
         }
         if (!this.isOverrideMethod(p.parent!)) {
@@ -471,6 +474,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
         }
+        if (d.isTestMethod) {
+            this.writeLine('@Test');
+        }
         this.writeVisibility(d.visibility);
 
         if (d.isAbstract) {
@@ -699,8 +705,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         forNew: boolean = false,
         asNativeArray: boolean = false,
         forTypeConstraint: boolean = false,
-        allowPromise: boolean = true,
-        optionalAsNullable: boolean = true
+        allowPromise: boolean = true
     ) {
         switch (type.nodeType) {
             case cs.SyntaxKind.PrimitiveTypeNode:
@@ -712,7 +717,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             this.write('IAlphaTabEnum');
                             break;
                         case cs.PrimitiveType.Object:
-                        case cs.PrimitiveType.Dynamic:
                         case cs.PrimitiveType.String:
                         case cs.PrimitiveType.Void:
                             this.write('class');
@@ -722,9 +726,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     switch ((type as cs.PrimitiveTypeNode).type) {
                         case cs.PrimitiveType.Bool:
                             this.write('Boolean');
-                            break;
-                        case cs.PrimitiveType.Dynamic:
-                            this.write('Any');
                             break;
                         case cs.PrimitiveType.Double:
                             this.write(this._forceInteger ? 'Int' : 'Double');
@@ -764,52 +765,107 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                         this.write(elementTypeName);
                         this.write('List');
                     } else {
-                        const isDynamicArray =
-                            cs.isPrimitiveTypeNode(arrayType.elementType) &&
-                            arrayType.elementType.type === cs.PrimitiveType.Dynamic;
-                        if (isDynamicArray && !forNew) {
-                            this.write('alphaTab.collections.List<*>');
-                        } else {
-                            if (forNew) {
-                                this.write('alphaTab.collections.List<');
-                            } else {
-                                this.write('alphaTab.collections.List<');
-                            }
-                            this.writeType(arrayType.elementType);
-                            this.write('>');
-                        }
+                        this.write('alphaTab.collections.List<');
+                        this.writeType(arrayType.elementType);
+                        this.write('>');
                     }
                 }
 
                 break;
             case cs.SyntaxKind.MapTypeNode:
                 const mapType = type as cs.MapTypeNode;
-
-                var keyTypeName = this.getContainerTypeName(mapType.keyType);
-                var valueTypeName = this.getContainerTypeName(mapType.valueType);
-
-                this.write('alphaTab.collections.');
-                if (keyTypeName && valueTypeName) {
-                    this.write(keyTypeName);
-                    this.write(valueTypeName);
-                    this.write('Map');
-                } else if (keyTypeName) {
-                    this.write(keyTypeName);
-                    this.write('ObjectMap<');
-                    this.writeType(mapType.valueType);
-                    this.write('>');
-                } else if (valueTypeName) {
-                    this.write('Object');
-                    this.write(valueTypeName);
-                    this.write('Map<');
-                    this.writeType(mapType.keyType);
-                    this.write('>');
+                if (!mapType.keyType && !mapType.valueType) {
+                    this.write('alphaTab.collections.MapBase<*,*>');
                 } else {
-                    this.write('Map<');
-                    this.writeType(mapType.keyType);
-                    this.write(', ');
-                    this.writeType(mapType.valueType);
-                    this.write('>');
+                    var keyTypeName = this.getContainerTypeName(mapType.keyType!);
+                    var valueTypeName = this.getContainerTypeName(mapType.valueType!);
+
+                    this.write('alphaTab.collections.');
+                    if (keyTypeName && valueTypeName) {
+                        this.write(keyTypeName);
+                        this.write(valueTypeName);
+                        this.write('Map');
+                    } else if (keyTypeName) {
+                        this.write(keyTypeName);
+                        this.write('ObjectMap<');
+                        this.writeType(mapType.valueType!);
+                        this.write('>');
+                    } else if (valueTypeName) {
+                        this.write('Object');
+                        this.write(valueTypeName);
+                        this.write('Map<');
+                        this.writeType(mapType.keyType!);
+                        this.write('>');
+                    } else {
+                        this.write('Map<');
+                        this.writeType(mapType.keyType!);
+                        this.write(', ');
+                        this.writeType(mapType.valueType!);
+                        this.write('>');
+                    }
+                }
+                break;
+            case cs.SyntaxKind.ArrayTupleNode:
+                const arrayTupleType = type as cs.ArrayTupleNode;
+
+                if (arrayTupleType.types.length > 2) {
+                    if (forNew) {
+                        this.write('alphaTab.core.ArrayTuple');
+                    } else {
+                        this.write('alphaTab.core.IArrayTuple');
+                    }
+                    this.write(arrayTupleType.types.length.toString());
+                    this.write('<');
+                    this.writeCommaSeparated(arrayTupleType.types, p => this.writeType(p));
+                } else {
+                    let arrayTupleName = '';
+                    let newTypeArgs: cs.TypeNode[] = [];
+                    for (const arg of arrayTupleType.types) {
+                        let itemType: cs.TypeReferenceType = arg;
+                        while (typeof itemType !== 'string' && cs.isTypeReference(itemType)) {
+                            itemType = itemType.reference;
+                        }
+
+                        if (typeof itemType === 'string') {
+                            arrayTupleName += 'Object';
+                            newTypeArgs.push(arg);
+                        } else if (cs.isPrimitiveTypeNode(itemType)) {
+                            switch (itemType.type) {
+                                case cs.PrimitiveType.Bool:
+                                    arrayTupleName += 'Boolean';
+                                    break;
+                                case cs.PrimitiveType.Int:
+                                    arrayTupleName += 'Int';
+                                    break;
+                                case cs.PrimitiveType.Double:
+                                    arrayTupleName += 'Double';
+                                    break;
+                                default:
+                                    arrayTupleName += 'Object';
+                                    newTypeArgs.push(arg);
+                                    break;
+                            }
+                        } else {
+                            arrayTupleName += 'Object';
+                            newTypeArgs.push(arg);
+                        }
+                    }
+
+                    if (arrayTupleName === 'ObjectObject') {
+                        arrayTupleName = '';
+                    }
+
+                    if (forNew) {
+                        this.write('alphaTab.core.' + arrayTupleName + 'ArrayTuple');
+                    } else {
+                        this.write('alphaTab.core.I' + arrayTupleName + 'ArrayTuple');
+                    }
+
+                    if (newTypeArgs.length > 0) {
+                        this.write('<');
+                        this.writeCommaSeparated(newTypeArgs, p => this.writeType(p));
+                        this.write('>');
+                    }
                 }
                 break;
             case cs.SyntaxKind.FunctionTypeNode:
@@ -842,8 +898,25 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
                 if (typeReference.typeArguments && typeReference.typeArguments.length > 0) {
                     this.write('<');
+
                     this.writeCommaSeparated(typeReference.typeArguments, p => this.writeType(p));
+
                     this.write('>');
+                } else if (typeReference.tsSymbol) {
+                    // we have to resolve the number of potential type parameters of the type
+                    const expectedParameters = typeReference.tsSymbol.declarations
+                        ?.map(d => {
+                            if (ts.isInterfaceDeclaration(d) || ts.isClassDeclaration(d)) {
+                                return d.typeParameters;
+                            }
+                        })
+                        .find(x => !!x);
+
+                    if (expectedParameters) {
+                        this.write('<');
+                        this.writeCommaSeparated(Array.from(expectedParameters), () => this.write('*'));
+                        this.write('>');
+                    }
                 }
 
                 if (typeReference.isAsync && allowPromise) {
@@ -1226,7 +1299,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         if (
             expr.tsSymbol?.valueDeclaration &&
             ts.isMethodDeclaration(expr.tsSymbol.valueDeclaration) &&
-            !ts.isCallExpression(expr.tsNode!.parent)
+            (!ts.isCallExpression(expr.tsNode!.parent) ||
+                (expr.tsNode!.parent as ts.CallExpression).expression !== expr.tsNode)
         ) {
             return true;
         }
@@ -1819,5 +1893,9 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         } else {
             this.write('return');
         }
+    }
+
+    protected writeDefaultExpression(_: cs.DefaultExpression): void {
+        this.write('null');
     }
 }

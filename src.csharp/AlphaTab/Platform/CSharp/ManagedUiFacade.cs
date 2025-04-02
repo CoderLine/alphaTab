@@ -2,7 +2,6 @@ using System;
 using System.Collections.Concurrent;
 using System.IO;
 using AlphaTab.Synth;
-using AlphaTab.Core.EcmaScript;
 using AlphaTab.Importer;
 using AlphaTab.Model;
 using AlphaTab.Rendering;

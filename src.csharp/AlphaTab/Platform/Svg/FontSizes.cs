@@ -1,7 +1,4 @@
-﻿using AlphaTab.Core;
-using AlphaTab.Core.EcmaScript;
-
-namespace AlphaTab.Platform.Svg;
+﻿namespace AlphaTab.Platform.Svg;
 
 partial class FontSizes
 {

@@ -1,8 +1,4 @@
 using System;
-using System.Threading;
-using System.Threading.Tasks;
-using AlphaTab.Core.EcmaScript;
-using AlphaTab.Platform.CSharp;
 
 namespace AlphaTab;
 

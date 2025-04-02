@@ -20,12 +20,16 @@ class TestPlatformPartials {
         }
 
         fun loadFile(path: String): kotlinx.coroutines.Deferred<Uint8Array> {
+            return CompletableDeferred(loadFileSync(path))
+        }
+
+        fun loadFileSync(path: String): Uint8Array {
             val fs = openFileRead(path)
             val ms = ByteArrayOutputStream()
             fs.use {
                 fs.copyTo(ms)
             }
-            return CompletableDeferred(Uint8Array(ms.toByteArray().asUByteArray()))
+            return Uint8Array(ms.toByteArray().asUByteArray())
         }
 
         val projectRoot: String by lazy {
@@ -34,17 +38,18 @@ class TestPlatformPartials {
                 path = path.parent
                     ?: throw AlphaTabError(AlphaTabErrorType.General, "Could not find project root")
             }
-            println(path.toString())
             path.toString()
         }
 
         private fun openFileRead(path: String): InputStream {
-            val filePath = Paths.get(projectRoot, path)
+            val sub = Paths.get(path)
+            val filePath = if(sub.isAbsolute) sub else Paths.get(projectRoot, path)
             return filePath.toFile().inputStream()
         }
 
         private fun openFileWrite(path: String): OutputStream {
-            val fullPath = Paths.get(projectRoot, path)
+            val sub = Paths.get(path)
+            val fullPath = if(sub.isAbsolute) sub else Paths.get(projectRoot, path)
             Logger.info("Test", "Saving file '$path' to '$fullPath'")
             fullPath.parent.toFile().mkdirs()
             return fullPath.toFile().outputStream()

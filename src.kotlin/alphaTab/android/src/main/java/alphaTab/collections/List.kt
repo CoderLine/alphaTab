@@ -62,6 +62,9 @@ public class List<T> : Iterable<T> {
     public fun some(predicate: (T) -> Boolean): Boolean {
         return _data.any(predicate)
     }
+    public fun includes(value:T): Boolean {
+        return _data.contains(value)
+    }
 
     public fun indexOf(value: T): Double {
         return _data.indexOf(value).toDouble()

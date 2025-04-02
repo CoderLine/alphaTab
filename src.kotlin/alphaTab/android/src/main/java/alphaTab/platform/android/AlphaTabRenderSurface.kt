@@ -93,7 +93,7 @@ internal class AlphaTabRenderSurface(context: Context, attributeSet: AttributeSe
 
     public fun fillPlaceholder(result: RenderFinishedEventArgs) {
         if (_resultIdToIndex.has(result.id)) {
-            val index = _resultIdToIndex.get(result.id);
+            val index = _resultIdToIndex.get(result.id)!!
             _placeholders[index.toInt()].apply {
                 this.result = result
                 this.state = RenderPlaceholder.STATE_RENDER_DONE

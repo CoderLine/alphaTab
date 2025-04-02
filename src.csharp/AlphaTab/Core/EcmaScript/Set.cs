@@ -5,7 +5,11 @@ using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript;
 
-public class Set<T> : IEnumerable<T>, ICollection
+public abstract class Set
+{
+}
+
+public class Set<T> : Set, IEnumerable<T>, ICollection
 {
     private readonly HashSet<T> _data;
 

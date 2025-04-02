@@ -1,6 +1,4 @@
-﻿using System.Drawing;
-using System.Windows.Forms;
-using System.Windows.Forms.Layout;
+﻿using System.Windows.Forms;
 
 namespace AlphaTab.WinForms
 {

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<score-timewise version="4.0">
+  <work>
+    <work-title>Title</work-title>
+  </work>
+  <movement-number></movement-number>
+  <movement-title></movement-title>
+  <identification>
+    <creator type="lyricist">Words</creator>
+    <creator type="arranger">Music</creator>
+    <creator>Artist</creator>
+    <rights>Copyright</rights>
+    <encoding>
+      <encoder>Tab</encoder>
+      <encoding-description>Notices</encoding-description>
+    </encoding>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name>Track 1</part-name>
+      <part-abbreviation>T1</part-abbreviation>
+      <midi-device port="1" />
+      <score-instrument id="I1">
+        <instrument-name>I1</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I1">
+        <midi-channel>1</midi-channel>
+        <midi-program>1</midi-program>
+        <volume>0.5</volume>
+        <pan>0.25</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P2">
+      <part-name>Track 2</part-name>
+      <part-abbreviation>T2</part-abbreviation>
+      <midi-device port="1" />
+      <score-instrument id="I2">
+        <instrument-name>I2</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I2">
+        <midi-channel>2</midi-channel>
+        <midi-program>2</midi-program>
+        <volume>0.25</volume>
+        <pan>0.5</pan>
+      </midi-instrument>
+    </score-part>
+    <score-part id="P3">
+      <part-name>Track 3</part-name>
+      <part-abbreviation>T3</part-abbreviation>
+      <midi-device port="1" />
+      <score-instrument id="I3">
+        <instrument-name>I3</instrument-name>
+      </score-instrument>
+      <midi-instrument id="I3">
+        <midi-channel>3</midi-channel>
+        <midi-program>3</midi-program>
+        <volume>0.25</volume>
+        <pan>0.25</pan>
+      </midi-instrument>
+    </score-part>
+  </part-list>
+
+  <measure number="1">
+    <part id="P1">
+    </part>
+    <part id="P2">
+    </part>
+    <part id="P3">
+    </part>
+  </measure>
+  <measure number="2">
+    <part id="P1">
+    </part>
+    <part id="P2">
+    </part>
+    <part id="P3">
+    </part>
+  </measure>
+  <measure number="3">
+    <part id="P1">
+    </part>
+    <part id="P2">
+    </part>
+    <part id="P3">
+    </part>
+  </measure>
+</score-timewise>

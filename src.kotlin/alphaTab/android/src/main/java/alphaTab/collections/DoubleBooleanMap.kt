@@ -31,7 +31,7 @@ public open class DoubleBooleanMapEntry {
     public constructor(key: Double, value: Boolean) {
         _key = key
         _value = value
-    }    
+    }
 }
 
 public class DoubleBooleanMapEntryInternal : DoubleBooleanMapEntry(), IMapEntryInternal {
@@ -50,13 +50,13 @@ public class DoubleBooleanMap : MapBase<DoubleBooleanMapEntry, DoubleBooleanMapE
             { entry, k -> entry.key == k }) >= 0
     }
 
-    public fun get(key: Double): Boolean {
+    public fun get(key: Double): Boolean? {
         val i = findEntryInternal(key,
             { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
         }
-        throw KeyNotFoundException()
+        return null
     }
 
     public fun set(key: Double, value: Boolean) {

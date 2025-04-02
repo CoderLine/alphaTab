@@ -1,11 +1,14 @@
 using System;
 using System.Collections;
+using System.IO;
+using System.Reflection;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test;
 #pragma warning disable CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 // ReSharper disable once InconsistentNaming
-public static class assert
+internal static class assert
 #pragma warning restore CS8981 // The type name only contains lower-cased ascii characters. Such names may become reserved for the language.
 {
     public static void Fail(string message)
@@ -14,7 +17,7 @@ public static class assert
     }
 }
 
-public static class TestGlobals
+internal static class TestGlobals
 {
     public static Expector<T> Expect<T>(T actual)
     {
@@ -30,9 +33,16 @@ public static class TestGlobals
     {
         Assert.Fail(Convert.ToString(message));
     }
+
+    internal static AsyncLocal<int> SnapshotAssertionCounter { get; }
+    static TestGlobals()
+    {
+        SnapshotAssertionCounter = new AsyncLocal<int>();
+        TestMethodAttribute.GlobalBeforeTest += () => { SnapshotAssertionCounter.Value = 0; };
+    }
 }
 
-public class NotExpector<T>
+internal class NotExpector<T>
 {
     private readonly T _actual;
     public NotExpector<T> Be => this;
@@ -55,7 +65,7 @@ public class NotExpector<T>
     }
 }
 
-public class Expector<T>
+internal class Expector<T>
 {
     private readonly T _actual;
 
@@ -70,6 +80,7 @@ public class Expector<T>
     {
         return new NotExpector<T>(_actual);
     }
+
     public Expector<T> Be => this;
     public Expector<T> Have => this;
 
@@ -79,6 +90,7 @@ public class Expector<T>
         {
             expected = (double)i;
         }
+
         if (expected is double d && _actual is int)
         {
             expected = (int)d;
@@ -99,11 +111,14 @@ public class Expector<T>
     {
         if (_actual is int i)
         {
-            Assert.IsTrue(i.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+            Assert.IsTrue(i.CompareTo(expected) > 0,
+                $"Expected {expected} to be greater than {_actual}");
         }
+
         if (_actual is double d)
         {
-            Assert.IsTrue(d.CompareTo(expected) > 0, $"Expected {expected} to be greater than {_actual}");
+            Assert.IsTrue(d.CompareTo(expected) > 0,
+                $"Expected {expected} to be greater than {_actual}");
         }
     }
 
@@ -134,9 +149,10 @@ public class Expector<T>
     {
         Assert.AreNotEqual(default!, _actual);
     }
+
     public void Length(int length)
     {
-        if(_actual is ICollection collection)
+        if (_actual is ICollection collection)
         {
             Assert.AreEqual(length, collection.Count);
         }
@@ -148,7 +164,7 @@ public class Expector<T>
 
     public void Contain(object element)
     {
-        if(_actual is ICollection collection)
+        if (_actual is ICollection collection)
         {
             CollectionAssert.Contains(collection, element);
         }
@@ -183,7 +199,6 @@ public class Expector<T>
     }
 
 
-
     public void Throw(Type expected)
     {
         if (_actual is Action d)
@@ -208,4 +223,41 @@ public class Expector<T>
             Assert.Fail("ToThrowError can only be used with an exception");
         }
     }
+
+    public void ToMatchSnapshot(string hint = "")
+    {
+        var testMethodInfo = TestMethodAccessor.CurrentTest;
+        Assert.IsNotNull(testMethodInfo,
+            "No information about current test available, cannot find test snapshot");
+
+        var file = testMethodInfo.MethodInfo.GetCustomAttribute<SnapshotFileAttribute>()?.Path;
+        if (string.IsNullOrEmpty(file))
+        {
+            Assert.Fail("Missing SnapshotFileAttribute with path to .snap file");
+        }
+
+        var absoluteSnapFilePath = Path.GetFullPath(Path.Join(
+            TestPlatform.RepositoryRoot.Value,
+            file
+        ));
+        if (!File.Exists(absoluteSnapFilePath))
+        {
+            Assert.Fail("Could not find snapshot file at " + absoluteSnapFilePath);
+        }
+
+        var snapshotFile = SnapshotFileRepository.LoadSnapshortFile(absoluteSnapFilePath);
+
+        var testSuiteName = testMethodInfo.MethodInfo.DeclaringType!.Name;
+        var testName = testMethodInfo.MethodInfo.GetCustomAttribute<TestMethodAttribute>()!.DisplayName;
+
+        var snapshortName = $"{testSuiteName} {testName} {++TestGlobals.SnapshotAssertionCounter.Value}";
+
+        var error = snapshotFile.Match(snapshortName, _actual);
+        if (!string.IsNullOrEmpty(error))
+        {
+            Assert.Fail(error);
+        }
+    }
 }
+
+
