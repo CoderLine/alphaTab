@@ -773,7 +773,14 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.write('"');
         exprs.forEach(expr => {
             this.write(', ');
-            this.writeExpression(expr);
+            
+            if (cs.isStringLiteral(expr)) {
+                this.writeExpression(expr);
+            } else {
+                this.write('(');
+                this.writeExpression(expr);
+                this.write(').ToTemplate()');
+            }
         });
         this.write(')');
     }

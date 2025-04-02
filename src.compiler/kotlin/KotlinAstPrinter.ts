@@ -775,7 +775,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             case cs.SyntaxKind.MapTypeNode:
                 const mapType = type as cs.MapTypeNode;
                 if (!mapType.keyType && !mapType.valueType) {
-                    this.write('alphaTab.collections.Map<*,*>');
+                    this.write('alphaTab.collections.MapBase<*,*>');
                 } else {
                     var keyTypeName = this.getContainerTypeName(mapType.keyType!);
                     var valueTypeName = this.getContainerTypeName(mapType.valueType!);

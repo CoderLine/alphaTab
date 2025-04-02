@@ -64,13 +64,13 @@ public class DoubleObjectMap<TValue> :
             { entry, k -> entry.key == k }) >= 0
     }
 
-    public fun get(key: Double): TValue {
+    public fun get(key: Double): TValue? {
         val i = findEntryInternal(key,
             { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
         }
-        throw KeyNotFoundException()
+        return null
     }
 
     public fun set(key: Double, value: TValue) {

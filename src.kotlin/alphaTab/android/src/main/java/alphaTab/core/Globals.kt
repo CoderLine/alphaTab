@@ -22,7 +22,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalUnsignedTypes
-internal fun UByteArray.decodeToFloatArray(): FloatArray {
+internal inline fun UByteArray.decodeToFloatArray(): FloatArray {
     val fb = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asFloatBuffer();
     val fa = FloatArray(fb.limit())
     fb.get(fa)
@@ -30,7 +30,7 @@ internal fun UByteArray.decodeToFloatArray(): FloatArray {
 }
 
 @ExperimentalUnsignedTypes
-internal fun UByteArray.decodeToDoubleArray(): DoubleArray {
+internal inline fun UByteArray.decodeToDoubleArray(): DoubleArray {
     val db = ByteBuffer.wrap(this.toByteArray()).order(ByteOrder.LITTLE_ENDIAN).asDoubleBuffer();
     val da = DoubleArray(db.limit())
     db.get(da)
@@ -38,35 +38,39 @@ internal fun UByteArray.decodeToDoubleArray(): DoubleArray {
 }
 
 @ExperimentalUnsignedTypes
-internal fun UByteArray.decodeToString(encoding: String): String {
+internal inline fun UByteArray.decodeToString(encoding: String): String {
     return String(this.toByteArray(), 0, this.size, Charset.forName(encoding))
 }
 
 
-internal fun <T : Comparable<T>> List<T>.sort() {
+internal inline fun <T : Comparable<T>> List<T>.sort() {
     this.sort { a, b ->
         a.compareTo(b).toDouble()
     }
 }
 
-internal fun String.substr(startIndex: Double, length: Double): String {
+internal inline fun String.substr(startIndex: Double, length: Double): String {
     return this.substring(startIndex.toInt(), (startIndex + length).toInt())
 }
 
-internal fun String.substr(startIndex: Double): String {
+internal inline fun String.substr(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-internal fun String.splitBy(separator: String): List<String> {
+internal inline fun String.splitBy(separator: String): List<String> {
     return List(this.split(separator))
 }
 
-internal fun String.replace(pattern: RegExp, replacement: String): String {
+internal inline fun String.replace(pattern: RegExp, replacement: String): String {
     return pattern.replace(this, replacement)
 }
 
-internal fun String.indexOfInDouble(item: String): Double {
+internal inline fun String.indexOfInDouble(item: String): Double {
     return this.indexOf(item).toDouble()
+}
+
+internal inline fun String.indexOfInDouble(item: String, startIndex: Double): Double {
+    return this.indexOf(item, startIndex.toInt()).toDouble()
 }
 
 internal fun Double.toInvariantString(base: Double): String {
@@ -92,68 +96,71 @@ internal fun Double.toInvariantString(): String {
     return this.toInt().toString();
 }
 
-internal fun IAlphaTabEnum.toInvariantString(): String {
+internal inline fun IAlphaTabEnum.toInvariantString(): String {
     return this.toString()
 }
 
-internal fun Double.toFixed(decimals: Double): String {
+internal inline fun Double.toFixed(decimals: Double): String {
     return String.format("%.${decimals.toInt()}f", this);
 }
 
-internal fun String.lastIndexOfInDouble(item: String): Double {
+internal inline fun String.lastIndexOfInDouble(item: String): Double {
     return this.lastIndexOf(item).toDouble()
 }
 
-internal operator fun Double.plus(str: String): String {
+internal inline operator fun Double.plus(str: String): String {
     return this.toInvariantString() + str
 }
 
-internal fun String.charAt(index: Double): String {
+internal inline fun String.charAt(index: Double): String {
     return this.substring(index.toInt(), index.toInt() + 1)
 }
 
-internal fun String.charCodeAt(index: Int): Double {
+internal inline fun String.charCodeAt(index: Int): Double {
     return this[index].code.toDouble()
 }
 
-internal fun String.charCodeAt(index: Double): Double {
+internal inline fun String.charCodeAt(index: Double): Double {
     return this[index.toInt()].code.toDouble()
 }
 
-internal fun String.split(delimiter: String): List<String> {
-    @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
+internal inline fun String.split(delimiter: String): List<String> {
     return List(this.split(delimiters = arrayOf(delimiter), ignoreCase = false, limit = 0))
 }
 
-internal fun String.substring(startIndex: Double, endIndex: Double): String {
+internal inline fun String.substring(startIndex: Double, endIndex: Double): String {
     return this.substring(startIndex.toInt(), endIndex.toInt())
 }
 
-internal operator fun String.get(index: Double): Char {
+internal inline operator fun String.get(index: Double): Char {
     return this[index.toInt()]
 }
 
-internal fun String.substring(startIndex: Double): String {
+internal inline fun String.substring(startIndex: Double): String {
     return this.substring(startIndex.toInt())
 }
 
-internal fun String.replaceAll(before: String, after: String): String {
+internal inline fun String.replaceAll(before: String, after: String): String {
     return this.replace(before, after)
 }
 
-internal fun IAlphaTabEnum.toDouble(): Double {
+internal inline fun String.replaceAll(search: RegExp, after: String): String {
+    return this.replace(search, after)
+}
+
+internal inline fun IAlphaTabEnum.toDouble(): Double {
     return this.value.toDouble()
 }
 
-internal fun IAlphaTabEnum?.toDouble(): Double? {
+internal inline fun IAlphaTabEnum?.toDouble(): Double? {
     return this?.value.toDouble()
 }
 
-internal fun IAlphaTabEnum.toInt(): Int {
+internal inline fun IAlphaTabEnum.toInt(): Int {
     return this.value
 }
 
-internal fun IAlphaTabEnum?.toInt(): Int? {
+internal inline fun IAlphaTabEnum?.toInt(): Int? {
     return this?.value
 }
 
@@ -175,11 +182,21 @@ internal fun Any?.toDouble(): Double {
     throw ClassCastException("Cannot cast ${this::class.simpleName} to double")
 }
 
-internal fun Int?.toDouble(): Double? {
+internal fun Any?.toLong(): Long {
+    if (this is Long) {
+        return this
+    }
+    if (this == null) {
+        throw ClassCastException("Cannot cast null to long")
+    }
+    throw ClassCastException("Cannot cast ${this::class.simpleName} to long")
+}
+
+internal inline fun Int?.toDouble(): Double? {
     return this?.toDouble()
 }
 
-internal fun String.toDoubleOrNaN(): Double {
+internal inline fun String.toDoubleOrNaN(): Double {
     try {
         val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
         if (number != null) {
@@ -215,35 +232,35 @@ internal class Globals {
         const val NaN: Double = Double.NaN
         val console = Console()
 
-        public fun isNaN(s: Double): Boolean {
+        public inline fun isNaN(s: Double): Boolean {
             return s.isNaN()
         }
 
-        public fun parseFloat(s: String): Double {
+        public inline fun parseFloat(s: String): Double {
             return s.toDoubleOrNaN()
         }
 
-        fun parseInt(s: String): Double {
+        inline fun parseInt(s: String): Double {
             return s.toIntOrNaN()
         }
 
-        fun parseInt(s: String, radix: Double): Double {
+        inline fun parseInt(s: String, radix: Double): Double {
             return s.toIntOrNaN(radix)
         }
 
-        fun parseInt(s: Char): Double {
+        inline fun parseInt(s: Char): Double {
             return parseInt(s.toString())
         }
 
-        fun parseInt(s: Char, radix: Double): Double {
+        inline fun parseInt(s: Char, radix: Double): Double {
             return parseInt(s.toString(), radix)
         }
 
-        fun setImmediate(action: () -> Unit) {
+        inline fun setImmediate(action: () -> Unit) {
             action()
         }
 
-        fun setTimeout(action: () -> Unit, millis: Double): Deferred<Unit> {
+        inline fun setTimeout(noinline action: () -> Unit, millis: Double): Deferred<Unit> {
             @Suppress("OPT_IN_USAGE")
             return GlobalScope.async {
                 delay(millis.toLong())

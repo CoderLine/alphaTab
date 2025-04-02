@@ -1,6 +1,12 @@
 package alphaTab.core
 
+import alphaTab.SnapshotFileRepository
+import alphaTab.TestPlatformPartials
+import alphaTab.collections.ObjectDoubleMap
 import org.junit.Assert
+import java.lang.reflect.Method
+import java.nio.file.Paths
+import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
 
 annotation class TestName(val name: String)

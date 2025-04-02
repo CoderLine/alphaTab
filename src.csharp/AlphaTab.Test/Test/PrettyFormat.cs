@@ -1,6 +1,6 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using AlphaTab.Collections;
 
 namespace AlphaTab;
 
@@ -8,11 +8,11 @@ partial class PrettyFormat
 {
     public static IEnumerable<ArrayTuple<object?, object?>> MapAsUnknownIterable(object map)
     {
-        if (map is IMapBase mapAsUnknownIterable)
+        if (map is IDictionary mapAsUnknownIterable)
         {
-            foreach (var v in mapAsUnknownIterable.UnknownEntries())
+            foreach (DictionaryEntry v in mapAsUnknownIterable)
             {
-                yield return v;
+                yield return new ArrayTuple<object?, object?>(v.Key, v.Value);
             }
         }
         else

@@ -231,7 +231,7 @@ export class PrettyFormat {
             } else {
                 result += `,${config.spacingInner}`;
             }
-            
+
             result += indentationNext;
 
             if (width++ === config.maxWidth) {
@@ -268,7 +268,6 @@ export class PrettyFormat {
     ): string {
         let result = '';
         let width = 0;
-
 
         const indentationNext = indentation + config.indent;
         for (const current of iterator) {
@@ -319,6 +318,7 @@ import { TestPlatform } from './TestPlatform';
 
 /**
  * A serializer plugin for pretty-format for creating simple Score model snapshots
+ * @partial
  */
 export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
     public static readonly instance = new ScoreSerializerPlugin();
@@ -427,14 +427,17 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
         defaultValueJson: Map<string, unknown>,
         kind?: string
     ) {
+        const oldMap = new Map<string, unknown>(modelJson);
+        modelJson.clear();
+
         // add a __kind property to identify the objects easier in the snap files
         if (kind) {
             modelJson.set('__kind', kind);
         }
 
-        for (const [k, dv] of defaultValueJson) {
-            if (modelJson.has(k)) {
-                const v = modelJson.get(k);
+        for (const [k, v] of oldMap) {
+            if (defaultValueJson.has(k)) {
+                const dv = defaultValueJson.get(k);
 
                 let isEqual = false;
                 if (typeof v === typeof dv) {
@@ -457,6 +460,18 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                         case 'object':
                             if (dv === null && v === null) {
                                 isEqual = true;
+                            } else if (dv instanceof Float32Array && v instanceof Float32Array) {
+                                isEqual = dv.length === 0 && v.length === 0;
+                            } else if (dv instanceof Int16Array && v instanceof Int16Array) {
+                                isEqual = dv.length === 0 && v.length === 0;
+                            } else if (dv instanceof Int32Array && v instanceof Int32Array) {
+                                isEqual = dv.length === 0 && v.length === 0;
+                            } else if (dv instanceof Uint8Array && v instanceof Uint8Array) {
+                                isEqual = dv.length === 0 && v.length === 0;
+                            } else if (dv instanceof Uint16Array && v instanceof Uint16Array) {
+                                isEqual = dv.length === 0 && v.length === 0;
+                            } else if (dv instanceof Uint32Array && v instanceof Uint32Array) {
+                                isEqual = dv.length === 0 && v.length === 0;
                             } else if (Array.isArray(dv) && Array.isArray(v)) {
                                 isEqual = dv.length === 0 && v.length === 0;
                             } else if (dv instanceof Map && v instanceof Map) {
@@ -469,29 +484,28 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                                     isEqual = true;
                                 }
                             } else {
-                                // we should not have any other types in our JSONs, if we extend it, this will catch it
-                                throw new Error('Unexpected value in serialized json' + String(dv));
+                                isEqual = ScoreSerializerPlugin.isPlatformTypeEqual(v, dv);
                             }
                             break;
                     }
                 }
 
-                if (isEqual) {
-                    modelJson.delete(k);
+                if (!isEqual) {
+                    modelJson.set(k, v);
                 }
+            } else {
+                modelJson.set(k, v);
             }
         }
+    }
 
-        // "sort" __kind to top.
-        if (kind) {
-            for (const key of Array.from(modelJson.keys())) {
-                if (key !== '__kind') {
-                    const v = modelJson.get(key);
-                    modelJson.delete(key);
-                    modelJson.set(key, v);
-                }
-            }
-        }
+    /**
+     * @target web
+     * @partial
+     */
+    private static isPlatformTypeEqual(v: unknown, dv: unknown): boolean {
+        // we should not have any other types in our JSONs, if we extend it, this will catch it
+        throw new Error('Unexpected value in serialized json' + String(v));
     }
 }
 
@@ -536,7 +550,7 @@ export class SnapshotFile {
         const actual = PrettyFormat.format(value, SnapshotFile.matchOptions).split('\n');
 
         const lines = Math.min(expected.length, actual.length);
-        let errors:string[] = [];
+        let errors: string[] = [];
 
         if (expected.length !== actual.length) {
             errors.push(`Expected ${expected.length} lines, but only got ${actual.length}`);

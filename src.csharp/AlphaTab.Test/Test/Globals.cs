@@ -1,5 +1,8 @@
 using System;
 using System.Collections;
+using System.IO;
+using System.Reflection;
+using System.Threading;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace AlphaTab.Test;

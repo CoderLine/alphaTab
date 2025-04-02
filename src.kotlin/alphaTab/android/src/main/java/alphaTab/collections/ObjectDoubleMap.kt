@@ -65,13 +65,13 @@ public class ObjectDoubleMap<TKey> :
     }
 
     @Suppress("UNCHECKED_CAST")
-    public fun get(key: TKey): Double {
+    public fun get(key: TKey): Double? {
         val i = findEntryInternal(key as Any,
             { entry, k -> entry.key == (k as TKey) })
         if (i >= 0) {
             return entries[i].value
         }
-        throw KeyNotFoundException()
+        return null
     }
 
     public fun set(key: TKey, value: Double) {

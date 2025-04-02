@@ -17,7 +17,7 @@ namespace AlphaTab.Core
 
         public static void Add<T>(this IList<T> list, IList<T> newItems)
         {
-            if(list is List<T> l)
+            if (list is List<T> l)
             {
                 l.AddRange(newItems);
             }
@@ -39,6 +39,7 @@ namespace AlphaTab.Core
         {
             return list.Contains(item);
         }
+
         public static bool Includes(this System.Collections.IList list, object item)
         {
             return list.Contains(item);
@@ -51,17 +52,17 @@ namespace AlphaTab.Core
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount)
         {
-            var items = data.GetRange((int) start, (int) deleteCount);
-            data.RemoveRange((int) start, (int) deleteCount);
+            var items = data.GetRange((int)start, (int)deleteCount);
+            data.RemoveRange((int)start, (int)deleteCount);
             return new List<T>(items);
         }
 
         public static IList<T> Splice<T>(this IList<T> data, double start, double deleteCount,
             params T[] newItems)
         {
-            var items = data.GetRange((int) start, (int) deleteCount);
-            data.RemoveRange((int) start, (int) deleteCount);
-            data.InsertRange((int) start, newItems);
+            var items = data.GetRange((int)start, (int)deleteCount);
+            data.RemoveRange((int)start, (int)deleteCount);
+            data.InsertRange((int)start, newItems);
 
             return new List<T>(items);
         }
@@ -90,7 +91,7 @@ namespace AlphaTab.Core
 
         public static IList<T> Slice<T>(this IList<T> data, double start)
         {
-            return new List<T>(data.GetRange((int) start, data.Count - (int) start));
+            return new List<T>(data.GetRange((int)start, data.Count - (int)start));
         }
 
         public static IList<T> GetRange<T>(this IList<T> data, int index, int count)
@@ -196,10 +197,10 @@ namespace AlphaTab.Core
             switch (data)
             {
                 case List<T> l:
-                    l.Sort((a, b) => (int) func(a, b));
+                    l.Sort((a, b) => (int)func(a, b));
                     break;
                 case T[] array:
-                    System.Array.Sort(array, (a, b) => (int) func(a, b));
+                    System.Array.Sort(array, (a, b) => (int)func(a, b));
                     break;
                 default:
                     throw new NotSupportedException("Cannot sort list of type " +
@@ -208,6 +209,7 @@ namespace AlphaTab.Core
 
             return data;
         }
+
         public static void Sort<T>(this IList<T> data)
         {
             switch (data)
@@ -225,13 +227,15 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TResult Reduce<TInput, TResult>(this IEnumerable<TInput> source, Func<TResult, TInput, TResult> func, TResult seed)
+        public static TResult Reduce<TInput, TResult>(this IEnumerable<TInput> source,
+            Func<TResult, TInput, TResult> func, TResult seed)
         {
             return source.Aggregate(seed, func);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IList<TResult> Map<TInput, TResult>(this IEnumerable<TInput> source, Func<TInput, TResult> func)
+        public static IList<TResult> Map<TInput, TResult>(this IEnumerable<TInput> source,
+            Func<TInput, TResult> func)
         {
             return source.Select(func).ToList();
         }
@@ -257,7 +261,7 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Substr(this string s, double start, double length)
         {
-            return s.Substring((int) start, (int) length);
+            return s.Substring((int)start, (int)length);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -270,19 +274,19 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string Substr(this string s, double start)
         {
-            return s.Substring((int) start);
+            return s.Substring((int)start);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int CharCodeAt(this string s, double index)
         {
-            return s[(int) index];
+            return s[(int)index];
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string CharAt(this string s, double index)
         {
-            return s.Substring((int) index, 1);
+            return s.Substring((int)index, 1);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -306,14 +310,14 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<string> Split(this string s, string separator)
         {
-            return new List<string>(s.Split(new[] {separator}, StringSplitOptions.None));
+            return new List<string>(s.Split(new[] { separator }, StringSplitOptions.None));
         }
 
         public static string ToInvariantString(this double num, int radix)
         {
             if (radix == 16)
             {
-                return ((int) num).ToString("X");
+                return ((int)num).ToString("X");
             }
 
             return num.ToString(CultureInfo.InvariantCulture);
@@ -331,7 +335,8 @@ namespace AlphaTab.Core
 
         public static string ToInvariantString(this Enum num)
         {
-            return ((IConvertible)num).ToInt32(CultureInfo.InvariantCulture).ToString(CultureInfo.InvariantCulture);
+            return ((IConvertible)num).ToInt32(CultureInfo.InvariantCulture)
+                .ToString(CultureInfo.InvariantCulture);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -357,6 +362,7 @@ namespace AlphaTab.Core
         {
             return s != null;
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(bool? b)
         {
@@ -386,13 +392,13 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string SubstringIndex(this string s, double startIndex)
         {
-            return s.Substring((int) startIndex);
+            return s.Substring((int)startIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string SubstringIndex(this string s, double startIndex, double endIndex)
         {
-            return s.Substring((int) startIndex, (int) (endIndex - startIndex));
+            return s.Substring((int)startIndex, (int)(endIndex - startIndex));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -436,11 +442,35 @@ namespace AlphaTab.Core
             }, TaskContinuationOptions.OnlyOnFaulted);
             return s;
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Task<T> Catch<T>(this Task<T> s, Action<object> after)
         {
             s.Catch((Error e) => after(e));
             return s;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static object ToTemplate<T>(this T value)
+        {
+            return value switch
+            {
+                bool b => b.ToTemplate(),
+                Enum e => e.ToTemplate(),
+                _ => value
+            };
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static object ToTemplate(this Enum value)
+        {
+            return ((IConvertible)value).ToInt32(CultureInfo.InvariantCulture);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static object ToTemplate(this bool value)
+        {
+            return value ? "true" : "false";
         }
 
         public static string TypeOf(object? actual)
@@ -493,6 +523,7 @@ namespace AlphaTab.Core
         {
             return items;
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToFixed(this double value, int decimals)
         {
@@ -519,12 +550,14 @@ namespace AlphaTab.Core
             {
                 builder.Append(value);
             }
+
             return builder.ToString();
         }
 
         public static Task CreatePromise(Action<Action, Action<object>> run)
         {
             var taskCompletionSource = new TaskCompletionSource<object?>();
+
             void Resolve()
             {
                 taskCompletionSource.SetResult(null);
@@ -541,7 +574,8 @@ namespace AlphaTab.Core
                         taskCompletionSource.SetException(new PromiseRejectedError(s));
                         break;
                     default:
-                        taskCompletionSource.SetException(new PromiseRejectedError("Promise was rejected", o));
+                        taskCompletionSource.SetException(
+                            new PromiseRejectedError("Promise was rejected", o));
                         break;
                 }
             }
@@ -551,16 +585,6 @@ namespace AlphaTab.Core
             return taskCompletionSource.Task;
         }
 
-        public static string ToBoolString(this object? o)
-        {
-            if (o is bool b)
-            {
-                return b ? "true" : "false";
-            }
-
-            return "false";
-
-        }
 
         public static IEnumerator<T> GetEnumerator<T>(this IEnumerator<T> enumerator)
         {
@@ -579,7 +603,6 @@ public class PromiseRejectedError : Error
 
     public PromiseRejectedError(string message) : base(message)
     {
-
     }
 
     public PromiseRejectedError(string message, object rejectData) : base(message)
