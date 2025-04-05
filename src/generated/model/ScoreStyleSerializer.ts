@@ -5,7 +5,9 @@
 // </auto-generated>
 import { ScoreStyle } from "@src/model/Score";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { HeaderFooterStyleSerializer } from "@src/generated/model/HeaderFooterStyleSerializer";
 import { ScoreSubElement } from "@src/model/Score";
+import { HeaderFooterStyle } from "@src/model/Score";
 import { Color } from "@src/model/Color";
 export class ScoreStyleSerializer {
     public static fromJson(obj: ScoreStyle, m: unknown): void {
@@ -21,6 +23,13 @@ export class ScoreStyleSerializer {
         const o = new Map<string, unknown>();
         {
             const m = new Map<string, unknown>();
+            o.set("headerandfooter", m);
+            for (const [k, v] of obj.headerAndFooter!) {
+                m.set(k.toString(), HeaderFooterStyleSerializer.toJson(v));
+            }
+        }
+        {
+            const m = new Map<string, unknown>();
             o.set("colors", m);
             for (const [k, v] of obj.colors!) {
                 m.set(k.toString(), Color.toJson(v));
@@ -30,6 +39,14 @@ export class ScoreStyleSerializer {
     }
     public static setProperty(obj: ScoreStyle, property: string, v: unknown): boolean {
         switch (property) {
+            case "headerandfooter":
+                obj.headerAndFooter = new Map<ScoreSubElement, HeaderFooterStyle | null>();
+                JsonHelper.forEach(v, (v, k) => {
+                    const i = new HeaderFooterStyle();
+                    HeaderFooterStyleSerializer.fromJson(i, v as Map<string, unknown>);
+                    obj.headerAndFooter.set(JsonHelper.parseEnum<ScoreSubElement>(k, ScoreSubElement)!, i);
+                });
+                return true;
             case "colors":
                 obj.colors = new Map<ScoreSubElement, Color | null>();
                 JsonHelper.forEach(v, (v, k) => {

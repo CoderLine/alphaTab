@@ -1,5 +1,6 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
+import { ScoreSubElement } from './model';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.
@@ -164,4 +165,30 @@ export class RenderingResources {
      * @since 0.9.6
      */
     public scoreInfoColor: Color = new Color(0, 0, 0, 0xff);
+
+    /**
+     * @internal
+     * @param element 
+     */
+    public getFontForElement(element: ScoreSubElement): Font {
+        switch(element){
+            case ScoreSubElement.Title:
+                return this.titleFont;
+            case ScoreSubElement.SubTitle:
+            case ScoreSubElement.Artist:
+            case ScoreSubElement.Album:
+                return this.subTitleFont;
+            case ScoreSubElement.Words:
+            case ScoreSubElement.Music:
+            case ScoreSubElement.WordsAndMusic:
+            case ScoreSubElement.Transcriber:
+                return this.wordsFont;
+            case ScoreSubElement.Copyright:
+            case ScoreSubElement.CopyrightSecondLine:
+                return this.copyrightFont;
+        }
+
+        return this.wordsFont;
+    }
+    
 }

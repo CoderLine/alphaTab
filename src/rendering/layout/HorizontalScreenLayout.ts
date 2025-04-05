@@ -19,7 +19,6 @@ export class HorizontalScreenLayoutPartialInfo {
  */
 export class HorizontalScreenLayout extends ScoreLayout {
     private _system: StaffSystem | null = null;
-    private _pagePadding: number[] | null = null;
 
     public get name(): string {
         return 'HorizontalScreen';
@@ -34,7 +33,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
     }
 
     public get firstBarX(): number {
-        let x = this._pagePadding![0];
+        let x = this.pagePadding![0];
         if (this._system) {
             x += this._system.accoladeWidth;
         }
@@ -46,8 +45,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
     }
 
     protected doLayoutAndRender(): void {
-        this._pagePadding = this.renderer.settings.display.padding;
-
         switch (this.renderer.settings.display.systemsLayoutMode) {
             case SystemsLayoutMode.Automatic:
                 this.systemsLayoutMode = InternalSystemsLayoutMode.Automatic;
@@ -57,24 +54,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 break;
         }
 
-        if (!this._pagePadding) {
-            this._pagePadding = [0, 0, 0, 0];
-        }
-        if (this._pagePadding.length === 1) {
-            this._pagePadding = [
-                this._pagePadding[0],
-                this._pagePadding[0],
-                this._pagePadding[0],
-                this._pagePadding[0]
-            ];
-        } else if (this._pagePadding.length === 2) {
-            this._pagePadding = [
-                this._pagePadding[0],
-                this._pagePadding[1],
-                this._pagePadding[0],
-                this._pagePadding[1]
-            ];
-        }
         let score: Score = this.renderer.score!;
 
         let startIndex: number = this.renderer.settings.display.startBar;
@@ -91,8 +70,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
         this._system = this.createEmptyStaffSystem();
         this._system.isLast = true;
-        this._system.x = this._pagePadding[0];
-        this._system.y = this._pagePadding[1];
+        this._system.x = this.pagePadding![0];
+        this._system.y = this.pagePadding![1];
         let countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
         let partials: HorizontalScreenLayoutPartialInfo[] = [];
         let currentPartial: HorizontalScreenLayoutPartialInfo = new HorizontalScreenLayoutPartialInfo();
@@ -125,7 +104,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 if (currentPartial.masterBars.length >= countPerPartial) {
                     if (partials.length === 0) {
                         // respect accolade and on first partial
-                        currentPartial.width += this._system.accoladeWidth + this._pagePadding[0];
+                        currentPartial.width += this._system.accoladeWidth + this.pagePadding![0];
                     }
                     renderX += currentPartial.width;
                     partials.push(currentPartial);
@@ -147,7 +126,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         // don't miss the last partial if not empty
         if (currentPartial.masterBars.length > 0) {
             if (partials.length === 0) {
-                currentPartial.width += this._system.accoladeWidth + this._pagePadding[0];
+                currentPartial.width += this._system.accoladeWidth + this.pagePadding![0];
             }
             partials.push(currentPartial);
             Logger.debug(
@@ -164,7 +143,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
         const scale = this.renderer.settings.display.scale;
 
         this.height = Math.floor(this._system.y + this._system.height) * scale;
-        this.width = (this._system.x + this._system.width + this._pagePadding[2]) * scale;
+        this.width = (this._system.x + this._system.width + this.pagePadding![2]) * scale;
         currentBarIndex = 0;
 
         let x = 0;
@@ -215,7 +194,10 @@ export class HorizontalScreenLayout extends ScoreLayout {
             currentBarIndex += partial.masterBars.length;
         }
 
-        this.height = this.layoutAndRenderAnnotation(this.height) + this._pagePadding[3];
+        this.height = this.layoutAndRenderBottomScoreInfo(this.height);
+        this.height = this.layoutAndRenderAnnotation(this.height) 
+        
+        this.height += this.pagePadding![3];
     }
 
     private finalizeStaffSystem() {
