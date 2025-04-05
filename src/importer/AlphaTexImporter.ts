@@ -2129,9 +2129,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'spe') {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
-            // exact ratio position will be applied after .finish() when times are known
-            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
-            this._sustainPedalToBeat.set(sustainPedal, beat);
+            sustainPedal.ratioPosition = 1;
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
             return true;
