@@ -2,7 +2,7 @@ import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { SimileMark } from '@src/model/SimileMark';
-import { Voice } from '@src/model/Voice';
+import { Voice, VoiceSubElement } from '@src/model/Voice';
 import { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
@@ -25,6 +25,7 @@ import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
 import { BeamDirection } from './utils/BeamDirection';
 import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
+import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}
@@ -575,6 +576,7 @@ export class BarRendererBase {
     }
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
                 canvas.fillMusicFontSymbol(
