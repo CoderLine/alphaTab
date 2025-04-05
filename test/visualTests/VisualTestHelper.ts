@@ -200,18 +200,18 @@ export class VisualTestHelper {
             return;
         }
 
-        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer as ArrayBuffer;
+        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.otf')).buffer as ArrayBuffer;
         VisualTestHelper.enableAlphaSkia(bravura);
 
         const fonts = [
-            'font/noto-sans/NotoSans-Regular.ttf',
-            'font/noto-sans/NotoSans-Italic.ttf',
-            'font/noto-sans/NotoSans-Bold.ttf',
-            'font/noto-sans/NotoSans-BoldItalic.ttf',
-            'font/noto-serif/NotoSerif-Regular.ttf',
-            'font/noto-serif/NotoSerif-Italic.ttf',
-            'font/noto-serif/NotoSerif-Bold.ttf',
-            'font/noto-serif/NotoSerif-BoldItalic.ttf'
+            'font/noto-sans/NotoSans-Regular.otf',
+            'font/noto-sans/NotoSans-Italic.otf',
+            'font/noto-sans/NotoSans-Bold.otf',
+            'font/noto-sans/NotoSans-BoldItalic.otf',
+            'font/noto-serif/NotoSerif-Regular.otf',
+            'font/noto-serif/NotoSerif-Italic.otf',
+            'font/noto-serif/NotoSerif-Bold.otf',
+            'font/noto-serif/NotoSerif-BoldItalic.otf'
         ];
 
         for (const font of fonts) {

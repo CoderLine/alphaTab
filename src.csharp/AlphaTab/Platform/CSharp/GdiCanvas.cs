@@ -68,7 +68,7 @@ internal sealed class GdiCanvas : ICanvas
 
         var type = typeof(GdiCanvas).GetTypeInfo();
         using var bravura =
-            type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf");
+            type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.otf");
         var dataPtr = Marshal.AllocCoTaskMem((int)bravura.Length);
         try
         {

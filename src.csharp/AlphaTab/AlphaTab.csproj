@@ -31,8 +31,8 @@
     </ItemGroup>
 
     <ItemGroup>
-        <EmbeddedResource Include="..\..\font\bravura\Bravura.ttf">
-            <Link>Platform\Skia\Bravura.ttf</Link>
+        <EmbeddedResource Include="..\..\font\bravura\Bravura.otf">
+            <Link>Platform\Skia\Bravura.otf</Link>
         </EmbeddedResource>
     </ItemGroup>
 </Project>

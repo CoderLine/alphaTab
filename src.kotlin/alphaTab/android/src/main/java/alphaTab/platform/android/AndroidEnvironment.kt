@@ -24,7 +24,7 @@ internal class AndroidEnvironment {
             AndroidCanvas.initialize(context)
 
             var bravuraBytes: ByteArray;
-            context.assets.open("Bravura.ttf").use {
+            context.assets.open("Bravura.otf").use {
                 bravuraBytes = it.readBytes()
             }
 

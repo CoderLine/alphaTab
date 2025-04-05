@@ -10,7 +10,7 @@ partial class SkiaCanvas
         // attempt to load correct skia native lib
         var type = typeof(SkiaCanvas).GetTypeInfo();
         using var bravura =
-            type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.ttf")!;
+            type.Assembly.GetManifestResourceStream(type.Namespace + ".Bravura.otf")!;
         var bravuraData = new MemoryStream((int)bravura.Length);
         bravura.CopyTo(bravuraData);
         MusicFont = AlphaSkiaTypeface.Register(new ArrayBuffer(bravuraData.ToArray()))!;
