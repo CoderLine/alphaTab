@@ -1,4 +1,4 @@
-import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
@@ -9,6 +9,7 @@ import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy
 import { IWriteable } from '@src/io/IWriteable';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { TextAlign } from '@src/platform';
+import { ModelUtils } from '@src/model/ModelUtils';
 
 enum DataType {
     Boolean,
@@ -209,123 +210,123 @@ export class BinaryStylesheet {
                     }
                     break;
                 case 'Header/Title':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).template = value as string;
                     break;
                 case 'Header/TitleAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawTitle':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).isVisible = value as boolean;
                     break;
 
                 case 'Header/Subtitle':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).template = value as string;
                     break;
                 case 'Header/SubtitleAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawSubtitle':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).isVisible = value as boolean;
                     break;
 
                 case 'Header/Artist':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).template = value as string;
                     break;
                 case 'Header/ArtistAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawArtist':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).isVisible = value as boolean;
                     break;
 
                 case 'Header/Album':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).template = value as string;
                     break;
                 case 'Header/AlbumAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawAlbum':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).isVisible = value as boolean;
                     break;
 
                 case 'Header/Words':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).template = value as string;
                     break;
                 case 'Header/WordsAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawWords':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).isVisible = value as boolean;
                     break;
 
                 case 'Header/Music':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).template = value as string;
                     break;
                 case 'Header/MusicAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawMusic':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).isVisible = value as boolean;
                     break;
 
                 case 'Header/WordsAndMusic':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).template = value as string;
                     break;
                 case 'Header/WordsAndMusicAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).textAlign =
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).textAlign =
                         this.toTextAlign(value as number);
                     break;
                 case 'Header/drawWordsAndMusic':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).isVisible =
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).isVisible =
                         value as boolean;
                     break;
 
                 case 'Header/Tabber':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).template = value as string;
                     break;
                 case 'Header/TabberAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Header/drawTabber':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).isVisible = value as boolean;
                     break;
 
                 case 'Footer/Copyright':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).template = value as string;
                     break;
                 case 'Footer/CopyrightAlignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Footer/drawCopyright':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).isVisible = value as boolean;
                     break;
 
                 case 'Footer/Copyright2':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).template = value as string;
                     break;
                 case 'Footer/Copyright2Alignment':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).textAlign = this.toTextAlign(
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).textAlign = this.toTextAlign(
                         value as number
                     );
                     break;
                 case 'Footer/drawCopyright2':
-                    this.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible = value as boolean;
                     break;
             }
         }
@@ -340,23 +341,6 @@ export class BinaryStylesheet {
                 return TextAlign.Right;
         }
         return TextAlign.Left;
-    }
-    private getOrCreateHeaderFooterStyle(score: Score, element: ScoreSubElement) {
-        let style = score.style;
-        if (!score.style) {
-            style = new ScoreStyle();
-            score.style = style;
-        }
-
-        let headerFooterStyle: HeaderFooterStyle;
-        if (style!.headerAndFooter.has(element)) {
-            headerFooterStyle = style!.headerAndFooter.get(element)!;
-        } else {
-            headerFooterStyle = new HeaderFooterStyle();
-            style!.headerAndFooter.set(element, headerFooterStyle);
-        }
-
-        return headerFooterStyle;
     }
 
     public addValue(key: string, value: unknown, type?: DataType): void {

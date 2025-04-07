@@ -20,7 +20,7 @@ import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';
 import { PickStroke } from '@src/model/PickStroke';
-import { Score } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -57,6 +57,7 @@ import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy
 import { Color } from '@src/model/Color';
 import { BendStyle } from '@src/model/BendStyle';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { TextAlign } from '@src/platform';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -837,28 +838,40 @@ export class AlphaTexImporter extends ScoreImporter {
                         // Need to use quotes in that case, or rewrite parsing logic.
                         this.error(metadataTag, AlphaTexSymbols.String, true);
                     }
-                    let metadataValue: string = this._syData as string;
+
+                    const metadataValue: string = this._syData as string;
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+
+                    let element: ScoreSubElement = ScoreSubElement.ChordDiagramList;
                     switch (metadataTag) {
                         case 'title':
                             this._score.title = metadataValue;
+                            element = ScoreSubElement.Title;
                             break;
                         case 'subtitle':
                             this._score.subTitle = metadataValue;
+                            element = ScoreSubElement.SubTitle;
                             break;
                         case 'artist':
                             this._score.artist = metadataValue;
+                            element = ScoreSubElement.Artist;
                             break;
                         case 'album':
                             this._score.album = metadataValue;
+                            element = ScoreSubElement.Album;
                             break;
                         case 'words':
                             this._score.words = metadataValue;
+                            element = ScoreSubElement.Words;
                             break;
                         case 'music':
                             this._score.music = metadataValue;
+                            element = ScoreSubElement.Music;
                             break;
                         case 'copyright':
                             this._score.copyright = metadataValue;
+                            element = ScoreSubElement.Copyright;
                             break;
                         case 'instructions':
                             this._score.instructions = metadataValue;
@@ -868,9 +881,21 @@ export class AlphaTexImporter extends ScoreImporter {
                             break;
                         case 'tab':
                             this._score.tab = metadataValue;
+                            element = ScoreSubElement.Transcriber;
                             break;
                     }
-                    this._sy = this.newSy();
+
+                    if (element !== ScoreSubElement.ChordDiagramList) {
+                        this.headerFooterStyle(ScoreSubElement.CopyrightSecondLine);
+                    }
+
+                    break;
+                case 'copyright2':
+                    this.headerFooterStyle(ScoreSubElement.CopyrightSecondLine);
+                    anyTopLevelMeta = true;
+                    break;
+                case 'wordsandmusic':
+                    this.headerFooterStyle(ScoreSubElement.WordsAndMusic);
                     anyTopLevelMeta = true;
                     break;
                 case 'tempo':
@@ -1030,6 +1055,32 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         return anyTopLevelMeta || anyOtherMeta;
+    }
+    headerFooterStyle(element: ScoreSubElement) {
+        if (this._sy === AlphaTexSymbols.String) {
+            if (this._syData as string) {
+                ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).template = this._syData as string;
+            } else {
+                ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).isVisible = false;
+            }
+            this._sy = this.newSy();
+        }
+
+        if (this._sy === AlphaTexSymbols.String) {
+            const style = ModelUtils.getOrCreateHeaderFooterStyle(this._score, element);
+            switch ((this._syData as string).toLowerCase()) {
+                case 'left':
+                    style.textAlign = TextAlign.Left;
+                    break;
+                case 'center':
+                    style.textAlign = TextAlign.Center;
+                    break;
+                case 'right':
+                    style.textAlign = TextAlign.Right;
+                    break;
+            }
+            this._sy = this.newSy();
+        }
     }
 
     private parseTrackNamePolicy(v: string): TrackNamePolicy {

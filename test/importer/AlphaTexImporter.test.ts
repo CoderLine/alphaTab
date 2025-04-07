@@ -23,7 +23,7 @@ import {
     VibratoType,
     WhammyType
 } from '@src/model';
-import { Score } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { Staff } from '@src/model/Staff';
@@ -43,6 +43,7 @@ import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { TextAlign } from '@src/platform';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -1835,5 +1836,81 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.perTrackMultiBarRest).to.be.ok;
         expect(score.stylesheet.perTrackMultiBarRest!.has(0)).to.be.true;
         expect(score.stylesheet.perTrackMultiBarRest!.has(1)).to.be.false;
+    });
+
+    it('header-footer', async () => {
+        let score = parseTex(`
+            \\title "Title" "Title: %TITLE%" left
+            \\subtitle "Subtitle" "Subtitle: %SUBTITLE%" center
+            \\artist "Artist" "Artist: %ARTIST%" right
+            \\album "Album" "Album: %ARTIST%" left
+            \\words "Words" "Words: %WORDS%" center
+            \\music "Music" "Music: %MUSIC%" right
+            \\wordsAndMusic "Music" "Words & Music: %MUSIC%" left
+            \\tab "Tab" "Transcriber: %TABBER%" center
+            \\copyright "Copyright" "Copyright: %COPYRIGHT%" right
+            \\copyright2 "Copyright2" right
+            .
+            `);
+
+        expect(score.style).to.be.ok;
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).to.equal('Subtitle: %SUBTITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).to.equal('Album: %ALBUM%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).to.equal('Music: %MUSIC%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
+            'Words & Music: %MUSIC%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.template).to.equal(
+            'Transcriber: %TABBER%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).to.equal(
+            'Copyright: %COPYRIGHT%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
+            TextAlign.Right
+        );
     });
 });

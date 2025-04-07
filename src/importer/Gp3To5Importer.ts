@@ -27,7 +27,7 @@ import { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { PickStroke } from '@src/model/PickStroke';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -237,21 +237,40 @@ export class Gp3To5Importer extends ScoreImporter {
         // Padding Top (4)
         // Padding Bottom (4)
         // Size Proportion(4)
-        // Header and Footer display flags (2)
-        this.data.skip(30);
-        // title format
-        // subtitle format
-        // artist format
-        // album format
-        // words format
-        // music format
-        // words and music format
-        // copyright format
-        // pagpublic enumber format
-        for (let i: number = 0; i < 10; i++) {
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-        }
+        this.data.skip(28);
+
+        var flags = IOHelper.readInt16LE(this.data);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).isVisible = (flags & (0x01 << 0)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).isVisible = (flags & (0x01 << 1)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).isVisible = (flags & (0x01 << 2)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).isVisible = (flags & (0x01 << 3)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).isVisible = (flags & (0x01 << 4)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).isVisible = (flags & (0x01 << 5)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).isVisible = (flags & (0x01 << 6)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).isVisible = (flags & (0x01 << 7)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).isVisible = (flags & (0x01 << 7)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        // page number format
+        GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
     }
+
+
 
     public readPlaybackInfos(): void {
         this._playbackInfos = [];

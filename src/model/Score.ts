@@ -77,6 +77,7 @@ export class HeaderFooterStyle {
      * * `%ARTIST%`
      * * `%ALBUM%`
      * * `%WORDS%`
+     * * `%WORDSMUSIC%`
      * * `%MUSIC%`
      * * `%TABBER%`
      * * `%COPYRIGHT%`
@@ -123,6 +124,7 @@ export class HeaderFooterStyle {
                     value = score.album;
                     break;
                 case `WORDS`:
+                case `WORDSMUSIC`:
                     value = score.words;
                     break;
                 case `MUSIC`:
