@@ -9,7 +9,6 @@ public interface IMap
     void Clear();
 }
 public interface IMap<TKey, TValue> : IMap, IEnumerable<MapEntry<TKey, TValue>>
-    where TValue : class?
 {
     IEnumerable<TKey> Keys();
     IEnumerable<TValue> Values();
@@ -20,7 +19,6 @@ public interface IMap<TKey, TValue> : IMap, IEnumerable<MapEntry<TKey, TValue>>
 }
 
 public class Map<TKey, TValue> : Dictionary<TKey, TValue>, IMap<TKey, TValue>
-    where TValue : class?
 {
     public double Size => Count;
     IEnumerable<TKey> IMap<TKey, TValue>.Keys()

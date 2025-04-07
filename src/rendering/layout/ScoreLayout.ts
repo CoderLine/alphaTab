@@ -219,7 +219,7 @@ export abstract class ScoreLayout {
             ? score.style!.headerAndFooter.get(element)!
             : ScoreStyle.defaultHeaderAndFooter.get(element)!;
 
-        let isVisible = style.isVisible !== undefined ? style.isVisible : true;
+        let isVisible = style.isVisible !== undefined ? style.isVisible! : true;
         if (notationElement !== undefined) {
             isVisible = notation.isNotationElementVisible(notationElement);
         }
@@ -437,7 +437,7 @@ export abstract class ScoreLayout {
                 canvas.color = res.scoreInfoColor;
                 canvas.textAlign = TextAlign.Left;
                 canvas.textBaseline = TextBaseline.Top;
-                for (const g of scoreInfoGlyphs.values()) {
+                for (const g of scoreInfoGlyphs) {
                     g.paint(0, 0, canvas);
                 }
             });

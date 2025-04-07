@@ -1058,8 +1058,9 @@ export class AlphaTexImporter extends ScoreImporter {
     }
     headerFooterStyle(element: ScoreSubElement) {
         if (this._sy === AlphaTexSymbols.String) {
-            if (this._syData as string) {
-                ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).template = this._syData as string;
+            const value =  this._syData as string;
+            if (value) {
+                ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).template = value;
             } else {
                 ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).isVisible = false;
             }

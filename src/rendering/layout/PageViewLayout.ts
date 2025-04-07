@@ -197,7 +197,7 @@ export class PageViewLayout extends ScoreLayout {
             this.registerPartial(e, (canvas: ICanvas) => {
                 canvas.color = res.scoreInfoColor;
                 canvas.textAlign = TextAlign.Center;
-                for (const g of scoreInfoGlyphs.values()) {
+                for (const g of scoreInfoGlyphs) {
                     g.paint(0, 0, canvas);
                 }
             });

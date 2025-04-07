@@ -107,7 +107,7 @@ export class HeaderFooterStyle {
     public buildText(score: Score) {
         let anyPlaceholderFilled = false;
         let anyPlaceholder = false;
-        const replaced = this.template.replace(HeaderFooterStyle.PlaceholderPattern, (match, variable) => {
+        const replaced = this.template.replace(HeaderFooterStyle.PlaceholderPattern, (_match: string, variable: string) => {
             anyPlaceholder = true;
             let value = '';
             switch (variable) {
