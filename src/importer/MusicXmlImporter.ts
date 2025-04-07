@@ -157,6 +157,11 @@ export class MusicXmlImporter extends ScoreImporter {
                 while (staff.bars.length < this._score.masterBars.length) {
                     const bar: Bar = new Bar();
                     staff.addBar(bar);
+                    const previousBar = bar.previousBar;
+                    if(previousBar) {
+                        bar.clef = previousBar.clef;
+                        bar.clefOttava = previousBar.clefOttava;
+                    }
 
                     for (let i = 0; i < voiceCount; i++) {
                         const v = new Voice();
@@ -840,7 +845,6 @@ export class MusicXmlImporter extends ScoreImporter {
             number += this._implicitBars;
         }
 
-        let barsCreated = false;
         while (this._score.masterBars.length < number) {
             const newMasterBar = new MasterBar();
             if (implicit) {
@@ -855,20 +859,10 @@ export class MusicXmlImporter extends ScoreImporter {
                 newMasterBar.timeSignatureNumerator = newMasterBar.previousMasterBar!.timeSignatureNumerator;
                 newMasterBar.tripletFeel = newMasterBar.previousMasterBar!.tripletFeel;
             }
-            barsCreated = true;
         }
 
         this._previousMasterBarNumber = number;
         const masterBar = this._score.masterBars[number - 1];
-
-        // ensure we create directly bars for all staves for new masterbars
-        if (barsCreated) {
-            for (const t of this._score.tracks) {
-                for (const s of t.staves) {
-                    this.getOrCreateBar(s, masterBar);
-                }
-            }
-        }
 
         return masterBar;
     }

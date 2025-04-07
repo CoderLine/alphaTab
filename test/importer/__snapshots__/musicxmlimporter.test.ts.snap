@@ -69,6 +69,25 @@ Map {
             },
             Map {
               "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
               "id" => 2,
               "voices" => Array [
                 Map {
@@ -77,7 +96,26 @@ Map {
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
-                      "id" => 1,
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
                       "isempty" => true,
                       "displayduration" => 960,
                       "playbackduration" => 960,
@@ -93,44 +131,6 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 4,
-                  "beats" => Array [
-                    Map {
-                      "__kind" => "Beat",
-                      "id" => 2,
-                      "isempty" => true,
-                      "displayduration" => 960,
-                      "playbackduration" => 960,
-                    },
-                  ],
-                },
-              ],
-            },
-            Map {
-              "__kind" => "Bar",
-              "id" => 6,
-              "voices" => Array [
-                Map {
-                  "__kind" => "Voice",
-                  "id" => 6,
-                  "beats" => Array [
-                    Map {
-                      "__kind" => "Beat",
-                      "id" => 3,
-                      "isempty" => true,
-                      "displayduration" => 960,
-                      "playbackduration" => 960,
-                    },
-                  ],
-                },
-              ],
-            },
-            Map {
-              "__kind" => "Bar",
-              "id" => 8,
-              "voices" => Array [
-                Map {
-                  "__kind" => "Voice",
-                  "id" => 8,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -163,11 +163,11 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 1,
+              "id" => 5,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 5,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -191,34 +191,15 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 3,
+              "id" => 6,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 3,
+                  "id" => 6,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
                       "id" => 6,
-                      "isempty" => true,
-                      "displayduration" => 960,
-                      "playbackduration" => 960,
-                    },
-                  ],
-                },
-              ],
-            },
-            Map {
-              "__kind" => "Bar",
-              "id" => 5,
-              "voices" => Array [
-                Map {
-                  "__kind" => "Voice",
-                  "id" => 5,
-                  "beats" => Array [
-                    Map {
-                      "__kind" => "Beat",
-                      "id" => 7,
                       "isempty" => true,
                       "displayduration" => 960,
                       "playbackduration" => 960,
@@ -234,6 +215,25 @@ Map {
                 Map {
                   "__kind" => "Voice",
                   "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -341,11 +341,11 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 3,
+              "id" => 1,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 3,
+                  "id" => 1,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -360,11 +360,11 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 6,
+              "id" => 2,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 6,
+                  "id" => 2,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -397,11 +397,11 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 1,
+              "id" => 3,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 3,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -444,11 +444,11 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 7,
+              "id" => 5,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 7,
+                  "id" => 5,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -481,11 +481,11 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 2,
+              "id" => 6,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 2,
+                  "id" => 6,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -509,11 +509,11 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 5,
+              "id" => 7,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 5,
+                  "id" => 7,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -675,11 +675,11 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 3,
+              "id" => 2,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 4,
+                  "id" => 3,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -762,11 +762,11 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 2,
+              "id" => 1,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 2,
+                  "id" => 1,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -799,7 +799,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 3,
+                  "id" => 2,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -835,11 +835,11 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 4,
+              "id" => 3,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 5,
+                  "id" => 4,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -872,7 +872,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 6,
+                  "id" => 5,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -923,11 +923,11 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 1,
+              "id" => 4,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 6,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -970,7 +970,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 8,
+                  "id" => 7,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1003,7 +1003,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 10,
+                  "id" => 8,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1043,7 +1043,7 @@ Map {
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 7,
+                  "id" => 9,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1077,7 +1077,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 9,
+                  "id" => 10,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1304,12 +1304,12 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 2,
+              "id" => 1,
               "clef" => 3,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 2,
+                  "id" => 1,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1546,7 +1546,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 3,
+                  "id" => 2,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1559,7 +1559,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 4,
+                  "id" => 3,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1572,7 +1572,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 5,
+                  "id" => 4,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1585,7 +1585,7 @@ Map {
                 },
                 Map {
                   "__kind" => "Voice",
-                  "id" => 6,
+                  "id" => 5,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
@@ -1775,11 +1775,11 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 1,
+              "id" => 2,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 6,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
