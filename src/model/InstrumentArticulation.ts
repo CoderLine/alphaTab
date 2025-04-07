@@ -1,9 +1,9 @@
-import { TextBaseline } from "@src/platform/ICanvas";
-import { Duration } from "./Duration";
-import { MusicFontSymbol } from "./MusicFontSymbol";
+import { TextBaseline } from '@src/platform/ICanvas';
+import { Duration } from './Duration';
+import { MusicFontSymbol } from './MusicFontSymbol';
 
 /**
- * Describes an instrument articulation which is used for percussions. 
+ * Describes an instrument articulation which is used for percussions.
  * @json
  * @json_strict
  */
@@ -17,39 +17,65 @@ export class InstrumentArticulation {
      */
     public staffLine: number;
     /**
-     * Gets or sets the note head to display by default. 
+     * Gets or sets the note head to display by default.
      */
     public noteHeadDefault: MusicFontSymbol;
     /**
-     * Gets or sets the note head to display for half duration notes. 
+     * Gets or sets the note head to display for half duration notes.
      */
     public noteHeadHalf: MusicFontSymbol;
     /**
-     * Gets or sets the note head to display for whole duration notes. 
+     * Gets or sets the note head to display for whole duration notes.
      */
     public noteHeadWhole: MusicFontSymbol;
     /**
-     * Gets or sets which additional technique symbol should be placed for the note head. 
+     * Gets or sets which additional technique symbol should be placed for the note head.
      */
     public techniqueSymbol: MusicFontSymbol;
     /**
-     * Gets or sets where the technique symbol should be placed. 
+     * Gets or sets where the technique symbol should be placed.
      */
     public techniqueSymbolPlacement: TextBaseline;
+
     /**
-     * Gets or sets which midi number to use when playing the note.
+     * Gets or sets which midi key to use when playing the note.
      */
     public outputMidiNumber: number;
 
+    // TODO: https://github.com/CoderLine/alphaTab/issues/1975 respect the data below
+
+
+    /**
+     * The midi channel number to use when playing the note (-1 if using the default track channels).
+     */
+    public outputMidiChannel: number = -1;
+
+    /**
+     * The midi channel program to use when playing the note (-1 if using the default track program).
+     */
+    public outputMidiProgram: number = -1;
+
+    /**
+     * The volume to use when playing the note (-1 if using the default track volume).
+     */
+    public outputVolume: number = -1;
+
+    /**
+     * The balance to use when playing the note (-1 if using the default track balance).
+     */
+    public outputBalance: number = -1;
+
+
     public constructor(
-        elementType: string = "",
+        elementType: string = '',
         staffLine: number = 0,
         outputMidiNumber: number = 0,
         noteHeadDefault: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TextBaseline = TextBaseline.Middle) {
+        techniqueSymbolPlacement: TextBaseline = TextBaseline.Middle
+    ) {
         this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;
         this.staffLine = staffLine;
