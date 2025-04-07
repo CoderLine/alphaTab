@@ -51,7 +51,6 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { dir } from 'console';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;
@@ -636,11 +635,11 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private static interpolatePercent(value: number) {
-        return MusicXmlImporter.interpolate(0, 100, 0, 16, value);
+        return MusicXmlImporter.interpolate(0, 100, 0, 16, value) | 0;
     }
 
     private static interpolatePan(value: number) {
-        return MusicXmlImporter.interpolate(-180, 180, 0, 16, value);
+        return MusicXmlImporter.interpolate(-90, 90, 0, 16, value) | 0;
     }
 
     private static interpolate(
