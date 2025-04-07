@@ -18,11 +18,6 @@ export class WahPedalGlyph extends MusicFontGlyph {
         return MusicFontSymbol.None;
     }
 
-    public override doLayout(): void {
-        this.width = 11;
-        this.height = 11;
-    }
-
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy + this.height, canvas);
     }

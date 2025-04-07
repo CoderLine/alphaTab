@@ -9,11 +9,6 @@ export class NoteOrnamentGlyph extends MusicFontGlyph {
         this.center = true;
     }
 
-    public override doLayout(): void {
-        this.width = 26;
-        this.height = 18;
-    }
-
     private static getSymbol(ornament: NoteOrnament): MusicFontSymbol {
         switch (ornament) {
             case NoteOrnament.InvertedTurn:

@@ -20,14 +20,6 @@ export class FadeGlyph extends MusicFontGlyph {
         return MusicFontSymbol.None;
     }
 
-    public override doLayout(): void {
-        this.width = 13;
-        if (this.symbol == MusicFontSymbol.GuitarVolumeSwell) {
-            this.width *= 2;
-        }
-        this.height = 13;
-    }
-
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy + this.height, canvas)
     }

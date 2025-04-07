@@ -20,12 +20,7 @@ export class FermataGlyph extends MusicFontGlyph {
                 return MusicFontSymbol.None;
         }
     }
-
-    public override doLayout(): void {
-        this.width = 23;
-        this.height = 12;
-    }
-
+    
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx - this.width / 2, cy + this.height, canvas);
     }

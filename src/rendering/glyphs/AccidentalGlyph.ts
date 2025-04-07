@@ -3,11 +3,8 @@ import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class AccidentalGlyph extends MusicFontGlyph {
-    private _accidentalType: AccidentalType;
-
     public constructor(x: number, y: number, accidentalType: AccidentalType, scale: number) {
         super(x, y, scale, AccidentalGlyph.getMusicSymbol(accidentalType));
-        this._accidentalType = accidentalType;
     }
 
     public static getMusicSymbol(accidentalType: AccidentalType): MusicFontSymbol {
@@ -30,17 +27,5 @@ export class AccidentalGlyph extends MusicFontGlyph {
                 return MusicFontSymbol.AccidentalDoubleFlat;
         }
         return MusicFontSymbol.None;
-    }
-
-    public override doLayout(): void {
-        switch (this._accidentalType) {
-            case AccidentalType.DoubleFlat:
-                this.width = 18;
-                break;
-            default:
-                this.width = 8;
-                break;
-        }
-        this.width = this.width * this.glyphScale;
     }
 }

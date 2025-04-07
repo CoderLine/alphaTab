@@ -4,6 +4,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { Duration } from '@src/model/Duration';
 import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
@@ -46,25 +47,12 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     }
 
     public override doLayout(): void {
-        const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        switch (this.symbol) {
-            case MusicFontSymbol.NoteheadWhole:
-                this.width = 14;
-                break;
-            case MusicFontSymbol.NoteheadCircleX:
-            case MusicFontSymbol.NoteheadDiamondWhite:
-                this.width = 9;
-                break;
-            case MusicFontSymbol.NoteheadHeavyXHat:
-            case MusicFontSymbol.NoteheadHeavyX:
-                this.width = 13;
-                break;
-            default:
-                this.width = 10;
-                break;
+        super.doLayout();
+        if (this.width === 0) {
+            this.height = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteheadBlack)!;
         }
-
-        this.width = this.width * scale;
-        this.height = NoteHeadGlyph.NoteHeadHeight * scale;
+        if (this.height === 0) {
+            this.height = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        }
     }
 }

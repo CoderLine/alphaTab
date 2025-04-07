@@ -15,8 +15,8 @@ import { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { MusicFontSymbol } from '@src/model';
-import { Environment } from '@src/Environment';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -35,18 +35,18 @@ export abstract class SystemBracket {
             return;
         }
 
+        // SMUFL: The brace glyph should have a height of 1em, i.e. the height of a single five-line stave, and should be scaled proportionally
+        const bravuraBraceHeightAtMusicFontSize = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceWidthAtMusicFontSize = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.Brace)!;
+
         // normal bracket width
-        this.width = 3;
+        this.width = bravuraBraceWidthAtMusicFontSize;
         if (!this.drawAsBrace || !this.firstStaffInBracket || !this.lastStaffInBracket) {
             return;
         }
 
         const firstStart: number = this.firstStaffInBracket.contentTop;
         const lastEnd: number = this.lastStaffInBracket.contentBottom;
-
-        // SMUFL: The brace glyph should have a height of 1em, i.e. the height of a single five-line stave, and should be scaled proportionally
-        const bravuraBraceHeightAtMusicFontSize = Environment.MusicFontSize;
-        const bravuraBraceWidthAtMusicFontSize = 3;
 
         const requiredHeight = lastEnd - firstStart;
         const requiredScaleForBracket = requiredHeight / bravuraBraceHeightAtMusicFontSize;
@@ -499,7 +499,7 @@ export class StaffSystem {
             // Draw start grouping
             //
             canvas.color = res.barSeparatorColor;
-           
+
             const firstStaffInBracket = this._firstStaffInBrackets;
             const lastStaffInBracket = this._lastStaffInBrackets;
 
@@ -556,14 +556,13 @@ export class StaffSystem {
                                     trackNameText = g.track.shortName;
                                     break;
                             }
-                            
+
                             using _trackNameStyle = ElementStyleHelper.track(
                                 canvas,
                                 TrackSubElement.TrackName,
                                 g.track
                             );
-                    
-                            
+
                             if (trackNameText.length > 0) {
                                 const textEndX =
                                     // start at beginning of first renderer
@@ -606,11 +605,7 @@ export class StaffSystem {
                 }
             }
 
-            using _ = ElementStyleHelper.track(
-                canvas,
-                TrackSubElement.BracesAndBrackets,
-                this.staves[0].track
-            );
+            using _ = ElementStyleHelper.track(canvas, TrackSubElement.BracesAndBrackets, this.staves[0].track);
 
             if (firstStaffInBracket && lastStaffInBracket) {
                 //

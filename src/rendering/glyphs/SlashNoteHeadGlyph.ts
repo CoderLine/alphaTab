@@ -7,16 +7,10 @@ import { BeamingHelper } from '../utils/BeamingHelper';
 import { EffectGlyph } from './EffectGlyph';
 import { Beat, BeatSubElement, NoteSubElement } from '@src/model';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class SlashNoteHeadGlyph extends EffectGlyph {
-    public static readonly NoteHeadHeight: number = 17;
-
-    public static readonly QuarterNoteHeadWidth: number = 12;
-    public static readonly HalfNoteHeadWidth: number = 25;
-    public static readonly WholeNoteHeadWidth: number = 32;
-
     private _isGrace: boolean;
-    private _duration: Duration;
 
     public beatEffects: Map<string, Glyph> = new Map();
     public beamingHelper!: BeamingHelper;
@@ -27,7 +21,6 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
         super(x, y);
         this._isGrace = isGrace;
-        this._duration = duration;
         this._symbol = SlashNoteHeadGlyph.getSymbol(duration);
         this.beat = beat;
     }
@@ -52,23 +45,12 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        switch (this._duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.DoubleWhole:
-            case Duration.Whole:
-                this.width = SlashNoteHeadGlyph.WholeNoteHeadWidth * scale;
-                break;
-            case Duration.Half:
-                this.width = SlashNoteHeadGlyph.HalfNoteHeadWidth * scale;
-                break;
-            default:
-                this.width = SlashNoteHeadGlyph.QuarterNoteHeadWidth * scale;
-                break;
-        }
-        this.height = SlashNoteHeadGlyph.NoteHeadHeight * scale;
+
+        this.width = MusicFontSymbolSizes.Widths.get(this._symbol)! * scale;
+        this.height = MusicFontSymbolSizes.Heights.get(this._symbol)! * scale;
 
         let effectSpacing: number = 7;
-        let effectY = SlashNoteHeadGlyph.NoteHeadHeight;
+        let effectY = MusicFontSymbolSizes.Heights.get(this._symbol)!;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;

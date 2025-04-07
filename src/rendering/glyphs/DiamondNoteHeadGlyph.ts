@@ -4,11 +4,8 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class DiamondNoteHeadGlyph extends MusicFontGlyph {
-    private _isGrace: boolean;
-
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, DiamondNoteHeadGlyph.getSymbol(duration));
-        this._isGrace = isGrace;
     }
 
     private static getSymbol(duration: Duration): MusicFontSymbol {
@@ -21,10 +18,5 @@ export class DiamondNoteHeadGlyph extends MusicFontGlyph {
             default:
                 return MusicFontSymbol.NoteheadDiamondBlackWide;
         }
-    }
-
-    public override doLayout(): void {
-        this.width = 9 * (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
-        this.height = NoteHeadGlyph.NoteHeadHeight;
     }
 }
