@@ -1843,10 +1843,10 @@ describe('AlphaTexImporterTest', () => {
             \\title "Title" "Title: %TITLE%" left
             \\subtitle "Subtitle" "Subtitle: %SUBTITLE%" center
             \\artist "Artist" "Artist: %ARTIST%" right
-            \\album "Album" "Album: %ARTIST%" left
+            \\album "Album" "Album: %ALBUM%" left
             \\words "Words" "Words: %WORDS%" center
             \\music "Music" "Music: %MUSIC%" right
-            \\wordsAndMusic "Music" "Words & Music: %MUSIC%" left
+            \\wordsAndMusic "Words & Music: %MUSIC%" left
             \\tab "Tab" "Transcriber: %TABBER%" center
             \\copyright "Copyright" "Copyright: %COPYRIGHT%" right
             \\copyright2 "Copyright2" right
@@ -1857,7 +1857,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Left);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
@@ -1867,7 +1867,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Right);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
@@ -1877,7 +1877,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Center);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
@@ -1889,7 +1889,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
             'Words & Music: %MUSIC%'
         );
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Left);
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.true;
@@ -1908,7 +1908,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
-        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.true;
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
             TextAlign.Right
         );

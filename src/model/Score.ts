@@ -137,7 +137,7 @@ export class HeaderFooterStyle {
                     value = score.copyright;
                     break;
                 default:
-                    value = score.title;
+                    value = '';
                     break;
             }
 
@@ -165,9 +165,9 @@ export class ScoreStyle extends ElementStyle<ScoreSubElement> {
     /**
      * Changes additional style aspects fo the of the specified sub-element.
      */
-    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle | null> = new Map<
+    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<
         ScoreSubElement,
-        HeaderFooterStyle | null
+        HeaderFooterStyle
     >();
 
     /**

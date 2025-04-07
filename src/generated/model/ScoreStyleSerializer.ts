@@ -40,7 +40,7 @@ export class ScoreStyleSerializer {
     public static setProperty(obj: ScoreStyle, property: string, v: unknown): boolean {
         switch (property) {
             case "headerandfooter":
-                obj.headerAndFooter = new Map<ScoreSubElement, HeaderFooterStyle | null>();
+                obj.headerAndFooter = new Map<ScoreSubElement, HeaderFooterStyle>();
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new HeaderFooterStyle();
                     HeaderFooterStyleSerializer.fromJson(i, v as Map<string, unknown>);

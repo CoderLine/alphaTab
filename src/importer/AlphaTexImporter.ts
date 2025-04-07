@@ -886,15 +886,25 @@ export class AlphaTexImporter extends ScoreImporter {
                     }
 
                     if (element !== ScoreSubElement.ChordDiagramList) {
-                        this.headerFooterStyle(ScoreSubElement.CopyrightSecondLine);
+                        this.headerFooterStyle(element);
                     }
 
                     break;
                 case 'copyright2':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error(metadataTag, AlphaTexSymbols.String, true);
+                    }
+
                     this.headerFooterStyle(ScoreSubElement.CopyrightSecondLine);
                     anyTopLevelMeta = true;
                     break;
                 case 'wordsandmusic':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error(metadataTag, AlphaTexSymbols.String, true);
+                    }
+
                     this.headerFooterStyle(ScoreSubElement.WordsAndMusic);
                     anyTopLevelMeta = true;
                     break;
@@ -1057,18 +1067,22 @@ export class AlphaTexImporter extends ScoreImporter {
         return anyTopLevelMeta || anyOtherMeta;
     }
     headerFooterStyle(element: ScoreSubElement) {
+        const style = ModelUtils.getOrCreateHeaderFooterStyle(this._score, element);
+        if (style.isVisible === undefined) {
+            style.isVisible = true;
+        }
+
         if (this._sy === AlphaTexSymbols.String) {
-            const value =  this._syData as string;
+            const value = this._syData as string;
             if (value) {
-                ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).template = value;
+                style.template = value;
             } else {
-                ModelUtils.getOrCreateHeaderFooterStyle(this._score, element).isVisible = false;
+                style.isVisible = false;
             }
             this._sy = this.newSy();
         }
 
         if (this._sy === AlphaTexSymbols.String) {
-            const style = ModelUtils.getOrCreateHeaderFooterStyle(this._score, element);
             switch ((this._syData as string).toLowerCase()) {
                 case 'left':
                     style.textAlign = TextAlign.Left;

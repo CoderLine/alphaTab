@@ -1,4 +1,4 @@
-import { Score, ScoreSubElement } from '@src/model/Score';
+import { HeaderFooterStyle, Score, ScoreSubElement } from '@src/model/Score';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
@@ -225,12 +225,12 @@ export class BinaryStylesheet {
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).template = value as string;
                     break;
                 case 'Header/SubtitleAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).textAlign = this.toTextAlign(
-                        value as number
-                    );
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).textAlign =
+                        this.toTextAlign(value as number);
                     break;
                 case 'Header/drawSubtitle':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).isVisible =
+                        value as boolean;
                     break;
 
                 case 'Header/Artist':
@@ -282,7 +282,8 @@ export class BinaryStylesheet {
                     break;
 
                 case 'Header/WordsAndMusic':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).template =
+                        value as string;
                     break;
                 case 'Header/WordsAndMusicAlignment':
                     ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).textAlign =
@@ -294,39 +295,42 @@ export class BinaryStylesheet {
                     break;
 
                 case 'Header/Tabber':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).template =
+                        value as string;
                     break;
                 case 'Header/TabberAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).textAlign = this.toTextAlign(
-                        value as number
-                    );
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).textAlign =
+                        this.toTextAlign(value as number);
                     break;
                 case 'Header/drawTabber':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).isVisible =
+                        value as boolean;
                     break;
 
                 case 'Footer/Copyright':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).template =
+                        value as string;
                     break;
                 case 'Footer/CopyrightAlignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).textAlign = this.toTextAlign(
-                        value as number
-                    );
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).textAlign =
+                        this.toTextAlign(value as number);
                     break;
                 case 'Footer/drawCopyright':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).isVisible =
+                        value as boolean;
                     break;
 
                 case 'Footer/Copyright2':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).template = value as string;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).template =
+                        value as string;
                     break;
                 case 'Footer/Copyright2Alignment':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).textAlign = this.toTextAlign(
-                        value as number
-                    );
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).textAlign =
+                        this.toTextAlign(value as number);
                     break;
                 case 'Footer/drawCopyright2':
-                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible = value as boolean;
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible =
+                        value as boolean;
                     break;
             }
         }
@@ -505,8 +509,63 @@ export class BinaryStylesheet {
                 break;
         }
 
+        const scoreStyle = score.style;
+        if (scoreStyle) {
+            for (const [k, v] of scoreStyle.headerAndFooter) {
+                switch (k) {
+                    case ScoreSubElement.Title:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
+                        break;
+                    case ScoreSubElement.SubTitle:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
+                        break;
+                    case ScoreSubElement.Artist:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
+                        break;
+                    case ScoreSubElement.Album:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
+                        break;
+                    case ScoreSubElement.Words:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
+                        break;
+                    case ScoreSubElement.Music:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
+                        break;
+                    case ScoreSubElement.WordsAndMusic:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
+                        break;
+                    case ScoreSubElement.Transcriber:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
+                        break;
+                    case ScoreSubElement.Copyright:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
+                        break;
+                    case ScoreSubElement.CopyrightSecondLine:
+                        this.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
+                        break;
+                }
+            }
+        }
+
         const writer = ByteBuffer.withCapacity(128);
         binaryStylesheet.writeTo(writer);
         return writer.toArray();
+    }
+
+    private static addHeaderAndFooter(
+        binaryStylesheet: BinaryStylesheet,
+        style: HeaderFooterStyle,
+        prefix: string,
+        name: string
+    ) {
+        if (style.template !== undefined) {
+            binaryStylesheet.addValue(`${prefix}${name}`, style.template!, DataType.String);
+        }
+
+        binaryStylesheet.addValue(`${prefix}${name}Alignment`, style.textAlign as number, DataType.Integer);
+        
+        if (style.isVisible !== undefined) {
+            binaryStylesheet.addValue(`${prefix}draw${name}`, style.isVisible! as boolean, DataType.Boolean);
+        }
     }
 }

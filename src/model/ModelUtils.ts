@@ -527,7 +527,6 @@ export class ModelUtils {
                 const defaults = ScoreStyle.defaultHeaderAndFooter.get(element)!;
                 headerFooterStyle.template = defaults.template;
                 headerFooterStyle.textAlign = defaults.textAlign;
-                headerFooterStyle.isVisible = defaults.isVisible;
             }
 
             style!.headerAndFooter.set(element, headerFooterStyle);
