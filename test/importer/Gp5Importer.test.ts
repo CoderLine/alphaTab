@@ -2,8 +2,9 @@ import { Settings } from '@src/Settings';
 import { Ottavia } from '@src/model';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
-import { Score } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { WahPedal } from '@src/model/WahPedal';
+import { TextAlign } from '@src/platform';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
@@ -444,7 +445,9 @@ describe('Gp5ImporterTest', () => {
         // invert to down
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(
+            BeamDirection.Down
+        );
 
         // invert to up
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
@@ -452,7 +455,6 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
     });
 
-    
     it('ottavia', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/ottavia.gp5')).readScore();
 
@@ -462,7 +464,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].ottava).to.equal(Ottavia._15mb);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].ottava).to.equal(Ottavia.Regular);
     });
-    
+
     it('wah-wah', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/wah-wah.gp5')).readScore();
 
@@ -472,5 +474,64 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].wahPedal).to.equal(WahPedal.Open);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].wahPedal).to.equal(WahPedal.Closed);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].wahPedal).to.equal(WahPedal.None);
+    });
+
+    it('header-footer', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/header-footer.gp5')).readScore();
+
+        expect(score.style).to.be.ok;
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).to.equal('Subtitle: %SUBTITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).to.equal('Album: %ALBUM%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).to.equal('Music: %MUSIC%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
+            'Words & Music: %WORDSMUSIC%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.false;
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).to.equal(
+            'Copyright: %COPYRIGHT%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
+            TextAlign.Center
+        );
     });
 });

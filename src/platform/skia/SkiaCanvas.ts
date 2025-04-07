@@ -251,7 +251,8 @@ export class SkiaCanvas implements ICanvas {
         }
 
 
-        this._canvas.fillText(text, this.getTypeFace(), this.font.size * this._scale, x * this._scale, y * this._scale, textAlign, textBaseline);
+        // NOTE: Avoiding sub-pixel text positions as they can lead to strange artifacts.
+        this._canvas.fillText(text, this.getTypeFace(), this.font.size * this._scale, (x * this._scale) | 0, (y * this._scale) | 0, textAlign, textBaseline);
     }
 
     /**
@@ -263,10 +264,10 @@ export class SkiaCanvas implements ICanvas {
     public measureText(text: string) {
         // BUG: for some reason the very initial measure text in alphaSkia delivers wrong results, so we it twice
         if(this._initialMeasure) {
-            this._canvas.measureText(text, this.getTypeFace(), this.font.size * this._scale);
+            this._canvas.measureText(text, this.getTypeFace(), this.font.size);
             this._initialMeasure = false;
         }
-        return new MeasuredText(this._canvas.measureText(text, this.getTypeFace(), this.font.size * this._scale), this.font.size * this._scale * SkiaCanvas.FontSizeToLineHeight);
+        return new MeasuredText(this._canvas.measureText(text, this.getTypeFace(), this.font.size), this.font.size * SkiaCanvas.FontSizeToLineHeight);
     }
 
     public fillMusicFontSymbol(

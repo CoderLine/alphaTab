@@ -352,6 +352,12 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static string Replace(this string input, RegExp pattern, Func<string, string, string> replacer)
+        {
+            return pattern.Replace(input, replacer);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsTruthy(string? s)
         {
             return !string.IsNullOrEmpty(s);

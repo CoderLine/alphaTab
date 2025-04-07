@@ -8,6 +8,8 @@ import { Bar } from './Bar';
 import { Beat } from './Beat';
 import { Voice } from './Voice';
 import { Note } from './Note';
+import { TextAlign } from '@src/platform';
+import type { NotationSettings } from '@src/NotationSettings';
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
@@ -42,9 +44,19 @@ export enum ScoreSubElement {
      */
     WordsAndMusic,
     /**
+     * The transcriber of the music sheet
+     */
+    Transcriber,
+
+    /**
      * The copyright holder of the song
      */
     Copyright,
+
+    /**
+     * The second copyright line (typically something like 'All Rights Reserved')
+     */
+    CopyrightSecondLine,
 
     /**
      * The chord diagram list shown on top of the score.
@@ -53,11 +65,133 @@ export enum ScoreSubElement {
 }
 
 /**
+ * The additional style and display information for header and footer elements.
+ * @json
+ * @json_strict
+ */
+export class HeaderFooterStyle {
+    /**
+     * The template how the text should be formatted. Following placeholders exist and are filled from the song information:
+     * * `%TITLE%`
+     * * `%SUBTITLE%`
+     * * `%ARTIST%`
+     * * `%ALBUM%`
+     * * `%WORDS%`
+     * * `%WORDSMUSIC%`
+     * * `%MUSIC%`
+     * * `%TABBER%`
+     * * `%COPYRIGHT%`
+     */
+    public template: string;
+
+    /**
+     * Whether the element should be visible. Overriden by {@link NotationSettings.elements} if specified.
+     */
+    public isVisible?: boolean;
+
+    /**
+     * The alignment of the element on the page.
+     */
+    public textAlign: TextAlign;
+
+    public constructor(
+        template: string = '',
+        isVisible: boolean | undefined = undefined,
+        textAlign: TextAlign = TextAlign.Left
+    ) {
+        this.template = template;
+        this.isVisible = isVisible;
+        this.textAlign = textAlign;
+    }
+
+    public buildText(score: Score) {
+        let anyPlaceholderFilled = false;
+        let anyPlaceholder = false;
+        const replaced = this.template.replace(HeaderFooterStyle.PlaceholderPattern, (_match: string, variable: string) => {
+            anyPlaceholder = true;
+            let value = '';
+            switch (variable) {
+                case `TITLE`:
+                    value = score.title;
+                    break;
+                case `SUBTITLE`:
+                    value = score.subTitle;
+                    break;
+                case `ARTIST`:
+                    value = score.artist;
+                    break;
+                case `ALBUM`:
+                    value = score.album;
+                    break;
+                case `WORDS`:
+                case `WORDSMUSIC`:
+                    value = score.words;
+                    break;
+                case `MUSIC`:
+                    value = score.music;
+                    break;
+                case `TABBER`:
+                    value = score.tab;
+                    break;
+                case `COPYRIGHT`:
+                    value = score.copyright;
+                    break;
+                default:
+                    value = '';
+                    break;
+            }
+
+            if (value) {
+                anyPlaceholderFilled = true;
+            }
+            return value;
+        });
+
+        if (anyPlaceholder && !anyPlaceholderFilled) {
+            return '';
+        }
+        return replaced;
+    }
+
+    private static readonly PlaceholderPattern = new RegExp('%([^%]+)%', 'g');
+}
+
+/**
  * Defines the custom styles for Scores.
  * @json
  * @json_strict
  */
-export class ScoreStyle extends ElementStyle<ScoreSubElement> {}
+export class ScoreStyle extends ElementStyle<ScoreSubElement> {
+    /**
+     * Changes additional style aspects fo the of the specified sub-element.
+     */
+    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<
+        ScoreSubElement,
+        HeaderFooterStyle
+    >();
+
+    /**
+     * The default styles applied to headers and footers if not specified
+     */
+    public static readonly defaultHeaderAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<
+        ScoreSubElement,
+        HeaderFooterStyle
+    >([
+        [ScoreSubElement.Title, new HeaderFooterStyle('%TITLE%', undefined, TextAlign.Center)],
+        [ScoreSubElement.SubTitle, new HeaderFooterStyle('%SUBTITLE%', undefined, TextAlign.Center)],
+        [ScoreSubElement.Artist, new HeaderFooterStyle('%ARTIST%', undefined, TextAlign.Center)],
+        [ScoreSubElement.Album, new HeaderFooterStyle('%ALBUM%', undefined, TextAlign.Center)],
+        [ScoreSubElement.Words, new HeaderFooterStyle('Words by %WORDS%', undefined, TextAlign.Left)],
+        [ScoreSubElement.Music, new HeaderFooterStyle('Music by %MUSIC%', undefined, TextAlign.Right)],
+        [ScoreSubElement.WordsAndMusic, new HeaderFooterStyle('Words & Music by %MUSIC%', undefined, TextAlign.Right)],
+        [ScoreSubElement.Transcriber, new HeaderFooterStyle('Tabbed by %TABBER%', false, TextAlign.Right)],
+        [ScoreSubElement.Copyright, new HeaderFooterStyle('%COPYRIGHT%', undefined, TextAlign.Center)],
+        [
+            ScoreSubElement.CopyrightSecondLine,
+            new HeaderFooterStyle('All Rights Reserved - International Copyright Secured', true, TextAlign.Center)
+        ]
+    ]);
+}
 
 /**
  * The score is the root node of the complete

@@ -2,7 +2,7 @@ import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Fingers } from '@src/model/Fingers';
-import { Score } from '@src/model/Score';
+import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
 import { NoteAccidentalMode } from './NoteAccidentalMode';
@@ -444,7 +444,6 @@ export class ModelUtils {
                     break;
                 }
 
-
                 // masterbar is good, now check bars across staves
                 let areAllBarsSuitable = true;
                 for (const t of tracks) {
@@ -457,7 +456,7 @@ export class ModelUtils {
                         }
                     }
 
-                    if(!areAllBarsSuitable) {
+                    if (!areAllBarsSuitable) {
                         break;
                     }
                 }
@@ -465,7 +464,6 @@ export class ModelUtils {
                 if (!areAllBarsSuitable) {
                     break;
                 }
-
 
                 // skip initial bar as it is not "additional" but we are checking it
                 currentIndex++;
@@ -510,5 +508,30 @@ export class ModelUtils {
 
         endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
         return endBarIndex;
+    }
+
+    public static getOrCreateHeaderFooterStyle(score: Score, element: ScoreSubElement) {
+        let style = score.style;
+        if (!score.style) {
+            style = new ScoreStyle();
+            score.style = style;
+        }
+
+        let headerFooterStyle: HeaderFooterStyle;
+        if (style!.headerAndFooter.has(element)) {
+            headerFooterStyle = style!.headerAndFooter.get(element)!;
+        } else {
+            headerFooterStyle = new HeaderFooterStyle();
+
+            if(ScoreStyle.defaultHeaderAndFooter.has(element)) {
+                const defaults = ScoreStyle.defaultHeaderAndFooter.get(element)!;
+                headerFooterStyle.template = defaults.template;
+                headerFooterStyle.textAlign = defaults.textAlign;
+            }
+
+            style!.headerAndFooter.set(element, headerFooterStyle);
+        }
+
+        return headerFooterStyle;
     }
 }

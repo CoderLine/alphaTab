@@ -65,6 +65,10 @@ internal inline fun String.replace(pattern: RegExp, replacement: String): String
     return pattern.replace(this, replacement)
 }
 
+internal fun String.replace(pattern: RegExp, replacement: (match:String, group1:String) -> String): String {
+    return pattern.replace(this, replacement)
+}
+
 internal inline fun String.indexOfInDouble(item: String): Double {
     return this.indexOf(item).toDouble()
 }

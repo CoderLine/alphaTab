@@ -7,8 +7,8 @@ import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
-import { NotationElement } from '@src/NotationSettings';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
+import { ScoreSubElement } from '@src/model';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.
@@ -17,7 +17,6 @@ export class PageViewLayout extends ScoreLayout {
     private _systems: StaffSystem[] = [];
     private _allMasterBarRenderers: MasterBarsRenderers[] = [];
     private _barsFromPreviousSystem: MasterBarsRenderers[] = [];
-    private _pagePadding: number[] | null = null;
 
     public get name(): string {
         return 'PageView';
@@ -37,26 +36,7 @@ export class PageViewLayout extends ScoreLayout {
                 break;
         }
 
-        this._pagePadding = this.renderer.settings.display.padding.map(p => p / this.renderer.settings.display.scale);
-        if (!this._pagePadding) {
-            this._pagePadding = [0, 0, 0, 0];
-        }
-        if (this._pagePadding.length === 1) {
-            this._pagePadding = [
-                this._pagePadding[0],
-                this._pagePadding[0],
-                this._pagePadding[0],
-                this._pagePadding[0]
-            ];
-        } else if (this._pagePadding.length === 2) {
-            this._pagePadding = [
-                this._pagePadding[0],
-                this._pagePadding[1],
-                this._pagePadding[0],
-                this._pagePadding[1]
-            ];
-        }
-        let y: number = this._pagePadding[1];
+        let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
         this._allMasterBarRenderers = [];
         //
@@ -72,9 +52,11 @@ export class PageViewLayout extends ScoreLayout {
         // 4. One result per StaffSystem
         y = this.layoutAndRenderScore(y);
 
+        y = this.layoutAndRenderBottomScoreInfo(y);
+
         y = this.layoutAndRenderAnnotation(y);
 
-        this.height = (y + this._pagePadding[3]) * this.renderer.settings.display.scale;
+        this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
 
     public get supportsResize(): boolean {
@@ -82,7 +64,7 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     public get firstBarX(): number {
-        let x = this._pagePadding![0];
+        let x = this.pagePadding![0];
         if (this._systems.length > 0) {
             x += this._systems[0].accoladeWidth;
         }
@@ -90,7 +72,7 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     public doResize(): void {
-        let y: number = this._pagePadding![1];
+        let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
         let oldHeight: number = this.height;
         //
@@ -106,9 +88,11 @@ export class PageViewLayout extends ScoreLayout {
         // 4. One result per StaffSystem
         y = this.resizeAndRenderScore(y, oldHeight);
 
+        y = this.layoutAndRenderBottomScoreInfo(y);
+
         y = this.layoutAndRenderAnnotation(y);
 
-        this.height = (y + this._pagePadding![3]) * this.renderer.settings.display.scale;
+        this.height = (y + this.pagePadding![3]) * this.renderer.settings.display.scale;
     }
 
     private layoutAndRenderTunings(y: number, totalHeight: number = -1): number {
@@ -117,11 +101,11 @@ export class PageViewLayout extends ScoreLayout {
         }
 
         let res: RenderingResources = this.renderer.settings.display.resources;
-        this.tuningGlyph.x = this._pagePadding![0];
+        this.tuningGlyph.x = this.pagePadding![0];
         this.tuningGlyph.width = this.scaledWidth;
         this.tuningGlyph.doLayout();
 
-        let tuningHeight = this.tuningGlyph.height;
+        let tuningHeight = Math.round(this.tuningGlyph.height);
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -148,7 +132,7 @@ export class PageViewLayout extends ScoreLayout {
         this.chordDiagrams.width = this.scaledWidth;
         this.chordDiagrams.doLayout();
 
-        const diagramHeight = Math.floor(this.chordDiagrams.height);
+        const diagramHeight = Math.round(this.chordDiagrams.height);
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -177,45 +161,34 @@ export class PageViewLayout extends ScoreLayout {
         let infoHeight = 0;
 
         let res: RenderingResources = this.renderer.settings.display.resources;
-        let centeredGlyphs: NotationElement[] = [
-            NotationElement.ScoreTitle,
-            NotationElement.ScoreSubTitle,
-            NotationElement.ScoreArtist,
-            NotationElement.ScoreAlbum,
-            NotationElement.ScoreWordsAndMusic
-        ];
-        for (let i: number = 0; i < centeredGlyphs.length; i++) {
-            if (this.scoreInfoGlyphs.has(centeredGlyphs[i])) {
-                let glyph: TextGlyph = this.scoreInfoGlyphs.get(centeredGlyphs[i])!;
-                glyph.x = this.scaledWidth / 2;
+
+        const scoreInfoGlyphs: TextGlyph[] = [];
+
+        for (const [scoreElement, _notationElement] of ScoreLayout.HeaderElements.value) {
+            if (this.headerGlyphs.has(scoreElement)) {
+                const glyph: TextGlyph = this.headerGlyphs.get(scoreElement)!;
                 glyph.y = infoHeight;
-                glyph.textAlign = TextAlign.Center;
-                infoHeight += glyph.font.size;
+                this.alignScoreInfoGlyph(glyph);
+
+                let lineHeight = glyph.font.size;
+
+                // words and music on same line if not aligned on same side
+                if (scoreElement === ScoreSubElement.Words) {
+                    if (this.headerGlyphs.has(ScoreSubElement.Music)) {
+                        const musicGlyph = this.headerGlyphs.get(ScoreSubElement.Music)!;
+                        if (musicGlyph.textAlign !== glyph.textAlign) {
+                            lineHeight = 0;
+                        }
+                    }
+                }
+
+                infoHeight += lineHeight;
+
+                scoreInfoGlyphs.push(glyph);
             }
         }
-        let musicOrWords: boolean = false;
-        let musicOrWordsHeight: number = 0;
-        if (this.scoreInfoGlyphs.has(NotationElement.ScoreMusic)) {
-            let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreMusic)!;
-            glyph.x = this.scaledWidth - this._pagePadding![2];
-            glyph.y = infoHeight;
-            glyph.textAlign = TextAlign.Right;
-            musicOrWords = true;
-            musicOrWordsHeight = glyph.font.size;
-        }
-        if (this.scoreInfoGlyphs.has(NotationElement.ScoreWords)) {
-            let glyph: TextGlyph = this.scoreInfoGlyphs.get(NotationElement.ScoreWords)!;
-            glyph.x = this._pagePadding![0];
-            glyph.y = infoHeight;
-            glyph.textAlign = TextAlign.Left;
-            musicOrWords = true;
-            musicOrWordsHeight = glyph.font.size;
-        }
-        if (musicOrWords) {
-            infoHeight += musicOrWordsHeight;
-        }
 
-        if (this.scoreInfoGlyphs.size > 0) {
+        if (scoreInfoGlyphs.length > 0) {
             infoHeight = Math.floor(infoHeight + 17);
             e.width = this.scaledWidth;
             e.height = infoHeight;
@@ -224,7 +197,7 @@ export class PageViewLayout extends ScoreLayout {
             this.registerPartial(e, (canvas: ICanvas) => {
                 canvas.color = res.scoreInfoColor;
                 canvas.textAlign = TextAlign.Center;
-                for (const g of this.scoreInfoGlyphs.values()) {
+                for (const g of scoreInfoGlyphs) {
                     g.paint(0, 0, canvas);
                 }
             });
@@ -251,7 +224,7 @@ export class PageViewLayout extends ScoreLayout {
             let maxWidth: number = this.maxWidth;
             let system: StaffSystem = this.createEmptyStaffSystem();
             system.index = this._systems.length;
-            system.x = this._pagePadding![0];
+            system.x = this.pagePadding![0];
             system.y = y;
             while (currentIndex < this._allMasterBarRenderers.length) {
                 // if the current renderer still has space in the current system add it
@@ -277,7 +250,7 @@ export class PageViewLayout extends ScoreLayout {
                     // note: we do not increase currentIndex here to have it added to the next system
                     system = this.createEmptyStaffSystem();
                     system.index = this._systems.length;
-                    system.x = this._pagePadding![0];
+                    system.x = this.pagePadding![0];
                     system.y = y;
                 }
             }
@@ -299,7 +272,7 @@ export class PageViewLayout extends ScoreLayout {
             // create system and align set proper coordinates
             let system: StaffSystem = this.createStaffSystem(currentBarIndex, endBarIndex);
             this._systems.push(system);
-            system.x = this._pagePadding![0];
+            system.x = this.pagePadding![0];
             system.y = y;
             currentBarIndex = system.lastBarIndex + 1;
             // finalize system (sizing etc).
@@ -395,11 +368,7 @@ export class PageViewLayout extends ScoreLayout {
                         ? multiBarRestInfo.get(barIndex)!
                         : null;
 
-                const renderers = system.addBars(
-                    this.renderer.tracks!,
-                    barIndex,
-                    additionalMultiBarsRestBarIndices
-                );
+                const renderers = system.addBars(this.renderer.tracks!, barIndex, additionalMultiBarsRestBarIndices);
                 this._allMasterBarRenderers.push(renderers);
                 barIndex = renderers.lastMasterBarIndex;
             }
@@ -435,6 +404,6 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private get maxWidth(): number {
-        return this.scaledWidth - this._pagePadding![0] - this._pagePadding![2];
+        return this.scaledWidth - this.pagePadding![0] - this.pagePadding![2];
     }
 }

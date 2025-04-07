@@ -3,6 +3,7 @@ import * as cs from './CSharpAst';
 import path from 'path';
 import fs from 'fs';
 import CSharpEmitterContext from './CSharpEmitterContext';
+import exp from 'constants';
 
 export default class CSharpAstTransformer {
     protected _typeScriptFile: ts.SourceFile;
@@ -3183,8 +3184,10 @@ export default class CSharpAstTransformer {
 
             csExpr.type = this._context.makeArrayTupleType(csExpr, []);
 
+            const tupleType = this._context.typeChecker.getContextualType(expression) ?? type;
+
             (csExpr.type as cs.ArrayTupleNode).types = this._context.typeChecker
-                .getTypeArguments(type as ts.TypeReference)
+                .getTypeArguments(tupleType as ts.TypeReference)
                 .map((p, i) => this.createUnresolvedTypeNode(csExpr.type, expression.elements[i], p));
 
             expression.elements.forEach(e => {
