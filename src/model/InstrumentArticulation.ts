@@ -13,7 +13,12 @@ export class InstrumentArticulation {
      */
     public elementType: string;
     /**
-     * Gets or sets the line the note head should be shown for standard notation
+     * The line the note head should be shown for standard notation.
+     * 
+     * @remarks
+     * This value is a bit special and its semantics are adopted from Guitar Pro: 
+     * Staff lines are actually "steps" including lines and spaces on the staff.
+     * 1 means the note is on the top line of the staff and from there its counting downwards.
      */
     public staffLine: number;
     /**
@@ -41,30 +46,6 @@ export class InstrumentArticulation {
      * Gets or sets which midi key to use when playing the note.
      */
     public outputMidiNumber: number;
-
-    // TODO: https://github.com/CoderLine/alphaTab/issues/1975 respect the data below
-
-
-    /**
-     * The midi channel number to use when playing the note (-1 if using the default track channels).
-     */
-    public outputMidiChannel: number = -1;
-
-    /**
-     * The midi channel program to use when playing the note (-1 if using the default track program).
-     */
-    public outputMidiProgram: number = -1;
-
-    /**
-     * The volume to use when playing the note (-1 if using the default track volume).
-     */
-    public outputVolume: number = -1;
-
-    /**
-     * The balance to use when playing the note (-1 if using the default track balance).
-     */
-    public outputBalance: number = -1;
-
 
     public constructor(
         elementType: string = '',

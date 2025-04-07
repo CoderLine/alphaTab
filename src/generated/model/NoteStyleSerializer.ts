@@ -5,6 +5,7 @@
 // </auto-generated>
 import { NoteStyle } from "@src/model/Note";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { NoteSubElement } from "@src/model/Note";
 import { Color } from "@src/model/Color";
 export class NoteStyleSerializer {
@@ -19,6 +20,8 @@ export class NoteStyleSerializer {
             return null;
         }
         const o = new Map<string, unknown>();
+        o.set("notehead", obj.noteHead as number | undefined);
+        o.set("noteheadcenteronstem", obj.noteHeadCenterOnStem);
         {
             const m = new Map<string, unknown>();
             o.set("colors", m);
@@ -30,6 +33,12 @@ export class NoteStyleSerializer {
     }
     public static setProperty(obj: NoteStyle, property: string, v: unknown): boolean {
         switch (property) {
+            case "notehead":
+                obj.noteHead = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol);
+                return true;
+            case "noteheadcenteronstem":
+                obj.noteHeadCenterOnStem = v as boolean | undefined;
+                return true;
             case "colors":
                 obj.colors = new Map<NoteSubElement, Color | null>();
                 JsonHelper.forEach(v, (v, k) => {
