@@ -212,21 +212,20 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private consolidate() {
-        const usedChannels = new Set<number>();
+        const usedChannels = new Set<number>([SynthConstants.PercussionChannel]);
         for (let track of this._score.tracks) {
             // unique midi channels and generate secondary channels
-            while (
-                usedChannels.has(track.playbackInfo.primaryChannel) &&
-                track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel
-            ) {
-                track.playbackInfo.primaryChannel++;
+            if (track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
+                while (usedChannels.has(track.playbackInfo.primaryChannel)) {
+                    track.playbackInfo.primaryChannel++;
+                }
             }
             usedChannels.add(track.playbackInfo.primaryChannel);
-            while (
-                usedChannels.has(track.playbackInfo.secondaryChannel) &&
-                track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel
-            ) {
-                track.playbackInfo.secondaryChannel++;
+
+            if (track.playbackInfo.secondaryChannel !== SynthConstants.PercussionChannel) {
+                while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
+                    track.playbackInfo.secondaryChannel++;
+                }
             }
             usedChannels.add(track.playbackInfo.secondaryChannel);
 
