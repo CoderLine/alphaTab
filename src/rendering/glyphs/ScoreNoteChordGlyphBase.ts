@@ -6,6 +6,8 @@ import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { BarRendererBase } from '../BarRendererBase';
+import { NoteHeadGlyph } from './NoteHeadGlyph';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
@@ -28,29 +30,21 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     protected add(noteGlyph: Glyph, noteLine: number): void {
         let info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
         this._infos.push(info);
-        if (!this.minNote || this.minNote.line > info.line) {
+        if (!this.minNote || this.minNote.steps > info.steps) {
             this.minNote = info;
         }
-        if (!this.maxNote || this.maxNote.line < info.line) {
+        if (!this.maxNote || this.maxNote.steps < info.steps) {
             this.maxNote = info;
         }
     }
 
-    public get hasTopOverflow(): boolean {
-        return !!this.minNote && this.minNote.line <= 0;
-    }
-
-    public get hasBottomOverflow(): boolean {
-        return !!this.maxNote && this.maxNote.line > 8;
-    }
-
     public override doLayout(): void {
         this._infos.sort((a, b) => {
-            return b.line - a.line;
+            return b.steps - a.steps;
         });
         let displacedX: number = 0;
         let lastDisplaced: boolean = false;
-        let lastLine: number = 0;
+        let lastStep: number = 0;
         let anyDisplaced: boolean = false;
         let direction: BeamDirection = this.direction;
         let w: number = 0;
@@ -63,7 +57,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 displacedX = g.width;
             } else {
                 // check if note needs to be repositioned
-                if (Math.abs(lastLine - this._infos[i].line) <= 1) {
+                if (Math.abs(lastStep - this._infos[i].steps) <= 1) {
                     // reposition if needed
                     if (!lastDisplaced) {
                         displace = true;
@@ -85,8 +79,13 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 g.x = displace ? displacedX : 0;
             }
             g.x += this.noteStartX;
-            lastLine = this._infos[i].line;
+            lastStep = this._infos[i].steps;
             w = Math.max(w, g.x + g.width);
+
+            // after size calculation, re-align glyph to stem if needed
+            if (g instanceof NoteHeadGlyph && (g as NoteHeadGlyph).centerOnStem) {
+                g.x = displacedX;
+            }
         }
         if (anyDisplaced) {
             this._noteHeadPadding = 0;
@@ -116,28 +115,33 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
     }
     private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
+        if(!this.minNote){
+            return;
+        }
+
         let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
 
         let linePadding: number = 3;
         let lineWidth: number = this.width - this.noteStartX + linePadding * 2;
-        if (this.hasTopOverflow) {
-            let l: number = -2;
-            while (l >= this.minNote!.line) {
-                // + 1 Because we want to place the line in the center of the note, not at the top
-                let lY: number = cy + scoreRenderer.getScoreY(l);
-                canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, 1);
-                l -= 2;
-            }
+
+        const lineSpacing = scoreRenderer.getLineHeight(1);
+        const firstTopLedgerY = scoreRenderer.getLineY(-1);
+        const firstBottomLedgerY = scoreRenderer.getLineY(scoreRenderer.drawnLineCount);
+        const minNoteLineY = scoreRenderer.getLineY(this.minNote!.steps / 2);
+        const maxNoteLineY = scoreRenderer.getLineY(this.maxNote!.steps / 2);
+
+        let y = firstTopLedgerY;
+        while(y >= minNoteLineY) {
+            canvas.fillRect(cx - linePadding + this.noteStartX, cy + y | 0, lineWidth, BarRendererBase.StaffLineThickness);
+            y -= lineSpacing;
         }
-        if (this.hasBottomOverflow) {
-            let l: number = 10;
-            while (l <= this.maxNote!.line) {
-                let lY: number = cy + scoreRenderer.getScoreY(l);
-                canvas.fillRect(cx - linePadding + this.noteStartX, lY, lineWidth, 1);
-                l += 2;
-            }
+
+        y = firstBottomLedgerY;
+        while(y <= maxNoteLineY) {
+            canvas.fillRect(cx - linePadding + this.noteStartX, cy + y | 0, lineWidth, BarRendererBase.StaffLineThickness);
+            y += lineSpacing;
         }
     }
 }

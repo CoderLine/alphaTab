@@ -7,7 +7,7 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { LineBarRenderer } from '../LineBarRenderer';
-import { KeySignature } from '@src/model';
+import { Clef, KeySignature } from '@src/model';
 
 class BeatLines {
     public maxLine: number = -1000;
@@ -177,10 +177,10 @@ export class AccidentalHelper {
         let line: number = 0;
         const noteValue = AccidentalHelper.getNoteValue(note);
 
-        if (bar.staff.isPercussion) {
+        if (note.isPercussion) {
             line = AccidentalHelper.getPercussionLine(bar, noteValue);
         } else {
-            line = AccidentalHelper.calculateNoteLine(bar, noteValue);
+            line = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
         }
         return line;
     }
@@ -267,7 +267,7 @@ export class AccidentalHelper {
                 // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
                 // and clear the registration
                 if (currentAccidental !== null) {
-                    if(currentAccidental === AccidentalType.Natural) {
+                    if (currentAccidental === AccidentalType.Natural) {
                         accidentalToSet = AccidentalType.None;
                     } else {
                         accidentalToSet = AccidentalType.Natural;
@@ -286,18 +286,19 @@ export class AccidentalHelper {
         isHelperNote: boolean,
         note: Note | null = null
     ): AccidentalType {
-        let line: number = 0;
+        let steps: number = 0;
 
         let accidentalToSet = AccidentalType.None;
 
-        if (this._bar.staff.isPercussion) {
-            line = AccidentalHelper.getPercussionLine(this._bar, noteValue);
+        const isPercussion = note != null ? note.isPercussion : this._bar.staff.isPercussion;
+        if (isPercussion) {
+            steps = AccidentalHelper.getPercussionLine(this._bar, noteValue);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-            line = AccidentalHelper.calculateNoteLine(this._bar, noteValue);
+            steps = AccidentalHelper.calculateNoteSteps(this._bar.masterBar.keySignature, this._bar.clef, noteValue);
 
-            const currentAccidental = this._registeredAccidentals.has(line)
-                ? this._registeredAccidentals.get(line)!
+            const currentAccidental = this._registeredAccidentals.has(steps)
+                ? this._registeredAccidentals.get(steps)!
                 : null;
 
             accidentalToSet = AccidentalHelper.computeAccidental(
@@ -324,7 +325,7 @@ export class AccidentalHelper {
                         const previousRenderer = this._barRenderer.previousRenderer as ScoreBarRenderer;
                         if (previousRenderer) {
                             const tieOriginLine = previousRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
-                            if (tieOriginLine === line) {
+                            if (tieOriginLine === steps) {
                                 skipAccidental = true;
                             }
                         }
@@ -335,7 +336,7 @@ export class AccidentalHelper {
                     } else {
                         // do we need an accidental on the note?
                         if (accidentalToSet !== AccidentalType.None) {
-                            this._registeredAccidentals.set(line, accidentalToSet);
+                            this._registeredAccidentals.set(steps, accidentalToSet);
                         }
                     }
                     break;
@@ -343,23 +344,23 @@ export class AccidentalHelper {
         }
 
         if (note) {
-            this._appliedScoreLines.set(note.id, line);
+            this._appliedScoreLines.set(note.id, steps);
             this._notesByValue.set(noteValue, note);
         } else {
-            this._appliedScoreLinesByValue.set(noteValue, line);
+            this._appliedScoreLinesByValue.set(noteValue, steps);
         }
 
-        if (this.minLine === -1000 || this.minLine < line) {
-            this.minLine = line;
+        if (this.minLine === -1000 || this.minLine < steps) {
+            this.minLine = steps;
             this.minLineBeat = relatedBeat;
         }
-        if (this.maxLine === -1000 || this.maxLine > line) {
-            this.maxLine = line;
+        if (this.maxLine === -1000 || this.maxLine > steps) {
+            this.maxLine = steps;
             this.maxLineBeat = relatedBeat;
         }
 
         if (!isHelperNote) {
-            this.registerLine(relatedBeat, line);
+            this.registerLine(relatedBeat, steps);
         }
 
         return accidentalToSet;
@@ -389,15 +390,15 @@ export class AccidentalHelper {
         return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.minLine : 0;
     }
 
-    public static calculateNoteLine(bar: Bar, noteValue: number): number {
+    public static calculateNoteSteps(keySignature: KeySignature, clef: Clef, noteValue: number): number {
         let value: number = noteValue;
-        let ks: number = bar.masterBar.keySignature;
-        let clef: number = bar.clef as number;
+        let ks: number = keySignature as number;
+        let clefValue: number = clef as number;
         let index: number = value % 12;
         let octave: number = ((value / 12) | 0) - 1;
 
         // Initial Position
-        let steps: number = AccidentalHelper.OctaveSteps[clef];
+        let steps: number = AccidentalHelper.OctaveSteps[clefValue];
         // Move to Octave
         steps -= octave * AccidentalHelper.StepsPerOctave;
         // get the step list for the current keySignature

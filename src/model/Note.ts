@@ -22,6 +22,7 @@ import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteOrnament } from './NoteOrnament';
 import { ElementStyle } from './ElementStyle';
+import { MusicFontSymbol } from './MusicFontSymbol';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
@@ -102,7 +103,18 @@ export enum NoteSubElement {
  * @json
  * @json_strict
  */
-export class NoteStyle extends ElementStyle<NoteSubElement> {}
+export class NoteStyle extends ElementStyle<NoteSubElement> {
+
+    /**
+     * The symbol that should be used as note head. 
+     */
+    public noteHead?:MusicFontSymbol;
+
+    /**
+     * Whether the note head symbol should be centered on the stem (e.g. for arrow notes)
+     */
+    public noteHeadCenterOnStem?:boolean;
+}
 
 /**
  * A note is a single played sound on a fretted instrument.

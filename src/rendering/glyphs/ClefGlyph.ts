@@ -17,20 +17,6 @@ export class ClefGlyph extends MusicFontGlyph {
         this._clefOttava = clefOttava;
     }
 
-    public override doLayout(): void {
-        switch (this._clef) {
-            case Clef.Neutral:
-                this.width = 15;
-                break;
-            case Clef.C3:
-            case Clef.C4:
-            case Clef.F4:
-            case Clef.G2:
-                this.width = 28;
-                break;
-        }
-    }
-
     private static getSymbol(clef: Clef): MusicFontSymbol {
         switch (clef) {
             case Clef.Neutral:

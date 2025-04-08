@@ -15,6 +15,8 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model';
 
 export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
@@ -143,6 +145,9 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         let directionBeat: Beat = this._beat.graceType === GraceType.BendGrace ? this._beat.nextBeat! : this._beat;
         let direction: BeamDirection =
             this._notes.length === 1 ? this.getTieDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
+
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+
         // draw slurs
         for (let i: number = 0; i < this._notes.length; i++) {
             let note: Note = this._notes[i];
@@ -151,9 +156,9 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 direction = BeamDirection.Down;
             }
             let startY: number = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(note, NoteYPosition.Top);
-            let heightOffset: number = NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
+            let heightOffset: number = noteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
             if (direction === BeamDirection.Down) {
-                startY += NoteHeadGlyph.NoteHeadHeight;
+                startY += noteHeadHeight;
             }
             let slurText: string = note.bendStyle === BendStyle.Gradual ? 'grad.' : '';
             if (note.isTieOrigin) {
@@ -204,7 +209,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                         cx + endNoteRenderer.x + endNoteRenderer.getBeatX(endNote.beat, BeatXPosition.MiddleNotes);
                     let endY: number = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(endNote, NoteYPosition.Top);
                     if (direction === BeamDirection.Down) {
-                        endY += NoteHeadGlyph.NoteHeadHeight;
+                        endY += noteHeadHeight;
                     }
                     if (note.bendType === BendType.Hold || note.bendType === BendType.Prebend) {
                         TieGlyph.paintTie(

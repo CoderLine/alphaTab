@@ -5,6 +5,7 @@ import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { Color } from '@src/model';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
@@ -40,10 +41,6 @@ export class TuningGlyph extends GlyphGroup {
         canvas.color = c;
     }
 
-    /**
-     * The height of the GuitarString# glyphs at scale 1
-     */
-    public static readonly CircleNumberHeight: number = 20;
     public static readonly CircleNumberScale: number = 0.7;
 
     private createGlyphs(tuning: Tuning): void {
@@ -81,7 +78,7 @@ export class TuningGlyph extends GlyphGroup {
         if (!tuning.isStandard) {
             this.height += rowHeight;
             const circleScale = TuningGlyph.CircleNumberScale;
-            const circleHeight = TuningGlyph.CircleNumberHeight * circleScale;
+            const circleHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
             // Strings
             let stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;

@@ -8,7 +8,6 @@ import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { LineBarRenderer } from './LineBarRenderer';
-import { SlashNoteHeadGlyph } from './glyphs/SlashNoteHeadGlyph';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
 import { NumberedBeatContainerGlyph } from './NumberedBeatContainerGlyph';
@@ -17,11 +16,12 @@ import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { NumberedKeySignatureGlyph } from './glyphs/NumberedKeySignatureGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { Duration } from '@src/model';
+import { Duration, MusicFontSymbol } from '@src/model';
 import { BeatXPosition } from './BeatXPosition';
 import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from './utils/MusicFontSymbolSizes';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -225,11 +225,13 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -254,7 +256,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - SlashNoteHeadGlyph.NoteHeadHeight / 2;
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override createPreBeatGlyphs(): void {

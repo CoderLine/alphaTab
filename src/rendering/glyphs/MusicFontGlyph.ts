@@ -2,10 +2,11 @@ import { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Color } from '@src/model';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class MusicFontGlyph extends EffectGlyph {
     protected glyphScale: number = 0;
-    protected symbol: MusicFontSymbol;
+    public symbol: MusicFontSymbol;
     protected center: boolean = false;
     public colorOverride?: Color;
 
@@ -13,6 +14,16 @@ export class MusicFontGlyph extends EffectGlyph {
         super(x, y);
         this.glyphScale = glyphScale;
         this.symbol = symbol;
+    }
+
+    public override doLayout(): void {
+        this.width = MusicFontSymbolSizes.Widths.has(this.symbol)
+            ? MusicFontSymbolSizes.Widths.get(this.symbol)! * this.glyphScale
+            : 0;
+
+        this.height = MusicFontSymbolSizes.Heights.has(this.symbol)
+            ? MusicFontSymbolSizes.Heights.get(this.symbol)! * this.glyphScale
+            : 0;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

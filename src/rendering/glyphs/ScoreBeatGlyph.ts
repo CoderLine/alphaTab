@@ -242,6 +242,21 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private createNoteHeadGlyph(n: Note): MusicFontGlyph {
         let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+
+        const style = n.style;
+        if (style?.noteHead !== undefined) {
+            const noteHead = new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
+            // NOTE: sizes are not yet perfect
+            // will be done in https://github.com/CoderLine/alphaTab/issues/1949
+            noteHead.symbol = style!.noteHead!;
+            if (style.noteHeadCenterOnStem) {
+                noteHead.centerOnStem = true;
+            }
+            return noteHead;
+        }
+
+        // TODO: here we should unify it to one common glyph which knows all sizes.
+
         if (n.beat.voice.bar.staff.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation) {
@@ -262,6 +277,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.harmonicType === HarmonicType.Natural) {
             return new DiamondNoteHeadGlyph(0, 0, n.beat.duration, isGrace);
         }
+
         return new NoteHeadGlyph(0, 0, n.beat.duration, isGrace);
     }
 

@@ -1,6 +1,7 @@
 import { ICanvas, TextBaseline } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
 import { Automation, MusicFontSymbol } from '@src/model';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 /**
  * This glyph renders tempo annotations for tempo automations
@@ -41,7 +42,7 @@ export class BarTempoGlyph extends EffectGlyph {
             );
             canvas.fillText(
                 '= ' + automation.value.toString(),
-                x + 8,
+                x + (MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteQuarterUp)! * 0.5) + 3,
                 cy + this.y + canvas.font.size / 2
             );
         }

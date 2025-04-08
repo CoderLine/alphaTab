@@ -39,18 +39,59 @@ export enum MusicFontSymbol {
     NoteheadBlack = 0xe0a4,
     NoteheadNull = 0xe0a5,
     NoteheadXOrnate = 0xe0aa,
+
+    NoteheadPlusDoubleWhole = 0xe0ac,
+    NoteheadPlusWhole = 0xe0ad,
+    NoteheadPlusHalf = 0xe0ae,
+    NoteheadPlusBlack = 0xe0af,
+
+    NoteheadSquareWhite = 0xe0b8,
+    NoteheadSquareBlack = 0xe0b9,
+
+    NoteheadTriangleUpDoubleWhole = 0xe0ba,
     NoteheadTriangleUpWhole = 0xe0bb,
     NoteheadTriangleUpHalf = 0xe0bc,
     NoteheadTriangleUpBlack = 0xe0be,
+
+    NoteheadTriangleRightWhite = 0xe0c1,
+    NoteheadTriangleRightBlack = 0xe0c2,
+
+    NoteheadTriangleDownDoubleWhole = 0xe0cc,
+    NoteheadTriangleDownWhole = 0xe0c4,
+    NoteheadTriangleDownHalf = 0xe0c5,
+    NoteheadTriangleDownBlack = 0xe0c7,
+
+    NoteheadDiamondDoubleWhole = 0xe0d7,
+    NoteheadDiamondWhole = 0xe0d8,
+    NoteheadDiamondHalf = 0xe0d9,
+    NoteheadDiamondBlack = 0xe0db,
+
     NoteheadDiamondBlackWide = 0xe0dc,
     NoteheadDiamondWhite = 0xe0dd,
     NoteheadDiamondWhiteWide = 0xe0de,
+    NoteheadCircleXDoubleWhole = 0xe0b0,
+    NoteheadCircleXWhole = 0xe0b1,
+    NoteheadCircleXHalf = 0xe0b2,
     NoteheadCircleX = 0xe0b3,
+    NoteheadXDoubleWhole = 0xe0a6,
     NoteheadXWhole = 0xe0a7,
     NoteheadXHalf = 0xe0a8,
     NoteheadXBlack = 0xe0a9,
     NoteheadParenthesis = 0xe0ce,
+    NoteheadSlashedBlack1 = 0xe0cf,
     NoteheadSlashedBlack2 = 0xe0d0,
+    NoteheadSlashedHalf1 = 0xe0d1,
+    NoteheadSlashedHalf2 = 0xe0d2,
+    NoteheadSlashedWhole1 = 0xe0d3,
+    NoteheadSlashedWhole2 = 0xe0d4,
+    NoteheadSlashedDoubleWhole1 = 0xe0d5,
+    NoteheadSlashedDoubleWhole2 = 0xe0d6,
+
+    NoteheadCircledBlack = 0xe0e4,
+    NoteheadCircledHalf = 0xe0e5,
+    NoteheadCircledWhole = 0xe0e6,
+    NoteheadCircledDoubleWhole = 0xe0e7,
+
     NoteheadCircleSlash = 0xe0f7,
     NoteheadHeavyX = 0xe0f8,
     NoteheadHeavyXHat = 0xe0f9,
@@ -59,22 +100,56 @@ export enum MusicFontSymbol {
     NoteheadSlashWhiteWhole = 0xe102,
     NoteheadSlashWhiteHalf = 0xe103,
 
+    NoteheadRoundWhiteWithDot = 0xe115,
+
+    NoteheadSquareBlackLarge = 0xe11a,
+    NoteheadSquareBlackWhite = 0xe11b,
+
+    NoteheadClusterDoubleWhole3rd = 0xe128,
+    NoteheadClusterWhole3rd = 0xe129,
+    NoteheadClusterHalf3rd = 0xe12a,
+    NoteheadClusterQuarter3rd = 0xe12b,
+
+    NoteShapeRoundWhite = 0xe1b0,
+    NoteShapeRoundBlack = 0xe1b1,
+
+    NoteShapeSquareWhite = 0xe1b2,
+    NoteShapeSquareBlack = 0xe1b3,
+
+    NoteShapeTriangleRightWhite = 0xe1b4,
+    NoteShapeTriangleRightBlack = 0xe1b5,
+
+    NoteShapeTriangleLeftWhite = 0xe1b6,
+    NoteShapeTriangleLeftBlack = 0xe1b7,
+
+    NoteShapeDiamondWhite = 0xe1b8,
+    NoteShapeDiamondBlack = 0xe1b9,
+
+    NoteShapeTriangleUpWhite = 0xe1ba,
+    NoteShapeTriangleUpBlack = 0xe1bb,
+
+    NoteShapeMoonWhite = 0xe1bc,
+    NoteShapeMoonBlack = 0xe1bd,
+
+    NoteShapeTriangleRoundWhite = 0xe1be,
+    NoteShapeTriangleRoundBlack = 0xe1bf,
+
     NoteQuarterUp = 0xe1d5,
     NoteEighthUp = 0xe1d7,
 
-    TextBlackNoteLongStem = 0xE1F1,
-    TextBlackNoteFrac8thLongStem = 0xE1F3,
-    TextBlackNoteFrac16thLongStem = 0xE1F5,
-    TextBlackNoteFrac32ndLongStem = 0xE1F6,
+    TextBlackNoteLongStem = 0xe1f1,
+    TextBlackNoteFrac8thLongStem = 0xe1f3,
+    TextBlackNoteFrac16thLongStem = 0xe1f5,
+    TextBlackNoteFrac32ndLongStem = 0xe1f6,
 
-    TextCont8thBeamLongStem = 0xE1F8,
-    TextCont16thBeamLongStem = 0xE1FA,
-    TextCont32ndBeamLongStem = 0xE1FB,
+    TextCont8thBeamLongStem = 0xe1f8,
+    TextCont16thBeamLongStem = 0xe1fa,
+    TextCont32ndBeamLongStem = 0xe1fb,
 
-    TextAugmentationDot = 0xE1FC,
-    TextTupletBracketStartLongStem = 0xE201,
-    TextTuplet3LongStem = 0xE202,
-    TextTupletBracketEndLongStem = 0xE203,
+    TextAugmentationDot = 0xe1fc,
+    TextTupletBracketStartLongStem = 0xe201,
+    TextTuplet3LongStem = 0xe202,
+    TextTupletBracketEndLongStem = 0xe203,
 
     Tremolo3 = 0xe222,
     Tremolo2 = 0xe221,
@@ -130,9 +205,9 @@ export enum MusicFontSymbol {
     RestOneHundredTwentyEighth = 0xe4ea,
     RestTwoHundredFiftySixth = 0xe4eb,
 
-    RestHBarLeft = 0xE4EF,
-    RestHBarMiddle = 0xE4F0,
-    RestHBarRight = 0xE4F1,
+    RestHBarLeft = 0xe4ef,
+    RestHBarMiddle = 0xe4f0,
+    RestHBarRight = 0xe4f1,
 
     Repeat1Bar = 0xe500,
     Repeat2Bars = 0xe501,
@@ -161,8 +236,8 @@ export enum MusicFontSymbol {
     StringsDownBow = 0xe610,
     StringsUpBow = 0xe612,
 
-    KeyboardPedalPed = 0xE650,
-    KeyboardPedalUp = 0xE655,
+    KeyboardPedalPed = 0xe650,
+    KeyboardPedalUp = 0xe655,
 
     PictEdgeOfCymbal = 0xe729,
 

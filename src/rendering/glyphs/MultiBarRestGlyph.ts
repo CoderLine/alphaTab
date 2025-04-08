@@ -1,8 +1,8 @@
 import { MusicFontSymbol } from '@src/model';
 import { ICanvas } from '@src/platform';
 import { LineBarRenderer } from '../LineBarRenderer';
-import { DigitGlyph } from './DigitGlyph';
 import { Glyph } from './Glyph';
+import { NumberGlyph } from './NumberGlyph';
 
 export class MultiBarRestGlyph extends Glyph {
     private _numberGlyph: MusicFontSymbol[] = [];
@@ -13,15 +13,9 @@ export class MultiBarRestGlyph extends Glyph {
 
     public override doLayout(): void {
         this.width = 70;
-
         this.renderer.registerOverflowTop((this.renderer as LineBarRenderer).getLineHeight(1));
-
-        let i: number = this.renderer.additionalMultiRestBars!.length + 1;
-        while (i > 0) {
-            let num: number = i % 10;
-            this._numberGlyph.unshift(DigitGlyph.getSymbol(num));
-            i = (i / 10) | 0;
-        }
+        const i: number = this.renderer.additionalMultiRestBars!.length + 1;
+        this._numberGlyph = NumberGlyph.getSymbols(i);
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

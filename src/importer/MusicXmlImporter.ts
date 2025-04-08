@@ -31,9 +31,11 @@ import {
     KeySignature,
     KeySignatureType,
     MasterBar,
+    MusicFontSymbol,
     Note,
     NoteAccidentalMode,
     NoteOrnament,
+    NoteStyle,
     Ottavia,
     PickStroke,
     Section,
@@ -51,6 +53,8 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;
@@ -68,12 +72,92 @@ class StaffContext {
     }
 }
 
+class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulation {
+    /**
+     * The midi channel number to use when playing the note (-1 if using the default track channels).
+     */
+    public outputMidiChannel: number = -1;
+
+    /**
+     * The midi channel program to use when playing the note (-1 if using the default track program).
+     */
+    public outputMidiProgram: number = -1;
+
+    /**
+     * The volume to use when playing the note (-1 if using the default track volume).
+     */
+    public outputVolume: number = -1;
+
+    /**
+     * The balance to use when playing the note (-1 if using the default track balance).
+     */
+    public outputBalance: number = -1;
+}
+
 class TrackInfo {
     public track: Track;
-    public firstArticulation?: InstrumentArticulation;
-    public instruments: Map<string, InstrumentArticulation> = new Map<string, InstrumentArticulation>();
+    public firstArticulation?: InstrumentArticulationWithPlaybackInfo;
+    public instruments: Map<string, InstrumentArticulationWithPlaybackInfo> = new Map<
+        string,
+        InstrumentArticulationWithPlaybackInfo
+    >();
+
+    private _instrumentIdToArticulationIndex: Map<string, number> = new Map<string, number>();
+
     public constructor(track: Track) {
         this.track = track;
+    }
+
+    private static defaultNoteArticulation: InstrumentArticulation = new InstrumentArticulation(
+        'Default',
+        0,
+        0,
+        MusicFontSymbol.NoteheadBlack,
+        MusicFontSymbol.NoteheadHalf,
+        MusicFontSymbol.NoteheadWhole
+    );
+
+    public getOrCreateArticulation(instrumentId: string, note: Note) {
+        const noteValue = note.octave * 12 + note.tone;
+        const lookup = instrumentId + '_' + noteValue;
+        if (this._instrumentIdToArticulationIndex.has(lookup)) {
+            return this._instrumentIdToArticulationIndex.get(lookup)!;
+        }
+
+        let articulation: InstrumentArticulation;
+        if (this.instruments.has(instrumentId)) {
+            articulation = this.instruments.get(instrumentId)!;
+        } else {
+            articulation = TrackInfo.defaultNoteArticulation;
+        }
+        const index = this.track.percussionArticulations.length;
+
+        const bar = note.beat.voice.bar;
+
+        // the calculation in the AccidentalHelper assumes a standard 5-line staff.
+        const musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
+
+        // to translate this into the "staffLine" semantics we need to subtract additionally the steps "missing" from the absent lines
+        const actualSteps = note.beat.voice.bar.staff.standardNotationLineCount * 2 - 1;
+        const fiveLineSteps = 5 * 2 - 1;
+        const stepDifference = fiveLineSteps - actualSteps;
+
+        const staffLine = musicXmlStaffSteps - stepDifference;
+
+        const newArticulation = new InstrumentArticulation(
+            articulation.elementType,
+            staffLine,
+            articulation.outputMidiNumber,
+            articulation.noteHeadDefault,
+            articulation.noteHeadHalf,
+            articulation.noteHeadWhole,
+            articulation.techniqueSymbol,
+            articulation.techniqueSymbolPlacement
+        );
+
+        this._instrumentIdToArticulationIndex.set(lookup, index);
+        this.track.percussionArticulations.push(newArticulation);
+        return index;
     }
 }
 
@@ -128,15 +212,20 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private consolidate() {
-        const usedChannels = new Set<number>();
+        const usedChannels = new Set<number>([SynthConstants.PercussionChannel]);
         for (let track of this._score.tracks) {
             // unique midi channels and generate secondary channels
-            while (usedChannels.has(track.playbackInfo.primaryChannel)) {
-                track.playbackInfo.primaryChannel++;
+            if (track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
+                while (usedChannels.has(track.playbackInfo.primaryChannel)) {
+                    track.playbackInfo.primaryChannel++;
+                }
             }
             usedChannels.add(track.playbackInfo.primaryChannel);
-            while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
-                track.playbackInfo.secondaryChannel++;
+
+            if (track.playbackInfo.secondaryChannel !== SynthConstants.PercussionChannel) {
+                while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
+                    track.playbackInfo.secondaryChannel++;
+                }
             }
             usedChannels.add(track.playbackInfo.secondaryChannel);
 
@@ -157,6 +246,11 @@ export class MusicXmlImporter extends ScoreImporter {
                 while (staff.bars.length < this._score.masterBars.length) {
                     const bar: Bar = new Bar();
                     staff.addBar(bar);
+                    const previousBar = bar.previousBar;
+                    if (previousBar) {
+                        bar.clef = previousBar.clef;
+                        bar.clefOttava = previousBar.clefOttava;
+                    }
 
                     for (let i = 0; i < voiceCount; i++) {
                         const v = new Voice();
@@ -596,7 +690,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseScoreInstrument(element: XmlNode, trackInfo: TrackInfo) {
-        const articulation = new InstrumentArticulation();
+        const articulation = new InstrumentArticulationWithPlaybackInfo();
         if (!trackInfo.firstArticulation) {
             trackInfo.firstArticulation = articulation;
         }
@@ -613,15 +707,15 @@ export class MusicXmlImporter extends ScoreImporter {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'midi-channel':
-                    articulation.outputMidiChannel = parseInt(c.innerText);
+                    articulation.outputMidiChannel = parseInt(c.innerText) - 1;
                     break;
                 // case 'midi-name': Ignored
                 // case 'midi-bank': Not supported (https://github.com/CoderLine/alphaTab/issues/1986)
                 case 'midi-program':
-                    articulation.outputMidiProgram = parseInt(c.innerText);
+                    articulation.outputMidiProgram = parseInt(c.innerText) - 1;
                     break;
                 case 'midi-unpitched':
-                    articulation.outputMidiNumber = parseInt(c.innerText);
+                    articulation.outputMidiNumber = parseInt(c.innerText) - 1;
                     break;
                 case 'volume':
                     articulation.outputVolume = MusicXmlImporter.interpolatePercent(parseInt(c.innerText));
@@ -840,7 +934,6 @@ export class MusicXmlImporter extends ScoreImporter {
             number += this._implicitBars;
         }
 
-        let barsCreated = false;
         while (this._score.masterBars.length < number) {
             const newMasterBar = new MasterBar();
             if (implicit) {
@@ -855,20 +948,10 @@ export class MusicXmlImporter extends ScoreImporter {
                 newMasterBar.timeSignatureNumerator = newMasterBar.previousMasterBar!.timeSignatureNumerator;
                 newMasterBar.tripletFeel = newMasterBar.previousMasterBar!.tripletFeel;
             }
-            barsCreated = true;
         }
 
         this._previousMasterBarNumber = number;
         const masterBar = this._score.masterBars[number - 1];
-
-        // ensure we create directly bars for all staves for new masterbars
-        if (barsCreated) {
-            for (const t of this._score.tracks) {
-                for (const s of t.staves) {
-                    this.getOrCreateBar(s, masterBar);
-                }
-            }
-        }
 
         return masterBar;
     }
@@ -937,6 +1020,27 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'link': Not supported
                 // case 'bookmark': Not supported
             }
+        }
+
+        this.applySimileMarks(masterBar, track);
+    }
+
+    private applySimileMarks(masterBar: MasterBar, track: Track) {
+        if (this._simileMarkAllStaves !== null) {
+            for (const s of track.staves) {
+                const bar = this.getOrCreateBar(s, masterBar);
+                bar.simileMark = this._simileMarkAllStaves!;
+            }
+            this._simileMarkAllStaves = null;
+        }
+
+        if (this._simileMarkPerStaff !== null) {
+            for (const [i, m] of this._simileMarkPerStaff!) {
+                const s = this.getOrCreateStaff(track, i);
+                const bar = this.getOrCreateBar(s, masterBar);
+                bar.simileMark = m;
+            }
+            this._simileMarkPerStaff = null;
         }
     }
 
@@ -2181,6 +2285,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let note: Note | null = null;
         let tieNode: XmlNode | null = null;
         let isPitched = false;
+        let instrumentId: string | null = null;
 
         // will create new beat with all information in the correct tree
         // or add the note to an existing beat if specified accordingly.
@@ -2322,6 +2427,15 @@ export class MusicXmlImporter extends ScoreImporter {
 
             this.insertBeatToVoice(newBeat, voice);
 
+            if (note !== null) {
+                const trackInfo = this._indexToTrackInfo.get(track.index)!;
+                if (instrumentId !== null) {
+                    note!.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId!, note!);
+                } else if (!isPitched) {
+                    note!.percussionArticulation = trackInfo.getOrCreateArticulation('', note!);
+                }
+            }
+
             // duration only after we added it into the tree
             if (graceType !== GraceType.None) {
                 newBeat.graceType = graceType;
@@ -2396,14 +2510,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     if (note === null) {
                         Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
                     } else {
-                        const id = c.getAttribute('id', '');
-                        const trackInfo = this._indexToTrackInfo.get(track.index)!;
-                        if (trackInfo.instruments.has(id)) {
-                            // const articulation = trackInfo.instruments.get(id);
-                            // TODO: https://github.com/CoderLine/alphaTab/issues/1975
-                            // add the articulation to trackInfo.track.percussionArticulations if missing 
-                            // (maintain a lookup table here to avoid looping)
-                        }
+                        instrumentId = c.getAttribute('id', '');
                     }
                     break;
 
@@ -2448,7 +2555,18 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'stem':
                     preferredBeamDirection = this.parseStem(c);
                     break;
-                // case 'notehead': Not supported
+                case 'notehead':
+                    if (note === null) {
+                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
+                    } else {
+                        this.parseNoteHead(
+                            c,
+                            note,
+                            beatDuration ?? Duration.Quarter,
+                            preferredBeamDirection ?? this.estimateBeamDirection(note)
+                        );
+                    }
+                    break;
                 // case 'notehead-text': Not supported
                 case 'staff':
                     staffIndex = parseInt(c.innerText) - 1;
@@ -2494,6 +2612,316 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // if not yet created do it befor we exit to ensure we created the beat/note
         ensureBeat();
+    }
+
+    private static readonly B4Value = 71;
+    private estimateBeamDirection(note: Note): BeamDirection {
+        return note.calculateRealValue(false, false) < MusicXmlImporter.B4Value ? BeamDirection.Down : BeamDirection.Up;
+    }
+
+    private parseNoteHead(element: XmlNode, note: Note, beatDuration: Duration, beamDirection: BeamDirection) {
+        if (element.getAttribute('parentheses', 'no') === 'yes') {
+            note.isGhost = true;
+        }
+
+        const filled = element.getAttribute('filled', '');
+        let forceFill: boolean | undefined = undefined;
+        if (filled === 'yes') {
+            forceFill = true;
+        } else if (filled === 'no') {
+            forceFill = false;
+        }
+
+        note.style = new NoteStyle();
+        switch (element.innerText) {
+            case 'arrow down':
+                note.style!.noteHeadCenterOnStem = true;
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadTriangleDownDoubleWhole,
+                    MusicFontSymbol.NoteheadTriangleDownWhole,
+                    MusicFontSymbol.NoteheadTriangleDownHalf,
+                    MusicFontSymbol.NoteheadTriangleDownBlack
+                );
+                break;
+            case 'arrow up':
+                note.style!.noteHeadCenterOnStem = true;
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadTriangleUpDoubleWhole,
+                    MusicFontSymbol.NoteheadTriangleUpWhole,
+                    MusicFontSymbol.NoteheadTriangleUpHalf,
+                    MusicFontSymbol.NoteheadTriangleUpBlack
+                );
+                break;
+            case 'back slashed':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadSlashedDoubleWhole2,
+                    MusicFontSymbol.NoteheadSlashedWhole2,
+                    MusicFontSymbol.NoteheadSlashedHalf2,
+                    MusicFontSymbol.NoteheadSlashedBlack2
+                );
+                break;
+            case 'circle dot':
+                note.style.noteHead = MusicFontSymbol.NoteheadRoundWhiteWithDot;
+                break;
+            case 'circle-x':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadCircleXDoubleWhole,
+                    MusicFontSymbol.NoteheadCircleXWhole,
+                    MusicFontSymbol.NoteheadCircleXHalf,
+                    MusicFontSymbol.NoteheadCircleX
+                );
+                break;
+            case 'circled':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadCircledDoubleWhole,
+                    MusicFontSymbol.NoteheadCircledWhole,
+                    MusicFontSymbol.NoteheadCircledHalf,
+                    MusicFontSymbol.NoteheadCircledBlack
+                );
+                break;
+            case 'cluster':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadClusterDoubleWhole3rd,
+                    MusicFontSymbol.NoteheadClusterWhole3rd,
+                    MusicFontSymbol.NoteheadClusterHalf3rd,
+                    MusicFontSymbol.NoteheadClusterQuarter3rd
+                );
+                break;
+            case 'cross':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadPlusDoubleWhole,
+                    MusicFontSymbol.NoteheadPlusWhole,
+                    MusicFontSymbol.NoteheadPlusHalf,
+                    MusicFontSymbol.NoteheadPlusBlack
+                );
+                break;
+            case 'diamond':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadDiamondDoubleWhole,
+                    MusicFontSymbol.NoteheadDiamondWhole,
+                    MusicFontSymbol.NoteheadDiamondHalf,
+                    MusicFontSymbol.NoteheadDiamondBlack
+                );
+                break;
+            case 'do':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeTriangleUpWhite,
+                    MusicFontSymbol.NoteShapeTriangleUpWhite,
+                    MusicFontSymbol.NoteShapeTriangleUpWhite,
+                    MusicFontSymbol.NoteShapeTriangleUpBlack
+                );
+                break;
+            case 'fa':
+                if (beamDirection === BeamDirection.Up) {
+                    this.applyNoteHead(
+                        note,
+                        beatDuration,
+                        forceFill,
+                        MusicFontSymbol.NoteShapeTriangleRightWhite,
+                        MusicFontSymbol.NoteShapeTriangleRightWhite,
+                        MusicFontSymbol.NoteShapeTriangleRightWhite,
+                        MusicFontSymbol.NoteShapeTriangleRightBlack
+                    );
+                } else {
+                    this.applyNoteHead(
+                        note,
+                        beatDuration,
+                        forceFill,
+                        MusicFontSymbol.NoteShapeTriangleLeftWhite,
+                        MusicFontSymbol.NoteShapeTriangleLeftWhite,
+                        MusicFontSymbol.NoteShapeTriangleLeftWhite,
+                        MusicFontSymbol.NoteShapeTriangleLeftBlack
+                    );
+                }
+                break;
+            case 'fa up':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeTriangleLeftWhite,
+                    MusicFontSymbol.NoteShapeTriangleLeftWhite,
+                    MusicFontSymbol.NoteShapeTriangleLeftWhite,
+                    MusicFontSymbol.NoteShapeTriangleLeftBlack
+                );
+                break;
+            case 'inverted triangle':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadTriangleDownDoubleWhole,
+                    MusicFontSymbol.NoteheadTriangleDownWhole,
+                    MusicFontSymbol.NoteheadTriangleDownHalf,
+                    MusicFontSymbol.NoteheadTriangleDownBlack
+                );
+                break;
+            case 'la':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeSquareWhite,
+                    MusicFontSymbol.NoteShapeSquareWhite,
+                    MusicFontSymbol.NoteShapeSquareWhite,
+                    MusicFontSymbol.NoteShapeSquareBlack
+                );
+                break;
+            case 'left triangle':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadTriangleRightWhite,
+                    MusicFontSymbol.NoteheadTriangleRightWhite,
+                    MusicFontSymbol.NoteheadTriangleRightWhite,
+                    MusicFontSymbol.NoteheadTriangleRightBlack
+                );
+                break;
+            case 'mi':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeDiamondWhite,
+                    MusicFontSymbol.NoteShapeDiamondWhite,
+                    MusicFontSymbol.NoteShapeDiamondWhite,
+                    MusicFontSymbol.NoteShapeDiamondBlack
+                );
+                break;
+            case 'none':
+                note.style!.noteHead = MusicFontSymbol.NoteheadNull;
+                break;
+            case 'normal':
+                // no need to style
+                break;
+            case 're':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeMoonWhite,
+                    MusicFontSymbol.NoteShapeMoonWhite,
+                    MusicFontSymbol.NoteShapeMoonWhite,
+                    MusicFontSymbol.NoteShapeMoonBlack
+                );
+                break;
+            case 'rectangle':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadSquareWhite,
+                    MusicFontSymbol.NoteheadSquareWhite,
+                    MusicFontSymbol.NoteheadSquareWhite,
+                    MusicFontSymbol.NoteheadSquareBlack
+                );
+                break;
+            case 'slash':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadSlashWhiteWhole,
+                    MusicFontSymbol.NoteheadSlashWhiteWhole,
+                    MusicFontSymbol.NoteheadSlashWhiteHalf,
+                    MusicFontSymbol.NoteheadSlashVerticalEnds
+                );
+                break;
+            case 'slashed':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadSlashedDoubleWhole1,
+                    MusicFontSymbol.NoteheadSlashedWhole1,
+                    MusicFontSymbol.NoteheadSlashedHalf1,
+                    MusicFontSymbol.NoteheadSlashedBlack1
+                );
+                break;
+            case 'so':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeRoundWhite,
+                    MusicFontSymbol.NoteShapeRoundWhite,
+                    MusicFontSymbol.NoteShapeRoundWhite,
+                    MusicFontSymbol.NoteShapeRoundBlack
+                );
+                break;
+            case 'square':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeSquareWhite,
+                    MusicFontSymbol.NoteShapeSquareWhite,
+                    MusicFontSymbol.NoteShapeSquareWhite,
+                    MusicFontSymbol.NoteShapeSquareBlack
+                );
+                break;
+            case 'ti':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteShapeTriangleRoundWhite,
+                    MusicFontSymbol.NoteShapeTriangleRoundWhite,
+                    MusicFontSymbol.NoteShapeTriangleRoundWhite,
+                    MusicFontSymbol.NoteShapeTriangleRoundBlack
+                );
+                break;
+            case 'triangle':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadTriangleUpDoubleWhole,
+                    MusicFontSymbol.NoteheadTriangleUpWhole,
+                    MusicFontSymbol.NoteheadTriangleUpHalf,
+                    MusicFontSymbol.NoteheadTriangleUpBlack
+                );
+                break;
+            case 'x':
+                this.applyNoteHead(
+                    note,
+                    beatDuration,
+                    forceFill,
+                    MusicFontSymbol.NoteheadXDoubleWhole,
+                    MusicFontSymbol.NoteheadXWhole,
+                    MusicFontSymbol.NoteheadXHalf,
+                    MusicFontSymbol.NoteheadXBlack
+                );
+                break;
+        }
     }
 
     private createRestForGap(gap: number, preferredDuration: Duration): Beat | null {
@@ -3188,7 +3616,6 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseUnpitched(element: XmlNode, track: Track): Note {
-        // TODO: percussion - use instrument articulations, build a new copy if needed.
         let step: string = '';
         let octave: number = 0;
         for (let c of element.childElements()) {
@@ -3198,14 +3625,16 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'display-octave':
                     // 0-9, 4 for middle C
-                    octave = parseInt(c.innerText);
+                    octave = parseInt(c.innerText) + 1;
                     break;
             }
         }
+
         let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
         const note = new Note();
         note.octave = (value / 12) | 0;
         note.tone = value - note.octave * 12;
+
         return note;
     }
 
@@ -3239,5 +3668,51 @@ export class MusicXmlImporter extends ScoreImporter {
         note.tone = value - note.octave * 12;
 
         return note;
+    }
+
+    private applyNoteHead(
+        note: Note,
+        beatDuration: Duration,
+        forceFill: boolean | undefined,
+        doubleWhole: MusicFontSymbol,
+        whole: MusicFontSymbol,
+        half: MusicFontSymbol,
+        filled: MusicFontSymbol
+    ) {
+        if (forceFill === undefined) {
+            switch (beatDuration) {
+                case Duration.QuadrupleWhole:
+                case Duration.DoubleWhole:
+                    note.style!.noteHead = doubleWhole;
+                    break;
+                case Duration.Whole:
+                    note.style!.noteHead = whole;
+                    break;
+                case Duration.Half:
+                    note.style!.noteHead = half;
+                    break;
+                default:
+                    note.style!.noteHead = filled;
+                    break;
+            }
+        } else if (forceFill! === true) {
+            note.style!.noteHead = filled;
+        } else {
+            switch (beatDuration) {
+                case Duration.QuadrupleWhole:
+                case Duration.DoubleWhole:
+                    note.style!.noteHead = doubleWhole;
+                    break;
+                case Duration.Whole:
+                    note.style!.noteHead = whole;
+                    break;
+                case Duration.Half:
+                    note.style!.noteHead = half;
+                    break;
+                default:
+                    note.style!.noteHead = half;
+                    break;
+            }
+        }
     }
 }

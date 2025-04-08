@@ -8,26 +8,24 @@ import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class TabRestGlyph extends MusicFontGlyph {
     private _isVisibleRest: boolean;
-    private _duration: Duration;
     public beamingHelper!: BeamingHelper;
 
     public constructor(x: number, y: number, isVisibleRest: boolean, duration: Duration) {
         super(x, y, 1, ScoreRestGlyph.getSymbol(duration));
         this._isVisibleRest = isVisibleRest;
-        this._duration = duration;
     }
 
     public override doLayout(): void {
-        if (this._isVisibleRest) {
-            this.width = ScoreRestGlyph.getSize(this._duration);
-        } else {
+        super.doLayout();
+        if (!this._isVisibleRest) {
             this.width = 10;
         }
     }
 
     public updateBeamingHelper(cx: number): void {
         if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat!)) {
-            this.beamingHelper.registerBeatLineX('tab',
+            this.beamingHelper.registerBeatLineX(
+                'tab',
                 this.beat!,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2

@@ -17,6 +17,8 @@ import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@src/model';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     public static readonly SimpleDipHeight: number = TabWhammyBarGlyph.PerHalfSize * 2;
@@ -121,6 +123,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         let beatDirection: BeamDirection = this.getTieDirection(beat, startNoteRenderer);
         let direction: BeamDirection = this._beat.notes.length === 1 ? beatDirection : BeamDirection.Up;
         let textalign: TextAlign = canvas.textAlign;
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        
         for (let i: number = 0; i < beat.notes.length; i++) {
             let note: Note = beat.notes[i];
             using _noteStyle = ElementStyleHelper.note(canvas, NoteSubElement.StandardNotationEffects, note);
@@ -159,7 +163,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     endNoteRenderer = null;
                 }
             }
-            let heightOffset: number = NoteHeadGlyph.NoteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
+            let heightOffset: number = noteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
             if (direction === BeamDirection.Up) {
                 heightOffset = -heightOffset;
             }
@@ -180,7 +184,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                 endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, NoteYPosition.Top);
                 bendTie = true;
                 if (direction === BeamDirection.Down) {
-                    endY += NoteHeadGlyph.NoteHeadHeight;
+                    endY += noteHeadHeight;
                 }
             } else if (note.isTieOrigin) {
                 if (!endNoteRenderer) {
@@ -189,7 +193,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(note.tieDestination!, NoteYPosition.Top);
                 }
                 if (direction === BeamDirection.Down) {
-                    endY += NoteHeadGlyph.NoteHeadHeight;
+                    endY += noteHeadHeight;
                 }
             }
 

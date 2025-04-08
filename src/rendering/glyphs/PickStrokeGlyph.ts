@@ -10,11 +10,6 @@ export class PickStrokeGlyph extends MusicFontGlyph {
         super(x, y, NoteHeadGlyph.GraceScale, PickStrokeGlyph.getSymbol(pickStroke));
     }
 
-    public override doLayout(): void {
-        this.width = 9;
-        this.height = 13;
-    }
-
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy + this.height, canvas);
     }
