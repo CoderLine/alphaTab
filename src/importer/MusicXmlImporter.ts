@@ -54,6 +54,7 @@ import { Logger } from '@src/Logger';
 import { BeamDirection } from '@src/rendering';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;
@@ -137,8 +138,8 @@ class TrackInfo {
         const musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
 
         // to translate this into the "staffLine" semantics we need to subtract additionally the steps "missing" from the absent lines
-        const actualSteps = (note.beat.voice.bar.staff.standardNotationLineCount * 2) - 1; 
-        const fiveLineSteps = (5 * 2) - 1;
+        const actualSteps = note.beat.voice.bar.staff.standardNotationLineCount * 2 - 1;
+        const fiveLineSteps = 5 * 2 - 1;
         const stepDifference = fiveLineSteps - actualSteps;
 
         const staffLine = musicXmlStaffSteps - stepDifference;
@@ -214,11 +215,17 @@ export class MusicXmlImporter extends ScoreImporter {
         const usedChannels = new Set<number>();
         for (let track of this._score.tracks) {
             // unique midi channels and generate secondary channels
-            while (usedChannels.has(track.playbackInfo.primaryChannel)) {
+            while (
+                usedChannels.has(track.playbackInfo.primaryChannel) &&
+                track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel
+            ) {
                 track.playbackInfo.primaryChannel++;
             }
             usedChannels.add(track.playbackInfo.primaryChannel);
-            while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
+            while (
+                usedChannels.has(track.playbackInfo.secondaryChannel) &&
+                track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel
+            ) {
                 track.playbackInfo.secondaryChannel++;
             }
             usedChannels.add(track.playbackInfo.secondaryChannel);
@@ -241,7 +248,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     const bar: Bar = new Bar();
                     staff.addBar(bar);
                     const previousBar = bar.previousBar;
-                    if(previousBar) {
+                    if (previousBar) {
                         bar.clef = previousBar.clef;
                         bar.clefOttava = previousBar.clefOttava;
                     }
@@ -701,15 +708,15 @@ export class MusicXmlImporter extends ScoreImporter {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'midi-channel':
-                    articulation.outputMidiChannel = parseInt(c.innerText);
+                    articulation.outputMidiChannel = parseInt(c.innerText) - 1;
                     break;
                 // case 'midi-name': Ignored
                 // case 'midi-bank': Not supported (https://github.com/CoderLine/alphaTab/issues/1986)
                 case 'midi-program':
-                    articulation.outputMidiProgram = parseInt(c.innerText);
+                    articulation.outputMidiProgram = parseInt(c.innerText) - 1;
                     break;
                 case 'midi-unpitched':
-                    articulation.outputMidiNumber = parseInt(c.innerText);
+                    articulation.outputMidiNumber = parseInt(c.innerText) - 1;
                     break;
                 case 'volume':
                     articulation.outputVolume = MusicXmlImporter.interpolatePercent(parseInt(c.innerText));
@@ -1014,6 +1021,27 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'link': Not supported
                 // case 'bookmark': Not supported
             }
+        }
+
+        this.applySimileMarks(masterBar, track);
+    }
+
+    private applySimileMarks(masterBar: MasterBar, track: Track) {
+        if (this._simileMarkAllStaves !== null) {
+            for (const s of track.staves) {
+                const bar = this.getOrCreateBar(s, masterBar);
+                bar.simileMark = this._simileMarkAllStaves!;
+            }
+            this._simileMarkAllStaves = null;
+        }
+
+        if (this._simileMarkPerStaff !== null) {
+            for (const [i, m] of this._simileMarkPerStaff!) {
+                const s = this.getOrCreateStaff(track, i);
+                const bar = this.getOrCreateBar(s, masterBar);
+                bar.simileMark = m;
+            }
+            this._simileMarkPerStaff = null;
         }
     }
 
@@ -2403,9 +2431,9 @@ export class MusicXmlImporter extends ScoreImporter {
             if (note !== null) {
                 const trackInfo = this._indexToTrackInfo.get(track.index)!;
                 if (instrumentId !== null) {
-                    note!.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId, note!);
+                    note!.percussionArticulation = trackInfo.getOrCreateArticulation(instrumentId!, note!);
                 } else if (!isPitched) {
-                    note.percussionArticulation = trackInfo.getOrCreateArticulation('', note);
+                    note!.percussionArticulation = trackInfo.getOrCreateArticulation('', note!);
                 }
             }
 
