@@ -25,6 +25,7 @@ import { KeySignature } from '@src/model/KeySignature';
 import { LineBarRenderer } from './LineBarRenderer';
 import { KeySignatureGlyph } from './glyphs/KeySignatureGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import { SimileMark } from '@src/model';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -602,6 +603,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
+        if(this.bar.simileMark !== SimileMark.None) {
+            return;
+        }
+        
         for (const b of v.beats) {
             let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();
