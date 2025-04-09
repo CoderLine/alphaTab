@@ -276,6 +276,9 @@ Map {
       "shortname" => "T2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -554,6 +557,9 @@ Map {
       "shortname" => "T3",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -1151,6 +1157,9 @@ Map {
       "shortname" => "Track 2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -2178,6 +2187,9 @@ Map {
       "shortname" => "Track 2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -2457,6 +2469,9 @@ Map {
       "shortname" => "T2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -2735,5 +2750,8 @@ Map {
       "shortname" => "T3",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;

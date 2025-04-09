@@ -70,6 +70,8 @@ export class ComparisonHelpers {
                                 'tiedestinationnoteid',
                                 'sluroriginnoteid',
                                 'slurdestinationnoteid',
+                                'slidetargetnoteid',
+                                'slideoriginnoteid',
                                 'systemslayout',
                                 'defaultsystemslayout',
                                 'displayscale',
