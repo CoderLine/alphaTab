@@ -58,7 +58,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     private getPreviousDynamicsBeat(beat: Beat) {
         let previousBeat = beat.previousBeat;
         while (previousBeat != null) {
-            if (!previousBeat.isRest && previousBeat.graceType === beat.graceType) {
+            if (!previousBeat.isRest) {
                 return previousBeat;
             }
             previousBeat = previousBeat.previousBeat;
