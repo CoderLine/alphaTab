@@ -33,6 +33,13 @@ export class TrackSerializer {
         o.set("shortname", obj.shortName);
         o.set("defaultsystemslayout", obj.defaultSystemsLayout);
         o.set("systemslayout", obj.systemsLayout);
+        if (obj.lineBreaks !== undefined) {
+            const a: number[] = [];
+            o.set("linebreaks", a);
+            for (const v of obj.lineBreaks!) {
+                a.push(v);
+            }
+        }
         o.set("percussionarticulations", obj.percussionArticulations.map(i => InstrumentArticulationSerializer.toJson(i)));
         if (obj.style) {
             o.set("style", TrackStyleSerializer.toJson(obj.style));
@@ -69,6 +76,11 @@ export class TrackSerializer {
                 return true;
             case "systemslayout":
                 obj.systemsLayout = v! as number[];
+                return true;
+            case "linebreaks":
+                for (const i of (v as unknown[])) {
+                    obj.addLineBreaks(i as number);
+                }
                 return true;
             case "percussionarticulations":
                 obj.percussionArticulations = [];

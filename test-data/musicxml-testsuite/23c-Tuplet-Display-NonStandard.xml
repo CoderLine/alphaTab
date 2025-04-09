@@ -1,21 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Displaying tuplet note types,
-          that might not coincide with the displayed note. The first two tuplets 
-          take the type from the note, the second two from the 
-          &lt;time-modification> element, the remaining pair of tuplets from the 
-          &lt;tuplet> notation element. The tuplets in measure 3 specify both 
-          a number of notes and a type inside the &lt;tuplet-actual> and 
-          &lt;tuplet-normal> elements, the ones in measure 4 specify only a 
-          note type (but no number), and the ones in measure 5 specify only a 
-          number of tuplet-notes (but no type, which is deduced from the 
-          note's type). The first tuplet of measures 3-5 uses 
-          'display-type="actual"', the second one 'display-type="both"'.
-          FIXME: The tuplet-normal should coincide with the real notes!</miscellaneous-field>
+      <miscellaneous-field name="description">Displaying tuplet note types that
+          might not coincide with the displayed note.  The first two tuplets
+          take the type from the note, the second two from the
+          &lt;time-modification&gt; element, the remaining pair of tuplets from
+          the &lt;tuplet&gt; notation element.
+
+          The tuplets in measure 3 specify both a number of notes and a type
+          inside the &lt;tuplet-actual&gt; and &lt;tuplet-normal&gt; elements,
+          the ones in measure 4 specify only a note type (but no number), and
+          the ones in measure 5 specify only a number of tuplet notes (but no
+          type, which is deduced from the note's type).
+
+          The first tuplet of measures 3 to 5 uses ‘display-type="actual"’, the
+          second one ‘display-type="both"’.
+
+          FIXME: The tuplet-normal should coincide with the real
+          notes!</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -259,7 +264,8 @@
           <normal-type>breve</normal-type>
         </time-modification>
         <notations>
-          <tuplet bracket="yes" show-number="both" show-type="actual" number="1" type="start">
+          <tuplet bracket="yes" show-number="both" show-type="actual"
+                  number="1" type="start">
             <tuplet-actual>
               <tuplet-number>7</tuplet-number>
               <tuplet-type>quarter</tuplet-type>
@@ -321,7 +327,8 @@
           <normal-dot/>
         </time-modification>
         <notations>
-          <tuplet bracket="yes" show-number="both" show-type="both" number="1" type="start">
+          <tuplet bracket="yes" show-number="both" show-type="both"
+                  number="1" type="start">
             <tuplet-actual>
               <tuplet-number>7</tuplet-number>
               <tuplet-type>half</tuplet-type>
@@ -374,6 +381,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="4">
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>C</step>
@@ -388,7 +396,8 @@
           <normal-type>breve</normal-type>
         </time-modification>
         <notations>
-          <tuplet bracket="yes" show-number="both" show-type="actual" number="1" type="start">
+          <tuplet bracket="yes" show-number="both" show-type="actual"
+                  number="1" type="start">
             <tuplet-actual>
               <tuplet-type>quarter</tuplet-type>
               <tuplet-dot/><tuplet-dot/><tuplet-dot/>
@@ -448,7 +457,8 @@
           <normal-dot/>
         </time-modification>
         <notations>
-          <tuplet bracket="yes" show-number="both" show-type="both" number="1" type="start">
+          <tuplet bracket="yes" show-number="both" show-type="both"
+                  number="1" type="start">
             <tuplet-actual>
               <tuplet-type>half</tuplet-type>
               <tuplet-dot/>
@@ -565,7 +575,8 @@
           <normal-notes>2</normal-notes>
         </time-modification>
         <notations>
-          <tuplet bracket="yes" show-number="both" show-type="both" number="1" type="start">
+          <tuplet bracket="yes" show-number="both" show-type="both"
+                  number="1" type="start">
             <tuplet-actual>
               <tuplet-number>7</tuplet-number>
               <tuplet-type>eighth</tuplet-type>

@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Staff changes in a piano staff. 
-          The voice from the second staff has some notes/chords on the first 
-          staff. The final two chords have some notes on the first, some on 
-          the second staff.</miscellaneous-field>
+      <miscellaneous-field name="description">Staff changes in a piano staff.
+          In the first measure, the voice from the second staff has some notes
+          on the first staff.  In the second measure, the voice from the second
+          staff has a chord on the second eighth on the first
+          staff.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -34,8 +35,8 @@
           <line>2</line>
         </clef>
         <clef number="2">
-          <sign>F</sign>
-          <line>4</line>
+          <sign>G</sign>
+          <line>2</line>
         </clef>
       </attributes>
       <note>
@@ -123,12 +124,18 @@
         <duration>1</duration>
         <voice>2</voice>
         <type>eighth</type>
-        <staff>2</staff>
+        <staff>1</staff>
         <beam number="1">end</beam>
       </note>
     </measure>
     <!--=======================================================-->
     <measure number="2">
+      <attributes>
+        <clef number="2">
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
       <note>
         <rest/>
         <duration>8</duration>
@@ -315,5 +322,4 @@
       </barline>
     </measure>
   </part>
-  <!--=========================================================-->
 </score-partwise>

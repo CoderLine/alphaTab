@@ -1,16 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">Several spanners defined in
-           MusicXML: tuplet, slur (solid, dashed), tie,  wedge (cresc, dim),
-           tr + wavy-line, single-note trill spanner, octave-shift (8va,15mb),
-           bracket (solid down/down, dashed down/down, solid none/down,
-           dashed none/up, solid none/none), dashes, glissando (wavy),
-           bend-alter, slide (solid), grouping, two-note tremolo, hammer-on,
-           pull-off, pedal (down, change, up).</miscellaneous-field>
+           MusicXML: tuplet, slur (solid, dashed), wedge (cresc, dim), trill
+           with accidental mark and wavy-line (with another accidental mark on
+           the second beat), single-note trill spanner, octave-shift (8va,15mb),
+           bracket (solid down/down, dashed down/down, solid none/down, dashed
+           none/up, solid none/none), dashes, glissando (wavy), slide (solid),
+           grouping, two-note tremolo, hammer-on, pull-off, pedal line (down,
+           change, up), pedal text (down, up).</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -99,7 +100,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <notations>
-          <slur number="1" type="start"/>
+          <slur number="1" placement="below" type="start"/>
         </notations>
       </note>
       <note>
@@ -202,7 +203,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="5">
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <wedge spread="15" type="diminuendo"/>
         </direction-type>
@@ -253,6 +254,7 @@
         <notations>
           <ornaments>
             <trill-mark/>
+            <accidental-mark placement="above">sharp</accidental-mark>
             <wavy-line number="1" type="start"/>
           </ornaments>
         </notations>
@@ -265,6 +267,12 @@
         <duration>3</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <notations>
+          <ornaments>
+            <wavy-line number="1" type="continue"/>
+            <accidental-mark placement="above">natural</accidental-mark>
+          </ornaments>
+        </notations>
       </note>
       <note>
         <pitch>
@@ -293,6 +301,7 @@
         <type>quarter</type>
         <notations>
           <ornaments>
+            <trill-mark placement="below"/>
             <wavy-line number="1" type="start"/>
             <wavy-line number="1" type="stop"/>
           </ornaments>
@@ -427,7 +436,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="11">
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <bracket line-end="down" line-type="dashed" number="1" type="start"/>
         </direction-type>
@@ -450,7 +459,7 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <bracket line-end="down" number="1" type="stop"/>
         </direction-type>
@@ -507,7 +516,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="13">
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <bracket line-end="none" line-type="dashed" number="1" type="start"/>
         </direction-type>
@@ -530,7 +539,7 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <bracket line-end="up" number="1" type="stop"/>
         </direction-type>
@@ -587,7 +596,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="15">
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <dashes number="1" type="start"/>
         </direction-type>
@@ -610,7 +619,7 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <direction placement="above">
+      <direction placement="below">
         <direction-type>
           <dashes number="1" type="stop"/>
         </direction-type>
@@ -669,47 +678,6 @@
         <voice>1</voice>
         <type>quarter</type>
         <notations>
-          <technical>
-            <bend>
-              <bend-alter>6</bend-alter>
-            </bend>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <pitch>
-          <step>C</step>
-          <octave>5</octave>
-        </pitch>
-        <duration>3</duration>
-        <voice>1</voice>
-        <type>quarter</type>
-        <notations>
-          <technical>
-            <bend>
-              <bend-alter>0</bend-alter>
-            </bend>
-          </technical>
-        </notations>
-      </note>
-      <note>
-        <rest/>
-        <duration>3</duration>
-        <voice>1</voice>
-        <type>quarter</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="18">
-      <note>
-        <pitch>
-          <step>B</step>
-          <octave>4</octave>
-        </pitch>
-        <duration>3</duration>
-        <voice>1</voice>
-        <type>quarter</type>
-        <notations>
           <slide line-type="solid" number="1" type="start"/>
         </notations>
       </note>
@@ -733,7 +701,7 @@
       </note>
     </measure>
     <!--=======================================================-->
-    <measure number="19">
+    <measure number="18">
       <grouping type="start"/>
       <note>
         <pitch>
@@ -765,7 +733,7 @@
       <grouping type="stop"/>
     </measure>
     <!--=======================================================-->
-    <measure number="20">
+    <measure number="19">
       <note>
         <pitch>
           <step>B</step>
@@ -773,9 +741,16 @@
         </pitch>
         <duration>3</duration>
         <voice>1</voice>
-        <type>quarter</type>
+        <type>half</type>
+        <time-modification>
+          <actual-notes>2</actual-notes>
+          <normal-notes>1</normal-notes>
+        </time-modification>
+        <beam number="1">begin</beam>
         <notations>
-          <ornaments><tremolo type="start">2</tremolo></ornaments>
+          <ornaments>
+            <tremolo type="start">2</tremolo>
+          </ornaments>
         </notations>
       </note>
       <note>
@@ -785,9 +760,16 @@
         </pitch>
         <duration>3</duration>
         <voice>1</voice>
-        <type>quarter</type>
+        <type>half</type>
+        <time-modification>
+          <actual-notes>2</actual-notes>
+          <normal-notes>1</normal-notes>
+        </time-modification>
+        <beam number="1">end</beam>
         <notations>
-          <ornaments><tremolo type="stop">2</tremolo></ornaments>
+          <ornaments>
+            <tremolo type="stop">2</tremolo>
+          </ornaments>
         </notations>
       </note>
       <note>
@@ -798,7 +780,7 @@
       </note>
     </measure>
     <!--=======================================================-->
-    <measure number="21">
+    <measure number="20">
       <note>
         <pitch>
           <step>B</step><octave>4</octave>
@@ -833,7 +815,7 @@
       </note>
     </measure>
     <!--=======================================================-->
-    <measure number="22">
+    <measure number="21">
       <note>
         <pitch>
           <step>B</step><octave>4</octave>
@@ -868,8 +850,44 @@
       </note>
     </measure>
     <!--=======================================================-->
-    <measure number="23">
+    <measure number="22">
       <direction>
+        <direction-type>
+          <pedal type="start" line="yes"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <direction>
+        <direction-type>
+          <pedal type="change" line="yes"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+      <direction>
+        <direction-type>
+          <pedal type="stop" line="yes"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>B</step><octave>4</octave></pitch>
+        <duration>3</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="23">
+      <direction placement="above">
         <direction-type>
           <pedal type="start"/>
         </direction-type>
@@ -880,18 +898,13 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <direction>
-        <direction-type>
-          <pedal type="change"/>
-        </direction-type>
-      </direction>
       <note>
         <pitch><step>B</step><octave>4</octave></pitch>
         <duration>3</duration>
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <direction>
+      <direction placement="above">
         <direction-type>
           <pedal type="stop"/>
         </direction-type>

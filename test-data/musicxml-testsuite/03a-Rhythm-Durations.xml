@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All note durations, from long, 
-          brevis, whole until 128th; First with their plain values, then dotted 
-          and finally doubly-dotted.</miscellaneous-field>
+      <miscellaneous-field name="description">All note durations, from long,
+          brevis, whole, etc., until 1024th.  First with their plain values,
+          then dotted, and finally double-dotted.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -18,7 +18,7 @@
   <part id="P1">
     <measure number="1">
       <attributes>
-        <divisions>64</divisions>
+        <divisions>1024</divisions>
         <key>
           <fifths>0</fifths>
           <mode>major</mode>
@@ -37,7 +37,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>1024</duration>
+        <duration>16384</duration>
         <voice>1</voice>
         <type>long</type>
       </note>
@@ -49,7 +49,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>512</duration>
+        <duration>8192</duration>
         <voice>1</voice>
         <type>breve</type>
       </note>
@@ -58,7 +58,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>256</duration>
+        <duration>4096</duration>
         <voice>1</voice>
         <type>whole</type>
       </note>
@@ -67,7 +67,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>128</duration>
+        <duration>2048</duration>
         <voice>1</voice>
         <type>half</type>
       </note>
@@ -76,7 +76,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>64</duration>
+        <duration>1024</duration>
         <voice>1</voice>
         <type>quarter</type>
       </note>
@@ -85,7 +85,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>32</duration>
+        <duration>512</duration>
         <voice>1</voice>
         <type>eighth</type>
       </note>
@@ -94,7 +94,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>16</duration>
+        <duration>256</duration>
         <voice>1</voice>
         <type>16th</type>
       </note>
@@ -103,7 +103,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>8</duration>
+        <duration>128</duration>
         <voice>1</voice>
         <type>32nd</type>
       </note>
@@ -112,7 +112,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>4</duration>
+        <duration>64</duration>
         <voice>1</voice>
         <type>64th</type>
       </note>
@@ -121,7 +121,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>32</duration>
         <voice>1</voice>
         <type>128th</type>
       </note>
@@ -130,9 +130,36 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>16</duration>
         <voice>1</voice>
-        <type>128th</type>
+        <type>256th</type>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>8</duration>
+        <voice>1</voice>
+        <type>512th</type>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>1024th</type>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>1024th</type>
       </note>
     </measure>
     <!--=======================================================-->
@@ -148,7 +175,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>1536</duration>
+        <duration>24576</duration>
         <voice>1</voice>
         <type>long</type>
         <dot/>
@@ -161,7 +188,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>768</duration>
+        <duration>12288</duration>
         <voice>1</voice>
         <type>breve</type>
         <dot/>
@@ -171,7 +198,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>384</duration>
+        <duration>6144</duration>
         <voice>1</voice>
         <type>whole</type>
         <dot/>
@@ -181,7 +208,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>192</duration>
+        <duration>3072</duration>
         <voice>1</voice>
         <type>half</type>
         <dot/>
@@ -191,7 +218,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>96</duration>
+        <duration>1536</duration>
         <voice>1</voice>
         <type>quarter</type>
         <dot/>
@@ -201,7 +228,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>48</duration>
+        <duration>768</duration>
         <voice>1</voice>
         <type>eighth</type>
         <dot/>
@@ -211,7 +238,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>24</duration>
+        <duration>384</duration>
         <voice>1</voice>
         <type>16th</type>
         <dot/>
@@ -221,7 +248,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>12</duration>
+        <duration>192</duration>
         <voice>1</voice>
         <type>32nd</type>
         <dot/>
@@ -231,7 +258,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>6</duration>
+        <duration>96</duration>
         <voice>1</voice>
         <type>64th</type>
         <dot/>
@@ -241,7 +268,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>3</duration>
+        <duration>48</duration>
         <voice>1</voice>
         <type>128th</type>
         <dot/>
@@ -251,9 +278,39 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>3</duration>
+        <duration>24</duration>
         <voice>1</voice>
-        <type>128th</type>
+        <type>256th</type>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>512th</type>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>1024th</type>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>1024th</type>
         <dot/>
       </note>
     </measure>
@@ -270,7 +327,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>1792</duration>
+        <duration>28672</duration>
         <voice>1</voice>
         <type>long</type>
         <dot/>
@@ -284,7 +341,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>896</duration>
+        <duration>14336</duration>
         <voice>1</voice>
         <type>breve</type>
         <dot/>
@@ -295,7 +352,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>448</duration>
+        <duration>7168</duration>
         <voice>1</voice>
         <type>whole</type>
         <dot/>
@@ -306,7 +363,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>224</duration>
+        <duration>3584</duration>
         <voice>1</voice>
         <type>half</type>
         <dot/>
@@ -317,7 +374,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>112</duration>
+        <duration>1792</duration>
         <voice>1</voice>
         <type>quarter</type>
         <dot/>
@@ -328,7 +385,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>56</duration>
+        <duration>896</duration>
         <voice>1</voice>
         <type>eighth</type>
         <dot/>
@@ -339,7 +396,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>28</duration>
+        <duration>448</duration>
         <voice>1</voice>
         <type>16th</type>
         <dot/>
@@ -350,7 +407,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>14</duration>
+        <duration>224</duration>
         <voice>1</voice>
         <type>32nd</type>
         <dot/>
@@ -361,7 +418,7 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>7</duration>
+        <duration>112</duration>
         <voice>1</voice>
         <type>64th</type>
         <dot/>
@@ -372,9 +429,53 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
+        <duration>56</duration>
+        <voice>1</voice>
+        <type>128th</type>
+        <dot/>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>28</duration>
+        <voice>1</voice>
+        <type>256th</type>
+        <dot/>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>14</duration>
+        <voice>1</voice>
+        <type>512th</type>
+        <dot/>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>7</duration>
         <voice>1</voice>
-        <type>64th</type>
+        <type>1024th</type>
+        <dot/>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>7</duration>
+        <voice>1</voice>
+        <type>1024th</type>
         <dot/>
         <dot/>
       </note>

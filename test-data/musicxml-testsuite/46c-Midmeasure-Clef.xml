@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A clef change in the middle of a 
-            measure, using either an implicit measure or simply placing 
+      <miscellaneous-field name="description">A clef change in the middle of a
+            measure, using either an implicit measure or simply placing
             the attributes in the middle of the measure.</miscellaneous-field>
     </miscellaneous>
   </identification>

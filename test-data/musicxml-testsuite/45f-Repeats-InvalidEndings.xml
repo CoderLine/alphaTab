@@ -1,13 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Some more nested repeats with 
-          alternatives, where the MusicXML file does not make sense in the 
-          first place. How well are applications able to cope with improper 
-          repeats and alternatives?</miscellaneous-field>
+      <miscellaneous-field name="description">A stress test with a combination
+          of &lt;repeat&gt; and &lt;ending&gt; elements that don't make sense.
+          The displayed result depends on the sanitizing possibilities of the
+          application that handles the input.
+
+          Bar 2 starts and ends with &lt;ending number="1, 2, 3"&gt;.  Bar 3
+          starts and ends with &lt;ending number="2"&gt; (where the right
+          element is of type 'discontinue'); there is no &lt;repeat&gt; element
+          between bars 2 and 3.  Finally, at the end of bar 4 there is a
+          both a &lt;repeat direction="backward"&gt; and a &lt;ending
+          type="stop"&gt; element.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

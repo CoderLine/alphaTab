@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Different kinds of grace notes: 
-          acciaccatura, appoggiatura; beamed grace notes; grace notes with 
-          accidentals; different durations of the grace notes.</miscellaneous-field>
+      <miscellaneous-field name="description">Different kinds of grace notes.
+          First bar: single 1/16 grace note, beamed 1/16 grace notes,
+          1/16 appoggiatura, 1/8 appoggiatura.  Second bar: slashed single 1/16
+          grace note, beamed 1/16 grace notes (with both notes marked as
+          slashed), 1/16 acciaccatura, 1/16 grace note (without slash) right
+          before the measure bar.  Third bar: no grace note before chord, 1/4
+          grace note with sharp, two 1/4 grace notes with flats, 1/16 slashed
+          grace note before rest.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -33,7 +38,7 @@
         </clef>
       </attributes>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>D</step>
           <octave>5</octave>
@@ -51,7 +56,7 @@
         <type>quarter</type>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>E</step>
           <octave>5</octave>
@@ -62,7 +67,7 @@
         <beam number="2">begin</beam>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>D</step>
           <octave>5</octave>
@@ -82,16 +87,15 @@
         <type>quarter</type>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <tie type="start"/>
         <voice>1</voice>
         <type>16th</type>
         <notations>
-          <tied type="start"/>
+          <slur number="1" type="start"/>
         </notations>
       </note>
       <note>
@@ -102,15 +106,21 @@
         <duration>4</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <notations>
+          <slur number="1" type="stop"/>
+        </notations>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>D</step>
           <octave>5</octave>
         </pitch>
         <voice>1</voice>
         <type>eighth</type>
+        <notations>
+          <slur number="1" type="start"/>
+        </notations>
       </note>
       <note>
         <pitch>
@@ -120,6 +130,9 @@
         <duration>4</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <notations>
+          <slur number="1" type="stop"/>
+        </notations>
       </note>
     </measure>
     <!--=======================================================-->
@@ -143,7 +156,7 @@
         <type>quarter</type>
       </note>
       <note>
-        <grace/>
+        <grace slash="yes"/>
         <pitch>
           <step>E</step>
           <octave>5</octave>
@@ -154,7 +167,7 @@
         <beam number="2">begin</beam>
       </note>
       <note>
-        <grace/>
+        <grace slash="yes"/>
         <pitch>
           <step>D</step>
           <octave>5</octave>
@@ -169,9 +182,9 @@
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>8</duration>
+        <duration>4</duration>
         <voice>1</voice>
-        <type>half</type>
+        <type>quarter</type>
       </note>
       <note>
         <grace slash="yes"/>
@@ -181,38 +194,33 @@
         </pitch>
         <voice>1</voice>
         <type>16th</type>
+        <notations>
+          <slur number="1" type="start"/>
+        </notations>
       </note>
       <note>
         <pitch>
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>4</duration>
         <voice>1</voice>
-        <type>eighth</type>
-        <beam number="1">begin</beam>
-      </note>
-      <note>
-        <grace slash="yes"/>
-        <pitch>
-          <step>D</step>
-          <octave>5</octave>
-        </pitch>
-        <voice>1</voice>
-        <type>16th</type>
+        <type>quarter</type>
+        <notations>
+          <slur number="1" type="stop"/>
+        </notations>
       </note>
       <note>
         <pitch>
           <step>C</step>
           <octave>5</octave>
         </pitch>
-        <duration>2</duration>
+        <duration>4</duration>
         <voice>1</voice>
-        <type>eighth</type>
-        <beam number="1">end</beam>
+        <type>quarter</type>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>E</step>
           <octave>5</octave>
@@ -223,15 +231,6 @@
     </measure>
     <!--=======================================================-->
     <measure number="3">
-      <note>
-        <grace/>
-        <pitch>
-          <step>E</step>
-          <octave>5</octave>
-        </pitch>
-        <voice>1</voice>
-        <type>16th</type>
-      </note>
       <note>
         <pitch>
           <step>F</step>
@@ -303,10 +302,16 @@
         <type>quarter</type>
       </note>
       <note>
+        <grace slash="yes"/>
         <pitch>
-          <step>C</step>
+          <step>D</step>
           <octave>5</octave>
         </pitch>
+        <voice>1</voice>
+        <type>16th</type>
+      </note>
+      <note>
+        <rest/>
         <duration>4</duration>
         <voice>1</voice>
         <type>quarter</type>

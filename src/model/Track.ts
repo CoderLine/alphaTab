@@ -31,9 +31,8 @@ export enum TrackSubElement {
     /**
      * The tuning of the strings.
      */
-    StringTuning,
+    StringTuning
 }
-
 
 /**
  * Defines the custom styles for tracks.
@@ -89,7 +88,7 @@ export class Track {
      * In formats like Guitar Pro this flag indicates whether on the default "multi-track" layout
      * tracks should be visible or not.
      */
-    public isVisibleOnMultiTrack:boolean = true;
+    public isVisibleOnMultiTrack: boolean = true;
 
     /**
      * Gets or sets the short name of this track.
@@ -109,6 +108,24 @@ export class Track {
     public systemsLayout: number[] = [];
 
     /**
+     * Defines on which bars specifically a line break is forced.
+     * @json_add addLineBreaks
+     */
+    public lineBreaks?: Set<number>;
+
+    /**
+     * Adds a new line break.
+     * @param index  The index of the bar before which a line break should happen.
+     */
+    public addLineBreaks(index: number) {
+        if (!this.lineBreaks) {
+            this.lineBreaks = new Set<number>();
+        }
+
+        this.lineBreaks!.add(index);
+    }
+
+    /**
      * Gets or sets a mapping on which staff lines particular percussion instruments
      * should be shown.
      */
@@ -117,7 +134,7 @@ export class Track {
     /**
      * The style customizations for this item.
      */
-    public style?:TrackStyle;
+    public style?: TrackStyle;
 
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {
@@ -162,7 +179,7 @@ export class Track {
                         // initialize lyrics list for beat if required
                         if (!beat.lyrics) {
                             beat.lyrics = new Array<string>(lyrics.length);
-                            beat.lyrics.fill("");
+                            beat.lyrics.fill('');
                         }
                         // assign chunk
                         beat.lyrics[li] = lyric.chunks[ci];

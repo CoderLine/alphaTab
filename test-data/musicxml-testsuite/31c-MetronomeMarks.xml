@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Tempo Markings: note=bpm, 
-          text (note=bpm), note=note, (note=note), (note=bpm)</miscellaneous-field>
+      <miscellaneous-field name="description">Tempo Markings: ‘quarter.=100’,
+          ‘quarter..=half.’, ‘(quarter.=half..)’,
+          ‘(quarter.=77)’.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -52,36 +53,17 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <direction>
-        <direction-type>
-          <words>Adagio</words>
-        </direction-type>
-        <direction-type>
-          <metronome>
-            <beat-unit>long</beat-unit>
-            <per-minute>100</per-minute>
-          </metronome>
-        </direction-type>
-      </direction>
       <note>
         <pitch><step>C</step><octave>5</octave></pitch>
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
       </note>
-      <note>
-        <pitch><step>C</step><octave>5</octave></pitch>
-        <duration>1</duration>
-        <voice>1</voice>
-        <type>quarter</type>
-      </note>
-    </measure>
-    <!--=======================================================-->
-    <measure number="2">
       <direction>
         <direction-type>
           <metronome>
             <beat-unit>quarter</beat-unit>
+            <beat-unit-dot/>
             <beat-unit-dot/>
             <beat-unit>half</beat-unit>
             <beat-unit-dot/>
@@ -94,6 +76,15 @@
         <voice>1</voice>
         <type>quarter</type>
       </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2">
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
       <note>
         <pitch><step>C</step><octave>5</octave></pitch>
         <duration>1</duration>
@@ -102,9 +93,11 @@
       </note>
       <direction>
         <direction-type>
-          <metronome>
-            <beat-unit>long</beat-unit>
-            <beat-unit>32nd</beat-unit>
+          <metronome parentheses="yes">
+            <beat-unit>quarter</beat-unit>
+            <beat-unit-dot/>
+            <beat-unit>half</beat-unit>
+            <beat-unit-dot/>
             <beat-unit-dot/>
           </metronome>
         </direction-type>
@@ -124,22 +117,6 @@
     </measure>
     <!--=======================================================-->
     <measure number="3">
-      <direction>
-        <direction-type>
-          <metronome parentheses="yes">
-            <beat-unit>quarter</beat-unit>
-            <beat-unit-dot/>
-            <beat-unit>half</beat-unit>
-            <beat-unit-dot/>
-          </metronome>
-        </direction-type>
-      </direction>
-      <note>
-        <pitch><step>C</step><octave>5</octave></pitch>
-        <duration>1</duration>
-        <voice>1</voice>
-        <type>quarter</type>
-      </note>
       <note>
         <pitch><step>C</step><octave>5</octave></pitch>
         <duration>1</duration>
@@ -155,6 +132,12 @@
           </metronome>
         </direction-type>
       </direction>
+      <note>
+        <pitch><step>C</step><octave>5</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+      </note>
       <note>
         <pitch><step>C</step><octave>5</octave></pitch>
         <duration>1</duration>

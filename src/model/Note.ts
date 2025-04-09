@@ -31,6 +31,8 @@ class NoteIdBag {
     public slurOriginNoteId: number = -1;
     public hammerPullDestinationNoteId: number = -1;
     public hammerPullOriginNoteId: number = -1;
+    public slideTargetNoteId: number = -1;
+    public slideOriginNoteId: number = -1;
 }
 
 /**
@@ -883,7 +885,10 @@ export class Note {
         switch (this.slideOutType) {
             case SlideOutType.Shift:
             case SlideOutType.Legato:
-                this.slideTarget = nextNoteOnLine.value;
+                if(!this.slideTarget) {
+                    this.slideTarget = nextNoteOnLine.value;
+                }
+
                 if (!this.slideTarget) {
                     this.slideOutType = SlideOutType.None;
                 } else {
@@ -1124,7 +1129,8 @@ export class Note {
             if (
                 this._noteIdBag.hammerPullDestinationNoteId !== -1 ||
                 this._noteIdBag.tieDestinationNoteId !== -1 ||
-                this._noteIdBag.slurDestinationNoteId !== -1
+                this._noteIdBag.slurDestinationNoteId !== -1 ||
+                this._noteIdBag.slideTargetNoteId !== -1
             ) {
                 noteIdLookup.set(this.id, this);
             }
@@ -1142,6 +1148,11 @@ export class Note {
             if (this._noteIdBag.slurOriginNoteId !== -1) {
                 this.slurOrigin = noteIdLookup.get(this._noteIdBag.slurOriginNoteId)!;
                 this.slurOrigin.slurDestination = this;
+            }
+
+            if (this._noteIdBag.slideOriginNoteId !== -1) {
+                this.slideOrigin = noteIdLookup.get(this._noteIdBag.slideOriginNoteId)!;
+                this.slideOrigin.slideTarget = this;
             }
 
             this._noteIdBag = null; // not needed anymore
@@ -1190,6 +1201,13 @@ export class Note {
         if (this.hammerPullDestination !== null) {
             o.set('hammerpulldestinationnoteid', this.hammerPullDestination.id);
         }
+
+        if (this.slideTarget !== null) {
+            o.set('slidetargetnoteid', this.slideTarget.id);
+        }
+        if (this.slideOrigin !== null) {
+            o.set('slideoriginnoteid', this.slideOrigin.id);
+        }
     }
 
     /**
@@ -1234,6 +1252,18 @@ export class Note {
                     this._noteIdBag = new NoteIdBag();
                 }
                 this._noteIdBag.hammerPullDestinationNoteId = v as number;
+                return true;
+            case 'slidetargetnoteid':
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.slideTargetNoteId = v as number;
+                return true;
+            case 'slideoriginnoteid':
+                if (this._noteIdBag == null) {
+                    this._noteIdBag = new NoteIdBag();
+                }
+                this._noteIdBag.slideOriginNoteId = v as number;
                 return true;
         }
         return false;

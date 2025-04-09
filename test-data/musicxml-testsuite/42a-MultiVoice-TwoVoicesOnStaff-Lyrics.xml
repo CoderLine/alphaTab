@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Two voices share one staff. Each 
-        voice is assigned some lyrics.</miscellaneous-field>
+      <miscellaneous-field name="description">Two voices share one staff.  To
+          each voice some lyrics is assigned (with the lyrics of voice one
+          positioned above the staff).  In the last bar, the second voice is
+          empty, thus the full rest should be positioned on the staff's middle
+          line.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -42,11 +45,11 @@
         <stem>up</stem>
         <notations>
           <articulations>
-            <accent placement="below"/>
+            <accent placement="above"/>
           </articulations>
           <fermata type="upright"/>
         </notations>
-        <lyric number="1">
+        <lyric number="1" placement="above">
           <syllabic>single</syllabic>
           <text>This</text>
         </lyric>
@@ -67,7 +70,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <stem>up</stem>
-        <lyric number="1">
+        <lyric number="1" placement="above">
           <syllabic>single</syllabic>
           <text>is</text>
         </lyric>
@@ -81,7 +84,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <stem>up</stem>
-        <lyric number="1">
+        <lyric number="1" placement="above">
           <syllabic>single</syllabic>
           <text>the</text>
         </lyric>
@@ -102,7 +105,7 @@
           <articulations>
             <accent placement="below"/>
           </articulations>
-          <fermata type="upright"/>
+          <fermata type="inverted"/>
         </notations>
         <lyric number="1">
           <syllabic>single</syllabic>
@@ -158,7 +161,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <stem>up</stem>
-        <lyric number="1">
+        <lyric number="1" placement="above">
           <syllabic>single</syllabic>
           <text>lyrics</text>
         </lyric>
@@ -176,7 +179,7 @@
         <notations>
           <slur number="1" type="start"/>
         </notations>
-        <lyric number="1">
+        <lyric number="1" placement="above">
           <syllabic>single</syllabic>
           <text>of</text>
         </lyric>
@@ -193,7 +196,7 @@
         <notations>
           <slur number="1" type="stop"/>
         </notations>
-        <lyric number="1">
+        <lyric number="1" placement="above">
           <syllabic>single</syllabic>
           <text>Voice1</text>
         </lyric>
@@ -256,7 +259,7 @@
         </notations>
         <lyric number="1">
           <syllabic>single</syllabic>
-          <text>Voice1</text>
+          <text>Voice2</text>
         </lyric>
       </note>
     </measure>

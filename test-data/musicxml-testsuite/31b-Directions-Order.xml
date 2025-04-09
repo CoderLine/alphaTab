@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Using &lt;offset&gt; it is
+          possible to make successive &lt;direction&gt; elements look like being
+          concatenated.  However, it is a bad idea in general to do that because
+          it makes the rendering dependent on a program's score formatting.
+
+          In the first bar, the first &lt;direction&gt; element contains a tempo
+          mark and is directly followed by another &lt;direction&gt; element
+          containing a metronome mark that is moved to the right by a positive
+          &lt;offset&gt; element.
+
+          In the second bar, the first &lt;direction&gt; element holds the start
+          of a diminuendo wedge; it is directly followed by another
+          &lt;direction&gt; element containing a dynamics mark.  Since the
+          wedge has an &lt;offset&gt; element with a positive value while the
+          dynamics has no such element at all, the dynamics precedes the
+          wedge.</miscellaneous-field> 
+    </miscellaneous>
+  </identification>
+  <defaults/>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>8</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <direction directive="yes" placement="above">
+        <direction-type>
+          <words default-y="33"
+                 font-weight="bold">Lento</words>
+        </direction-type>
+      </direction>
+      <direction placement="above">
+        <direction-type>
+          <metronome default-y="33" parentheses="yes">
+            <beat-unit>quarter</beat-unit>
+            <per-minute>56</per-minute>
+          </metronome>
+        </direction-type>
+        <offset>4</offset>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>32</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2">
+      <direction placement="below">
+        <direction-type>
+          <wedge default-y="-73" type="diminuendo"/>
+        </direction-type>
+        <offset>8</offset>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <dynamics default-y="-77">
+            <f/>
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>32</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+      <direction>
+        <direction-type>
+          <wedge type="stop"/>
+        </direction-type>
+      </direction>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>

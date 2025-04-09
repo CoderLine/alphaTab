@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Three types of percussion staves: 
-          A five-line staff with bass clef for Timpani, a five-line staff with 
-          percussion clef, and a one-line percussion staff with only unpitched 
+      <miscellaneous-field name="description">Three types of percussion staves:
+          A five-line staff with bass clef for Timpani, a five-line staff with
+          percussion clef, and a one-line percussion staff with only unpitched
           notes.</miscellaneous-field>
     </miscellaneous>
   </identification>

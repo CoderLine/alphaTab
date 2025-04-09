@@ -1,4 +1,3 @@
-import { LayoutMode } from '@src/LayoutMode';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
@@ -19,9 +18,10 @@ import { TestPlatform } from '@test/TestPlatform';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { assert, expect } from 'chai';
+import { VisualTestHelper, VisualTestOptions } from '@test/visualTests/VisualTestHelper';
+import { SystemsLayoutMode } from '@src/DisplaySettings';
 
 export class MusicXmlImporterTestHelper {
-
     public static async loadFile(file: string): Promise<Score> {
         const fileData = await TestPlatform.loadFile(file);
         const reader: MusicXmlImporter = new MusicXmlImporter();
@@ -29,21 +29,23 @@ export class MusicXmlImporterTestHelper {
         return reader.readScore();
     }
 
-    public static prepareImporterWithBytes(buffer: Uint8Array): MusicXmlImporter {
+    public static prepareImporterWithBytes(buffer: Uint8Array, settings?: Settings): MusicXmlImporter {
         let readerBase: MusicXmlImporter = new MusicXmlImporter();
-        readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
+        readerBase.init(ByteBuffer.fromBuffer(buffer), settings ?? new Settings());
         return readerBase;
     }
 
     public static async testReferenceFile(
         file: string,
-        renderLayout: LayoutMode = LayoutMode.Page,
-        renderAllTracks: boolean = false
+        render: boolean = true,
+        renderAllTracks: boolean = true,
+        prepare: ((settings: Settings) => void) | null = null
     ): Promise<Score> {
         const fileData = await TestPlatform.loadFile(file);
         let score: Score;
+        const settings = new Settings();
         try {
-            let importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData);
+            let importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData, settings);
             score = importer.readScore();
         } catch (e) {
             if (e instanceof UnsupportedFormatError) {
@@ -56,12 +58,37 @@ export class MusicXmlImporterTestHelper {
         try {
             const expectedJson = JsonConverter.scoreToJsObject(score);
 
-            const deserialized = JsonConverter.jsObjectToScore(expectedJson);
+            const deserialized = JsonConverter.jsObjectToScore(expectedJson, settings);
             const actualJson = JsonConverter.scoreToJsObject(deserialized);
 
             ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + file + '>', null);
         } catch (e) {
             assert.fail((e as Error).message + (e as Error).stack);
+        }
+
+        if (render) {
+            settings.display.justifyLastSystem = score.masterBars.length > 4;
+            if (score.tracks.some(t => t.systemsLayout.length > 0)) {
+                settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
+            }
+
+            prepare?.(settings);
+            const testOptions = new VisualTestOptions(
+                score,
+                [
+                    {
+                        referenceFileName: TestPlatform.changeExtension(file, '.png'),
+                        width: 1300
+                    }
+                ],
+                settings
+            );
+
+            if (renderAllTracks) {
+                testOptions.tracks = score.tracks.map(t => t.index);
+            }
+
+            await VisualTestHelper.runVisualTestFull(testOptions);
         }
 
         return score;

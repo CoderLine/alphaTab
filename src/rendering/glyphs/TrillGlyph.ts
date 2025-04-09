@@ -1,33 +1,42 @@
 import { ICanvas } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { RenderingResources } from '@src/RenderingResources';
+import { BeatXPosition } from '../BeatXPosition';
+import { GroupedEffectGlyph } from './GroupedEffectGlyph';
+import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
-export class TrillGlyph extends EffectGlyph {
+export class TrillGlyph extends GroupedEffectGlyph {
     public constructor(x: number, y: number) {
-        super(x, y);
+        super(BeatXPosition.EndBeat);
+        this.x = x;
+        this.y = y;
     }
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.resources.markerFont.size;
+        this.height = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.OrnamentTrill)! / 2;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let res: RenderingResources = this.renderer.resources;
-        canvas.font = res.markerFont;
-        let textw: number = canvas.measureText('tr').width;
-        canvas.fillText('tr', cx + this.x, cy + this.y);
-        let startX: number = textw + 3;
-        let endX: number = this.width - startX;
-        let waveScale: number = 1.2;
-        let step: number = 11 * waveScale;
-        let loops: number = Math.max(1, (endX - startX) / step);
+    protected override paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
+        let startX: number = cx + this.x;
+
+        canvas.fillMusicFontSymbol(
+            startX,
+            cy + this.y + this.height,
+            1,
+            MusicFontSymbol.OrnamentTrill,
+            true
+        );
+
+        startX += MusicFontSymbolSizes.Widths.get(MusicFontSymbol.OrnamentTrill)! / 2;
+
+        const waveScale: number = 1.2;
+        const step: number = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.WiggleTrill)! * waveScale;
+        const loops: number = Math.floor((endX - startX) / step);
+        const loopY: number = cy + this.y + this.height * 1.37;
         let loopX: number = startX;
-        let loopY: number = cy + this.y + this.height * 1.2;
         for (let i: number = 0; i < loops; i++) {
             canvas.fillMusicFontSymbol(
-                cx + this.x + loopX,
+                loopX,
                 loopY,
                 waveScale,
                 MusicFontSymbol.WiggleTrill,

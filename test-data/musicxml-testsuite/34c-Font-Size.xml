@@ -1,0 +1,597 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Font sizes.  The elements in the
+          first bar have the ‘font-size’ attribute set to a larger value for
+          &lt;note&gt;, &lt;notehead&gt;, &lt;trill-mark&gt;, &lt;dot&gt;, and
+          &lt;accidental&gt;, respectively.
+
+          The elements in the second bar have the ‘font-size’ attribute set to a
+          larger value for &lt;down-bow&gt;, &lt;accidental-mark&gt;,
+          &lt;accent&gt;, and &lt;note&gt; again (for the rest), respectively,
+          followed by a larger percussion clef and a larger unpitched note.
+
+          The third and fourth bar consists of an oversized two-bar rest.
+
+          The fifth bar has an oversized rehearsal mark on its starting bar
+          line.  The first note has three fingerings, with the middle one
+          oversized; also attached is an oversized ‘ff’ sign.  The second note
+          has three plucks, with the first one oversized.  An oversized ‘Adagio’
+          tempo indication is on top of the third and fourth beats, which
+          consist of a quadruplet with an oversized number.  The fifth beat
+          demonstrates oversized lyrics.
+
+          The sixth bar holds an oversized pedal marker with an oversized octave
+          shift, an oversized trill with a wavy line, and an oversized ‘cresc.’
+          with dashes.
+
+          The seventh measure demonstrates an oversized, non-traditional key
+          change, followed by an oversized 6/8 time signature, an oversized
+          breath mark, an oversized bass clef, and an oversized, traditional key
+          change.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1"><part-name></part-name></score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>8</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>15</beats>
+          <beat-type>8</beat-type>
+        </time>
+        <staves>1</staves>
+        <clef number="1">
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <note font-size="30">
+        <pitch>
+          <step>G</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>G</step>
+          <alter>-1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notehead font-size="30">normal</notehead>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <stem>up</stem>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark font-size="30"/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <alter>-1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot font-size="30"/>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>E</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <accidental font-size="30">sharp</accidental>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2">
+      <note>
+        <pitch>
+          <step>G</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <technical>
+            <down-bow placement="below" font-size="30"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>G</step>
+          <alter>-1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above"
+                             font-size="30">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent/>
+          </articulations>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <alter>1</alter>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <technical>
+            <down-bow placement="below"/>
+          </technical>
+          <ornaments>
+            <trill-mark/>
+            <accidental-mark placement="above">double-sharp</accidental-mark>
+          </ornaments>
+          <articulations>
+            <accent font-size="30"/>
+          </articulations>
+        </notations>
+      </note>
+      <note font-size="30">
+        <rest/>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+      </note>
+      <attributes>
+        <clef number="1" font-size="30">
+          <sign>percussion</sign>
+        </clef>
+      </attributes>
+      <note font-size="30">
+        <unpitched/>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="3">
+      <print new-system="yes"/>
+      <attributes>
+        <measure-style font-size="30">
+          <multiple-rest>2</multiple-rest>
+        </measure-style>
+      </attributes>
+      <note>
+        <rest/>
+        <duration>60</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="4">
+      <note>
+        <rest/>
+        <duration>60</duration>
+        <voice>1</voice>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="5">
+      <attributes>
+        <clef number="1">
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <direction>
+        <direction-type>
+          <rehearsal font-size="30">A</rehearsal>
+        </direction-type>
+      </direction>
+      <direction>
+        <direction-type>
+          <dynamics font-size="30"><ff/></dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <technical>
+            <fingering>0</fingering>
+            <fingering font-size="30">1</fingering>
+            <fingering>2</fingering>
+          </technical>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <technical>
+            <pluck font-size="30" placement="above">a</pluck>
+            <pluck placement="above">m</pluck>
+            <pluck placement="above">i</pluck>
+          </technical>
+        </notations>
+      </note>
+      <direction placement="above">
+        <direction-type>
+          <words font-weight="bold" font-size="30">Adagio</words>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <time-modification>
+          <actual-notes>4</actual-notes>
+          <normal-notes>3</normal-notes>
+        </time-modification>
+        <notations>
+          <tuplet number="1" show-number="both" show-type="actual" type="start">
+            <tuplet-actual>
+              <tuplet-number font-size="30">4</tuplet-number>
+              <tuplet-type>quarter</tuplet-type>
+            </tuplet-actual>
+            <tuplet-normal>
+              <tuplet-number>2</tuplet-number>
+              <tuplet-type>quarter</tuplet-type>
+              <tuplet-dot/>
+            </tuplet-normal>
+          </tuplet>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <time-modification>
+          <actual-notes>4</actual-notes>
+          <normal-notes>3</normal-notes>
+        </time-modification>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <time-modification>
+          <actual-notes>4</actual-notes>
+          <normal-notes>3</normal-notes>
+        </time-modification>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>6</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <time-modification>
+          <actual-notes>4</actual-notes>
+          <normal-notes>3</normal-notes>
+        </time-modification>
+        <notations>
+          <tuplet number="1" type="stop"/>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step><octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <lyric number="1">
+          <text font-size="30">lyrics</text>
+        </lyric>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="6">
+      <print new-system="yes"/>
+      <direction>
+        <direction-type>
+          <pedal type="start" font-size="30" line="no"/>
+        </direction-type>
+        <direction-type>
+          <octave-shift size="8" font-size="30" type="down"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <beam number="1">begin</beam>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <beam number="1">continue</beam>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>eighth</type>
+        <beam number="1">end</beam>
+      </note>
+      <direction>
+        <direction-type>
+          <pedal type="stop" line="yes"/>
+        </direction-type>
+        <direction-type>
+          <octave-shift size="8" type="stop"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <ornaments>
+            <trill-mark font-size="30"/>
+            <wavy-line number="1" type="start"/>
+          </ornaments>
+        </notations>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <ornaments>
+            <wavy-line number="1" type="stop"/>
+          </ornaments>
+        </notations>
+      </note>
+      <direction placement="above">
+        <direction-type>
+          <words font-style="italic" font-size="30">cresc.</words>
+        </direction-type>
+        <direction-type>
+          <dashes type="start" number="1"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+      </note>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="7">
+      <attributes>
+        <key font-size="30">
+          <key-step>D</key-step>
+          <key-alter>1</key-alter>
+          <key-step>A</key-step>
+          <key-alter>1</key-alter>
+          <key-step>C</key-step>
+          <key-alter>1</key-alter>
+        </key>
+        <time font-size="30">
+          <beats>6</beats>
+          <beat-type>8</beat-type>
+        </time>
+      </attributes>
+      <direction>
+        <direction-type>
+          <dashes type="stop" number="1"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+        <notations>
+          <articulations>
+            <breath-mark font-size="30"/>
+          </articulations>
+        </notations>
+      </note>
+      <attributes>
+        <key font-size="30">
+          <fifths>-2</fifths>
+        </key>
+        <clef number="1" font-size="30">
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+      </attributes>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>12</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <dot/>
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>

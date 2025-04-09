@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Multiple (simple) lyrics. The 
-          order of the exported stanzas is relevant (identified by the number 
+      <miscellaneous-field name="description">Multiple (simple) lyrics. The
+          order of the exported stanzas is relevant (identified by the number
           attribute in this test case)</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -46,11 +46,11 @@
         </lyric>
         <lyric number="2">
           <syllabic>begin</syllabic>
-          <text>2.tra</text>
+          <text>2.-4./5. tra</text>
         </lyric>
-        <lyric number="3">
+        <lyric number="iij">
           <syllabic>begin</syllabic>
-          <text>3.TRA</text>
+          <text>6., 7.TRA</text>
         </lyric>
       </note>
       <note>
@@ -69,7 +69,7 @@
           <syllabic>middle</syllabic>
           <text>la</text>
         </lyric>
-        <lyric number="3">
+        <lyric number="iij">
           <syllabic>middle</syllabic>
           <text>LA</text>
         </lyric>
@@ -90,7 +90,7 @@
           <syllabic>end</syllabic>
           <text>la,</text>
         </lyric>
-        <lyric number="3">
+        <lyric number="iij">
           <syllabic>end</syllabic>
           <text>LA,</text>
         </lyric>
@@ -113,7 +113,7 @@
           <text>ja!</text>
           <extend/>
         </lyric>
-        <lyric number="3">
+        <lyric number="iij">
           <syllabic>single</syllabic>
           <text>JA!</text>
           <extend/>
@@ -147,7 +147,7 @@
           <syllabic>begin</syllabic>
           <text>Tra</text>
         </lyric>
-        <lyric number="3">
+        <lyric number="iij">
           <syllabic>begin</syllabic>
           <text>TRA</text>
         </lyric>
@@ -177,7 +177,7 @@
           <syllabic>end</syllabic>
           <text>ra.</text>
         </lyric>
-        <lyric number="3">
+        <lyric number="iij">
           <syllabic>end</syllabic>
           <text>RA...</text>
         </lyric>

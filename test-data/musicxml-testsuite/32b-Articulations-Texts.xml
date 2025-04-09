@@ -1,96 +1,108 @@
-<?xml version="1.0" encoding="ISO-8859-1" standalone="no"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 0.6b Partwise//EN"
- "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
-	<identification>
-		<miscellaneous>
-			<miscellaneous-field name="description">Text markup: 
-                            different font sizes, weights and colors.</miscellaneous-field>
-		</miscellaneous>
-	</identification>
-	<part-list>
-		<score-part id="P1"><part-name></part-name></score-part>
-	</part-list>
-	<part id="P1">
-		<measure number="1">
-			<attributes>
-				<divisions>96</divisions>
-				<key><fifths>0</fifths></key>
-				<time><beats>4</beats><beat-type>4</beat-type></time>
-				<staves>1</staves>
-				<clef number="1"><sign>G</sign><line>2</line></clef>
-			</attributes>
-			<direction placement="above">
-				<direction-type>
-					<words default-x="-1" default-y="15" font-size="medium" font-weight="normal"> 
-						Normal, Medium
-					</words>
-				</direction-type>
-			</direction>
-			<note>
-				<pitch><step>F</step><octave>4</octave></pitch>
-				<duration>384</duration>
-				<voice>1</voice>
-				<type>eighth</type>
-			</note>
-			<direction placement="below">
-				<direction-type>
-					<words default-x="1" default-y="15" justify="left" font-size="medium" font-weight="bold"> 
-						Bold, Medium
-					</words>
-				</direction-type>
-			</direction>
-		</measure>
-		<measure number="2">
-			<direction placement="above">
-				<direction-type>
-					<words default-x="1" default-y="15" font-size="large" font-weight="normal"> 
-						Normal, Large
-					</words>
-				</direction-type>
-			</direction>
-			<note>
-				<pitch><step>G</step><octave>4</octave></pitch>
-				<duration>384</duration>
-				<voice>1</voice>
-				<type>whole</type>
-			</note>
-			<direction placement="below">
-				<direction-type>
-					<words default-x="1" default-y="15" font-size="large" font-weight="bold"> 
-						Bold, Large
-					</words>
-				</direction-type>
-			</direction>
-		</measure>
-		<measure number="3">
-			<direction placement="above">
-				<direction-type>
-					<words default-x="1" default-y="15" font-size="small" font-weight="normal"> 
-						Normal, Small
-					</words>
-				</direction-type>
-			</direction>
-			<note>
-				<pitch><step>F</step><octave>4</octave></pitch>
-				<duration>384</duration>
-				<voice>1</voice>
-				<type>whole</type>
-			</note>
-                        <direction placement="below">
-                            <direction-type>
-                                <words default-x="1" default-y="15" font-size="small" font-weight="bold"> 
-                                    Bold, Small
-                                </words>
-                            </direction-type>
-                        </direction>
-                        <direction placement="below">
-                            <direction-type>
-                                <words default-x="1" default-y="-15" font-size="small" color="#FF8000"> 
-                                    Normal, Small, Colored, Below
-                                </words>
-                            </direction-type>
-                        </direction>
-		</measure>
-	</part>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Text markup with different CSS
+          font sizes, weights, horizontal positions (using ‘default-x’), and
+          vertical positions (using ‘default-y’).  Strings below the staff are
+          positioned right before the &lt;measure&gt;; the last one is also
+          drawn in red.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>96</divisions>
+        <key>
+          <fifths>0</fifths>
+        </key>
+        <time>
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <staves>1</staves>
+        <clef number="1">
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <direction placement="above">
+        <direction-type>
+          <words default-x="0" default-y="15" font-size="medium"
+                 font-weight="normal">(0,15) normal, medium ↑</words>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>384</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+      <direction placement="below">
+        <direction-type>
+          <words default-x="-50" default-y="-100" font-size="medium"
+                 font-weight="bold">(-50,-100) bold, medium ↓</words>
+        </direction-type>
+      </direction>
+    </measure>
+    <measure number="2">
+      <direction placement="above">
+        <direction-type>
+          <words default-x="50" default-y="35" font-size="large"
+                 font-weight="normal">(50,35) normal, large ↑</words>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>384</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+      <direction placement="below">
+        <direction-type>
+          <words default-x="0" default-y="-120" font-size="large"
+                 font-weight="bold">(0,-120) bold, large ↓</words>
+        </direction-type>
+      </direction>
+    </measure>
+    <measure number="3">
+      <direction placement="above">
+        <direction-type>
+          <words default-x="0" default-y="55" font-size="small"
+                 font-weight="normal">(0,55) normal, small ↑</words>
+        </direction-type>
+      </direction>
+      <note>
+        <rest measure="yes"/>
+        <duration>384</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+      <direction placement="below">
+        <direction-type>
+          <words default-x="50" default-y="-140" font-size="small"
+                 font-weight="bold">(50,-140) bold, small ↓</words>
+        </direction-type>
+      </direction>
+      <direction placement="below">
+        <direction-type>
+          <words default-x="100" default-y="-160" font-size="small"
+                 color="#FF0000">(100,-160) normal, small, red ↓</words>
+        </direction-type>
+      </direction>
+    </measure>
+  </part>
 </score-partwise>
