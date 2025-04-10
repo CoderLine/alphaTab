@@ -2,14 +2,7 @@
     "name": "@coderline/alphatab",
     "version": "1.5.0",
     "description": "alphaTab is a music notation and guitar tablature rendering library",
-    "keywords": [
-        "guitar",
-        "music-notation",
-        "music-sheet",
-        "html5",
-        "svg",
-        "guitar-tablature"
-    ],
+    "keywords": ["guitar", "music-notation", "music-sheet", "html5", "svg", "guitar-tablature"],
     "homepage": "https://alphatab.net",
     "bugs": {
         "url": "https://github.com/coderline/alphaTab/issues"
@@ -48,7 +41,6 @@
     },
     "scripts": {
         "clean": "rimraf dist",
-        "lint": "eslint .",
         "start": "node scripts/setup-playground.js && npm run generate-typescript && vite",
         "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
         "generate-csharp": "npm run generate-typescript && tsx src.compiler/csharp/CSharpTranspiler.ts --outDir dist/lib.csharp",
@@ -67,6 +59,7 @@
         "typecheck": "tsc --noEmit"
     },
     "devDependencies": {
+        "@biomejs/biome": "^1.9.4",
         "@coderline/alphaskia": "^2.3.120",
         "@coderline/alphaskia-windows": "^2.3.120",
         "@fontsource/noto-sans": "^5.1.1",
@@ -81,7 +74,10 @@
         "@rollup/plugin-typescript": "^12.1.2",
         "@types/chai": "^5.0.1",
         "@types/cors": "^2.8.17",
+        "@types/express": "^5.0.0",
         "@types/mocha": "^10.0.10",
+        "@types/node": "^22.13.4",
+        "@types/opener": "^1.4.3",
         "@typescript-eslint/eslint-plugin": "^8.24.1",
         "@typescript-eslint/parser": "^8.24.1",
         "ace-builds": "^1.38.0",
@@ -100,7 +96,6 @@
         "mocha": "^11.1.0",
         "multer": "^1.4.5-lts.1",
         "opener": "^1.5.2",
-        "prettier": "^3.5.2",
         "rimraf": "^6.0.1",
         "rollup-plugin-copy": "^3.5.0",
         "rollup-plugin-dts": "^6.1.1",
@@ -124,10 +119,5 @@
         "/dist/soundfont/*",
         "LICENSE",
         "LICENSE.header"
-    ],
-    "dependencies": {
-        "@types/express": "^5.0.0",
-        "@types/node": "^22.13.4",
-        "@types/opener": "^1.4.3"
-    }
+    ]
 }
