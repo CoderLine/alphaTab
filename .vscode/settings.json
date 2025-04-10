@@ -1,5 +1,18 @@
 {
     "debug.javascript.terminalOptions": {
-        "resolveSourceMapLocations": ["${workspaceFolder}/**", "!**/node_modules/**", "**/node_modules/.vite-temp/**"]
+        "resolveSourceMapLocations": [
+            "${workspaceFolder}/**",
+            "!**/node_modules/**",
+            "**/node_modules/.vite-temp/**"
+        ]
+    },
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "biomejs.biome"
     }
 }
