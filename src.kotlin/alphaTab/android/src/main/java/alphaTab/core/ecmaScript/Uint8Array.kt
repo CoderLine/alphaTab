@@ -47,7 +47,9 @@ public class Uint8Array : Iterable<UByte> {
     }
 
     internal inline fun set(subarray: Uint8Array, pos: Double) {
-        subarray.buffer.copyInto(buffer, pos.toInt(), this.byteOffset.toInt(), subarray.buffer.size)
+        subarray.buffer.copyInto(buffer, (byteOffset + pos).toInt(),
+            subarray.byteOffset.toInt(),
+            (subarray.byteOffset + subarray.length).toInt())
     }
 
     override fun iterator(): Iterator<UByte> {
@@ -56,7 +58,11 @@ public class Uint8Array : Iterable<UByte> {
     }
 
     internal fun subarray(begin: Double, end: Double): Uint8Array {
-        return Uint8Array(buffer.copyOfRange((this.byteOffset + begin).toInt(), (this.byteOffset + end).toInt()))
+        return Uint8Array(
+            buffer,
+            this.byteOffset + begin,
+            end - begin
+        )
     }
 
     internal fun reverse() {
@@ -65,7 +71,8 @@ public class Uint8Array : Iterable<UByte> {
 
     internal fun slice(startByte: Double, endByte: Double): Uint8Array {
         return Uint8Array(
-            this.buffer, this.byteOffset + startByte,
+            this.buffer,
+            this.byteOffset + startByte,
             endByte - startByte)
     }
 }

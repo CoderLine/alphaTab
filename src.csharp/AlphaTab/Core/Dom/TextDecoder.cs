@@ -14,6 +14,6 @@ internal class TextDecoder
 
     public string Decode(ArrayBuffer data)
     {
-        return _encoding.GetString(data.Raw.Array, data.Raw.Offset, data.Raw.Count);
+        return _encoding.GetString(data.Raw, 0, (int)data.ByteLength);
     }
 }

@@ -102,11 +102,28 @@ android {
         getByName("main") {
             java.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
             kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
+            assets.srcDirs(
+                "../../../font/bravura",
+                "../../../font/sonivox"
+            )
         }
         getByName("test") {
             java.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
             kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
         }
+    }
+
+    androidResources {
+        ignoreAssetsPattern = arrayOf(
+            "eot",
+            "ttf",
+            "svg",
+            "woff",
+            "woff2",
+            "json",
+            "txt",
+            "md"
+        ).joinToString(":") { "!*.${it}" }
     }
 }
 
@@ -127,15 +144,36 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
+publishing {
+    repositories{
+        maven {
+            name = "DistPath"
+            url = rootProject.projectDir.resolve("dist").toURI()
+        }
+    }
+}
+
+internal fun Project.findOptionalProperty(propertyName: String) = findProperty(propertyName)?.toString()
+
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     coordinates(libGroup, libArtifactId, libVersion)
+    signAllPublications()
 
     configure(AndroidSingleVariantLibrary(
         variant = "release",
         sourcesJar = true,
         publishJavadocJar = true
     ))
+
+    val inMemoryKeyFile = project.findOptionalProperty("signingInMemoryKeyFile")
+    if (inMemoryKeyFile != null) {
+        val inMemoryKeyId = project.findOptionalProperty("signingInMemoryKeyId")
+        val inMemoryKeyPassword = project.findOptionalProperty("signingInMemoryKeyPassword").orEmpty()
+        val signing = project.extensions.getByType(SigningExtension::class.java)
+        val inMemoryKey = File(inMemoryKeyFile).readText()
+        signing.useInMemoryPgpKeys(inMemoryKeyId, inMemoryKey, inMemoryKeyPassword)
+    }
 
     pom {
         name = libArtifactId

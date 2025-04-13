@@ -48,10 +48,10 @@ export class Hydra {
                 // 6.1 Sample Data Format in the smpl Sub-chunk
                 // The smpl sub-chunk, if present, contains one or more "samples" of digital audio information in the form
                 // of linearly coded sixteen bit, signed, little endian (least significant byte first) words.
-                let shorts = new Int16Array(sampleBytes.buffer);
-                samples = new Float32Array(shorts.length);
-                for (let i: number = 0; i < shorts.length; i++) {
-                    samples[i] = shorts[i] / 32767;
+                const dataView = new DataView(sampleBytes.buffer, sampleBytes.byteOffset, sampleBytes.length);
+                samples = new Float32Array(sampleBytes.length / 2);
+                for (let i: number = 0; i < samples.length; i++) {
+                    samples[i] = dataView.getInt16(i * 2, true) / 32767;
                 }
             }
 
