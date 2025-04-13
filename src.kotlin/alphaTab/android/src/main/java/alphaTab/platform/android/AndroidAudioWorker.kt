@@ -89,7 +89,7 @@ internal class AndroidAudioWorker(
             _updateSchedule = _updateTimer.scheduleWithFixedDelay(
                 {
                     this@AndroidAudioWorker.onUpdatePlayedSamples()
-                }, 0L, 0, TimeUnit.MILLISECONDS
+                }, 0L, 50L, TimeUnit.MILLISECONDS
             )
 
             _playingSemaphore.release() // proceed thread
