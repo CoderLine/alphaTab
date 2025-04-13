@@ -449,22 +449,22 @@ export class MusicXmlImporter extends ScoreImporter {
             for (const type of creditTypes) {
                 switch (type) {
                     case 'title':
-                        this._score.title = fullText;
+                        this._score.title = MusicXmlImporter.sanitizeDisplay(fullText);
                         break;
                     case 'subtitle':
-                        this._score.subTitle = fullText;
+                        this._score.subTitle = MusicXmlImporter.sanitizeDisplay(fullText);
                         break;
                     case 'composer':
-                        this._score.artist = fullText;
+                        this._score.artist = MusicXmlImporter.sanitizeDisplay(fullText);
                         break;
                     case 'arranger':
-                        this._score.artist = fullText;
+                        this._score.artist = MusicXmlImporter.sanitizeDisplay(fullText);
                         break;
                     case 'lyricist':
-                        this._score.words = fullText;
+                        this._score.words = MusicXmlImporter.sanitizeDisplay(fullText);
                         break;
                     case 'rights':
-                        this._score.copyright = fullText;
+                        this._score.copyright = MusicXmlImporter.sanitizeDisplay(fullText);
                         break;
                     case 'part name':
                         break;
@@ -493,7 +493,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     fullText.includes('(c)') ||
                     fullText.includes('(C)')
                 ) {
-                    this._score.copyright = fullText;
+                    this._score.copyright = MusicXmlImporter.sanitizeDisplay(fullText);
                     return;
                 }
 
@@ -501,39 +501,48 @@ export class MusicXmlImporter extends ScoreImporter {
                 // use the typical alphaTab placement as reference for valid props
                 if (halign === 'center' || justify === 'center') {
                     if (this._score.title.length === 0) {
-                        this._score.title = fullText;
+                        this._score.title = MusicXmlImporter.sanitizeDisplay(fullText);
                         return;
                     }
 
                     if (this._score.subTitle.length === 0) {
-                        this._score.subTitle = fullText;
+                        this._score.subTitle = MusicXmlImporter.sanitizeDisplay(fullText);
                         return;
                     }
 
                     if (this._score.album.length === 0) {
-                        this._score.album = fullText;
+                        this._score.album = MusicXmlImporter.sanitizeDisplay(fullText);
                         return;
                     }
                 } else if (halign == 'right' || justify === 'right') {
                     // in alphaTab only `music` is right
                     if (this._score.music.length === 0) {
-                        this._score.music = fullText;
+                        this._score.music = MusicXmlImporter.sanitizeDisplay(fullText);
                         return;
                     }
                 }
 
                 // from here we simply fallback to filling any remaining information (first one wins approach)
                 if (this._score.artist.length === 0) {
-                    this._score.artist = fullText;
+                    this._score.artist = MusicXmlImporter.sanitizeDisplay(fullText);
                     return;
                 }
 
                 if (this._score.words.length === 0) {
-                    this._score.words = fullText;
+                    this._score.words = MusicXmlImporter.sanitizeDisplay(fullText);
                     return;
                 }
             }
         }
+    }
+
+    private static sanitizeDisplay(text: string): string {
+        // no newlines or tabs, and non-breaking spaces
+        return text.replaceAll('\r', '')
+            .replaceAll('\n', ' ')
+            .replaceAll('\t', '\xA0\xA0')
+            .replaceAll(' ', '\xA0');
+
     }
 
     // visual aspects of credits are ignored
@@ -567,17 +576,17 @@ export class MusicXmlImporter extends ScoreImporter {
                     if (c.attributes.has('type')) {
                         switch (c.attributes.get('type')!) {
                             case 'composer':
-                                this._score.artist = c.innerText;
+                                this._score.artist = MusicXmlImporter.sanitizeDisplay(c.innerText);
                                 break;
                             case 'lyricist':
-                                this._score.words = c.innerText;
+                                this._score.words = MusicXmlImporter.sanitizeDisplay(c.innerText);
                                 break;
                             case 'arranger':
-                                this._score.music = c.innerText;
+                                this._score.music = MusicXmlImporter.sanitizeDisplay(c.innerText);
                                 break;
                         }
                     } else {
-                        this._score.artist = c.innerText;
+                        this._score.artist = MusicXmlImporter.sanitizeDisplay(c.innerText);
                     }
                     break;
                 case 'rights':
@@ -613,7 +622,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'software': Ignored
                 case 'encoding-description':
-                    this._score.notices += c.innerText;
+                    this._score.notices += MusicXmlImporter.sanitizeDisplay(c.innerText);
                     break;
                 // case 'supports': Ignored
             }
@@ -623,10 +632,10 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseMovementTitle(element: XmlNode) {
         if (this._score.title.length == 0) {
             // we have no "work title", then use the "movement title" as main title
-            this._score.title = element.innerText;
+            this._score.title = MusicXmlImporter.sanitizeDisplay(element.innerText);
         } else {
             // we have a "work title", then use the "movement title" as subtitle
-            this._score.subTitle = element.innerText;
+            this._score.subTitle = MusicXmlImporter.sanitizeDisplay(element.innerText);
         }
     }
 
@@ -885,7 +894,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'work-number': Ignored
                 // case 'opus': Ignored
                 case 'work-title':
-                    this._score.title = c.innerText;
+                    this._score.title = MusicXmlImporter.sanitizeDisplay(c.innerText);
                     break;
             }
         }
