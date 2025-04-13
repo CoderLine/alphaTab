@@ -142,21 +142,21 @@ describe('LayoutTests', () => {
     it('multibar-rests-single-track', async () => {
         await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
             o.tracks = [0];
-            o.runs[0].referenceFileName = 'layout/multibar-rest-single-track.png';
+            o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-single-track.png';
         });
     });
 
     it('multibar-rests-multi-track', async () => {
         await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
             o.tracks = [0, 1];
-            o.runs[0].referenceFileName = 'layout/multibar-rest-multi-track.png';
+            o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-multi-track.png';
         });
     });
 
     it('multibar-rests-all-tracks', async () => {
         await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
             o.tracks = [0, 1, 2];
-            o.runs[0].referenceFileName = 'layout/multibar-rest-all-tracks.png';
+            o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-all-tracks.png';
         });
     });
 });

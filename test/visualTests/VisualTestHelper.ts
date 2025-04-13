@@ -71,7 +71,8 @@ export class VisualTestHelper {
         settings?: Settings,
         configure?: (o: VisualTestOptions) => void
     ): Promise<void> {
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
+        inputFile = `test-data/visual-tests/${inputFile}`;
+        const inputFileData = await TestPlatform.loadFile(inputFile);
         const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
         let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
@@ -99,7 +100,7 @@ export class VisualTestHelper {
         let referenceFileData: Uint8Array[] = [];
         for (const run of runs) {
             try {
-                referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${run.referenceFileName}`));
+                referenceFileData.push(await TestPlatform.loadFile(run.referenceFileName));
             } catch (e) {
                 referenceFileData.push(new Uint8Array(0));
             }
@@ -395,7 +396,6 @@ export class VisualTestHelper {
         actual: AlphaSkiaImage,
         diff: AlphaSkiaImage | undefined
     ): Promise<void> {
-        expectedFilePath = TestPlatform.joinPath('test-data', 'visual-tests', expectedFilePath);
         if (diff) {
             const diffData = diff.toPng()!;
 
