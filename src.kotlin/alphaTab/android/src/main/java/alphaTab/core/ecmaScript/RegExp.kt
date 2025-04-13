@@ -1,8 +1,6 @@
 package alphaTab.core.ecmaScript
 
-import android.annotation.SuppressLint
 import android.os.Build
-import java.util.regex.Matcher
 import java.util.regex.Pattern
 
 private data class RegExpCacheEntry(val pattern: String, val flags: String)
@@ -50,15 +48,42 @@ internal class RegExp {
             _regex.matcher(s).replaceFirst(replacement)
     }
 
-    @SuppressLint("NewApi")
-    public fun replace(s: String, replacement: (match: String, group1: String) -> String): String {
-        return if (_global)
-            _regex.matcher(s).replaceAll({
-                replacement(it.group(), it.group(1))
-            })
-        else
-            _regex.matcher(s).replaceFirst {
-                replacement(it.group(), it.group(1))
+    fun replace(s: String, replacement: (match: String, group1: String) -> String): String {
+        val matcher = _regex.matcher(s);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            return if (_global)
+                matcher.replaceAll {
+                    replacement(it.group(), it.group(1))
+                }
+            else
+                matcher.replaceFirst {
+                    replacement(it.group(), it.group(1))
+                }
+        } else {
+            // custom implementation for older android versions
+            if(!matcher.find()){
+                return s;
             }
+
+            val sb = StringBuilder()
+
+            var appendPos = 0
+            if(_global) {
+
+                do {
+                    sb.append(s, appendPos, matcher.start())
+                    sb.append(replacement(matcher.group(), matcher.group(1)!!))
+                    appendPos = matcher.end()
+                } while (matcher.find())
+
+                sb.append(s, appendPos, s.length)
+            } else {
+                sb.append(s, appendPos, matcher.start())
+                sb.append(replacement(matcher.group(), matcher.group(1)!!))
+                sb.append(s, matcher.end(), s.length)
+            }
+
+            return sb.toString()
+        }
     }
 }
