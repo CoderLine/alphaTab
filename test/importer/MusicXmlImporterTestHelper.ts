@@ -18,7 +18,7 @@ import { TestPlatform } from '@test/TestPlatform';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { assert, expect } from 'chai';
-import { VisualTestHelper, VisualTestOptions } from '@test/visualTests/VisualTestHelper';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 
 export class MusicXmlImporterTestHelper {
@@ -76,10 +76,7 @@ export class MusicXmlImporterTestHelper {
             const testOptions = new VisualTestOptions(
                 score,
                 [
-                    {
-                        referenceFileName: TestPlatform.changeExtension(file, '.png'),
-                        width: 1300
-                    }
+                    new VisualTestRun(1300, TestPlatform.changeExtension(file, '.png')),
                 ],
                 settings
             );
