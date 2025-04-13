@@ -2435,7 +2435,7 @@ export class MusicXmlImporter extends ScoreImporter {
             if (durationInTicks < 0 && beatDuration !== null) {
                 durationInTicks = MidiUtils.toTicks(beatDuration!);
                 if (dots > 0) {
-                    durationInTicks = MidiUtils.applyDot(beatDuration!, dots == 2);
+                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots == 2);
                 }
             }
 
