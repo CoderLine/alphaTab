@@ -78,8 +78,8 @@ export class TrackSerializer {
                 obj.systemsLayout = v! as number[];
                 return true;
             case "linebreaks":
-                for (const i of (v as unknown[])) {
-                    obj.addLineBreaks(i as number);
+                for (const i of (v as number[])) {
+                    obj.addLineBreaks(i);
                 }
                 return true;
             case "percussionarticulations":
