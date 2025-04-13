@@ -668,13 +668,13 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'identification': Ignored, no part-wise information.
                 // case 'part-link': Not supported
                 case 'part-name':
-                    track.name = c.innerText;
+                    track.name = MusicXmlImporter.sanitizeDisplay(c.innerText);
                     break;
                 case 'part-name-display':
                     track.name = this.parsePartDisplayAsText(c);
                     break;
                 case 'part-abbreviation':
-                    track.shortName = c.innerText;
+                    track.shortName = MusicXmlImporter.sanitizeDisplay(c.innerText);
                     break;
                 case 'part-abbreviation-display':
                     track.shortName = this.parsePartDisplayAsText(c);
@@ -885,7 +885,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
             }
         }
-        return text;
+        return MusicXmlImporter.sanitizeDisplay(text);
     }
 
     private parseWork(element: XmlNode) {
