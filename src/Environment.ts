@@ -73,6 +73,7 @@ import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectIn
 import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
 import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
 import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
+import { VersionInfo } from './generated/VersionInfo';
 
 /**
  * A factory for custom layout engines. 
@@ -854,5 +855,36 @@ export class Environment {
         }
 
         return WebPlatform.Browser;
+    }
+
+    /**
+     * Prints the environment information for easier troubleshooting.
+     * @param force Whether to force printing.
+     */
+    public static printEnvironmentInfo(force:boolean = true) {
+        const printer:(message:string) => void = force ? (message) => {
+            Logger.log.debug('VersionInfo', message);
+        } : (message) => {
+            Logger.debug('VersionInfo', message);
+        }
+        VersionInfo.print(printer);
+        printer(`High DPI: ${Environment.HighDpiFactor}`);
+        Environment.printPlatformInfo(printer);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    private static printPlatformInfo(print: (message:string) => void) {
+        print(`Browser: ${navigator.userAgent}`);
+        print(`Platform: ${WebPlatform[Environment.webPlatform]}`);
+        print(`WebPack: ${Environment.isWebPackBundled}`);
+        print(`Vite: ${Environment.isViteBundled}`);
+        if(Environment.webPlatform !== WebPlatform.NodeJs) {
+            print(`Window Size: ${window.outerWidth}x${window.outerHeight}`);
+            print(`Screen Size: ${window.screen.width}x${window.screen.height}`);    
+        }
+        
     }
 }

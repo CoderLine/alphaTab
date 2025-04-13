@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AlphaTab.Collections;
@@ -12,6 +13,14 @@ partial class Environment
     public static void PlatformInit()
     {
 
+    }
+
+    private static void PrintPlatformInfo(System.Action<string> print)
+    {
+        print($".net Runtime: {RuntimeInformation.FrameworkDescription}");
+        print($"Process: {RuntimeInformation.ProcessArchitecture}");
+        print($"OS Description: {RuntimeInformation.OSDescription}");
+        print($"OS Arch: {RuntimeInformation.OSArchitecture}");
     }
 
     public static Action Throttle(Action action, double delay)
@@ -39,4 +48,6 @@ partial class Environment
         );
         renderEngines.Set("default", renderEngines.Get("skia")!);
     }
+
+
 }

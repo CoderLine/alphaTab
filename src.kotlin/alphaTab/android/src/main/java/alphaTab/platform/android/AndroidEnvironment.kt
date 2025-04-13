@@ -11,6 +11,9 @@ internal class AndroidEnvironment {
     companion object {
         private var _isInitialized: Boolean = false
 
+        var screenWidth:Int = 0;
+        var screenHeight:Int = 0;
+
         @ExperimentalUnsignedTypes
         @ExperimentalContracts
         public fun initializeAndroid(context: android.content.Context) {
@@ -20,6 +23,9 @@ internal class AndroidEnvironment {
             _isInitialized = true
 
             Environment.HighDpiFactor = context.resources.displayMetrics.density.toDouble()
+
+            screenWidth = context.resources.displayMetrics.widthPixels
+            screenHeight = context.resources.displayMetrics.heightPixels
 
             AndroidCanvas.initialize(context)
 
