@@ -24,7 +24,7 @@ describe('EffectsAndAnnotationsTests', () => {
             .
             :4 3.3*4 | 3.3 3.3 {v f tempo 120 "Other" } 3.3 6.3
         `,
-            `effects-and-annotations/tempo-text.png`
+            `test-data/visual-tests/effects-and-annotations/tempo-text.png`
         );
     });
 
@@ -105,7 +105,7 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
                 score,
-                [new VisualTestRun(400, 'effects-and-annotations/slides-line-break.png')],
+                [new VisualTestRun(400, 'test-data/visual-tests/effects-and-annotations/slides-line-break.png')],
                 settings
             )
         );
@@ -160,9 +160,9 @@ describe('EffectsAndAnnotationsTests', () => {
     it('sustain-pedal', async () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file('effects-and-annotations/sustain.gp', [
-                new VisualTestRun(1200, 'effects-and-annotations/sustain-1200.png'),
-                new VisualTestRun(850, 'effects-and-annotations/sustain-850.png'),
-                new VisualTestRun(600, 'effects-and-annotations/sustain-600.png')
+                new VisualTestRun(1200, 'test-data/visual-tests/effects-and-annotations/sustain-1200.png'),
+                new VisualTestRun(850, 'test-data/visual-tests/effects-and-annotations/sustain-850.png'),
+                new VisualTestRun(600, 'test-data/visual-tests/effects-and-annotations/sustain-600.png')
             ])
         );
     });
@@ -190,9 +190,9 @@ describe('EffectsAndAnnotationsTests', () => {
             new VisualTestOptions(
                 score,
                 [
-                    new VisualTestRun(1200, 'effects-and-annotations/sustain-1200.png'),
-                    new VisualTestRun(850, 'effects-and-annotations/sustain-850.png'),
-                    new VisualTestRun(600, 'effects-and-annotations/sustain-600.png')
+                    new VisualTestRun(1200, 'test-data/visual-tests/effects-and-annotations/sustain-1200.png'),
+                    new VisualTestRun(850, 'test-data/visual-tests/effects-and-annotations/sustain-850.png'),
+                    new VisualTestRun(600, 'test-data/visual-tests/effects-and-annotations/sustain-600.png')
                 ],
                 settings
             )
@@ -268,7 +268,7 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
                 score,
-                [new VisualTestRun(-1, 'effects-and-annotations/bend-vibrato-default.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/effects-and-annotations/bend-vibrato-default.png')],
                 settings
             )
         );
@@ -285,7 +285,7 @@ describe('EffectsAndAnnotationsTests', () => {
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
                 score,
-                [new VisualTestRun(-1, 'effects-and-annotations/bend-vibrato-songbook.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/effects-and-annotations/bend-vibrato-songbook.png')],
                 settings
             )
         );
@@ -304,6 +304,6 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('legato', async () => {
-        await VisualTestHelper.runVisualTestTex(`3.3.4{ legatoOrigin } 10.3.4`, 'effects-and-annotations/legato.png');
+        await VisualTestHelper.runVisualTestTex(`3.3.4{ legatoOrigin } 10.3.4`, 'test-data/visual-tests/effects-and-annotations/legato.png');
     });
 });

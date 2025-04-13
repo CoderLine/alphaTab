@@ -19,7 +19,7 @@ describe('NotationLegend', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'notation-legend/notation-legend.gp',
-                [new VisualTestRun(-1, 'notation-legend/full-default-small.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/notation-legend/full-default-small.png')],
                 settings
             )
         );
@@ -31,7 +31,7 @@ describe('NotationLegend', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'notation-legend/notation-legend.gp',
-                [new VisualTestRun(-1, 'notation-legend/full-default-large.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/notation-legend/full-default-large.png')],
                 settings
             )
         );
@@ -250,10 +250,10 @@ describe('NotationLegend', () => {
     it('resize-sequence', async () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file('notation-legend/notation-legend.gp', [
-                new VisualTestRun(1300, 'notation-legend/resize-sequence-1300.png'),
-                new VisualTestRun(800, 'notation-legend/resize-sequence-800.png'),
-                new VisualTestRun(1500, 'notation-legend/resize-sequence-1500.png'),
-                new VisualTestRun(500, 'notation-legend/resize-sequence-500.png')
+                new VisualTestRun(1300, 'test-data/visual-tests/notation-legend/resize-sequence-1300.png'),
+                new VisualTestRun(800, 'test-data/visual-tests/notation-legend/resize-sequence-800.png'),
+                new VisualTestRun(1500, 'test-data/visual-tests/notation-legend/resize-sequence-1500.png'),
+                new VisualTestRun(500, 'test-data/visual-tests/notation-legend/resize-sequence-500.png')
             ])
         );
     });
@@ -275,7 +275,7 @@ describe('NotationLegend', () => {
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/${fileName}`);
         let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
-        const o =  new VisualTestOptions(score, [new VisualTestRun(-1, `notation-legend/${referenceFileName}`)], settings);
+        const o =  new VisualTestOptions(score, [new VisualTestRun(-1, `test-data/visual-tests/notation-legend/${referenceFileName}`)], settings);
         await VisualTestHelper.runVisualTestFull(o);
     }
 });

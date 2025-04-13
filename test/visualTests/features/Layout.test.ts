@@ -15,7 +15,7 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'layout/page-layout.gp',
-                [new VisualTestRun(-1, 'layout/page-layout-justify-last-row.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/layout/page-layout-justify-last-row.png')],
                 settings
             )
         );
@@ -134,7 +134,7 @@ describe('LayoutTests', () => {
             \\scale 0.5 c4 | \\scale 2 c4 | \\scale 0.5 c4 |
             c4 | c4  
         `,
-            'layout/system-layout-tex.png',
+            'test-data/visual-tests/layout/system-layout-tex.png',
             settings
         );
     });
