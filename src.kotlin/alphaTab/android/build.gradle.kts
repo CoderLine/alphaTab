@@ -144,6 +144,17 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
 }
 
+publishing {
+    repositories{
+        maven {
+            name = "DistPath"
+            url = rootProject.projectDir.resolve("dist").toURI()
+        }
+    }
+}
+
+internal fun Project.findOptionalProperty(propertyName: String) = findProperty(propertyName)?.toString()
+
 mavenPublishing {
     publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
     coordinates(libGroup, libArtifactId, libVersion)
@@ -155,7 +166,14 @@ mavenPublishing {
         publishJavadocJar = true
     ))
 
-    signAllPublications()
+    val inMemoryKeyFile = project.findOptionalProperty("signingInMemoryKeyFile")
+    if (inMemoryKeyFile != null) {
+        val inMemoryKeyId = project.findOptionalProperty("signingInMemoryKeyId")
+        val inMemoryKeyPassword = project.findOptionalProperty("signingInMemoryKeyPassword").orEmpty()
+        val signing = project.extensions.getByType(SigningExtension::class.java)
+        val inMemoryKey = File(inMemoryKeyFile).readText()
+        signing.useInMemoryPgpKeys(inMemoryKeyId, inMemoryKey, inMemoryKeyPassword)
+    }
 
     pom {
         name = libArtifactId
