@@ -21,6 +21,14 @@ jobs:
       - run: npm install
       - run: npm run build
       - run: npm run test
+        id: test
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
+        with: 
+          name: test-results-web
+          path: |
+            test-data/**/*.new.png
+            test-data/**/*.diff.png
 
   build_csharp:
     name: Build and Test C#
@@ -38,6 +46,14 @@ jobs:
       - run: npm install
       - run: npm run build-csharp
       - run: npm run test-csharp
+        id: test
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
+        with: 
+          name: test-results-csharp
+          path: |
+            test-data/**/*.new.png
+            test-data/**/*.diff.png
 
   build_kotlin:
     name: Build and Test Kotlin
@@ -68,4 +84,12 @@ jobs:
       - run: npm install
       - run: npm run build-kotlin
       - run: npm run test-kotlin
+        id: test
+      - uses: actions/upload-artifact@v4
+        if: ${{ failure() && steps.test.conclusion == 'failure' }}
+        with: 
+          name: test-results-kotlin
+          path: |
+            test-data/**/*.new.png
+            test-data/**/*.diff.png      
       - run: ./src.kotlin/alphaTab/gradlew --stop
