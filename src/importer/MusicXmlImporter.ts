@@ -2358,7 +2358,6 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // Note level
         let note: Note | null = null;
-        let tieNode: XmlNode | null = null;
         let isPitched = false;
         let instrumentId: string | null = null;
         let noteIsVisible = element.getAttribute('print-object', 'yes') !== 'no';
@@ -2387,9 +2386,6 @@ export class MusicXmlImporter extends ScoreImporter {
             if (isChord) {
                 beat = this._lastBeat!;
                 beat!.addNote(note!);
-                if (tieNode) {
-                    this.parseTie(tieNode!, note!, staff);
-                }
                 return;
             }
 
@@ -2500,10 +2496,6 @@ export class MusicXmlImporter extends ScoreImporter {
 
             if (note !== null) {
                 newBeat.addNote(note!);
-
-                if (tieNode) {
-                    this.parseTie(tieNode!, note!, staff);
-                }
             }
 
             this.insertBeatToVoice(newBeat, voice);
@@ -2580,14 +2572,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'duration':
                     durationInTicks = this.parseDuration(c);
                     break;
-                case 'tie':
-                    if (note === null) {
-                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
-                    } else {
-                        tieNode = c;
-                    }
-                    break;
-
+                // case 'tie': Ignored -> "tie" is sound, "tied" is notation
                 case 'instrument':
                     if (note === null) {
                         Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
@@ -3600,7 +3585,44 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTied(element: XmlNode, note: Note, staff: Staff): void {
-        this.parseTie(element, note, staff);
+        const type = element.getAttribute('type');
+        let number = element.getAttribute('number', '');
+
+        const context = this.getStaffContext(staff);
+
+        if (type === 'start') {
+            if (number) {
+                context.tieStartIds.set(number, note);
+            }
+
+            context.tieStarts.add(note);
+        } else if (type === 'stop' && !note.isTieDestination) {
+            let tieOrigin: Note | null = null;
+            if (number) {
+                if (!context.tieStartIds.has(number)) {
+                    return;
+                }
+
+                tieOrigin = context.tieStartIds.get(number)!;
+                context.tieStartIds.delete(number);
+            } else {
+                const realValue = this.calculatePitchedNoteValue(note);
+                for (const t of context.tieStarts) {
+                    if (this.calculatePitchedNoteValue(t) === realValue) {
+                        tieOrigin = t;
+                        context.tieStarts.delete(tieOrigin);
+                        break;
+                    }
+                }
+            }
+
+            if (!tieOrigin) {
+                return;
+            }
+
+            note.isTieDestination = true;
+            note.tieOrigin = tieOrigin;
+        }
     }
 
     private parseStem(element: XmlNode): BeamDirection | null {
@@ -3676,47 +3698,6 @@ export class MusicXmlImporter extends ScoreImporter {
             // default:
             //     Logger.warning('MusicXML', `Unsupported accidental ${element.innerText}`);
             //     break;
-        }
-    }
-
-    private parseTie(element: XmlNode, note: Note, staff: Staff) {
-        const type = element.getAttribute('type');
-        let number = element.getAttribute('number', '');
-
-        const context = this.getStaffContext(staff);
-
-        if (type === 'start') {
-            if (number) {
-                context.tieStartIds.set(number, note);
-            }
-
-            context.tieStarts.add(note);
-        } else if (type === 'stop' && !note.isTieDestination) {
-            let tieOrigin: Note | null = null;
-            if (number) {
-                if (!context.tieStartIds.has(number)) {
-                    return;
-                }
-
-                tieOrigin = context.tieStartIds.get(number)!;
-                context.tieStartIds.delete(number);
-            } else {
-                const realValue = this.calculatePitchedNoteValue(note);
-                for (const t of context.tieStarts) {
-                    if (this.calculatePitchedNoteValue(t) === realValue) {
-                        tieOrigin = t;
-                        context.tieStarts.delete(tieOrigin);
-                        break;
-                    }
-                }
-            }
-
-            if (!tieOrigin) {
-                return;
-            }
-
-            note.isTieDestination = true;
-            note.tieOrigin = tieOrigin;
         }
     }
 
