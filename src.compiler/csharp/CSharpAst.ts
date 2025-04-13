@@ -311,7 +311,7 @@ export interface PrimitiveTypeNode extends TypeNode {
 
 // Expressions
 
-export interface Expression extends Node {}
+export interface Expression extends Node { }
 
 export interface PrefixUnaryExpression extends Node {
     nodeType: SyntaxKind.PrefixUnaryExpression;
@@ -337,7 +337,7 @@ export interface ThisLiteral extends Node {
     nodeType: SyntaxKind.ThisLiteral;
 }
 
-export interface BaseLiteralExpression extends Node {}
+export interface BaseLiteralExpression extends Node { }
 
 export interface StringLiteral extends Node {
     nodeType: SyntaxKind.StringLiteral;
@@ -441,6 +441,7 @@ export interface InvocationExpression extends Node {
     expression: Expression;
     arguments: Expression[];
     typeArguments?: TypeNode[];
+    nullSafe?: Boolean;
 }
 
 export interface NewExpression extends Node {
@@ -485,7 +486,7 @@ export interface YieldExpression extends Node {
 
 // Statements
 
-export interface Statement extends Node {}
+export interface Statement extends Node { }
 
 export interface Block extends Statement {
     nodeType: SyntaxKind.Block;
