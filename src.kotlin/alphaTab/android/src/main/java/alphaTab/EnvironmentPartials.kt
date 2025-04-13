@@ -1,6 +1,8 @@
 package alphaTab
 
 import alphaTab.platform.android.AndroidCanvas
+import alphaTab.platform.android.AndroidEnvironment
+import android.os.Build
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,6 +26,15 @@ internal class EnvironmentPartials {
         }
 
         internal fun platformInit() {
+        }
+
+        internal fun printPlatformInfo(print: (message: String) -> Unit) {
+            print("OS Name: ${System.getProperty("os.name")}");
+            print("OS Version: ${System.getProperty("os.version")}");
+            print("Device Brand: ${Build.MANUFACTURER}");
+            print("Device Model: ${Build.MODEL}");
+            print("SDK Version: ${Build.VERSION.SDK_INT}");
+            print("Screen Size: ${AndroidEnvironment.screenWidth}x${AndroidEnvironment.screenHeight}");
         }
 
         private val throttleScope = CoroutineScope(Dispatchers.Default)
