@@ -155,6 +155,8 @@ mavenPublishing {
         publishJavadocJar = true
     ))
 
+    signAllPublications()
+
     pom {
         name = libArtifactId
         description = libDescription
