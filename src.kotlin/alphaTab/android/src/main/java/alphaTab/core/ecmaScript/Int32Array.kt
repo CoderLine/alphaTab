@@ -47,8 +47,14 @@ internal class Int32Array : Iterable<Int> {
         _data.fill(i)
     }
 
-    override fun iterator(): Iterator<Int> {
-        return (0 until length.toInt()).map { _data[_offset + it] }.iterator()
+    override fun iterator(): IntIterator {
+        return ArrayIntIterator(this)
+    }
+
+    private class ArrayIntIterator(private val array: Int32Array) : IntIterator() {
+        private var index = 0
+        override fun hasNext() = index < array.length
+        override fun nextInt() = array._data[array._offset + index++]
     }
 
     fun subarray(start: Double, end: Double): Int32Array {

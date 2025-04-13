@@ -43,7 +43,7 @@ public class Float32Array : Iterable<Float> {
         data[idx] = value.toFloat()
     }
 
-    override fun iterator(): Iterator<Float> {
+    override fun iterator(): FloatIterator {
         return data.iterator()
     }
 
