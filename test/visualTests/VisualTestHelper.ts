@@ -409,8 +409,6 @@ export class VisualTestHelper {
     }
 
     static async deleteFiles(expectedFilePath: string): Promise<void> {
-        expectedFilePath = TestPlatform.joinPath('test-data', 'visual-tests', expectedFilePath);
-
         const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
         await TestPlatform.deleteFile(diffFileName);
 
