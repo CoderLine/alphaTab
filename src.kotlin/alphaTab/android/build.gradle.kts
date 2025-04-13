@@ -102,11 +102,28 @@ android {
         getByName("main") {
             java.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
             kotlin.srcDirs("../../../dist/lib.kotlin/commonMain/generated")
+            assets.srcDirs(
+                "../../../font/bravura",
+                "../../../font/sonivox"
+            )
         }
         getByName("test") {
             java.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
             kotlin.srcDirs("../../../dist/lib.kotlin/commonTest/generated")
         }
+    }
+
+    androidResources {
+        ignoreAssetsPattern = arrayOf(
+            "eot",
+            "ttf",
+            "svg",
+            "woff",
+            "woff2",
+            "json",
+            "txt",
+            "md"
+        ).joinToString(":") { "!*.${it}" }
     }
 }
 
