@@ -48,7 +48,7 @@ public class AlphaSkiaImage : IDisposable
             return null;
         }
 
-        return new ArrayBuffer(new ArraySegment<byte>(data, 0, data.Length));
+        return new ArrayBuffer(data);
     }
 
     internal ArrayBuffer? ToPng()
@@ -59,19 +59,19 @@ public class AlphaSkiaImage : IDisposable
             return null;
         }
 
-        return new ArrayBuffer(new ArraySegment<byte>(data, 0, data.Length));
+        return new ArrayBuffer(data);
     }
 
     internal static AlphaSkiaImage? Decode(ArrayBuffer buffer)
     {
-        var underlying = AlphaSkia.AlphaSkiaImage.Decode(buffer.Raw.Array!);
+        var underlying = AlphaSkia.AlphaSkiaImage.Decode(buffer.Raw);
         return underlying == null ? null : new AlphaSkiaImage(underlying);
     }
 
     internal static AlphaSkiaImage? FromPixels(double width, double height, ArrayBuffer pixels)
     {
         var underlying =
-            AlphaSkia.AlphaSkiaImage.FromPixels((int)width, (int)height, pixels.Raw.Array!);
+            AlphaSkia.AlphaSkiaImage.FromPixels((int)width, (int)height, pixels.Raw);
         return underlying == null ? null : new AlphaSkiaImage(underlying);
     }
 }
@@ -258,7 +258,7 @@ internal class AlphaSkiaTypeface : IDisposable
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static AlphaSkiaTypeface? Register(ArrayBuffer buffer)
     {
-        var underlying = AlphaSkia.AlphaSkiaTypeface.Register(buffer.Raw.Array!);
+        var underlying = AlphaSkia.AlphaSkiaTypeface.Register(buffer.Raw);
         return underlying == null
             ? null
             : new AlphaSkiaTypeface(underlying);

@@ -37,7 +37,7 @@ static partial class TestPlatform
         var path = Path.Combine(RepositoryRoot.Value, name);
         Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         await using var fs = new FileStream(path, FileMode.Create);
-        await fs.WriteAsync(data.Data.Array!, data.Data.Offset, data.Data.Count);
+        await fs.WriteAsync(data.Buffer.Raw, (int)data.ByteOffset, (int)data.Length);
     }
 
     public static Task<IList<string>> ListDirectory(string path)
