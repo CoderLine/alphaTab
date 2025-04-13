@@ -148,7 +148,12 @@ class TrackInfo {
         const bar = note.beat.voice.bar;
 
         // the calculation in the AccidentalHelper assumes a standard 5-line staff.
-        const musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
+        let musicXmlStaffSteps: number;
+        if (noteValue === 0) { // no display pitch defined?
+            musicXmlStaffSteps = 4; // middle of bar
+        } else {
+            musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
+        }
 
         // to translate this into the "staffLine" semantics we need to subtract additionally the steps "missing" from the absent lines
         const actualSteps = note.beat.voice.bar.staff.standardNotationLineCount * 2 - 1;
@@ -3738,10 +3743,17 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        let value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
+        // if no display information -> middle of staff (handled in getOrCreateArticulation)
         const note = new Note();
-        note.octave = (value / 12) | 0;
-        note.tone = value - note.octave * 12;
+        if (step === '') {
+            note.octave = 0;
+            note.tone = 0;
+        }
+        else {
+            const value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
+            note.octave = (value / 12) | 0;
+            note.tone = value - note.octave * 12;
+        }
 
         return note;
     }
