@@ -1,7 +1,7 @@
 /**@target web */
 import type * as webpackTypes from 'webpack';
 
-export { webpackTypes };
+export type { webpackTypes };
 
 export type webPackWithAlphaTab = {
     webpack: webpackTypes.Compiler['webpack'];

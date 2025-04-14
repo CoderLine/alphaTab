@@ -31,10 +31,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-export { type Plugin } from 'vite';
+export type { Plugin } from 'vite';
 export { fileToUrl } from './asset';
 export { createToImportMetaURLBasedRelativeRuntime, toOutputFilePathInJS } from './build';
-export { type ResolvedConfig } from './config';
+export type { ResolvedConfig } from './config';
 export { ENV_PUBLIC_PATH } from './constants';
 export { evalValue, cleanUrl, injectQuery, encodeURIPath } from './utils';
 export { tryFsResolve } from './resolve';

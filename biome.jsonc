@@ -33,7 +33,6 @@
                 "useEnumInitializers": "off",
                 "useConst": "off",
                 "useTemplate": "off",
-                "useExportType": "off",
                 "useExponentiationOperator": "off"
             },
             "suspicious": {
