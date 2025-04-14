@@ -8,6 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  lint:
+    name: Linting and TypeCheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+      - run: npm install
+      - run: npm run lint-ci
+      - run: npm run typecheck
+
   build_web:
     name: Build and Test Web
     runs-on: ubuntu-latest

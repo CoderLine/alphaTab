@@ -43,6 +43,7 @@
         "clean": "rimraf dist",
         "lint": "biome lint",
         "lint-fix": "biome lint --write",
+        "lint-ci": "biome ci --reporter=github",
         "format": "biome format --write",
         "start": "node scripts/setup-playground.js && npm run generate-typescript && vite",
         "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
