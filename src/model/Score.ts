@@ -112,29 +112,29 @@ export class HeaderFooterStyle {
             anyPlaceholder = true;
             let value = '';
             switch (variable) {
-                case `TITLE`:
+                case 'TITLE':
                     value = score.title;
                     break;
-                case `SUBTITLE`:
+                case 'SUBTITLE':
                     value = score.subTitle;
                     break;
-                case `ARTIST`:
+                case 'ARTIST':
                     value = score.artist;
                     break;
-                case `ALBUM`:
+                case 'ALBUM':
                     value = score.album;
                     break;
-                case `WORDS`:
-                case `WORDSMUSIC`:
+                case 'WORDS':
+                case 'WORDSMUSIC':
                     value = score.words;
                     break;
-                case `MUSIC`:
+                case 'MUSIC':
                     value = score.music;
                     break;
-                case `TABBER`:
+                case 'TABBER':
                     value = score.tab;
                     break;
-                case `COPYRIGHT`:
+                case 'COPYRIGHT':
                     value = score.copyright;
                     break;
                 default:

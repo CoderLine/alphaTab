@@ -75,23 +75,23 @@ describe('NotationElements', () => {
     });
     
     it('guitar-tuning-on', async () => {
-        const tex = `\\tuning e5 b4 g4 d4 a3 d3 . 3.3*4`;
+        const tex = '\\tuning e5 b4 g4 d4 a3 d3 . 3.3*4';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/guitar-tuning-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/guitar-tuning-on.png', settings);
     });
 
     it('guitar-tuning-off', async () => {
-        const tex = `\\tuning d5 b4 g4 d4 a3 d3 . 3.3*4`;
+        const tex = '\\tuning d5 b4 g4 d4 a3 d3 . 3.3*4';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/guitar-tuning-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/guitar-tuning-off.png', settings);
     });
 
     it('track-names-off', async () => {
@@ -101,7 +101,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/track-names-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/track-names-off.png', settings);
     });
 
     it('track-names-on', async () => {
@@ -111,7 +111,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/track-names-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/track-names-on.png', settings);
     });
 
     it('chord-diagrams-off', async () => {
@@ -121,7 +121,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/chord-diagrams-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/chord-diagrams-off.png', settings);
     });
 
     it('chord-diagrams-on', async () => {
@@ -131,88 +131,88 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/chord-diagrams-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/chord-diagrams-on.png', settings);
     });
 
     it('parenthesis-on-tied-bends-off', async () => {
-        const tex = `3.3{b (0 4 )} -.3`;
+        const tex = '3.3{b (0 4 )} -.3';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/parenthesis-on-tied-bends-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/parenthesis-on-tied-bends-off.png', settings);
     });
 
     it('parenthesis-on-tied-bends-on', async () => {
-        const tex = `3.3{b (0 4 )} -.3`;
+        const tex = '3.3{b (0 4 )} -.3';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/parenthesis-on-tied-bends-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/parenthesis-on-tied-bends-on.png', settings);
     });
 
     it('tab-notes-on-tied-bends-off', async () => {
-        const tex = `3.3{b (0 4 )} -.3{b (4 8)}`;
+        const tex = '3.3{b (0 4 )} -.3{b (4 8)}';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/tab-notes-on-tied-bends-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/tab-notes-on-tied-bends-off.png', settings);
     });
 
     it('tab-notes-on-tied-bends-on', async () => {
-        const tex = `3.3{b (0 4 )} -.3{b (4 8)}`;
+        const tex = '3.3{b (0 4 )} -.3{b (4 8)}';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/tab-notes-on-tied-bends-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/tab-notes-on-tied-bends-on.png', settings);
     });
 
     it('zeros-on-dive-whammys-off', async () => {
-        const tex = `3.3.1{tb (0 -4)}`;
+        const tex = '3.3.1{tb (0 -4)}';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/zeros-on-dive-whammys-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/zeros-on-dive-whammys-off.png', settings);
     });
 
     it('zeros-on-dive-whammys-on', async () => {
-        const tex = `3.3.1{tb (0 -4)}`;
+        const tex = '3.3.1{tb (0 -4)}';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/zeros-on-dive-whammys-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/zeros-on-dive-whammys-on.png', settings);
     });
 
     it('effects-off', async () => {
-        const tex = `. \\tempo 180 \\tf t16 3.3*4 | \\tempo 60 \\tf d16 3.3*4`;
+        const tex = '. \\tempo 180 \\tf t16 3.3*4 | \\tempo 60 \\tf d16 3.3*4';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.EffectTempo, false);
         settings.notation.elements.set(NotationElement.EffectTripletFeel, false);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/effects-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/effects-off.png', settings);
     });
 
     it('effects-on', async () => {
-        const tex = `. \\tempo 180 \\tf t16 3.3*4 | \\tempo 60 \\tf d16 3.3*4`;
+        const tex = '. \\tempo 180 \\tf t16 3.3*4 | \\tempo 60 \\tf d16 3.3*4';
 
         let settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.EffectTempo, true);
         settings.notation.elements.set(NotationElement.EffectTripletFeel, true);
-        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/effects-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, 'test-data/visual-tests/notation-elements/effects-on.png', settings);
     });
 });

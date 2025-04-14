@@ -90,7 +90,7 @@ class FontParser {
             if (this.parseOnlyFamilies) {
                 return;
             }
-            throw new Error(`Missing font list`);
+            throw new Error('Missing font list');
         }
 
         const familyListInput = this._input.substr(this._currentToken.startPos).trim();
@@ -141,7 +141,7 @@ class FontParser {
 
     private fontSizeLineHeight() {
         if (!this._currentToken) {
-            throw new Error(`Missing font size`);
+            throw new Error('Missing font size');
         }
 
         const parts = this._currentToken.text.split('/');
@@ -182,7 +182,7 @@ class FontParser {
                 }
             }
         } else {
-            throw new Error(`Missing font size`);
+            throw new Error('Missing font size');
         }
     }
 

@@ -6,7 +6,7 @@ import type { ResolvedConfig } from './config';
 import * as path from 'node:path';
 import { joinUrlSegments, removeLeadingSlash, withTrailingSlash } from './utils';
 
-export const FS_PREFIX = `/@fs/`;
+export const FS_PREFIX = '/@fs/';
 
 export async function fileToUrl(id: string, config: ResolvedConfig): Promise<string> {
     let rtn: string;

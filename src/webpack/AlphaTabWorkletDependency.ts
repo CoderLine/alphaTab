@@ -107,7 +107,7 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
                         ]),
                         '}'
                     ]),
-                    `})(alphaTabWorklet)`
+                    '})(alphaTabWorklet)'
                 ])
             );
         }

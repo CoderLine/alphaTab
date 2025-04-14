@@ -1262,10 +1262,10 @@ export class GpifWriter {
                         automation.addElement('Visible').innerText = 'true';
                         switch (sustainPedal.pedalType) {
                             case SustainPedalMarkerType.Down:
-                                automation.addElement('Value').innerText = `0 1`;
+                                automation.addElement('Value').innerText = '0 1';
                                 break;
                             case SustainPedalMarkerType.Up:
-                                automation.addElement('Value').innerText = `0 3`;
+                                automation.addElement('Value').innerText = '0 3';
                                 break;
                         }
                     }

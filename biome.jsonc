@@ -31,7 +31,6 @@
                 "noParameterAssign": "off", // useful for default values
                 // temporary disabled, apply fixes gradually
                 "useEnumInitializers": "off",
-                "noUnusedTemplateLiteral": "off",
                 "useConst": "off",
                 "useTemplate": "off",
                 "useExportType": "off",

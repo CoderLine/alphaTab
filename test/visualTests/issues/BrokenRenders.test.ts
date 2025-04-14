@@ -16,7 +16,7 @@ describe('BrokenRendersTests', () => {
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = false;
 
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/layout/page-layout.gp`);
+        const inputFileData = await TestPlatform.loadFile('test-data/visual-tests/layout/page-layout.gp');
         const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
         const api = new ScoreRenderer(settings);

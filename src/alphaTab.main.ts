@@ -27,7 +27,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                         type: 'module'
                     });
                 } catch (e) {
-                    alphaTab.Logger.debug('AlphaTab', `ESM webworker construction with direct URL failed`, e);
+                    alphaTab.Logger.debug('AlphaTab', 'ESM webworker construction with direct URL failed', e);
                     // continue with fallbacks
                 }
 
@@ -46,7 +46,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 } catch (e) {
                     alphaTab.Logger.debug(
                         'AlphaTab',
-                        `ESM webworker construction with blob import failed`,
+                        'ESM webworker construction with blob import failed',
                         workerUrl,
                         e
                     );
@@ -69,7 +69,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 } catch (e) {
                     alphaTab.Logger.debug(
                         'AlphaTab',
-                        `ESM webworker construction with blob import failed`,
+                        'ESM webworker construction with blob import failed',
                         settings.core.scriptFile,
                         e
                     );

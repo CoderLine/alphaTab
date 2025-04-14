@@ -77,7 +77,7 @@ describe('SystemsLayoutTests', () => {
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
 
         const score = ScoreLoader.loadScoreFromBytes(
-            await TestPlatform.loadFile(`test-data/visual-tests/systems-layout/multi-track-different.gp`)
+            await TestPlatform.loadFile('test-data/visual-tests/systems-layout/multi-track-different.gp')
         );
 
         for (const bars of score.tracks[0].staves[0].bars) {
@@ -98,7 +98,7 @@ describe('SystemsLayoutTests', () => {
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
         const score = ScoreLoader.loadScoreFromBytes(
-            await TestPlatform.loadFile(`test-data/visual-tests/systems-layout/multi-track-different.gp`)
+            await TestPlatform.loadFile('test-data/visual-tests/systems-layout/multi-track-different.gp')
         );
 
         for (const masterBar of score.masterBars) {

@@ -91,7 +91,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp5-to-gp7', async () => {
-        await testRoundTripEqual(`conversion/full-song.gp5`, [
+        await testRoundTripEqual('conversion/full-song.gp5', [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'automations' // volume automations are not yet supported in gpif
@@ -99,7 +99,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp6-to-gp7', async () => {
-        await testRoundTripEqual(`conversion/full-song.gpx`, [
+        await testRoundTripEqual('conversion/full-song.gpx', [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'percussionarticulation' // gets added

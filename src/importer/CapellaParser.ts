@@ -1000,7 +1000,7 @@ export class CapellaParser {
             return restBeat;
         }
         // TODO: multibar rests
-        Logger.warning('Importer', `Multi-Bar rests are not supported`);
+        Logger.warning('Importer', 'Multi-Bar rests are not supported');
         return null;
     }
 

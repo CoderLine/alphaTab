@@ -30,7 +30,7 @@ export function injectWorkerRuntimeModule(webPackWithAlphaTab: webPackWithAlphaT
 
             return webPackWithAlphaTab.webpack.Template.asString([
                 `if ( ! ('AudioWorkletGlobalScope' in ${globalObject}) ) { return; }`,
-                `const installedChunks = {`,
+                'const installedChunks = {',
                 webPackWithAlphaTab.webpack.Template.indent(
                     Array.from(initialChunkIds, id => `${JSON.stringify(id)}: 1`).join(',\n')
                 ),

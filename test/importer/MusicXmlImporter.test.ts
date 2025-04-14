@@ -222,32 +222,32 @@ describe('MusicXmlImporterTests', () => {
     });
 
     it('partwise-basic', async () => {
-        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-basic.xml`);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-basic.xml');
         expect(score).toMatchSnapshot();
     });
 
     it('timewise-basic', async () => {
-        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/timewise-basic.xml`);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/timewise-basic.xml');
         expect(score).toMatchSnapshot();
     });
 
     it('partwise-anacrusis', async () => {
-        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-anacrusis.xml`);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-anacrusis.xml');
         expect(score).toMatchSnapshot();
     });
 
     it('timewise-anacrusis', async () => {
-        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/timewise-anacrusis.xml`);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/timewise-anacrusis.xml');
         expect(score).toMatchSnapshot();
     });
 
     it('partwise-complex-measures', async () => {
-        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-complex-measures.xml`);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-complex-measures.xml');
         expect(score).toMatchSnapshot();
     });
 
     it('partwise-staff-change', async () => {
-        const score = await MusicXmlImporterTestHelper.loadFile(`test-data/musicxml4/partwise-staff-change.xml`);
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-staff-change.xml');
         expect(score).toMatchSnapshot();
     });
 });
