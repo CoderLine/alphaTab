@@ -33,7 +33,7 @@ export class FontLoadingChecker {
 
         this._isStarted = true;
         let failCounter: number = 0;
-        let failCounterId: number = window.setInterval(() => {
+        const failCounterId: number = window.setInterval(() => {
             Logger.warning(
                 'Rendering',
                 `Could not load font '${this._families[0]}' within ${(failCounter + 1) * 5} seconds`,
@@ -51,7 +51,7 @@ export class FontLoadingChecker {
 
         Logger.debug('Font', `Start checking for font availablility: ${this._families.join(', ')}`);
 
-        let errorHandler = (e: unknown) => {
+        const errorHandler = (e: unknown) => {
             if (this._families.length > 1) {
                 Logger.debug('Font', `[${this._families[0]}] Loading Failed, switching to ${this._families[1]}`, e);
                 this._families.shift();
@@ -65,14 +65,14 @@ export class FontLoadingChecker {
             }
         };
 
-        let successHandler = (font: string) => {
+        const successHandler = (font: string) => {
             Logger.debug('Font', `[${font}] Font API signaled available`);
             this.isFontLoaded = true;
             window.clearInterval(failCounterId);
             (this.fontLoaded as EventEmitterOfT<string>).trigger(this._families[0]);
         };
 
-        let checkFont = async () => {
+        const checkFont = async () => {
             // Fast Path: check if one of the specified fonts is already available.
             for (const font of this._families) {
                 if (await this.isFontAvailable(font, false)) {

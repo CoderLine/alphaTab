@@ -101,8 +101,8 @@ export class BarCollisionHelper {
                 // restglyph is placed
                 // rest glyphs have their ancor
                 const restSizes = BeamingHelper.computeLineHeightsForRest(beat.duration).map(i => i * linesToPixel);
-                let oldRestTopY = currentY - restSizes[0];
-                let oldRestBottomY = currentY + restSizes[1];
+                const oldRestTopY = currentY - restSizes[0];
+                const oldRestBottomY = currentY + restSizes[1];
                 let newRestTopY = oldRestTopY;
 
                 const reservedSlots = this.reservedLayoutAreasByDisplayTime.get(beat.playbackStart)!;
@@ -129,11 +129,11 @@ export class BarCollisionHelper {
                         newRestTopY = reservedSlots.bottomY;
                     }
 
-                    let newRestBottomY = newRestTopY + restSizes[0] + restSizes[1];
+                    const newRestBottomY = newRestTopY + restSizes[0] + restSizes[1];
 
                     // moving always happens in full stave spaces
                     const staveSpace = linesToPixel * 2;
-                    let distanceInLines = Math.ceil(Math.abs(newRestTopY - oldRestTopY) / staveSpace);
+                    const distanceInLines = Math.ceil(Math.abs(newRestTopY - oldRestTopY) / staveSpace);
 
                     // register new min/max offsets
                     reservedSlots.addSlot(newRestTopY, newRestBottomY);

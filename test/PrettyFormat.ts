@@ -557,7 +557,7 @@ export class SnapshotFile {
         const actual = PrettyFormat.format(value, SnapshotFile.matchOptions).split('\n');
 
         const lines = Math.min(expected.length, actual.length);
-        let errors: string[] = [];
+        const errors: string[] = [];
 
         if (expected.length !== actual.length) {
             errors.push(`Expected ${expected.length} lines, but only got ${actual.length}`);

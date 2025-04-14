@@ -59,7 +59,7 @@ export class TestPlatform {
     }
 
     public static changeExtension(file: string, extension: string): string {
-        let lastDot: number = file.lastIndexOf('.');
+        const lastDot: number = file.lastIndexOf('.');
         if (lastDot === -1) {
             return file + extension;
         }

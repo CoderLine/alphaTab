@@ -39,7 +39,7 @@ export class StaffSystemBounds {
         this.realBounds.scaleWith(scale);
         this.visualBounds.scaleWith(scale);
 
-        for (let t of this.bars) {
+        for (const t of this.bars) {
             t.finish(scale);
         }
     }
@@ -62,7 +62,7 @@ export class StaffSystemBounds {
     public findBarAtPos(x: number): MasterBarBounds | null {
         let b: MasterBarBounds | null = null;
         // move from left to right as long we find bars that start before the clicked position
-        for (let bar of this.bars) {
+        for (const bar of this.bars) {
             if (!b || bar.realBounds.x < x) {
                 b = bar;
             } else if (x > bar.realBounds.x + bar.realBounds.w) {

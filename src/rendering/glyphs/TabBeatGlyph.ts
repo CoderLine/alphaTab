@@ -41,12 +41,12 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     public override doLayout(): void {
-        let tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
 
         if (!this.container.beat.isRest) {
             //
             // Note numbers
-            let isGrace: boolean =
+            const isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
 
             let beatEffects: Map<string, Glyph>;
@@ -73,7 +73,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 this.noteNumbers = tabNoteNumbers;
                 tabNoteNumbers.beat = this.container.beat;
                 tabNoteNumbers.beamingHelper = this.beamingHelper;
-                for (let note of this.container.beat.notes) {
+                for (const note of this.container.beat.notes) {
                     if (note.isVisible) {
                         this.createNoteGlyph(note);
                     }
@@ -85,7 +85,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Whammy Bar
             if (this.container.beat.hasWhammyBar) {
-                let whammy: TabWhammyBarGlyph = new TabWhammyBarGlyph(this.container.beat);
+                const whammy: TabWhammyBarGlyph = new TabWhammyBarGlyph(this.container.beat);
                 whammy.renderer = this.renderer;
                 whammy.doLayout();
                 this.container.ties.push(whammy);
@@ -94,7 +94,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Tremolo Picking
             if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
                 let offset: number = 0;
-                let speed = this.container.beat.tremoloSpeed!;
+                const speed = this.container.beat.tremoloSpeed!;
                 let tremoloX = 5;
                 switch (speed) {
                     case Duration.ThirtySecond:
@@ -131,8 +131,8 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 }
             }
         } else {
-            let line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
-            let y: number = tabRenderer.getTabY(line);
+            const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
+            const y: number = tabRenderer.getTabY(line);
             const restGlyph = new TabRestGlyph(0, y, tabRenderer.showRests, this.container.beat.duration);
             this.restGlyph = restGlyph;
             restGlyph.beat = this.container.beat;
@@ -154,7 +154,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         }
         let w: number = 0;
         for (let i: number = 0, j: number = this.glyphs!.length; i < j; i++) {
-            let g: Glyph = this.glyphs![i];
+            const g: Glyph = this.glyphs![i];
             g.x = w;
             g.renderer = this.renderer;
             g.doLayout();
@@ -184,15 +184,15 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     private createNoteGlyph(n: Note): void {
-        let tr: TabBarRenderer = this.renderer as TabBarRenderer;
-        let noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n);
-        let l: number = n.beat.voice.bar.staff.tuning.length - n.string;
+        const tr: TabBarRenderer = this.renderer as TabBarRenderer;
+        const noteNumberGlyph: NoteNumberGlyph = new NoteNumberGlyph(0, 0, n);
+        const l: number = n.beat.voice.bar.staff.tuning.length - n.string;
         noteNumberGlyph.y = tr.getTabY(l);
         noteNumberGlyph.renderer = this.renderer;
         noteNumberGlyph.doLayout();
         this.noteNumbers!.addNoteGlyph(noteNumberGlyph, n);
-        let topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
-        let bottomY = topY + noteNumberGlyph.height;
+        const topY = noteNumberGlyph.y - noteNumberGlyph.height / 2;
+        const bottomY = topY + noteNumberGlyph.height;
         this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, topY, bottomY);
     }
 }

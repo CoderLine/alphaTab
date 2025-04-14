@@ -13,7 +13,7 @@ export class HtmlElementContainer implements IContainer {
         () =>
             new ResizeObserver((entries: ResizeObserverEntry[]) => {
                 for (const e of entries) {
-                    let evt = new CustomEvent('resize', {
+                    const evt = new CustomEvent('resize', {
                         detail: e
                     });
                     e.target.dispatchEvent(evt);

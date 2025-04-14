@@ -37,12 +37,12 @@ export class TieGlyph extends Glyph {
             return;
         }
 
-        let startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        const startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
         );
         this.startNoteRenderer = startNoteRenderer;
-        let endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        const endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.endBeat.voice.bar
         );
@@ -258,7 +258,7 @@ export class TieGlyph extends Glyph {
         // normal vector
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;
-        let length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
         if (down) {
             normalVectorX *= -1;
         } else {
@@ -268,13 +268,13 @@ export class TieGlyph extends Glyph {
         normalVectorX /= length;
         normalVectorY /= length;
         // center of connection
-        let centerX: number = (x2 + x1) / 2;
-        let centerY: number = (y2 + y1) / 2;
+        const centerX: number = (x2 + x1) / 2;
+        const centerY: number = (y2 + y1) / 2;
         // control points
-        let cp1X: number = centerX + offset * normalVectorX;
-        let cp1Y: number = centerY + offset * normalVectorY;
-        let cp2X: number = centerX + (offset - size) * normalVectorX;
-        let cp2Y: number = centerY + (offset - size) * normalVectorY;
+        const cp1X: number = centerX + offset * normalVectorX;
+        const cp1Y: number = centerY + offset * normalVectorY;
+        const cp2X: number = centerX + (offset - size) * normalVectorX;
+        const cp2Y: number = centerY + (offset - size) * normalVectorY;
 
         return [x1, y1, cp1X, cp1Y, cp2X, cp2Y, x2, y2];
     }
@@ -329,7 +329,7 @@ export class TieGlyph extends Glyph {
     ): void {
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;
-        let length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
         if (down) {
             normalVectorX *= -1;
         } else {
@@ -340,22 +340,22 @@ export class TieGlyph extends Glyph {
         normalVectorY /= length;
         // center of connection
         // TODO: should be 1/3
-        let centerX: number = (x2 + x1) / 2;
-        let centerY: number = (y2 + y1) / 2;
+        const centerX: number = (x2 + x1) / 2;
+        const centerY: number = (y2 + y1) / 2;
         let offset: number = TieGlyph.BendSlurHeight * scale;
         if (x2 - x1 < 20) {
             offset /= 2;
         }
-        let cp1X: number = centerX + offset * normalVectorX;
-        let cp1Y: number = centerY + offset * normalVectorY;
+        const cp1X: number = centerX + offset * normalVectorX;
+        const cp1Y: number = centerY + offset * normalVectorY;
         canvas.beginPath();
         canvas.moveTo(x1, y1);
         canvas.lineTo(cp1X, cp1Y);
         canvas.lineTo(x2, y2);
         canvas.stroke();
         if (slurText) {
-            let w: number = canvas.measureText(slurText).width;
-            let textOffset: number = down ? 0 : -canvas.font.size;
+            const w: number = canvas.measureText(slurText).width;
+            const textOffset: number = down ? 0 : -canvas.font.size;
             canvas.fillText(slurText, cp1X - w / 2, cp1Y + textOffset);
         }
     }

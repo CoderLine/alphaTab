@@ -27,8 +27,8 @@ export class BeatVibratoGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         let startX: number = cx + this.x;
-        let width: number = endX - startX;
-        let loops: number = Math.max(1, width / this._stepSize);
+        const width: number = endX - startX;
+        const loops: number = Math.max(1, width / this._stepSize);
         canvas.beginPath();
         canvas.moveTo(startX, cy + this.y);
         for (let i: number = 0; i < loops; i++) {

@@ -20,7 +20,7 @@ describe('Gp7ExporterTest', () => {
     }
 
     function prepareImporterWithBytes(buffer: Uint8Array): Gp7To8Importer {
-        let readerBase: Gp7To8Importer = new Gp7To8Importer();
+        const readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }

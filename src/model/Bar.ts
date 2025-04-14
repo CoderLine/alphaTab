@@ -318,7 +318,7 @@ export class Bar {
         this._isEmpty = true;
         this._isRestOnly = true;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
-            let voice: Voice = this.voices[i];
+            const voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
             if (i > 0 && !voice.isEmpty) {
                 this.isMultiVoice = true;
@@ -343,7 +343,7 @@ export class Bar {
                 previousMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
             }
 
-            let isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
+            const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
 
             for (const marker of sustainPedals) {
                 if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
@@ -383,8 +383,8 @@ export class Bar {
 
     public calculateDuration(): number {
         let duration: number = 0;
-        for (let voice of this.voices) {
-            let voiceDuration: number = voice.calculateDuration();
+        for (const voice of this.voices) {
+            const voiceDuration: number = voice.calculateDuration();
             if (voiceDuration > duration) {
                 duration = voiceDuration;
             }

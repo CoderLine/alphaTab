@@ -62,7 +62,7 @@ export class BitReader {
     }
 
     public readAll(): Uint8Array {
-        let all: ByteBuffer = ByteBuffer.empty();
+        const all: ByteBuffer = ByteBuffer.empty();
         try {
             while (true) {
                 all.writeByte(this.readByte() & 0xff);

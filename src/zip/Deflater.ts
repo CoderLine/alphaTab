@@ -148,10 +148,10 @@ export class Deflater {
      * needsInput() or finished() returns true or length is zero.
      */
     public deflate(output: Uint8Array, offset: number, length: number): number {
-        let origLength = length;
+        const origLength = length;
 
         while(true) {
-            let count = this._pending.flush(output, offset, length);
+            const count = this._pending.flush(output, offset, length);
             offset += count;
             length -= count;
 

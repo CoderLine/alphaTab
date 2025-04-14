@@ -32,19 +32,19 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
     public override doLayout(): void {
         if (!this.container.beat.isRest) {
-            let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
+            const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
 
-            let fingering: FingeringGroupGlyph = new FingeringGroupGlyph();
+            const fingering: FingeringGroupGlyph = new FingeringGroupGlyph();
             fingering.renderer = this.renderer;
 
-            let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
+            const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(true);
             ghost.renderer = this.renderer;
 
             const preBends = new BendNoteHeadGroupGlyph(this.container.beat, true);
             this._prebends = preBends;
             preBends.renderer = this.renderer;
-            for (let note of this.container.beat.notes) {
+            for (const note of this.container.beat.notes) {
                 const color = ElementStyleHelper.noteColor(
                     this.renderer.resources,
                     NoteSubElement.StandardNotationEffects,
@@ -151,23 +151,23 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     }
 
     private createAccidentalGlyph(n: Note, accidentals: AccidentalGroupGlyph): void {
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         let accidental: AccidentalType = sr.accidentalHelper.applyAccidental(n);
         let noteLine: number = sr.getNoteLine(n);
-        let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+        const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
         const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationAccidentals, n);
         const graceScale = isGrace ? NoteHeadGlyph.GraceScale : 1;
         if (accidental !== AccidentalType.None) {
-            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
+            const g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
             g.colorOverride = color;
             g.renderer = this.renderer;
             accidentals.addGlyph(g);
         }
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
-            let harmonicFret: number = n.displayValue + n.harmonicPitch;
+            const harmonicFret: number = n.displayValue + n.harmonicPitch;
             accidental = sr.accidentalHelper.applyAccidentalForValue(n.beat, harmonicFret, isGrace, false);
             noteLine = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
-            let g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
+            const g = new AccidentalGlyph(0, sr.getScoreY(noteLine), accidental, graceScale);
             g.colorOverride = color;
             g.renderer = this.renderer;
             accidentals.addGlyph(g);

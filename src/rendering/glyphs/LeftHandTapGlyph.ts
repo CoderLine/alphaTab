@@ -16,9 +16,9 @@ export class LeftHandTapGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let res: RenderingResources = this.renderer.resources;
+        const res: RenderingResources = this.renderer.resources;
         canvas.font = res.effectFont;
-        let old: TextAlign = canvas.textAlign;
+        const old: TextAlign = canvas.textAlign;
         canvas.textAlign = TextAlign.Center;
         canvas.fillText('T', cx + this.x, cy + this.y + canvas.font.size / 2);
         canvas.textAlign = old;

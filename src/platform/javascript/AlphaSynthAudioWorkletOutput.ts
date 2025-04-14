@@ -75,8 +75,8 @@ export class AlphaSynthWebWorklet {
                 }
 
                 private handleMessage(e: MessageEvent) {
-                    let data: any = e.data;
-                    let cmd: any = data.cmd;
+                    const data: any = e.data;
+                    const cmd: any = data.cmd;
                     switch (cmd) {
                         case AlphaSynthWorkerSynthOutput.CmdOutputAddSamples:
                             const f: Float32Array = data.samples;
@@ -101,14 +101,14 @@ export class AlphaSynthWebWorklet {
                         return false;
                     }
 
-                    let left: Float32Array = outputs[0][0];
-                    let right: Float32Array = outputs[0][1];
+                    const left: Float32Array = outputs[0][0];
+                    const right: Float32Array = outputs[0][1];
 
                     if (!left || !right) {
                         return true;
                     }
 
-                    let samples: number = left.length + right.length;
+                    const samples: number = left.length + right.length;
                     let buffer = this._outputBuffer;
                     if (buffer.length !== samples) {
                         buffer = new Float32Array(samples);
@@ -146,11 +146,11 @@ export class AlphaSynthWebWorklet {
                     // if we fall under the half of buffers
                     // we request one half
                     const halfBufferCount = (this._bufferCount / 2) | 0;
-                    let halfSamples: number = halfBufferCount * AlphaSynthWebWorkletProcessor.BufferSize;
+                    const halfSamples: number = halfBufferCount * AlphaSynthWebWorkletProcessor.BufferSize;
                     // Issue #631: it can happen that requestBuffers is called multiple times
                     // before we already get samples via addSamples, therefore we need to
                     // remember how many buffers have been requested, and consider them as available.
-                    let bufferedSamples =
+                    const bufferedSamples =
                         this._circularBuffer.count +
                         this._requestedBufferCount * AlphaSynthWebWorkletProcessor.BufferSize;
                     if (bufferedSamples < halfSamples) {
@@ -190,7 +190,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
 
     public override play(): void {
         super.play();
-        let ctx = this._context!;
+        const ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
         Environment.createAudioWorklet(ctx, this._settings).then(
             () => {
@@ -213,8 +213,8 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     }
 
     private handleMessage(e: MessageEvent) {
-        let data: any = e.data;
-        let cmd: any = data.cmd;
+        const data: any = e.data;
+        const cmd: any = data.cmd;
         switch (cmd) {
             case AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed:
                 this.onSamplesPlayed(data.samples);

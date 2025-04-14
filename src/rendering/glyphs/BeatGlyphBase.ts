@@ -22,7 +22,7 @@ export class BeatGlyphBase extends GlyphGroup {
         let w: number = 0;
         if (this.glyphs) {
             for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
-                let g: Glyph = this.glyphs[i];
+                const g: Glyph = this.glyphs[i];
                 g.x = w;
                 g.renderer = this.renderer;
                 g.doLayout();

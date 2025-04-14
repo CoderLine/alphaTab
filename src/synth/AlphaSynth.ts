@@ -101,7 +101,7 @@ export class AlphaSynth implements IAlphaSynth {
 
     public set playbackSpeed(value: number) {
         value = ModelUtils.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
-        let oldSpeed: number = this._sequencer.playbackSpeed;
+        const oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
         this.timePosition = this.timePosition * (oldSpeed / value);
     }
@@ -223,7 +223,7 @@ export class AlphaSynth implements IAlphaSynth {
                 this.output.addSamples(samples);
             } else {
                 // Tell output that there is no data left for it.
-                let samples: Float32Array = new Float32Array(0);
+                const samples: Float32Array = new Float32Array(0);
                 this.output.addSamples(samples);
             }
         });
@@ -336,10 +336,10 @@ export class AlphaSynth implements IAlphaSynth {
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
 
-        let input: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const input: ByteBuffer = ByteBuffer.fromBuffer(data);
         try {
             Logger.debug('AlphaSynth', 'Loading soundfont from bytes');
-            let soundFont: Hydra = new Hydra();
+            const soundFont: Hydra = new Hydra();
             soundFont.load(input);
             if (!append) {
                 this._loadedSoundFonts = [];
@@ -429,7 +429,7 @@ export class AlphaSynth implements IAlphaSynth {
         if (sampleCount === 0) {
             return;
         }
-        let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
+        const playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
         this._notPlayedSamples -= sampleCount * SynthConstants.AudioChannels;
         this.updateTimePosition(this._timePosition + playedMillis, false);
         this.checkForFinish();

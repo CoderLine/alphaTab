@@ -57,7 +57,7 @@ export class Settings {
     }
 
     public static get songBook(): Settings {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.setSongBookModeSettings();
         return settings;
     }

@@ -12,7 +12,7 @@ export class VorbisFile {
 
         const decoder = new VorbisStreamReader(packets);
         while (true) {
-            let stream = decoder.read();
+            const stream = decoder.read();
             if (stream == null) {
                 break;
             }

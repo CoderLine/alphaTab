@@ -22,10 +22,10 @@ export class Html5Canvas implements ICanvas {
     public settings!: Settings;
 
     public constructor() {
-        let fontElement: HTMLElement = document.createElement('span');
+        const fontElement: HTMLElement = document.createElement('span');
         fontElement.classList.add('at');
         document.body.appendChild(fontElement);
-        let style: CSSStyleDeclaration = window.getComputedStyle(fontElement);
+        const style: CSSStyleDeclaration = window.getComputedStyle(fontElement);
         let family: string = style.fontFamily;
         if (family.startsWith('"') || family.startsWith("'")) {
             family = family.substr(1, family.length - 2);
@@ -61,7 +61,7 @@ export class Html5Canvas implements ICanvas {
     }
 
     public endRender(): unknown {
-        let result: HTMLCanvasElement = this._canvas!;
+        const result: HTMLCanvasElement = this._canvas!;
         this._canvas = null;
         return result;
     }
@@ -251,7 +251,7 @@ export class Html5Canvas implements ICanvas {
         centerAtPosition: boolean = false
     ): void {
         let s: string = '';
-        for (let symbol of symbols) {
+        for (const symbol of symbols) {
             if (symbol !== MusicFontSymbol.None) {
                 s += String.fromCharCode(symbol);
             }
@@ -266,9 +266,9 @@ export class Html5Canvas implements ICanvas {
         symbols: string,
         centerAtPosition: boolean
     ): void {
-        let textAlign = this._context.textAlign;
-        let baseLine = this._context.textBaseline;
-        let font: string = this._context.font;
+        const textAlign = this._context.textAlign;
+        const baseLine = this._context.textBaseline;
+        const font: string = this._context.font;
         this._context.font = this._musicFont.toCssString(relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {

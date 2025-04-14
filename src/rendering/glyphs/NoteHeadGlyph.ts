@@ -15,7 +15,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let offset: number = this._isGrace ? 1 : 0;
+        const offset: number = this._isGrace ? 1 : 0;
         if(this.centerOnStem) {
             this.center = true;
         }

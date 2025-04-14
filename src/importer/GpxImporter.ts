@@ -21,7 +21,7 @@ export class GpxImporter extends ScoreImporter {
         // at first we need to load the binary file system
         // from the GPX container
         Logger.debug(this.name, 'Loading GPX filesystem');
-        let fileSystem: GpxFileSystem = new GpxFileSystem();
+        const fileSystem: GpxFileSystem = new GpxFileSystem();
         fileSystem.fileFilter = s => {
             return s.endsWith('score.gpif') || s.endsWith('BinaryStylesheet') || s.endsWith('PartConfiguration') || s.endsWith('LayoutConfiguration');
         };
@@ -32,7 +32,7 @@ export class GpxImporter extends ScoreImporter {
         let binaryStylesheetData: Uint8Array | null = null;
         let partConfigurationData: Uint8Array | null = null;
         let layoutConfigurationData: Uint8Array | null = null;
-        for (let entry of fileSystem.files) {
+        for (const entry of fileSystem.files) {
             switch (entry.fileName) {
                 case 'score.gpif':
                     xml = IOHelper.toString(entry.data!, this.settings.importer.encoding);
@@ -56,14 +56,14 @@ export class GpxImporter extends ScoreImporter {
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
         Logger.debug(this.name, 'Start Parsing score.gpif');
-        let gpifParser: GpifParser = new GpifParser();
+        const gpifParser: GpifParser = new GpifParser();
         gpifParser.parseXml(xml, this.settings);
         Logger.debug(this.name, 'score.gpif parsed');
-        let score: Score = gpifParser.score;
+        const score: Score = gpifParser.score;
 
         if (binaryStylesheetData) {
             Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
-            let binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
+            const binaryStylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
             binaryStylesheet.apply(score);
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
@@ -78,7 +78,7 @@ export class GpxImporter extends ScoreImporter {
 
         if (layoutConfigurationData && partConfigurationParser != null) {
             Logger.debug(this.name, 'Start Parsing Layout Configuration');
-            let layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
+            const layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
                 partConfigurationParser,
                 layoutConfigurationData
             );

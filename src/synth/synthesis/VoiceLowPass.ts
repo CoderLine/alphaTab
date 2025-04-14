@@ -27,9 +27,9 @@ export class VoiceLowPass {
 
     public setup(fc: number): void {
         // Lowpass filter from http://www.earlevel.com/main/2012/11/26/biquad-c-source-code/
-        let k: number = Math.tan(Math.PI * fc);
-        let KK: number = k * k;
-        let norm: number = 1 / (1 + k * this.qInv + KK);
+        const k: number = Math.tan(Math.PI * fc);
+        const KK: number = k * k;
+        const norm: number = 1 / (1 + k * this.qInv + KK);
         this.a0 = KK * norm;
         this.a1 = 2 * this.a0;
         this.b1 = 2 * (KK - 1) * norm;
@@ -37,7 +37,7 @@ export class VoiceLowPass {
     }
 
     public process(input: number): number {
-        let output: number = input * this.a0 + this.z1;
+        const output: number = input * this.a0 + this.z1;
         this.z1 = input * this.a1 + this.z2 - this.b1 * output;
         this.z2 = input * this.a0 - this.b2 * output;
         return output;

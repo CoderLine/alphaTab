@@ -98,7 +98,7 @@ export class LayoutConfiguration {
     public apply(score: Score): void {
         if(this.scoreViews.length > 0) {
             let trackIndex = 0;
-            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
+            for (const trackConfig of this.scoreViews[0].trackViewGroups) {
                 if (trackIndex < score.tracks.length) {
                     const track = score.tracks[trackIndex];
                     track.isVisibleOnMultiTrack = trackConfig.isVisible;

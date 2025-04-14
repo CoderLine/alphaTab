@@ -31,7 +31,7 @@ export class TapEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        let res: RenderingResources = renderer.resources;
+        const res: RenderingResources = renderer.resources;
         if (beat.slap) {
             return new TextGlyph(0, 0, 'S', res.effectFont, TextAlign.Left);
         }

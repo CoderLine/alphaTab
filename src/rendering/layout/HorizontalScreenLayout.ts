@@ -49,7 +49,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 break;
         }
 
-        let score: Score = this.renderer.score!;
+        const score: Score = this.renderer.score!;
 
         let startIndex: number = this.renderer.settings.display.startBar;
         startIndex--; // map to array index
@@ -67,8 +67,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];
-        let countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
-        let partials: HorizontalScreenLayoutPartialInfo[] = [];
+        const countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
+        const partials: HorizontalScreenLayoutPartialInfo[] = [];
         let currentPartial: HorizontalScreenLayoutPartialInfo = new HorizontalScreenLayoutPartialInfo();
         let renderX = 0;
         while (currentBarIndex <= endBarIndex) {

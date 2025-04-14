@@ -14,14 +14,14 @@ export class Tuning {
     public static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
 
     public static getTextForTuning(tuning: number, includeOctave: boolean): string {
-        let parts = Tuning.getTextPartsForTuning(tuning);
+        const parts = Tuning.getTextPartsForTuning(tuning);
         return includeOctave ? parts.join('') : parts[0];
     }
 
     public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
-        let octave: number = (tuning / 12) | 0;
-        let note: number = tuning % 12;
-        let notes: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+        const octave: number = (tuning / 12) | 0;
+        const note: number = tuning % 12;
+        const notes: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
         return [notes[note], (octave + octaveShift).toString()];
     }
 
@@ -140,9 +140,9 @@ export class Tuning {
      * @returns The known tuning.
      */
     public static findTuning(strings: number[]): Tuning | null {
-        let tunings: Tuning[] = Tuning.getPresetsFor(strings.length);
+        const tunings: Tuning[] = Tuning.getPresetsFor(strings.length);
         for (let t: number = 0, tc: number = tunings.length; t < tc; t++) {
-            let tuning: Tuning = tunings[t];
+            const tuning: Tuning = tunings[t];
             let equals: boolean = true;
             for (let i: number = 0, j: number = strings.length; i < j; i++) {
                 if (strings[i] !== tuning.tunings[i]) {

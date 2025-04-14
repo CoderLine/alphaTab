@@ -61,8 +61,8 @@ export class Automation {
         if (reference < 1 || reference > 5) {
             reference = 2;
         }
-        let references: Float32Array = new Float32Array([1, 0.5, 1.0, 1.5, 2.0, 3.0]);
-        let automation: Automation = new Automation();
+        const references: Float32Array = new Float32Array([1, 0.5, 1.0, 1.5, 2.0, 3.0]);
+        const automation: Automation = new Automation();
         automation.type = AutomationType.Tempo;
         automation.isLinear = isLinear;
         automation.ratioPosition = ratioPosition;
@@ -76,7 +76,7 @@ export class Automation {
         ratioPosition: number,
         value: number
     ): Automation {
-        let automation: Automation = new Automation();
+        const automation: Automation = new Automation();
         automation.type = AutomationType.Instrument;
         automation.isLinear = isLinear;
         automation.ratioPosition = ratioPosition;

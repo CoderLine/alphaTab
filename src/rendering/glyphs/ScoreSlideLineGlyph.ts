@@ -36,10 +36,10 @@ export class ScoreSlideLineGlyph extends Glyph {
     }
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let sizeX: number = 12;
+        const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sizeX: number = 12;
         let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2;
-        let endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+        const endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
         let startX = endX - sizeX;
         let startY: number = cy + startNoteRenderer.y;
 
@@ -54,14 +54,14 @@ export class ScoreSlideLineGlyph extends Glyph {
                 return;
         }
 
-        let accidentalsWidth: number = this.getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
+        const accidentalsWidth: number = this.getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
         startX -= accidentalsWidth;
         endX -= accidentalsWidth;
         this.paintSlideLine(canvas, false, startX, endX, startY, endY);
     }
 
     private getAccidentalsWidth(renderer: ScoreBarRenderer, beat: Beat): number {
-        let preNotes: ScoreBeatPreNotesGlyph = renderer.getPreNotesGlyphForBeat(beat) as ScoreBeatPreNotesGlyph;
+        const preNotes: ScoreBeatPreNotesGlyph = renderer.getPreNotesGlyphForBeat(beat) as ScoreBeatPreNotesGlyph;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
         }
@@ -69,10 +69,10 @@ export class ScoreSlideLineGlyph extends Glyph {
     }
 
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let sizeX: number = 12;
-        let offsetX: number = 2;
-        let offsetY: number = 2;
+        const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sizeX: number = 12;
+        const offsetX: number = 2;
+        const offsetY: number = 2;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -88,7 +88,7 @@ export class ScoreSlideLineGlyph extends Glyph {
                     offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
-                    let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                    const endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
                     );
@@ -175,19 +175,19 @@ export class ScoreSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 
             startY -= glyph.height / 2;
             endY -= glyph.height / 2;
 
-            let b: number = endX - startX;
-            let a: number = endY - startY;
-            let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+            const b: number = endX - startX;
+            const a: number = endY - startY;
+            const c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
             glyph.width = b;
 
-            let angle: number = Math.asin(a / c) * (180 / Math.PI);
+            const angle: number = Math.asin(a / c) * (180 / Math.PI);
             canvas.beginRotate(startX, startY, angle);
             glyph.paint(0, 0, canvas);
             canvas.endRotate();

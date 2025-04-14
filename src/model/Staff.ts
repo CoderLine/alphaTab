@@ -137,7 +137,7 @@ export class Staff {
     
 
     public addBar(bar: Bar): void {
-        let bars: Bar[] = this.bars;
+        const bars: Bar[] = this.bars;
         bar.staff = this;
         bar.index = bars.length;
         if (bars.length > 0) {

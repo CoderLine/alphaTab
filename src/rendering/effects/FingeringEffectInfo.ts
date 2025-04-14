@@ -46,14 +46,14 @@ export class FingeringEffectInfo extends EffectBarRendererInfo {
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
         let finger: Fingers = Fingers.Unknown;
         let isLeft: boolean = false;
-        let note: Note = beat.notes[0];
+        const note: Note = beat.notes[0];
         if (note.leftHandFinger !== Fingers.Unknown) {
             finger = note.leftHandFinger;
             isLeft = true;
         } else if (note.rightHandFinger !== Fingers.Unknown) {
             finger = note.rightHandFinger;
         }
-        let s: string = ModelUtils.fingerToString(renderer.settings, beat, finger, isLeft) ?? "";
+        const s: string = ModelUtils.fingerToString(renderer.settings, beat, finger, isLeft) ?? "";
         return new TextGlyph(0, 0, s, renderer.resources.fingeringFont, TextAlign.Left);
     }
 

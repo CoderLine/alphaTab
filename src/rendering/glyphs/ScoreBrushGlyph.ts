@@ -24,24 +24,24 @@ export class ScoreBrushGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._beat.brushType === BrushType.ArpeggioUp || this._beat.brushType === BrushType.ArpeggioDown) {
-            let scoreBarRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-            let lineSize: number = scoreBarRenderer.lineOffset;
-            let startY: number =
+            const scoreBarRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+            const lineSize: number = scoreBarRenderer.lineOffset;
+            const startY: number =
                 cy + this.y + (scoreBarRenderer.getNoteY(this._beat.maxNote!, NoteYPosition.Bottom) - lineSize);
-            let endY: number =
+            const endY: number =
                 cy + this.y + scoreBarRenderer.getNoteY(this._beat.minNote!, NoteYPosition.Top) + lineSize;
-            let arrowX: number = cx + this.x + this.width / 2;
-            let arrowSize: number = 8;
+            const arrowX: number = cx + this.x + this.width / 2;
+            const arrowSize: number = 8;
 
-            let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 
-            let waveOffset = -glyph.height / 2;
+            const waveOffset = -glyph.height / 2;
 
             if (this._beat.brushType === BrushType.ArpeggioUp) {
-                let lineStartY: number = startY + arrowSize;
-                let lineEndY: number = endY - arrowSize;
+                const lineStartY: number = startY + arrowSize;
+                const lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
                 canvas.beginRotate(cx + this.x + 5, lineEndY, -90);
@@ -55,8 +55,8 @@ export class ScoreBrushGlyph extends Glyph {
                 canvas.closePath();
                 canvas.fill();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
-                let lineStartY: number = startY + arrowSize;
-                let lineEndY: number = endY;
+                const lineStartY: number = startY + arrowSize;
+                const lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
                 canvas.beginRotate(cx + this.x + 5, lineStartY, 90);

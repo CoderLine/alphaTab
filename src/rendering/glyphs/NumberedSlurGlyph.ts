@@ -60,14 +60,14 @@ export class NumberedSlurGlyph extends TabTieGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        const startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
         )!;
-        let direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);
-        let slurId: string = `numbered.slur.${this.startNote.beat.id}.${this.endNote.beat.id}.${direction}`;
-        let renderer = this.renderer;
-        let isSlurRendered: boolean = renderer.staff.getSharedLayoutData(slurId, false);
+        const direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);
+        const slurId: string = `numbered.slur.${this.startNote.beat.id}.${this.endNote.beat.id}.${direction}`;
+        const renderer = this.renderer;
+        const isSlurRendered: boolean = renderer.staff.getSharedLayoutData(slurId, false);
         if (!isSlurRendered) {
             renderer.staff.setSharedLayoutData(slurId, true);
             super.paint(cx, cy, canvas);

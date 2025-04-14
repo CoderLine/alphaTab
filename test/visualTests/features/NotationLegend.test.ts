@@ -265,7 +265,7 @@ describe('NotationLegend', () => {
         songBook: boolean,
         fileName: string = 'notation-legend.gp'
     ): Promise<void> {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = startBar;
         settings.display.barCount = barCount;
@@ -273,7 +273,7 @@ describe('NotationLegend', () => {
             settings.setSongBookModeSettings();
         }
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/${fileName}`);
-        let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+        const score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
         const o =  new VisualTestOptions(score, [new VisualTestRun(-1, `test-data/visual-tests/notation-legend/${referenceFileName}`)], settings);
         await VisualTestHelper.runVisualTestFull(o);

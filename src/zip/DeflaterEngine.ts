@@ -172,7 +172,7 @@ export class DeflaterEngine {
      * @param count The number of bytes of data to use as input.
      */
     public setInput(buffer: Uint8Array, offset: number, count: number) {
-        let end = offset + count;
+        const end = offset + count;
         this.inputBuf = buffer;
         this.inputOff = offset;
         this.inputEnd = end;
@@ -188,7 +188,7 @@ export class DeflaterEngine {
         let progress: boolean;
         do {
             this.fillWindow();
-            let canFlush = flush && (this.inputOff === this.inputEnd);
+            const canFlush = flush && (this.inputOff === this.inputEnd);
             progress = this.deflateSlow(canFlush, finish);
         } while (this.pending.isFlushed && progress); // repeat while we have no pending output and progress was made
         return progress;
@@ -221,10 +221,10 @@ export class DeflaterEngine {
                 this.slideWindow();
             }
 
-            let prevMatch = this.matchStart;
+            const prevMatch = this.matchStart;
             let prevLen = this.matchLen;
             if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
-                let hashHead = this.insertString();
+                const hashHead = this.insertString();
 
                 if (hashHead !== 0 &&
                     this.strstart - hashHead <= DeflaterConstants.MAX_DIST &&
@@ -270,7 +270,7 @@ export class DeflaterEngine {
                 if (this.prevAvailable) {
                     len--;
                 }
-                let lastBlock = (finish && (this.lookahead === 0) && !this.prevAvailable);
+                const lastBlock = (finish && (this.lookahead === 0) && !this.prevAvailable);
                 this.huffman.flushBlock(this.window, this.blockStart, len, lastBlock);
                 this.blockStart += len;
                 return !lastBlock;
@@ -290,13 +290,13 @@ export class DeflaterEngine {
         let match: number;
         let scan = this.strstart;
         // scanMax is the highest position that we can look at
-        let scanMax = scan + Math.min(DeflaterConstants.MAX_MATCH, this.lookahead) - 1;
-        let limit = Math.max(scan - DeflaterConstants.MAX_DIST, 0);
+        const scanMax = scan + Math.min(DeflaterConstants.MAX_MATCH, this.lookahead) - 1;
+        const limit = Math.max(scan - DeflaterConstants.MAX_DIST, 0);
 
-        let window = this.window;
-        let prev = this.prev;
+        const window = this.window;
+        const prev = this.prev;
         let chainLength = this.maxChain;
-        let niceLength = Math.min(this.niceLength, this.lookahead);
+        const niceLength = Math.min(this.niceLength, this.lookahead);
 
         this.matchLen = Math.max(this.matchLen, DeflaterConstants.MIN_MATCH - 1);
 
@@ -426,10 +426,9 @@ export class DeflaterEngine {
      * @returns The previous hash value
      */
     private insertString(): number {
-        let match: number;
-        let hash = ((this.insertHashIndex << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) & DeflaterConstants.HASH_MASK;
+        const hash = ((this.insertHashIndex << DeflaterConstants.HASH_SHIFT) ^ this.window[this.strstart + (DeflaterConstants.MIN_MATCH - 1)]) & DeflaterConstants.HASH_MASK;
 
-        match = this.head[hash];
+        const match = this.head[hash];
         this.prev[this.strstart & DeflaterConstants.WMASK] = match;
         this.head[hash] = this.strstart;
         this.insertHashIndex = hash;
@@ -479,13 +478,13 @@ export class DeflaterEngine {
         // Slide the hash table (could be avoided with 32 bit values
         // at the expense of memory usage).
         for (let i = 0; i < DeflaterConstants.HASH_SIZE; ++i) {
-            let m = this.head[i] & 0xffff;
+            const m = this.head[i] & 0xffff;
             this.head[i] = (m >= DeflaterConstants.WSIZE ? (m - DeflaterConstants.WSIZE) : 0);
         }
 
         // Slide the prev table.
         for (let i = 0; i < DeflaterConstants.WSIZE; i++) {
-            let m = this.prev[i] & 0xffff;
+            const m = this.prev[i] & 0xffff;
             this.prev[i] = (m >= DeflaterConstants.WSIZE ? (m - DeflaterConstants.WSIZE) : 0);
         }
     }

@@ -96,7 +96,7 @@ export abstract class ScoreLayout {
     public layoutAndRender(): void {
         this._lazyPartials.clear();
 
-        let score: Score = this.renderer.score!;
+        const score: Score = this.renderer.score!;
 
         this.firstBarIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.renderer.settings);
         this.lastBarIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.renderer.settings, this.firstBarIndex);
@@ -273,9 +273,9 @@ export abstract class ScoreLayout {
         const notation = settings.notation;
         const res = settings.display.resources;
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
-            let stavesWithTuning: Staff[] = [];
-            for (let track of this.renderer.tracks!) {
-                for (let staff of track.staves) {
+            const stavesWithTuning: Staff[] = [];
+            for (const track of this.renderer.tracks!) {
+                for (const staff of track.staves) {
                     let showTuning =
                         !staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature;
 
@@ -300,7 +300,7 @@ export abstract class ScoreLayout {
                 for (const staff of stavesWithTuning) {
                     if (staff.stringTuning.tunings.length > 0) {
                         const trackLabel = stavesWithTuning.length > 1 ? staff.track.name : '';
-                        let item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
+                        const item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
                         item.colorOverride = ElementStyleHelper.trackColor(
                             res,
                             TrackSubElement.StringTuning,
@@ -317,9 +317,9 @@ export abstract class ScoreLayout {
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
             this.chordDiagrams.renderer = fakeBarRenderer;
-            let chordIds: Set<string> = new Set<string>();
+            const chordIds: Set<string> = new Set<string>();
 
-            for (let track of this.renderer.tracks!) {
+            for (const track of this.renderer.tracks!) {
                 const shouldShowDiagramsForTrack =
                     score.stylesheet.globalDisplayChordDiagramsOnTop &&
                     (score.stylesheet.perTrackChordDiagramsOnTop == null ||
@@ -330,7 +330,7 @@ export abstract class ScoreLayout {
                     continue;
                 }
 
-                for (let staff of track.staves) {
+                for (const staff of track.staves) {
                     const sc = staff.chords;
                     if (sc) {
                         for (const [, chord] of sc) {
@@ -352,15 +352,15 @@ export abstract class ScoreLayout {
     public lastBarIndex: number = 0;
 
     protected createEmptyStaffSystem(): StaffSystem {
-        let system: StaffSystem = new StaffSystem(this);
+        const system: StaffSystem = new StaffSystem(this);
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
-            let track: Track = this.renderer.tracks![trackIndex];
+            const track: Track = this.renderer.tracks![trackIndex];
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
-                let staff: Staff = track.staves[staffIndex];
-                let profile: BarRendererFactory[] = Environment.staveProfiles.get(
+                const staff: Staff = track.staves[staffIndex];
+                const profile: BarRendererFactory[] = Environment.staveProfiles.get(
                     this.renderer.settings.display.staveProfile
                 )!;
-                for (let factory of profile) {
+                for (const factory of profile) {
                     if (factory.canCreate(track, staff)) {
                         system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
                     }
@@ -384,7 +384,7 @@ export abstract class ScoreLayout {
 
     public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
         if (this._barRendererLookup.has(key)) {
-            let lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
+            const lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
             lookup.delete(renderer.bar.id);
             if (renderer.additionalMultiRestBars) {
                 for (const b of renderer.additionalMultiRestBars) {
@@ -395,7 +395,7 @@ export abstract class ScoreLayout {
     }
 
     public getRendererForBar(key: string, bar: Bar): BarRendererBase | null {
-        let barRendererId: number = bar.id;
+        const barRendererId: number = bar.id;
         if (this._barRendererLookup.has(key) && this._barRendererLookup.get(key)!.has(barRendererId)) {
             return this._barRendererLookup.get(key)!.get(barRendererId)!;
         }
@@ -469,8 +469,8 @@ export abstract class ScoreLayout {
     public layoutAndRenderAnnotation(y: number): number {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         const msg: string = 'rendered by alphaTab';
-        let resources: RenderingResources = this.renderer.settings.display.resources;
-        let size: number = 12;
+        const resources: RenderingResources = this.renderer.settings.display.resources;
+        const size: number = 12;
         const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);

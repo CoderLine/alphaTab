@@ -34,8 +34,8 @@ export class RiffChunk {
             parent.size -= RiffChunk.HeaderSize + chunk.size;
         }
 
-        let isRiff: boolean = chunk.id === 'RIFF';
-        let isList: boolean = chunk.id === 'LIST';
+        const isRiff: boolean = chunk.id === 'RIFF';
+        const isList: boolean = chunk.id === 'LIST';
         if (isRiff && parent) {
             // not allowed
             return false;

@@ -18,7 +18,7 @@ describe('Gp8ImporterTest', () => {
     }
 
     function prepareImporterWithBytes(buffer: Uint8Array) {
-        let readerBase: Gp7To8Importer = new Gp7To8Importer();
+        const readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }

@@ -26,7 +26,7 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
 
     public override play(): void {
         super.play();
-        let ctx = this._context!;
+        const ctx = this._context!;
         // create a script processor node which will replace the silence with the generated audio
         this._audioNode = ctx.createScriptProcessor(4096, 0, 2);
         this._audioNode.onaudioprocess = this.generateSound.bind(this);
@@ -61,11 +61,11 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
         // if we fall under the half of buffers
         // we request one half
         const halfBufferCount = (this._bufferCount / 2) | 0;
-        let halfSamples: number = halfBufferCount * AlphaSynthWebAudioOutputBase.BufferSize;
+        const halfSamples: number = halfBufferCount * AlphaSynthWebAudioOutputBase.BufferSize;
         // Issue #631: it can happen that requestBuffers is called multiple times
         // before we already get samples via addSamples, therefore we need to
         // remember how many buffers have been requested, and consider them as available.
-        let bufferedSamples =
+        const bufferedSamples =
             this._circularBuffer.count + this._requestedBufferCount * AlphaSynthWebAudioOutputBase.BufferSize;
         if (bufferedSamples < halfSamples) {
             for (let i: number = 0; i < halfBufferCount; i++) {
@@ -77,9 +77,9 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
 
     private _outputBuffer: Float32Array = new Float32Array(0);
     private generateSound(e: AudioProcessingEvent): void {
-        let left: Float32Array = e.outputBuffer.getChannelData(0);
-        let right: Float32Array = e.outputBuffer.getChannelData(1);
-        let samples: number = left.length + right.length;
+        const left: Float32Array = e.outputBuffer.getChannelData(0);
+        const right: Float32Array = e.outputBuffer.getChannelData(1);
+        const samples: number = left.length + right.length;
         let buffer = this._outputBuffer;
         if (buffer.length !== samples) {
             buffer = new Float32Array(samples);

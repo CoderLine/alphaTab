@@ -227,18 +227,18 @@ export class TestUiFacade implements IUiFacade<unknown> {
     }
 
     public getOffset(scrollContainer: IContainer | null, container: IContainer): Bounds {
-        let element = container as TestUiContainer;
+        const element = container as TestUiContainer;
 
         let top: number = element.top;
         let left: number = element.left;
         if (scrollContainer) {
-            let scrollElement = scrollContainer as TestUiContainer;
-            let scrollElementOffset = this.getOffset(null, scrollContainer);
+            const scrollElement = scrollContainer as TestUiContainer;
+            const scrollElementOffset = this.getOffset(null, scrollContainer);
             top = top + scrollElement.scrollTop - scrollElementOffset.y;
             left = left + scrollElement.scrollLeft - scrollElementOffset.x;
         }
 
-        let b = new Bounds();
+        const b = new Bounds();
         b.x = left;
         b.y = top;
         b.w = element.width;
@@ -261,7 +261,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
             return true;
         }
         if (data instanceof ArrayBuffer) {
-            let byteArray: Uint8Array = new Uint8Array(data as ArrayBuffer);
+            const byteArray: Uint8Array = new Uint8Array(data as ArrayBuffer);
             success(ScoreLoader.loadScoreFromBytes(byteArray, this._api.settings));
             return true;
         }

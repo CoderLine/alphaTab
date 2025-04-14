@@ -26,13 +26,13 @@ export class GpImporterTestHelper {
         name: string,
         settings: Settings | null = null
     ): Promise<Gp3To5Importer> {
-        let path: string = 'test-data/';
+        const path: string = 'test-data/';
         const buffer = await TestPlatform.loadFile(path + name);
         return GpImporterTestHelper.prepareImporterWithBytes(buffer, settings);
     }
 
     public static prepareImporterWithBytes(buffer: Uint8Array, settings: Settings | null = null): Gp3To5Importer {
-        let readerBase: Gp3To5Importer = new Gp3To5Importer();
+        const readerBase: Gp3To5Importer = new Gp3To5Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), settings ?? new Settings());
         return readerBase;
     }
@@ -40,7 +40,7 @@ export class GpImporterTestHelper {
     public static checkNotes(score: Score): void {
         // Whole Notes
         let beat: number = 0;
-        let durationsInFile: Duration[] = [
+        const durationsInFile: Duration[] = [
             Duration.Whole,
             Duration.Half,
             Duration.Quarter,
@@ -49,7 +49,7 @@ export class GpImporterTestHelper {
             Duration.ThirtySecond,
             Duration.SixtyFourth
         ];
-        for (let duration of durationsInFile) {
+        for (const duration of durationsInFile) {
             expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).to.equal(1);
             expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).to.equal(1);
             expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
@@ -478,8 +478,8 @@ export class GpImporterTestHelper {
     }
 
     public static checkChords(score: Score): void {
-        let track: Track = score.tracks[0];
-        let staff: Staff = track.staves[0];
+        const track: Track = score.tracks[0];
+        const staff: Staff = track.staves[0];
         expect(staff.chords!.size).to.equal(8);
 
         GpImporterTestHelper.checkChord(

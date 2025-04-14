@@ -85,7 +85,7 @@ export class PartConfiguration {
     }
 
     public constructor(partConfigurationData: Uint8Array) {
-        let readable: ByteBuffer = ByteBuffer.fromBuffer(partConfigurationData);
+        const readable: ByteBuffer = ByteBuffer.fromBuffer(partConfigurationData);
 
         const scoreViewCount: number = IOHelper.readInt32BE(readable);
 
@@ -102,7 +102,7 @@ export class PartConfiguration {
                 if (flags === 0) {
                     flags = 1;
                 }
-                let trackConfiguration = new PartConfigurationTrackViewGroup();
+                const trackConfiguration = new PartConfigurationTrackViewGroup();
                 trackConfiguration.showStandardNotation = (flags & 0x01) !== 0;
                 trackConfiguration.showTablature = (flags & 0x02) !== 0;
                 trackConfiguration.showSlash = (flags & 0x04) !== 0;

@@ -51,7 +51,7 @@ export async function initializeJestSnapshot() {
                 const received = utils.flag(this, 'object');
                 const isNot = utils.flag(this, 'negate') as boolean;
 
-                let args = [received];
+                const args = [received];
                 if (message !== undefined) {
                     args.push(message);
                 }
@@ -341,7 +341,7 @@ function writeSummaryReport() {
 
     // filter out obsolete keys if we did not execute the related test
     for (const uncheckedFile of snapshots.uncheckedKeysByFile) {
-        let keysToRemove = new Set<string>();
+        const keysToRemove = new Set<string>();
         for (const key of uncheckedFile.keys) {
             let removeKey = true;
             for (const executed of executedTestNames) {

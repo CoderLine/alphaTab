@@ -280,8 +280,8 @@ export class AlphaTexImporter extends ScoreImporter {
             return;
         }
 
-        for (let track of this._score.tracks) {
-            for (let staff of track.staves) {
+        for (const track of this._score.tracks) {
+            for (const staff of track.staves) {
                 // fill empty beats
                 for (const b of staff.bars) {
                     for (const v of b.voices) {
@@ -330,7 +330,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else {
             receivedSymbol = expected;
         }
-        let e = AlphaTexError.symbolError(
+        const e = AlphaTexError.symbolError(
             this._lastValidSpot[0],
             this._lastValidSpot[1],
             this._lastValidSpot[2],
@@ -346,7 +346,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private errorMessage(message: string): void {
-        let e: AlphaTexError = AlphaTexError.errorMessage(
+        const e: AlphaTexError = AlphaTexError.errorMessage(
             message,
             this._lastValidSpot[0],
             this._lastValidSpot[1],
@@ -634,7 +634,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this.saveValidSpot();
             } else if (this._ch === 0x22 /* " */ || this._ch === 0x27 /* ' */) {
-                let startChar: number = this._ch;
+                const startChar: number = this._ch;
                 this._ch = this.nextChar();
                 let s: string = '';
                 this._sy = AlphaTexSymbols.String;
@@ -713,8 +713,8 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (this.isDigit(this._ch)) {
                 this.readNumberOrName();
             } else if (AlphaTexImporter.isNameLetter(this._ch)) {
-                let name: string = this.readName();
-                let tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
+                const name: string = this.readName();
+                const tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
                 if (tuning) {
                     this._sy = AlphaTexSymbols.Tuning;
                     this._syData = tuning;
@@ -815,7 +815,7 @@ export class AlphaTexImporter extends ScoreImporter {
         let anyOtherMeta = false;
         let continueReading: boolean = true;
         while (this._sy === AlphaTexSymbols.MetaCommand && continueReading) {
-            let metadataTag: string = (this._syData as string).toLowerCase();
+            const metadataTag: string = (this._syData as string).toLowerCase();
             switch (metadataTag) {
                 case 'title':
                 case 'subtitle':
@@ -1138,12 +1138,12 @@ export class AlphaTexImporter extends ScoreImporter {
                 return StaffMetaResult.KnownStaffMeta;
             case 'tuning':
                 this._sy = this.newSy();
-                let strings: number = this._currentStaff.tuning.length;
+                const strings: number = this._currentStaff.tuning.length;
                 this._staffHasExplicitTuning = true;
                 this._staffTuningApplied = false;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        let text: string = (this._syData as string).toLowerCase();
+                        const text: string = (this._syData as string).toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             this.makeCurrentStaffPitched();
                         } else {
@@ -1152,9 +1152,9 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._sy = this.newSy();
                         break;
                     case AlphaTexSymbols.Tuning:
-                        let tuning: number[] = [];
+                        const tuning: number[] = [];
                         do {
-                            let t: TuningParseResult = this._syData as TuningParseResult;
+                            const t: TuningParseResult = this._syData as TuningParseResult;
                             tuning.push(t.realValue);
                             this._sy = this.newSy();
                         } while (this._sy === AlphaTexSymbols.Tuning);
@@ -1181,14 +1181,14 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
                 this._staffTuningApplied = false;
                 if (this._sy === AlphaTexSymbols.Number) {
-                    let instrument: number = this._syData as number;
+                    const instrument: number = this._syData as number;
                     if (instrument >= 0 && instrument <= 127) {
                         this._currentTrack.playbackInfo.program = this._syData as number;
                     } else {
                         this.error('instrument', AlphaTexSymbols.Number, false);
                     }
                 } else if (this._sy === AlphaTexSymbols.String) {
-                    let instrumentName: string = (this._syData as string).toLowerCase();
+                    const instrumentName: string = (this._syData as string).toLowerCase();
                     if (instrumentName === 'percussion') {
                         for (const staff of this._currentTrack.staves) {
                             this.applyPercussionStaff(staff);
@@ -1205,7 +1205,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return StaffMetaResult.KnownStaffMeta;
             case 'lyrics':
                 this._sy = this.newSy();
-                let lyrics: Lyrics = new Lyrics();
+                const lyrics: Lyrics = new Lyrics();
                 lyrics.startBar = 0;
                 lyrics.text = '';
                 if (this._sy === AlphaTexSymbols.Number) {
@@ -1222,7 +1222,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return StaffMetaResult.KnownStaffMeta;
             case 'chord':
                 this._sy = this.newSy();
-                let chord: Chord = new Chord();
+                const chord: Chord = new Chord();
                 this.chordProperties(chord);
                 if (this._sy === AlphaTexSymbols.String) {
                     chord.name = this._syData as string;
@@ -1440,7 +1440,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private bars(): boolean {
-        let anyData = this.bar();
+        const anyData = this.bar();
         while (this._sy !== AlphaTexSymbols.Eof) {
             // read pipe from last bar
             if (this._sy === AlphaTexSymbols.Pipe) {
@@ -1667,9 +1667,9 @@ export class AlphaTexImporter extends ScoreImporter {
     private bar(): boolean {
         const anyStaffMeta = this.trackStaffMeta();
 
-        let bar: Bar = this.newBar(this._currentStaff);
+        const bar: Bar = this.newBar(this._currentStaff);
         if (this._currentStaff.bars.length > this._score.masterBars.length) {
-            let master: MasterBar = new MasterBar();
+            const master: MasterBar = new MasterBar();
             this._score.addMasterBar(master);
             if (master.index > 0) {
                 master.keySignature = master.previousMasterBar!.keySignature;
@@ -1753,7 +1753,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         let anyBeatData = false;
-        let voice: Voice = bar.voices[this._voiceIndex];
+        const voice: Voice = bar.voices[this._voiceIndex];
 
         // if we have a setup like \track \staff \track \staff (without any notes/beats defined)
         // we are at a track meta at this point and we don't read any beats
@@ -1771,7 +1771,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         if (voice.beats.length === 0) {
-            let emptyBeat: Beat = new Beat();
+            const emptyBeat: Beat = new Beat();
             emptyBeat.isEmpty = true;
             voice.addBeat(emptyBeat);
         }
@@ -1799,7 +1799,7 @@ export class AlphaTexImporter extends ScoreImporter {
         this._barIndex++;
 
         for (let i = 0; i < voiceCount; i++) {
-            let voice: Voice = new Voice();
+            const voice: Voice = new Voice();
             newBar.addVoice(voice);
         }
 
@@ -1810,7 +1810,7 @@ export class AlphaTexImporter extends ScoreImporter {
         // duration specifier?
         this.beatDuration();
 
-        let beat: Beat = new Beat();
+        const beat: Beat = new Beat();
         voice.addBeat(beat);
 
         this._allowTuning = !this._currentStaff.isPercussion;
@@ -1891,7 +1891,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            let effect: string = (this._syData as string).toLowerCase();
+            const effect: string = (this._syData as string).toLowerCase();
             switch (effect) {
                 case 'tu':
                     this._sy = this.newSy();
@@ -1933,7 +1933,7 @@ export class AlphaTexImporter extends ScoreImporter {
      * @returns true if a effect could be applied, otherwise false
      */
     private applyBeatEffect(beat: Beat): boolean {
-        let syData: string = (this._syData as string).toLowerCase();
+        const syData: string = (this._syData as string).toLowerCase();
         if (syData === 'f') {
             beat.fade = FadeType.FadeIn;
         } else if (syData === 'fo') {
@@ -1988,7 +1988,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'tb' || syData === 'tbe') {
             this._sy = this.newSy();
 
-            let exact: boolean = syData === 'tbe';
+            const exact: boolean = syData === 'tbe';
 
             // Type
             if (this._sy === AlphaTexSymbols.String) {
@@ -2038,8 +2038,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 // set positions
                 if (!exact) {
-                    let count: number = beat.whammyBarPoints.length;
-                    let step: number = (60 / count) | 0;
+                    const count: number = beat.whammyBarPoints.length;
+                    const step: number = (60 / count) | 0;
                     let i: number = 0;
                     while (i < count) {
                         beat.whammyBarPoints[i].offset = Math.min(60, i * step);
@@ -2086,10 +2086,10 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'ch') {
             this._sy = this.newSy();
-            let chordName: string = this._syData as string;
-            let chordId: string = this.getChordId(this._currentStaff, chordName);
+            const chordName: string = this._syData as string;
+            const chordId: string = this.getChordId(this._currentStaff, chordName);
             if (!this._currentStaff.hasChord(chordId)) {
-                let chord: Chord = new Chord();
+                const chord: Chord = new Chord();
                 chord.showDiagram = false;
                 chord.name = chordName;
                 this._currentStaff.addChord(chordId, chord);
@@ -2531,7 +2531,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     this.makeCurrentStaffPitched();
                 }
 
-                let tuning: TuningParseResult = this._syData as TuningParseResult;
+                const tuning: TuningParseResult = this._syData as TuningParseResult;
                 octave = tuning.octave;
                 tone = tuning.tone.noteValue;
                 if (this._accidentalMode === AlphaTexAccidentalMode.Explicit) {
@@ -2543,7 +2543,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy(); // Fret done
 
-        let isFretted: boolean =
+        const isFretted: boolean =
             octave === -1 && this._currentStaff.tuning.length > 0 && !this._currentStaff.isPercussion;
         let noteString: number = -1;
         if (isFretted) {
@@ -2563,7 +2563,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this._sy = this.newSy(); // string done
         }
         // read effects
-        let note: Note = new Note();
+        const note: Note = new Note();
         if (isFretted) {
             note.string = this._currentStaff.tuning.length - (noteString - 1);
             note.isDead = isDead;
@@ -2590,10 +2590,10 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            let syData = (this._syData as string).toLowerCase();
+            const syData = (this._syData as string).toLowerCase();
             if (syData === 'b' || syData === 'be') {
                 this._sy = this.newSy();
-                let exact: boolean = syData === 'be';
+                const exact: boolean = syData === 'be';
 
                 // Type
                 if (this._sy === AlphaTexSymbols.String) {
@@ -2646,8 +2646,8 @@ export class AlphaTexImporter extends ScoreImporter {
                             return a.offset - b.offset;
                         });
                     } else {
-                        let count: number = points.length;
-                        let step: number = (60 / (count - 1)) | 0;
+                        const count: number = points.length;
+                        const step: number = (60 / (count - 1)) | 0;
                         let i: number = 0;
                         while (i < count) {
                             points[i].offset = Math.min(60, i * step);
@@ -2685,7 +2685,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('trill-effect', AlphaTexSymbols.Number, true);
                 }
-                let fret: number = this._syData as number;
+                const fret: number = this._syData as number;
                 this._sy = this.newSy();
                 let duration: Duration = Duration.Sixteenth;
                 if (this._sy === AlphaTexSymbols.Number) {
@@ -2937,11 +2937,11 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private barMeta(bar: Bar): boolean {
         let anyMeta = false;
-        let master: MasterBar = bar.masterBar;
+        const master: MasterBar = bar.masterBar;
         let endOfMeta = false;
         while (!endOfMeta && this._sy === AlphaTexSymbols.MetaCommand) {
             anyMeta = true;
-            let syData: string = (this._syData as string).toLowerCase();
+            const syData: string = (this._syData as string).toLowerCase();
             if (syData === 'ts') {
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.String) {
@@ -3020,7 +3020,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         bar.clef = this.parseClefFromInt(this._syData as number);
                         break;
                     case AlphaTexSymbols.Tuning:
-                        let parseResult: TuningParseResult = this._syData as TuningParseResult;
+                        const parseResult: TuningParseResult = this._syData as TuningParseResult;
                         bar.clef = this.parseClefFromInt(parseResult.realValue);
                         break;
                     default:
@@ -3044,7 +3044,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     text = this._syData as string;
                     this._sy = this.newSy();
                 }
-                let section: Section = new Section();
+                const section: Section = new Section();
                 section.marker = marker;
                 section.text = text;
                 master.section = section;
@@ -3134,7 +3134,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         if (master.index === 0 && master.tempoAutomations.length === 0) {
-            let tempoAutomation: Automation = new Automation();
+            const tempoAutomation: Automation = new Automation();
             tempoAutomation.isLinear = false;
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = this._score.tempo;
@@ -3257,7 +3257,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private applyAlternateEnding(master: MasterBar): void {
-        let num = this._syData as number;
+        const num = this._syData as number;
         if (num < 1) {
             // Repeat numberings start from 1
             this.error('alternateending', AlphaTexSymbols.Number, true);

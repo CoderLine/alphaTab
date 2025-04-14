@@ -106,9 +106,9 @@ export function getWorkerRuntime(
     cachedContextify: (s: string) => string,
     workerIndexMap: WeakMap<webpackTypes.ParserState, number>
 ): string {
-    let i = workerIndexMap.get(parser.state) || 0;
+    const i = workerIndexMap.get(parser.state) || 0;
     workerIndexMap.set(parser.state, i + 1);
-    let name = `${cachedContextify(parser.state.module.identifier())}|${i}`;
+    const name = `${cachedContextify(parser.state.module.identifier())}|${i}`;
     const hash = compilation.compiler.webpack.util.createHash(compilation.outputOptions.hashFunction!);
     hash.update(name);
     const digest = hash.digest(compilation.outputOptions.hashDigest) as string;

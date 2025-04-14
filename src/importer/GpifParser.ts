@@ -141,7 +141,7 @@ export class GpifParser {
         this._soundsByTrack = new Map<string, Map<string, GpifSound>>();
         this._skipApplyLyrics = false;
 
-        let dom: XmlDocument = new XmlDocument();
+        const dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
         } catch (e) {
@@ -153,14 +153,14 @@ export class GpifParser {
         this.score.finish(settings);
         if (!this._skipApplyLyrics && this._lyricsByTrack.size > 0) {
             for (const [t, lyrics] of this._lyricsByTrack) {
-                let track: Track = this._tracksById.get(t)!;
+                const track: Track = this._tracksById.get(t)!;
                 track.applyLyrics(lyrics);
             }
         }
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.firstElement;
+        const root: XmlNode | null = dom.firstElement;
         if (!root) {
             return;
         }
@@ -171,7 +171,7 @@ export class GpifParser {
         if (root.localName === 'GPIF') {
             this.score = new Score();
             // parse all children
-            for (let n of root.childElements()) {
+            for (const n of root.childElements()) {
                 switch (n.localName) {
                     case 'Score':
                         this.parseScoreNode(n);
@@ -211,7 +211,7 @@ export class GpifParser {
     // <Score>...</Score>
     //
     private parseScoreNode(element: XmlNode): void {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'Title':
                     this.score.title = c.firstChild!.innerText;
@@ -233,7 +233,7 @@ export class GpifParser {
                     break;
                 case 'WordsAndMusic':
                     if (c.firstChild && c.firstChild.innerText !== '') {
-                        let wordsAndMusic: string = c.firstChild.innerText;
+                        const wordsAndMusic: string = c.firstChild.innerText;
                         if (wordsAndMusic && !this.score.words) {
                             this.score.words = wordsAndMusic;
                         }
@@ -268,7 +268,7 @@ export class GpifParser {
     // <MasterTrack>...</MasterTrack>
     //
     private parseMasterTrackNode(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Automations':
                     this.parseAutomations(c, this._masterTrackAutomations, null, null);
@@ -289,7 +289,7 @@ export class GpifParser {
         sounds: Map<string, GpifSound> | null,
         sustainPedals: Map<number, SustainPedalMarker[]> | null
     ): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Automation':
                     this.parseAutomation(c, automations, sounds, sustainPedals);
@@ -312,7 +312,7 @@ export class GpifParser {
         let textValue: string | null = null;
         let reference: number = 0;
         let text: string | null = null;
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Type':
                     type = c.innerText;
@@ -330,7 +330,7 @@ export class GpifParser {
                     if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
                         textValue = c.innerText;
                     } else {
-                        let parts: string[] = c.innerText.split(' ');
+                        const parts: string[] = c.innerText.split(' ');
                         // Issue 391: Some GPX files might have
                         // single floating point value.
                         if (parts.length === 1) {
@@ -409,7 +409,7 @@ export class GpifParser {
     // <Tracks>...</Tracks>
     //
     private parseTracksNode(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Track':
                     this.parseTrack(c);
@@ -421,28 +421,28 @@ export class GpifParser {
     private parseTrack(node: XmlNode): void {
         this._articulationByName = new Map<string, InstrumentArticulation>();
 
-        let track: Track = new Track();
+        const track: Track = new Track();
         track.ensureStaveCount(1);
-        let staff: Staff = track.staves[0];
+        const staff: Staff = track.staves[0];
         staff.showStandardNotation = true;
-        let trackId: string = node.getAttribute('id');
+        const trackId: string = node.getAttribute('id');
 
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
                     track.name = c.innerText;
                     break;
                 case 'Color':
-                    let parts: string[] = c.innerText.split(' ');
+                    const parts: string[] = c.innerText.split(' ');
                     if (parts.length >= 3) {
-                        let r: number = Number.parseInt(parts[0]);
-                        let g: number = Number.parseInt(parts[1]);
-                        let b: number = Number.parseInt(parts[2]);
+                        const r: number = Number.parseInt(parts[0]);
+                        const g: number = Number.parseInt(parts[1]);
+                        const b: number = Number.parseInt(parts[2]);
                         track.color = new Color(r, g, b, 0xff);
                     }
                     break;
                 case 'Instrument':
-                    let instrumentName: string = c.getAttribute('ref');
+                    const instrumentName: string = c.getAttribute('ref');
                     if (instrumentName.endsWith('-gs') || instrumentName.endsWith('GrandStaff')) {
                         track.ensureStaveCount(2);
                         track.staves[1].showStandardNotation = true;
@@ -478,7 +478,7 @@ export class GpifParser {
                     this.parseSounds(trackId, track, c);
                     break;
                 case 'PlaybackState':
-                    let state: string = c.innerText;
+                    const state: string = c.innerText;
                     track.playbackInfo.isSolo = state === 'Solo';
                     track.playbackInfo.isMute = state === 'Mute';
                     break;
@@ -513,11 +513,11 @@ export class GpifParser {
     }
 
     private parseNotationPatch(track: Track, node: XmlNode) {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'LineCount':
                     const lineCount = Number.parseInt(c.innerText);
-                    for (let staff of track.staves) {
+                    for (const staff of track.staves) {
                         staff.standardNotationLineCount = lineCount;
                     }
                     break;
@@ -529,18 +529,18 @@ export class GpifParser {
     }
 
     private parseInstrumentSet(track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Type':
                     switch (c.innerText) {
                         case 'drumKit':
-                            for (let staff of track.staves) {
+                            for (const staff of track.staves) {
                                 staff.isPercussion = true;
                             }
                             break;
                     }
                     if (c.innerText === 'drumKit') {
-                        for (let staff of track.staves) {
+                        for (const staff of track.staves) {
                             staff.isPercussion = true;
                         }
                     }
@@ -550,7 +550,7 @@ export class GpifParser {
                     break;
                 case 'LineCount':
                     const lineCount = Number.parseInt(c.innerText);
-                    for (let staff of track.staves) {
+                    for (const staff of track.staves) {
                         staff.standardNotationLineCount = lineCount;
                     }
                     break;
@@ -558,7 +558,7 @@ export class GpifParser {
         }
     }
     private parseElements(track: Track, node: XmlNode) {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Element':
                     this.parseElement(track, c);
@@ -570,7 +570,7 @@ export class GpifParser {
     private parseElement(track: Track, node: XmlNode) {
         const typeElement = node.findChildElement('Type');
         const type = typeElement ? typeElement.innerText : '';
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
                 case 'Articulations':
@@ -580,7 +580,7 @@ export class GpifParser {
         }
     }
     private parseArticulations(track: Track, node: XmlNode, elementType: string) {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Articulation':
                     this.parseArticulation(track, c, elementType);
@@ -594,7 +594,7 @@ export class GpifParser {
         articulation.outputMidiNumber = -1;
         articulation.elementType = elementType;
         let name = '';
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             const txt = c.innerText;
             switch (c.localName) {
                 case 'Name':
@@ -736,11 +736,11 @@ export class GpifParser {
 
     private parseStaves(track: Track, node: XmlNode): void {
         let staffIndex: number = 0;
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Staff':
                     track.ensureStaveCount(staffIndex + 1);
-                    let staff: Staff = track.staves[staffIndex];
+                    const staff: Staff = track.staves[staffIndex];
                     this.parseStaff(staff, c);
                     staffIndex++;
                     break;
@@ -749,7 +749,7 @@ export class GpifParser {
     }
 
     private parseStaff(staff: Staff, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Properties':
                     this.parseStaffProperties(staff, c);
@@ -759,7 +759,7 @@ export class GpifParser {
     }
 
     private parseStaffProperties(staff: Staff, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Property':
                     this.parseStaffProperty(staff, c);
@@ -769,14 +769,14 @@ export class GpifParser {
     }
 
     private parseStaffProperty(staff: Staff, node: XmlNode): void {
-        let propertyName: string = node.getAttribute('name');
+        const propertyName: string = node.getAttribute('name');
         switch (propertyName) {
             case 'Tuning':
-                for (let c of node.childElements()) {
+                for (const c of node.childElements()) {
                     switch (c.localName) {
                         case 'Pitches':
-                            let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
-                            let tuning = new Array<number>(tuningParts.length);
+                            const tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
+                            const tuning = new Array<number>(tuningParts.length);
                             for (let i: number = 0; i < tuning.length; i++) {
                                 tuning[tuning.length - 1 - i] = Number.parseInt(tuningParts[i]);
                             }
@@ -798,15 +798,15 @@ export class GpifParser {
                 this.parseDiagramCollectionForStaff(staff, node);
                 break;
             case 'CapoFret':
-                let capo: number = Number.parseInt(node.findChildElement('Fret')!.innerText);
+                const capo: number = Number.parseInt(node.findChildElement('Fret')!.innerText);
                 staff.capo = capo;
                 break;
         }
     }
 
     private parseLyrics(trackId: string, node: XmlNode): void {
-        let tracks: Lyrics[] = [];
-        for (let c of node.childElements()) {
+        const tracks: Lyrics[] = [];
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Line':
                     tracks.push(this.parseLyricsLine(c));
@@ -817,8 +817,8 @@ export class GpifParser {
     }
 
     private parseLyricsLine(node: XmlNode): Lyrics {
-        let lyrics: Lyrics = new Lyrics();
-        for (let c of node.childElements()) {
+        const lyrics: Lyrics = new Lyrics();
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Offset':
                     lyrics.startBar = Number.parseInt(c.innerText);
@@ -832,8 +832,8 @@ export class GpifParser {
     }
 
     private parseDiagramCollectionForTrack(track: Track, node: XmlNode): void {
-        let items: XmlNode = node.findChildElement('Items')!;
-        for (let c of items.childElements()) {
+        const items: XmlNode = node.findChildElement('Items')!;
+        for (const c of items.childElements()) {
             switch (c.localName) {
                 case 'Item':
                     this.parseDiagramItemForTrack(track, c);
@@ -843,8 +843,8 @@ export class GpifParser {
     }
 
     private parseDiagramCollectionForStaff(staff: Staff, node: XmlNode): void {
-        let items: XmlNode = node.findChildElement('Items')!;
-        for (let c of items.childElements()) {
+        const items: XmlNode = node.findChildElement('Items')!;
+        for (const c of items.childElements()) {
             switch (c.localName) {
                 case 'Item':
                     this.parseDiagramItemForStaff(staff, c);
@@ -854,17 +854,17 @@ export class GpifParser {
     }
 
     private parseDiagramItemForTrack(track: Track, node: XmlNode): void {
-        let chord: Chord = new Chord();
-        let chordId: string = node.getAttribute('id');
-        for (let staff of track.staves) {
+        const chord: Chord = new Chord();
+        const chordId: string = node.getAttribute('id');
+        for (const staff of track.staves) {
             staff.addChord(chordId, chord);
         }
         this.parseDiagramItemForChord(chord, node);
     }
 
     private parseDiagramItemForStaff(staff: Staff, node: XmlNode): void {
-        let chord: Chord = new Chord();
-        let chordId: string = node.getAttribute('id');
+        const chord: Chord = new Chord();
+        const chordId: string = node.getAttribute('id');
         staff.addChord(chordId, chord);
         this.parseDiagramItemForChord(chord, node);
     }
@@ -872,31 +872,31 @@ export class GpifParser {
     private parseDiagramItemForChord(chord: Chord, node: XmlNode): void {
         chord.name = node.getAttribute('name');
 
-        let diagram = node.findChildElement('Diagram');
+        const diagram = node.findChildElement('Diagram');
         if (!diagram) {
             chord.showDiagram = false;
             chord.showFingering = false;
             return;
         }
-        let stringCount: number = Number.parseInt(diagram.getAttribute('stringCount'));
-        let baseFret: number = diagram.attributes.has('baseFret') ? Number.parseInt(diagram.getAttribute('baseFret')) : 0;
+        const stringCount: number = Number.parseInt(diagram.getAttribute('stringCount'));
+        const baseFret: number = diagram.attributes.has('baseFret') ? Number.parseInt(diagram.getAttribute('baseFret')) : 0;
         chord.firstFret = baseFret + 1;
         for (let i: number = 0; i < stringCount; i++) {
             chord.strings.push(-1);
         }
-        for (let c of diagram.childElements()) {
+        for (const c of diagram.childElements()) {
             switch (c.localName) {
                 case 'Fret':
-                    let guitarString: number = Number.parseInt(c.getAttribute('string'));
+                    const guitarString: number = Number.parseInt(c.getAttribute('string'));
                     chord.strings[stringCount - guitarString - 1] = baseFret + Number.parseInt(c.getAttribute('fret'));
                     break;
                 case 'Fingering':
-                    let existingFingers: Map<Fingers, boolean> = new Map<Fingers, boolean>();
-                    for (let p of c.childElements()) {
+                    const existingFingers: Map<Fingers, boolean> = new Map<Fingers, boolean>();
+                    for (const p of c.childElements()) {
                         switch (p.localName) {
                             case 'Position':
                                 let finger: Fingers = Fingers.Unknown;
-                                let fret: number = baseFret + Number.parseInt(p.getAttribute('fret'));
+                                const fret: number = baseFret + Number.parseInt(p.getAttribute('fret'));
                                 switch (p.getAttribute('finger')) {
                                     case 'Index':
                                         finger = Fingers.IndexFinger;
@@ -945,7 +945,7 @@ export class GpifParser {
     }
 
     private parseTrackProperties(track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Property':
                     this.parseTrackProperty(track, c);
@@ -955,15 +955,15 @@ export class GpifParser {
     }
 
     private parseTrackProperty(track: Track, node: XmlNode): void {
-        let propertyName: string = node.getAttribute('name');
+        const propertyName: string = node.getAttribute('name');
         switch (propertyName) {
             case 'Tuning':
-                let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
-                let tuning = new Array<number>(tuningParts.length);
+                const tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
+                const tuning = new Array<number>(tuningParts.length);
                 for (let i: number = 0; i < tuning.length; i++) {
                     tuning[tuning.length - 1 - i] = Number.parseInt(tuningParts[i]);
                 }
-                for (let staff of track.staves) {
+                for (const staff of track.staves) {
                     staff.stringTuning.tunings = tuning;
                     staff.showStandardNotation = true;
                     staff.showTablature = true;
@@ -974,8 +974,8 @@ export class GpifParser {
                 this.parseDiagramCollectionForTrack(track, node);
                 break;
             case 'CapoFret':
-                let capo: number = Number.parseInt(node.findChildElement('Fret')!.innerText);
-                for (let staff of track.staves) {
+                const capo: number = Number.parseInt(node.findChildElement('Fret')!.innerText);
+                for (const staff of track.staves) {
                     staff.capo = capo;
                 }
                 break;
@@ -983,7 +983,7 @@ export class GpifParser {
     }
 
     private parseGeneralMidi(track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Program':
                     track.playbackInfo.program = Number.parseInt(c.innerText);
@@ -999,16 +999,16 @@ export class GpifParser {
                     break;
             }
         }
-        let isPercussion: boolean = node.getAttribute('table') === 'Percussion';
+        const isPercussion: boolean = node.getAttribute('table') === 'Percussion';
         if (isPercussion) {
-            for (let staff of track.staves) {
+            for (const staff of track.staves) {
                 staff.isPercussion = true;
             }
         }
     }
 
     private parseSounds(trackId: string, track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Sound':
                     this.parseSound(trackId, track, c);
@@ -1019,7 +1019,7 @@ export class GpifParser {
 
     private parseSound(trackId: string, track: Track, node: XmlNode): void {
         const sound = new GpifSound();
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Name':
                     sound.name = c.innerText;
@@ -1048,7 +1048,7 @@ export class GpifParser {
     }
 
     private parseSoundMidi(sound: GpifSound, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Program':
                     sound.program = Number.parseInt(c.innerText);
@@ -1058,10 +1058,10 @@ export class GpifParser {
     }
 
     private parsePartSounding(track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'TranspositionPitch':
-                    for (let staff of track.staves) {
+                    for (const staff of track.staves) {
                         staff.displayTranspositionPitch = Number.parseInt(c.innerText);
                     }
                     break;
@@ -1072,7 +1072,7 @@ export class GpifParser {
     private parseTranspose(track: Track, node: XmlNode): void {
         let octave: number = 0;
         let chromatic: number = 0;
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Chromatic':
                     chromatic = Number.parseInt(c.innerText);
@@ -1082,13 +1082,13 @@ export class GpifParser {
                     break;
             }
         }
-        for (let staff of track.staves) {
+        for (const staff of track.staves) {
             staff.displayTranspositionPitch = octave * 12 + chromatic;
         }
     }
 
     private parseRSE(track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'ChannelStrip':
                     this.parseChannelStrip(track, c);
@@ -1098,7 +1098,7 @@ export class GpifParser {
     }
 
     private parseChannelStrip(track: Track, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Parameters':
                     this.parseChannelStripParameters(track, c);
@@ -1109,7 +1109,7 @@ export class GpifParser {
 
     private parseChannelStripParameters(track: Track, node: XmlNode): void {
         if (node.firstChild && node.firstChild.value) {
-            let parameters = node.firstChild.value.split(' ');
+            const parameters = node.firstChild.value.split(' ');
             if (parameters.length >= 12) {
                 track.playbackInfo.balance = Math.floor(Number.parseFloat(parameters[11]) * 16);
                 track.playbackInfo.volume = Math.floor(Number.parseFloat(parameters[12]) * 16);
@@ -1121,7 +1121,7 @@ export class GpifParser {
     // <MasterBars>...</MasterBars>
     //
     private parseMasterBarsNode(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'MasterBar':
                     this.parseMasterBar(c);
@@ -1131,14 +1131,14 @@ export class GpifParser {
     }
 
     private parseMasterBar(node: XmlNode): void {
-        let masterBar: MasterBar = new MasterBar();
+        const masterBar: MasterBar = new MasterBar();
         if (this._masterBars.length === 0 && this._hasAnacrusis) {
             masterBar.isAnacrusis = true;
         }
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Time':
-                    let timeParts: string[] = c.innerText.split('/');
+                    const timeParts: string[] = c.innerText.split('/');
                     masterBar.timeSignatureNumerator = Number.parseInt(timeParts[0]);
                     masterBar.timeSignatureDenominator = Number.parseInt(timeParts[1]);
                     break;
@@ -1162,7 +1162,7 @@ export class GpifParser {
                     }
                     break;
                 case 'AlternateEndings':
-                    let alternateEndings: string[] = c.innerText.split(' ');
+                    const alternateEndings: string[] = c.innerText.split(' ');
                     let i: number = 0;
                     for (let k: number = 0; k < alternateEndings.length; k++) {
                         i = i | (1 << (-1 + Number.parseInt(alternateEndings[k])));
@@ -1199,7 +1199,7 @@ export class GpifParser {
                     break;
                 case 'Key':
                     masterBar.keySignature = Number.parseInt(c.findChildElement('AccidentalCount')!.innerText) as KeySignature;
-                    let mode: XmlNode = c.findChildElement('Mode')!;
+                    const mode: XmlNode = c.findChildElement('Mode')!;
                     if (mode) {
                         switch (mode.innerText.toLowerCase()) {
                             case 'major':
@@ -1226,7 +1226,7 @@ export class GpifParser {
     }
 
     private parseDirections(masterBar: MasterBar, node: XmlNode) {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Target':
                     switch (c.innerText) {
@@ -1302,7 +1302,7 @@ export class GpifParser {
     }
 
     private parseFermatas(masterBar: MasterBar, node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Fermata':
                     this.parseFermata(masterBar, c);
@@ -1313,8 +1313,8 @@ export class GpifParser {
 
     private parseFermata(masterBar: MasterBar, node: XmlNode): void {
         let offset: number = 0;
-        let fermata: Fermata = new Fermata();
-        for (let c of node.childElements()) {
+        const fermata: Fermata = new Fermata();
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Type':
                     switch (c.innerText) {
@@ -1333,10 +1333,10 @@ export class GpifParser {
                     fermata.length = Number.parseFloat(c.innerText);
                     break;
                 case 'Offset':
-                    let parts: string[] = c.innerText.split('/');
+                    const parts: string[] = c.innerText.split('/');
                     if (parts.length === 2) {
-                        let numerator: number = Number.parseInt(parts[0]);
-                        let denominator: number = Number.parseInt(parts[1]);
+                        const numerator: number = Number.parseInt(parts[0]);
+                        const denominator: number = Number.parseInt(parts[1]);
                         offset = ((numerator / denominator) * MidiUtils.QuarterTime) | 0;
                     }
                     break;
@@ -1349,7 +1349,7 @@ export class GpifParser {
     // <Bars>...</Bars>
     //
     private parseBars(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Bar':
                     this.parseBar(c);
@@ -1359,9 +1359,9 @@ export class GpifParser {
     }
 
     private parseBar(node: XmlNode): void {
-        let bar: Bar = new Bar();
-        let barId: string = node.getAttribute('id');
-        for (let c of node.childElements()) {
+        const bar: Bar = new Bar();
+        const barId: string = node.getAttribute('id');
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Voices':
                     this._voicesOfBar.set(barId, c.innerText.split(' '));
@@ -1426,7 +1426,7 @@ export class GpifParser {
     // <Voices>...</Voices>
     //
     private parseVoices(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Voice':
                     this.parseVoice(c);
@@ -1436,9 +1436,9 @@ export class GpifParser {
     }
 
     private parseVoice(node: XmlNode): void {
-        let voice: Voice = new Voice();
-        let voiceId: string = node.getAttribute('id');
-        for (let c of node.childElements()) {
+        const voice: Voice = new Voice();
+        const voiceId: string = node.getAttribute('id');
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Beats':
                     this._beatsOfVoice.set(voiceId, c.innerText.split(' '));
@@ -1452,7 +1452,7 @@ export class GpifParser {
     // <Beats>...</Beats>
     //
     private parseBeats(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Beat':
                     this.parseBeat(c);
@@ -1462,9 +1462,9 @@ export class GpifParser {
     }
 
     private parseBeat(node: XmlNode): void {
-        let beat: Beat = new Beat();
-        let beatId: string = node.getAttribute('id');
-        for (let c of node.childElements()) {
+        const beat: Beat = new Beat();
+        const beatId: string = node.getAttribute('id');
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Notes':
                     this._notesOfBeat.set(beatId, c.innerText.split(' '));
@@ -1581,19 +1581,19 @@ export class GpifParser {
                     }
                     break;
                 case 'Whammy':
-                    let whammyOrigin: BendPoint = new BendPoint(0, 0);
+                    const whammyOrigin: BendPoint = new BendPoint(0, 0);
                     whammyOrigin.value = this.toBendValue(Number.parseFloat(c.getAttribute('originValue')));
                     whammyOrigin.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('originOffset')));
                     beat.addWhammyBarPoint(whammyOrigin);
-                    let whammyMiddle1: BendPoint = new BendPoint(0, 0);
+                    const whammyMiddle1: BendPoint = new BendPoint(0, 0);
                     whammyMiddle1.value = this.toBendValue(Number.parseFloat(c.getAttribute('middleValue')));
                     whammyMiddle1.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('middleOffset1')));
                     beat.addWhammyBarPoint(whammyMiddle1);
-                    let whammyMiddle2: BendPoint = new BendPoint(0, 0);
+                    const whammyMiddle2: BendPoint = new BendPoint(0, 0);
                     whammyMiddle2.value = this.toBendValue(Number.parseFloat(c.getAttribute('middleValue')));
                     whammyMiddle2.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('middleOffset2')));
                     beat.addWhammyBarPoint(whammyMiddle2);
-                    let whammyDestination: BendPoint = new BendPoint(0, 0);
+                    const whammyDestination: BendPoint = new BendPoint(0, 0);
                     whammyDestination.value = this.toBendValue(Number.parseFloat(c.getAttribute('destinationValue')));
                     whammyDestination.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('destinationOffset')));
                     beat.addWhammyBarPoint(whammyDestination);
@@ -1668,7 +1668,7 @@ export class GpifParser {
     private parseBeatLyrics(node: XmlNode): string[] {
         const lines: string[] = [];
 
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Line':
                     lines.push(c.innerText);
@@ -1680,10 +1680,10 @@ export class GpifParser {
     }
 
     private parseBeatXProperties(node: XmlNode, beat: Beat): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'XProperty':
-                    let id: string = c.getAttribute('id');
+                    const id: string = c.getAttribute('id');
                     let value: number = 0;
                     switch (id) {
                         case '1124204546':
@@ -1722,7 +1722,7 @@ export class GpifParser {
     }
 
     private parseBarXProperties(node: XmlNode, bar: Bar) {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'XProperty':
                     const id: string = c.getAttribute('id');
@@ -1738,7 +1738,7 @@ export class GpifParser {
     }
 
     private parseMasterBarXProperties(masterBar: MasterBar, node: XmlNode) {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'XProperty':
                     const id: string = c.getAttribute('id');
@@ -1759,10 +1759,10 @@ export class GpifParser {
         let whammyMiddleOffset1: number | null = null;
         let whammyMiddleOffset2: number | null = null;
         let whammyDestination: BendPoint | null = null;
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Property':
-                    let name: string = c.getAttribute('name');
+                    const name: string = c.getAttribute('name');
                     switch (name) {
                         case 'Brush':
                             if (c.findChildElement('Direction')!.innerText === 'Up') {
@@ -1941,7 +1941,7 @@ export class GpifParser {
     // <Notes>...</Notes>
     //
     private parseNotes(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Note':
                     this.parseNote(c);
@@ -1951,9 +1951,9 @@ export class GpifParser {
     }
 
     private parseNote(node: XmlNode): void {
-        let note: Note = new Note();
-        let noteId: string = node.getAttribute('id');
-        for (let c of node.childElements()) {
+        const note: Note = new Note();
+        const noteId: string = node.getAttribute('id');
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Properties':
                     this.parseNoteProperties(c, note, noteId);
@@ -1971,7 +1971,7 @@ export class GpifParser {
                     note.trillSpeed = Duration.Sixteenth;
                     break;
                 case 'Accent':
-                    let accentFlags: number = Number.parseInt(c.innerText);
+                    const accentFlags: number = Number.parseInt(c.innerText);
                     if ((accentFlags & 0x01) !== 0) {
                         note.isStaccato = true;
                     }
@@ -2073,10 +2073,10 @@ export class GpifParser {
         // GP6 had percussion as element+variation
         let element: number = -1;
         let variation: number = -1;
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Property':
-                    let name: string = c.getAttribute('name');
+                    const name: string = c.getAttribute('name');
                     switch (name) {
                         case 'ShowStringNumber':
                             if (c.findChildElement('Enable')) {
@@ -2099,7 +2099,7 @@ export class GpifParser {
                             this._tappedNotes.set(noteId, true);
                             break;
                         case 'HarmonicType':
-                            let htype: XmlNode = c.findChildElement('HType')!;
+                            const htype: XmlNode = c.findChildElement('HType')!;
                             if (htype) {
                                 switch (htype.innerText) {
                                     case 'NoHarmonic':
@@ -2127,7 +2127,7 @@ export class GpifParser {
                             }
                             break;
                         case 'HarmonicFret':
-                            let hfret: XmlNode = c.findChildElement('HFret')!;
+                            const hfret: XmlNode = c.findChildElement('HFret')!;
                             if (hfret) {
                                 note.harmonicValue = Number.parseFloat(hfret.innerText);
                             }
@@ -2209,7 +2209,7 @@ export class GpifParser {
                             note.isLeftHandTapped = true;
                             break;
                         case 'Slide':
-                            let slideFlags: number = Number.parseInt(c.findChildElement('Flags')!.innerText);
+                            const slideFlags: number = Number.parseInt(c.findChildElement('Flags')!.innerText);
                             if ((slideFlags & 1) !== 0) {
                                 note.slideOutType = SlideOutType.Shift;
                             } else if ((slideFlags & 2) !== 0) {
@@ -2264,7 +2264,7 @@ export class GpifParser {
     private parseConcertPitch(node: XmlNode, note: Note) {
         const pitch = node.findChildElement('Pitch');
         if (pitch) {
-            for (let c of pitch.childElements()) {
+            for (const c of pitch.childElements()) {
                 switch (c.localName) {
                     case 'Accidental':
                         switch (c.innerText) {
@@ -2296,7 +2296,7 @@ export class GpifParser {
     }
 
     private parseRhythms(node: XmlNode): void {
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Rhythm':
                     this.parseRhythm(c);
@@ -2306,10 +2306,10 @@ export class GpifParser {
     }
 
     private parseRhythm(node: XmlNode): void {
-        let rhythm: GpifRhythm = new GpifRhythm();
-        let rhythmId: string = node.getAttribute('id');
+        const rhythm: GpifRhythm = new GpifRhythm();
+        const rhythmId: string = node.getAttribute('id');
         rhythm.id = rhythmId;
-        for (let c of node.childElements()) {
+        for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'NoteValue':
                     switch (c.innerText) {
@@ -2363,19 +2363,19 @@ export class GpifParser {
     private buildModel(): void {
         // build score
         for (let i: number = 0, j: number = this._masterBars.length; i < j; i++) {
-            let masterBar: MasterBar = this._masterBars[i];
+            const masterBar: MasterBar = this._masterBars[i];
             this.score.addMasterBar(masterBar);
         }
         // add tracks to score
-        for (let trackId of this._tracksMapping) {
+        for (const trackId of this._tracksMapping) {
             if (!trackId) {
                 continue;
             }
-            let track: Track = this._tracksById.get(trackId)!;
+            const track: Track = this._tracksById.get(trackId)!;
             this.score.addTrack(track);
         }
         // process all masterbars
-        for (let barIds of this._barsOfMasterBar) {
+        for (const barIds of this._barsOfMasterBar) {
             // add all bars of masterbar vertically to all tracks
             let staffIndex: number = 0;
             for (
@@ -2383,28 +2383,28 @@ export class GpifParser {
                 barIndex < barIds.length && trackIndex < this.score.tracks.length;
                 barIndex++
             ) {
-                let barId: string = barIds[barIndex];
+                const barId: string = barIds[barIndex];
                 if (barId !== GpifParser.InvalidId) {
-                    let bar: Bar = this._barsById.get(barId)!;
-                    let track: Track = this.score.tracks[trackIndex];
-                    let staff: Staff = track.staves[staffIndex];
+                    const bar: Bar = this._barsById.get(barId)!;
+                    const track: Track = this.score.tracks[trackIndex];
+                    const staff: Staff = track.staves[staffIndex];
                     staff.addBar(bar);
                     if (this._voicesOfBar.has(barId)) {
                         // add voices to bars
-                        for (let voiceId of this._voicesOfBar.get(barId)!) {
+                        for (const voiceId of this._voicesOfBar.get(barId)!) {
                             if (voiceId !== GpifParser.InvalidId) {
-                                let voice: Voice = this._voiceById.get(voiceId)!;
+                                const voice: Voice = this._voiceById.get(voiceId)!;
                                 bar.addVoice(voice);
                                 if (this._beatsOfVoice.has(voiceId)) {
                                     // add beats to voices
-                                    for (let beatId of this._beatsOfVoice.get(voiceId)!) {
+                                    for (const beatId of this._beatsOfVoice.get(voiceId)!) {
                                         if (beatId !== GpifParser.InvalidId) {
                                             // important! we clone the beat because beats get reused
                                             // in gp6, our model needs to have unique beats.
-                                            let beat: Beat = BeatCloner.clone(this._beatById.get(beatId)!);
+                                            const beat: Beat = BeatCloner.clone(this._beatById.get(beatId)!);
                                             voice.addBeat(beat);
-                                            let rhythmId: string = this._rhythmOfBeat.get(beatId)!;
-                                            let rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
+                                            const rhythmId: string = this._rhythmOfBeat.get(beatId)!;
+                                            const rhythm: GpifRhythm = this._rhythmById.get(rhythmId)!;
                                             // set beat duration
                                             beat.duration = rhythm.value;
                                             beat.dots = rhythm.dots;
@@ -2412,7 +2412,7 @@ export class GpifParser {
                                             beat.tupletDenominator = rhythm.tupletDenominator;
                                             // add notes to beat
                                             if (this._notesOfBeat.has(beatId)) {
-                                                for (let noteId of this._notesOfBeat.get(beatId)!) {
+                                                for (const noteId of this._notesOfBeat.get(beatId)!) {
                                                     if (noteId !== GpifParser.InvalidId) {
                                                         const note = NoteCloner.clone(this._noteById.get(noteId)!);
                                                         // reset midi value for non-percussion staves
@@ -2434,9 +2434,9 @@ export class GpifParser {
                                 }
                             } else {
                                 // invalid voice -> empty voice
-                                let voice: Voice = new Voice();
+                                const voice: Voice = new Voice();
                                 bar.addVoice(voice);
-                                let beat: Beat = new Beat();
+                                const beat: Beat = new Beat();
                                 beat.isEmpty = true;
                                 beat.duration = Duration.Quarter;
                                 voice.addBeat(beat);
@@ -2459,11 +2459,11 @@ export class GpifParser {
 
         // clear out percussion articulations where not needed
         // and add automations
-        for (let trackId of this._tracksMapping) {
+        for (const trackId of this._tracksMapping) {
             if (!trackId) {
                 continue;
             }
-            let track: Track = this._tracksById.get(trackId)!;
+            const track: Track = this._tracksById.get(trackId)!;
 
             let hasPercussion = false;
             for (const staff of track.staves) {
@@ -2508,9 +2508,9 @@ export class GpifParser {
 
         // build masterbar automations
         for (const [barNumber, automations] of this._masterTrackAutomations) {
-            let masterBar: MasterBar = this.score.masterBars[barNumber];
+            const masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
-                let automation: Automation = automations[i];
+                const automation: Automation = automations[i];
                 if (automation.type === AutomationType.Tempo) {
                     if (barNumber === 0) {
                         this.score.tempo = automation.value | 0;

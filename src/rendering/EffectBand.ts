@@ -65,7 +65,7 @@ export class EffectBand extends Glyph {
                         break;
                 }
             }
-            let glyph: EffectGlyph = this.createOrResizeGlyph(this.info.sizingMode, beat);
+            const glyph: EffectGlyph = this.createOrResizeGlyph(this.info.sizingMode, beat);
             if (glyph.height > this.height) {
                 this.height = glyph.height;
                 this.originalHeight = glyph.height;
@@ -100,13 +100,13 @@ export class EffectBand extends Glyph {
                 return g;
             case EffectBarGlyphSizing.GroupedOnBeat:
             case EffectBarGlyphSizing.GroupedOnBeatToEnd:
-                let singleSizing: EffectBarGlyphSizing =
+                const singleSizing: EffectBarGlyphSizing =
                     sizing === EffectBarGlyphSizing.GroupedOnBeat
                         ? EffectBarGlyphSizing.SingleOnBeat
                         : EffectBarGlyphSizing.SingleOnBeatToEnd;
                 if (b.index > 0 || this.renderer.index > 0) {
                     // check if the previous beat also had this effect
-                    let prevBeat = b.previousBeat!;
+                    const prevBeat = b.previousBeat!;
                     if (this.info.shouldCreateGlyph(this.renderer.settings, prevBeat)) {
                         // first load the effect bar renderer and glyph
                         let prevEffect: EffectGlyph | null = null;
@@ -115,12 +115,12 @@ export class EffectBand extends Glyph {
                             prevEffect = this._effectGlyphs[b.voice.index].get(prevBeat.index)!;
                         } else if (this.renderer.index > 0) {
                             // load the effect from the previous renderer if possible.
-                            let previousRenderer: EffectBarRenderer = this.renderer
+                            const previousRenderer: EffectBarRenderer = this.renderer
                                 .previousRenderer as EffectBarRenderer;
-                            let previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
+                            const previousBand = previousRenderer.getBand(prevBeat.voice, this.info.effectId);
                             // it can happen that we have an empty voice and then we don't have an effect band
                             if (previousBand) {
-                                let voiceGlyphs: Map<number, EffectGlyph> =
+                                const voiceGlyphs: Map<number, EffectGlyph> =
                                     previousBand._effectGlyphs[prevBeat.voice.index];
                                 if (voiceGlyphs.has(prevBeat.index)) {
                                     prevEffect = voiceGlyphs.get(prevBeat.index)!;
@@ -130,7 +130,7 @@ export class EffectBand extends Glyph {
                         // if the effect cannot be expanded, create a new glyph
                         // in case of expansion also create a new glyph, but also link the glyphs together
                         // so for rendering it might be expanded.
-                        let newGlyph: EffectGlyph = this.createOrResizeGlyph(singleSizing, b);
+                        const newGlyph: EffectGlyph = this.createOrResizeGlyph(singleSizing, b);
                         if (prevEffect && this.info.canExpand(prevBeat, b)) {
                             // link glyphs
                             prevEffect.nextGlyph = newGlyph;
@@ -159,9 +159,9 @@ export class EffectBand extends Glyph {
         // canvas.color = c;
 
         for (let i: number = 0, j: number = this._uniqueEffectGlyphs.length; i < j; i++) {
-            let v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
+            const v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
-                let g: EffectGlyph = v[k];
+                const g: EffectGlyph = v[k];
                 using _ = ElementStyleHelper.beat(
                     canvas,
                     BeatSubElement.Effects,
@@ -182,8 +182,8 @@ export class EffectBand extends Glyph {
     }
 
     private alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
-        let g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
-        let container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
+        const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
+        const container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
                 
         // container is aligned with the "onTimeX" position of the beat in effect renders
         

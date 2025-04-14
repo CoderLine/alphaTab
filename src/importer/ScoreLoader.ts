@@ -29,17 +29,17 @@ export class ScoreLoader {
         error: (error: any) => void,
         settings?: Settings
     ): void {
-        let xhr: XMLHttpRequest = new XMLHttpRequest();
+        const xhr: XMLHttpRequest = new XMLHttpRequest();
         xhr.open('GET', path, true, null, null);
         xhr.responseType = 'arraybuffer';
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                let response: unknown = xhr.response;
+                const response: unknown = xhr.response;
                 if (xhr.status === 200 || (xhr.status === 0 && response)) {
                     try {
-                        let buffer: ArrayBuffer = xhr.response;
-                        let reader: Uint8Array = new Uint8Array(buffer);
-                        let score: Score = ScoreLoader.loadScoreFromBytes(reader, settings);
+                        const buffer: ArrayBuffer = xhr.response;
+                        const reader: Uint8Array = new Uint8Array(buffer);
+                        const score: Score = ScoreLoader.loadScoreFromBytes(reader, settings);
                         success(score);
                     } catch (e) {
                         error(e);
@@ -73,14 +73,14 @@ export class ScoreLoader {
             settings = new Settings();
         }
 
-        let importers: ScoreImporter[] = Environment.buildImporters();
+        const importers: ScoreImporter[] = Environment.buildImporters();
         Logger.debug(
             'ScoreLoader',
             `Loading score from ${data.length} bytes using ${importers.length} importers`
         );
         let score: Score | null = null;
-        let bb: ByteBuffer = ByteBuffer.fromBuffer(data);
-        for (let importer of importers) {
+        const bb: ByteBuffer = ByteBuffer.fromBuffer(data);
+        for (const importer of importers) {
             bb.reset();
             try {
                 Logger.debug('ScoreLoader', `Importing using importer ${importer.name}`);

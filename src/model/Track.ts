@@ -161,12 +161,12 @@ export class Track {
     }
 
     public applyLyrics(lyrics: Lyrics[]): void {
-        for (let lyric of lyrics) {
+        for (const lyric of lyrics) {
             lyric.finish();
         }
-        let staff: Staff = this.staves[0];
+        const staff: Staff = this.staves[0];
         for (let li: number = 0; li < lyrics.length; li++) {
-            let lyric: Lyrics = lyrics[li];
+            const lyric: Lyrics = lyrics[li];
             if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
                 let beat: Beat | null = staff.bars[lyric.startBar].voices[0].beats[0];
                 for (let ci: number = 0; ci < lyric.chunks.length && beat; ci++) {

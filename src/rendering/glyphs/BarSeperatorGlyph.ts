@@ -32,11 +32,11 @@ export class BarSeperatorGlyph extends Glyph {
 
         using _ = ElementStyleHelper.bar(canvas, renderer.barSeparatorBarSubElement, this.renderer.bar, true);
 
-        let blockWidth: number = 4;
-        let top: number = cy + this.y + this.renderer.topPadding;
-        let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
-        let left: number = cx + this.x;
-        let h: number = bottom - top;
+        const blockWidth: number = 4;
+        const top: number = cy + this.y + this.renderer.topPadding;
+        const bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
+        const left: number = cx + this.x;
+        const h: number = bottom - top;
         if (this.renderer.isLast) {
             // small bar
             canvas.fillRect(left + this.width - blockWidth - blockWidth, top, 1, h);

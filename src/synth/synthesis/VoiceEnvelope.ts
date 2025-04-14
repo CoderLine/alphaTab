@@ -95,7 +95,7 @@ export class VoiceEnvelope {
 
                         if (this.isAmpEnv) {
                             // I don't truly understand this; just following what LinuxSampler does.
-                            let mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
+                            const mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
                             this.slope = Math.exp(mysterySlope);
                             this.segmentIsExponential = true;
                             if (this.parameters.sustain > 0.0) {
@@ -134,7 +134,7 @@ export class VoiceEnvelope {
 
                     if (this.isAmpEnv) {
                         // I don't truly understand this; just following what LinuxSampler does.
-                        let mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
+                        const mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
                         this.slope = Math.exp(mysterySlope);
                         this.segmentIsExponential = true;
                     } else {

@@ -9,7 +9,7 @@ export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
         this.lastCreateInfo = [];
         for (let i: number = 0, j: number = beat.notes.length; i < j; i++) {
-            let n: Note = beat.notes[i];
+            const n: Note = beat.notes[i];
             if (this.shouldCreateGlyphForNote(n)) {
                 this.lastCreateInfo.push(n);
             }

@@ -15,15 +15,15 @@ export class RepeatCloseGlyph extends Glyph {
             this.renderer.bar
         );
 
-        let blockWidth: number = 4;
-        let top: number = cy + this.y + this.renderer.topPadding;
-        let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
+        const blockWidth: number = 4;
+        const top: number = cy + this.y + this.renderer.topPadding;
+        const bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
         let left: number = cx + this.x;
-        let h: number = bottom - top;
+        const h: number = bottom - top;
         // circles
-        let circleSize: number = 1.5;
-        let middle: number = (top + bottom) / 2;
-        let dotOffset: number = 3;
+        const circleSize: number = 1.5;
+        const middle: number = (top + bottom) / 2;
+        const dotOffset: number = 3;
         canvas.fillCircle(left, middle - circleSize * dotOffset, circleSize);
         canvas.fillCircle(left, middle + circleSize * dotOffset, circleSize);
         // line

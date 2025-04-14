@@ -52,16 +52,16 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         }
 
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
-            let common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
+            const common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
             this.addGlyph(common);
             super.doLayout();
         } else if (this._isCommon && this._numerator === 4 && this._denominator === 4) {
-            let common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
+            const common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
             this.addGlyph(common);
             super.doLayout();
         } else {
-            let numerator: NumberGlyph = new NumberGlyph(x, -numberHeight / 2, this._numerator, this.numberScale);
-            let denominator: NumberGlyph = new NumberGlyph(x, numberHeight / 2, this._denominator, this.numberScale);
+            const numerator: NumberGlyph = new NumberGlyph(x, -numberHeight / 2, this._numerator, this.numberScale);
+            const denominator: NumberGlyph = new NumberGlyph(x, numberHeight / 2, this._denominator, this.numberScale);
             this.addGlyph(numerator);
             this.addGlyph(denominator);
             super.doLayout();

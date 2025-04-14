@@ -50,10 +50,10 @@ export class MidiTrack {
      */
     public writeTo(s: IWriteable): void {
         // build track data first
-        let trackData: ByteBuffer = ByteBuffer.empty();
+        const trackData: ByteBuffer = ByteBuffer.empty();
         let previousTick: number = 0;
-        for (let midiEvent of this.events) {
-            let delta: number = midiEvent.tick - previousTick;
+        for (const midiEvent of this.events) {
+            const delta: number = midiEvent.tick - previousTick;
             MidiFile.writeVariableInt(trackData, delta);
             midiEvent.writeTo(trackData);
             previousTick = midiEvent.tick;
@@ -63,7 +63,7 @@ export class MidiTrack {
         const b = new Uint8Array([0x4d, 0x54, 0x72, 0x6b]);
         s.write(b, 0, b.length);
         // size as integer
-        let data: Uint8Array = trackData.toArray();
+        const data: Uint8Array = trackData.toArray();
         IOHelper.writeInt32BE(s, data.length);
         s.write(data, 0, data.length);
     }
@@ -128,7 +128,7 @@ export class MidiFile {
      * @returns The binary midi file.
      */
     public toBinary(): Uint8Array {
-        let data: ByteBuffer = ByteBuffer.empty();
+        const data: ByteBuffer = ByteBuffer.empty();
         this.writeTo(data);
         return data.toArray();
     }
@@ -139,7 +139,7 @@ export class MidiFile {
      */
     public writeTo(s: IWriteable): void {
         // magic number "MThd" (0x4D546864)
-        let b: Uint8Array = new Uint8Array([0x4d, 0x54, 0x68, 0x64]);
+        const b: Uint8Array = new Uint8Array([0x4d, 0x54, 0x68, 0x64]);
         s.write(b, 0, b.length);
         // Header Length 6 (0x00000006)
         IOHelper.writeInt32BE(s, 6);
@@ -156,7 +156,7 @@ export class MidiFile {
     }
 
     public static writeVariableInt(s: IWriteable, value: number): void {
-        let array: Uint8Array = new Uint8Array(4);
+        const array: Uint8Array = new Uint8Array(4);
         let n: number = 0;
         do {
             array[n++] = value & 0x7f;

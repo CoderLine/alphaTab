@@ -49,8 +49,8 @@ export class FingeringGroupGlyph extends GlyphGroup {
     }
 
     private addFinger(note: Note, text: string) {
-        let sr = this.renderer as ScoreBarRenderer;
-        let line: number = sr.getNoteLine(note);
+        const sr = this.renderer as ScoreBarRenderer;
+        const line: number = sr.getNoteLine(note);
 
         if (!this._infos.has(line)) {
             const info = new FingeringInfo(line, text);
@@ -63,7 +63,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
     }
 
     public override doLayout(): void {
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
         for (const [_, info] of this._infos) {
             const g = new TextGlyph(

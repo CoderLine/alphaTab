@@ -81,7 +81,7 @@ export class TuningGlyph extends GlyphGroup {
             const circleHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
             // Strings
-            let stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
+            const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
             let currentY: number = this.height;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {

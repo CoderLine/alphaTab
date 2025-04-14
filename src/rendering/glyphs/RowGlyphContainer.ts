@@ -25,7 +25,7 @@ export class RowGlyphContainer extends GlyphGroup {
                 x = this.width - this._glyphWidth;
                 break;
         }
-        for (let glyph of this.glyphs!) {
+        for (const glyph of this.glyphs!) {
             glyph.x = x;
             x += glyph.width;
         }

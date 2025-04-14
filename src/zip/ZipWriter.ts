@@ -91,7 +91,7 @@ export class ZipWriter {
             output.write(data, 0, data.length);
             return crc.value;
         }
-        let buffer: Uint8Array = new Uint8Array(512);
+        const buffer: Uint8Array = new Uint8Array(512);
 
         // init deflater
         this._deflater.reset();

@@ -185,7 +185,7 @@ export class Gp3To5Importer extends ScoreImporter {
             throw new UnsupportedFormatError('Unsupported format');
         }
         version = version.substr(Gp3To5Importer.VersionString.length + 1);
-        let dot: number = version.indexOf(String.fromCharCode(46));
+        const dot: number = version.indexOf(String.fromCharCode(46));
         this._versionNumber = 100 * Number.parseInt(version.substr(0, dot)) + Number.parseInt(version.substr(dot + 1));
         Logger.debug(this.name, `Guitar Pro version ${version} detected`);
     }
@@ -203,7 +203,7 @@ export class Gp3To5Importer extends ScoreImporter {
         this._score.copyright = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
         this._score.tab = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
         this._score.instructions = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
-        let noticeLines: number = IOHelper.readInt32LE(this.data);
+        const noticeLines: number = IOHelper.readInt32LE(this.data);
         let notice: string = '';
         for (let i: number = 0; i < noticeLines; i++) {
             if (i > 0) {
@@ -218,7 +218,7 @@ export class Gp3To5Importer extends ScoreImporter {
         this._lyrics = [];
         this._lyricsTrack = IOHelper.readInt32LE(this.data) - 1;
         for (let i: number = 0; i < 5; i++) {
-            let lyrics: Lyrics = new Lyrics();
+            const lyrics: Lyrics = new Lyrics();
             lyrics.startBar = IOHelper.readInt32LE(this.data) - 1;
             lyrics.text = GpBinaryHelpers.gpReadStringInt(this.data, this.settings.importer.encoding);
             this._lyrics.push(lyrics);
@@ -271,7 +271,7 @@ export class Gp3To5Importer extends ScoreImporter {
     public readPlaybackInfos(): void {
         this._playbackInfos = [];
         for (let i: number = 0; i < 64; i++) {
-            let info: PlaybackInformation = new PlaybackInformation();
+            const info: PlaybackInformation = new PlaybackInformation();
             info.primaryChannel = i;
             info.secondaryChannel = i;
             info.program = IOHelper.readInt32LE(this.data);
@@ -293,8 +293,8 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._score.masterBars.length > 0) {
             previousMasterBar = this._score.masterBars[this._score.masterBars.length - 1];
         }
-        let newMasterBar: MasterBar = new MasterBar();
-        let flags: number = this.data.readByte();
+        const newMasterBar: MasterBar = new MasterBar();
+        const flags: number = this.data.readByte();
         // time signature
         if ((flags & 0x01) !== 0) {
             newMasterBar.timeSignatureNumerator = this.data.readByte();
@@ -330,10 +330,10 @@ export class Gp3To5Importer extends ScoreImporter {
             }
             // now calculate the alternative for this bar
             let repeatAlternative: number = 0;
-            let repeatMask: number = this.data.readByte();
+            const repeatMask: number = this.data.readByte();
             for (let i: number = 0; i < 8; i++) {
                 // only add the repeating if it is not existing
-                let repeating: number = 1 << i;
+                const repeating: number = 1 << i;
                 if (repeatMask > i && (existentAlternatives & repeating) === 0) {
                     repeatAlternative = repeatAlternative | repeating;
                 }
@@ -342,7 +342,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         // marker
         if ((flags & 0x20) !== 0) {
-            let section: Section = new Section();
+            const section: Section = new Section();
             section.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
             section.marker = '';
             GpBinaryHelpers.gpReadColor(this.data, false);
@@ -365,7 +365,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         // tripletfeel
         if (this._versionNumber >= 500) {
-            let tripletFeel: number = this.data.readByte();
+            const tripletFeel: number = this.data.readByte();
             switch (tripletFeel) {
                 case 1:
                     newMasterBar.tripletFeel = TripletFeel.Triplet8th;
@@ -397,10 +397,10 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readTrack(): void {
-        let newTrack: Track = new Track();
+        const newTrack: Track = new Track();
         newTrack.ensureStaveCount(1);
         this._score.addTrack(newTrack);
-        let mainStaff: Staff = newTrack.staves[0];
+        const mainStaff: Staff = newTrack.staves[0];
 
         // Track Flags:
         // 1   - Percussion Track
@@ -412,7 +412,7 @@ export class Gp3To5Importer extends ScoreImporter {
         // 64  - Unknown
         // 128 - Show Tuning
 
-        let flags: number = this.data.readByte();
+        const flags: number = this.data.readByte();
         newTrack.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 40, this.settings.importer.encoding);
         if ((flags & 0x01) !== 0) {
             mainStaff.isPercussion = true;
@@ -427,23 +427,23 @@ export class Gp3To5Importer extends ScoreImporter {
         this._score.stylesheet.perTrackDisplayTuning!.set(newTrack.index, (flags & 0x80) !== 0);
 
         //
-        let stringCount: number = IOHelper.readInt32LE(this.data);
-        let tuning: number[] = [];
+        const stringCount: number = IOHelper.readInt32LE(this.data);
+        const tuning: number[] = [];
         for (let i: number = 0; i < 7; i++) {
-            let stringTuning: number = IOHelper.readInt32LE(this.data);
+            const stringTuning: number = IOHelper.readInt32LE(this.data);
             if (stringCount > i) {
                 tuning.push(stringTuning);
             }
         }
         mainStaff.stringTuning.tunings = tuning;
 
-        let port: number = IOHelper.readInt32LE(this.data);
-        let index: number = IOHelper.readInt32LE(this.data) - 1;
-        let effectChannel: number = IOHelper.readInt32LE(this.data) - 1;
+        const port: number = IOHelper.readInt32LE(this.data);
+        const index: number = IOHelper.readInt32LE(this.data) - 1;
+        const effectChannel: number = IOHelper.readInt32LE(this.data) - 1;
         this.data.skip(4); // Fretcount
 
         if (index >= 0 && index < this._playbackInfos.length) {
-            let info: PlaybackInformation = this._playbackInfos[index];
+            const info: PlaybackInformation = this._playbackInfos[index];
             info.port = port;
             info.isSolo = (flags & 0x10) !== 0;
             info.isMute = (flags & 0x20) !== 0;
@@ -492,8 +492,8 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readBar(track: Track): void {
-        let newBar: Bar = new Bar();
-        let mainStaff: Staff = track.staves[0];
+        const newBar: Bar = new Bar();
+        const mainStaff: Staff = track.staves[0];
         if (mainStaff.isPercussion) {
             newBar.clef = Clef.Neutral;
         }
@@ -509,11 +509,11 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readVoice(track: Track, bar: Bar): void {
-        let beatCount: number = IOHelper.readInt32LE(this.data);
+        const beatCount: number = IOHelper.readInt32LE(this.data);
         if (beatCount === 0) {
             return;
         }
-        let newVoice: Voice = new Voice();
+        const newVoice: Voice = new Voice();
         bar.addVoice(newVoice);
         for (let i: number = 0; i < beatCount; i++) {
             this.readBeat(track, bar, newVoice);
@@ -521,17 +521,17 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readBeat(track: Track, bar: Bar, voice: Voice): void {
-        let newBeat: Beat = new Beat();
-        let flags: number = this.data.readByte();
+        const newBeat: Beat = new Beat();
+        const flags: number = this.data.readByte();
         if ((flags & 0x01) !== 0) {
             newBeat.dots = 1;
         }
         if ((flags & 0x40) !== 0) {
-            let type: number = this.data.readByte();
+            const type: number = this.data.readByte();
             newBeat.isEmpty = (type & 0x02) === 0;
         }
         voice.addBeat(newBeat);
-        let duration: number = IOHelper.readSInt8(this.data);
+        const duration: number = IOHelper.readSInt8(this.data);
         switch (duration) {
             case -2:
                 newBeat.duration = Duration.Whole;
@@ -593,7 +593,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.readChord(newBeat);
         }
 
-        let beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack; // detect if not lyrics track
+        const beatTextAsLyrics = this.settings.importer.beatTextAsLyrics && track.index !== this._lyricsTrack; // detect if not lyrics track
 
         if ((flags & 0x04) !== 0) {
             const text = GpBinaryHelpers.gpReadStringIntUnused(this.data, this.settings.importer.encoding);
@@ -621,7 +621,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if ((flags & 0x10) !== 0) {
             this.readMixTableChange(newBeat);
         }
-        let stringFlags: number = this.data.readByte();
+        const stringFlags: number = this.data.readByte();
         for (let i: number = 6; i >= 0; i--) {
             if ((stringFlags & (1 << i)) !== 0 && 6 - i < bar.staff.tuning.length) {
                 const note = this.readNote(track, bar, voice, newBeat, 6 - i);
@@ -714,21 +714,21 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readChord(beat: Beat): void {
-        let chord: Chord = new Chord();
-        let chordId: string = ModelUtils.newGuid();
+        const chord: Chord = new Chord();
+        const chordId: string = ModelUtils.newGuid();
         if (this._versionNumber >= 500) {
             this.data.skip(17);
             chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 21, this.settings.importer.encoding);
             this.data.skip(4);
             chord.firstFret = IOHelper.readInt32LE(this.data);
             for (let i: number = 0; i < 7; i++) {
-                let fret: number = IOHelper.readInt32LE(this.data);
+                const fret: number = IOHelper.readInt32LE(this.data);
                 if (i < beat.voice.bar.staff.tuning.length) {
                     chord.strings.push(fret);
                 }
             }
-            let numberOfBarres: number = this.data.readByte();
-            let barreFrets: Uint8Array = new Uint8Array(5);
+            const numberOfBarres: number = this.data.readByte();
+            const barreFrets: Uint8Array = new Uint8Array(5);
             this.data.read(barreFrets, 0, barreFrets.length);
             for (let i: number = 0; i < numberOfBarres; i++) {
                 chord.barreFrets.push(barreFrets[i]);
@@ -755,13 +755,13 @@ export class Gp3To5Importer extends ScoreImporter {
                     this.data.skip(4);
                     chord.firstFret = IOHelper.readInt32LE(this.data);
                     for (let i: number = 0; i < 7; i++) {
-                        let fret: number = IOHelper.readInt32LE(this.data);
+                        const fret: number = IOHelper.readInt32LE(this.data);
                         if (i < beat.voice.bar.staff.tuning.length) {
                             chord.strings.push(fret);
                         }
                     }
-                    let numberOfBarres: number = this.data.readByte();
-                    let barreFrets: Uint8Array = new Uint8Array(5);
+                    const numberOfBarres: number = this.data.readByte();
+                    const barreFrets: Uint8Array = new Uint8Array(5);
                     this.data.read(barreFrets, 0, barreFrets.length);
                     for (let i: number = 0; i < numberOfBarres; i++) {
                         chord.barreFrets.push(barreFrets[i]);
@@ -779,7 +779,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     chord.name = GpBinaryHelpers.gpReadStringByteLength(this.data, 34, this.settings.importer.encoding);
                     chord.firstFret = IOHelper.readInt32LE(this.data);
                     for (let i: number = 0; i < 6; i++) {
-                        let fret: number = IOHelper.readInt32LE(this.data);
+                        const fret: number = IOHelper.readInt32LE(this.data);
                         if (i < beat.voice.bar.staff.tuning.length) {
                             chord.strings.push(fret);
                         }
@@ -788,12 +788,12 @@ export class Gp3To5Importer extends ScoreImporter {
                     this.data.skip(36);
                 }
             } else {
-                let strings: number = this._versionNumber >= 406 ? 7 : 6;
+                const strings: number = this._versionNumber >= 406 ? 7 : 6;
                 chord.name = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
                 chord.firstFret = IOHelper.readInt32LE(this.data);
                 if (chord.firstFret > 0) {
                     for (let i: number = 0; i < strings; i++) {
-                        let fret: number = IOHelper.readInt32LE(this.data);
+                        const fret: number = IOHelper.readInt32LE(this.data);
                         if (i < beat.voice.bar.staff.tuning.length) {
                             chord.strings.push(fret);
                         }
@@ -808,7 +808,7 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readBeatEffects(beat: Beat): HarmonicType {
-        let flags: number = this.data.readByte();
+        const flags: number = this.data.readByte();
         let flags2: number = 0;
         if (this._versionNumber >= 400) {
             flags2 = this.data.readByte();
@@ -823,7 +823,7 @@ export class Gp3To5Importer extends ScoreImporter {
             beat.rasgueado = Rasgueado.Ii;
         }
         if ((flags & 0x20) !== 0 && this._versionNumber >= 400) {
-            let slapPop: number = IOHelper.readSInt8(this.data);
+            const slapPop: number = IOHelper.readSInt8(this.data);
             switch (slapPop) {
                 case 1:
                     beat.tap = true;
@@ -836,7 +836,7 @@ export class Gp3To5Importer extends ScoreImporter {
                     break;
             }
         } else if ((flags & 0x20) !== 0) {
-            let slapPop: number = IOHelper.readSInt8(this.data);
+            const slapPop: number = IOHelper.readSInt8(this.data);
             switch (slapPop) {
                 case 1:
                     beat.tap = true;
@@ -902,10 +902,10 @@ export class Gp3To5Importer extends ScoreImporter {
 
         IOHelper.readInt32LE(this.data); // value
 
-        let pointCount: number = IOHelper.readInt32LE(this.data);
+        const pointCount: number = IOHelper.readInt32LE(this.data);
         if (pointCount > 0) {
             for (let i: number = 0; i < pointCount; i++) {
-                let point: BendPoint = new BendPoint(0, 0);
+                const point: BendPoint = new BendPoint(0, 0);
                 point.offset = IOHelper.readInt32LE(this.data); // 0...60
 
                 point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0; // 0..12 (amount of quarters)
@@ -937,17 +937,17 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readMixTableChange(beat: Beat): void {
-        let tableChange: MixTableChange = new MixTableChange();
+        const tableChange: MixTableChange = new MixTableChange();
         tableChange.instrument = IOHelper.readSInt8(this.data);
         if (this._versionNumber >= 500) {
             this.data.skip(16); // Rse Info
         }
         tableChange.volume = IOHelper.readSInt8(this.data);
         tableChange.balance = IOHelper.readSInt8(this.data);
-        let chorus: number = IOHelper.readSInt8(this.data);
-        let reverb: number = IOHelper.readSInt8(this.data);
-        let phaser: number = IOHelper.readSInt8(this.data);
-        let tremolo: number = IOHelper.readSInt8(this.data);
+        const chorus: number = IOHelper.readSInt8(this.data);
+        const reverb: number = IOHelper.readSInt8(this.data);
+        const phaser: number = IOHelper.readSInt8(this.data);
+        const tremolo: number = IOHelper.readSInt8(this.data);
         if (this._versionNumber >= 500) {
             tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
@@ -997,28 +997,28 @@ export class Gp3To5Importer extends ScoreImporter {
             GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
         if (tableChange.volume >= 0) {
-            let volumeAutomation: Automation = new Automation();
+            const volumeAutomation: Automation = new Automation();
             volumeAutomation.isLinear = true;
             volumeAutomation.type = AutomationType.Volume;
             volumeAutomation.value = tableChange.volume;
             beat.automations.push(volumeAutomation);
         }
         if (tableChange.balance >= 0) {
-            let balanceAutomation: Automation = new Automation();
+            const balanceAutomation: Automation = new Automation();
             balanceAutomation.isLinear = true;
             balanceAutomation.type = AutomationType.Balance;
             balanceAutomation.value = tableChange.balance;
             beat.automations.push(balanceAutomation);
         }
         if (tableChange.instrument >= 0) {
-            let instrumentAutomation: Automation = new Automation();
+            const instrumentAutomation: Automation = new Automation();
             instrumentAutomation.isLinear = true;
             instrumentAutomation.type = AutomationType.Instrument;
             instrumentAutomation.value = tableChange.instrument;
             beat.automations.push(instrumentAutomation);
         }
         if (tableChange.tempo >= 0) {
-            let tempoAutomation: Automation = new Automation();
+            const tempoAutomation: Automation = new Automation();
             tempoAutomation.isLinear = true;
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tableChange.tempo;
@@ -1028,9 +1028,9 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readNote(track: Track, bar: Bar, voice: Voice, beat: Beat, stringIndex: number): Note {
-        let newNote: Note = new Note();
+        const newNote: Note = new Note();
         newNote.string = bar.staff.tuning.length - stringIndex;
-        let flags: number = this.data.readByte();
+        const flags: number = this.data.readByte();
         if ((flags & 0x02) !== 0) {
             newNote.accentuated = AccentuationType.Heavy;
         } else if ((flags & 0x40) !== 0) {
@@ -1038,7 +1038,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         newNote.isGhost = (flags & 0x04) !== 0;
         if ((flags & 0x20) !== 0) {
-            let noteType: number = this.data.readByte();
+            const noteType: number = this.data.readByte();
             if (noteType === 3) {
                 newNote.isDead = true;
             } else if (noteType === 2) {
@@ -1051,7 +1051,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this.data.readByte(); // tuplet
         }
         if ((flags & 0x10) !== 0) {
-            let dynamicNumber: number = IOHelper.readSInt8(this.data);
+            const dynamicNumber: number = IOHelper.readSInt8(this.data);
             newNote.dynamics = this.toDynamicValue(dynamicNumber);
             beat.dynamics = newNote.dynamics;
         }
@@ -1067,7 +1067,7 @@ export class Gp3To5Importer extends ScoreImporter {
             if ((flags & 0x01) !== 0) {
                 newNote.durationPercent = IOHelper.readFloat64BE(this.data);
             }
-            let flags2: number = this.data.readByte();
+            const flags2: number = this.data.readByte();
             swapAccidentals = (flags2 & 0x02) !== 0;
         }
         beat.addNote(newNote);
@@ -1116,7 +1116,7 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readNoteEffects(track: Track, voice: Voice, beat: Beat, note: Note): void {
-        let flags: number = this.data.readByte();
+        const flags: number = this.data.readByte();
         let flags2: number = 0;
         if (this._versionNumber >= 400) {
             flags2 = this.data.readByte();
@@ -1159,10 +1159,10 @@ export class Gp3To5Importer extends ScoreImporter {
 
         IOHelper.readInt32LE(this.data); // value
 
-        let pointCount: number = IOHelper.readInt32LE(this.data);
+        const pointCount: number = IOHelper.readInt32LE(this.data);
         if (pointCount > 0) {
             for (let i: number = 0; i < pointCount; i++) {
-                let point: BendPoint = new BendPoint(0, 0);
+                const point: BendPoint = new BendPoint(0, 0);
                 point.offset = IOHelper.readInt32LE(this.data); // 0...60
 
                 point.value = (IOHelper.readInt32LE(this.data) / Gp3To5Importer.BendStep) | 0; // 0..12 (amount of quarters)
@@ -1175,13 +1175,13 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readGrace(voice: Voice, note: Note): void {
-        let graceBeat: Beat = new Beat();
-        let graceNote: Note = new Note();
+        const graceBeat: Beat = new Beat();
+        const graceNote: Note = new Note();
         graceNote.string = note.string;
         graceNote.fret = IOHelper.readSInt8(this.data);
         graceBeat.duration = Duration.ThirtySecond;
         graceBeat.dynamics = this.toDynamicValue(IOHelper.readSInt8(this.data));
-        let transition: number = IOHelper.readSInt8(this.data);
+        const transition: number = IOHelper.readSInt8(this.data);
         switch (transition) {
             case 0:
                 break;
@@ -1201,7 +1201,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber < 500) {
             graceBeat.graceType = GraceType.BeforeBeat;
         } else {
-            let flags: number = this.data.readByte();
+            const flags: number = this.data.readByte();
             graceNote.isDead = (flags & 0x01) !== 0;
             graceBeat.graceType = (flags & 0x02) !== 0 ? GraceType.OnBeat : GraceType.BeforeBeat;
         }
@@ -1210,7 +1210,7 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readTremoloPicking(beat: Beat): void {
-        let speed: number = this.data.readByte();
+        const speed: number = this.data.readByte();
         switch (speed) {
             case 1:
                 beat.tremoloSpeed = Duration.Eighth;
@@ -1226,7 +1226,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readSlide(note: Note): void {
         if (this._versionNumber >= 500) {
-            let type: number = IOHelper.readSInt8(this.data);
+            const type: number = IOHelper.readSInt8(this.data);
             if ((type & 1) !== 0) {
                 note.slideOutType = SlideOutType.Shift;
             } else if ((type & 2) !== 0) {
@@ -1242,7 +1242,7 @@ export class Gp3To5Importer extends ScoreImporter {
                 note.slideInType = SlideInType.IntoFromAbove;
             }
         } else {
-            let type: number = IOHelper.readSInt8(this.data);
+            const type: number = IOHelper.readSInt8(this.data);
             switch (type) {
                 case 1:
                     note.slideOutType = SlideOutType.Shift;
@@ -1267,7 +1267,7 @@ export class Gp3To5Importer extends ScoreImporter {
     }
 
     public readArtificialHarmonic(note: Note): void {
-        let type: number = this.data.readByte();
+        const type: number = this.data.readByte();
         if (this._versionNumber >= 500) {
             switch (type) {
                 case 1:
@@ -1338,9 +1338,9 @@ export class Gp3To5Importer extends ScoreImporter {
 
 export class GpBinaryHelpers {
     public static gpReadColor(data: IReadable, readAlpha: boolean = false): Color {
-        let r: number = data.readByte();
-        let g: number = data.readByte();
-        let b: number = data.readByte();
+        const r: number = data.readByte();
+        const g: number = data.readByte();
+        const b: number = data.readByte();
         let a: number = 255;
         if (readAlpha) {
             a = data.readByte();
@@ -1374,13 +1374,13 @@ export class GpBinaryHelpers {
      * Reads an integer as size, skips a byte and reads the string itself
      */
     public static gpReadStringIntByte(data: IReadable, encoding: string): string {
-        let length: number = IOHelper.readInt32LE(data) - 1;
+        const length: number = IOHelper.readInt32LE(data) - 1;
         data.readByte();
         return GpBinaryHelpers.gpReadString(data, length, encoding);
     }
 
     public static gpReadString(data: IReadable, length: number, encoding: string): string {
-        let b: Uint8Array = new Uint8Array(length);
+        const b: Uint8Array = new Uint8Array(length);
         data.read(b, 0, b.length);
         return IOHelper.toString(b, encoding);
     }
@@ -1400,8 +1400,8 @@ export class GpBinaryHelpers {
      * @returns
      */
     public static gpReadStringByteLength(data: IReadable, length: number, encoding: string): string {
-        let stringLength: number = data.readByte();
-        let s: string = GpBinaryHelpers.gpReadString(data, stringLength, encoding);
+        const stringLength: number = data.readByte();
+        const s: string = GpBinaryHelpers.gpReadString(data, stringLength, encoding);
         if (stringLength < length) {
             data.skip(length - stringLength);
         }

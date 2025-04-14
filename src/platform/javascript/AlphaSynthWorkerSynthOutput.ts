@@ -43,8 +43,8 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     }
 
     private handleMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: any = data.cmd;
+        const data: any = e.data;
+        const cmd: any = data.cmd;
         switch (cmd) {
             case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
                 (this.sampleRequest as EventEmitter).trigger();

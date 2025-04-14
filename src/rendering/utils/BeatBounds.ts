@@ -65,9 +65,9 @@ export class BeatBounds {
         // TODO: can be likely optimized
         // a beat is mostly vertically aligned, we could sort the note bounds by Y
         // and then do a binary search on the Y-axis.
-        for (let note of notes) {
-            let bottom: number = note.noteHeadBounds.y + note.noteHeadBounds.h;
-            let right: number = note.noteHeadBounds.x + note.noteHeadBounds.w;
+        for (const note of notes) {
+            const bottom: number = note.noteHeadBounds.y + note.noteHeadBounds.h;
+            const right: number = note.noteHeadBounds.x + note.noteHeadBounds.w;
             if (note.noteHeadBounds.x <= x && note.noteHeadBounds.y <= y && x <= right && y <= bottom) {
                 return note.note;
             }

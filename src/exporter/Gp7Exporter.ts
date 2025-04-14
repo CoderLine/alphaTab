@@ -25,7 +25,7 @@ export class Gp7Exporter extends ScoreExporter {
         const layoutConfiguration = LayoutConfiguration.writeForScore(score);
 
         Logger.debug(this.name, 'Writing ZIP entries');
-        let fileSystem: ZipWriter = new ZipWriter(this.data);
+        const fileSystem: ZipWriter = new ZipWriter(this.data);
         fileSystem.writeEntry(new ZipEntry('VERSION', IOHelper.stringToBytes('7.0')));
         fileSystem.writeEntry(new ZipEntry('Content/', new Uint8Array(0)));
         fileSystem.writeEntry(new ZipEntry('Content/BinaryStylesheet', binaryStylesheet));

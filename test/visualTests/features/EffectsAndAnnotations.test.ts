@@ -100,7 +100,7 @@ describe('EffectsAndAnnotationsTests', () => {
 
         const importer = new AlphaTexImporter();
         importer.init(ByteBuffer.fromString(tex), settings);
-        let score = importer.readScore();
+        const score = importer.readScore();
 
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(

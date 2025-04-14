@@ -69,8 +69,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     protected updateFirstLineY() {
-        let fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
-        let actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
+        const fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
+        const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
         this.firstLineY = this.topPadding + (fullLineHeight - actualLineHeight) / 2;
     }
 
@@ -129,7 +129,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const lineY = this.getLineY(i);
 
             let lineX: number = 0;
-            for (let line of spaces[i]) {
+            for (const line of spaces[i]) {
                 canvas.fillRect(
                     cx + this.x + lineX,
                     (cy + this.y + lineY) | 0,
@@ -201,14 +201,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
         bracketsAsArcs: boolean
     ): void {
         const res = this.resources;
-        let oldAlign: TextAlign = canvas.textAlign;
-        let oldBaseLine = canvas.textBaseline;
+        const oldAlign: TextAlign = canvas.textAlign;
+        const oldBaseLine = canvas.textBaseline;
         canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Middle;
         let s: string;
-        let num: number = h.beats[0].tupletNumerator;
-        let den: number = h.beats[0].tupletDenominator;
+        const num: number = h.beats[0].tupletNumerator;
+        const den: number = h.beats[0].tupletDenominator;
         // list as in Guitar Pro 7. for certain tuplets only the numerator is shown
         if (num === 2 && den === 3) {
             s = '2';
@@ -248,14 +248,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         if (h.beats.length === 1 || !h.isFull) {
             for (const beat of h.beats) {
-                let beamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(beat.index)!;
+                const beamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(beat.index)!;
                 if (!beamingHelper) {
                     continue;
                 }
 
-                let direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
+                const direction: BeamDirection = this.getTupletBeamDirection(beamingHelper);
 
-                let tupletX: number = beamingHelper.getBeatLineX(beat);
+                const tupletX: number = beamingHelper.getBeatLineX(beat);
                 let tupletY: number = this.calculateBeamYWithDirection(beamingHelper, tupletX, direction);
 
                 if (direction === BeamDirection.Down) {
@@ -268,8 +268,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 canvas.fillText(s, cx + this.x + tupletX, cy + this.y + tupletY);
             }
         } else {
-            let firstBeat: Beat = h.beats[0];
-            let lastBeat: Beat = h.beats[h.beats.length - 1];
+            const firstBeat: Beat = h.beats[0];
+            const lastBeat: Beat = h.beats[h.beats.length - 1];
 
             let firstNonRestBeat: Beat | null = null;
             let lastNonRestBeat: Beat | null = null;
@@ -298,16 +298,16 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             //
             // Calculate the overall area of the tuplet bracket
-            let firstBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
-            let lastBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
-            let startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
-            let endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
+            const firstBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
+            const lastBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
+            const startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
+            const endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
 
             //
             // calculate the y positions for our bracket
-            let firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
-            let lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
-            let direction = this.getTupletBeamDirection(firstBeamingHelper);
+            const firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
+            const lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
+            const direction = this.getTupletBeamDirection(firstBeamingHelper);
             let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
             let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
             if (isRestOnly) {
@@ -318,19 +318,19 @@ export abstract class LineBarRenderer extends BarRendererBase {
             //
             // Calculate how many space the text will need
             canvas.font = res.effectFont;
-            let sw: number = canvas.measureText(s).width;
-            let sp: number = 3;
+            const sw: number = canvas.measureText(s).width;
+            const sp: number = 3;
             //
             // Calculate the offsets where to break the bracket
-            let middleX: number = (startX + endX) / 2;
-            let offset1X: number = middleX - sw / 2 - sp;
-            let offset2X: number = middleX + sw / 2 + sp;
+            const middleX: number = (startX + endX) / 2;
+            const offset1X: number = middleX - sw / 2 - sp;
+            const offset2X: number = middleX + sw / 2 + sp;
 
-            let k: number = (endY - startY) / (endX - startX);
-            let d: number = startY - k * startX;
-            let offset1Y: number = k * offset1X + d;
-            let middleY: number = k * middleX + d;
-            let offset2Y: number = k * offset2X + d;
+            const k: number = (endY - startY) / (endX - startX);
+            const d: number = startY - k * startX;
+            const offset1Y: number = k * offset1X + d;
+            const middleY: number = k * middleX + d;
+            const offset2Y: number = k * offset2X + d;
             if (direction === BeamDirection.Down) {
                 offset *= -1;
                 size *= -1;
@@ -455,14 +455,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 continue;
             }
 
-            let isGrace: boolean = beat.graceType !== GraceType.None;
-            let scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
+            const isGrace: boolean = beat.graceType !== GraceType.None;
+            const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
             //
             // draw line
             //
-            let stemSize: number = this.getFlagStemSize(h.shortestDuration);
-            let beatLineX: number = h.getBeatLineX(beat);
-            let direction: BeamDirection = this.getBeamDirection(h);
+            const stemSize: number = this.getFlagStemSize(h.shortestDuration);
+            const beatLineX: number = h.getBeatLineX(beat);
+            const direction: BeamDirection = this.getBeamDirection(h);
             let topY: number = this.getFlagTopY(beat, direction);
             let bottomY: number = this.getFlagBottomY(beat, direction);
             let beamY: number = 0;
@@ -490,8 +490,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
             if (beat.graceType === GraceType.BeforeBeat) {
-                let graceSizeY: number = 15;
-                let graceSizeX: number = 12;
+                const graceSizeY: number = 15;
+                const graceSizeX: number = 12;
                 canvas.beginPath();
                 if (direction === BeamDirection.Down) {
                     canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + bottomY - graceSizeY);
@@ -507,7 +507,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Draw flag
             //
             if (h.hasFlag(true, beat)) {
-                let glyph: FlagGlyph = new FlagGlyph(beatLineX - 1 / 2, beamY, beat.duration, direction, isGrace);
+                const glyph: FlagGlyph = new FlagGlyph(beatLineX - 1 / 2, beamY, beat.duration, direction, isGrace);
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(cx + this.x, cy + this.y, canvas);
@@ -589,20 +589,20 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, beamsElement: BeatSubElement): void {
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
-            let beat: Beat = h.beats[i];
+            const beat: Beat = h.beats[i];
             if (!h.hasBeatLineX(beat) || beat.deadSlapped) {
                 continue;
             }
 
-            let isGrace: boolean = beat.graceType !== GraceType.None;
-            let scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
+            const isGrace: boolean = beat.graceType !== GraceType.None;
+            const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
             //
             // draw line
             //
-            let beatLineX: number = h.getBeatLineX(beat);
-            let direction: BeamDirection = this.getBeamDirection(h);
-            let y1: number = cy + this.y + this.getBarLineStart(beat, direction);
-            let y2: number = cy + this.y + this.calculateBeamY(h, beatLineX);
+            const beatLineX: number = h.getBeatLineX(beat);
+            const direction: BeamDirection = this.getBeamDirection(h);
+            const y1: number = cy + this.y + this.getBarLineStart(beat, direction);
+            const y2: number = cy + this.y + this.calculateBeamY(h, beatLineX);
 
             // canvas.lineWidth = BarRendererBase.StemWidth;
             // canvas.beginPath();
@@ -621,11 +621,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
             } else if (i !== 0) {
                 fingeringY -= canvas.font.size * 1.5;
             }
-            let brokenBarOffset: number = 6 * scaleMod;
+            const brokenBarOffset: number = 6 * scaleMod;
             let barSpacing: number = (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
             let barSize: number = BarRendererBase.BeamThickness * scaleMod;
-            let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
-            let barStart: number = cy + this.y;
+            const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+            const barStart: number = cy + this.y;
             if (direction === BeamDirection.Down) {
                 barSpacing = -barSpacing;
                 barSize = -barSize;
@@ -635,7 +635,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 let barEndX: number = 0;
                 let barStartY: number = 0;
                 let barEndY: number = 0;
-                let barY: number = barStart + barIndex * barSpacing;
+                const barY: number = barStart + barIndex * barSpacing;
                 //
                 // Bar to Next?
                 //

@@ -45,7 +45,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
-        let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
+        const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
 
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
@@ -114,7 +114,7 @@ export class BeatContainerGlyph extends Glyph {
             }
         }
         let tieWidth: number = 0;
-        for (let tie of this.ties) {
+        for (const tie of this.ties) {
             if (tie.width > tieWidth) {
                 tieWidth = tie.width;
             }
@@ -172,7 +172,7 @@ export class BeatContainerGlyph extends Glyph {
         // }
         // canvas.color = c;
 
-        let isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
+        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
         if (isEmptyGlyph) {
             return;
         }
@@ -182,10 +182,10 @@ export class BeatContainerGlyph extends Glyph {
         this.onNotes.paint(cx + this.x, cy + this.y, canvas);
 
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
-        let staffX: number = cx - this.voiceContainer.x - this.renderer.x;
-        let staffY: number = cy - this.voiceContainer.y - this.renderer.y;
+        const staffX: number = cx - this.voiceContainer.x - this.renderer.x;
+        const staffY: number = cy - this.voiceContainer.y - this.renderer.y;
         for (let i: number = 0, j: number = this.ties.length; i < j; i++) {
-            let t: Glyph = this.ties[i];
+            const t: Glyph = this.ties[i];
             t.renderer = this.renderer;
             t.paint(staffX, staffY, canvas);
         }
@@ -193,7 +193,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, isEmptyBar: boolean) {
-        let beatBoundings: BeatBounds = new BeatBounds();
+        const beatBoundings: BeatBounds = new BeatBounds();
         beatBoundings.beat = this.beat;
 
         if (this.beat.isEmpty) {

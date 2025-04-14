@@ -122,7 +122,7 @@ export class CapellaParser {
         this._crescendo = new Map<Beat, WedgeDrawObject>();
         this._isFirstSystem = true;
 
-        let dom: XmlDocument = new XmlDocument();
+        const dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
         } catch (e) {
@@ -195,7 +195,7 @@ export class CapellaParser {
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.firstElement;
+        const root: XmlNode | null = dom.firstElement;
         if (!root) {
             throw new UnsupportedFormatError('No valid XML');
         }
@@ -203,7 +203,7 @@ export class CapellaParser {
             this.score = new Score();
             this.score.tempo = 120;
             // parse all children
-            for (let n of root.childElements()) {
+            for (const n of root.childElements()) {
                 switch (n.localName) {
                     case 'info':
                         this.parseInfo(n);
@@ -230,7 +230,7 @@ export class CapellaParser {
 
     private _staffLookup: Map<number, Staff> = new Map();
     private parseLayout(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staves':
                     this.parseLayoutStaves(c);
@@ -294,7 +294,7 @@ export class CapellaParser {
 
     private _brackets: Bracket[] = [];
     private parseBrackets(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'bracket':
                     this.parseBracket(c);
@@ -314,7 +314,7 @@ export class CapellaParser {
     }
 
     private parseLayoutStaves(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staffLayout':
                     this.parseStaffLayout(c);
@@ -330,7 +330,7 @@ export class CapellaParser {
         const layout = new StaffLayout();
         layout.description = element.getAttribute('description');
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'notation':
                     if (c.attributes.has('defaultClef')) {
@@ -386,7 +386,7 @@ export class CapellaParser {
     }
 
     private parseSystems(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'system':
                     this.parseSystem(c);
@@ -406,7 +406,7 @@ export class CapellaParser {
             this._beamingMode = BeatBeamingMode.ForceSplitToNext;
         }
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staves':
                     this.parseStaves(element, c);
@@ -418,8 +418,8 @@ export class CapellaParser {
     }
 
     private parseStaves(systemElement: XmlNode, element: XmlNode) {
-        let firstBarIndex = this.score.masterBars.length;
-        for (let c of element.childElements()) {
+        const firstBarIndex = this.score.masterBars.length;
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staff':
                     this.parseStaff(systemElement, firstBarIndex, c);
@@ -448,7 +448,7 @@ export class CapellaParser {
             this.addNewBar(staff);
         }
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'voices':
                     this.parseVoices(staffId, staff, systemElement, firstBarIndex, c);
@@ -487,7 +487,7 @@ export class CapellaParser {
         element: XmlNode
     ) {
         let voiceIndex = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'voice':
                     this.parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
@@ -506,7 +506,7 @@ export class CapellaParser {
 
     private addNewBar(staff: Staff) {
         // voice tags always start a new bar
-        let currentBar: Bar = new Bar();
+        const currentBar: Bar = new Bar();
         if (staff.bars.length > 0) {
             currentBar.clef = staff.bars[staff.bars.length - 1].clef;
             currentBar.clefOttava = staff.bars[staff.bars.length - 1].clefOttava;
@@ -517,7 +517,7 @@ export class CapellaParser {
 
         // create masterbar if needed
         if (staff.bars.length > this.score.masterBars.length) {
-            let master: MasterBar = new MasterBar();
+            const master: MasterBar = new MasterBar();
             this.score.addMasterBar(master);
             if (master.index > 0) {
                 master.keySignature = master.previousMasterBar!.keySignature;
@@ -600,7 +600,7 @@ export class CapellaParser {
         }
 
         if (noteObjects) {
-            for (let c of noteObjects.childElements()) {
+            for (const c of noteObjects.childElements()) {
                 if (this._currentVoiceState.currentBarComplete && c.localName !== 'barline') {
                     this.newBar(staff, voiceIndex);
                 }
@@ -682,7 +682,7 @@ export class CapellaParser {
                         }
                         break;
                     case 'chord':
-                        let chordBeat = new Beat();
+                        const chordBeat = new Beat();
                         this.initFromPreviousBeat(chordBeat, this._currentVoice);
                         chordBeat.beamingMode = this._beamingMode;
                         if (this._currentVoiceState.voiceStemDir) {
@@ -718,7 +718,7 @@ export class CapellaParser {
     }
 
     private initFromPreviousBeat(chordBeat: Beat, currentVoice: Voice) {
-        let previousBeat = this.getLastBeat(currentVoice);
+        const previousBeat = this.getLastBeat(currentVoice);
         if (previousBeat) {
             chordBeat.dynamics = previousBeat.dynamics;
         }
@@ -755,7 +755,7 @@ export class CapellaParser {
 
     private parseChord(beat: Beat, element: XmlNode) {
         const articulation: Note = new Note();
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'stem':
                     switch (c.getAttribute('dir')) {
@@ -805,7 +805,7 @@ export class CapellaParser {
     }
 
     private parseHeads(beat: Beat, articulation: Note, element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'head':
                     this.parseHead(beat, articulation, c);
@@ -831,7 +831,7 @@ export class CapellaParser {
         // TODO: based on the shape attribute apply effects or
         // right percussion value
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'alter':
                     if (c.attributes.has('step')) {
@@ -856,7 +856,7 @@ export class CapellaParser {
     }
 
     private parseBeatDrawObject(beat: Beat, element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -919,7 +919,7 @@ export class CapellaParser {
     }
 
     private parseBarDrawObject(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -966,7 +966,7 @@ export class CapellaParser {
     }
 
     private parseLyric(beat: Beat, element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'verse':
                     if (!beat.lyrics) {
@@ -985,7 +985,7 @@ export class CapellaParser {
     private parseRestDurations(bar: Bar, element: XmlNode): Beat | null {
         const durationBase = element.getAttribute('base');
         if (durationBase.indexOf('/') !== -1) {
-            let restBeat = new Beat();
+            const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
             this.parseDuration(bar, restBeat, element);
             return restBeat;
@@ -994,7 +994,7 @@ export class CapellaParser {
         // for
         const fullBars = Number.parseInt(durationBase);
         if (fullBars === 1) {
-            let restBeat = new Beat();
+            const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
             restBeat.duration = Duration.Whole;
             return restBeat;
@@ -1053,7 +1053,7 @@ export class CapellaParser {
     }
 
     private parsePageObjects(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -1082,7 +1082,7 @@ export class CapellaParser {
     }
 
     private parseGallery(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -1099,7 +1099,7 @@ export class CapellaParser {
 
         let noteRange = 1;
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'text':
                     obj = this.parseText(c);
@@ -1254,7 +1254,7 @@ export class CapellaParser {
         }
 
         if (element.firstElement) {
-            for (let c of element.childElements()) {
+            for (const c of element.childElements()) {
                 switch (c.localName) {
                     case 'font':
                         obj.fontFace = c.getAttribute('face');
@@ -1281,7 +1281,7 @@ export class CapellaParser {
     }
 
     private parseInfo(element: XmlNode): void {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // encodingSoftware ignored
                 case 'author':

@@ -74,7 +74,7 @@ export class VisualTestHelper {
         inputFile = `test-data/visual-tests/${inputFile}`;
         const inputFileData = await TestPlatform.loadFile(inputFile);
         const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
-        let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+        const score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
         const o = new VisualTestOptions(score, [new VisualTestRun(-1, referenceFileName)], settings);
         if (configure) {
@@ -97,7 +97,7 @@ export class VisualTestHelper {
         await VisualTestHelper.prepareAlphaSkia();
         VisualTestHelper.prepareSettingsForTest(settings!);
 
-        let referenceFileData: Uint8Array[] = [];
+        const referenceFileData: Uint8Array[] = [];
         for (const run of runs) {
             try {
                 referenceFileData.push(await TestPlatform.loadFile(run.referenceFileName));
@@ -106,15 +106,15 @@ export class VisualTestHelper {
             }
         }
 
-        let results: RenderFinishedEventArgs[][] = [];
-        let totalWidths: number[] = [];
-        let totalHeights: number[] = [];
+        const results: RenderFinishedEventArgs[][] = [];
+        const totalWidths: number[] = [];
+        const totalHeights: number[] = [];
         const uiFacade = new TestUiFacade();
         uiFacade.rootContainer.width = runs[runIndex++].width;
 
         const api = new AlphaTabApiBase<unknown>(uiFacade, settings);
 
-        let render = new Promise<void>((resolve, reject) => {
+        const render = new Promise<void>((resolve, reject) => {
             api.renderStarted.on(_ => {
                 results.push([]);
                 totalWidths.push(0);
@@ -345,7 +345,7 @@ export class VisualTestHelper {
                 pixelMatchOptions.diffMask = true;
                 pixelMatchOptions.alpha = 1;
 
-                let match = PixelMatch.match(
+                const match = PixelMatch.match(
                     new Uint8Array(expectedImageData),
                     new Uint8Array(actualImageData),
                     new Uint8Array(diffImageData),
@@ -355,15 +355,15 @@ export class VisualTestHelper {
                 );
 
                 // only pixels that are not transparent are relevant for the diff-ratio
-                let totalPixels = match.totalPixels - match.transparentPixels;
-                let percentDifference = (match.differentPixels / totalPixels) * 100;
+                const totalPixels = match.totalPixels - match.transparentPixels;
+                const percentDifference = (match.differentPixels / totalPixels) * 100;
 
                 pass = percentDifference <= tolerancePercent;
                 // result.pass = match.differentPixels === 0;
                 errorMessage = '';
 
                 if (!pass) {
-                    let percentDifferenceText = percentDifference.toFixed(2);
+                    const percentDifferenceText = percentDifference.toFixed(2);
                     errorMessage = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
 
                     using diffPng = AlphaSkiaImage.fromPixels(actual.width, actual.height, diffImageData)!;

@@ -31,7 +31,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
 
     public override doLayout(): void {
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
-            let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
+            const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
 
             if (this.container.beat.notes.length > 0) {
@@ -70,10 +70,10 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                 // do we need an accidental on the note?
                 if (accidentalToSet !== AccidentalType.None) {
                     this.accidental = accidentalToSet;
-                    let sr: NumberedBarRenderer = this.renderer as NumberedBarRenderer;
+                    const sr: NumberedBarRenderer = this.renderer as NumberedBarRenderer;
                     const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.NumberedAccidentals, note);
 
-                    let g = new AccidentalGlyph(
+                    const g = new AccidentalGlyph(
                         0,
                         sr.getLineY(0),
                         accidentalToSet,
@@ -210,7 +210,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override doLayout(): void {
         // create glyphs
-        let sr = this.renderer as NumberedBarRenderer;
+        const sr = this.renderer as NumberedBarRenderer;
 
         if (sr.shortestDuration < this.container.beat.duration) {
             sr.shortestDuration = this.container.beat.duration;
@@ -236,9 +236,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 if (note.isDead) {
                     numberWithinOctave = 'X';
                 } else {
-                    let noteValue = note.displayValue - oneNoteValue;
+                    const noteValue = note.displayValue - oneNoteValue;
 
-                    let index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
+                    const index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
 
                     let dots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
                     if (noteValue < 0) {

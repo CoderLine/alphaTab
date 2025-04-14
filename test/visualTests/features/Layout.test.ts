@@ -32,14 +32,14 @@ describe('LayoutTests', () => {
     });
 
     it('page-layout-5barsperrow', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
         settings.display.barsPerRow = 5;
         await VisualTestHelper.runVisualTest('layout/page-layout-5barsperrow.gp', settings);
     });
 
     it('page-layout-bar5to8', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
         settings.display.startBar = 5;
         settings.display.barCount = 4;
@@ -47,13 +47,13 @@ describe('LayoutTests', () => {
     });
 
     it('horizontal-layout', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         await VisualTestHelper.runVisualTest('layout/horizontal-layout.gp', settings);
     });
 
     it('horizontal-layout-bar5to8', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = 5;
         settings.display.barCount = 4;

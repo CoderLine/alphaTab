@@ -12,7 +12,7 @@ import { expect } from 'chai';
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/score-info.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         expect(score.title).to.equal('Title');
         expect(score.subTitle).to.equal('Subtitle');
         expect(score.artist).to.equal('Artist');
@@ -31,109 +31,109 @@ describe('Gp5ImporterTest', () => {
 
     it('notes', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/notes.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkNotes(score);
     });
 
     it('time-signatures', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/time-signatures.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTimeSignatures(score);
     });
 
     it('dead', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/dead.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkDead(score);
     });
 
     it('grace', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/grace.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkGrace(score);
     });
 
     it('accentuations', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/accentuations.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkAccentuations(score, true);
     });
 
     it('harmonics', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/harmonics.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkHarmonics(score);
     });
 
     it('hammer', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hammer.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkHammer(score);
     });
 
     it('bend', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bends.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkBend(score);
     });
 
     it('tremolo', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/tremolo.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTremolo(score);
     });
 
     it('slides', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/slides.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkSlides(score);
     });
 
     it('vibrato', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/vibrato.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkVibrato(score, true);
     });
 
     it('trills', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/trills.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTrills(score);
     });
 
     it('other-effects', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/other-effects.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkOtherEffects(score, false);
     });
 
     it('fingering', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/fingering.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkFingering(score);
     });
 
     it('stroke', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/strokes.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkStroke(score);
     });
 
     it('tuplets', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/tuplets.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTuplets(score);
     });
 
     it('ranges', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/ranges.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkRanges(score);
     });
 
     it('effects', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/effects.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkEffects(score);
     });
 
@@ -145,25 +145,25 @@ describe('Gp5ImporterTest', () => {
 
     it('strings', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/strings.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkStrings(score);
     });
 
     it('key-signatures', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/key-signatures.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkKeySignatures(score);
     });
 
     it('chords', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/chords.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkChords(score);
     });
 
     it('colors', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/colors.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
     });
 
@@ -180,7 +180,7 @@ describe('Gp5ImporterTest', () => {
 
     it('canon', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         expect(score.title).to.equal('Canon Rock');
         expect(score.subTitle).to.equal('');
         expect(score.artist).to.equal('JerryC');
@@ -207,7 +207,7 @@ describe('Gp5ImporterTest', () => {
         const settings = new Settings();
         settings.importer.beatTextAsLyrics = true;
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/beat-text-lyrics.gp5', settings);
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
 
         const expectedChunks: string[] = [
             '',

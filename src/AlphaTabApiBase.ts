@@ -296,7 +296,7 @@ export class AlphaTabApiBase<TSettings> {
                 }
             }, uiFacade.resizeThrottle)
         );
-        let initialResizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
+        const initialResizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
         initialResizeEventInfo.oldWidth = this.renderer.width;
         initialResizeEventInfo.newWidth = this.container.width | 0;
         initialResizeEventInfo.settings = this.settings;
@@ -306,7 +306,7 @@ export class AlphaTabApiBase<TSettings> {
             this.onRenderFinished(renderingResult);
         });
         this.renderer.postRenderFinished.on(() => {
-            let duration: number = Date.now() - this._startTime;
+            const duration: number = Date.now() - this._startTime;
             Logger.debug('rendering', `Rendering completed in ${duration}ms`);
             this.onPostRenderFinished();
         });
@@ -511,7 +511,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public renderScore(score: Score, trackIndexes?: number[]): void {
-        let tracks: Track[] = [];
+        const tracks: Track[] = [];
         if (!trackIndexes) {
             if (score.tracks.length > 0) {
                 tracks.push(score.tracks[0]);
@@ -522,11 +522,11 @@ export class AlphaTabApiBase<TSettings> {
                     tracks.push(score.tracks[0]);
                 }
             } else if (trackIndexes.length === 1 && trackIndexes[0] === -1) {
-                for (let track of score.tracks) {
+                for (const track of score.tracks) {
                     tracks.push(track);
                 }
             } else {
-                for (let index of trackIndexes) {
+                for (const index of trackIndexes) {
                     if (index >= 0 && index <= score.tracks.length) {
                         tracks.push(score.tracks[index]);
                     }
@@ -571,8 +571,8 @@ export class AlphaTabApiBase<TSettings> {
      */
     public renderTracks(tracks: Track[]): void {
         if (tracks.length > 0) {
-            let score: Score = tracks[0].score;
-            for (let track of tracks) {
+            const score: Score = tracks[0].score;
+            for (const track of tracks) {
                 if (track.score !== score) {
                     this.onError(
                         new AlphaTabError(
@@ -594,7 +594,7 @@ export class AlphaTabApiBase<TSettings> {
             this._tracks = tracks;
             this._tickCache = null;
             this._trackIndexes = [];
-            for (let track of tracks) {
+            for (const track of tracks) {
                 this._trackIndexes.push(track.index);
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
@@ -611,7 +611,7 @@ export class AlphaTabApiBase<TSettings> {
             }
 
             this._trackIndexes = [];
-            for (let track of tracks) {
+            for (const track of tracks) {
                 this._trackIndexes.push(track.index);
             }
             this._trackIndexLookup = new Set<number>(this._trackIndexes);
@@ -635,7 +635,7 @@ export class AlphaTabApiBase<TSettings> {
                 this.triggerResize();
             });
         } else {
-            let resizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
+            const resizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
             resizeEventInfo.oldWidth = this.renderer.width;
             resizeEventInfo.newWidth = this.container.width;
             resizeEventInfo.settings = this.settings;
@@ -699,10 +699,10 @@ export class AlphaTabApiBase<TSettings> {
      */
     public tex(tex: string, tracks?: number[]): void {
         try {
-            let parser: AlphaTexImporter = new AlphaTexImporter();
+            const parser: AlphaTexImporter = new AlphaTexImporter();
             parser.logErrors = true;
             parser.initFromString(tex, this.settings);
-            let score: Score = parser.readScore();
+            const score: Score = parser.readScore();
             this.renderScore(score, tracks);
         } catch (e) {
             this.onError(e as Error);
@@ -1443,8 +1443,8 @@ export class AlphaTabApiBase<TSettings> {
         this.player.readyForPlayback.on(() => {
             this.onPlayerReady();
             if (this.tracks) {
-                for (let track of this.tracks) {
-                    let volume: number = track.playbackInfo.volume / 16;
+                for (const track of this.tracks) {
+                    const volume: number = track.playbackInfo.volume / 16;
                     this.player!.setChannelVolume(track.playbackInfo.primaryChannel, volume);
                     this.player!.setChannelVolume(track.playbackInfo.secondaryChannel, volume);
                 }
@@ -1474,9 +1474,9 @@ export class AlphaTabApiBase<TSettings> {
         const score = this.score!;
 
         Logger.debug('AlphaTab', 'Generating Midi');
-        let midiFile: MidiFile = new MidiFile();
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, this.settings, handler);
+        const midiFile: MidiFile = new MidiFile();
+        const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, this.settings, handler);
 
         const startIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.settings);
         const endIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.settings, startIndex);
@@ -1535,7 +1535,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.player) {
             return;
         }
-        for (let track of tracks) {
+        for (const track of tracks) {
             this.player.setChannelVolume(track.playbackInfo.primaryChannel, volume);
             this.player.setChannelVolume(track.playbackInfo.secondaryChannel, volume);
         }
@@ -1578,7 +1578,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.player) {
             return;
         }
-        for (let track of tracks) {
+        for (const track of tracks) {
             this.player.setChannelSolo(track.playbackInfo.primaryChannel, solo);
             this.player.setChannelSolo(track.playbackInfo.secondaryChannel, solo);
         }
@@ -1620,7 +1620,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.player) {
             return;
         }
-        for (let track of tracks) {
+        for (const track of tracks) {
             this.player.setChannelMute(track.playbackInfo.primaryChannel, mute);
             this.player.setChannelMute(track.playbackInfo.secondaryChannel, mute);
         }
@@ -1664,7 +1664,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!this.player) {
             return;
         }
-        for (let track of tracks) {
+        for (const track of tracks) {
             this.player.setChannelTranspositionPitch(track.playbackInfo.primaryChannel, semitones);
             this.player.setChannelTranspositionPitch(track.playbackInfo.secondaryChannel, semitones);
         }
@@ -1846,9 +1846,9 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         // we generate a new midi file containing only the beat
-        let midiFile: MidiFile = new MidiFile();
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(
+        const midiFile: MidiFile = new MidiFile();
+        const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        const generator: MidiFileGenerator = new MidiFileGenerator(
             beat.voice.bar.staff.track.score,
             this.settings,
             handler
@@ -1896,9 +1896,9 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         // we generate a new midi file containing only the beat
-        let midiFile: MidiFile = new MidiFile();
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
-        let generator: MidiFileGenerator = new MidiFileGenerator(
+        const midiFile: MidiFile = new MidiFile();
+        const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        const generator: MidiFileGenerator = new MidiFileGenerator(
             note.beat.voice.bar.staff.track.score,
             this.settings,
             handler
@@ -1935,7 +1935,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enableCursor && !this._cursorWrapper) {
             //
             // Create cursors
-            let cursors = this.uiFacade.createCursors();
+            const cursors = this.uiFacade.createCursors();
             if (cursors) {
                 // store options and created elements for fast access
                 this._cursorWrapper = cursors.cursorWrapper;
@@ -1971,8 +1971,8 @@ export class AlphaTabApiBase<TSettings> {
             this.player.stateChanged.on(e => {
                 this._playerState = e.state;
                 if (!e.stopped && e.state === PlayerState.Paused) {
-                    let currentBeat = this._currentBeat;
-                    let tickCache = this._tickCache;
+                    const currentBeat = this._currentBeat;
+                    const tickCache = this._tickCache;
                     if (currentBeat && tickCache) {
                         this.player!.tickPosition = tickCache.getBeatStart(currentBeat.beat);
                     }
@@ -1993,11 +1993,11 @@ export class AlphaTabApiBase<TSettings> {
         shouldScroll: boolean = false,
         forceUpdate: boolean = false
     ): void {
-        let cache: MidiTickLookup | null = this._tickCache;
+        const cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
-            let tracks = this._trackIndexLookup;
+            const tracks = this._trackIndexLookup;
             if (tracks != null && tracks.size > 0) {
-                let beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
+                const beat: MidiTickLookupFindBeatResult | null = cache.findBeat(tracks, tick, this._currentBeat);
                 if (beat) {
                     this.cursorUpdateBeat(
                         beat,
@@ -2027,13 +2027,13 @@ export class AlphaTabApiBase<TSettings> {
         if (!beat) {
             return;
         }
-        let cache: BoundsLookup | null = this.renderer.boundsLookup;
+        const cache: BoundsLookup | null = this.renderer.boundsLookup;
         if (!cache) {
             return;
         }
-        let previousBeat = this._currentBeat;
-        let previousCache: BoundsLookup | null = this._previousCursorCache;
-        let previousState: PlayerState | null = this._previousStateForCursor;
+        const previousBeat = this._currentBeat;
+        const previousCache: BoundsLookup | null = this._previousCursorCache;
+        const previousState: PlayerState | null = this._previousStateForCursor;
         if (
             !forceUpdate &&
             beat === previousBeat?.beat &&
@@ -2043,7 +2043,7 @@ export class AlphaTabApiBase<TSettings> {
         ) {
             return;
         }
-        let beatBoundings: BeatBounds | null = cache.findBeat(beat);
+        const beatBoundings: BeatBounds | null = cache.findBeat(beat);
         if (!beatBoundings) {
             return;
         }
@@ -2082,28 +2082,28 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private internalScrollToCursor(barBoundings: MasterBarBounds) {
-        let scrollElement: IContainer = this.uiFacade.getScrollContainer();
-        let isVertical: boolean = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).vertical;
-        let mode: ScrollMode = this.settings.player.scrollMode;
+        const scrollElement: IContainer = this.uiFacade.getScrollContainer();
+        const isVertical: boolean = Environment.getLayoutEngineFactory(this.settings.display.layoutMode).vertical;
+        const mode: ScrollMode = this.settings.player.scrollMode;
         if (isVertical) {
             // when scrolling on the y-axis, we preliminary check if the new beat/bar have
             // moved on the y-axis
-            let y: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+            const y: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
             if (y !== this._lastScroll) {
                 this._lastScroll = y;
                 switch (mode) {
                     case ScrollMode.Continuous:
-                        let elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
+                        const elementOffset: Bounds = this.uiFacade.getOffset(scrollElement, this.container);
                         this.uiFacade.scrollToY(scrollElement, elementOffset.y + y, this.settings.player.scrollSpeed);
                         break;
                     case ScrollMode.OffScreen:
-                        let elementBottom: number =
+                        const elementBottom: number =
                             scrollElement.scrollTop + this.uiFacade.getOffset(null, scrollElement).h;
                         if (
                             barBoundings.visualBounds.y + barBoundings.visualBounds.h >= elementBottom ||
                             barBoundings.visualBounds.y < scrollElement.scrollTop
                         ) {
-                            let scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
+                            const scrollTop: number = barBoundings.realBounds.y + this.settings.player.scrollOffsetY;
                             this.uiFacade.scrollToY(scrollElement, scrollTop, this.settings.player.scrollSpeed);
                         }
                         break;
@@ -2112,24 +2112,24 @@ export class AlphaTabApiBase<TSettings> {
         } else {
             // when scrolling on the x-axis, we preliminary check if the new bar has
             // moved on the x-axis
-            let x: number = barBoundings.visualBounds.x;
+            const x: number = barBoundings.visualBounds.x;
             if (x !== this._lastScroll) {
                 this._lastScroll = x;
                 switch (mode) {
                     case ScrollMode.Continuous:
-                        let scrollLeftContinuous: number =
+                        const scrollLeftContinuous: number =
                             barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
                         this._lastScroll = barBoundings.visualBounds.x;
                         this.uiFacade.scrollToX(scrollElement, scrollLeftContinuous, this.settings.player.scrollSpeed);
                         break;
                     case ScrollMode.OffScreen:
-                        let elementRight: number =
+                        const elementRight: number =
                             scrollElement.scrollLeft + this.uiFacade.getOffset(null, scrollElement).w;
                         if (
                             barBoundings.visualBounds.x + barBoundings.visualBounds.w >= elementRight ||
                             barBoundings.visualBounds.x < scrollElement.scrollLeft
                         ) {
-                            let scrollLeftOffScreen: number =
+                            const scrollLeftOffScreen: number =
                                 barBoundings.realBounds.x + this.settings.player.scrollOffsetX;
                             this._lastScroll = barBoundings.visualBounds.x;
                             this.uiFacade.scrollToX(
@@ -2158,8 +2158,8 @@ export class AlphaTabApiBase<TSettings> {
         const barCursor = this._barCursor;
         const beatCursor = this._beatCursor;
 
-        let barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
-        let barBounds: Bounds = barBoundings.visualBounds;
+        const barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
+        const barBounds: Bounds = barBoundings.visualBounds;
 
         this._currentBarBounds = barBoundings;
 
@@ -2185,8 +2185,8 @@ export class AlphaTabApiBase<TSettings> {
         const isPlayingUpdate = this._playerState === PlayerState.Playing && !stop;
         if (isPlayingUpdate) {
             if (this.settings.player.enableElementHighlighting) {
-                for (let highlight of beatsToHighlight) {
-                    let className: string = BeatContainerGlyph.getGroupId(highlight.beat);
+                for (const highlight of beatsToHighlight) {
+                    const className: string = BeatContainerGlyph.getGroupId(highlight.beat);
                     this.uiFacade.highlightElements(className, beat.voice.bar.index);
                 }
             }
@@ -2201,7 +2201,7 @@ export class AlphaTabApiBase<TSettings> {
             if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
                 // if we are moving within the same bar or to the next bar
                 // transition to the next beat, otherwise transition to the end of the bar.
-                let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+                const nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
                 if (
                     nextBeatBoundings &&
                     nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
@@ -2633,22 +2633,22 @@ export class AlphaTabApiBase<TSettings> {
             this.settings.player.enableUserInteraction
         ) {
             if (this._selectionEnd) {
-                let startTick: number =
+                const startTick: number =
                     this._tickCache?.getBeatStart(this._selectionStart!.beat) ??
                     this._selectionStart!.beat.absolutePlaybackStart;
-                let endTick: number =
+                const endTick: number =
                     this._tickCache?.getBeatStart(this._selectionEnd!.beat) ??
                     this._selectionEnd!.beat.absolutePlaybackStart;
                 if (endTick < startTick) {
-                    let t: SelectionInfo = this._selectionStart!;
+                    const t: SelectionInfo = this._selectionStart!;
                     this._selectionStart = this._selectionEnd;
                     this._selectionEnd = t;
                 }
             }
             if (this._selectionStart && this._tickCache) {
                 // get the start and stop ticks (which consider properly repeats)
-                let tickCache: MidiTickLookup = this._tickCache;
-                let realMasterBarStart: number = tickCache.getMasterBarStart(
+                const tickCache: MidiTickLookup = this._tickCache;
+                const realMasterBarStart: number = tickCache.getMasterBarStart(
                     this._selectionStart.beat.voice.bar.masterBar
                 );
                 // move to selection start
@@ -2659,11 +2659,11 @@ export class AlphaTabApiBase<TSettings> {
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range
                 if (this._selectionEnd && this._selectionStart.beat !== this._selectionEnd.beat) {
-                    let realMasterBarEnd: number = tickCache.getMasterBarStart(
+                    const realMasterBarEnd: number = tickCache.getMasterBarStart(
                         this._selectionEnd.beat.voice.bar.masterBar
                     );
 
-                    let range = new PlaybackRange();
+                    const range = new PlaybackRange();
                     range.startTick = realMasterBarStart + this._selectionStart.beat.playbackStart;
                     range.endTick =
                         realMasterBarEnd +
@@ -2719,9 +2719,9 @@ export class AlphaTabApiBase<TSettings> {
             if (this.settings.player.enableUserInteraction) {
                 e.preventDefault();
             }
-            let relX: number = e.getX(this.canvasElement);
-            let relY: number = e.getY(this.canvasElement);
-            let beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
+            const relX: number = e.getX(this.canvasElement);
+            const relY: number = e.getY(this.canvasElement);
+            const beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             if (beat) {
                 this.onBeatMouseDown(e, beat);
 
@@ -2737,9 +2737,9 @@ export class AlphaTabApiBase<TSettings> {
             if (!this._beatMouseDown) {
                 return;
             }
-            let relX: number = e.getX(this.canvasElement);
-            let relY: number = e.getY(this.canvasElement);
-            let beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
+            const relX: number = e.getX(this.canvasElement);
+            const relY: number = e.getY(this.canvasElement);
+            const beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             if (beat) {
                 this.onBeatMouseMove(e, beat);
 
@@ -2758,9 +2758,9 @@ export class AlphaTabApiBase<TSettings> {
             if (this.settings.player.enableUserInteraction) {
                 e.preventDefault();
             }
-            let relX: number = e.getX(this.canvasElement);
-            let relY: number = e.getY(this.canvasElement);
-            let beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
+            const relX: number = e.getX(this.canvasElement);
+            const relY: number = e.getY(this.canvasElement);
+            const beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             this.onBeatMouseUp(e, beat);
 
             if (this._noteMouseDown) {
@@ -2786,11 +2786,11 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private cursorSelectRange(startBeat: SelectionInfo | null, endBeat: SelectionInfo | null): void {
-        let cache: BoundsLookup | null = this.renderer.boundsLookup;
+        const cache: BoundsLookup | null = this.renderer.boundsLookup;
         if (!cache) {
             return;
         }
-        let selectionWrapper: IContainer | null = this._selectionWrapper;
+        const selectionWrapper: IContainer | null = this._selectionWrapper;
         if (!selectionWrapper) {
             return;
         }
@@ -2806,14 +2806,14 @@ export class AlphaTabApiBase<TSettings> {
         if (!endBeat.bounds) {
             endBeat.bounds = cache.findBeat(endBeat.beat);
         }
-        let startTick: number = this._tickCache?.getBeatStart(startBeat.beat) ?? startBeat.beat.absolutePlaybackStart;
-        let endTick: number = this._tickCache?.getBeatStart(endBeat.beat) ?? endBeat.beat.absolutePlaybackStart;
+        const startTick: number = this._tickCache?.getBeatStart(startBeat.beat) ?? startBeat.beat.absolutePlaybackStart;
+        const endTick: number = this._tickCache?.getBeatStart(endBeat.beat) ?? endBeat.beat.absolutePlaybackStart;
         if (endTick < startTick) {
-            let t: SelectionInfo = startBeat;
+            const t: SelectionInfo = startBeat;
             startBeat = endBeat;
             endBeat = t;
         }
-        let startX: number = startBeat.bounds!.realBounds.x;
+        const startX: number = startBeat.bounds!.realBounds.x;
         let endX: number = endBeat.bounds!.realBounds.x + endBeat.bounds!.realBounds.w;
         if (endBeat.beat.index === endBeat.beat.voice.beats.length - 1) {
             endX =
@@ -2828,11 +2828,11 @@ export class AlphaTabApiBase<TSettings> {
             // from the startbeat to the end of the staff,
             // then fill all staffs until the end-beat staff
             // then from staff-start to the end beat (or to end of bar if it's the last beat)
-            let staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x;
-            let staffEndX: number =
+            const staffStartX: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x;
+            const staffEndX: number =
                 startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.x +
                 startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.visualBounds.w;
-            let startSelection: IContainer = this.uiFacade.createSelectionElement()!;
+            const startSelection: IContainer = this.uiFacade.createSelectionElement()!;
             startSelection.setBounds(
                 startX,
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
@@ -2840,11 +2840,11 @@ export class AlphaTabApiBase<TSettings> {
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.h
             );
             selectionWrapper.appendChild(startSelection);
-            let staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index + 1;
-            let staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index;
+            const staffStartIndex: number = startBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index + 1;
+            const staffEndIndex: number = endBeat.bounds!.barBounds.masterBarBounds.staffSystemBounds!.index;
             for (let staffIndex: number = staffStartIndex; staffIndex < staffEndIndex; staffIndex++) {
-                let staffBounds: StaffSystemBounds = cache.staffSystems[staffIndex];
-                let middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
+                const staffBounds: StaffSystemBounds = cache.staffSystems[staffIndex];
+                const middleSelection: IContainer = this.uiFacade.createSelectionElement()!;
                 middleSelection.setBounds(
                     staffStartX,
                     staffBounds.visualBounds.y,
@@ -2853,7 +2853,7 @@ export class AlphaTabApiBase<TSettings> {
                 );
                 selectionWrapper.appendChild(middleSelection);
             }
-            let endSelection: IContainer = this.uiFacade.createSelectionElement()!;
+            const endSelection: IContainer = this.uiFacade.createSelectionElement()!;
             endSelection.setBounds(
                 staffStartX,
                 endBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,
@@ -2863,7 +2863,7 @@ export class AlphaTabApiBase<TSettings> {
             selectionWrapper.appendChild(endSelection);
         } else {
             // if the beats are on the same staff, we simply highlight from the startbeat to endbeat
-            let selection: IContainer = this.uiFacade.createSelectionElement()!;
+            const selection: IContainer = this.uiFacade.createSelectionElement()!;
             selection.setBounds(
                 startX,
                 startBeat.bounds!.barBounds.masterBarBounds.visualBounds.y,

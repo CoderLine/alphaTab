@@ -34,9 +34,9 @@ export class TabSlideLineGlyph extends Glyph {
     }
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let sizeX: number = 12;
-        let sizeY: number = 3;
+        const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        const sizeX: number = 12;
+        const sizeY: number = 3;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -62,9 +62,9 @@ export class TabSlideLineGlyph extends Glyph {
     }
 
     private paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let sizeX: number = 12;
-        let sizeY: number = 3;
+        const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        const sizeX: number = 12;
+        const sizeY: number = 3;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -83,7 +83,7 @@ export class TabSlideLineGlyph extends Glyph {
                     + offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
-                    let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
+                    const endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
                         this.renderer.staff.staveId,
                         this._startNote.slideTarget.beat.voice.bar
                     );
@@ -173,19 +173,19 @@ export class TabSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 
             startY -= glyph.height / 2;
             endY -= glyph.height / 2;
 
-            let b: number = endX - startX;
-            let a: number = endY - startY;
-            let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+            const b: number = endX - startX;
+            const a: number = endY - startY;
+            const c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
             glyph.width = b;
 
-            let angle: number = Math.asin(a / c) * (180 / Math.PI);
+            const angle: number = Math.asin(a / c) * (180 / Math.PI);
             canvas.beginRotate(startX, startY, angle);
             glyph.paint(0, 0, canvas);
             canvas.endRotate();

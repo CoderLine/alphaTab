@@ -18,7 +18,7 @@ export class DummyEffectGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let c = canvas.color; 
+        const c = canvas.color; 
         canvas.color = Color.random();
         canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         canvas.color = c;

@@ -90,7 +90,7 @@ export class ClefGlyph extends MusicFontGlyph {
         }
         numberGlyph.renderer = this.renderer;
         numberGlyph.doLayout();
-        let x: number = this.width / 2;
+        const x: number = this.width / 2;
         numberGlyph.paint(cx + this.x + x + offsetX, cy + this.y + offsetY, canvas);
     }
 }

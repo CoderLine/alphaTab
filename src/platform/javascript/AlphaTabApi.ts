@@ -36,7 +36,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */
     public override tex(tex: string, tracks?: number[]): void {
-        let browser: BrowserUiFacade = this.uiFacade as BrowserUiFacade;
+        const browser: BrowserUiFacade = this.uiFacade as BrowserUiFacade;
         super.tex(tex, browser.parseTracks(tracks));
     }
 
@@ -66,8 +66,8 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      */         
     public print(width?: string, additionalSettings: unknown = null): void {
         // prepare a popup window for printing (a4 width, window height, centered)
-        let preview: Window = window.open('', '', 'width=0,height=0')!;
-        let a4: HTMLElement = preview.document.createElement('div');
+        const preview: Window = window.open('', '', 'width=0,height=0')!;
+        const a4: HTMLElement = preview.document.createElement('div');
         if (width) {
             a4.style.width = width;
         } else {
@@ -107,33 +107,33 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
             }
         }
         preview.document.body.appendChild(a4);
-        let dualScreenLeft: number =
+        const dualScreenLeft: number =
             typeof (window as any).screenLeft !== 'undefined'
                 ? (window as any).screenLeft
                 : (window as any).left;
-        let dualScreenTop: number =
+        const dualScreenTop: number =
             typeof (window as any).screenTop !== 'undefined' ? (window as any).screenTop : (window as any).top;
-        let screenWidth: number =
+        const screenWidth: number =
             "innerWidth" in window
                 ? window.innerWidth
                 : "clientWidth" in document.documentElement
                     ? document.documentElement.clientWidth
                     : (window as Window).screen.width;
-        let screenHeight: number =
+        const screenHeight: number =
             "innerHeight" in window
                 ? window.innerHeight
                 : "clientHeight" in document.documentElement
                     ? document.documentElement.clientHeight
                     : (window as Window).screen.height;
-        let w: number = a4.offsetWidth + 50;
-        let h: number = window.innerHeight;
-        let left: number = ((screenWidth / 2) | 0) - ((w / 2) | 0) + dualScreenLeft;
-        let top: number = ((screenHeight / 2) | 0) - ((h / 2) | 0) + dualScreenTop;
+        const w: number = a4.offsetWidth + 50;
+        const h: number = window.innerHeight;
+        const left: number = ((screenWidth / 2) | 0) - ((w / 2) | 0) + dualScreenLeft;
+        const top: number = ((screenHeight / 2) | 0) - ((h / 2) | 0) + dualScreenTop;
         preview.resizeTo(w, h);
         preview.moveTo(left, top);
         preview.focus();
         // render alphaTab
-        let settings: Settings = JsonConverter.jsObjectToSettings(JsonConverter.settingsToJsObject(this.settings));
+        const settings: Settings = JsonConverter.jsObjectToSettings(JsonConverter.settingsToJsObject(this.settings));
         settings.core.enableLazyLoading = false;
         settings.core.useWorkers = true;
         settings.core.file = null;
@@ -146,7 +146,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         settings.display.scale = 0.8;
         settings.display.stretchForce = 0.8;
         SettingsSerializer.fromJson(settings, additionalSettings);
-        let alphaTab: AlphaTabApi = new AlphaTabApi(a4, settings);
+        const alphaTab: AlphaTabApi = new AlphaTabApi(a4, settings);
         preview.onunload = () => {
             alphaTab.destroy();
         };
@@ -178,19 +178,19 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
             return;
         }
 
-        let midiFile: MidiFile = new MidiFile();
+        const midiFile: MidiFile = new MidiFile();
         midiFile.format = format;
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile, true);
-        let generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
+        const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile, true);
+        const generator: MidiFileGenerator = new MidiFileGenerator(this.score, this.settings, handler);
         generator.generate();
-        let binary: Uint8Array = midiFile.toBinary();
-        let fileName: string = !this.score.title ? 'File.mid' : `${this.score.title}.mid`;
-        let dlLink: HTMLAnchorElement = document.createElement('a');
+        const binary: Uint8Array = midiFile.toBinary();
+        const fileName: string = !this.score.title ? 'File.mid' : `${this.score.title}.mid`;
+        const dlLink: HTMLAnchorElement = document.createElement('a');
         dlLink.download = fileName;
-        let blob: Blob = new Blob([binary], {
+        const blob: Blob = new Blob([binary], {
             type: 'audio/midi'
         });
-        let url: string = URL.createObjectURL(blob);
+        const url: string = URL.createObjectURL(blob);
         dlLink.href = url;
         dlLink.style.display = 'none';
         document.body.appendChild(dlLink);
@@ -202,7 +202,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */
     public override changeTrackMute(tracks: Track[], mute: boolean): void {
-        let trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
+        const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackMute(trackList, mute);
     }
 
@@ -210,7 +210,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */    
     public override changeTrackSolo(tracks: Track[], solo: boolean): void {
-        let trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
+        const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackSolo(trackList, solo);
     }
 
@@ -218,7 +218,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @inheritdoc
      */    
     public override changeTrackVolume(tracks: Track[], volume: number): void {
-        let trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
+        const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackVolume(trackList, volume);
     }
 
@@ -226,13 +226,13 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         if (!this.score) {
             return [];
         }
-        let tracks: Track[] = [];
+        const tracks: Track[] = [];
         if (trackIndexes.length === 1 && trackIndexes[0] === -1) {
-            for (let track of this.score.tracks) {
+            for (const track of this.score.tracks) {
                 tracks.push(track);
             }
         } else {
-            for (let index of trackIndexes) {
+            for (const index of trackIndexes) {
                 if (index >= 0 && index < this.score.tracks.length) {
                     tracks.push(this.score.tracks[index]);
                 }

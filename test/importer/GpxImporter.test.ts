@@ -14,25 +14,25 @@ describe('GpxImporterTest', () => {
         return prepareImporterWithBytes(data);}
 
     function prepareImporterWithBytes(buffer: Uint8Array) {
-        let readerBase: GpxImporter = new GpxImporter();
+        const readerBase: GpxImporter = new GpxImporter();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }
 
     it('file-system-compressed', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro6/file-system-compressed.gpx');
-        let fileSystem: GpxFileSystem = new GpxFileSystem();
+        const fileSystem: GpxFileSystem = new GpxFileSystem();
         fileSystem.load(ByteBuffer.fromBuffer(data));
-        let names: string[] = [
+        const names: string[] = [
             'score.gpif',
             'misc.xml',
             'BinaryStylesheet',
             'PartConfiguration',
             'LayoutConfiguration'
         ];
-        let sizes = [8488, 130, 12204, 20, 12];
+        const sizes = [8488, 130, 12204, 20, 12];
         for (let i: number = 0; i < fileSystem.files.length; i++) {
-            let file: GpxFile = fileSystem.files[i];
+            const file: GpxFile = fileSystem.files[i];
             Logger.info('Test', `${file.fileName} - ${file.fileSize}`);
             expect(file.fileName).to.equal(names[i]);
             expect(file.fileSize).to.equal(sizes[i]);
@@ -41,7 +41,7 @@ describe('GpxImporterTest', () => {
 
     it('score-info', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/score-info.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         expect(score.title).to.equal('Title');
         expect(score.subTitle).to.equal('Subtitle');
         expect(score.artist).to.equal('Artist');
@@ -60,49 +60,49 @@ describe('GpxImporterTest', () => {
 
     it('notes', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/notes.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkNotes(score);
     });
 
     it('time-signatures', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/time-signatures.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTimeSignatures(score);
     });
 
     it('dead', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/dead.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkDead(score);
     });
 
     it('grace', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/grace.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkGrace(score);
     });
 
     it('accentuations', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/accentuations.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkAccentuations(score, true);
     });
 
     it('harmonics', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/harmonics.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkHarmonics(score);
     });
 
     it('hammer', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/hammer.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkHammer(score);
     });
 
     it('bends', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/bends.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
@@ -136,7 +136,7 @@ describe('GpxImporterTest', () => {
 
     it('tremolo', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/tremolo.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
 
@@ -185,55 +185,55 @@ describe('GpxImporterTest', () => {
 
     it('slides', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/slides.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkSlides(score);
     });
 
     it('vibrato', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/vibrato.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkVibrato(score, true);
     });
 
     it('trills', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/trills.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTrills(score);
     });
 
     it('other-effects', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/other-effects.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkOtherEffects(score, true);
     });
 
     it('fingering', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/fingering.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkFingering(score);
     });
 
     it('stroke', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/strokes.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkStroke(score);
     });
 
     it('tuplets', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/tuplets.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTuplets(score);
     });
 
     it('ranges', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/ranges.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkRanges(score);
     });
 
     it('effects', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/effects.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkEffects(score);
     });
 
@@ -245,25 +245,25 @@ describe('GpxImporterTest', () => {
 
     it('strings', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/strings.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkStrings(score);
     });
 
     it('key-signatures', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/key-signatures.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkKeySignatures(score);
     });
 
     it('chords', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/chords.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkChords(score);
     });
 
     it('colors', async () => {
         const reader = await prepareImporterWithFile('guitarpro6/colors.gpx');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
     });
 

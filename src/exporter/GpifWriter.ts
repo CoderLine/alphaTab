@@ -597,8 +597,8 @@ export class GpifWriter {
     private writeStandardBend(properties: XmlNode, bendPoints: BendPoint[]) {
         this.writeSimplePropertyNode(properties, 'Bended', 'Enable', null);
 
-        let bendOrigin = bendPoints[0];
-        let bendDestination = bendPoints[bendPoints.length - 1];
+        const bendOrigin = bendPoints[0];
+        const bendDestination = bendPoints[bendPoints.length - 1];
         let bendMiddle1: BendPoint;
         let bendMiddle2: BendPoint;
 
@@ -993,8 +993,8 @@ export class GpifWriter {
 
     private writeStandardWhammy(parent: XmlNode, whammyBarPoints: BendPoint[]) {
         const whammyNode = parent.addElement('Whammy');
-        let whammyOrigin = whammyBarPoints[0];
-        let whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
+        const whammyOrigin = whammyBarPoints[0];
+        const whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
         let whammyMiddle1: BendPoint;
         let whammyMiddle2: BendPoint;
 
@@ -1400,7 +1400,7 @@ export class GpifWriter {
                 const fretToStrings = new Map<number, number[]>();
 
                 for (let i = 0; i < chord.strings.length; i++) {
-                    let chordFret = chord.strings[i];
+                    const chordFret = chord.strings[i];
                     if (chordFret !== -1) {
                         const fretNode = diagram.addElement('Fret');
                         const chordString = chord.strings.length - 1 - i;
@@ -1525,7 +1525,7 @@ export class GpifWriter {
         const lyrics = trackNode.addElement('Lyrics');
         lyrics.attributes.set('dispatched', 'true');
 
-        let lines: Lyrics[] = [];
+        const lines: Lyrics[] = [];
 
         for (const bar of track.staves[0].bars) {
             for (const voice of bar.voices) {
@@ -1585,10 +1585,10 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
-            let currentElementType: string = '';
+            const currentElementType: string = '';
             let currentElementName: string = '';
             let currentArticulations: XmlNode = new XmlNode();
-            let counterPerType = new Map<string, number>();
+            const counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of articulations) {
                 if (!currentElementType || currentElementType !== articulation.elementType) {
@@ -1671,7 +1671,7 @@ export class GpifWriter {
         if (symbol === MusicFontSymbol.None) {
             return '';
         }
-        let s = MusicFontSymbol[symbol];
+        const s = MusicFontSymbol[symbol];
         return s.substring(0, 1).toLowerCase() + s.substring(1);
     }
 
@@ -1698,7 +1698,7 @@ export class GpifWriter {
             masterBarNode.addElement('FreeTime');
         }
 
-        let bars: string[] = [];
+        const bars: string[] = [];
         for (const tracks of masterBar.score.tracks) {
             for (const staves of tracks.staves) {
                 bars.push(staves.bars[masterBar.index].id.toString());

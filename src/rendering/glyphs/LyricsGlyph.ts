@@ -22,7 +22,7 @@ export class LyricsGlyph extends EffectGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.font = this.font;
-        let old: TextAlign = canvas.textAlign;
+        const old: TextAlign = canvas.textAlign;
         canvas.textAlign = this.textAlign;
         for (let i: number = 0; i < this._lines.length; i++) {
             if (this._lines[i]) {

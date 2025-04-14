@@ -193,8 +193,8 @@ export class MidiFileGenerator {
                 : -track.staves[0].transpositionPitch;
         this.transpositionPitches.set(channel, transpositionPitch);
 
-        let volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);
-        let balance: number = MidiFileGenerator.toChannelShort(playbackInfo.balance);
+        const volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);
+        const balance: number = MidiFileGenerator.toChannelShort(playbackInfo.balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.VolumeCoarse, volume);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.PanCoarse, balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.ExpressionControllerCoarse, 127);
@@ -267,7 +267,7 @@ export class MidiFileGenerator {
     }
 
     private generateBar(bar: Bar, barStartTick: number, tempoOnBarStart: number): void {
-        let playbackBar: Bar = this.getPlaybackBar(bar);
+        const playbackBar: Bar = this.getPlaybackBar(bar);
 
         const barStartTime = this._currentTime;
         for (const v of playbackBar.voices) {
@@ -411,8 +411,8 @@ export class MidiFileGenerator {
         } else if (beat.deadSlapped) {
             this.generateDeadSlap(beat, barStartTick + beatStart);
         } else {
-            let brushInfo = this.getBrushInfo(beat);
-            let rasgueadoInfo = this.getRasgueadoInfo(beat, audioDuration);
+            const brushInfo = this.getBrushInfo(beat);
+            const rasgueadoInfo = this.getRasgueadoInfo(beat, audioDuration);
             for (const n of beat.notes) {
                 this.generateNote(
                     n,
@@ -615,7 +615,7 @@ export class MidiFileGenerator {
         const channel: number = this.determineChannel(track, note);
         let initialBend: number = 0;
 
-        let noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
+        const noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
 
         if (note.hasBend) {
             initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints![0].value);
@@ -912,7 +912,7 @@ export class MidiFileGenerator {
             let letRingEnd: number = 0;
             const maxDuration: number = note.beat.voice.bar.masterBar.calculateDuration();
             while (lastLetRingBeat.nextBeat) {
-                let next: Beat = lastLetRingBeat.nextBeat;
+                const next: Beat = lastLetRingBeat.nextBeat;
                 if (next.isRest) {
                     break;
                 }
@@ -1113,7 +1113,7 @@ export class MidiFileGenerator {
             let phase: number = 0;
             const phaseDuration: number = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
             while (phase < phaseDuration) {
-                let bend: number = bendBase + bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
+                const bend: number = bendBase + bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
                 addBend((noteStart + phase) | 0, MidiFileGenerator.getPitchWheel(bend));
                 phase += resolution;
             }
@@ -1161,10 +1161,10 @@ export class MidiFileGenerator {
         channel: number,
         tempoOnBeatStart: number
     ) {
-        let duration: number =
+        const duration: number =
             note.slideOutType === SlideOutType.Legato ? noteDuration.noteOnly : noteDuration.untilTieOrSlideEnd;
-        let playedBendPoints: BendPoint[] = [];
-        let track: Track = note.beat.voice.bar.staff.track;
+        const playedBendPoints: BendPoint[] = [];
+        const track: Track = note.beat.voice.bar.staff.track;
 
         const simpleSlidePitchOffset = this._settings.player.slide.simpleSlidePitchOffset;
         const simpleSlideDurationOffset = Math.floor(
@@ -1227,8 +1227,8 @@ export class MidiFileGenerator {
         channel: number,
         tempoOnBeatStart: number
     ): void {
-        let bendPoints: BendPoint[] = note.bendPoints!;
-        let track: Track = note.beat.voice.bar.staff.track;
+        const bendPoints: BendPoint[] = note.bendPoints!;
+        const track: Track = note.beat.voice.bar.staff.track;
 
         const addBend: (tick: number, value: number) => void = (tick, value) => {
             this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
@@ -1646,7 +1646,7 @@ export class MidiFileGenerator {
         let trillLength: number = MidiUtils.toTicks(note.trillSpeed);
         let realKey: boolean = true;
         let tick: number = noteStart;
-        let end: number = noteStart + noteDuration.untilTieOrSlideEnd;
+        const end: number = noteStart + noteDuration.untilTieOrSlideEnd;
         while (tick + 10 < end) {
             // only the rest on last trill play
             if (tick + trillLength >= end) {
@@ -1947,7 +1947,7 @@ export class MidiFileGenerator {
             let brushMove: number = 0;
             const brushIncrement: number = (brushDuration / (stringCount - 1)) | 0;
             for (let i: number = 0; i < beat.voice.bar.staff.tuning.length; i++) {
-                let index: number = down ? i : brushInfo.length - 1 - i;
+                const index: number = down ? i : brushInfo.length - 1 - i;
                 if ((stringUsed & (0x01 << index)) !== 0) {
                     brushInfo[index] = brushMove;
                     brushMove += brushIncrement;
@@ -1975,7 +1975,7 @@ export class MidiFileGenerator {
                 );
                 break;
             case AutomationType.Balance:
-                let balance: number = MidiFileGenerator.toChannelShort(automation.value);
+                const balance: number = MidiFileGenerator.toChannelShort(automation.value);
                 this._handler.addControlChange(
                     beat.voice.bar.staff.track.index,
                     beat.playbackStart + startMove,
@@ -1992,7 +1992,7 @@ export class MidiFileGenerator {
                 );
                 break;
             case AutomationType.Volume:
-                let volume: number = MidiFileGenerator.toChannelShort(automation.value);
+                const volume: number = MidiFileGenerator.toChannelShort(automation.value);
                 this._handler.addControlChange(
                     beat.voice.bar.staff.track.index,
                     beat.playbackStart + startMove,
@@ -2058,7 +2058,7 @@ export class MidiFileGenerator {
         this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
         this._handler.addTempo(0, tempo);
 
-        let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
+        const volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
         this._handler.addControlChange(
             0,
             0,

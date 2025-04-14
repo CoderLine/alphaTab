@@ -13,16 +13,16 @@ export class BrowserMouseEventArgs implements IMouseEventArgs {
     }
 
     public getX(relativeTo: IContainer): number {
-        let relativeToElement: HTMLElement = (relativeTo as HtmlElementContainer).element;
-        let bounds: DOMRect = relativeToElement.getBoundingClientRect();
-        let left: number = bounds.left + relativeToElement.ownerDocument!.defaultView!.pageXOffset;
+        const relativeToElement: HTMLElement = (relativeTo as HtmlElementContainer).element;
+        const bounds: DOMRect = relativeToElement.getBoundingClientRect();
+        const left: number = bounds.left + relativeToElement.ownerDocument!.defaultView!.pageXOffset;
         return this.mouseEvent.pageX - left;
     }
 
     public getY(relativeTo: IContainer): number {
-        let relativeToElement: HTMLElement = (relativeTo as HtmlElementContainer).element;
-        let bounds: DOMRect = relativeToElement.getBoundingClientRect();
-        let top: number = bounds.top + relativeToElement.ownerDocument!.defaultView!.pageYOffset;
+        const relativeToElement: HTMLElement = (relativeTo as HtmlElementContainer).element;
+        const bounds: DOMRect = relativeToElement.getBoundingClientRect();
+        const top: number = bounds.top + relativeToElement.ownerDocument!.defaultView!.pageYOffset;
         return this.mouseEvent.pageY - top;
     }
 

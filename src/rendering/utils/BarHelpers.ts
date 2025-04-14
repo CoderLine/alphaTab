@@ -25,11 +25,11 @@ export class BarHelpers {
         let currentBeamHelper: BeamingHelper | null = null;
         let currentGraceBeamHelper: BeamingHelper | null = null;
         for (let i: number = 0, j: number = bar.voices.length; i < j; i++) {
-            let v: Voice = bar.voices[i];
+            const v: Voice = bar.voices[i];
             this.beamHelpers.push([]);
             this.beamHelperLookup.push(new Map<number, BeamingHelper>());
             for (let k: number = 0, l: number = v.beats.length; k < l; k++) {
-                let b: Beat = v.beats[k];
+                const b: Beat = v.beats[k];
                 let helperForBeat: BeamingHelper | null;
                 if (b.graceType !== GraceType.None) {
                     helperForBeat = currentGraceBeamHelper;

@@ -291,7 +291,7 @@ export class SkiaCanvas implements ICanvas {
         centerAtPosition?: boolean
     ): void {
         let s: string = '';
-        for (let symbol of symbols) {
+        for (const symbol of symbols) {
             if (symbol !== MusicFontSymbol.None) {
                 s += String.fromCharCode(symbol);
             }

@@ -96,7 +96,7 @@ class FontParser {
         const familyListInput = this._input.substr(this._currentToken.startPos).trim();
         let pos = 0;
         while (pos < familyListInput.length) {
-            let c = familyListInput.charAt(pos);
+            const c = familyListInput.charAt(pos);
             if (c === ' ' || c === ',') {
                 // skip whitespace and quotes
                 pos++;
@@ -200,13 +200,13 @@ class FontParser {
         let hasVariant = false;
         let hasWeight = false;
         let valuesNeeded = 3;
-        let ambiguous: string[] = [];
+        const ambiguous: string[] = [];
 
         while (true) {
             if (!this._currentToken) {
                 return;
             }
-            let text: string = this._currentToken.text;
+            const text: string = this._currentToken.text;
             switch (text) {
                 // ambiguous
                 case 'normal':
@@ -499,19 +499,19 @@ export class Font {
                 return null;
             case 'object': {
                 const m = v as Map<string, unknown>;
-                let families = m.get('families') as string[];
+                const families = m.get('families') as string[];
                 // tslint:disable-next-line: no-unnecessary-type-assertion
-                let size = m.get('size')! as number;
-                let style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
-                let weight = JsonHelper.parseEnum<FontWeight>(m.get('weight'), FontWeight)!;
+                const size = m.get('size')! as number;
+                const style = JsonHelper.parseEnum<FontStyle>(m.get('style'), FontStyle)!;
+                const weight = JsonHelper.parseEnum<FontWeight>(m.get('weight'), FontWeight)!;
                 return Font.withFamilyList(families, size, style, weight);
             }
             case 'string': {
                 const parser = new FontParser(v as string);
                 parser.parse();
 
-                let families: string[] = parser.families;
-                let fontSizeString: string = parser.size.toLowerCase();
+                const families: string[] = parser.families;
+                const fontSizeString: string = parser.size.toLowerCase();
                 let fontSize: number = 0;
                 // as per https://websemantics.uk/articles/font-size-conversion/
                 switch (fontSizeString) {
@@ -563,7 +563,7 @@ export class Font {
                 }
 
                 let fontWeight: FontWeight = FontWeight.Regular;
-                let fontWeightString: string = parser.weight.toLowerCase();
+                const fontWeightString: string = parser.weight.toLowerCase();
                 switch (fontWeightString) {
                     case 'normal':
                     case 'lighter':

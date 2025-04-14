@@ -91,8 +91,8 @@ export class TupletGroup {
                 this.isFull = true;
             }
         } else {
-            let factor: number = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
-            for (let potentialMatch of TupletGroup.AllTicks) {
+            const factor: number = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
+            for (const potentialMatch of TupletGroup.AllTicks) {
                 if (this.totalDuration === potentialMatch * factor) {
                     this.isFull = true;
                     break;

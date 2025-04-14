@@ -33,8 +33,8 @@ export class TuningParseResultTone {
  */
 export class ModelUtils {
     public static getIndex(duration: Duration): number {
-        let index: number = 0;
-        let value: number = duration;
+        const index: number = 0;
+        const value: number = duration;
         if (value < 0) {
             return index;
         }
@@ -56,12 +56,12 @@ export class ModelUtils {
     public static applyPitchOffsets(settings: Settings, score: Score): void {
         for (let i: number = 0; i < score.tracks.length; i++) {
             if (i < settings.notation.displayTranspositionPitches.length) {
-                for (let staff of score.tracks[i].staves) {
+                for (const staff of score.tracks[i].staves) {
                     staff.displayTranspositionPitch = -settings.notation.displayTranspositionPitches[i];
                 }
             }
             if (i < settings.notation.transpositionPitches.length) {
-                for (let staff of score.tracks[i].staves) {
+                for (const staff of score.tracks[i].staves) {
                     staff.transpositionPitch = -settings.notation.transpositionPitches[i];
                 }
             }
@@ -147,7 +147,7 @@ export class ModelUtils {
         let note: string = '';
         let octave: string = '';
         for (let i: number = 0; i < name.length; i++) {
-            let c: number = name.charCodeAt(i);
+            const c: number = name.charCodeAt(i);
             if (c >= 0x30 && c <= 0x39 /* 0-9 */) {
                 // number without note?
                 if (!note) {
@@ -163,7 +163,7 @@ export class ModelUtils {
         if (!octave || !note) {
             return null;
         }
-        let result: TuningParseResult = new TuningParseResult();
+        const result: TuningParseResult = new TuningParseResult();
 
         result.octave = Number.parseInt(octave) + 1;
         result.note = note.toLowerCase();
@@ -180,7 +180,7 @@ export class ModelUtils {
     }
 
     public static getTuningForText(str: string): number {
-        let result: TuningParseResult | null = ModelUtils.parseTuning(str);
+        const result: TuningParseResult | null = ModelUtils.parseTuning(str);
         if (!result) {
             return -1;
         }
@@ -310,7 +310,7 @@ export class ModelUtils {
 
     public static toHexString(n: number, digits: number = 0): string {
         let s: string = '';
-        let hexChars: string = '0123456789ABCDEF';
+        const hexChars: string = '0123456789ABCDEF';
         do {
             s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
             n = n >> 4;
@@ -399,7 +399,7 @@ export class ModelUtils {
 
         let currentIndex = startIndex;
         while (currentIndex <= endIndexInclusive) {
-            let currentGroupStartIndex = currentIndex;
+            const currentGroupStartIndex = currentIndex;
             let currentGroup: number[] | null = null;
 
             while (currentIndex <= endIndexInclusive) {

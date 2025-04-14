@@ -13,10 +13,10 @@ export class TabClefGlyph extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.GuitarTabsClef, this.renderer.bar);
 
-        let strings: number = this.renderer.bar.staff.tuning.length;
-        let symbol: MusicFontSymbol =
+        const strings: number = this.renderer.bar.staff.tuning.length;
+        const symbol: MusicFontSymbol =
             strings <= 4 ? MusicFontSymbol.FourStringTabClef : MusicFontSymbol.SixStringTabClef;
-        let scale: number = strings <= 4 ? strings / 4.5 : strings / 6.5;
+        const scale: number = strings <= 4 ? strings / 4.5 : strings / 6.5;
         canvas.fillMusicFontSymbol(cx + this.x + 5, cy + this.y, scale, symbol, false);
     }
 }

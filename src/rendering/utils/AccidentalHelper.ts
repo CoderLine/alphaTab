@@ -161,7 +161,7 @@ export class AccidentalHelper {
      */
     public applyAccidental(note: Note): AccidentalType {
         const noteValue = AccidentalHelper.getNoteValue(note);
-        let quarterBend: boolean = note.hasQuarterToneOffset;
+        const quarterBend: boolean = note.hasQuarterToneOffset;
         return this.getAccidental(noteValue, quarterBend, note.beat, false, note);
     }
 
@@ -202,13 +202,13 @@ export class AccidentalHelper {
         quarterBend: boolean,
         currentAccidental: AccidentalType | null = null
     ) {
-        let ks: number = keySignature;
-        let ksi: number = ks + 7;
-        let index: number = noteValue % 12;
+        const ks: number = keySignature;
+        const ksi: number = ks + 7;
+        const index: number = noteValue % 12;
 
-        let accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-        let hasKeySignatureAccidentalSetForNote: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
-        let hasNoteAccidentalWithinOctave: boolean = AccidentalHelper.AccidentalNotes[index];
+        const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
+        const hasKeySignatureAccidentalSetForNote: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
+        const hasNoteAccidentalWithinOctave: boolean = AccidentalHelper.AccidentalNotes[index];
 
         // the general logic is like this:
         // - we check if the key signature has an accidental defined
@@ -404,18 +404,18 @@ export class AccidentalHelper {
     }
 
     public static calculateNoteSteps(keySignature: KeySignature, clef: Clef, noteValue: number): number {
-        let value: number = noteValue;
-        let ks: number = keySignature as number;
-        let clefValue: number = clef as number;
-        let index: number = value % 12;
-        let octave: number = ((value / 12) | 0) - 1;
+        const value: number = noteValue;
+        const ks: number = keySignature as number;
+        const clefValue: number = clef as number;
+        const index: number = value % 12;
+        const octave: number = ((value / 12) | 0) - 1;
 
         // Initial Position
         let steps: number = AccidentalHelper.OctaveSteps[clefValue];
         // Move to Octave
         steps -= octave * AccidentalHelper.StepsPerOctave;
         // get the step list for the current keySignature
-        let stepList =
+        const stepList =
             ModelUtils.keySignatureIsSharp(ks) || ModelUtils.keySignatureIsNatural(ks)
                 ? AccidentalHelper.SharpNoteSteps
                 : AccidentalHelper.FlatNoteSteps;

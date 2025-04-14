@@ -96,7 +96,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override doLayout(): void {
         // create glyphs
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
                 if (this.container.beat.slashed) {
@@ -124,9 +124,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this.noteHeads = noteHeads;
                     noteHeads.beat = this.container.beat;
                     noteHeads.beamingHelper = this.beamingHelper;
-                    let ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
+                    const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
                     ghost.renderer = this.renderer;
-                    for (let note of this.container.beat.notes) {
+                    for (const note of this.container.beat.notes) {
                         if (note.isVisible) {
                             this.createNoteGlyph(note);
                             ghost.addParenthesis(note);
@@ -148,7 +148,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 //
                 // Whammy Bar
                 if (this.container.beat.hasWhammyBar) {
-                    let whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container.beat);
+                    const whammy: ScoreWhammyBarGlyph = new ScoreWhammyBarGlyph(this.container.beat);
                     whammy.renderer = this.renderer;
                     whammy.doLayout();
                     this.container.ties.push(whammy);
@@ -159,9 +159,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 if (this.container.beat.dots > 0) {
                     this.addNormal(new SpacingGlyph(0, 0, 5));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
-                        let group: GlyphGroup = new GlyphGroup(0, 0);
+                        const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
-                        for (let note of this.container.beat.notes) {
+                        for (const note of this.container.beat.notes) {
                             const g = this.createBeatDot(sr.getNoteLine(note), group);
                             g.colorOverride = ElementStyleHelper.noteColor(
                                 sr.resources,
@@ -195,8 +195,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 if (this.renderer.bar.isMultiVoice) {
                     if (this.container.beat.voice.index === 0) {
                         const restSizes = BeamingHelper.computeLineHeightsForRest(this.container.beat.duration);
-                        let restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
-                        let restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
+                        const restTop = restGlyph.y - sr.getScoreHeight(restSizes[0]);
+                        const restBottom = restGlyph.y + sr.getScoreHeight(restSizes[1]);
                         this.renderer.helpers.collisionHelper.reserveBeatSlot(this.container.beat, restTop, restBottom);
                     } else {
                         this.renderer.helpers.collisionHelper.registerRest(this.container.beat);
@@ -213,7 +213,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 if (this.container.beat.dots > 0) {
                     this.addNormal(new SpacingGlyph(0, 0, 5));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
-                        let group: GlyphGroup = new GlyphGroup(0, 0);
+                        const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
                         this.createBeatDot(line, group);
                         this.addEffect(group);
@@ -234,14 +234,14 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     }
 
     private createBeatDot(line: number, group: GlyphGroup) {
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const g = new CircleGlyph(0, sr.getScoreY(line), 1.5);
         group.addGlyph(g);
         return g;
     }
 
     private createNoteHeadGlyph(n: Note): MusicFontGlyph {
-        let isGrace: boolean = this.container.beat.graceType !== GraceType.None;
+        const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
 
         const style = n.style;
         if (style?.noteHead !== undefined) {
@@ -281,8 +281,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.beat.graceType === GraceType.BendGrace && !n.hasBend) {
             return;
         }
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let noteHeadGlyph = this.createNoteHeadGlyph(n);
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const noteHeadGlyph = this.createNoteHeadGlyph(n);
         noteHeadGlyph.colorOverride = ElementStyleHelper.noteColor(
             sr.resources,
             NoteSubElement.StandardNotationNoteHead,
@@ -295,7 +295,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
-            let harmonicFret: number = n.displayValue + n.harmonicPitch;
+            const harmonicFret: number = n.displayValue + n.harmonicPitch;
             const harmonicsGlyph = new DiamondNoteHeadGlyph(
                 0,
                 0,

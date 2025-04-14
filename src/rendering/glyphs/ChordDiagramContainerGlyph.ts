@@ -8,7 +8,7 @@ import { ScoreSubElement } from '@src/model/Score';
 export class ChordDiagramContainerGlyph extends RowContainerGlyph {
     public addChord(chord: Chord): void {
         if (chord.strings.length > 0) {
-            let chordDiagram: ChordDiagramGlyph = new ChordDiagramGlyph(0, 0, chord);
+            const chordDiagram: ChordDiagramGlyph = new ChordDiagramGlyph(0, 0, chord);
             chordDiagram.renderer = this.renderer;
             chordDiagram.doLayout();
             this.glyphs!.push(chordDiagram);

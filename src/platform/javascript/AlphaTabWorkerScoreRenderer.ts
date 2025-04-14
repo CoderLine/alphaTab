@@ -87,8 +87,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private handleWorkerMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: string = data.cmd;
+        const data: any = e.data;
+        const cmd: string = data.cmd;
         switch (cmd) {
             case 'alphaTab.preRender':
                 (this.preRender as EventEmitterOfT<boolean>).trigger(data.resize);
@@ -114,7 +114,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public renderScore(score: Score | null, trackIndexes: number[] | null): void {
-        let jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
+        const jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,

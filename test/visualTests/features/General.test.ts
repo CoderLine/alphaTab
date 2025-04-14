@@ -27,13 +27,13 @@ describe('GeneralTests', () => {
     });
 
     it('repeats', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('general/repeats.gp', settings);
     });
 
     it('alternate-endings', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('general/alternate-endings.gp', settings);
     });

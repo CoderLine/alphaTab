@@ -14,7 +14,7 @@ export class TabTimeSignatureGlyph extends TimeSignatureGlyph {
     }
 
     protected get numberScale(): number {
-        let renderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        const renderer: TabBarRenderer = this.renderer as TabBarRenderer;
         if (renderer.bar.staff.tuning.length <= 4) {
             return NoteHeadGlyph.GraceScale;
         }

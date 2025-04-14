@@ -49,7 +49,7 @@ export class GpxFileSystem {
      * @returns
      */
     public load(s: IReadable): void {
-        let src: BitReader = new BitReader(s);
+        const src: BitReader = new BitReader(s);
         this.readBlock(src);
     }
 
@@ -71,30 +71,30 @@ export class GpxFileSystem {
      * @returns the decompressed byte data. if skipHeader is set to false the BCFS header is included.
      */
     public decompress(src: BitReader, skipHeader: boolean = false): Uint8Array {
-        let uncompressed: ByteBuffer = ByteBuffer.empty();
+        const uncompressed: ByteBuffer = ByteBuffer.empty();
         let buffer: Uint8Array;
-        let expectedLength: number = this.getInteger(src.readBytes(4), 0);
+        const expectedLength: number = this.getInteger(src.readBytes(4), 0);
         try {
             // as long we reach our expected length we try to decompress, a EOF might occure.
             while (uncompressed.length < expectedLength) {
                 // compression flag
-                let flag: number = src.readBits(1);
+                const flag: number = src.readBits(1);
                 if (flag === 1) {
                     // get offset and size of the content we need to read.
                     // compressed does mean we already have read the data and need
                     // to copy it from our uncompressed buffer to the end
-                    let wordSize: number = src.readBits(4);
-                    let offset: number = src.readBitsReversed(wordSize);
-                    let size: number = src.readBitsReversed(wordSize);
+                    const wordSize: number = src.readBits(4);
+                    const offset: number = src.readBitsReversed(wordSize);
+                    const size: number = src.readBitsReversed(wordSize);
                     // the offset is relative to the end
-                    let sourcePosition: number = uncompressed.length - offset;
-                    let toRead: number = Math.min(offset, size);
+                    const sourcePosition: number = uncompressed.length - offset;
+                    const toRead: number = Math.min(offset, size);
                     // get the subbuffer storing the data and add it again to the end
                     buffer = uncompressed.getBuffer();
                     uncompressed.write(buffer, sourcePosition, toRead);
                 } else {
                     // on raw content we need to read the data from the source buffer
-                    let size: number = src.readBitsReversed(2);
+                    const size: number = src.readBitsReversed(2);
                     for (let i: number = 0; i < size; i++) {
                         uncompressed.writeByte(src.readByte());
                     }
@@ -106,10 +106,10 @@ export class GpxFileSystem {
             }
         }
         buffer = uncompressed.getBuffer();
-        let resultOffset: number = skipHeader ? 4 : 0;
-        let resultSize: number = uncompressed.length - resultOffset;
-        let result: Uint8Array = new Uint8Array(resultSize);
-        let count: number = resultSize;
+        const resultOffset: number = skipHeader ? 4 : 0;
+        const resultSize: number = uncompressed.length - resultOffset;
+        const result: Uint8Array = new Uint8Array(resultSize);
+        const count: number = resultSize;
         result.set(buffer.subarray(resultOffset, resultOffset + count), 0);
         return result;
     }
@@ -120,7 +120,7 @@ export class GpxFileSystem {
      * @returns
      */
     private readBlock(data: BitReader): void {
-        let header: string = this.readHeader(data);
+        const header: string = this.readHeader(data);
         if (header === 'BCFZ') {
             // decompress the data and use this
             // we will skip the header
@@ -142,11 +142,11 @@ export class GpxFileSystem {
         // the first sector (0x1000 bytes) is empty (filled with 0xFF)
         // so the first sector starts at 0x1000
         // (we already skipped the 4 byte header so we don't have to take care of this)
-        let sectorSize: number = 0x1000;
+        const sectorSize: number = 0x1000;
         let offset: number = sectorSize;
         // we always need 4 bytes (+3 including offset) to read the type
         while (offset + 3 < data.length) {
-            let entryType: number = this.getInteger(data, offset);
+            const entryType: number = this.getInteger(data, offset);
             if (entryType === 2) {
                 // file structure:
                 //   offset |   type   |   size   | what
@@ -157,22 +157,22 @@ export class GpxFileSystem {
                 //    0x90  |    ?     |    4byte | Unknown
                 //    0x94  |   int[]  |  n*4byte | Indices of the sector containing the data (end is marked with 0)
                 // The sectors marked at 0x94 are absolutely positioned ( 1*0x1000 is sector 1, 2*0x1000 is sector 2,...)
-                let file: GpxFile = new GpxFile();
+                const file: GpxFile = new GpxFile();
                 file.fileName = this.getString(data, offset + 0x04, 127);
                 file.fileSize = this.getInteger(data, offset + 0x8c);
                 // store file if needed
-                let storeFile: boolean = !this.fileFilter || this.fileFilter(file.fileName);
+                const storeFile: boolean = !this.fileFilter || this.fileFilter(file.fileName);
                 if (storeFile) {
                     this.files.push(file);
                 }
                 // we need to iterate the blocks because we need to move after the last datasector
-                let dataPointerOffset: number = offset + 0x94;
+                const dataPointerOffset: number = offset + 0x94;
                 let sector: number = 0;
                 // this var is storing the sector index
                 let sectorCount: number = 0;
                 // we're keeping count so we can calculate the offset of the array item
                 // as long we have data blocks we need to iterate them,
-                let fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
+                const fileData: ByteBuffer | null = storeFile ? ByteBuffer.withCapacity(file.fileSize) : null;
                 while (true) {
                     sector = this.getInteger(data, dataPointerOffset + 4 * sectorCount++);
                     if (sector !== 0) {
@@ -192,7 +192,7 @@ export class GpxFileSystem {
                     // trim data to filesize if needed
                     file.data = new Uint8Array(Math.min(file.fileSize, fileData!.length));
                     // we can use the getBuffer here because we are intelligent and know not to read the empty data.
-                    let raw: Uint8Array = fileData!.toArray();
+                    const raw: Uint8Array = fileData!.toArray();
                     file.data.set(raw.subarray(0, 0 + file.data.length), 0);
                 }
             }
@@ -211,7 +211,7 @@ export class GpxFileSystem {
     private getString(data: Uint8Array, offset: number, length: number): string {
         let buf: string = '';
         for (let i: number = 0; i < length; i++) {
-            let code: number = data[offset + i] & 0xff;
+            const code: number = data[offset + i] & 0xff;
             if (code === 0) {
                 break;
                 // zero terminated string

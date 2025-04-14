@@ -37,7 +37,7 @@ export class TabBarRendererFactory extends BarRendererFactory {
     }
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
-        let tabBarRenderer: TabBarRenderer = new TabBarRenderer(renderer, bar);
+        const tabBarRenderer: TabBarRenderer = new TabBarRenderer(renderer, bar);
         if(this.showRests !== null){
             tabBarRenderer.showRests = this.showRests!;
         }

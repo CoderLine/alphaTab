@@ -33,16 +33,16 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
             return false;
         }
 
-        let previousBeat = this.getPreviousDynamicsBeat(beat);
+        const previousBeat = this.getPreviousDynamicsBeat(beat);
 
         let show: boolean =
             (beat.voice.index === 0 && !previousBeat) ||
             (beat.dynamics !== previousBeat?.dynamics);
         // ensure we do not show duplicate dynamics
         if (show && beat.voice.index > 0) {
-            for (let voice of beat.voice.bar.voices) {
+            for (const voice of beat.voice.bar.voices) {
                 if (voice.index < beat.voice.index) {
-                    let beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
+                    const beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
                     if (
                         beatAtSamePos &&
                         beat.dynamics === beatAtSamePos.dynamics &&

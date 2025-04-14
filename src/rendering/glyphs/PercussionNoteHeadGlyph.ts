@@ -28,7 +28,7 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
             canvas.color = this.colorOverride!;
         }
 
-        let offset: number = this._isGrace ? 1 : 0;
+        const offset: number = this._isGrace ? 1 : 0;
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
 
         if (

@@ -110,7 +110,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override doLayout(): void {
         // create glyphs
-        let sr = this.renderer as SlashBarRenderer;
+        const sr = this.renderer as SlashBarRenderer;
 
         const line: number = sr.getNoteLine();
         const glyphY = sr.getLineY(line);

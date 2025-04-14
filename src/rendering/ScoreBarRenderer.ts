@@ -113,9 +113,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
     public override doLayout(): void {
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
-            let top: number = this.getScoreY(-2);
-            let bottom: number = this.getScoreY(10);
-            let whammyOffset: number = this.simpleWhammyOverflow;
+            const top: number = this.getScoreY(-2);
+            const bottom: number = this.getScoreY(10);
+            const whammyOffset: number = this.simpleWhammyOverflow;
 
             const beatEffectsMinY = this.beatEffectsMinY;
             if (beatEffectsMinY !== null) {
@@ -136,7 +136,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.registerOverflowTop(whammyOffset);
 
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
-            let maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
+            const maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 if (maxNoteHelper.hasTuplet) {
@@ -147,7 +147,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
             let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine);
-            let minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
+            const minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 if (minNoteHelper.hasTuplet) {
@@ -254,7 +254,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         if (note.beat.slashed) {
-            let line = (this.heightLineCount - 1) / 2;
+            const line = (this.heightLineCount - 1) / 2;
             return this.getLineY(line);
         }
 
@@ -273,9 +273,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
         const result = super.applyLayoutingInfo();
         if (result && this.bar.isMultiVoice) {
             // consider rest overflows
-            let top: number = this.getScoreY(-2);
-            let bottom: number = this.getScoreY(10);
-            let minMax = this.helpers.collisionHelper.getBeatMinMaxY();
+            const top: number = this.getScoreY(-2);
+            const bottom: number = this.getScoreY(10);
+            const minMax = this.helpers.collisionHelper.getBeatMinMaxY();
             if (minMax[0] < top) {
                 this.registerOverflowTop(Math.abs(minMax[0]));
             }
@@ -287,10 +287,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
-        let stemSize: number = this.getStemSize(h);
+        const stemSize: number = this.getStemSize(h);
 
         if (!h.drawingInfos.has(direction)) {
-            let drawingInfo = new BeamingHelperDrawInfo();
+            const drawingInfo = new BeamingHelperDrawInfo();
             h.drawingInfos.set(direction, drawingInfo);
 
             // the beaming logic works like this:
@@ -331,7 +331,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // 2. ensure max height
             // we use the min/max notes to place the beam along their real position
             // we only want a maximum of 10 offset for their gradient
-            let maxDistance: number = 10;
+            const maxDistance: number = 10;
             if (
                 direction === BeamDirection.Down &&
                 drawingInfo.startY > drawingInfo.endY &&
@@ -365,7 +365,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             if (h.beats.length > 1) {
                 // check if highest note shifts bar up or down
                 if (direction === BeamDirection.Up) {
-                    let yNeededForHighestNote =
+                    const yNeededForHighestNote =
                         this.getScoreY(this.accidentalHelper.getMinLine(h.beatOfHighestNote)) - stemSize;
                     const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfHighestNote));
 
@@ -375,7 +375,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                         drawingInfo.endY -= diff;
                     }
                 } else {
-                    let yNeededForLowestNote =
+                    const yNeededForLowestNote =
                         this.getScoreY(this.accidentalHelper.getMaxLine(h.beatOfLowestNote)) + stemSize;
                     const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfLowestNote));
 
@@ -389,13 +389,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 // check if rest shifts bar up or down
                 if (h.minRestLine !== null || h.maxRestLine !== null) {
                     const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
-                    let scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
+                    const scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
                         barCount * (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
                     barSpacing += BarRendererBase.BeamSpacing;
 
                     if (direction === BeamDirection.Up && h.minRestLine !== null) {
-                        let yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
+                        const yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
                         const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMinRestLine!));
 
                         const diff = yGivenByCurrentValues - yNeededForRest;
@@ -404,7 +404,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                             drawingInfo.endY -= diff;
                         }
                     } else if (direction === BeamDirection.Down && h.maxRestLine !== null) {
-                        let yNeededForRest = this.getScoreY(h.maxRestLine!) + barSpacing;
+                        const yNeededForRest = this.getScoreY(h.maxRestLine!) + barSpacing;
                         const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(h.beatOfMaxRestLine!));
 
                         const diff = yNeededForRest - yGivenByCurrentValues;
@@ -516,8 +516,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     private createKeySignatureGlyphs(): void {
         let offsetClef: number = 0;
-        let currentKey: number = this.bar.masterBar.keySignature;
-        let previousKey: number = !this.bar.previousBar ? 0 : this.bar.previousBar.masterBar.keySignature;
+        const currentKey: number = this.bar.masterBar.keySignature;
+        const previousKey: number = !this.bar.previousBar ? 0 : this.bar.previousBar.masterBar.keySignature;
         switch (this.bar.clef) {
             case Clef.Neutral:
                 offsetClef = 0;
@@ -539,33 +539,33 @@ export class ScoreBarRenderer extends LineBarRenderer {
         const glyph = new KeySignatureGlyph();
         glyph.renderer = this;
 
-        let newLines: Map<number, boolean> = new Map<number, boolean>();
-        let newGlyphs: Glyph[] = [];
+        const newLines: Map<number, boolean> = new Map<number, boolean>();
+        const newGlyphs: Glyph[] = [];
         // how many symbols do we need to get from a C-keysignature
         // to the new one
         // var offsetSymbols = (currentKey <= 7) ? currentKey : currentKey - 7;
         // a sharp keysignature
         if (ModelUtils.keySignatureIsSharp(currentKey)) {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
-                let step: number = ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
+                const step: number = ScoreBarRenderer.SharpKsSteps[i] + offsetClef;
                 newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Sharp, 1));
                 newLines.set(step, true);
             }
         } else {
             for (let i: number = 0; i < Math.abs(currentKey); i++) {
-                let step: number = ScoreBarRenderer.FlatKsSteps[i] + offsetClef;
+                const step: number = ScoreBarRenderer.FlatKsSteps[i] + offsetClef;
                 newGlyphs.push(new AccidentalGlyph(0, this.getScoreY(step), AccidentalType.Flat, 1));
                 newLines.set(step, true);
             }
         }
         // naturalize previous key if naturalizing
         if (this.bar.masterBar.keySignature === KeySignature.C) {
-            let naturalizeSymbols: number = Math.abs(previousKey);
-            let previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
+            const naturalizeSymbols: number = Math.abs(previousKey);
+            const previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
                 ? ScoreBarRenderer.SharpKsSteps
                 : ScoreBarRenderer.FlatKsSteps;
             for (let i: number = 0; i < naturalizeSymbols; i++) {
-                let step: number = previousKeyPositions[i] + offsetClef;
+                const step: number = previousKeyPositions[i] + offsetClef;
                 if (!newLines.has(step)) {
                     glyph.addGlyph(
                         new AccidentalGlyph(
@@ -579,7 +579,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
         }
 
-        for (let newGlyph of newGlyphs) {
+        for (const newGlyph of newGlyphs) {
             glyph.addGlyph(newGlyph);
         }
 
@@ -608,7 +608,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
         
         for (const b of v.beats) {
-            let container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();
             container.onNotes = new ScoreBeatGlyph();
             this.addBeatGlyph(container);

@@ -156,7 +156,7 @@ export class Environment {
 
             styleElement = elementDocument.createElement('style');
             styleElement.id = 'alphaTabStyle';
-            let css: string = `
+            const css: string = `
             @font-face {
                 font-display: block;
                 font-family: 'alphaTab';
@@ -347,7 +347,7 @@ export class Environment {
 
         if (!relativeUrl.startsWith('http') && !relativeUrl.startsWith('https') && !relativeUrl.startsWith('file')) {
             let root: string = '';
-            let location: Location = Environment.globalThis.location;
+            const location: Location = Environment.globalThis.location;
             root += location.protocol?.toString();
             root += '//'?.toString();
             if (location.hostname) {
@@ -360,7 +360,7 @@ export class Environment {
             // as it is not clearly defined how slashes are treated in the location object
             // better be safe than sorry here
             if (!relativeUrl.startsWith('/')) {
-                let directory: string = location.pathname.split('/').slice(0, -1).join('/');
+                const directory: string = location.pathname.split('/').slice(0, -1).join('/');
                 if (directory.length > 0) {
                     if (!directory.startsWith('/')) {
                         root += '/'?.toString();
@@ -398,7 +398,7 @@ export class Environment {
 
         const scriptFile = Environment.scriptFile;
         if (scriptFile) {
-            let lastSlash: number = scriptFile.lastIndexOf(String.fromCharCode(47));
+            const lastSlash: number = scriptFile.lastIndexOf(String.fromCharCode(47));
             if (lastSlash >= 0) {
                 return `${scriptFile.substr(0, lastSlash)}/font/`;
             }
@@ -412,8 +412,8 @@ export class Environment {
      */
     private static registerJQueryPlugin(): void {
         if (!Environment.isRunningInWorker && Environment.globalThis && 'jQuery' in Environment.globalThis) {
-            let jquery: any = Environment.globalThis.jQuery;
-            let api: JQueryAlphaTab = new JQueryAlphaTab();
+            const jquery: any = Environment.globalThis.jQuery;
+            const api: JQueryAlphaTab = new JQueryAlphaTab();
             jquery.fn.alphaTab = function (this: any, method: string) {
                 // biome-ignore lint/style/noArguments: Legacy jQuery plugin argument forwarding
                 const args = Array.prototype.slice.call(arguments, 1);

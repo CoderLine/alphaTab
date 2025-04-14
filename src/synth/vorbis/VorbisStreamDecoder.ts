@@ -279,7 +279,7 @@ export class VorbisCodebook {
                 return false;
             }
 
-            let res = available[z];
+            const res = available[z];
             available[z] = 0;
             this.addEntry(sparse, codewords, codewordLengths, VorbisUtils.bitReverse(res), i, m++, len[i], values);
 
@@ -630,7 +630,7 @@ export class VorbisFloor0 implements IVorbisFloor {
                 const k = barkMap[i];
                 let p = 0.5;
                 let q = 0.5;
-                let w = wMap[k];
+                const w = wMap[k];
                 for (j = 1; j < this._order; j += 2) {
                     q *= w - data.coeff[j - 1];
                     p *= w - data.coeff[j];
@@ -1669,7 +1669,7 @@ export class VorbisMode {
 class MdctImpl {
     // biome-ignore lint/correctness/noPrecisionLoss: High precision PI
     // biome-ignore lint/suspicious/noApproximativeNumericConstant: High precision PI
-        private static readonly M_PI = 3.14159265358979323846264;
+    private static readonly M_PI = 3.14159265358979323846264;
 
     private readonly _n: number;
     private readonly _n2: number;
@@ -1732,7 +1732,7 @@ class MdctImpl {
             let d = this._n2 - 2; // buf2
             let AA = 0; // A
             let e = 0; // buffer
-            let e_stop = this._n2; // buffer
+            const e_stop = this._n2; // buffer
             while (e !== e_stop) {
                 buf2[d + 1] = buffer[e] * this._a[AA] - buffer[e + 2] * this._a[AA + 1];
                 buf2[d] = buffer[e] * this._a[AA + 1] + buffer[e + 2] * this._a[AA];
@@ -2072,14 +2072,14 @@ class MdctImpl {
         a_off: number,
         k0: number
     ) {
-        let A0 = this._a[a];
-        let A1 = this._a[a + 1];
-        let A2 = this._a[a + a_off];
-        let A3 = this._a[a + a_off + 1];
-        let A4 = this._a[a + a_off * 2];
-        let A5 = this._a[a + a_off * 2 + 1];
-        let A6 = this._a[a + a_off * 3];
-        let A7 = this._a[a + a_off * 3 + 1];
+        const A0 = this._a[a];
+        const A1 = this._a[a + 1];
+        const A2 = this._a[a + a_off];
+        const A3 = this._a[a + a_off + 1];
+        const A4 = this._a[a + a_off * 2];
+        const A5 = this._a[a + a_off * 2 + 1];
+        const A6 = this._a[a + a_off * 3];
+        const A7 = this._a[a + a_off * 3 + 1];
 
         let k00: number;
         let k11: number;
@@ -2167,32 +2167,22 @@ class MdctImpl {
     }
 
     private iter_54(e: Float32Array, z: number) {
-        let k00: number;
-        let k11: number;
-        let k22: number;
-        let k33: number;
-
-        let y0: number;
-        let y1: number;
-        let y2: number;
-        let y3: number;
-
-        k00 = e[z] - e[z - 4];
-        y0 = e[z] + e[z - 4];
-        y2 = e[z - 2] + e[z - 6];
-        k22 = e[z - 2] - e[z - 6];
+        const k00 = e[z] - e[z - 4];
+        const y0 = e[z] + e[z - 4];
+        const y2 = e[z - 2] + e[z - 6];
+        const k22 = e[z - 2] - e[z - 6];
 
         e[z] = y0 + y2;
         e[z - 2] = y0 - y2;
 
-        k33 = e[z - 3] - e[z - 7];
+        const k33 = e[z - 3] - e[z - 7];
 
         e[z - 4] = k00 + k33;
         e[z - 6] = k00 - k33;
 
-        k11 = e[z - 1] - e[z - 5];
-        y1 = e[z - 1] + e[z - 5];
-        y3 = e[z - 3] + e[z - 7];
+        const k11 = e[z - 1] - e[z - 5];
+        const y1 = e[z - 1] + e[z - 5];
+        const y3 = e[z - 3] + e[z - 7];
 
         e[z - 1] = y1 + y3;
         e[z - 3] = y1 - y3;

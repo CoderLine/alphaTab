@@ -41,8 +41,8 @@ export class JQueryAlphaTab {
         if (method.charCodeAt(0) === 95 || method === 'exec') {
             return null;
         }
-        let jElement: jQuery = new jQuery(element);
-        let context: AlphaTabApi = jElement.data('alphaTab') as AlphaTabApi;
+        const jElement: jQuery = new jQuery(element);
+        const context: AlphaTabApi = jElement.data('alphaTab') as AlphaTabApi;
         if (method === 'destroy' && !context) {
             return null;
         }
@@ -50,9 +50,9 @@ export class JQueryAlphaTab {
             throw new Error('alphaTab not initialized');
         }
         // biome-ignore lint/complexity/noBannedTypes: Special use within jQuery plugin
-        let apiMethod: Function = (this as any)[method];
+        const apiMethod: Function = (this as any)[method];
         if (apiMethod) {
-            let realArgs: string[] = ([jElement, context] as any[]).concat(args);
+            const realArgs: string[] = ([jElement, context] as any[]).concat(args);
             return apiMethod.apply(this, realArgs);
         }
         Logger.error('Api', `Method '${method}' does not exist on jQuery.alphaTab`);
@@ -63,7 +63,7 @@ export class JQueryAlphaTab {
         if (!context) {
             context = new AlphaTabApi(element[0], options);
             element.data('alphaTab', context);
-            for (let listener of this._initListeners) {
+            for (const listener of this._initListeners) {
                 listener(element, context, options);
             }
         }

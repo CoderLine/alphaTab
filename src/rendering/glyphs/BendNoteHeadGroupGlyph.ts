@@ -51,15 +51,15 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public addGlyph(noteValue: number, quarterBend: boolean, color: Color | undefined): void {
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let noteHeadGlyph: NoteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
-        let accidental: AccidentalType = sr.accidentalHelper.applyAccidentalForValue(
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const noteHeadGlyph: NoteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
+        const accidental: AccidentalType = sr.accidentalHelper.applyAccidentalForValue(
             this._beat,
             noteValue,
             quarterBend,
             true
         );
-        let line: number = sr.accidentalHelper.getNoteLineForValue(noteValue, false);
+        const line: number = sr.accidentalHelper.getNoteLineForValue(noteValue, false);
         noteHeadGlyph.y = sr.getScoreY(line);
         if (this._showParenthesis) {
             this._preNoteParenthesis!.renderer = this.renderer;
@@ -68,7 +68,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             this._postNoteParenthesis!.addParenthesisOnLine(line, true);
         }
         if (accidental !== AccidentalType.None) {
-            let g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, NoteHeadGlyph.GraceScale);
+            const g = new AccidentalGlyph(0, noteHeadGlyph.y, accidental, NoteHeadGlyph.GraceScale);
             g.renderer = this.renderer;
             this._accidentals.renderer = this.renderer;
             this._accidentals.addGlyph(g);

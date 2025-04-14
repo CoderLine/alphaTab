@@ -29,7 +29,7 @@ export class BarNumberGlyph extends Glyph {
             true
         );
 
-        let res: RenderingResources = this.renderer.resources;
+        const res: RenderingResources = this.renderer.resources;
         const baseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Top;
         canvas.font = res.barNumberFont;

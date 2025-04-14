@@ -709,12 +709,12 @@ export class Beat {
 
         // remove point
         points.splice(index, 1);
-        let point: BendPoint = points[index];
+        const point: BendPoint = points[index];
 
         // update maxWhammy point if required
         if (point === this.maxWhammyPoint) {
             this.maxWhammyPoint = null;
-            for (let currentPoint of points) {
+            for (const currentPoint of points) {
                 if (!this.maxWhammyPoint || currentPoint.value > this.maxWhammyPoint.value) {
                     this.maxWhammyPoint = currentPoint;
                 }
@@ -723,7 +723,7 @@ export class Beat {
 
         if (point === this.minWhammyPoint) {
             this.minWhammyPoint = null;
-            for (let currentPoint of points) {
+            for (const currentPoint of points) {
                 if (!this.minWhammyPoint || currentPoint.value < this.minWhammyPoint.value) {
                     this.minWhammyPoint = currentPoint;
                 }
@@ -741,7 +741,7 @@ export class Beat {
     }
 
     public removeNote(note: Note): void {
-        let index: number = this.notes.indexOf(note);
+        const index: number = this.notes.indexOf(note);
         if (index >= 0) {
             this.notes.splice(index, 1);
             if (note.isStringed) {
@@ -752,7 +752,7 @@ export class Beat {
 
     public getAutomation(type: AutomationType): Automation | null {
         for (let i: number = 0, j: number = this.automations.length; i < j; i++) {
-            let automation: Automation = this.automations[i];
+            const automation: Automation = this.automations[i];
             if (automation.type === type) {
                 return automation;
             }
@@ -787,7 +787,7 @@ export class Beat {
     }
 
     public updateDurations(): void {
-        let ticks: number = this.calculateDuration();
+        const ticks: number = this.calculateDuration();
         this.playbackDuration = ticks;
 
         switch (this.graceType) {
@@ -812,7 +812,7 @@ export class Beat {
                 break;
             default:
                 this.displayDuration = ticks;
-                let previous: Beat | null = this.previousBeat;
+                const previous: Beat | null = this.previousBeat;
                 if (previous && previous.graceType === GraceType.BendGrace) {
                     this.playbackDuration = previous.playbackDuration;
                 }
@@ -821,7 +821,7 @@ export class Beat {
     }
 
     public finishTuplet(): void {
-        let previousBeat: Beat | null = this.previousBeat;
+        const previousBeat: Beat | null = this.previousBeat;
         let currentTupletGroup: TupletGroup | null = previousBeat ? previousBeat.tupletGroup : null;
         if (this.hasTuplet || (this.graceType !== GraceType.None && currentTupletGroup)) {
             if (!previousBeat || !currentTupletGroup || !currentTupletGroup.check(this)) {
@@ -864,7 +864,7 @@ export class Beat {
         switch (this.graceType) {
             case GraceType.OnBeat:
             case GraceType.BeforeBeat:
-                let numberOfGraceBeats: number = this.graceGroup!.beats.length;
+                const numberOfGraceBeats: number = this.graceGroup!.beats.length;
                 // set right duration for beaming/display
                 if (numberOfGraceBeats === 1) {
                     this.duration = Duration.Eighth;
@@ -876,7 +876,7 @@ export class Beat {
                 break;
         }
 
-        let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
+        const displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
         if (isGradual && displayMode === NotationMode.SongBook) {
             this.text = '';
@@ -889,7 +889,7 @@ export class Beat {
         let visibleNotes: number = 0;
         let isEffectSlurBeat: boolean = false;
         for (let i: number = 0, j: number = this.notes.length; i < j; i++) {
-            let note: Note = this.notes[i];
+            const note: Note = this.notes[i];
             note.dynamics = this.dynamics;
             note.finish(settings, sharedDataBag);
             if (note.isLetRing) {
@@ -995,10 +995,10 @@ export class Beat {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
             if (points!.length === 4) {
-                let origin: BendPoint = points[0];
-                let middle1: BendPoint = points[1];
-                let middle2: BendPoint = points[2];
-                let destination: BendPoint = points[3];
+                const origin: BendPoint = points[0];
+                const middle1: BendPoint = points[1];
+                const middle2: BendPoint = points[2];
+                const destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // constant decrease or increase
@@ -1038,12 +1038,12 @@ export class Beat {
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes
-            let cloneBeat: Beat = BeatCloner.clone(this);
+            const cloneBeat: Beat = BeatCloner.clone(this);
             cloneBeat.id = Beat._globalBeatId++;
             cloneBeat.pickStroke = PickStroke.None;
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
-                let cloneNote: Note = cloneBeat.notes[i];
-                let note: Note = this.notes[i];
+                const cloneNote: Note = cloneBeat.notes[i];
+                const note: Note = this.notes[i];
 
                 // remove bend on cloned note
                 cloneNote.bendType = BendType.None;
@@ -1065,10 +1065,10 @@ export class Beat {
                 // if the note has a bend which is continued on the next note
                 // we need to convert this note into a hold bend
                 if (note.hasBend && note.isTieOrigin) {
-                    let tieDestination: Note | null = Note.findTieOrigin(note);
+                    const tieDestination: Note | null = Note.findTieOrigin(note);
                     if (tieDestination && tieDestination.hasBend) {
                         cloneNote.bendType = BendType.Hold;
-                        let lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
+                        const lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
                         cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
                         cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
                     }

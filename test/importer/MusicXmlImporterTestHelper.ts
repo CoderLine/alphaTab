@@ -30,7 +30,7 @@ export class MusicXmlImporterTestHelper {
     }
 
     public static prepareImporterWithBytes(buffer: Uint8Array, settings?: Settings): MusicXmlImporter {
-        let readerBase: MusicXmlImporter = new MusicXmlImporter();
+        const readerBase: MusicXmlImporter = new MusicXmlImporter();
         readerBase.init(ByteBuffer.fromBuffer(buffer), settings ?? new Settings());
         return readerBase;
     }
@@ -45,7 +45,7 @@ export class MusicXmlImporterTestHelper {
         let score: Score;
         const settings = new Settings();
         try {
-            let importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData, settings);
+            const importer: MusicXmlImporter = MusicXmlImporterTestHelper.prepareImporterWithBytes(fileData, settings);
             score = importer.readScore();
         } catch (e) {
             if (e instanceof UnsupportedFormatError) {
@@ -92,31 +92,31 @@ export class MusicXmlImporterTestHelper {
     }
 
     protected static getHierarchy(node: unknown): string {
-        let note: Note | null = node instanceof Note ? node : null;
+        const note: Note | null = node instanceof Note ? node : null;
         if (note) {
             return `${MusicXmlImporterTestHelper.getHierarchy(note.beat)}Note[${note.index}]`;
         }
-        let beat: Beat | null = node instanceof Beat ? node : null;
+        const beat: Beat | null = node instanceof Beat ? node : null;
         if (beat) {
             return `${MusicXmlImporterTestHelper.getHierarchy(beat.voice)}Beat[${beat.index}]`;
         }
-        let voice: Voice | null = node instanceof Voice ? node : null;
+        const voice: Voice | null = node instanceof Voice ? node : null;
         if (voice) {
             return `${MusicXmlImporterTestHelper.getHierarchy(voice.bar)}Voice[${voice.index}]`;
         }
-        let bar: Bar | null = node instanceof Bar ? node : null;
+        const bar: Bar | null = node instanceof Bar ? node : null;
         if (bar) {
             return `${MusicXmlImporterTestHelper.getHierarchy(bar.staff)}Bar[${bar.index}]`;
         }
-        let staff: Staff | null = node instanceof Staff ? node : null;
+        const staff: Staff | null = node instanceof Staff ? node : null;
         if (staff) {
             return `${MusicXmlImporterTestHelper.getHierarchy(staff.track)}Staff[${staff.index}]`;
         }
-        let track: Track | null = node instanceof Track ? node : null;
+        const track: Track | null = node instanceof Track ? node : null;
         if (track) {
             return `Track[${track.index}]`;
         }
-        let mb: MasterBar | null = node instanceof MasterBar ? node : null;
+        const mb: MasterBar | null = node instanceof MasterBar ? node : null;
         if (mb) {
             return `MasterBar[${mb.index}]`;
         }

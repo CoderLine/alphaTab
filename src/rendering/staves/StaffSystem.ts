@@ -157,10 +157,10 @@ export class StaffSystem {
         renderers.layoutingInfo.preBeatSize = 0;
         let src: number = 0;
         for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            let g: StaffTrackGroup = this.staves[i];
+            const g: StaffTrackGroup = this.staves[i];
             for (let k: number = 0, l: number = g.staves.length; k < l; k++) {
-                let s: RenderStaff = g.staves[k];
-                let renderer: BarRendererBase = renderers.renderers[src++];
+                const s: RenderStaff = g.staves[k];
+                const renderer: BarRendererBase = renderers.renderers[src++];
                 s.addBarRenderer(renderer);
             }
         }
@@ -176,16 +176,16 @@ export class StaffSystem {
         barIndex: number,
         additionalMultiBarRestIndexes: number[] | null
     ): MasterBarsRenderers {
-        let result: MasterBarsRenderers = new MasterBarsRenderers();
+        const result: MasterBarsRenderers = new MasterBarsRenderers();
         result.additionalMultiBarRestIndexes = additionalMultiBarRestIndexes;
         result.layoutingInfo = new BarLayoutingInfo();
         result.masterBar = tracks[0].score.masterBars[barIndex];
         this.masterBarsRenderers.push(result);
 
         // add renderers
-        let barLayoutingInfo: BarLayoutingInfo = result.layoutingInfo;
-        for (let g of this.staves) {
-            for (let s of g.staves) {
+        const barLayoutingInfo: BarLayoutingInfo = result.layoutingInfo;
+        for (const g of this.staves) {
+            for (const s of g.staves) {
                 const bar: Bar = g.track.staves[s.modelStaff.index].bars[barIndex];
 
                 const additionalMultiBarsRestBars: Bar[] | null =
@@ -194,7 +194,7 @@ export class StaffSystem {
                         : additionalMultiBarRestIndexes.map(b => g.track.staves[s.modelStaff.index].bars[b]);
 
                 s.addBar(bar, barLayoutingInfo, additionalMultiBarsRestBars);
-                let renderer: BarRendererBase = s.barRenderers[s.barRenderers.length - 1];
+                const renderer: BarRendererBase = s.barRenderers[s.barRenderers.length - 1];
                 result.renderers.push(renderer);
                 if (renderer.isLinkedToPrevious) {
                     result.isLinkedToPrevious = true;
@@ -215,13 +215,13 @@ export class StaffSystem {
 
     public revertLastBar(): MasterBarsRenderers | null {
         if (this.masterBarsRenderers.length > 1) {
-            let toRemove: MasterBarsRenderers = this.masterBarsRenderers[this.masterBarsRenderers.length - 1];
+            const toRemove: MasterBarsRenderers = this.masterBarsRenderers[this.masterBarsRenderers.length - 1];
             this.masterBarsRenderers.splice(this.masterBarsRenderers.length - 1, 1);
             let width: number = 0;
             let barDisplayScale: number = 0;
             for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
-                let s: RenderStaff = this._allStaves[i];
-                let lastBar: BarRendererBase = s.revertLastBar();
+                const s: RenderStaff = this._allStaves[i];
+                const lastBar: BarRendererBase = s.revertLastBar();
                 const computedWidth = lastBar.computedWidth;
                 if (computedWidth > width) {
                     width = computedWidth;
@@ -243,7 +243,7 @@ export class StaffSystem {
         let realWidth: number = 0;
         let barDisplayScale: number = 0;
         for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
-            let s: RenderStaff = this._allStaves[i];
+            const s: RenderStaff = this._allStaves[i];
 
             const last = s.barRenderers[s.barRenderers.length - 1];
             last.applyLayoutingInfo();
@@ -304,10 +304,10 @@ export class StaffSystem {
 
                 let hasAnyTrackName = false;
                 if (shouldRender) {
-                    let canvas: ICanvas = this.layout.renderer.canvas!;
-                    let res: Font = settings.display.resources.effectFont;
+                    const canvas: ICanvas = this.layout.renderer.canvas!;
+                    const res: Font = settings.display.resources.effectFont;
                     canvas.font = res;
-                    for (let t of tracks) {
+                    for (const t of tracks) {
                         let trackNameText = '';
                         switch (trackNameMode) {
                             case TrackNameMode.FullName:
@@ -353,7 +353,7 @@ export class StaffSystem {
             // - requires a feature to draw glyphs with a max-width or a horizontal stretch scale
 
             let currentY: number = 0;
-            for (let staff of this._allStaves) {
+            for (const staff of this._allStaves) {
                 staff.y = currentY;
                 staff.calculateHeightForAccolade();
                 currentY += staff.height;
@@ -374,7 +374,7 @@ export class StaffSystem {
 
     private getStaffTrackGroup(track: Track): StaffTrackGroup | null {
         for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            let g: StaffTrackGroup = this.staves[i];
+            const g: StaffTrackGroup = this.staves[i];
             if (g.track === track) {
                 return g;
             }
@@ -488,7 +488,7 @@ export class StaffSystem {
         for (let i: number = 0, j: number = this._allStaves.length; i < j; i++) {
             this._allStaves[i].paint(cx, cy, canvas, startIndex, count);
         }
-        let res: RenderingResources = this.layout.renderer.settings.display.resources;
+        const res: RenderingResources = this.layout.renderer.settings.display.resources;
 
         if (this.staves.length > 0 && startIndex === 0) {
             //
@@ -540,8 +540,8 @@ export class StaffSystem {
                     const oldTextAlign = canvas.textAlign;
                     for (const g of this.staves) {
                         if (g.firstStaffInBracket && g.lastStaffInBracket) {
-                            let firstStart: number = cy + g.firstStaffInBracket.contentTop;
-                            let lastEnd: number = cy + g.lastStaffInBracket.contentBottom;
+                            const firstStart: number = cy + g.firstStaffInBracket.contentTop;
+                            const lastEnd: number = cy + g.lastStaffInBracket.contentBottom;
 
                             let trackNameText = '';
                             switch (trackNameMode) {
@@ -607,9 +607,9 @@ export class StaffSystem {
                 //
                 // draw grouping line for all staves
                 //
-                let firstStart: number = cy + firstStaffInBracket.contentTop;
-                let lastEnd: number = cy + lastStaffInBracket.contentBottom;
-                let acooladeX: number = cx + firstStaffInBracket.x;
+                const firstStart: number = cy + firstStaffInBracket.contentTop;
+                const lastEnd: number = cy + lastStaffInBracket.contentBottom;
+                const acooladeX: number = cx + firstStaffInBracket.x;
                 canvas.beginPath();
                 canvas.moveTo(acooladeX, firstStart);
                 canvas.lineTo(acooladeX, lastEnd);
@@ -646,7 +646,7 @@ export class StaffSystem {
                             Math.ceil(accoladeEnd - accoladeStart)
                         );
 
-                        let spikeX: number = barStartX - barOffset - barSize - 0.5;
+                        const spikeX: number = barStartX - barOffset - barSize - 0.5;
                         canvas.fillMusicFontSymbol(spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
                         canvas.fillMusicFontSymbol(spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
                     }
@@ -676,7 +676,7 @@ export class StaffSystem {
         }
 
         let currentY: number = 0;
-        for (let staff of this._allStaves) {
+        for (const staff of this._allStaves) {
             staff.x = this.accoladeWidth;
             staff.y = currentY;
             staff.finalizeStaff();
@@ -699,19 +699,19 @@ export class StaffSystem {
         }
         cy += this.topPadding;
 
-        let lastStaff: RenderStaff = this._allStaves[this._allStaves.length - 1];
-        let visualTop: number = cy + this.y + _firstStaffInBrackets.y;
-        let visualBottom: number = cy + this.y + _lastStaffInBrackets.y + _lastStaffInBrackets.height;
-        let realTop: number = cy + this.y + this._allStaves[0].y;
-        let realBottom: number = cy + this.y + lastStaff.y + lastStaff.height;
-        let lineTop: number =
+        const lastStaff: RenderStaff = this._allStaves[this._allStaves.length - 1];
+        const visualTop: number = cy + this.y + _firstStaffInBrackets.y;
+        const visualBottom: number = cy + this.y + _lastStaffInBrackets.y + _lastStaffInBrackets.height;
+        const realTop: number = cy + this.y + this._allStaves[0].y;
+        const realBottom: number = cy + this.y + lastStaff.y + lastStaff.height;
+        const lineTop: number =
             cy +
             this.y +
             _firstStaffInBrackets.y +
             _firstStaffInBrackets.topSpacing +
             _firstStaffInBrackets.topOverflow +
             (_firstStaffInBrackets.barRenderers.length > 0 ? _firstStaffInBrackets.barRenderers[0].topPadding : 0);
-        let lineBottom: number =
+        const lineBottom: number =
             cy +
             this.y +
             lastStaff.y +
@@ -719,11 +719,11 @@ export class StaffSystem {
             lastStaff.bottomSpacing -
             lastStaff.bottomOverflow -
             (lastStaff.barRenderers.length > 0 ? lastStaff.barRenderers[0].bottomPadding : 0);
-        let visualHeight: number = visualBottom - visualTop;
-        let lineHeight: number = lineBottom - lineTop;
-        let realHeight: number = realBottom - realTop;
-        let x: number = this.x + _firstStaffInBrackets.x;
-        let staffSystemBounds = new StaffSystemBounds();
+        const visualHeight: number = visualBottom - visualTop;
+        const lineHeight: number = lineBottom - lineTop;
+        const realHeight: number = realBottom - realTop;
+        const x: number = this.x + _firstStaffInBrackets.x;
+        const staffSystemBounds = new StaffSystemBounds();
         staffSystemBounds.visualBounds = new Bounds();
         staffSystemBounds.visualBounds.x = cx + this.x;
         staffSystemBounds.visualBounds.y = cy + this.y;
@@ -735,10 +735,10 @@ export class StaffSystem {
         staffSystemBounds.realBounds.w = this.width;
         staffSystemBounds.realBounds.h = this.height;
         this.layout.renderer.boundsLookup!.addStaffSystem(staffSystemBounds);
-        let masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
+        const masterBarBoundsLookup: Map<number, MasterBarBounds> = new Map<number, MasterBarBounds>();
         for (let i: number = 0; i < this.staves.length; i++) {
-            for (let staff of this.staves[i].stavesRelevantForBoundsLookup) {
-                for (let renderer of staff.barRenderers) {
+            for (const staff of this.staves[i].stavesRelevantForBoundsLookup) {
+                for (const renderer of staff.barRenderers) {
                     let masterBarBounds: MasterBarBounds;
                     if (!masterBarBoundsLookup.has(renderer.bar.masterBar.index)) {
                         masterBarBounds = new MasterBarBounds();
@@ -776,8 +776,8 @@ export class StaffSystem {
         if (!this._firstStaffInBrackets || this.layout.renderer.tracks!.length === 0) {
             return 0;
         }
-        let bar: Bar = this.layout.renderer.tracks![0].staves[0].bars[index];
-        let renderer: BarRendererBase = this.layout.getRendererForBar(this._firstStaffInBrackets.staveId, bar)!;
+        const bar: Bar = this.layout.renderer.tracks![0].staves[0].bars[index];
+        const renderer: BarRendererBase = this.layout.getRendererForBar(this._firstStaffInBrackets.staveId, bar)!;
         return renderer.x;
     }
 }

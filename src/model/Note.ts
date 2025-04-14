@@ -665,7 +665,7 @@ export class Note {
         if (this.harmonicType === HarmonicType.None || !this.isStringed) {
             return 0;
         }
-        let value: number = this.harmonicValue;
+        const value: number = this.harmonicValue;
         // add semitones to reach corresponding harmonic frets
         if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
             return 36;
@@ -844,8 +844,8 @@ export class Note {
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
-        let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
+        const nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
+        const isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
         // connect ties
         if (this.isTieDestination) {
@@ -876,7 +876,7 @@ export class Note {
         }
         // set hammeron/pulloffs
         if (this.isHammerPullOrigin) {
-            let hammerPullDestination = Note.findHammerPullDestination(this);
+            const hammerPullDestination = Note.findHammerPullDestination(this);
             if (!hammerPullDestination) {
                 this.isHammerPullOrigin = false;
             } else {
@@ -923,7 +923,7 @@ export class Note {
         const hasBend = points != null && points.length > 0;
 
         if (hasBend) {
-            let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
+            const isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
             this.isContinuedBend = isContinuedBend;
         } else {
             this.bendType = BendType.None;
@@ -931,10 +931,10 @@ export class Note {
 
         if (hasBend && this.bendType === BendType.Custom) {
             if (points!.length === 4) {
-                let origin: BendPoint = points[0];
-                let middle1: BendPoint = points[1];
-                let middle2: BendPoint = points[2];
-                let destination: BendPoint = points[3];
+                const origin: BendPoint = points[0];
+                const middle1: BendPoint = points[1];
+                const middle2: BendPoint = points[2];
+                const destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // bend higher?
@@ -978,8 +978,8 @@ export class Note {
                     Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
                 }
             } else if (points.length === 2) {
-                let origin: BendPoint = points[0];
-                let destination: BendPoint = points[1];
+                const origin: BendPoint = points[0];
+                const destination: BendPoint = points[1];
                 // bend higher?
                 if (destination.value > origin.value) {
                     if (!this.isContinuedBend && origin.value > 0) {
@@ -1017,7 +1017,7 @@ export class Note {
         let nextBeat: Beat | null = note.beat.nextBeat;
         // keep searching in same bar
         while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
-            let noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
+            const noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
             if (noteOnString) {
                 return noteOnString;
             }
@@ -1081,7 +1081,7 @@ export class Note {
             previousBeat.voice.bar.index >= note.beat.voice.bar.index - Note.MaxOffsetForSameLineSearch
         ) {
             if (note.isStringed) {
-                let noteOnString: Note | null = previousBeat.getNoteOnString(note.string);
+                const noteOnString: Note | null = previousBeat.getNoteOnString(note.string);
                 if (noteOnString) {
                     return noteOnString;
                 }
@@ -1093,7 +1093,7 @@ export class Note {
                         return previousBeat.notes[note.index];
                     }
                 } else {
-                    let noteWithValue: Note | null = previousBeat.getNoteWithRealValue(note.realValue);
+                    const noteWithValue: Note | null = previousBeat.getNoteWithRealValue(note.realValue);
                     if (noteWithValue) {
                         return noteWithValue;
                     }
@@ -1163,7 +1163,7 @@ export class Note {
                 return;
             }
 
-            let tieOrigin = this.tieOrigin ?? Note.findTieOrigin(this);
+            const tieOrigin = this.tieOrigin ?? Note.findTieOrigin(this);
             if (!tieOrigin) {
                 this.isTieDestination = false;
             } else {

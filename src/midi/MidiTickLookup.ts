@@ -391,7 +391,7 @@ export class MidiTickLookup {
         // scan through beats and find first one which has a beat visible
         while (masterBar) {
             if (masterBar.firstBeat) {
-                let beat = this.findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, trackLookup, isNextSearch);
+                const beat = this.findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, trackLookup, isNextSearch);
 
                 if (beat) {
                     return beat;

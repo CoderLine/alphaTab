@@ -49,7 +49,7 @@ export class BarBounds {
      */
     public findBeatAtPos(x: number): BeatBounds | null {
         let beat: BeatBounds | null = null;
-        for (let t of this.beats) {
+        for (const t of this.beats) {
             if (!beat || t.realBounds.x < x) {
                 beat = t;
             } else if (t.realBounds.x > x) {

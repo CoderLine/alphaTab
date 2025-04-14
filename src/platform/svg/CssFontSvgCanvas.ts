@@ -27,7 +27,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
         centerAtPosition?: boolean
     ): void {
         let s: string = '';
-        for (let symbol of symbols) {
+        for (const symbol of symbols) {
             if (symbol !== MusicFontSymbol.None) {
                 s += `&#${symbol};`;
             }

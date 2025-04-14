@@ -78,12 +78,12 @@ export class OttavaGlyph extends GroupedEffectGlyph {
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        let size: number = this.paintOttava(cx, cy, canvas);
-        let lineSpacing: number = 3;
-        let startX: number = cx + this.x + size + lineSpacing;
+        const size: number = this.paintOttava(cx, cy, canvas);
+        const lineSpacing: number = 3;
+        const startX: number = cx + this.x + size + lineSpacing;
         let lineY: number = cy + this.y;
         lineY += this._aboveStaff ? 2 : this.height - 2;
-        let lineSize: number = 8;
+        const lineSize: number = 8;
         if (endX > startX) {
             let lineX: number = startX;
             while (lineX < endX) {

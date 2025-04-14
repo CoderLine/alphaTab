@@ -105,12 +105,12 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
         const padding: number = 1;
-        for (let voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
-                for (let bg of vc.beatGlyphs) {
-                    let notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
-                    let noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
+                const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
+                for (const bg of vc.beatGlyphs) {
+                    const notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
+                    const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                     if (noteNumbers) {
                         for (const [str, noteNumber] of noteNumbers.notesPerString) {
                             if (!noteNumber.isEmpty) {
@@ -139,9 +139,9 @@ export class TabBarRenderer extends LineBarRenderer {
         super.doLayout();
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this._hasTuplets = false;
-            for (let voice of this.bar.voices) {
+            for (const voice of this.bar.voices) {
                 if (this.hasVoiceContainer(voice)) {
-                    let c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
+                    const c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                     if (c.tupletGroups.length > 0) {
                         this._hasTuplets = true;
                         break;
@@ -157,7 +157,7 @@ export class TabBarRenderer extends LineBarRenderer {
     protected override createLinePreBeatGlyphs(): void {
         // Clef
         if (this.isFirstOfLine) {
-            let center: number = (this.bar.staff.tuning.length - 1) / 2;
+            const center: number = (this.bar.staff.tuning.length - 1) / 2;
             this.addPreBeatGlyph(new TabClefGlyph(5, this.getTabY(center)));
         }
         // Time Signature
@@ -202,11 +202,11 @@ export class TabBarRenderer extends LineBarRenderer {
 
         // multibar rest
         if (this.additionalMultiRestBars) {
-            let container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
+            const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
             this.addBeatGlyph(container);
         } else {
             for (const b of v.beats) {
-                let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+                const container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
                 container.preNotes = new TabBeatPreNotesGlyph();
                 container.onNotes = new TabBeatGlyph();
                 this.addBeatGlyph(container);
@@ -243,7 +243,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
-        let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
+        const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
         }

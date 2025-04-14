@@ -26,12 +26,12 @@ export class RepeatOpenGlyph extends Glyph {
             this.renderer.bar
         );
 
-        let blockWidth: number = 4;
-        let top: number = cy + this.y + this.renderer.topPadding;
-        let bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
+        const blockWidth: number = 4;
+        const top: number = cy + this.y + this.renderer.topPadding;
+        const bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
         let left: number = cx + this.x + 0.5;
         // big bar
-        let h: number = bottom - top;
+        const h: number = bottom - top;
         canvas.fillRect(left, top, blockWidth, h);
         // line
         left += blockWidth * 2 - 0.5;
@@ -41,8 +41,8 @@ export class RepeatOpenGlyph extends Glyph {
         canvas.stroke();
         // circles
         left += 3;
-        let circleSize: number = this._circleSize;
-        let middle: number = (top + bottom) / 2;
+        const circleSize: number = this._circleSize;
+        const middle: number = (top + bottom) / 2;
         canvas.fillCircle(left, middle - circleSize * this._dotOffset, circleSize);
         canvas.fillCircle(left, middle + circleSize * this._dotOffset, circleSize);
     }

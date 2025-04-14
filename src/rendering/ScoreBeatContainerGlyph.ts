@@ -43,26 +43,26 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
             n.tieDestination.isVisible
         ) {
             // tslint:disable-next-line: no-unnecessary-type-assertion
-            let tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!, false);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph(n, n.tieDestination!, false);
             this.addTie(tie);
         }
         if (n.isTieDestination && !n.tieOrigin!.hasBend && !n.beat.hasWhammyBar) {
-            let tie: ScoreTieGlyph = new ScoreTieGlyph(n.tieOrigin!, n, true);
+            const tie: ScoreTieGlyph = new ScoreTieGlyph(n.tieOrigin!, n, true);
             this.addTie(tie);
         }
         // TODO: depending on the type we have other positioning
         // we should place glyphs in the preNotesGlyph or postNotesGlyph if needed
         if (n.slideInType !== SlideInType.None || n.slideOutType !== SlideOutType.None) {
-            let l: ScoreSlideLineGlyph = new ScoreSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
+            const l: ScoreSlideLineGlyph = new ScoreSlideLineGlyph(n.slideInType, n.slideOutType, n, this);
             this.addTie(l);
         }
         if (n.isSlurOrigin && n.slurDestination && n.slurDestination.isVisible) {
             // tslint:disable-next-line: no-unnecessary-type-assertion
-            let tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!, false);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n, n.slurDestination!, false);
             this.addTie(tie);
         }
         if (n.isSlurDestination) {
-            let tie: ScoreSlurGlyph = new ScoreSlurGlyph(n.slurOrigin!, n, true);
+            const tie: ScoreSlurGlyph = new ScoreSlurGlyph(n.slurOrigin!, n, true);
             this.addTie(tie);
         }
         // start effect slur on first beat
@@ -73,10 +73,10 @@ export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
         }
         // end effect slur on last beat
         if (!this._effectEndSlur && n.beat.isEffectSlurDestination && n.beat.effectSlurOrigin) {
-            let direction: BeamDirection = this.onNotes.beamingHelper.direction;
-            let startNote: Note =
+            const direction: BeamDirection = this.onNotes.beamingHelper.direction;
+            const startNote: Note =
                 direction === BeamDirection.Up ? n.beat.effectSlurOrigin.minNote! : n.beat.effectSlurOrigin.maxNote!;
-            let endNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
+            const endNote: Note = direction === BeamDirection.Up ? n.beat.minNote! : n.beat.maxNote!;
             const effectEndSlur = new ScoreSlurGlyph(startNote, endNote, true);
             this._effectEndSlur = effectEndSlur;
             this.addTie(effectEndSlur);

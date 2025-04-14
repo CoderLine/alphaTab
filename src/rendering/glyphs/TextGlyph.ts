@@ -46,11 +46,11 @@ export class TextGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let color = canvas.color;
+        const color = canvas.color;
         canvas.color = this.colorOverride ?? color;;
         canvas.font = this.font;
-        let old = canvas.textAlign;
-        let oldBaseLine = canvas.textBaseline;
+        const old = canvas.textAlign;
+        const oldBaseLine = canvas.textBaseline;
         canvas.textAlign = this.textAlign;
         if (this.textBaseline !== null) {
             canvas.textBaseline = this.textBaseline!;

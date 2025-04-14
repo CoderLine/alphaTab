@@ -26,7 +26,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
     public override doLayout(): void {
         super.doLayout();
         this.width = 0;
-        for (let noteHeads of this.BendNoteHeads) {
+        for (const noteHeads of this.BendNoteHeads) {
             noteHeads.doLayout();
             this.width += noteHeads.width + 10;
         }

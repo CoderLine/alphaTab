@@ -14,42 +14,42 @@ export class BoundsLookup {
      * @target web
      */
     public toJson(): unknown {
-        let json: any = {} as any;
-        let systems: StaffSystemBounds[] = [];
+        const json: any = {} as any;
+        const systems: StaffSystemBounds[] = [];
         json.staffSystems = systems;
-        for (let system of this.staffSystems) {
-            let g: StaffSystemBounds = {} as any;
+        for (const system of this.staffSystems) {
+            const g: StaffSystemBounds = {} as any;
             g.visualBounds = this.boundsToJson(system.visualBounds);
             g.realBounds = this.boundsToJson(system.realBounds);
             g.bars = [];
-            for (let masterBar of system.bars) {
-                let mb: MasterBarBounds = {} as any;
+            for (const masterBar of system.bars) {
+                const mb: MasterBarBounds = {} as any;
                 mb.lineAlignedBounds = this.boundsToJson(masterBar.lineAlignedBounds);
                 mb.visualBounds = this.boundsToJson(masterBar.visualBounds);
                 mb.realBounds = this.boundsToJson(masterBar.realBounds);
                 mb.index = masterBar.index;
                 mb.bars = [];
-                for (let bar of masterBar.bars) {
-                    let b: BarBounds = {} as any;
+                for (const bar of masterBar.bars) {
+                    const b: BarBounds = {} as any;
                     b.visualBounds = this.boundsToJson(bar.visualBounds);
                     b.realBounds = this.boundsToJson(bar.realBounds);
                     b.beats = [];
-                    for (let beat of bar.beats) {
-                        let bb: BeatBounds = {} as any;
+                    for (const beat of bar.beats) {
+                        const bb: BeatBounds = {} as any;
                         bb.visualBounds = this.boundsToJson(beat.visualBounds);
                         bb.realBounds = this.boundsToJson(beat.realBounds);
                         bb.onNotesX = beat.onNotesX;
-                        let bbd: any = bb;
+                        const bbd: any = bb;
                         bbd.beatIndex = beat.beat.index;
                         bbd.voiceIndex = beat.beat.voice.index;
                         bbd.barIndex = beat.beat.voice.bar.index;
                         bbd.staffIndex = beat.beat.voice.bar.staff.index;
                         bbd.trackIndex = beat.beat.voice.bar.staff.track.index;
                         if (beat.notes) {
-                            let notes: NoteBounds[] = (bb.notes = []);
-                            for (let note of beat.notes) {
-                                let n: NoteBounds = {} as any;
-                                let nd: any = n;
+                            const notes: NoteBounds[] = (bb.notes = []);
+                            for (const note of beat.notes) {
+                                const n: NoteBounds = {} as any;
+                                const nd: any = n;
                                 nd.index = note.note.index;
                                 n.noteHeadBounds = this.boundsToJson(note.noteHeadBounds);
                                 notes.push(n);
@@ -70,41 +70,41 @@ export class BoundsLookup {
      * @target web
      */
     public static fromJson(json: unknown, score: Score): BoundsLookup {
-        let lookup: BoundsLookup = new BoundsLookup();
-        let staffSystems: StaffSystemBounds[] = (json as any).staffSystems;
-        for (let staffSystem of staffSystems) {
-            let sg: StaffSystemBounds = new StaffSystemBounds();
+        const lookup: BoundsLookup = new BoundsLookup();
+        const staffSystems: StaffSystemBounds[] = (json as any).staffSystems;
+        for (const staffSystem of staffSystems) {
+            const sg: StaffSystemBounds = new StaffSystemBounds();
             sg.visualBounds = BoundsLookup.boundsFromJson(staffSystem.visualBounds);
             sg.realBounds = BoundsLookup.boundsFromJson(staffSystem.realBounds);
             lookup.addStaffSystem(sg);
-            for (let masterBar of staffSystem.bars) {
-                let mb: MasterBarBounds = new MasterBarBounds();
+            for (const masterBar of staffSystem.bars) {
+                const mb: MasterBarBounds = new MasterBarBounds();
                 mb.index = masterBar.index;
                 mb.isFirstOfLine = masterBar.isFirstOfLine;
                 mb.lineAlignedBounds = BoundsLookup.boundsFromJson(masterBar.lineAlignedBounds);
                 mb.visualBounds = BoundsLookup.boundsFromJson(masterBar.visualBounds);
                 mb.realBounds = BoundsLookup.boundsFromJson(masterBar.realBounds);
                 sg.addBar(mb);
-                for (let bar of masterBar.bars) {
-                    let b: BarBounds = new BarBounds();
+                for (const bar of masterBar.bars) {
+                    const b: BarBounds = new BarBounds();
                     b.visualBounds = BoundsLookup.boundsFromJson(bar.visualBounds);
                     b.realBounds = BoundsLookup.boundsFromJson(bar.realBounds);
                     mb.addBar(b);
-                    for (let beat of bar.beats) {
-                        let bb: BeatBounds = new BeatBounds();
+                    for (const beat of bar.beats) {
+                        const bb: BeatBounds = new BeatBounds();
                         bb.visualBounds = BoundsLookup.boundsFromJson(beat.visualBounds);
                         bb.realBounds = BoundsLookup.boundsFromJson(beat.realBounds);
                         bb.onNotesX = beat.onNotesX;
-                        let bd: any = beat;
+                        const bd: any = beat;
                         bb.beat =
                             score.tracks[bd.trackIndex].staves[bd.staffIndex].bars[bd.barIndex].voices[
                                 bd.voiceIndex
                             ].beats[bd.beatIndex];
                         if (beat.notes) {
                             bb.notes = [];
-                            for (let note of beat.notes) {
-                                let n: NoteBounds = new NoteBounds();
-                                let nd: any = note;
+                            for (const note of beat.notes) {
+                                const n: NoteBounds = new NoteBounds();
+                                const nd: any = note;
                                 n.note = bb.beat.notes[nd.index];
                                 n.noteHeadBounds = BoundsLookup.boundsFromJson(note.noteHeadBounds);
                                 bb.addNote(n);
@@ -136,7 +136,7 @@ export class BoundsLookup {
      * @target web
      */
     private boundsToJson(bounds: Bounds): Bounds {
-        let json: Bounds = {} as any;
+        const json: Bounds = {} as any;
         json.x = bounds.x;
         json.y = bounds.y;
         json.w = bounds.w;
@@ -161,7 +161,7 @@ export class BoundsLookup {
      * Finishes the lookup for optimized access.
      */
     public finish(scale: number = 1): void {
-        for (let t of this.staffSystems) {
+        for (const t of this.staffSystems) {
             t.finish(scale);
         }
         this.isFinished = true;
@@ -221,7 +221,7 @@ export class BoundsLookup {
      * @returns The master bar bounds if it was rendered, or null if no boundary information is available.
      */
     public findMasterBar(bar: MasterBar): MasterBarBounds | null {
-        let id: number = bar.index;
+        const id: number = bar.index;
         if (this._masterBarLookup.has(id)) {
             return this._masterBarLookup.get(id)!;
         }
@@ -244,7 +244,7 @@ export class BoundsLookup {
      * @returns The beat bounds if it was rendered, or null if no boundary information is available.
      */
     public findBeats(beat: Beat): BeatBounds[] | null {
-        let id: number = beat.id;
+        const id: number = beat.id;
         if (this._beatLookup.has(id)) {
             return this._beatLookup.get(id)!;
         }
@@ -264,8 +264,8 @@ export class BoundsLookup {
         let top: number = this.staffSystems.length - 1;
         let staffSystemIndex: number = -1;
         while (bottom <= top) {
-            let middle: number = ((top + bottom) / 2) | 0;
-            let system: StaffSystemBounds = this.staffSystems[middle];
+            const middle: number = ((top + bottom) / 2) | 0;
+            const system: StaffSystemBounds = this.staffSystems[middle];
             // found?
             if (y >= system.realBounds.y && y <= system.realBounds.y + system.realBounds.h) {
                 staffSystemIndex = middle;
@@ -284,8 +284,8 @@ export class BoundsLookup {
         }
         //
         // Find the matching bar in the row
-        let staffSystem: StaffSystemBounds = this.staffSystems[staffSystemIndex];
-        let bar: MasterBarBounds | null = staffSystem.findBarAtPos(x);
+        const staffSystem: StaffSystemBounds = this.staffSystems[staffSystemIndex];
+        const bar: MasterBarBounds | null = staffSystem.findBarAtPos(x);
         if (bar) {
             return bar.findBeatAtPos(x, y);
         }

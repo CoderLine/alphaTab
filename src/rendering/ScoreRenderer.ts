@@ -79,7 +79,7 @@ export class ScoreRenderer implements IScoreRenderer {
                     tracks = score.tracks.slice(0);
                 } else {
                     tracks = [];
-                    for (let track of trackIndexes) {
+                    for (const track of trackIndexes) {
                         if (track >= 0 && track < score.tracks.length) {
                             tracks.push(score.tracks[track]);
                         }
@@ -149,7 +149,7 @@ export class ScoreRenderer implements IScoreRenderer {
         } else {
             Logger.debug('Rendering', `Rendering ${this.tracks.length} tracks`);
             for (let i: number = 0; i < this.tracks.length; i++) {
-                let track: Track = this.tracks[i];
+                const track: Track = this.tracks[i];
                 Logger.debug('Rendering', `Track ${i}: ${track.name}`);
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);

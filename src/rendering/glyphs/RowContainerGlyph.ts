@@ -17,11 +17,11 @@ export class RowContainerGlyph extends GlyphGroup {
     public override doLayout(): void {
         let x: number = 0;
         let y: number = 0;
-        let padding: number = RowContainerGlyph.Padding;
+        const padding: number = RowContainerGlyph.Padding;
         this._rows = [];
         let row: RowGlyphContainer = new RowGlyphContainer(x, y, this._align);
         row.width = this.width;
-        for (let g of this.glyphs!) {
+        for (const g of this.glyphs!) {
             if (x + g.width < this.width) {
                 row.addGlyphToRow(g);
                 x += g.width;
@@ -47,7 +47,7 @@ export class RowContainerGlyph extends GlyphGroup {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        for (let row of this._rows) {
+        for (const row of this._rows) {
             row.paint(cx + this.x, cy + this.y, canvas);
         }
     }

@@ -27,17 +27,17 @@ export class VoiceContainerGlyph extends GlyphGroup {
     }
 
     public scaleToWidth(width: number): void {
-        let force: number = this.renderer.layoutingInfo.spaceToForce(width);
+        const force: number = this.renderer.layoutingInfo.spaceToForce(width);
         this.scaleToForce(force);
     }
 
     private scaleToForce(force: number): void {
         this.width = this.renderer.layoutingInfo.calculateVoiceWidth(force);
-        let positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
-        let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
+        const positions: Map<number, number> = this.renderer.layoutingInfo.buildOnTimePositions(force);
+        const beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
 
         for (let i: number = 0, j: number = beatGlyphs.length; i < j; i++) {
-            let currentBeatGlyph: BeatContainerGlyph = beatGlyphs[i];
+            const currentBeatGlyph: BeatContainerGlyph = beatGlyphs[i];
 
             switch (currentBeatGlyph.beat.graceType) {
                 case GraceType.None:
@@ -51,7 +51,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                     if (currentBeatGlyph.beat.graceGroup!.isComplete && positions.has(graceDisplayStart)) {
                         currentBeatGlyph.x = positions.get(graceDisplayStart)! - currentBeatGlyph.onTimeX;
 
-                        let graceSprings = this.renderer.layoutingInfo.allGraceRods.get(graceGroupId)!;
+                        const graceSprings = this.renderer.layoutingInfo.allGraceRods.get(graceGroupId)!;
 
                         // get the pre beat stretch of this voice/staff, not the
                         // shared space. This way we use the potentially empty space (see discussions/1092).
@@ -76,7 +76,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                         currentBeatGlyph.x -= lastGraceSpring.graceBeatWidth;
                     } else {
                         // placement for improper grace beats where no beat in the same bar follows
-                        let graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
+                        const graceSpring = this.renderer.layoutingInfo.incompleteGraceRods.get(graceGroupId)!;
                         const relativeOffset =
                             graceSpring[currentBeatGlyph.beat.graceIndex].postSpringWidth -
                             graceSpring[currentBeatGlyph.beat.graceIndex].preSpringWidth;
@@ -105,34 +105,34 @@ export class VoiceContainerGlyph extends GlyphGroup {
             // size always previous glyph after we know the position
             // of the next glyph
             if (i > 0) {
-                let beatWidth: number = currentBeatGlyph.x - beatGlyphs[i - 1].x;
+                const beatWidth: number = currentBeatGlyph.x - beatGlyphs[i - 1].x;
                 beatGlyphs[i - 1].scaleToWidth(beatWidth);
             }
             // for the last glyph size based on the full width
             if (i === j - 1) {
-                let beatWidth: number = this.width - beatGlyphs[beatGlyphs.length - 1].x;
+                const beatWidth: number = this.width - beatGlyphs[beatGlyphs.length - 1].x;
                 currentBeatGlyph.scaleToWidth(beatWidth);
             }
         }
     }
 
     public registerLayoutingInfo(info: BarLayoutingInfo): void {
-        let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
-        for (let b of beatGlyphs) {
+        const beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
+        for (const b of beatGlyphs) {
             b.registerLayoutingInfo(info);
         }
     }
 
     public applyLayoutingInfo(info: BarLayoutingInfo): void {
-        let beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
-        for (let b of beatGlyphs) {
+        const beatGlyphs: BeatContainerGlyph[] = this.beatGlyphs;
+        for (const b of beatGlyphs) {
             b.applyLayoutingInfo(info);
         }
         this.scaleToForce(Math.max(this.renderer.settings.display.stretchForce, info.minStretchForce));
     }
 
     public override addGlyph(g: Glyph): void {
-        let bg: BeatContainerGlyph = g as BeatContainerGlyph;
+        const bg: BeatContainerGlyph = g as BeatContainerGlyph;
         g.x =
             this.beatGlyphs.length === 0
                 ? 0

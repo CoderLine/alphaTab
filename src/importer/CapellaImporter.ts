@@ -20,14 +20,14 @@ export class CapellaImporter extends ScoreImporter {
 
     public readScore(): Score {
         Logger.debug(this.name, 'Loading ZIP entries');
-        let fileSystem: ZipReader = new ZipReader(this.data);
+        const fileSystem: ZipReader = new ZipReader(this.data);
         let entries: ZipEntry[];
         let xml: string | null = null;
         entries = fileSystem.read();
 
         Logger.debug(this.name, 'Zip entries loaded');
         if (entries.length > 0) {
-            for (let entry of entries) {
+            for (const entry of entries) {
                 switch (entry.fileName) {
                     case 'score.xml':
                         xml = IOHelper.toString(entry.data, this.settings.importer.encoding);
@@ -45,10 +45,10 @@ export class CapellaImporter extends ScoreImporter {
 
         Logger.debug(this.name, 'Start Parsing score.xml');
         try {
-            let capellaParser: CapellaParser = new CapellaParser();
+            const capellaParser: CapellaParser = new CapellaParser();
             capellaParser.parseXml(xml, this.settings);
             Logger.debug(this.name, 'score.xml parsed');
-            let score: Score = capellaParser.score;
+            const score: Score = capellaParser.score;
             return score;
         } catch (e) {
             throw new UnsupportedFormatError('Failed to parse CapXML', e as Error);

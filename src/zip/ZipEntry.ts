@@ -13,7 +13,7 @@ export class ZipEntry {
 
     public constructor(fullName: string, data: Uint8Array) {
         this.fullName = fullName;
-        let i: number = fullName.lastIndexOf('/');
+        const i: number = fullName.lastIndexOf('/');
         this.fileName = i === -1 || i === fullName.length - 1 ? this.fullName : fullName.substr(i + 1);
         this.data = data;
     }

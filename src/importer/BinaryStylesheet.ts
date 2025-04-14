@@ -74,41 +74,41 @@ export class BinaryStylesheet {
 
     private read(data: Uint8Array) {
         // BinaryStylesheet apears to be big-endien
-        let readable: ByteBuffer = ByteBuffer.fromBuffer(data);
-        let entryCount: number = IOHelper.readInt32BE(readable);
+        const readable: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const entryCount: number = IOHelper.readInt32BE(readable);
         for (let i: number = 0; i < entryCount; i++) {
-            let key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
-            let type: DataType = readable.readByte() as DataType;
+            const key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
+            const type: DataType = readable.readByte() as DataType;
             this._types.set(key, type);
             switch (type) {
                 case DataType.Boolean:
-                    let flag: boolean = readable.readByte() === 1;
+                    const flag: boolean = readable.readByte() === 1;
                     this.addValue(key, flag);
                     break;
                 case DataType.Integer:
-                    let ivalue: number = IOHelper.readInt32BE(readable);
+                    const ivalue: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, ivalue);
                     break;
                 case DataType.Float:
-                    let fvalue: number = IOHelper.readFloat32BE(readable);
+                    const fvalue: number = IOHelper.readFloat32BE(readable);
                     this.addValue(key, fvalue);
                     break;
                 case DataType.String:
-                    let s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
+                    const s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
                     this.addValue(key, s);
                     break;
                 case DataType.Point:
-                    let x: number = IOHelper.readInt32BE(readable);
-                    let y: number = IOHelper.readInt32BE(readable);
+                    const x: number = IOHelper.readInt32BE(readable);
+                    const y: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, new BendPoint(x, y));
                     break;
                 case DataType.Size:
-                    let width: number = IOHelper.readInt32BE(readable);
-                    let height: number = IOHelper.readInt32BE(readable);
+                    const width: number = IOHelper.readInt32BE(readable);
+                    const height: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, new BendPoint(width, height));
                     break;
                 case DataType.Rectangle:
-                    let rect = new Bounds();
+                    const rect = new Bounds();
                     rect.x = IOHelper.readInt32BE(readable);
                     rect.y = IOHelper.readInt32BE(readable);
                     rect.w = IOHelper.readInt32BE(readable);
@@ -116,7 +116,7 @@ export class BinaryStylesheet {
                     this.addValue(key, rect);
                     break;
                 case DataType.Color:
-                    let color: Color = GpBinaryHelpers.gpReadColor(readable, true);
+                    const color: Color = GpBinaryHelpers.gpReadColor(readable, true);
                     this.addValue(key, color);
                     break;
             }

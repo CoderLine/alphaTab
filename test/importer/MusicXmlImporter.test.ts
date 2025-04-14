@@ -6,7 +6,7 @@ import { expect } from 'chai';
 
 describe('MusicXmlImporterTests', () => {
     it('track-volume', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml3/track-volume-balance.musicxml'
         );
 
@@ -18,7 +18,7 @@ describe('MusicXmlImporterTests', () => {
     });
 
     it('track-balance', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml3/track-volume-balance.musicxml'
         );
 
@@ -30,7 +30,7 @@ describe('MusicXmlImporterTests', () => {
     });
 
     it('full-bar-rest', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml3/full-bar-rest.musicxml'
         );
 
@@ -102,7 +102,7 @@ describe('MusicXmlImporterTests', () => {
         expect(score.masterBars.length).to.equal(1);
     });
     it('bend', async () => {
-        let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
             'test-data/musicxml4/bends.xml'
         );
         let note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];

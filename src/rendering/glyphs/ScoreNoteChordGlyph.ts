@@ -34,7 +34,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
-            let n = this._noteGlyphLookup.get(note.id)!;
+            const n = this._noteGlyphLookup.get(note.id)!;
 
             let pos = this.x + n.x + this._noteHeadPadding;
             switch (requestedPosition) {
@@ -98,7 +98,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public override doLayout(): void {
         super.doLayout();
-        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
         if (this.beat.deadSlapped) {
             this._deadSlapped = new DeadSlappedBeatGlyph();
@@ -107,7 +107,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             this.width = this._deadSlapped.width;
         }
 
-        let direction: BeamDirection = this.direction;
+        const direction: BeamDirection = this.direction;
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
         let belowEffectSpacing = 1;
@@ -189,9 +189,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
         if (this.beat.isTremolo && !this.beat.deadSlapped) {
             let offset: number = 0;
-            let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
+            const baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
             let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
-            let speed: Duration = this.beat.tremoloSpeed!;
+            const speed: Duration = this.beat.tremoloSpeed!;
             switch (speed) {
                 case Duration.ThirtySecond:
                     offset = direction === BeamDirection.Up ? -15 : 15;
@@ -218,10 +218,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
-        for (let note of this._notes) {
+        for (const note of this._notes) {
             if (this._noteGlyphLookup.has(note.id)) {
-                let glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
-                let noteBounds: NoteBounds = new NoteBounds();
+                const glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
+                const noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;
                 noteBounds.noteHeadBounds = new Bounds();
                 noteBounds.noteHeadBounds.x = cx + this.x + this._noteHeadPadding + glyph.x;

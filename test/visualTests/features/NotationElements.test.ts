@@ -18,7 +18,7 @@ describe('NotationElements', () => {
             NotationElement.ScoreWordsAndMusic
         ];
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         if(element !== null) {
@@ -77,7 +77,7 @@ describe('NotationElements', () => {
     it('guitar-tuning-on', async () => {
         const tex = '\\tuning e5 b4 g4 d4 a3 d3 . 3.3*4';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, true);
@@ -87,7 +87,7 @@ describe('NotationElements', () => {
     it('guitar-tuning-off', async () => {
         const tex = '\\tuning d5 b4 g4 d4 a3 d3 . 3.3*4';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, false);
@@ -97,7 +97,7 @@ describe('NotationElements', () => {
     it('track-names-off', async () => {
         const tex = `\\track "Track Name" 3.3*4`;
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, false);
@@ -107,7 +107,7 @@ describe('NotationElements', () => {
     it('track-names-on', async () => {
         const tex = `\\track "Track Name" 3.3*4`;
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, true);
@@ -117,7 +117,7 @@ describe('NotationElements', () => {
     it('chord-diagrams-off', async () => {
         const tex = `\\chord "C" 0 1 0 2 3 x . (0.1 1.2 0.3 2.4 3.5){ch "C"}`;
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, false);
@@ -127,7 +127,7 @@ describe('NotationElements', () => {
     it('chord-diagrams-on', async () => {
         const tex = `\\chord "C" 0 1 0 2 3 x . (0.1 1.2 0.3 2.4 3.5){ch "C"}`;
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, true);
@@ -137,7 +137,7 @@ describe('NotationElements', () => {
     it('parenthesis-on-tied-bends-off', async () => {
         const tex = '3.3{b (0 4 )} -.3';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
@@ -147,7 +147,7 @@ describe('NotationElements', () => {
     it('parenthesis-on-tied-bends-on', async () => {
         const tex = '3.3{b (0 4 )} -.3';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, true);
@@ -157,7 +157,7 @@ describe('NotationElements', () => {
     it('tab-notes-on-tied-bends-off', async () => {
         const tex = '3.3{b (0 4 )} -.3{b (4 8)}';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
@@ -167,7 +167,7 @@ describe('NotationElements', () => {
     it('tab-notes-on-tied-bends-on', async () => {
         const tex = '3.3{b (0 4 )} -.3{b (4 8)}';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, true);
@@ -177,7 +177,7 @@ describe('NotationElements', () => {
     it('zeros-on-dive-whammys-off', async () => {
         const tex = '3.3.1{tb (0 -4)}';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, false);
@@ -187,7 +187,7 @@ describe('NotationElements', () => {
     it('zeros-on-dive-whammys-on', async () => {
         const tex = '3.3.1{tb (0 -4)}';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
@@ -197,7 +197,7 @@ describe('NotationElements', () => {
     it('effects-off', async () => {
         const tex = '. \\tempo 180 \\tf t16 3.3*4 | \\tempo 60 \\tf d16 3.3*4';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.EffectTempo, false);
@@ -208,7 +208,7 @@ describe('NotationElements', () => {
     it('effects-on', async () => {
         const tex = '. \\tempo 180 \\tf t16 3.3*4 | \\tempo 60 \\tf d16 3.3*4';
 
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.EffectTempo, true);

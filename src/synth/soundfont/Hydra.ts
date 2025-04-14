@@ -70,7 +70,7 @@ export class Hydra {
         }
 
         while (RiffChunk.load(chunkHead, chunkFastList, readable)) {
-            let chunk: RiffChunk = new RiffChunk();
+            const chunk: RiffChunk = new RiffChunk();
             if (chunkFastList.id === 'pdta') {
                 while (RiffChunk.load(chunkFastList, chunk, readable)) {
                     switch (chunk.id) {
