@@ -74,10 +74,7 @@ export class ScoreLoader {
         }
 
         const importers: ScoreImporter[] = Environment.buildImporters();
-        Logger.debug(
-            'ScoreLoader',
-            `Loading score from ${data.length} bytes using ${importers.length} importers`
-        );
+        Logger.debug('ScoreLoader', `Loading score from ${data.length} bytes using ${importers.length} importers`);
         let score: Score | null = null;
         const bb: ByteBuffer = ByteBuffer.fromBuffer(data);
         for (const importer of importers) {

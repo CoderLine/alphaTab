@@ -275,7 +275,11 @@ describe('NotationLegend', () => {
         const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/notation-legend/${fileName}`);
         const score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
-        const o =  new VisualTestOptions(score, [new VisualTestRun(-1, `test-data/visual-tests/notation-legend/${referenceFileName}`)], settings);
+        const o = new VisualTestOptions(
+            score,
+            [new VisualTestRun(-1, `test-data/visual-tests/notation-legend/${referenceFileName}`)],
+            settings
+        );
         await VisualTestHelper.runVisualTestFull(o);
     }
 });

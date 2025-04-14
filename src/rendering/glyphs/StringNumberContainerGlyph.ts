@@ -12,7 +12,8 @@ export class StringNumberContainerGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        const circleHeight = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.GuitarString0)! * TuningGlyph.CircleNumberScale;
+        const circleHeight =
+            MusicFontSymbolSizes.Widths.get(MusicFontSymbol.GuitarString0)! * TuningGlyph.CircleNumberScale;
         this.height = (circleHeight + 3) * this._strings.size;
         this.width = circleHeight;
     }
@@ -21,7 +22,8 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         const tuningLength = this.renderer.bar.staff.tuning.length;
 
         let y = 0;
-        const circleHeight = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.GuitarString0)! * TuningGlyph.CircleNumberScale;
+        const circleHeight =
+            MusicFontSymbolSizes.Widths.get(MusicFontSymbol.GuitarString0)! * TuningGlyph.CircleNumberScale;
         const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
         for (const s of this._strings) {
             const stringValue = tuningLength - s;

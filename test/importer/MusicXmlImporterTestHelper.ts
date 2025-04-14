@@ -75,9 +75,7 @@ export class MusicXmlImporterTestHelper {
             prepare?.(settings);
             const testOptions = new VisualTestOptions(
                 score,
-                [
-                    new VisualTestRun(1300, TestPlatform.changeExtension(file, '.png')),
-                ],
+                [new VisualTestRun(1300, TestPlatform.changeExtension(file, '.png'))],
                 settings
             );
 

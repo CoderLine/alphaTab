@@ -34,7 +34,7 @@ export function configureWebWorker(
 
     new webPackWithAlphaTab.webpack.javascript.EnableChunkLoadingPlugin('import-scripts').apply(compiler);
 
-    const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {       
+    const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {
         const [arg1, arg2] = expr.arguments;
         const parsedUrl = parseModuleUrl(parser, arg1 as Expression);
         if (!parsedUrl) {

@@ -1,6 +1,5 @@
 /**@target web */
 
-
 // https://github.com/vitejs/vite/blob/v6.1.1/packages/vite/src/node/typeUtils.ts
 import type { ObjectHook, MinimalPluginContext as RollupMinimalPluginContext, Plugin as RollupPlugin } from 'rollup';
 

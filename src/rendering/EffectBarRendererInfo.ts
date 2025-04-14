@@ -14,7 +14,7 @@ export abstract class EffectBarRendererInfo {
      * Gets the unique effect name for this effect. (Used for grouping)
      */
     public get effectId(): string {
-        return this.notationElement.toString(); 
+        return this.notationElement.toString();
     }
 
     /**

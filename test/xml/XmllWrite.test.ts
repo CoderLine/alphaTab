@@ -34,7 +34,7 @@ describe('XmlWriteTest', () => {
         const s: string = '<root>Text</root>';
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
-        expect(xml.toFormattedString("  ")).to.equal(s);
+        expect(xml.toFormattedString('  ')).to.equal(s);
     });
 
     it('writeChild', () => {
@@ -42,8 +42,8 @@ describe('XmlWriteTest', () => {
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.toFormattedString()).to.equal('<root><cc/></root>');
-        expect(xml.toFormattedString("  ")).to.equal('<root>\n  <cc/>\n</root>');
-        expect(xml.toFormattedString("    ")).to.equal('<root>\n    <cc/>\n</root>');
+        expect(xml.toFormattedString('  ')).to.equal('<root>\n  <cc/>\n</root>');
+        expect(xml.toFormattedString('    ')).to.equal('<root>\n    <cc/>\n</root>');
     });
 
     it('writeNumber', () => {
@@ -58,8 +58,8 @@ describe('XmlWriteTest', () => {
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.toFormattedString()).to.equal('<root><cc/><cc/></root>');
-        expect(xml.toFormattedString("  ")).to.equal('<root>\n  <cc/>\n  <cc/>\n</root>');
-        expect(xml.toFormattedString("    ")).to.equal('<root>\n    <cc/>\n    <cc/>\n</root>');
+        expect(xml.toFormattedString('  ')).to.equal('<root>\n  <cc/>\n  <cc/>\n</root>');
+        expect(xml.toFormattedString('    ')).to.equal('<root>\n    <cc/>\n    <cc/>\n</root>');
     });
 
     it('writeXmlHeadTest', () => {
@@ -67,7 +67,7 @@ describe('XmlWriteTest', () => {
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.toFormattedString('', true)).to.equal('<?xml version="1.0" encoding="utf-8"?><root/>');
-        expect(xml.toFormattedString("  ", true)).to.equal('<?xml version="1.0" encoding="utf-8"?>\n<root/>');
+        expect(xml.toFormattedString('  ', true)).to.equal('<?xml version="1.0" encoding="utf-8"?>\n<root/>');
     });
 
     it('writeDoctype', () => {
@@ -75,19 +75,18 @@ describe('XmlWriteTest', () => {
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.toFormattedString()).to.equal(s);
-        expect(xml.toFormattedString("  ")).to.equal('<!DOCTYPE html>\n<test/>');
+        expect(xml.toFormattedString('  ')).to.equal('<!DOCTYPE html>\n<test/>');
     });
 
     it('writeEscapedAttributeValues', () => {
         const s: string = '<test/>';
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
-        xml.firstElement!.attributes.set("lt", "<");
-        xml.firstElement!.attributes.set("gt", ">");
-        xml.firstElement!.attributes.set("amp", "&");
-        xml.firstElement!.attributes.set("apos", "'");
-        xml.firstElement!.attributes.set("quot", "\"");
+        xml.firstElement!.attributes.set('lt', '<');
+        xml.firstElement!.attributes.set('gt', '>');
+        xml.firstElement!.attributes.set('amp', '&');
+        xml.firstElement!.attributes.set('apos', "'");
+        xml.firstElement!.attributes.set('quot', '"');
         expect(xml.toFormattedString()).to.equal('<test lt="&lt;" gt="&gt;" amp="&amp;" apos="&apos;" quot="&quot;"/>');
     });
-
 });

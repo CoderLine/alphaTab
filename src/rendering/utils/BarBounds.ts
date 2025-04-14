@@ -67,7 +67,7 @@ export class BarBounds {
         this.visualBounds.scaleWith(scale);
 
         this.beats.sort((a, b) => a.realBounds.x - b.realBounds.x);
-        for(const b of this.beats){
+        for (const b of this.beats) {
             b.finish(scale);
         }
     }

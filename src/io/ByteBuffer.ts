@@ -29,7 +29,7 @@ export class ByteBuffer implements IWriteable, IReadable {
     public static fromBuffer(data: Uint8Array): ByteBuffer {
         const buffer: ByteBuffer = new ByteBuffer();
         buffer._buffer = data;
-        buffer.length = data.length
+        buffer.length = data.length;
         return buffer;
     }
 
@@ -70,7 +70,7 @@ export class ByteBuffer implements IWriteable, IReadable {
     public writeByte(value: number): void {
         const i: number = this.position + 1;
         this.ensureCapacity(i);
-        this._buffer[this.position] = value & 0xFF;
+        this._buffer[this.position] = value & 0xff;
         if (i > this.length) {
             this.length = i;
         }
@@ -80,7 +80,7 @@ export class ByteBuffer implements IWriteable, IReadable {
     public write(buffer: Uint8Array, offset: number, count: number): void {
         const i: number = this.position + count;
         this.ensureCapacity(i);
-        
+
         const count1: number = Math.min(count, buffer.length - offset);
         this._buffer.set(buffer.subarray(offset, offset + count1), this.position);
 
@@ -118,7 +118,7 @@ export class ByteBuffer implements IWriteable, IReadable {
         return copy;
     }
 
-    public copyTo(destination:IWriteable) {
+    public copyTo(destination: IWriteable) {
         destination.write(this._buffer, 0, this.length);
     }
 }

@@ -124,7 +124,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         let direction: BeamDirection = this._beat.notes.length === 1 ? beatDirection : BeamDirection.Up;
         const textalign: TextAlign = canvas.textAlign;
         const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
-        
+
         for (let i: number = 0; i < beat.notes.length; i++) {
             const note: Note = beat.notes[i];
             using _noteStyle = ElementStyleHelper.note(canvas, NoteSubElement.StandardNotationEffects, note);

@@ -76,7 +76,7 @@ import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
 import { VersionInfo } from './generated/VersionInfo';
 
 /**
- * A factory for custom layout engines. 
+ * A factory for custom layout engines.
  */
 export class LayoutEngineFactory {
     /**
@@ -95,13 +95,13 @@ export class LayoutEngineFactory {
 }
 
 /**
- * A factory for custom render engines. 
- * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are 
+ * A factory for custom render engines.
+ * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are
  * also done in the background worker files (e.g. when bundling)
  */
 export class RenderEngineFactory {
     /**
-     * Whether the layout supports background workers. 
+     * Whether the layout supports background workers.
      */
     public readonly supportsWorkers: boolean;
     public readonly createCanvas: () => ICanvas;
@@ -438,12 +438,14 @@ export class Environment {
     /**
      * @internal
      */
-    public static readonly layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
-    
+    public static readonly layoutEngines: Map<LayoutMode, LayoutEngineFactory> =
+        Environment.createDefaultLayoutEngines();
+
     /**
      * @internal
      */
-    public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
+    public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> =
+        Environment.createDefaultStaveProfiles();
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
@@ -556,7 +558,7 @@ export class Environment {
                 new BeatBarreEffectInfo(),
                 new NoteOrnamentEffectInfo(),
                 new RasgueadoEffectInfo(),
-                new WahPedalEffectInfo(),
+                new WahPedalEffectInfo()
             ]),
             new EffectBarRendererFactory(
                 Environment.StaffIdBeforeScoreHideable,
@@ -862,12 +864,14 @@ export class Environment {
      * Prints the environment information for easier troubleshooting.
      * @param force Whether to force printing.
      */
-    public static printEnvironmentInfo(force:boolean = true) {
-        const printer:(message:string) => void = force ? (message) => {
-            Logger.log.debug('VersionInfo', message);
-        } : (message) => {
-            Logger.debug('VersionInfo', message);
-        }
+    public static printEnvironmentInfo(force: boolean = true) {
+        const printer: (message: string) => void = force
+            ? message => {
+                  Logger.log.debug('VersionInfo', message);
+              }
+            : message => {
+                  Logger.debug('VersionInfo', message);
+              };
         VersionInfo.print(printer);
         printer(`High DPI: ${Environment.HighDpiFactor}`);
         Environment.printPlatformInfo(printer);
@@ -877,15 +881,14 @@ export class Environment {
      * @target web
      * @partial
      */
-    private static printPlatformInfo(print: (message:string) => void) {
+    private static printPlatformInfo(print: (message: string) => void) {
         print(`Browser: ${navigator.userAgent}`);
         print(`Platform: ${WebPlatform[Environment.webPlatform]}`);
         print(`WebPack: ${Environment.isWebPackBundled}`);
         print(`Vite: ${Environment.isViteBundled}`);
-        if(Environment.webPlatform !== WebPlatform.NodeJs) {
+        if (Environment.webPlatform !== WebPlatform.NodeJs) {
             print(`Window Size: ${window.outerWidth}x${window.outerHeight}`);
-            print(`Screen Size: ${window.screen.width}x${window.screen.height}`);    
+            print(`Screen Size: ${window.screen.width}x${window.screen.height}`);
         }
-        
     }
 }

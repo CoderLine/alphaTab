@@ -133,7 +133,9 @@ export class VorbisCodebook {
 
     public decodeScalar(packet: IntBitReader): number {
         let data = packet.tryPeekBits(this._prefixBitLength);
-        if (data.bitsRead === 0) { return -1; }
+        if (data.bitsRead === 0) {
+            return -1;
+        }
 
         // try to get the value from the prefix list...
         let node = this._prefixList![data.value];
@@ -359,7 +361,9 @@ export class VorbisCodebook {
                     const value = multiplicands[moff] * deltaValue + minValue + last;
                     lookupTable[idx * this.dimensions + i] = value;
 
-                    if (sequence_p) { last = value; }
+                    if (sequence_p) {
+                        last = value;
+                    }
 
                     ++moff;
                 }
@@ -659,7 +663,9 @@ export class VorbisFloor0 implements IVorbisFloor {
 
                 residue[i] *= q;
 
-                while (barkMap[++i] === k) { residue[i] *= q; }
+                while (barkMap[++i] === k) {
+                    residue[i] *= q;
+                }
             }
         } else {
             residue.fill(0, 0, n);
@@ -771,9 +777,13 @@ export class VorbisFloor1 implements IVorbisFloor {
             for (let j = 2; j < i; j++) {
                 const temp = this._xList[j];
                 if (temp < this._xList[i]) {
-                    if (temp > this._xList[this._lNeigh[i]]) { this._lNeigh[i] = j; }
+                    if (temp > this._xList[this._lNeigh[i]]) {
+                        this._lNeigh[i] = j;
+                    }
                 } else {
-                    if (temp < this._xList[this._hNeigh[i]]) { this._hNeigh[i] = j; }
+                    if (temp < this._xList[this._hNeigh[i]]) {
+                        this._hNeigh[i] = j;
+                    }
                 }
             }
         }
@@ -863,7 +873,9 @@ export class VorbisFloor1 implements IVorbisFloor {
                     lx = hx;
                     ly = hy;
                 }
-                if (lx >= n) { break; }
+                if (lx >= n) {
+                    break;
+                }
             }
 
             if (lx < n) {

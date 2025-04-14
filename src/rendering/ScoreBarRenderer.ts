@@ -136,7 +136,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.registerOverflowTop(whammyOffset);
 
             let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
-            const maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.maxLineBeat);
+            const maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
+                this.accidentalHelper.maxLineBeat
+            );
             if (maxNoteHelper.direction === BeamDirection.Up) {
                 maxNoteY -= this.getStemSize(maxNoteHelper);
                 if (maxNoteHelper.hasTuplet) {
@@ -147,7 +149,9 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
             let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine);
-            const minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(this.accidentalHelper.minLineBeat!);
+            const minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
+                this.accidentalHelper.minLineBeat!
+            );
             if (minNoteHelper.direction === BeamDirection.Down) {
                 minNoteY += this.getStemSize(minNoteHelper);
                 if (minNoteHelper.hasTuplet) {
@@ -603,10 +607,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        if(this.bar.simileMark !== SimileMark.None) {
+        if (this.bar.simileMark !== SimileMark.None) {
             return;
         }
-        
+
         for (const b of v.beats) {
             const container: ScoreBeatContainerGlyph = new ScoreBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new ScoreBeatPreNotesGlyph();

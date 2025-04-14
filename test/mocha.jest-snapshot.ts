@@ -3,7 +3,13 @@ import chalk from 'chalk';
 import * as chai from 'chai';
 import url from 'node:url';
 import path from 'node:path';
-import { addSerializer, buildSnapshotResolver, type SnapshotResolver, SnapshotState, toMatchSnapshot } from 'jest-snapshot';
+import {
+    addSerializer,
+    buildSnapshotResolver,
+    type SnapshotResolver,
+    SnapshotState,
+    toMatchSnapshot
+} from 'jest-snapshot';
 import type { Config } from '@jest/types';
 import slash from 'slash';
 import type { SyncExpectationResult } from 'expect';

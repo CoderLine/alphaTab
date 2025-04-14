@@ -115,7 +115,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         }
     }
     private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
-        if(!this.minNote){
+        if (!this.minNote) {
             return;
         }
 
@@ -133,14 +133,24 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         const maxNoteLineY = scoreRenderer.getLineY(this.maxNote!.steps / 2);
 
         let y = firstTopLedgerY;
-        while(y >= minNoteLineY) {
-            canvas.fillRect(cx - linePadding + this.noteStartX, cy + y | 0, lineWidth, BarRendererBase.StaffLineThickness);
+        while (y >= minNoteLineY) {
+            canvas.fillRect(
+                cx - linePadding + this.noteStartX,
+                (cy + y) | 0,
+                lineWidth,
+                BarRendererBase.StaffLineThickness
+            );
             y -= lineSpacing;
         }
 
         y = firstBottomLedgerY;
-        while(y <= maxNoteLineY) {
-            canvas.fillRect(cx - linePadding + this.noteStartX, cy + y | 0, lineWidth, BarRendererBase.StaffLineThickness);
+        while (y <= maxNoteLineY) {
+            canvas.fillRect(
+                cx - linePadding + this.noteStartX,
+                (cy + y) | 0,
+                lineWidth,
+                BarRendererBase.StaffLineThickness
+            );
             y += lineSpacing;
         }
     }

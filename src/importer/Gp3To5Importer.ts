@@ -236,37 +236,53 @@ export class Gp3To5Importer extends ScoreImporter {
         this.data.skip(28);
 
         const flags = IOHelper.readInt16LE(this.data);
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).isVisible = (flags & (0x01 << 0)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).isVisible =
+            (flags & (0x01 << 0)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).isVisible = (flags & (0x01 << 1)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).isVisible =
+            (flags & (0x01 << 1)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.SubTitle).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).isVisible = (flags & (0x01 << 2)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).isVisible =
+            (flags & (0x01 << 2)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Artist).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).isVisible = (flags & (0x01 << 3)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).isVisible =
+            (flags & (0x01 << 3)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Album).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).isVisible = (flags & (0x01 << 4)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).isVisible =
+            (flags & (0x01 << 4)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Words).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).isVisible = (flags & (0x01 << 5)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).isVisible =
+            (flags & (0x01 << 5)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Music).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).isVisible = (flags & (0x01 << 6)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).isVisible =
+            (flags & (0x01 << 6)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.WordsAndMusic).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).isVisible = (flags & (0x01 << 7)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).isVisible =
+            (flags & (0x01 << 7)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Copyright).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).isVisible = (flags & (0x01 << 7)) !== 0;
-        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).isVisible =
+            (flags & (0x01 << 7)) !== 0;
+        ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.CopyrightSecondLine).template =
+            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         // page number format
         GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
     }
-
-
 
     public readPlaybackInfos(): void {
         this._playbackInfos = [];
@@ -888,7 +904,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber < 400) {
             if ((flags & 0x04) !== 0) {
                 return HarmonicType.Natural;
-            } 
+            }
             if ((flags & 0x08) !== 0) {
                 return HarmonicType.Artificial;
             }

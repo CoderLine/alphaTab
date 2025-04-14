@@ -15,8 +15,8 @@ export abstract class BarRendererFactory {
     public hideOnPercussionTrack: boolean = false;
 
     public abstract get staffId(): string;
-    public abstract getStaffPaddingTop(staff:RenderStaff): number;
-    public abstract getStaffPaddingBottom(staff:RenderStaff): number;
+    public abstract getStaffPaddingTop(staff: RenderStaff): number;
+    public abstract getStaffPaddingBottom(staff: RenderStaff): number;
 
     public canCreate(track: Track, staff: Staff): boolean {
         return !this.hideOnPercussionTrack || !staff.isPercussion;

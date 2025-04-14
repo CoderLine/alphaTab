@@ -91,7 +91,7 @@ export function buildTypeSchema(program: ts.Program, input: ts.ClassDeclaration)
     let typeArgumentMapping: Map<string, ts.Type> | undefined;
     const checker = program.getTypeChecker();
     while (hierarchy) {
-        for(const x of hierarchy.members) {
+        for (const x of hierarchy.members) {
             handleMember(x, typeArgumentMapping);
         }
 

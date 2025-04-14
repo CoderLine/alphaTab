@@ -19,13 +19,7 @@ export class TrillGlyph extends GroupedEffectGlyph {
     protected override paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         let startX: number = cx + this.x;
 
-        canvas.fillMusicFontSymbol(
-            startX,
-            cy + this.y + this.height,
-            1,
-            MusicFontSymbol.OrnamentTrill,
-            true
-        );
+        canvas.fillMusicFontSymbol(startX, cy + this.y + this.height, 1, MusicFontSymbol.OrnamentTrill, true);
 
         startX += MusicFontSymbolSizes.Widths.get(MusicFontSymbol.OrnamentTrill)! / 2;
 
@@ -35,13 +29,7 @@ export class TrillGlyph extends GroupedEffectGlyph {
         const loopY: number = cy + this.y + this.height * 1.37;
         let loopX: number = startX;
         for (let i: number = 0; i < loops; i++) {
-            canvas.fillMusicFontSymbol(
-                loopX,
-                loopY,
-                waveScale,
-                MusicFontSymbol.WiggleTrill,
-                false
-            );
+            canvas.fillMusicFontSymbol(loopX, loopY, waveScale, MusicFontSymbol.WiggleTrill, false);
             loopX += step;
         }
     }

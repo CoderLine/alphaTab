@@ -23,9 +23,12 @@ if (alphaTab.Environment.isRunningInWorker) {
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating webworker');
                 try {
-                    return new alphaTab.Environment.alphaTabWorker(new alphaTab.Environment.alphaTabUrl('./alphaTab.worker.ts', import.meta.url), {
-                        type: 'module'
-                    });
+                    return new alphaTab.Environment.alphaTabWorker(
+                        new alphaTab.Environment.alphaTabUrl('./alphaTab.worker.ts', import.meta.url),
+                        {
+                            type: 'module'
+                        }
+                    );
                 } catch (e) {
                     alphaTab.Logger.debug('AlphaTab', 'ESM webworker construction with direct URL failed', e);
                     // continue with fallbacks
@@ -112,7 +115,9 @@ if (alphaTab.Environment.isRunningInWorker) {
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating Module worklet');
                 const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
-                return alphaTabWorklet.addModule(new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet.ts', import.meta.url));
+                return alphaTabWorklet.addModule(
+                    new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet.ts', import.meta.url)
+                );
             }
 
             alphaTab.Logger.debug('AlphaTab', 'Creating Script worklet');

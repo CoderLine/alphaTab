@@ -114,7 +114,7 @@ export interface IAlphaSynth {
     stop(): void;
 
     /**
-     * Stops any ongoing playback and plays the given midi file instead. 
+     * Stops any ongoing playback and plays the given midi file instead.
      * @param midi The midi file to play
      */
     playOneTimeMidiFile(midi: MidiFile): void;
@@ -144,7 +144,7 @@ export interface IAlphaSynth {
     applyTranspositionPitches(transpositionPitches: Map<number, number>): void;
 
     /**
-     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the 
+     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the
      * ones applied already via {@link applyTranspositionPitches}.
      * @param channel The channel number
      * @param semitones The number of semitones to apply as pitch offset.
@@ -215,7 +215,7 @@ export interface IAlphaSynth {
      * This event is fired when the loading of the Midi file failed.
      * @eventProperty
      */
-    readonly midiLoadFailed: IEventEmitterOfT<Error>
+    readonly midiLoadFailed: IEventEmitterOfT<Error>;
 
     /**
      * This event is fired when the playback state changed.

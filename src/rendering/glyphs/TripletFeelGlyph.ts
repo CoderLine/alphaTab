@@ -102,9 +102,7 @@ export class TripletFeelGlyph extends EffectGlyph {
                     MusicFontSymbol.TextBlackNoteFrac8thLongStem
                 ];
 
-                rightAugmentationSymbols = [
-                    MusicFontSymbol.TextAugmentationDot,
-                ]
+                rightAugmentationSymbols = [MusicFontSymbol.TextAugmentationDot];
 
                 rightNoteSymbols = [
                     MusicFontSymbol.TextBlackNoteLongStem,
@@ -119,9 +117,7 @@ export class TripletFeelGlyph extends EffectGlyph {
                     MusicFontSymbol.TextBlackNoteFrac16thLongStem
                 ];
 
-                rightAugmentationSymbols = [
-                    MusicFontSymbol.TextAugmentationDot,
-                ]
+                rightAugmentationSymbols = [MusicFontSymbol.TextAugmentationDot];
 
                 rightNoteSymbols = [
                     MusicFontSymbol.TextBlackNoteLongStem,
@@ -141,7 +137,7 @@ export class TripletFeelGlyph extends EffectGlyph {
                     MusicFontSymbol.TextBlackNoteLongStem,
                     MusicFontSymbol.TextCont16thBeamLongStem,
                     MusicFontSymbol.TextBlackNoteFrac8thLongStem,
-                    MusicFontSymbol.TextAugmentationDot,
+                    MusicFontSymbol.TextAugmentationDot
                 ];
                 break;
             case TripletFeel.Scottish16th:
@@ -155,7 +151,7 @@ export class TripletFeelGlyph extends EffectGlyph {
                     MusicFontSymbol.TextBlackNoteLongStem,
                     MusicFontSymbol.TextCont32ndBeamLongStem,
                     MusicFontSymbol.TextBlackNoteFrac16thLongStem,
-                    MusicFontSymbol.TextAugmentationDot,
+                    MusicFontSymbol.TextAugmentationDot
                 ];
                 break;
         }
@@ -163,8 +159,14 @@ export class TripletFeelGlyph extends EffectGlyph {
         canvas.fillMusicFontSymbols(leftNoteX, noteY, TripletFeelGlyph.NoteScale, leftNoteSymbols, false);
         canvas.fillText('=', cx + 32, cy + 5);
         canvas.fillMusicFontSymbols(rightNoteX, noteY, TripletFeelGlyph.NoteScale, rightNoteSymbols, false);
-        if(rightAugmentationSymbols.length > 0) {
-            canvas.fillMusicFontSymbols(rightNoteX + 7, noteY, TripletFeelGlyph.NoteScale, rightAugmentationSymbols, false);
+        if (rightAugmentationSymbols.length > 0) {
+            canvas.fillMusicFontSymbols(
+                rightNoteX + 7,
+                noteY,
+                TripletFeelGlyph.NoteScale,
+                rightAugmentationSymbols,
+                false
+            );
         }
         if (rightTupletSymbols.length > 0) {
             canvas.fillMusicFontSymbols(rightNoteX, tupletY, TripletFeelGlyph.TupletScale, rightTupletSymbols, false);

@@ -23,7 +23,12 @@ export class GpxImporter extends ScoreImporter {
         Logger.debug(this.name, 'Loading GPX filesystem');
         const fileSystem: GpxFileSystem = new GpxFileSystem();
         fileSystem.fileFilter = s => {
-            return s.endsWith('score.gpif') || s.endsWith('BinaryStylesheet') || s.endsWith('PartConfiguration') || s.endsWith('LayoutConfiguration');
+            return (
+                s.endsWith('score.gpif') ||
+                s.endsWith('BinaryStylesheet') ||
+                s.endsWith('PartConfiguration') ||
+                s.endsWith('LayoutConfiguration')
+            );
         };
         fileSystem.load(this.data);
         Logger.debug(this.name, 'GPX filesystem loaded');

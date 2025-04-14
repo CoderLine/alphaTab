@@ -162,12 +162,7 @@ export class EffectBand extends Glyph {
             const v: EffectGlyph[] = this._uniqueEffectGlyphs[i];
             for (let k: number = 0, l: number = v.length; k < l; k++) {
                 const g: EffectGlyph = v[k];
-                using _ = ElementStyleHelper.beat(
-                    canvas,
-                    BeatSubElement.Effects,
-                    g.beat!,
-                    false
-                );
+                using _ = ElementStyleHelper.beat(canvas, BeatSubElement.Effects, g.beat!, false);
                 g.paint(cx + this.x, cy + this.y, canvas);
             }
         }
@@ -184,9 +179,9 @@ export class EffectBand extends Glyph {
     private alignGlyph(sizing: EffectBarGlyphSizing, beat: Beat): void {
         const g: EffectGlyph = this._effectGlyphs[beat.voice.index].get(beat.index)!;
         const container: BeatContainerGlyph = this.renderer.getBeatContainer(beat)!;
-                
+
         // container is aligned with the "onTimeX" position of the beat in effect renders
-        
+
         switch (sizing) {
             case EffectBarGlyphSizing.SinglePreBeat:
                 // shift to the start using the biggest pre-beat size of the respective beat

@@ -96,7 +96,6 @@ describe('AlphaSynthTests', () => {
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
 
-
         expect(synth.isReadyForPlayback).to.be.true;
         expect(synth.hasSamplesForProgram(24)).to.be.true;
         expect(synth.hasSamplesForProgram(30)).to.be.true;
@@ -105,7 +104,7 @@ describe('AlphaSynthTests', () => {
         expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
     });
 
-   async function testVorbisFile(name:string) {
+    async function testVorbisFile(name: string) {
         const data = await TestPlatform.loadFile(`test-data/audio/${name}.ogg`);
         const vorbis = new VorbisFile(ByteBuffer.fromBuffer(data));
 

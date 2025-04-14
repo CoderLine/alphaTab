@@ -585,21 +585,13 @@ describe('MidiFileGeneratorTest', () => {
         const score: Score = parseTex(tex);
         // prettier-ignore
         const expectedPlaybackStartTimes: number[] = [
-            0, 480, 960, 1440,
-            0, 240, 480, 720, 960, 1200, 1440, 1680,
-            0, 480, 960, 1440,
-            0, 240, 480, 720, 960, 1200, 1440, 1680,
-            0, 480, 960, 1440,
-            0, 240, 480, 720, 960, 1200, 1440, 1680
+            0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200,
+            1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680
         ];
         // prettier-ignore
         const expectedPlaybackDurations: number[] = [
-            480, 480, 480, 480,
-            240, 240, 240, 240, 240, 240, 240, 240,
-            480, 480, 480, 480,
-            240, 240, 240, 240, 240, 240, 240, 240,
-            480, 480, 480, 480,
-            240, 240, 240, 240, 240, 240, 240, 240
+            480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240,
+            240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240
         ];
         const actualPlaybackStartTimes: number[] = [];
         const actualPlaybackDurations: number[] = [];
@@ -613,21 +605,13 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualPlaybackDurations.join(',')).to.equal(expectedPlaybackDurations.join(','));
         // prettier-ignore
         const expectedMidiStartTimes: number[] = [
-            0, 640, 960, 1600,
-            1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680,
-            3840, 4560, 4800, 5520,
-            5760, 6120, 6240, 6600, 6720, 7080, 7200, 7560,
-            7680, 7920, 8640, 8880,
-            9600, 9720, 10080, 10200, 10560, 10680, 11040, 11160
+            0, 640, 960, 1600, 1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680, 3840, 4560, 4800, 5520, 5760, 6120, 6240,
+            6600, 6720, 7080, 7200, 7560, 7680, 7920, 8640, 8880, 9600, 9720, 10080, 10200, 10560, 10680, 11040, 11160
         ];
         // prettier-ignore
         const expectedMidiDurations: number[] = [
-            640, 320, 640, 320,
-            320, 160, 320, 160, 320, 160, 320, 160,
-            720, 240, 720, 240,
-            360, 120, 360, 120, 360, 120, 360, 120,
-            240, 720, 240, 720,
-            120, 360, 120, 360, 120, 360, 120, 360
+            640, 320, 640, 320, 320, 160, 320, 160, 320, 160, 320, 160, 720, 240, 720, 240, 360, 120, 360, 120, 360,
+            120, 360, 120, 240, 720, 240, 720, 120, 360, 120, 360, 120, 360, 120, 360
         ];
 
         const actualMidiStartTimes: number[] = [];
@@ -1764,7 +1748,7 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).to.equal(expectedTimers.join(','));
     });
 
-    it('transpose', ()=>{
+    it('transpose', () => {
         const score = parseTex(`
             \\track \\staff \\instrument piano 
                     C4.4| r.1
@@ -1805,5 +1789,5 @@ describe('MidiFileGeneratorTest', () => {
 
         expect(generator.transpositionPitches.has(5)).to.be.true;
         expect(generator.transpositionPitches.get(5)!).to.equal(12);
-    })
+    });
 });

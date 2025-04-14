@@ -347,9 +347,8 @@ export class Bar {
 
             for (const marker of sustainPedals) {
                 if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
-
                     //duplicate or out-of-order markers
-                    if(previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {
+                    if (previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {
                         continue;
                     }
 
@@ -357,12 +356,12 @@ export class Bar {
                     marker.previousPedalMarker = previousMarker;
                 }
 
-                if(isDown && marker.pedalType === SustainPedalMarkerType.Down) {
+                if (isDown && marker.pedalType === SustainPedalMarkerType.Down) {
                     marker.pedalType = SustainPedalMarkerType.Hold;
                 }
 
                 marker.bar = this;
-                this.sustainPedals.push(marker)
+                this.sustainPedals.push(marker);
                 previousMarker = marker;
             }
         } else if (this.previousBar && this.previousBar.sustainPedals.length > 0) {

@@ -71,7 +71,7 @@ export class AccidentalGroupGlyph extends GlyphGroup {
             const g: Glyph = this.glyphs[i];
 
             const column = columns[g.x];
-            g.x = (this.width - column.x);
+            g.x = this.width - column.x;
         }
     }
 }

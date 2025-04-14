@@ -149,7 +149,8 @@ class TrackInfo {
 
         // the calculation in the AccidentalHelper assumes a standard 5-line staff.
         let musicXmlStaffSteps: number;
-        if (noteValue === 0) { // no display pitch defined?
+        if (noteValue === 0) {
+            // no display pitch defined?
             musicXmlStaffSteps = 4; // middle of bar
         } else {
             musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
@@ -527,11 +528,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private static sanitizeDisplay(text: string): string {
         // no newlines or tabs, and non-breaking spaces
-        return text.replaceAll('\r', '')
-            .replaceAll('\n', ' ')
-            .replaceAll('\t', '\xA0\xA0')
-            .replaceAll(' ', '\xA0');
-
+        return text.replaceAll('\r', '').replaceAll('\n', ' ').replaceAll('\t', '\xA0\xA0').replaceAll(' ', '\xA0');
     }
 
     // visual aspects of credits are ignored
@@ -3024,8 +3021,8 @@ export class MusicXmlImporter extends ScoreImporter {
                 if (previousNonGraceBeat.graceType === GraceType.None) {
                     // found
                     break;
-                } 
-                
+                }
+
                 if (previousNonGraceBeat.index > 0) {
                     previousNonGraceBeat = previousNonGraceBeat.previousBeat;
                 } else {
@@ -3579,7 +3576,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (type === 'start') {
             if (number) {
                 // start without end
-                if(context.tieStartIds.has(number)) {
+                if (context.tieStartIds.has(number)) {
                     const unclosed = context.tieStartIds.get(number)!;
                     context.tieStarts.delete(unclosed);
                 }
@@ -3722,8 +3719,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (step === '') {
             note.octave = 0;
             note.tone = 0;
-        }
-        else {
+        } else {
             const value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
             note.octave = (value / 12) | 0;
             note.tone = value - note.octave * 12;

@@ -88,7 +88,6 @@ export class RenderingResources {
      */
     public tablatureFont: Font = new Font(RenderingResources.sansFont, 13, FontStyle.Plain);
 
-
     /**
      * The font to use for grace notation related texts in the music sheet.
      * @defaultValue `11px Arial, sans-serif`
@@ -168,10 +167,10 @@ export class RenderingResources {
 
     /**
      * @internal
-     * @param element 
+     * @param element
      */
     public getFontForElement(element: ScoreSubElement): Font {
-        switch(element){
+        switch (element) {
             case ScoreSubElement.Title:
                 return this.titleFont;
             case ScoreSubElement.SubTitle:
@@ -190,5 +189,4 @@ export class RenderingResources {
 
         return this.wordsFont;
     }
-    
 }

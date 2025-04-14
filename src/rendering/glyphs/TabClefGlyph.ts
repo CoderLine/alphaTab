@@ -8,7 +8,7 @@ import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 export class TabClefGlyph extends Glyph {
     public override doLayout(): void {
         this.width = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.SixStringTabClef)!;
-    } 
+    }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.GuitarTabsClef, this.renderer.bar);

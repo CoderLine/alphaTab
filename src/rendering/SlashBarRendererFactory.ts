@@ -23,7 +23,6 @@ export class SlashBarRendererFactory extends BarRendererFactory {
         return staff.system.layout.renderer.settings.display.notationStaffPaddingBottom;
     }
 
-    
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
         return new SlashBarRenderer(renderer, bar);
     }

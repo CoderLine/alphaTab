@@ -343,8 +343,8 @@ export class Region {
                     (amount.wordAmount & 3) === 3
                         ? LoopMode.Sustain
                         : (amount.wordAmount & 3) === 1
-                        ? LoopMode.Continuous
-                        : LoopMode.None;
+                          ? LoopMode.Continuous
+                          : LoopMode.None;
                 break;
             case GenOperators.ScaleTuning:
                 this.pitchKeyTrack = amount.shortAmount;

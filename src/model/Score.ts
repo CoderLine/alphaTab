@@ -108,45 +108,48 @@ export class HeaderFooterStyle {
     public buildText(score: Score) {
         let anyPlaceholderFilled = false;
         let anyPlaceholder = false;
-        const replaced = this.template.replace(HeaderFooterStyle.PlaceholderPattern, (_match: string, variable: string) => {
-            anyPlaceholder = true;
-            let value = '';
-            switch (variable) {
-                case 'TITLE':
-                    value = score.title;
-                    break;
-                case 'SUBTITLE':
-                    value = score.subTitle;
-                    break;
-                case 'ARTIST':
-                    value = score.artist;
-                    break;
-                case 'ALBUM':
-                    value = score.album;
-                    break;
-                case 'WORDS':
-                case 'WORDSMUSIC':
-                    value = score.words;
-                    break;
-                case 'MUSIC':
-                    value = score.music;
-                    break;
-                case 'TABBER':
-                    value = score.tab;
-                    break;
-                case 'COPYRIGHT':
-                    value = score.copyright;
-                    break;
-                default:
-                    value = '';
-                    break;
-            }
+        const replaced = this.template.replace(
+            HeaderFooterStyle.PlaceholderPattern,
+            (_match: string, variable: string) => {
+                anyPlaceholder = true;
+                let value = '';
+                switch (variable) {
+                    case 'TITLE':
+                        value = score.title;
+                        break;
+                    case 'SUBTITLE':
+                        value = score.subTitle;
+                        break;
+                    case 'ARTIST':
+                        value = score.artist;
+                        break;
+                    case 'ALBUM':
+                        value = score.album;
+                        break;
+                    case 'WORDS':
+                    case 'WORDSMUSIC':
+                        value = score.words;
+                        break;
+                    case 'MUSIC':
+                        value = score.music;
+                        break;
+                    case 'TABBER':
+                        value = score.tab;
+                        break;
+                    case 'COPYRIGHT':
+                        value = score.copyright;
+                        break;
+                    default:
+                        value = '';
+                        break;
+                }
 
-            if (value) {
-                anyPlaceholderFilled = true;
+                if (value) {
+                    anyPlaceholderFilled = true;
+                }
+                return value;
             }
-            return value;
-        });
+        );
 
         if (anyPlaceholder && !anyPlaceholderFilled) {
             return '';
@@ -166,10 +169,7 @@ export class ScoreStyle extends ElementStyle<ScoreSubElement> {
     /**
      * Changes additional style aspects fo the of the specified sub-element.
      */
-    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<
-        ScoreSubElement,
-        HeaderFooterStyle
-    >();
+    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<ScoreSubElement, HeaderFooterStyle>();
 
     /**
      * The default styles applied to headers and footers if not specified

@@ -1,4 +1,4 @@
-import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * Represents a stream of binary data that can be read from.

@@ -12,7 +12,7 @@ export class BeatOnNoteGlyphBase extends BeatGlyphBase {
         //
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         // implemented in subclasses
     }
 

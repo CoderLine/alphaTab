@@ -59,8 +59,8 @@ export abstract class SvgCanvas implements ICanvas {
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
         this.buffer += `<rect x="${((x * this.scale) | 0) + blurOffset}" y="${((y * this.scale) | 0) + blurOffset}" width="${
-            (w * this.scale)
-        }" height="${(h * this.scale)}" stroke="${this.color.rgba}"`;
+            w * this.scale
+        }" height="${h * this.scale}" stroke="${this.color.rgba}"`;
         if (this.lineWidth !== 1) {
             this.buffer += ` stroke-width="${this.lineWidth * this.scale}"`;
         }
@@ -233,8 +233,7 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
-        this.buffer +=
-            `<g transform="translate(${centerX * this.scale} ,${centerY * this.scale}) rotate( ${angle})">`;
+        this.buffer += `<g transform="translate(${centerX * this.scale} ,${centerY * this.scale}) rotate( ${angle})">`;
     }
 
     public endRotate(): void {

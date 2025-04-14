@@ -9,7 +9,6 @@ import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { NotationElement } from '@src/NotationSettings';
 
 export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
-    
     // for tied bends ending in a vibrato, the vibrato is drawn by the TabBendGlyph for proper alignment
     private _hideOnTiedBend: boolean;
 

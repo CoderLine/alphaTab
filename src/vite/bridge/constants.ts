@@ -1,6 +1,6 @@
 /**@target web */
 
-import type { RollupPluginHooks } from "./typeUtils";
+import type { RollupPluginHooks } from './typeUtils';
 
 // index.ts for more details on contents and license of this file
 
@@ -38,5 +38,5 @@ export const ROLLUP_HOOKS = [
     'resolveId',
     'shouldTransformCachedModule',
     'transform',
-    'onLog',
-  ] satisfies RollupPluginHooks[]
+    'onLog'
+] satisfies RollupPluginHooks[];

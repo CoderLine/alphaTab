@@ -282,26 +282,26 @@ export class ModelUtils {
     }
 
     public static newGuid(): string {
-        return (
-            `${Math.floor((1 + Math.random()) * 0x10000)
+        return `${
+            Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
                 .substring(1) +
             Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1)}`
-        );
+                .substring(1)
+        }-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}`;
     }
 
     public static isAlmostEqualTo(a: number, b: number): boolean {
@@ -513,7 +513,7 @@ export class ModelUtils {
         } else {
             headerFooterStyle = new HeaderFooterStyle();
 
-            if(ScoreStyle.defaultHeaderAndFooter.has(element)) {
+            if (ScoreStyle.defaultHeaderAndFooter.has(element)) {
                 const defaults = ScoreStyle.defaultHeaderAndFooter.get(element)!;
                 headerFooterStyle.template = defaults.template;
                 headerFooterStyle.textAlign = defaults.textAlign;

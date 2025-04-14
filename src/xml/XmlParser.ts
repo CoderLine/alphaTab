@@ -388,7 +388,7 @@ export class XmlParser {
                         } else if (XmlParser.Escapes.has(s)) {
                             buf += XmlParser.Escapes.get(s);
                         } else {
-                            buf += (`&${s};`)?.toString();
+                            buf += `&${s};`?.toString();
                         }
                         start = p + 1;
                         state = escapeNext;

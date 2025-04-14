@@ -31,7 +31,7 @@ export class GlyphGroup extends Glyph {
         if (!this.glyphs) {
             this.glyphs = [];
         }
-        if(this.renderer) {
+        if (this.renderer) {
             g.renderer = this.renderer;
         }
         this.glyphs.push(g);

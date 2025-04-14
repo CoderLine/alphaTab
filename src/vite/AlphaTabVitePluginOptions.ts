@@ -7,7 +7,7 @@ export interface AlphaTabVitePluginOptions {
     alphaTabSourceDir?: string;
 
     /**
-     * The location where assets of alphaTab should be placed. 
+     * The location where assets of alphaTab should be placed.
      * Set it to false to disable the copying of assets like fonts.
      * (default: compiler.options.output.path)
      */
@@ -16,7 +16,7 @@ export interface AlphaTabVitePluginOptions {
     /**
      * Whether alphaTab should configure the audio worklet support in Vite.
      * This might break support for audio playback unless audio worklet support is added
-     * through other means to Vite. 
+     * through other means to Vite.
      * (default: true)
      */
     audioWorklets?: boolean;
@@ -24,7 +24,7 @@ export interface AlphaTabVitePluginOptions {
     /**
      * Whether alphaTab should configure the web worklet support in Vite.
      * This might break support for audio playback and background unless audio worklet support is added
-     * through other means to Vite. 
+     * through other means to Vite.
      * (default: true)
      */
     webWorkers?: boolean;

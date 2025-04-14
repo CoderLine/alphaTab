@@ -17,9 +17,7 @@ export class ScoreBrushGlyph extends Glyph {
 
     public override doLayout(): void {
         this.width =
-            this._beat.brushType === BrushType.ArpeggioUp || this._beat.brushType === BrushType.ArpeggioDown
-                ? 10
-                : 0;
+            this._beat.brushType === BrushType.ArpeggioUp || this._beat.brushType === BrushType.ArpeggioDown ? 10 : 0;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

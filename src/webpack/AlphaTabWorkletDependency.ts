@@ -89,7 +89,10 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
 
             chunkGraph.addChunkRuntimeRequirements(
                 chunk,
-                new Set<string>([webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories, webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey])
+                new Set<string>([
+                    webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories,
+                    webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey
+                ])
             );
 
             runtimeRequirements.add(webPackWithAlphaTab.alphaTab.RuntimeGlobalWorkletGetStartupChunks);
@@ -123,7 +126,6 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
         compilation.dependencyTemplates.set(AlphaTabWorkletDependency, new AlphaTabWorkletDependency.Template());
     };
 
-    
     webPackWithAlphaTab.alphaTab.createWorkletDependency = (
         request: string,
         range: [number, number],

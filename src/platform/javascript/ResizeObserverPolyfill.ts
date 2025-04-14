@@ -1,5 +1,5 @@
 /**
- * A very basic polyfill of the ResizeObserver which triggers 
+ * A very basic polyfill of the ResizeObserver which triggers
  * a the callback on window resize for all registered targets.
  * @target web
  */
@@ -23,7 +23,6 @@ export class ResizeObserverPolyfill {
     public disconnect() {
         this._targets.clear();
     }
-
 
     private onWindowResize() {
         const entries: ResizeObserverEntry[] = [];

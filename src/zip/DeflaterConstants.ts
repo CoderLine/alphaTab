@@ -7,10 +7,10 @@
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
  * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
@@ -35,7 +35,8 @@ export class DeflaterConstants {
 
     public static readonly HASH_BITS: number = DeflaterConstants.DEFAULT_MEM_LEVEL + 7;
     public static readonly HASH_SIZE: number = 1 << DeflaterConstants.HASH_BITS;
-    public static readonly HASH_SHIFT: number = (DeflaterConstants.HASH_BITS + DeflaterConstants.MIN_MATCH - 1) / DeflaterConstants.MIN_MATCH;
+    public static readonly HASH_SHIFT: number =
+        (DeflaterConstants.HASH_BITS + DeflaterConstants.MIN_MATCH - 1) / DeflaterConstants.MIN_MATCH;
     public static readonly HASH_MASK: number = DeflaterConstants.HASH_SIZE - 1;
 
     public static readonly MIN_LOOKAHEAD: number = DeflaterConstants.MAX_MATCH + DeflaterConstants.MIN_MATCH + 1;

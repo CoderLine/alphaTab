@@ -1,18 +1,17 @@
-import type { AlphaTabApiBase } from "@src/AlphaTabApiBase";
-import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from "@src/EventEmitter";
-import { Settings } from "@src/Settings";
-import { ScoreLoader } from "@src/importer";
-import { Score } from "@src/model";
-import type { Cursors } from "@src/platform/Cursors";
-import type { IContainer } from "@src/platform/IContainer";
-import type { IMouseEventArgs } from "@src/platform/IMouseEventArgs";
-import type { IUiFacade } from "@src/platform/IUiFacade";
-import { Bounds, type IScoreRenderer, type RenderFinishedEventArgs } from "@src/rendering";
-import type { IAlphaSynth } from "@src/synth";
-import { TestPlatform } from "@test/TestPlatform";
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
+import { Settings } from '@src/Settings';
+import { ScoreLoader } from '@src/importer';
+import { Score } from '@src/model';
+import type { Cursors } from '@src/platform/Cursors';
+import type { IContainer } from '@src/platform/IContainer';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IUiFacade } from '@src/platform/IUiFacade';
+import { Bounds, type IScoreRenderer, type RenderFinishedEventArgs } from '@src/rendering';
+import type { IAlphaSynth } from '@src/synth';
+import { TestPlatform } from '@test/TestPlatform';
 
 class TestUiContainer implements IContainer {
-
     private _width: number = 0;
     private _height: number = 0;
 
@@ -65,8 +64,7 @@ class TestUiContainer implements IContainer {
         this.childNodes.push(child as TestUiContainer);
     }
 
-    public stopAnimation() {
-    }
+    public stopAnimation() {}
 
     protected lastBounds: Bounds = new Bounds();
 
@@ -132,14 +130,18 @@ export class TestUiFacade implements IUiFacade<unknown> {
         api.settings = settings;
     }
 
-    public destroy(): void {
-    }
+    public destroy(): void {}
 
     public createCanvasElement(): IContainer {
         return new TestUiContainer();
     }
 
-    public triggerEvent(container: IContainer, eventName: string, details: unknown, originalEvent?: IMouseEventArgs): void {
+    public triggerEvent(
+        container: IContainer,
+        eventName: string,
+        details: unknown,
+        originalEvent?: IMouseEventArgs
+    ): void {
         // nothing to do
     }
 
@@ -156,7 +158,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
-        const canvasElement: TestUiContainer = (this._api.canvasElement as TestUiContainer);
+        const canvasElement: TestUiContainer = this._api.canvasElement as TestUiContainer;
 
         // null result indicates that the rendering finished
         if (!renderResult) {
@@ -205,18 +207,15 @@ export class TestUiFacade implements IUiFacade<unknown> {
         return null;
     }
 
-    public destroyCursors(): void {
-    }
+    public destroyCursors(): void {}
 
     public beginInvoke(action: () => void): void {
         setImmediate(action);
     }
 
-    public removeHighlights(): void {
-    }
+    public removeHighlights(): void {}
 
-    public highlightElements(groupId: string, masterBarIndex: number): void {
-    }
+    public highlightElements(groupId: string, masterBarIndex: number): void {}
 
     public createSelectionElement(): IContainer | null {
         return null;
@@ -244,7 +243,6 @@ export class TestUiFacade implements IUiFacade<unknown> {
         b.w = element.width;
         b.h = element.height;
         return b;
-
     }
 
     public scrollToY(scrollElement: IContainer, offset: number, speed: number): void {
@@ -272,7 +270,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
         if (typeof data === 'string') {
             TestPlatform.loadFile(data)
                 .then(x => {
-                    success(ScoreLoader.loadScoreFromBytes(x))
+                    success(ScoreLoader.loadScoreFromBytes(x));
                 })
                 .catch(error);
             return true;

@@ -108,7 +108,9 @@ export class BeamingHelper {
     }
 
     private beatHasFlag(beat: Beat) {
-        return !beat.deadSlapped && !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None);
+        return (
+            !beat.deadSlapped && !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None)
+        );
     }
 
     public constructor(staff: Staff, renderer: BarRendererBase) {

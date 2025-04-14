@@ -14,7 +14,7 @@ export class TupletGroup {
     private static readonly SixtyFourthTicks: number = 60;
     private static readonly OneHundredTwentyEighthTicks: number = 30;
     private static readonly TwoHundredFiftySixthTicks: number = 15;
-    
+
     private static AllTicks: number[] = [
         TupletGroup.HalfTicks,
         TupletGroup.QuarterTicks,

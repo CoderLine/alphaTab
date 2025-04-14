@@ -30,7 +30,7 @@ export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new NoteOrnamentGlyph(beat.notes.find(n=>n.ornament !== NoteOrnament.None)!.ornament);
+        return new NoteOrnamentGlyph(beat.notes.find(n => n.ornament !== NoteOrnament.None)!.ornament);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

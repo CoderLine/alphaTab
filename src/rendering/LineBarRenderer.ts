@@ -240,11 +240,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         let offset: number = this.tupletOffset;
         let size: number = 5;
 
-        using _ = ElementStyleHelper.beat(canvas,
-            beatElement,
-            h.beats[0],
-        );
-
+        using _ = ElementStyleHelper.beat(canvas, beatElement, h.beats[0]);
 
         if (h.beats.length === 1 || !h.isFull) {
             for (const beat of h.beats) {
@@ -577,7 +573,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
                 );
             }
-        } else if(this.lastBar) {
+        } else if (this.lastBar) {
             this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
         }
     }

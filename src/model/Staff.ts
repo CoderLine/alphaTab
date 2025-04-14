@@ -128,13 +128,12 @@ export class Staff {
     }
 
     public hasChord(chordId: string): boolean {
-        return this.chords?.has(chordId) ?? false
+        return this.chords?.has(chordId) ?? false;
     }
 
     public getChord(chordId: string): Chord | null {
-        return this.chords?.get(chordId) ?? null
+        return this.chords?.get(chordId) ?? null;
     }
-    
 
     public addBar(bar: Bar): void {
         const bars: Bar[] = this.bars;

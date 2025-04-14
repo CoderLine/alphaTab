@@ -12,7 +12,7 @@ export class RepeatGroup {
     /**
      * the masterbars which opens the group.
      */
-    public opening: MasterBar|null = null;
+    public opening: MasterBar | null = null;
 
     /**
      * a list of masterbars which open the group.
@@ -29,9 +29,11 @@ export class RepeatGroup {
     public closings: MasterBar[] = [];
 
     /**
-     * Gets whether this repeat group is really opened as a repeat. 
+     * Gets whether this repeat group is really opened as a repeat.
      */
-    public get isOpened():boolean { return this.opening?.isRepeatStart === true; }
+    public get isOpened(): boolean {
+        return this.opening?.isRepeatStart === true;
+    }
 
     /**
      * true if the repeat group was closed well

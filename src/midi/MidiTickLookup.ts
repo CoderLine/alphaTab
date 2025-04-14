@@ -212,11 +212,7 @@ export class MidiTickLookup {
             return currentBeatHint;
         }
         // already on the next beat?
-        if (
-            currentBeatHint.nextBeat &&
-            tick >= currentBeatHint.nextBeat.start &&
-            tick < currentBeatHint.nextBeat.end
-        ) {
+        if (currentBeatHint.nextBeat && tick >= currentBeatHint.nextBeat.start && tick < currentBeatHint.nextBeat.end) {
             const next = currentBeatHint.nextBeat!;
             // fill next in chain
             this.fillNextBeat(next, trackLookup);

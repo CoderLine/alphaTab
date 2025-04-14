@@ -427,7 +427,7 @@ export class BarRendererBase {
 
         canvas.color = this.resources.mainGlyphColor;
         this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
-        
+
         for (const c of this._voiceContainers.values()) {
             c.paint(cx + this.x, cy + this.y, canvas);
         }

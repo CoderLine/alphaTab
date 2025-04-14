@@ -315,11 +315,7 @@ export class MidiFileGenerator {
 
         // in case of simile marks where we repeat we register the empty beat for the whole bar
         if (playbackBar.id !== bar.id) {
-            this.tickLookup.addBeat(
-                bar.voices[0].beats[0],
-                0,
-                tickDuration
-            );
+            this.tickLookup.addBeat(bar.voices[0].beats[0], 0, tickDuration);
             //this.tickLookup.addBeat(beat, 0, audioDuration);
         }
     }
@@ -695,18 +691,8 @@ export class MidiFileGenerator {
      */
     // prettier-ignore
     private static readonly OrnamentKeysUp = [
-        /* C -> D */ 2,
-        /* C# -> D# */ 2,
-        /* D -> E */ 2,
-        /* D# -> E */ 1,
-        /* E -> F */ 1, 
-        /* F -> G */ 2,
-        /* F# -> G# */ 2,
-        /* G -> A */ 2,
-        /* G# -> A# */ 2,
-        /* A -> B */ 2,
-        /* A# -> B */ 1,
-        /* B -> C */ 1
+        /* C -> D */ 2, /* C# -> D# */ 2, /* D -> E */ 2, /* D# -> E */ 1, /* E -> F */ 1, /* F -> G */ 2,
+        /* F# -> G# */ 2, /* G -> A */ 2, /* G# -> A# */ 2, /* A -> B */ 2, /* A# -> B */ 1, /* B -> C */ 1
     ];
 
     /**
@@ -717,18 +703,8 @@ export class MidiFileGenerator {
      */
     // prettier-ignore
     private static readonly OrnamentKeysDown = [
-        /* C -> B */ -1,
-        /* C# -> C */ -1,
-        /* D -> C# */ -1,
-        /* D# -> D */ -1,
-        /* E -> D# */ -1, 
-        /* F -> E */ -1,
-        /* F# -> F */ -1,
-        /* G -> F# */ -1,
-        /* G# -> G */ -1,
-        /* A -> G# */ -1,
-        /* A# -> A */ -1,
-        /* B -> A# */ -1
+        /* C -> B */ -1, /* C# -> C */ -1, /* D -> C# */ -1, /* D# -> D */ -1, /* E -> D# */ -1, /* F -> E */ -1,
+        /* F# -> F */ -1, /* G -> F# */ -1, /* G# -> G */ -1, /* A -> G# */ -1, /* A# -> A */ -1, /* B -> A# */ -1
     ];
 
     private generateOrnament(
@@ -1063,8 +1039,8 @@ export class MidiFileGenerator {
             note.vibrato !== VibratoType.None
                 ? note.vibrato
                 : note.isTieDestination
-                ? note.tieOrigin!.vibrato
-                : VibratoType.Slight; /* should never happen unless called wrongly */
+                  ? note.tieOrigin!.vibrato
+                  : VibratoType.Slight; /* should never happen unless called wrongly */
         switch (vibratoType) {
             case VibratoType.Slight:
                 phaseLength = this._settings.player.vibrato.noteSlightLength;

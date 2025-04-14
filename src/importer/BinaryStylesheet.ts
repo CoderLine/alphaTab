@@ -5,7 +5,12 @@ import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';
-import { type BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
+import {
+    type BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@src/model/RenderStylesheet';
 import type { IWriteable } from '@src/io/IWriteable';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { TextAlign } from '@src/platform';
@@ -563,7 +568,7 @@ export class BinaryStylesheet {
         }
 
         binaryStylesheet.addValue(`${prefix}${name}Alignment`, style.textAlign as number, DataType.Integer);
-        
+
         if (style.isVisible !== undefined) {
             binaryStylesheet.addValue(`${prefix}draw${name}`, style.isVisible! as boolean, DataType.Boolean);
         }

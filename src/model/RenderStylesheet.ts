@@ -65,7 +65,7 @@ export enum TrackNameOrientation {
      */
     Horizontal = 0,
     /**
-     * Vertically rotated (bottom-to-top) 
+     * Vertically rotated (bottom-to-top)
      */
     Vertical = 1
 }
@@ -145,11 +145,10 @@ export class RenderStylesheet {
     /**
      * If multi track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
      */
-    public multiTrackMultiBarRest:boolean = false;
+    public multiTrackMultiBarRest: boolean = false;
 
     /**
      * If single track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
      */
     public perTrackMultiBarRest: Set<number> | null = null;
-
 }

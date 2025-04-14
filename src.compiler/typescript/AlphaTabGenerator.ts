@@ -7,16 +7,23 @@ import fs from 'node:fs';
 import jsonDeclarationEmit from './JsonDeclarationEmitter';
 import { execSync } from 'node:child_process';
 
-transpiler([{
-    name: 'Clone',
-    emit: cloneEmit
-}, {
-    name: 'Serializer',
-    emit: serializerEmit
-}, {
-    name: 'JSON Declarations',
-    emit: jsonDeclarationEmit
-}], false);
+transpiler(
+    [
+        {
+            name: 'Clone',
+            emit: cloneEmit
+        },
+        {
+            name: 'Serializer',
+            emit: serializerEmit
+        },
+        {
+            name: 'JSON Declarations',
+            emit: jsonDeclarationEmit
+        }
+    ],
+    false
+);
 
 // Write version file
 const packageJson = JSON.parse(fs.readFileSync('package.json', 'utf-8'));
@@ -24,7 +31,9 @@ const { version } = packageJson;
 const fileHandle = fs.openSync('src/generated/VersionInfo.ts', 'w');
 const commit = execSync('git rev-parse HEAD').toString().trim();
 
-fs.writeSync(fileHandle, `\
+fs.writeSync(
+    fileHandle,
+    `\
 ${GENERATED_FILE_HEADER}
 
 
@@ -39,5 +48,6 @@ export class VersionInfo {
         print(\`build date: \${VersionInfo.date}\`);
     }
 }
-`);
+`
+);
 ts.sys.exit(ts.ExitStatus.Success);

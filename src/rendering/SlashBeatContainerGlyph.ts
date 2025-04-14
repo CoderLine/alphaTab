@@ -13,12 +13,12 @@ export class SlashBeatContainerGlyph extends BeatContainerGlyph {
 
         if (!this._tiedNoteTie && n.isTieOrigin && n.tieDestination!.isVisible) {
             const tie: SlashTieGlyph = new SlashTieGlyph(n, n.tieDestination!, false);
-            this._tiedNoteTie= tie;
+            this._tiedNoteTie = tie;
             this.addTie(tie);
         }
         if (!this._tiedNoteTie && n.isTieDestination) {
             const tie: SlashTieGlyph = new SlashTieGlyph(n.tieOrigin!, n, true);
-            this._tiedNoteTie= tie;
+            this._tiedNoteTie = tie;
             this.addTie(tie);
         }
     }

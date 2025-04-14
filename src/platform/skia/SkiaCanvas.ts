@@ -5,18 +5,18 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import type { Settings } from '@src/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
-import type { AlphaSkiaTypeface }  from '@coderline/alphaskia';
+import type { AlphaSkiaTypeface } from '@coderline/alphaskia';
 
 /**
  * Describes the members of the alphaSkia module.
  * @target web
  */
 export interface AlphaSkiaModule {
-    AlphaSkiaCanvas: typeof alphaSkia.AlphaSkiaCanvas,
-    AlphaSkiaImage: typeof alphaSkia.AlphaSkiaImage,
-    AlphaSkiaTextAlign: typeof alphaSkia.AlphaSkiaTextAlign,
-    AlphaSkiaTextBaseline: typeof alphaSkia.AlphaSkiaTextBaseline,
-    AlphaSkiaTypeface: typeof alphaSkia.AlphaSkiaTypeface,
+    AlphaSkiaCanvas: typeof alphaSkia.AlphaSkiaCanvas;
+    AlphaSkiaImage: typeof alphaSkia.AlphaSkiaImage;
+    AlphaSkiaTextAlign: typeof alphaSkia.AlphaSkiaTextAlign;
+    AlphaSkiaTextBaseline: typeof alphaSkia.AlphaSkiaTextBaseline;
+    AlphaSkiaTypeface: typeof alphaSkia.AlphaSkiaTypeface;
 }
 
 /**
@@ -39,8 +39,7 @@ export class SkiaCanvas implements ICanvas {
      * @target web
      * @partial
      */
-    public static enable(musicFontData: ArrayBuffer,
-        alphaSkia: unknown) {
+    public static enable(musicFontData: ArrayBuffer, alphaSkia: unknown) {
         SkiaCanvas.alphaSkia = alphaSkia as AlphaSkiaModule;
         SkiaCanvas.initializeMusicFont(SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(musicFontData)!);
     }
@@ -52,12 +51,19 @@ export class SkiaCanvas implements ICanvas {
     public static registerFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
         const typeface = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.register(fontData.buffer as ArrayBuffer)!;
         if (!fontInfo) {
-            fontInfo = Font.withFamilyList([typeface.familyName], 12, typeface.isItalic ? FontStyle.Italic : FontStyle.Plain,
-                typeface.isBold ? FontWeight.Bold : FontWeight.Regular);
+            fontInfo = Font.withFamilyList(
+                [typeface.familyName],
+                12,
+                typeface.isItalic ? FontStyle.Italic : FontStyle.Plain,
+                typeface.isBold ? FontWeight.Bold : FontWeight.Regular
+            );
         }
 
         for (const family of fontInfo.families) {
-            SkiaCanvas.customTypeFaces.set(SkiaCanvas.customTypefaceKey(family, fontInfo.isBold, fontInfo.isItalic), typeface);
+            SkiaCanvas.customTypeFaces.set(
+                SkiaCanvas.customTypefaceKey(family, fontInfo.isBold, fontInfo.isItalic),
+                typeface
+            );
         }
 
         return fontInfo;
@@ -70,7 +76,7 @@ export class SkiaCanvas implements ICanvas {
     private _canvas: alphaSkia.AlphaSkiaCanvas;
     private _color: Color = new Color(0, 0, 0, 0);
     private _lineWidth: number = 0;
-    private _typeFaceCache: string = "";
+    private _typeFaceCache: string = '';
     private _typeFaceIsSystem: boolean = false;
     private _typeFace: alphaSkia.AlphaSkiaTypeface | null = null;
     private _scale = 1;
@@ -87,16 +93,15 @@ export class SkiaCanvas implements ICanvas {
                 const key = SkiaCanvas.customTypefaceKey(family, this.font.isBold, this.font.isItalic);
                 if (!SkiaCanvas.customTypeFaces.has(key)) {
                     this._typeFaceIsSystem = true;
-                    this._typeFace = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.create(family,
+                    this._typeFace = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.create(
+                        family,
                         this.font.isBold,
                         this.font.isItalic
                     )!;
-                }
-                else {
+                } else {
                     this._typeFaceIsSystem = false;
                     this._typeFace = SkiaCanvas.customTypeFaces.get(key)!;
                 }
-
             }
 
             this._typeFaceCache = this.font.toCssString(this._scale);
@@ -107,7 +112,7 @@ export class SkiaCanvas implements ICanvas {
 
     public constructor() {
         this._canvas = new SkiaCanvas.alphaSkia.AlphaSkiaCanvas();
-        this.color = new Color(0, 0, 0, 0xff)
+        this.color = new Color(0, 0, 0, 0xff);
     }
 
     public destroy() {
@@ -150,13 +155,18 @@ export class SkiaCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._canvas.fillRect(((x * this._scale) | 0), ((y * this._scale) | 0), w * this._scale, h * this._scale);
+            this._canvas.fillRect((x * this._scale) | 0, (y * this._scale) | 0, w * this._scale, h * this._scale);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
-        this._canvas.strokeRect(((x * this._scale) | 0) + blurOffset, ((y * this._scale) | 0) + blurOffset, w * this._scale, h * this._scale);
+        this._canvas.strokeRect(
+            ((x * this._scale) | 0) + blurOffset,
+            ((y * this._scale) | 0) + blurOffset,
+            w * this._scale,
+            h * this._scale
+        );
     }
 
     public beginPath(): void {
@@ -180,23 +190,22 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public bezierCurveTo(cp1X: number, cp1Y: number, cp2X: number, cp2Y: number, x: number, y: number): void {
-        this._canvas.bezierCurveTo(cp1X * this._scale, cp1Y * this._scale, cp2X * this._scale, cp2Y * this._scale, x * this._scale, y * this._scale);
+        this._canvas.bezierCurveTo(
+            cp1X * this._scale,
+            cp1Y * this._scale,
+            cp2X * this._scale,
+            cp2Y * this._scale,
+            x * this._scale,
+            y * this._scale
+        );
     }
 
     public fillCircle(x: number, y: number, radius: number): void {
-        this._canvas.fillCircle(
-            x * this._scale,
-            y * this._scale,
-            radius * this._scale,
-        );
+        this._canvas.fillCircle(x * this._scale, y * this._scale, radius * this._scale);
     }
 
     public strokeCircle(x: number, y: number, radius: number): void {
-        this._canvas.strokeCircle(
-            x * this._scale,
-            y * this._scale,
-            radius * this._scale,
-        );
+        this._canvas.strokeCircle(x * this._scale, y * this._scale, radius * this._scale);
     }
 
     public fill(): void {
@@ -250,9 +259,16 @@ export class SkiaCanvas implements ICanvas {
                 break;
         }
 
-
         // NOTE: Avoiding sub-pixel text positions as they can lead to strange artifacts.
-        this._canvas.fillText(text, this.getTypeFace(), this.font.size * this._scale, (x * this._scale) | 0, (y * this._scale) | 0, textAlign, textBaseline);
+        this._canvas.fillText(
+            text,
+            this.getTypeFace(),
+            this.font.size * this._scale,
+            (x * this._scale) | 0,
+            (y * this._scale) | 0,
+            textAlign,
+            textBaseline
+        );
     }
 
     /**
@@ -263,11 +279,14 @@ export class SkiaCanvas implements ICanvas {
     private _initialMeasure = true;
     public measureText(text: string) {
         // BUG: for some reason the very initial measure text in alphaSkia delivers wrong results, so we it twice
-        if(this._initialMeasure) {
+        if (this._initialMeasure) {
             this._canvas.measureText(text, this.getTypeFace(), this.font.size);
             this._initialMeasure = false;
         }
-        return new MeasuredText(this._canvas.measureText(text, this.getTypeFace(), this.font.size), this.font.size * SkiaCanvas.FontSizeToLineHeight);
+        return new MeasuredText(
+            this._canvas.measureText(text, this.getTypeFace(), this.font.size),
+            this.font.size * SkiaCanvas.FontSizeToLineHeight
+        );
     }
 
     public fillMusicFontSymbol(
@@ -310,8 +329,11 @@ export class SkiaCanvas implements ICanvas {
             symbols,
             SkiaCanvas.musicFont!,
             Environment.MusicFontSize * this._scale * relativeScale,
-            x * this._scale, y * this._scale,
-            centerAtPosition ? SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Center : SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Left,
+            x * this._scale,
+            y * this._scale,
+            centerAtPosition
+                ? SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Center
+                : SkiaCanvas.alphaSkia.AlphaSkiaTextAlign.Left,
             SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic
         );
     }

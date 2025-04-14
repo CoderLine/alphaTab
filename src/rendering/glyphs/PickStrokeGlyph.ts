@@ -5,7 +5,6 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class PickStrokeGlyph extends MusicFontGlyph {
-
     public constructor(x: number, y: number, pickStroke: PickStroke) {
         super(x, y, NoteHeadGlyph.GraceScale, PickStrokeGlyph.getSymbol(pickStroke));
     }

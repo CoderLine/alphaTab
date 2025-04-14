@@ -1,7 +1,7 @@
 /**
  * Lists all layout modes that are supported.
  */
- export enum LayoutMode {
+export enum LayoutMode {
     /**
      * The bars are aligned in an [vertically endless page-style fashion](https://alphatab.net/docs/showcase/layouts#page-layout)
      */

@@ -14,10 +14,7 @@ export class BeatTickLookupItem {
      */
     public readonly playbackStart: number;
 
-    public constructor(
-        beat: Beat,
-        playbackStart: number
-    ) {
+    public constructor(beat: Beat, playbackStart: number) {
         this.beat = beat;
         this.playbackStart = playbackStart;
     }
@@ -41,7 +38,7 @@ export class BeatTickLookup {
 
     /**
      * Gets or sets a list of all beats that should be highlighted when
-     * the beat of this lookup starts playing. This might not mean 
+     * the beat of this lookup starts playing. This might not mean
      * the beats start at this position.
      */
     public highlightedBeats: BeatTickLookupItem[] = [];

@@ -20,7 +20,7 @@ export abstract class ScoreExporter {
     }
 
     /**
-     * Exports the given score to a binary buffer. 
+     * Exports the given score to a binary buffer.
      * @param score The score to serialize
      * @param settings  The settings to use during serialization
      * @returns A byte buffer with the serialized score.

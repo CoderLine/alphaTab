@@ -15,14 +15,14 @@ export class TabTieGlyph extends TieGlyph {
     }
 
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return 15;
         }
         return super.getTieHeight(startX, startY, endX, endY);
     }
 
     protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return BeamDirection.Up;
         }
         return TabTieGlyph.getBeamDirectionForNote(this.startNote);
@@ -33,11 +33,11 @@ export class TabTieGlyph extends TieGlyph {
     }
 
     protected override getStartY(): number {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Center);
         }
 
-        if(this.tieDirection === BeamDirection.Up) {
+        if (this.tieDirection === BeamDirection.Up) {
             return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Top);
         }
         return this.startNoteRenderer!.getNoteY(this.startNote, NoteYPosition.Bottom);
@@ -48,14 +48,14 @@ export class TabTieGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return this.getEndX() - 20;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }
 
     protected override getEndX(): number {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
         }
         return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);

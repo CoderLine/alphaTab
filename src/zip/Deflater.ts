@@ -7,10 +7,10 @@
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
  * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
@@ -19,18 +19,18 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { DeflaterConstants } from "./DeflaterConstants";
-import { DeflaterEngine } from "./DeflaterEngine";
-import { PendingBuffer } from "./PendingBuffer";
+import { DeflaterConstants } from './DeflaterConstants';
+import { DeflaterEngine } from './DeflaterEngine';
+import { PendingBuffer } from './PendingBuffer';
 
 /**
  * This is the Deflater class.  The deflater class compresses input
  * with the deflate algorithm described in RFC 1951.  It has several
  * compression levels and three different strategies described below.
- * 
+ *
  * This class is <i>not</i> thread safe.  This is inherent in the API, due
  * to the split of deflate and setInput.
- * 
+ *
  * author of the original java version : Jochen Hoenicke
  */
 export class Deflater {
@@ -112,7 +112,7 @@ export class Deflater {
      * are available.
      */
     public get isFinished() {
-        return (this._state === Deflater.FinishedState) && this._pending.isFlushed;
+        return this._state === Deflater.FinishedState && this._pending.isFlushed;
     }
 
     /**
@@ -150,7 +150,7 @@ export class Deflater {
     public deflate(output: Uint8Array, offset: number, length: number): number {
         const origLength = length;
 
-        while(true) {
+        while (true) {
             const count = this._pending.flush(output, offset, length);
             offset += count;
             length -= count;
@@ -159,7 +159,12 @@ export class Deflater {
                 break;
             }
 
-            if (!this._engine.deflate((this._state & Deflater.IsFlushing) !== 0, (this._state & Deflater.IsFinishing) !== 0)) {
+            if (
+                !this._engine.deflate(
+                    (this._state & Deflater.IsFlushing) !== 0,
+                    (this._state & Deflater.IsFinishing) !== 0
+                )
+            ) {
                 switch (this._state) {
                     case Deflater.BusyState:
                         // We need more input now
@@ -167,14 +172,14 @@ export class Deflater {
 
                     case Deflater.FlushingState:
                         /* We have to supply some lookahead.  8 bit lookahead
-                            * is needed by the zlib inflater, and we must fill
-                            * the next byte, so that all bits are flushed.
-                            */
-                        let neededbits = 8 + ((-this._pending.bitCount) & 7);
+                         * is needed by the zlib inflater, and we must fill
+                         * the next byte, so that all bits are flushed.
+                         */
+                        let neededbits = 8 + (-this._pending.bitCount & 7);
                         while (neededbits > 0) {
                             /* write a static tree block consisting solely of
-                                * an EOF:
-                                */
+                             * an EOF:
+                             */
                             this._pending.writeBits(2, 10);
                             neededbits -= 10;
                         }
@@ -189,15 +194,14 @@ export class Deflater {
             }
         }
         return origLength - length;
-
     }
 
     /**
      * Finishes the deflater with the current input block.  It is an error
      * to give more input after this method was called.  This method must
-     * be called to force all bytes to be flushed.    
+     * be called to force all bytes to be flushed.
      */
     public finish() {
-        this._state |= (Deflater.IsFlushing | Deflater.IsFinishing);
+        this._state |= Deflater.IsFlushing | Deflater.IsFinishing;
     }
 }

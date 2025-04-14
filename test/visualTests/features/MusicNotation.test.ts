@@ -174,7 +174,11 @@ describe('MusicNotationTests', () => {
         // score.stylesheet.bracketExtendMode = BracketExtendMode.NoBrackets;
 
         await VisualTestHelper.runVisualTestFull(
-            new VisualTestOptions(score, [new VisualTestRun(-1, 'test-data/visual-tests/music-notation/accidentals-advanced.png')], settings)
+            new VisualTestOptions(
+                score,
+                [new VisualTestRun(-1, 'test-data/visual-tests/music-notation/accidentals-advanced.png')],
+                settings
+            )
         );
     });
 });

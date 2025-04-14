@@ -109,8 +109,8 @@ export class FontSizes {
         }
 
         // add a small increase of size for spacing/kerning etc.
-        // we really need to improve the width calculation, maybe by using offscreencanvas? 
-        factor *= 1.07; 
+        // we really need to improve the width calculation, maybe by using offscreencanvas?
+        factor *= 1.07;
 
         return new MeasuredText(stringSize * factor, size * data.fontSizeToHeight);
     }

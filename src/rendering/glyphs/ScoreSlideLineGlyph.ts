@@ -84,14 +84,15 @@ export class ScoreSlideLineGlyph extends Glyph {
                 startX =
                     cx +
                     startNoteRenderer.x +
-                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) + 
+                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) +
                     offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
-                    const endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                        this.renderer.staff.staveId,
-                        this._startNote.slideTarget.beat.voice.bar
-                    );
+                    const endNoteRenderer: BarRendererBase | null =
+                        this.renderer.scoreRenderer.layout!.getRendererForBar(
+                            this.renderer.staff.staveId,
+                            this._startNote.slideTarget.beat.voice.bar
+                        );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                         endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
@@ -101,10 +102,13 @@ export class ScoreSlideLineGlyph extends Glyph {
                             endNoteRenderer.x +
                             endNoteRenderer.getBeatX(this._startNote.slideTarget.beat, BeatXPosition.PreNotes) -
                             offsetX;
-                        endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
+                        endY =
+                            cy +
+                            endNoteRenderer.y +
+                            endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
                     }
 
-                    if(this._startNote.slideTarget.realValue > this._startNote.realValue) {
+                    if (this._startNote.slideTarget.realValue > this._startNote.realValue) {
                         startY += offsetY;
                         endY -= offsetY;
                     } else {
@@ -117,19 +121,31 @@ export class ScoreSlideLineGlyph extends Glyph {
                 }
                 break;
             case SlideOutType.OutUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endX = startX + sizeX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 break;
             case SlideOutType.OutDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endX = startX + sizeX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 break;
             case SlideOutType.PickSlideUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX * 2;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX * 2;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
@@ -145,7 +161,11 @@ export class ScoreSlideLineGlyph extends Glyph {
                 waves = true;
                 break;
             case SlideOutType.PickSlideDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX * 2;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX * 2;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;

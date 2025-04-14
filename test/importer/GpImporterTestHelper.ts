@@ -552,7 +552,7 @@ export class GpImporterTestHelper {
     }
     public static checkSlash(score: Score): void {
         expect(score.tracks.length).to.equal(2);
-        
+
         expect(score.tracks[0].staves.length).to.equal(1);
         expect(score.tracks[0].staves[0].showSlash).to.equal(true);
         expect(score.tracks[0].staves[0].showTablature).to.equal(true);

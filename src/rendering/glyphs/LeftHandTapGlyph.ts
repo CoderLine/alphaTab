@@ -22,6 +22,10 @@ export class LeftHandTapGlyph extends EffectGlyph {
         canvas.textAlign = TextAlign.Center;
         canvas.fillText('T', cx + this.x, cy + this.y + canvas.font.size / 2);
         canvas.textAlign = old;
-        canvas.strokeCircle(cx + this.x, cy + this.y + canvas.font.size / 2 + (LeftHandTapGlyph.Padding - 1), canvas.font.size / 1.6);
+        canvas.strokeCircle(
+            cx + this.x,
+            cy + this.y + canvas.font.size / 2 + (LeftHandTapGlyph.Padding - 1),
+            canvas.font.size / 1.6
+        );
     }
 }

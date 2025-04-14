@@ -13,5 +13,5 @@ export enum BendStyle {
     /**
      * The bends are done fast before the next note.
      */
-    Fast = 2,
+    Fast = 2
 }

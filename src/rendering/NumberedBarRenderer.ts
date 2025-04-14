@@ -140,24 +140,32 @@ export class NumberedBarRenderer extends LineBarRenderer {
     private static DotSpacing = 5;
     public static DotSize = 2;
 
-    protected override paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
+    protected override paintFlag(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement
+    ): void {
         this.paintBar(cx, cy, canvas, h, flagsElement);
     }
 
-    protected override paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
-        if(h.beats.length === 0){
+    protected override paintBar(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement
+    ): void {
+        if (h.beats.length === 0) {
             return;
         }
         const res = this.resources;
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             const beat: Beat = h.beats[i];
 
-            using _ = ElementStyleHelper.beat(
-                canvas,
-                flagsElement,
-                beat    
-            )
-    
+            using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
+
             //
             // draw line
             //
@@ -344,6 +352,5 @@ export class NumberedBarRenderer extends LineBarRenderer {
         topY: number,
         bottomY: number,
         canvas: ICanvas
-    ): void {
-    }
+    ): void {}
 }

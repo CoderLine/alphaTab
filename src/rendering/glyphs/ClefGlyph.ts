@@ -35,11 +35,7 @@ export class ClefGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(
-            canvas,
-            BarSubElement.StandardNotationClef,
-            this.renderer.bar
-        );
+        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationClef, this.renderer.bar);
 
         super.paint(cx, cy, canvas);
         let numberGlyph: Glyph;

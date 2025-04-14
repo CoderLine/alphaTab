@@ -151,11 +151,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // canvas.color = Color.random();
         // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.renderer.height);
-        using _ = ElementStyleHelper.voice(canvas, 
-            VoiceSubElement.Glyphs,
-            this.voice,
-            true
-        )
+        using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, this.voice, true);
 
         for (let i: number = 0, j: number = this.beatGlyphs.length; i < j; i++) {
             this.beatGlyphs[i].paint(cx + this.x, cy + this.y, canvas);

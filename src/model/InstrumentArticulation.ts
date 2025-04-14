@@ -14,9 +14,9 @@ export class InstrumentArticulation {
     public elementType: string;
     /**
      * The line the note head should be shown for standard notation.
-     * 
+     *
      * @remarks
-     * This value is a bit special and its semantics are adopted from Guitar Pro: 
+     * This value is a bit special and its semantics are adopted from Guitar Pro:
      * Staff lines are actually "steps" including lines and spaces on the staff.
      * 1 means the note is on the top line of the staff and from there its counting downwards.
      */

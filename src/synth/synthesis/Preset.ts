@@ -5,7 +5,7 @@
 import type { Region } from '@src/synth/synthesis/Region';
 
 export class Preset {
-    public name: string = "";
+    public name: string = '';
     public presetNumber: number = 0;
     public bank: number = 0;
     public regions: Region[] | null = null;

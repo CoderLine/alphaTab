@@ -313,9 +313,7 @@ export class TabBendGlyph extends Glyph {
             if (endNote.vibrato !== VibratoType.None) {
                 const vibratoStartX = endX - cx + TabBendGlyph.ArrowSize - endNoteRenderer.x;
                 const vibratoStartY: number =
-                    topY -
-                    cy -
-                    TabBendGlyph.BendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
+                    topY - cy - TabBendGlyph.BendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
 
                 const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato, 1.2);
                 vibrato.beat = endNote.beat;

@@ -71,12 +71,12 @@ export function injectWorkerRuntimeModule(webPackWithAlphaTab: webPackWithAlphaT
                 compilation.addRuntimeModule(chunk, new AlphaTabWorkerRuntimeModule());
             });
 
-            compilation.hooks.additionalChunkRuntimeRequirements.tap(pluginName, (chunk, runtimeRequirements) =>{
-                if(isWorkerRuntime(chunk.runtime)) {
-                    runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories);
-                    runtimeRequirements.add(webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey);
-                }
-            });
+        compilation.hooks.additionalChunkRuntimeRequirements.tap(pluginName, (chunk, runtimeRequirements) => {
+            if (isWorkerRuntime(chunk.runtime)) {
+                runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories);
+                runtimeRequirements.add(webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey);
+            }
+        });
     };
     webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey = AlphaTabWorkerRuntimeModule.Key;
 }

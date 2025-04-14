@@ -9,7 +9,7 @@ import { NotationElement } from '@src/NotationSettings';
 
 export class DynamicsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
-        return NotationElement.EffectDynamics
+        return NotationElement.EffectDynamics;
     }
 
     public get hideOnMultiTrack(): boolean {
@@ -29,15 +29,18 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     }
 
     private internalShouldCreateGlyph(beat: Beat): boolean {
-        if (beat.voice.bar.staff.track.score.stylesheet.hideDynamics || beat.isEmpty || beat.voice.isEmpty || beat.isRest) {
+        if (
+            beat.voice.bar.staff.track.score.stylesheet.hideDynamics ||
+            beat.isEmpty ||
+            beat.voice.isEmpty ||
+            beat.isRest
+        ) {
             return false;
         }
 
         const previousBeat = this.getPreviousDynamicsBeat(beat);
 
-        let show: boolean =
-            (beat.voice.index === 0 && !previousBeat) ||
-            (beat.dynamics !== previousBeat?.dynamics);
+        let show: boolean = (beat.voice.index === 0 && !previousBeat) || beat.dynamics !== previousBeat?.dynamics;
         // ensure we do not show duplicate dynamics
         if (show && beat.voice.index > 0) {
             for (const voice of beat.voice.bar.voices) {

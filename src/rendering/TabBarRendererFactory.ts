@@ -12,8 +12,8 @@ import type { RenderStaff } from './staves/RenderStaff';
  */
 export class TabBarRendererFactory extends BarRendererFactory {
     public showTimeSignature: boolean | null = null;
-    public showRests: boolean| null = null;
-    public showTiedNotes: boolean| null = null;
+    public showRests: boolean | null = null;
+    public showTiedNotes: boolean | null = null;
 
     public get staffId(): string {
         return TabBarRenderer.StaffId;
@@ -38,13 +38,13 @@ export class TabBarRendererFactory extends BarRendererFactory {
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
         const tabBarRenderer: TabBarRenderer = new TabBarRenderer(renderer, bar);
-        if(this.showRests !== null){
+        if (this.showRests !== null) {
             tabBarRenderer.showRests = this.showRests!;
         }
-        if(this.showTimeSignature !== null){
+        if (this.showTimeSignature !== null) {
             tabBarRenderer.showTimeSignature = this.showTimeSignature!;
         }
-        if(this.showTiedNotes !== null){
+        if (this.showTiedNotes !== null) {
             tabBarRenderer.showTiedNotes = this.showTiedNotes!;
         }
         return tabBarRenderer;

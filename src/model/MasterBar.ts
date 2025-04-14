@@ -200,8 +200,8 @@ export class MasterBar {
      * Adds a direction to the masterbar.
      * @param direction The direction to add.
      */
-    public addDirection(direction:Direction):void {
-        if(this.directions == null){
+    public addDirection(direction: Direction): void {
+        if (this.directions == null) {
             this.directions = new Set<Direction>();
         }
         this.directions.add(direction);

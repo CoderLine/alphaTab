@@ -503,8 +503,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         let player: AlphaSynthWebWorkerApi | null = null;
         const supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
 
-        const supportsAudioWorklets: boolean =
-            window.isSecureContext && 'AudioWorkletNode' in window;
+        const supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
 
         if (supportsAudioWorklets && this._api.settings.player.outputMode === PlayerOutputMode.WebAudioAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
@@ -513,11 +512,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 this._api.settings
             );
         } else if (supportsScriptProcessor) {
-            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback');
-            player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthScriptProcessorOutput(),
-                this._api.settings
+            Logger.debug(
+                'Player',
+                'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback'
             );
+            player = new AlphaSynthWebWorkerApi(new AlphaSynthScriptProcessorOutput(), this._api.settings);
         }
 
         if (!player) {

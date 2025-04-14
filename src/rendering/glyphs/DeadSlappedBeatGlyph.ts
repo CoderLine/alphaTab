@@ -12,15 +12,14 @@ export class DeadSlappedBeatGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const renderer = (this.renderer as LineBarRenderer);
+        const renderer = this.renderer as LineBarRenderer;
         const crossHeight = renderer.getLineHeight(renderer.heightLineCount - 1);
 
         const staffTop = renderer.getLineY(0);
         const staffHeight = renderer.getLineHeight(renderer.drawnLineCount - 1);
 
         // center X on staff
-        const centerY = (staffTop + staffHeight / 2) - (crossHeight / 2);
-
+        const centerY = staffTop + staffHeight / 2 - crossHeight / 2;
 
         const lw = canvas.lineWidth;
         canvas.lineWidth = 2;

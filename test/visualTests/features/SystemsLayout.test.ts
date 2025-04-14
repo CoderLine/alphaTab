@@ -87,7 +87,12 @@ describe('SystemsLayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
                 score,
-                [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/horizontal-fixed-sizes-single-track.png')],
+                [
+                    new VisualTestRun(
+                        -1,
+                        'test-data/visual-tests/systems-layout/horizontal-fixed-sizes-single-track.png'
+                    )
+                ],
                 settings
             )
         );

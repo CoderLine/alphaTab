@@ -45,15 +45,15 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @param width An optional custom width as CSS width that should be used. Best is to use a CSS width that is suitable for your preferred page size.
      * @param additionalSettings An optional parameter to specify additional setting values which should be respected during printing ({@since 1.2.0})
      * @remarks
-     * Opens a popup window with the rendered music notation for printing. The default display of alphaTab in the browser is not very 
+     * Opens a popup window with the rendered music notation for printing. The default display of alphaTab in the browser is not very
      * suitable for printing. The items are lazy loaded, the width can be dynamic, and the scale might be better suitable for screens.
-     * This function opens a popup window which is filled with a by-default A4 optimized view of the rendered score: 
-     * 
+     * This function opens a popup window which is filled with a by-default A4 optimized view of the rendered score:
+     *
      * * Lazy loading is disabled
      * * The scale is reduced to 0.8
      * * The stretch force is reduced to 0.8
      * * The width is optimized to A4. Portrait if the page-layout is used, landscape if the horizontal-layout is used.
-     * 
+     *
      * @category Methods - Core
      * @since 0.9.4
      * @example
@@ -63,7 +63,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * api.print();
      * api.print(undefined, { display: { barsPerRow: 5 } });
      * ```
-     */         
+     */
     public print(width?: string, additionalSettings: unknown = null): void {
         // prepare a popup window for printing (a4 width, window height, centered)
         const preview: Window = window.open('', '', 'width=0,height=0')!;
@@ -77,7 +77,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
                 a4.style.width = '210mm';
             }
         }
-        // the style is a workaround for browser having problems with printing using absolute positions. 
+        // the style is a workaround for browser having problems with printing using absolute positions.
         preview.document.write(`
         <!DOCTYPE html>
         <html>
@@ -108,23 +108,21 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         }
         preview.document.body.appendChild(a4);
         const dualScreenLeft: number =
-            typeof (window as any).screenLeft !== 'undefined'
-                ? (window as any).screenLeft
-                : (window as any).left;
+            typeof (window as any).screenLeft !== 'undefined' ? (window as any).screenLeft : (window as any).left;
         const dualScreenTop: number =
             typeof (window as any).screenTop !== 'undefined' ? (window as any).screenTop : (window as any).top;
         const screenWidth: number =
-            "innerWidth" in window
+            'innerWidth' in window
                 ? window.innerWidth
-                : "clientWidth" in document.documentElement
-                    ? document.documentElement.clientWidth
-                    : (window as Window).screen.width;
+                : 'clientWidth' in document.documentElement
+                  ? document.documentElement.clientWidth
+                  : (window as Window).screen.width;
         const screenHeight: number =
-            "innerHeight" in window
+            'innerHeight' in window
                 ? window.innerHeight
-                : "clientHeight" in document.documentElement
-                    ? document.documentElement.clientHeight
-                    : (window as Window).screen.height;
+                : 'clientHeight' in document.documentElement
+                  ? document.documentElement.clientHeight
+                  : (window as Window).screen.height;
         const w: number = a4.offsetWidth + 50;
         const h: number = window.innerHeight;
         const left: number = ((screenWidth / 2) | 0) - ((w / 2) | 0) + dualScreenLeft;
@@ -154,16 +152,15 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
             preview.print();
         });
         alphaTab.renderTracks(this.tracks);
-
     }
 
     /**
      * Generates an SMF1.0 file and downloads it
      * @remarks
-     * Generates a SMF1.0 compliant MIDI file of the currently loaded song and starts the download of it. 
+     * Generates a SMF1.0 compliant MIDI file of the currently loaded song and starts the download of it.
      * Please be aware that SMF1.0 does not support bends per note which might result in wrong bend effects
      * in case multiple bends are applied on the same beat (e.g. two notes bending or vibrato + bends).
-     * 
+     *
      * @category Methods - Core
      * @since 1.3.0
      * @example
@@ -172,7 +169,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
      * api.downloadMidi();
      * ```
-     */     
+     */
     public downloadMidi(format: MidiFileFormat = MidiFileFormat.SingleTrackMultiChannel): void {
         if (!this.score) {
             return;
@@ -208,7 +205,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
 
     /**
      * @inheritdoc
-     */    
+     */
     public override changeTrackSolo(tracks: Track[], solo: boolean): void {
         const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackSolo(trackList, solo);
@@ -216,7 +213,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
 
     /**
      * @inheritdoc
-     */    
+     */
     public override changeTrackVolume(tracks: Track[], volume: number): void {
         const trackList: Track[] = this.trackIndexesToTracks((this.uiFacade as BrowserUiFacade).parseTracks(tracks));
         super.changeTrackVolume(trackList, volume);
@@ -258,7 +255,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      *     updateProgress(e.loaded, e.total);
      * });
      * ```
-     */    
+     */
     public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
 
     /**
@@ -267,18 +264,14 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @param append Whether to fully replace or append the data from the given soundfont.
      * @category Methods - Player
      * @since 0.9.4
-     */    
+     */
     public loadSoundFontFromUrl(url: string, append: boolean): void {
         if (!this.player) {
             return;
         }
-        (this.player as AlphaSynthWebWorkerApi).loadSoundFontFromUrl(
-            url,
-            append,
-            e => {
-                (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(e);
-                this.uiFacade.triggerEvent(this.container, 'soundFontLoad', e);
-            }
-        );
+        (this.player as AlphaSynthWebWorkerApi).loadSoundFontFromUrl(url, append, e => {
+            (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(e);
+            this.uiFacade.triggerEvent(this.container, 'soundFontLoad', e);
+        });
     }
 }

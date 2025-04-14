@@ -377,7 +377,7 @@ export class CapellaParser {
     private parseClefOttava(v: string): Ottavia {
         if (v.endsWith('-')) {
             return Ottavia._8vb;
-        } 
+        }
         if (v.endsWith('+')) {
             return Ottavia._8va;
         }

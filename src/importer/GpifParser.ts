@@ -879,7 +879,9 @@ export class GpifParser {
             return;
         }
         const stringCount: number = Number.parseInt(diagram.getAttribute('stringCount'));
-        const baseFret: number = diagram.attributes.has('baseFret') ? Number.parseInt(diagram.getAttribute('baseFret')) : 0;
+        const baseFret: number = diagram.attributes.has('baseFret')
+            ? Number.parseInt(diagram.getAttribute('baseFret'))
+            : 0;
         chord.firstFret = baseFret + 1;
         for (let i: number = 0; i < stringCount; i++) {
             chord.strings.push(-1);
@@ -1198,7 +1200,9 @@ export class GpifParser {
                     }
                     break;
                 case 'Key':
-                    masterBar.keySignature = Number.parseInt(c.findChildElement('AccidentalCount')!.innerText) as KeySignature;
+                    masterBar.keySignature = Number.parseInt(
+                        c.findChildElement('AccidentalCount')!.innerText
+                    ) as KeySignature;
                     const mode: XmlNode = c.findChildElement('Mode')!;
                     if (mode) {
                         switch (mode.innerText.toLowerCase()) {
@@ -1595,7 +1599,9 @@ export class GpifParser {
                     beat.addWhammyBarPoint(whammyMiddle2);
                     const whammyDestination: BendPoint = new BendPoint(0, 0);
                     whammyDestination.value = this.toBendValue(Number.parseFloat(c.getAttribute('destinationValue')));
-                    whammyDestination.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('destinationOffset')));
+                    whammyDestination.offset = this.toBendOffset(
+                        Number.parseFloat(c.getAttribute('destinationOffset'))
+                    );
                     beat.addWhammyBarPoint(whammyDestination);
                     break;
                 case 'Ottavia':
@@ -1808,22 +1814,32 @@ export class GpifParser {
                             if (!whammyOrigin) {
                                 whammyOrigin = new BendPoint(0, 0);
                             }
-                            whammyOrigin.value = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyOrigin.value = this.toBendValue(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'WhammyBarOriginOffset':
                             if (!whammyOrigin) {
                                 whammyOrigin = new BendPoint(0, 0);
                             }
-                            whammyOrigin.offset = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyOrigin.offset = this.toBendOffset(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'WhammyBarMiddleValue':
-                            whammyMiddleValue = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyMiddleValue = this.toBendValue(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'WhammyBarMiddleOffset1':
-                            whammyMiddleOffset1 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyMiddleOffset1 = this.toBendOffset(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'WhammyBarMiddleOffset2':
-                            whammyMiddleOffset2 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyMiddleOffset2 = this.toBendOffset(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'WhammyBarDestinationValue':
                             if (!whammyDestination) {
@@ -2162,22 +2178,32 @@ export class GpifParser {
                             if (!bendOrigin) {
                                 bendOrigin = new BendPoint(0, 0);
                             }
-                            bendOrigin.value = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            bendOrigin.value = this.toBendValue(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'BendOriginOffset':
                             if (!bendOrigin) {
                                 bendOrigin = new BendPoint(0, 0);
                             }
-                            bendOrigin.offset = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            bendOrigin.offset = this.toBendOffset(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'BendMiddleValue':
-                            bendMiddleValue = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            bendMiddleValue = this.toBendValue(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'BendMiddleOffset1':
-                            bendMiddleOffset1 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            bendMiddleOffset1 = this.toBendOffset(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'BendMiddleOffset2':
-                            bendMiddleOffset2 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
+                            bendMiddleOffset2 = this.toBendOffset(
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
+                            );
                             break;
                         case 'BendDestinationValue':
                             if (!bendDestination) {

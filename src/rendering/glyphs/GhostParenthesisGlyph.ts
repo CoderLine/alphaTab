@@ -21,7 +21,7 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const c = canvas.color;
-        if(this.colorOverride) {
+        if (this.colorOverride) {
             canvas.color = this.colorOverride;
         }
         if (this._isOpen) {

@@ -102,9 +102,7 @@ describe('MusicXmlImporterTests', () => {
         expect(score.masterBars.length).to.equal(1);
     });
     it('bend', async () => {
-        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml4/bends.xml'
-        );
+        const score: Score = await MusicXmlImporterTestHelper.testReferenceFile('test-data/musicxml4/bends.xml');
         let note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         expect(note.bendType).to.equal(BendType.Bend);
         expect(note.bendPoints!.length).to.equal(2);

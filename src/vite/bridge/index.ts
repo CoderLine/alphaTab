@@ -39,4 +39,11 @@ export { ENV_PUBLIC_PATH } from './constants';
 export { evalValue, cleanUrl, injectQuery, encodeURIPath } from './utils';
 export { tryFsResolve } from './resolve';
 export { tryOptimizedDepResolve } from './optimizer';
-export { AlphaTabWorkerTypes, WORKER_ASSET_ID, WORKER_FILE_ID, workerFileToUrl, workerCache, isSameContent } from './worker';
+export {
+    AlphaTabWorkerTypes,
+    WORKER_ASSET_ID,
+    WORKER_FILE_ID,
+    workerFileToUrl,
+    workerCache,
+    isSameContent
+} from './worker';

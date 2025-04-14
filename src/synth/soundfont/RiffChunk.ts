@@ -45,7 +45,7 @@ export class RiffChunk {
             // custom type without sub type
             return true;
         }
-        
+
         // for lists unwrap the list type
         chunk.id = IOHelper.read8BitStringLength(stream, 4);
         if (chunk.id.charCodeAt(0) <= 32 || chunk.id.charCodeAt(0) >= 122) {

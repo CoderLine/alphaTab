@@ -11,7 +11,8 @@ import { expect } from 'chai';
 describe('GpxImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<GpxImporter> {
         const data = await TestPlatform.loadFile(`test-data/${name}`);
-        return prepareImporterWithBytes(data);}
+        return prepareImporterWithBytes(data);
+    }
 
     function prepareImporterWithBytes(buffer: Uint8Array) {
         const readerBase: GpxImporter = new GpxImporter();
@@ -105,32 +106,56 @@ describe('GpxImporterTest', () => {
         const score: Score = reader.readScore();
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(
+            0,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(4);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints!.length).to.equal(2);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].offset).to.be.closeTo(
+            0,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].bendPoints![1].value).to.equal(4);
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints!.length).to.equal(3);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(
+            0,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(0, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].offset).to.be.closeTo(
+            0,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![1].value).to.equal(12);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].bendPoints![2].value).to.equal(6);
     });
 
@@ -143,10 +168,16 @@ describe('GpxImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].whammyBarPoints![2].value).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints!.length).to.equal(2);
@@ -154,7 +185,10 @@ describe('GpxImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(0);
 
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints!.length).to.equal(3);
@@ -162,10 +196,16 @@ describe('GpxImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(30, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            30,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(60, 0.001);
+        expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            60,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-4);
 
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints!.length).to.equal(4);
@@ -173,13 +213,22 @@ describe('GpxImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].offset).to.be.closeTo(0, 0.001);
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![0].value).to.equal(-4);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(15, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].offset).to.be.closeTo(
+            15,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(30.6, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].offset).to.be.closeTo(
+            30.6,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![2].value).to.equal(-12);
 
-        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(45, 0.001);
+        expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].offset).to.be.closeTo(
+            45,
+            0.001
+        );
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].whammyBarPoints![3].value).to.equal(0);
     });
 
@@ -270,15 +319,14 @@ describe('GpxImporterTest', () => {
     it('layout-configuration', async () => {
         const track1 = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-1.gpx')).readScore();
         const track2 = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-2.gpx')).readScore();
-        const trackAll = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-all.gpx')).readScore();
-        const track1And3 = (await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-1-3.gpx')).readScore();
+        const trackAll = (
+            await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-all.gpx')
+        ).readScore();
+        const track1And3 = (
+            await prepareImporterWithFile('guitarpro6/layout-configuration-multi-track-1-3.gpx')
+        ).readScore();
 
-        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(
-            track1, 
-            track2,
-            trackAll,
-            track1And3
-        );
+        GpImporterTestHelper.checkMultiTrackLayoutConfiguration(track1, track2, trackAll, track1And3);
     });
 
     it('slash', async () => {

@@ -19,7 +19,7 @@ interface AudioWorkletProcessor {
  */
 declare let AudioWorkletProcessor: {
     prototype: AudioWorkletProcessor;
-    new(options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
+    new (options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
 };
 
 // Bug 646: Safari 14.1 is buggy regarding audio worklets
@@ -64,8 +64,8 @@ export class AlphaSynthWebWorklet {
 
                     this._bufferCount = Math.floor(
                         (options.processorOptions.bufferTimeInMilliseconds * sampleRate) /
-                        1000 /
-                        AlphaSynthWebWorkletProcessor.BufferSize
+                            1000 /
+                            AlphaSynthWebWorkletProcessor.BufferSize
                     );
                     this._circularBuffer = new CircularSampleBuffer(
                         AlphaSynthWebWorkletProcessor.BufferSize * this._bufferCount
@@ -126,13 +126,13 @@ export class AlphaSynthWebWorklet {
                         right[i] = buffer[s++];
                     }
 
-                    if(samplesFromBuffer < left.length) {
-                        for(let i = samplesFromBuffer; i < left.length; i++) {
+                    if (samplesFromBuffer < left.length) {
+                        for (let i = samplesFromBuffer; i < left.length; i++) {
                             left[i] = 0;
                             right[i] = 0;
                         }
                     }
-                 
+
                     this.port.postMessage({
                         cmd: AlphaSynthWorkerSynthOutput.CmdOutputSamplesPlayed,
                         samples: samplesFromBuffer / SynthConstants.AudioChannels

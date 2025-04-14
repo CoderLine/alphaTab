@@ -6,7 +6,7 @@ import type { ICanvas } from '@src/platform';
 export class NoteHeadGlyph extends MusicFontGlyph {
     public static readonly GraceScale: number = 0.75;
 
-    private _isGrace:boolean;
+    private _isGrace: boolean;
     public centerOnStem = false;
 
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean) {
@@ -16,7 +16,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const offset: number = this._isGrace ? 1 : 0;
-        if(this.centerOnStem) {
+        if (this.centerOnStem) {
             this.center = true;
         }
         super.paint(cx, cy + offset, canvas);

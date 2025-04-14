@@ -58,7 +58,7 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
 
     protected calculateEndX(
         endBeatRenderer: BarRendererBase,
-        endBeat: Beat|null,
+        endBeat: Beat | null,
         cx: number,
         endPosition: BeatXPosition
     ): number {

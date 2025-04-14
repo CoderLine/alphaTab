@@ -69,7 +69,7 @@ export interface IUiFacade<TSettings> {
 
     /**
      * Tells the UI layer to append the given render results to the UI. At this point
-     * the partial result is not actually rendered yet, only the layouting process 
+     * the partial result is not actually rendered yet, only the layouting process
      * completed.
      * @param renderResults The rendered partial that should be added to the UI. null indicates the rendering finished.
      */

@@ -48,7 +48,10 @@ export class AlphaSynthWebWorker {
                 case 'alphaSynth.initialize':
                     AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                     Logger.logLevel = data.logLevel;
-                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main, data.bufferTimeInMilliseconds);
+                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(
+                        main,
+                        data.bufferTimeInMilliseconds
+                    );
                     break;
             }
         });

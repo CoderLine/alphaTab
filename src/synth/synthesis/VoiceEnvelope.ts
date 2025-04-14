@@ -57,7 +57,6 @@ export class VoiceEnvelope {
                     this.samplesUntilNextSegment = (this.parameters.attack * outSampleRate) | 0;
 
                     if (this.samplesUntilNextSegment > 0) {
-
                         if (!this.isAmpEnv) {
                             // mod env attack duration scales with velocity (velocity of 1 is full duration, max velocity is 0.125 times duration)
                             this.samplesUntilNextSegment =
@@ -130,7 +129,8 @@ export class VoiceEnvelope {
                     this.segment = VoiceEnvelopeSegment.Release;
                     this.samplesUntilNextSegment =
                         ((this.parameters.release <= 0 ? VoiceEnvelope.FastReleaseTime : this.parameters.release) *
-                            outSampleRate) | 0;
+                            outSampleRate) |
+                        0;
 
                     if (this.isAmpEnv) {
                         // I don't truly understand this; just following what LinuxSampler does.
@@ -188,7 +188,7 @@ export class VoiceEnvelope {
                 this.level += this.slope * numSamples;
             }
         }
-        
+
         this.samplesUntilNextSegment -= numSamples;
         if (this.samplesUntilNextSegment <= 0) {
             this.nextSegment(this.segment, outSampleRate);

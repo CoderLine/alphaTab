@@ -118,7 +118,6 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 );
             }
         } else if (prop.type.isMap) {
-
             let serializeBlock: ts.Block;
             if (prop.type.typeArguments![1].isPrimitiveType) {
                 serializeBlock = createNodeFromSource<ts.Block>(
@@ -142,7 +141,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 }`,
                     ts.SyntaxKind.Block
                 );
-            } else if(prop.type.typeArguments![1].isJsonImmutable) {
+            } else if (prop.type.typeArguments![1].isJsonImmutable) {
                 const notNull = !prop.type.typeArguments![1].isNullable ? '!' : '';
                 serializeBlock = createNodeFromSource<ts.Block>(
                     `{

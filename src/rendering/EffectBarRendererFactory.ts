@@ -14,7 +14,7 @@ export class EffectBarRendererFactory extends BarRendererFactory {
         return this._staffId;
     }
 
-    public shouldShow: ((track:Track, staff:Staff) => boolean) | null;
+    public shouldShow: ((track: Track, staff: Staff) => boolean) | null;
 
     public override getStaffPaddingTop(staff: RenderStaff): number {
         return staff.system.layout.renderer.settings.display.effectStaffPaddingTop;
@@ -24,7 +24,11 @@ export class EffectBarRendererFactory extends BarRendererFactory {
         return staff.system.layout.renderer.settings.display.effectStaffPaddingBottom;
     }
 
-    public constructor(staffId: string, infos: EffectBarRendererInfo[], shouldShow: ((track:Track, staff:Staff) => boolean) | null = null) {
+    public constructor(
+        staffId: string,
+        infos: EffectBarRendererInfo[],
+        shouldShow: ((track: Track, staff: Staff) => boolean) | null = null
+    ) {
         super();
         this.infos = infos;
         this._staffId = staffId;
@@ -37,7 +41,6 @@ export class EffectBarRendererFactory extends BarRendererFactory {
         const shouldShow = this.shouldShow;
         return super.canCreate(track, staff) && (!shouldShow || shouldShow(track, staff));
     }
-
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
         return new EffectBarRenderer(

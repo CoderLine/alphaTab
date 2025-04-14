@@ -6,13 +6,13 @@ export class OggPacket {
     public packetData: Uint8Array;
     public isBeginningOfStream: boolean;
     public isEndOfStream: boolean;
-    public granulePosition: number|null;
+    public granulePosition: number | null;
 
     public constructor(
         data: Uint8Array,
         isBeginOfStream: boolean,
         isEndOfStream: boolean,
-        granulePosition: number|null
+        granulePosition: number | null
     ) {
         this.packetData = data;
         this.isBeginningOfStream = isBeginOfStream;

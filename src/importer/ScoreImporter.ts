@@ -16,7 +16,7 @@ export abstract class ScoreImporter {
     public init(data: IReadable, settings: Settings): void {
         this.data = data;
         this.settings = settings;
-        // when beginning reading a new score we reset the IDs.       
+        // when beginning reading a new score we reset the IDs.
         Score.resetIds();
     }
 

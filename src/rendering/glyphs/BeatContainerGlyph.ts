@@ -50,20 +50,18 @@ export class BeatContainerGlyph extends Glyph {
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if(this.beat.graceType !== GraceType.None) {
+        if (this.beat.graceType !== GraceType.None) {
             // flagged grace
-            if(this.beat.graceGroup!.beats.length === 1) {
+            if (this.beat.graceGroup!.beats.length === 1) {
                 postBeatStretch += FlagGlyph.FlagWidth * NoteHeadGlyph.GraceScale;
             }
             // grace with bars, some space for bar unless last
-            else if(this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
+            else if (this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
                 postBeatStretch += 7;
-            }
-            else {
+            } else {
                 postBeatStretch += BeatContainerGlyph.GraceBeatPadding;
             }
-        }
-        else if (helper && this.drawBeamHelperAsFlags(helper)) {
+        } else if (helper && this.drawBeamHelperAsFlags(helper)) {
             postBeatStretch += FlagGlyph.FlagWidth;
         }
         for (const tie of this.ties) {

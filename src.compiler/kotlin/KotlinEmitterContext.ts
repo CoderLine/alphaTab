@@ -74,8 +74,8 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
 
         if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {
             return 'close';
-        } 
-        
+        }
+
         if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
             return this.toMethodName('iterator');
         }

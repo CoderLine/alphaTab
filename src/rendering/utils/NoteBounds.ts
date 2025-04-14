@@ -7,10 +7,9 @@ import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
  */
 export class NoteBounds {
     /**
-     * Gets or sets the reference to the beat boudns this note relates to. 
+     * Gets or sets the reference to the beat boudns this note relates to.
      */
     public beatBounds!: BeatBounds;
-
 
     /**
      * Gets or sets the bounds of the individual note head.
@@ -22,7 +21,6 @@ export class NoteBounds {
      */
     public note!: Note;
 
-    
     /**
      * Finishes the lookup object and optimizes itself for fast access.
      */

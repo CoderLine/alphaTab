@@ -29,5 +29,5 @@ export enum NoteAccidentalMode {
     /**
      * This will move the note two half notes up with a double flag symbol.
      */
-    ForceDoubleFlat = 6,
+    ForceDoubleFlat = 6
 }

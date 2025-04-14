@@ -1,4 +1,4 @@
-import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * The exception thrown by a {@link ScoreImporter} in case the

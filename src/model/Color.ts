@@ -30,8 +30,7 @@ export class Color {
 
     public updateRgba(): void {
         if (this.a === 0xff) {
-            this.rgba =
-                `#${ModelUtils.toHexString(this.r, 2)}${ModelUtils.toHexString(this.g, 2)}${ModelUtils.toHexString(this.b, 2)}`;
+            this.rgba = `#${ModelUtils.toHexString(this.r, 2)}${ModelUtils.toHexString(this.g, 2)}${ModelUtils.toHexString(this.b, 2)}`;
         } else {
             this.rgba = `rgba(${this.r},${this.g},${this.b},${this.a / 255.0})`;
         }

@@ -16,13 +16,14 @@ export class SynthEvent {
         this.isMetronome = this.event.type === MidiEventType.AlphaTabMetronome;
     }
 
-
-    public static newMetronomeEvent(eventIndex: number, tick: number, counter: number, durationInTicks: number, durationInMillis: number): SynthEvent {
-        const evt = new AlphaTabMetronomeEvent(0, tick,
-            counter,
-            durationInTicks,
-            durationInMillis
-        );
+    public static newMetronomeEvent(
+        eventIndex: number,
+        tick: number,
+        counter: number,
+        durationInTicks: number,
+        durationInMillis: number
+    ): SynthEvent {
+        const evt = new AlphaTabMetronomeEvent(0, tick, counter, durationInTicks, durationInMillis);
         const x: SynthEvent = new SynthEvent(eventIndex, evt);
         return x;
     }

@@ -6,7 +6,7 @@ export class Crc32 {
     private static buildCrc32Lookup(): Uint32Array {
         const poly = 0xedb88320;
         const lookup = new Uint32Array(256);
-        for(let i = 0; i < lookup.length; i++) {
+        for (let i = 0; i < lookup.length; i++) {
             let crc = i;
             for (let bit = 0; bit < 8; bit++) {
                 crc = (crc & 1) === 1 ? (crc >>> 1) ^ poly : crc >>> 1;
@@ -17,7 +17,7 @@ export class Crc32 {
         return lookup;
     }
 
-    private static readonly CrcInit: number = 0xFFFFFFFF;
+    private static readonly CrcInit: number = 0xffffffff;
 
     /**
      * The CRC data checksum so far.
@@ -45,8 +45,9 @@ export class Crc32 {
      * @param count The number of bytes to checksum starting from offset
      */
     public update(data: Uint8Array, offset: number, count: number) {
-        for(let i = 0; i < count; i++) {
-            this._checkValue = Crc32.Crc32Lookup[(this._checkValue ^ data[offset + i]) & 0xff] ^ (this._checkValue >>> 8);
+        for (let i = 0; i < count; i++) {
+            this._checkValue =
+                Crc32.Crc32Lookup[(this._checkValue ^ data[offset + i]) & 0xff] ^ (this._checkValue >>> 8);
         }
     }
 

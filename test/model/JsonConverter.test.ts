@@ -1,16 +1,16 @@
-import { LayoutMode } from "@src/LayoutMode";
-import { LogLevel } from "@src/LogLevel";
-import { StaveProfile } from "@src/StaveProfile";
-import { Settings } from "@src/Settings";
-import { SettingsSerializer } from "@src/generated/SettingsSerializer";
-import { ScoreLoader } from "@src/importer/ScoreLoader";
-import { Color } from "@src/model/Color";
-import { Font, FontStyle } from "@src/model/Font";
-import { JsonConverter } from "@src/model/JsonConverter";
-import type { Score } from "@src/model/Score";
-import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from "@src/NotationSettings";
-import { TestPlatform } from "@test/TestPlatform";
-import { ComparisonHelpers } from "./ComparisonHelpers";
+import { LayoutMode } from '@src/LayoutMode';
+import { LogLevel } from '@src/LogLevel';
+import { StaveProfile } from '@src/StaveProfile';
+import { Settings } from '@src/Settings';
+import { SettingsSerializer } from '@src/generated/SettingsSerializer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import { Color } from '@src/model/Color';
+import { Font, FontStyle } from '@src/model/Font';
+import { JsonConverter } from '@src/model/JsonConverter';
+import type { Score } from '@src/model/Score';
+import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from '@src/NotationSettings';
+import { TestPlatform } from '@test/TestPlatform';
+import { ComparisonHelpers } from './ComparisonHelpers';
 import { assert, expect } from 'chai';
 
 describe('JsonConverterTest', () => {
@@ -18,8 +18,7 @@ describe('JsonConverterTest', () => {
         try {
             const data = await TestPlatform.loadFile(`test-data/${name}`);
             return ScoreLoader.loadScoreFromBytes(data);
-        }
-        catch (e) {
+        } catch (e) {
             return null;
         }
     }
@@ -35,7 +34,12 @@ describe('JsonConverterTest', () => {
             const actual = JsonConverter.jsObjectToScore(expectedJson);
             const actualJson = JsonConverter.scoreToJsObject(actual);
 
-            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${name.substr(name.lastIndexOf('/') + 1)}>`, null);
+            ComparisonHelpers.expectJsonEqual(
+                expectedJson,
+                actualJson,
+                `<${name.substr(name.lastIndexOf('/') + 1)}>`,
+                null
+            );
         } catch (e) {
             assert.fail(String(e));
         }
@@ -84,7 +88,6 @@ describe('JsonConverterTest', () => {
         await testRoundTripFolderEqual('visual-tests/special-tracks');
     });
 
-
     it('settings', () => {
         const expected = new Settings();
         // here we modifiy some properties of each level and some special ones additionally
@@ -100,7 +103,7 @@ describe('JsonConverterTest', () => {
         expected.core.tracks = [1, 2, 3];
 
         expected.core.enableLazyLoading = false;
-        expected.core.engine = "engine";
+        expected.core.engine = 'engine';
         expected.core.logLevel = LogLevel.Error;
         expected.core.useWorkers = false;
         expected.core.includeNoteBounds = true;
@@ -149,7 +152,7 @@ describe('JsonConverterTest', () => {
 
         // json_on_parent
         raw.set('enableLazyLoading', false);
-        // string enum 
+        // string enum
         raw.set('logLevel', 'error');
         raw.set('displayLayoutMode', 1.0 as number);
 
@@ -176,7 +179,6 @@ describe('JsonConverterTest', () => {
         expect(settings.display.resources.copyrightFont.style).to.equal(FontStyle.Italic);
     });
 
-
     /*@target web*/
     it('settings-from-object', () => {
         const settings = new Settings();
@@ -184,7 +186,7 @@ describe('JsonConverterTest', () => {
         const raw = {
             // json_on_parent
             enableLazyLoading: false,
-            // string enum 
+            // string enum
             logLevel: 'error',
             displayLayoutMode: 1.0,
             // nested

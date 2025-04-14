@@ -21,7 +21,7 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 export class XmlError extends AlphaTabError {
     public xml: string;

@@ -96,8 +96,8 @@ export class AlphaSynthScriptProcessorOutput extends AlphaSynthWebAudioOutputBas
             left[i] = buffer[s++];
             right[i] = buffer[s++];
         }
-        if(samplesFromBuffer < left.length) {
-            for(let i = samplesFromBuffer; i < left.length; i++) {
+        if (samplesFromBuffer < left.length) {
+            for (let i = samplesFromBuffer; i < left.length; i++) {
                 left[i] = 0;
                 right[i] = 0;
             }

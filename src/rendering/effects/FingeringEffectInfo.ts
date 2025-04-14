@@ -53,7 +53,7 @@ export class FingeringEffectInfo extends EffectBarRendererInfo {
         } else if (note.rightHandFinger !== Fingers.Unknown) {
             finger = note.rightHandFinger;
         }
-        const s: string = ModelUtils.fingerToString(renderer.settings, beat, finger, isLeft) ?? "";
+        const s: string = ModelUtils.fingerToString(renderer.settings, beat, finger, isLeft) ?? '';
         return new TextGlyph(0, 0, s, renderer.resources.fingeringFont, TextAlign.Left);
     }
 

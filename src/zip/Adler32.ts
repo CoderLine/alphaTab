@@ -7,10 +7,10 @@
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
  * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
@@ -28,12 +28,10 @@
  * ZLIB Compressed Data Format Specification version 3.3)
  */
 export class Adler32 {
-
     /**
      * largest prime smaller than 65536
      */
     private static readonly Base: number = 65521;
-
 
     /**
      * Returns the Adler32 data checksum computed so far.
@@ -62,7 +60,7 @@ export class Adler32 {
      */
     public update(data: Uint8Array, offset: number, count: number) {
         //(By Per Bothner)
-        let s1 = this.value & 0xFFFF;
+        let s1 = this.value & 0xffff;
         let s2 = this.value >> 16;
         while (count > 0) {
             // We can defer the modulo operation:

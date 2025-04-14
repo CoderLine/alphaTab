@@ -88,7 +88,13 @@ export interface ICanvas {
 
     measureText(text: string): MeasuredText;
 
-    fillMusicFontSymbol(x: number, y: number, relativeScale: number, symbol: MusicFontSymbol, centerAtPosition?: boolean): void;
+    fillMusicFontSymbol(
+        x: number,
+        y: number,
+        relativeScale: number,
+        symbol: MusicFontSymbol,
+        centerAtPosition?: boolean
+    ): void;
 
     fillMusicFontSymbols(
         x: number,

@@ -111,7 +111,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
             sourcemap: config.build.sourcemap
         });
         chunk = outputChunk;
-        for(const outputChunk of outputChunks) {
+        for (const outputChunk of outputChunks) {
             if (outputChunk.type === 'asset') {
                 saveEmitWorkerAsset(config, outputChunk);
             } else if (outputChunk.type === 'chunk') {

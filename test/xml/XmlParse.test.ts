@@ -79,7 +79,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseComments', () => {
-        const s: string = '<!-- some comment --><test><cc c="d"><!-- some comment --></cc><!-- some comment --><cc>value<!-- some comment --></cc></test><!-- ending -->';
+        const s: string =
+            '<!-- some comment --><test><cc c="d"><!-- some comment --></cc><!-- some comment --><cc>value<!-- some comment --></cc></test><!-- ending -->';
         const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;

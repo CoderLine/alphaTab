@@ -112,7 +112,9 @@ export class ComparisonHelpers {
                 break;
             case 'string':
                 if ((actual as string) !== (expected as string)) {
-                    assert.fail(`String mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`);
+                    assert.fail(
+                        `String mismatch on hierarchy: ${path}, actual<'${actual}'> != expected<'${expected}'>`
+                    );
                 }
                 break;
             case 'undefined':

@@ -768,7 +768,7 @@ export class GpifWriter {
             beatNode.addElement('Wah').innerText = WahPedal[beat.wahPedal];
         }
 
-        if(beat.showTimer) {
+        if (beat.showTimer) {
             beatNode.addElement('Timer').innerText = (beat.timer ?? 0).toString();
         }
 
@@ -795,16 +795,16 @@ export class GpifWriter {
             this.writeSimpleXPropertyNode(beatProperties, '687935489', 'Int', beat.brushDuration.toString());
         }
 
-        switch(beat.beamingMode) {
+        switch (beat.beamingMode) {
             case BeatBeamingMode.ForceSplitToNext:
-                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "2");
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', '2');
                 break;
             case BeatBeamingMode.ForceMergeWithNext:
-                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "1");
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', '1');
                 break;
             case BeatBeamingMode.ForceSplitOnSecondaryToNext:
-                this.writeSimpleXPropertyNode(beatProperties, '1124204552', 'Int', "1");
-            break;
+                this.writeSimpleXPropertyNode(beatProperties, '1124204552', 'Int', '1');
+                break;
         }
     }
 
@@ -1690,9 +1690,8 @@ export class GpifWriter {
         key.addElement('Mode').innerText = KeySignatureType[masterBar.keySignatureType];
         key.addElement('Sharps').innerText = 'Sharps';
 
-        masterBarNode.addElement(
-            'Time'
-        ).innerText = `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
+        masterBarNode.addElement('Time').innerText =
+            `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
 
         if (masterBar.isFreeTime) {
             masterBarNode.addElement('FreeTime');

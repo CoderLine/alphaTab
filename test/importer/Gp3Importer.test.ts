@@ -56,12 +56,22 @@ describe('Gp3ImporterTest', () => {
 
     it('harmonics', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro3/harmonics.gp3');
-        const score: Score = reader.readScore();    
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.be.equal(HarmonicType.Natural);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.be.equal(HarmonicType.Artificial);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.be.equal(HarmonicType.Artificial);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.be.equal(HarmonicType.Artificial);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.be.equal(HarmonicType.Artificial);
+        const score: Score = reader.readScore();
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].harmonicType).to.be.equal(
+            HarmonicType.Natural
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].harmonicType).to.be.equal(
+            HarmonicType.Artificial
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].harmonicType).to.be.equal(
+            HarmonicType.Artificial
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].harmonicType).to.be.equal(
+            HarmonicType.Artificial
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.be.equal(
+            HarmonicType.Artificial
+        );
     });
 
     it('hammer', async () => {
@@ -105,12 +115,10 @@ describe('Gp3ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].chord!.name).to.equal('C');
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).to.equal('Text');
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo)).to.be.ok;
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo)!.value).to.equal(
-            120
-        );
         expect(
-            score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)
-        ).to.be.ok;
+            score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo)!.value
+        ).to.equal(120);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).to.be.ok;
         expect(
             score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)!.value
         ).to.equal(25);

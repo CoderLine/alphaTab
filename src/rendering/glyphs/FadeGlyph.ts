@@ -21,6 +21,6 @@ export class FadeGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height, canvas)
+        super.paint(cx, cy + this.height, canvas);
     }
 }

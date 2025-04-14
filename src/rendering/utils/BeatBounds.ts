@@ -19,7 +19,7 @@ export class BeatBounds {
     public visualBounds!: Bounds;
 
     /**
-     * Gets or sets x-position where the timely center of the notes for this beat is. 
+     * Gets or sets x-position where the timely center of the notes for this beat is.
      * This is where the cursor should be at the time when this beat is played.
      */
     public onNotesX: number = 0;
@@ -83,8 +83,8 @@ export class BeatBounds {
         this.visualBounds.scaleWith(scale);
         this.onNotesX *= scale;
 
-        if(this.notes){
-            for(const n of this.notes!){
+        if (this.notes) {
+            for (const n of this.notes!) {
                 n.finish(scale);
             }
         }

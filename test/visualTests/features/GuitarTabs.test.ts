@@ -23,5 +23,4 @@ describe('GuitarTabsTests', () => {
         settings.display.staveProfile = StaveProfile.Tab;
         await VisualTestHelper.runVisualTest('guitar-tabs/string-variations.gp', settings);
     });
-
 });

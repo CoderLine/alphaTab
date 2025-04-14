@@ -95,7 +95,9 @@ export class PixelMatch {
             throw new Error(`Image sizes do not match. ${img1.length} !== ${img2.length}`);
         }
 
-        if (img1.length !== width * height * 4) { throw new Error('Image data size does not match width/height.'); }
+        if (img1.length !== width * height * 4) {
+            throw new Error('Image data size does not match width/height.');
+        }
 
         options.aaColor = options.aaColor ?? PixelMatch.defaultOptions.aaColor;
         options.alpha = options.alpha ?? PixelMatch.defaultOptions.alpha;
@@ -132,7 +134,9 @@ export class PixelMatch {
         if (identical) {
             // fast path if identical
             if (output && !options.diffMask) {
-                for (let i = 0; i < len; i++) { PixelMatch.drawGrayPixel(img1, 4 * i, options.alpha!, output); }
+                for (let i = 0; i < len; i++) {
+                    PixelMatch.drawGrayPixel(img1, 4 * i, options.alpha!, output);
+                }
             }
             return new PixelMatchResult(len, 0, transparentPixels);
         }
@@ -172,15 +176,21 @@ export class PixelMatch {
                     ) {
                         // one of the pixels is anti-aliasing; draw as yellow and do not count as difference
                         // note that we do not include such pixels in a mask
-                        if (output && !options.diffMask) { PixelMatch.drawPixel(output, pos, aaR, aaG, aaB); }
+                        if (output && !options.diffMask) {
+                            PixelMatch.drawPixel(output, pos, aaR, aaG, aaB);
+                        }
                     } else {
                         // found substantial difference not caused by anti-aliasing; draw it as red
-                        if (output) { PixelMatch.drawPixel(output, pos, diffR, diffG, diffB); }
+                        if (output) {
+                            PixelMatch.drawPixel(output, pos, diffR, diffG, diffB);
+                        }
                         diff++;
                     }
                 } else if (output) {
                     // pixels are similar; draw background as grayscale image blended with white
-                    if (!options.diffMask) { PixelMatch.drawGrayPixel(img1, pos, options.alpha!, output); }
+                    if (!options.diffMask) {
+                        PixelMatch.drawGrayPixel(img1, pos, options.alpha!, output);
+                    }
                 }
             }
         }
@@ -210,7 +220,9 @@ export class PixelMatch {
         // go through 8 adjacent pixels
         for (let x = x0; x <= x2; x++) {
             for (let y = y0; y <= y2; y++) {
-                if (x === x1 && y === y1) { continue; }
+                if (x === x1 && y === y1) {
+                    continue;
+                }
 
                 // brightness delta between the center pixel and adjacent one
                 const delta = PixelMatch.colorDelta(img, img, pos, (y * width + x) * 4, true);
@@ -219,7 +231,9 @@ export class PixelMatch {
                 if (delta === 0) {
                     zeroes++;
                     // if found more than 2 equal siblings, it's definitely not anti-aliasing
-                    if (zeroes > 2) { return false; }
+                    if (zeroes > 2) {
+                        return false;
+                    }
 
                     // remember the darkest pixel
                 } else if (delta < min) {
@@ -237,7 +251,9 @@ export class PixelMatch {
         }
 
         // if there are no both darker and brighter pixels among siblings, it's not anti-aliasing
-        if (min === 0 || max === 0) { return false; }
+        if (min === 0 || max === 0) {
+            return false;
+        }
 
         // if either the darkest or the brightest pixel has 3+ equal siblings in both images
         // (definitely not anti-aliased), this pixel is anti-aliased
@@ -262,7 +278,9 @@ export class PixelMatch {
         // go through 8 adjacent pixels
         for (let x = x0; x <= x2; x++) {
             for (let y = y0; y <= y2; y++) {
-                if (x === x1 && y === y1) { continue; }
+                if (x === x1 && y === y1) {
+                    continue;
+                }
 
                 const pos2 = (y * width + x) * 4;
                 if (
@@ -274,7 +292,9 @@ export class PixelMatch {
                     zeroes++;
                 }
 
-                if (zeroes > 2) { return true; }
+                if (zeroes > 2) {
+                    return true;
+                }
             }
         }
 

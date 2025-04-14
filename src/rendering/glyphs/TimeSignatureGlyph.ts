@@ -37,7 +37,6 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         super.paint(cx, cy, canvas);
     }
 
-
     public override doLayout(): void {
         let x = 0;
         const numberHeight = NumberGlyph.numberHeight;

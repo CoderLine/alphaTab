@@ -5,7 +5,6 @@ import { Inflate } from '@src/zip/Inflate';
 import { ZipEntry } from '@src/zip/ZipEntry';
 
 export class ZipReader {
-
     private _readable: IReadable;
 
     public constructor(readable: IReadable) {

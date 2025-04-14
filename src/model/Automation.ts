@@ -70,12 +70,7 @@ export class Automation {
         return automation;
     }
 
-
-    public static buildInstrumentAutomation(
-        isLinear: boolean,
-        ratioPosition: number,
-        value: number
-    ): Automation {
+    public static buildInstrumentAutomation(isLinear: boolean, ratioPosition: number, value: number): Automation {
         const automation: Automation = new Automation();
         automation.type = AutomationType.Instrument;
         automation.isLinear = isLinear;

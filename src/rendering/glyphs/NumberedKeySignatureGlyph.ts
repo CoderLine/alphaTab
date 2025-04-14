@@ -163,7 +163,7 @@ export class NumberedKeySignatureGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.NumberedKeySignature, this.renderer.bar);
-        
+
         const res = this.renderer.resources;
         canvas.font = res.numberedNotationFont;
         canvas.textBaseline = TextBaseline.Middle;

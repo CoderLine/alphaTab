@@ -21,10 +21,8 @@ export class TabBrushGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const tabBarRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        const startY: number =
-            cy + this.x + (tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top));
-        const endY: number =
-            cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
+        const startY: number = cy + this.x + tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top);
+        const endY: number = cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
         const arrowX: number = (cx + this.x + this.width / 2) | 0;
         const arrowSize: number = 8;
         if (this._beat.brushType !== BrushType.None) {
@@ -37,7 +35,7 @@ export class TabBrushGlyph extends Glyph {
                 const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
-    
+
                 const lineStartY: number = startY;
                 const lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
@@ -53,7 +51,7 @@ export class TabBrushGlyph extends Glyph {
                 const lineStartY: number = startY + arrowSize;
                 const lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
-                
+
                 canvas.beginRotate(cx + this.x + 4, lineStartY, 90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();

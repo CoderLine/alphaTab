@@ -18,19 +18,18 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
         this.midiEvents.push(e);
     }
 
-    public addNote(
-        track: number,
-        start: number,
-        length: number,
-        key: number,
-        velocity: number,
-        channel: number
-    ): void {
+    public addNote(track: number, start: number, length: number, key: number, velocity: number, channel: number): void {
         const e = new FlatNoteEvent(start, track, channel, length, key, velocity);
         this.midiEvents.push(e);
     }
 
-    public addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void {
+    public addControlChange(
+        track: number,
+        tick: number,
+        channel: number,
+        controller: ControllerType,
+        value: number
+    ): void {
         const e = new FlatControlChangeEvent(tick, track, channel, controller, value);
         this.midiEvents.push(e);
     }
@@ -274,14 +273,7 @@ export class FlatNoteEvent extends FlatChannelMidiEvent {
     public key: number = 0;
     public velocity: number;
 
-    public constructor(
-        tick: number,
-        track: number,
-        channel: number,
-        length: number,
-        key: number,
-        velocity: number
-    ) {
+    public constructor(tick: number, track: number, channel: number, length: number, key: number, velocity: number) {
         super(tick, track, channel);
         this.length = length;
         this.key = key;

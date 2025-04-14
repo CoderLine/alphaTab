@@ -19,7 +19,7 @@ export class Channels {
         voice.noteGainDb += c.gainDb;
 
         voice.updatePitchRatio(c, tinySoundFont.outSampleRate);
-        
+
         if (newpan <= -0.5) {
             voice.panFactorLeft = 1.0;
             voice.panFactorRight = 0.0;

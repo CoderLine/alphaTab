@@ -8,7 +8,7 @@ import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
 export class WhammyBarEffectInfo extends EffectBarRendererInfo {
-    public get notationElement(): NotationElement{
+    public get notationElement(): NotationElement {
         return NotationElement.EffectWhammyBar;
     }
 

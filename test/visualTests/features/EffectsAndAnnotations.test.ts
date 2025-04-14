@@ -304,6 +304,9 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('legato', async () => {
-        await VisualTestHelper.runVisualTestTex('3.3.4{ legatoOrigin } 10.3.4', 'test-data/visual-tests/effects-and-annotations/legato.png');
+        await VisualTestHelper.runVisualTestTex(
+            '3.3.4{ legatoOrigin } 10.3.4',
+            'test-data/visual-tests/effects-and-annotations/legato.png'
+        );
     });
 });

@@ -33,7 +33,7 @@ export function tryOptimizedDepResolve(
     return undefined;
 }
 
-type DepsOptimizer = DevEnvironment['depsOptimizer']
+type DepsOptimizer = DevEnvironment['depsOptimizer'];
 
 // https://github.com/Danielku15/vite/blob/88b7def341f12d07d7d4f83cbe3dc73cc8c6b7be/packages/vite/src/node/optimizer/optimizer.ts#L32-L40
 const depsOptimizerMap = new WeakMap<ResolvedConfig, DepsOptimizer>();
@@ -63,8 +63,7 @@ function createDepsOptimizer(config: ResolvedConfig) {
         throw new Error('not implemented');
     };
     const depsOptimizer: DepsOptimizer = {
-        async init() {
-        },
+        async init() {},
         metadata,
         registerMissingImport: notImplemented,
         run: notImplemented,
