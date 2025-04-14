@@ -2,7 +2,7 @@
 agp = "8.9.1"
 kotlin = "2.1.20"
 
-kotlinx-coroutines = "1.10.1"
+kotlinx-coroutines = "1.10.2"
 dokka = "2.0.0"
 
 espressoCore = "3.6.1"
