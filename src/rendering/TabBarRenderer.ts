@@ -21,7 +21,6 @@ import { GraceType } from '@src/model/GraceType';
 import type { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
 import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
-import { SimileMark } from '@src/model';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -196,10 +195,6 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        if (this.bar.simileMark !== SimileMark.None) {
-            return;
-        }
-
         // multibar rest
         if (this.additionalMultiRestBars) {
             const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);

@@ -16,7 +16,7 @@ import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 import { MusicFontSymbolSizes } from './utils/MusicFontSymbolSizes';
-import { MusicFontSymbol, SimileMark } from '@src/model';
+import { MusicFontSymbol } from '@src/model';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
@@ -163,10 +163,6 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        if (this.bar.simileMark !== SimileMark.None) {
-            return;
-        }
-
         for (const b of v.beats) {
             const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
