@@ -1026,7 +1026,7 @@ export class VorbisFloor implements IVorbisFloor {
                 break;
 
             default:
-                throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Floor type: ' + type);
+                throw new AlphaTabError(AlphaTabErrorType.Format, `Vorbis: Invalid Floor type: ${type}`);
         }
     }
     public apply(floorData: IVorbisFloorData, blockSize: number, residue: Float32Array): void {
@@ -1313,7 +1313,7 @@ export class VorbisResidue implements IVorbisResidue {
                 break;
 
             default:
-                throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Residue type: ' + type);
+                throw new AlphaTabError(AlphaTabErrorType.Format, `Vorbis: Invalid Residue type: ${type}`);
         }
     }
 

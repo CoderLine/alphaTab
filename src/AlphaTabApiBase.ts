@@ -307,7 +307,7 @@ export class AlphaTabApiBase<TSettings> {
         });
         this.renderer.postRenderFinished.on(() => {
             let duration: number = Date.now() - this._startTime;
-            Logger.debug('rendering', 'Rendering completed in ' + duration + 'ms');
+            Logger.debug('rendering', `Rendering completed in ${duration}ms`);
             this.onPostRenderFinished();
         });
         this.renderer.preRender.on(_ => {

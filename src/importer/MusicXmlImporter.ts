@@ -132,7 +132,7 @@ class TrackInfo {
 
     public getOrCreateArticulation(instrumentId: string, note: Note) {
         const noteValue = note.octave * 12 + note.tone;
-        const lookup = instrumentId + '_' + noteValue;
+        const lookup = `${instrumentId}_${noteValue}`;
         if (this._instrumentIdToArticulationIndex.has(lookup)) {
             return this._instrumentIdToArticulationIndex.get(lookup)!;
         }
@@ -3137,7 +3137,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'syllabic' not supported
                 case 'text':
                     if (beat.lyrics[index]) {
-                        beat.lyrics[index] += ' ' + c.innerText;
+                        beat.lyrics[index] += ` ${c.innerText}`;
                     } else {
                         beat.lyrics[index] = c.innerText;
                     }

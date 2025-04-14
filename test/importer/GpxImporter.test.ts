@@ -10,7 +10,7 @@ import { expect } from 'chai';
 
 describe('GpxImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<GpxImporter> {
-        const data = await TestPlatform.loadFile('test-data/' + name);
+        const data = await TestPlatform.loadFile(`test-data/${name}`);
         return prepareImporterWithBytes(data);}
 
     function prepareImporterWithBytes(buffer: Uint8Array) {

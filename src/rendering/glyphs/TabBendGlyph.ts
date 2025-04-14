@@ -479,7 +479,7 @@ export class TabBendGlyph extends Glyph {
             case 3:
                 return '¾';
             default:
-                return steps + '/ 4';
+                return `${steps}/ 4`;
         }
     }
 }

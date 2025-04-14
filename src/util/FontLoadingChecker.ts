@@ -107,7 +107,7 @@ export class FontLoadingChecker {
         return new Promise<boolean>(resolve => {
             // In some very rare occasions Chrome reports false for the font.
             // in this case we try to force some refresh and reload by creating an element with this font.
-            const fontString = '1em ' + family;
+            const fontString = `1em ${family}`;
             if ((document as any).fonts.check(fontString)) {
                 resolve(true);
             } else if (advancedCheck) {

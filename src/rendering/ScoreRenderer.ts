@@ -119,10 +119,10 @@ export class ScoreRenderer implements IScoreRenderer {
         try {
             const layout = this.layout;
             if (layout) {
-                Logger.debug('Rendering', 'Request render of lazy partial ' + resultId);
+                Logger.debug('Rendering', `Request render of lazy partial ${resultId}`);
                 layout.renderLazyPartial(resultId);
             } else {
-                Logger.warning('Rendering', 'Request render of lazy partial ' + resultId + ' ignored, no layout exists');
+                Logger.warning('Rendering', `Request render of lazy partial ${resultId} ignored, no layout exists`);
             }
         } catch (e) {
             (this.error as EventEmitterOfT<Error>).trigger(e as Error);
@@ -147,10 +147,10 @@ export class ScoreRenderer implements IScoreRenderer {
             (this.postRenderFinished as EventEmitter).trigger();
             Logger.debug('Rendering', 'Clearing finished');
         } else {
-            Logger.debug('Rendering', 'Rendering ' + this.tracks.length + ' tracks');
+            Logger.debug('Rendering', `Rendering ${this.tracks.length} tracks`);
             for (let i: number = 0; i < this.tracks.length; i++) {
                 let track: Track = this.tracks[i];
-                Logger.debug('Rendering', 'Track ' + i + ': ' + track.name);
+                Logger.debug('Rendering', `Track ${i}: ${track.name}`);
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this.recreateLayout();
@@ -180,7 +180,7 @@ export class ScoreRenderer implements IScoreRenderer {
     private layoutAndRender(): void {
         Logger.debug(
             'Rendering',
-            'Rendering at scale ' + this.settings.display.scale + ' with layout ' + this.layout!.name,
+            `Rendering at scale ${this.settings.display.scale} with layout ${this.layout!.name}`,
             null
         );
         this.layout!.layoutAndRender();

@@ -16,7 +16,7 @@ import { assert, expect } from 'chai';
 describe('JsonConverterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         try {
-            const data = await TestPlatform.loadFile('test-data/' + name);
+            const data = await TestPlatform.loadFile(`test-data/${name}`);
             return ScoreLoader.loadScoreFromBytes(data);
         }
         catch (e) {
@@ -35,7 +35,7 @@ describe('JsonConverterTest', () => {
             const actual = JsonConverter.jsObjectToScore(expectedJson);
             const actualJson = JsonConverter.scoreToJsObject(actual);
 
-            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + name.substr(name.lastIndexOf('/') + 1) + '>', null);
+            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${name.substr(name.lastIndexOf('/') + 1)}>`, null);
         } catch (e) {
             assert.fail(String(e));
         }

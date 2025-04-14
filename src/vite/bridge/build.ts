@@ -35,7 +35,7 @@ const getFileUrlFromRelativePath = (path: string) => getFileUrlFromFullPath(`__d
 
 const relativeUrlMechanisms: Record<InternalModuleFormat, (relativePath: string) => string> = {
     amd: relativePath => {
-        if (relativePath[0] !== '.') relativePath = './' + relativePath;
+        if (relativePath[0] !== '.') relativePath = `./${relativePath}`;
         return getResolveUrl(`require.toUrl('${escapeId(relativePath)}'), document.baseURI`);
     },
     cjs: relativePath =>

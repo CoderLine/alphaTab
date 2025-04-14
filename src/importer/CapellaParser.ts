@@ -554,7 +554,7 @@ export class CapellaParser {
         firstBarIndex: number,
         element: XmlNode
     ) {
-        const voiceStateKey = staffId + '_' + voiceIndex;
+        const voiceStateKey = `${staffId}_${voiceIndex}`;
         if (this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
             this._currentBar.masterBar.isAnacrusis = true;
         }

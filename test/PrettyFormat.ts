@@ -512,7 +512,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
      */
     private static isPlatformTypeEqual(v: unknown, dv: unknown): boolean {
         // we should not have any other types in our JSONs, if we extend it, this will catch it
-        throw new Error('Unexpected value in serialized json' + String(v));
+        throw new Error(`Unexpected value in serialized json${String(v)}`);
     }
 }
 
@@ -589,7 +589,7 @@ export class SnapshotFile {
                 // start of snapshot
                 const endOfName = lines[i].indexOf('`]', 9);
                 if (endOfName === -1) {
-                    throw new Error('Failed to parse snapshot file, missing `] on line ' + (i + 1));
+                    throw new Error(`Failed to parse snapshot file, missing \`] on line ${i + 1}`);
                 }
 
                 const name = lines[i].substring(9, endOfName);
@@ -604,7 +604,7 @@ export class SnapshotFile {
                         break;
                     }
 
-                    value += line.trimEnd() + '\n';
+                    value += `${line.trimEnd()}\n`;
                 }
 
                 this.snapshots.set(name, value.trimEnd());

@@ -55,7 +55,7 @@ export class JQueryAlphaTab {
             let realArgs: string[] = ([jElement, context] as any[]).concat(args);
             return apiMethod.apply(this, realArgs);
         }
-        Logger.error('Api', "Method '" + method + "' does not exist on jQuery.alphaTab");
+        Logger.error('Api', `Method '${method}' does not exist on jQuery.alphaTab`);
         return null;
     }
 

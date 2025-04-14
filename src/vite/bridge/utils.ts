@@ -55,7 +55,7 @@ export function joinUrlSegments(a: string, b: string): string {
         a = a.substring(0, a.length - 1);
     }
     if (b[0] !== '/') {
-        b = '/' + b;
+        b = `/${b}`;
     }
     return a + b;
 }

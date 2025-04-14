@@ -400,7 +400,7 @@ export class Environment {
         if (scriptFile) {
             let lastSlash: number = scriptFile.lastIndexOf(String.fromCharCode(47));
             if (lastSlash >= 0) {
-                return scriptFile.substr(0, lastSlash) + '/font/';
+                return `${scriptFile.substr(0, lastSlash)}/font/`;
             }
         }
 

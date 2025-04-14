@@ -106,7 +106,7 @@ class FontParser {
                 this.families.push(
                     familyListInput
                         .substring(pos + 1, endOfString)
-                        .split('\\' + c)
+                        .split(`\\${c}`)
                         .join(c)
                 );
                 pos = endOfString + 1;

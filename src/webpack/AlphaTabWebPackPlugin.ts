@@ -291,7 +291,7 @@ export class AlphaTabWebPackPlugin {
                                 // see https://github.com/nodejs/node/pull/50976
                                 const sourceFilename = path.join(file.parentPath ?? file.path, file.name);
                                 await fs.promises.copyFile(sourceFilename, path.join(outputPath!, subdir, file.name));
-                                const assetFileName = subdir + '/' + file.name;
+                                const assetFileName = `${subdir}/${file.name}`;
                                 const existingAsset = compilation.getAsset(assetFileName);
 
                                 const data = await fs.promises.readFile(sourceFilename);

@@ -40,7 +40,7 @@ export class MarkerEffectInfo extends EffectBarRendererInfo {
             0,
             !beat.voice.bar.masterBar.section!.marker
                 ? beat.voice.bar.masterBar.section!.text
-                : '[' + beat.voice.bar.masterBar.section!.marker + '] ' + beat.voice.bar.masterBar.section!.text,
+                : `[${beat.voice.bar.masterBar.section!.marker}] ${beat.voice.bar.masterBar.section!.text}`,
             renderer.resources.markerFont,
             TextAlign.Left
         );

@@ -335,7 +335,7 @@ export class XmlParser {
                         }
                         let v: string = str.substr(start, p - start);
                         if (v !== parent.localName) {
-                            throw new XmlError('Expected </' + parent.localName + '>', str, p);
+                            throw new XmlError(`Expected </${parent.localName}>`, str, p);
                         }
                         state = XmlState.IgnoreSpaces;
                         next = XmlState.WaitEndRet;
@@ -382,13 +382,13 @@ export class XmlParser {
                         if (s.charCodeAt(0) === XmlParser.CharCodeSharp) {
                             let code: number =
                                 s.charCodeAt(1) === XmlParser.CharCodeLowerX
-                                    ? Number.parseInt('0' + s.substr(1, s.length - 1))
+                                    ? Number.parseInt(`0${s.substr(1, s.length - 1)}`)
                                     : Number.parseInt(s.substr(1, s.length - 1));
                             buf += String.fromCharCode(code);
                         } else if (XmlParser.Escapes.has(s)) {
                             buf += XmlParser.Escapes.get(s);
                         } else {
-                            buf += ('&' + s + ';')?.toString();
+                            buf += (`&${s};`)?.toString();
                         }
                         start = p + 1;
                         state = escapeNext;

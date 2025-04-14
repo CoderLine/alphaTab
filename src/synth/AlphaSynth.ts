@@ -352,7 +352,7 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'soundFont successfully loaded');
             this.checkReadyForPlayback();
         } catch (e) {
-            Logger.error('AlphaSynth', 'Could not load soundfont from bytes ' + e);
+            Logger.error('AlphaSynth', `Could not load soundfont from bytes ${e}`);
             (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(e as Error);
         }
     }
@@ -395,7 +395,7 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
             this.tickPosition = 0;
         } catch (e) {
-            Logger.error('AlphaSynth', 'Could not load midi from model ' + e);
+            Logger.error('AlphaSynth', `Could not load midi from model ${e}`);
             (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(e as Error);
         }
     }

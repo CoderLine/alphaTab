@@ -29,7 +29,7 @@ export class ScalableHtmlElementContainer extends HtmlElementContainer {
     }
 
     public override set width(value: number) {
-        this.element.style.width = value * this._xscale + 'px';
+        this.element.style.width = `${value * this._xscale}px`;
     }
 
     public override get height(): number {
@@ -38,7 +38,7 @@ export class ScalableHtmlElementContainer extends HtmlElementContainer {
 
     public override set height(value: number) {
         if (value >= 0) {
-            this.element.style.height = value * this._yscale + 'px';
+            this.element.style.height = `${value * this._yscale}px`;
         } else {
             this.element.style.height = '100%';
         }

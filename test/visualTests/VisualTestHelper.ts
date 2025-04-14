@@ -381,7 +381,7 @@ export class VisualTestHelper {
             }
         } else {
             pass = false;
-            errorMessage = 'Missing reference image file' + expectedFileName;
+            errorMessage = `Missing reference image file${expectedFileName}`;
             await VisualTestHelper.saveFiles(expectedFileName, oldActual, undefined);
         }
 

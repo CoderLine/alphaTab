@@ -97,7 +97,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             return false;
         }
 
-        Logger.debug('Font', 'All fonts loaded: ' + this._fontCheckers.size);
+        Logger.debug('Font', `All fonts loaded: ${this._fontCheckers.size}`);
         return true;
     }
 
@@ -239,7 +239,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         originalEvent?: IMouseEventArgs
     ): void {
         let element: HTMLElement = (container as HtmlElementContainer).element;
-        name = 'alphaTab.' + name;
+        name = `alphaTab.${name}`;
         let e: any = document.createEvent('CustomEvent');
         let originalMouseEvent: MouseEvent | null = originalEvent
             ? (originalEvent as BrowserMouseEventArgs).mouseEvent
@@ -465,10 +465,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             }
             placeholder.style.zIndex = '1';
             placeholder.style.position = 'absolute';
-            placeholder.style.left = renderResult.x + 'px';
-            placeholder.style.top = renderResult.y + 'px';
-            placeholder.style.width = renderResult.width + 'px';
-            placeholder.style.height = renderResult.height + 'px';
+            placeholder.style.left = `${renderResult.x}px`;
+            placeholder.style.top = `${renderResult.y}px`;
+            placeholder.style.width = `${renderResult.width}px`;
+            placeholder.style.height = `${renderResult.height}px`;
             placeholder.style.display = 'inline-block';
             placeholder.layoutResultId = renderResult.id;
             placeholder.resultState = ResultState.LayoutDone;

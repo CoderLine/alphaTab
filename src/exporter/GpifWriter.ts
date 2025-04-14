@@ -1545,7 +1545,7 @@ export class GpifWriter {
                                 line.text =
                                     line.text == '[Empty]'
                                         ? beat.lyrics[l]
-                                        : line.text + ' ' + beat.lyrics[l].split(' ').join('+');
+                                        : `${line.text} ${beat.lyrics[l].split(' ').join('+')}`;
                             }
                         }
                     }
@@ -1597,7 +1597,7 @@ export class GpifWriter {
                     let name = articulation.elementType;
                     if (counterPerType.has(name)) {
                         const counter = counterPerType.get(name)!;
-                        name += ' ' + counter;
+                        name += ` ${counter}`;
                         counterPerType.set(name, counter + 1);
                     } else {
                         counterPerType.set(name, 1);
@@ -1612,7 +1612,7 @@ export class GpifWriter {
 
                 const articulationNode = currentArticulations.addElement('Articulation');
                 articulationNode.addElement('Name').innerText =
-                    currentElementName + ' ' + currentArticulations.childNodes.length;
+                    `${currentElementName} ${currentArticulations.childNodes.length}`;
                 articulationNode.addElement('StaffLine').innerText = articulation.staffLine.toString();
                 articulationNode.addElement('Noteheads').innerText = [
                     this.mapMusicSymbol(articulation.noteHeadDefault),

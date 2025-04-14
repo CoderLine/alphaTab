@@ -28,7 +28,7 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public set width(value: number) {
-        this.element.style.width = value + 'px';
+        this.element.style.width = `${value}px`;
     }
 
     public get scrollLeft(): number {
@@ -53,7 +53,7 @@ export class HtmlElementContainer implements IContainer {
 
     public set height(value: number) {
         if (value >= 0) {
-            this.element.style.height = value + 'px';
+            this.element.style.height = `${value}px`;
         } else {
             this.element.style.height = '100%';
         }

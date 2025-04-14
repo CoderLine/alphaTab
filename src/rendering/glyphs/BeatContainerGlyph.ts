@@ -133,7 +133,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public static getGroupId(beat: Beat): string {
-        return 'b' + beat.id;
+        return `b${beat.id}`;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

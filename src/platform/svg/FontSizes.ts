@@ -55,7 +55,7 @@ export class FontSizes {
                 widths.push(metrics.width);
             }
 
-            const heightMetrics = measureContext.measureText(fullTxt + 'ÄÖÜÁÈ');
+            const heightMetrics = measureContext.measureText(`${fullTxt}ÄÖÜÁÈ`);
 
             const top = 0 - Math.abs(heightMetrics.fontBoundingBoxAscent);
             const bottom = 0 + Math.abs(heightMetrics.fontBoundingBoxDescent);

@@ -234,13 +234,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
         this.buffer +=
-            '<g transform="translate(' +
-            centerX * this.scale +
-            ' ,' +
-            centerY * this.scale +
-            ') rotate( ' +
-            angle +
-            ')">';
+            `<g transform="translate(${centerX * this.scale} ,${centerY * this.scale}) rotate( ${angle})">`;
     }
 
     public endRotate(): void {

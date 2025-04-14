@@ -55,7 +55,7 @@ export class ScoreLoader {
                 } else if (xhr.statusText === 'timeout') {
                     error(new FileLoadError('Request Time out.', xhr));
                 } else {
-                    error(new FileLoadError('Unknow Error: ' + xhr.responseText, xhr));
+                    error(new FileLoadError(`Unknow Error: ${xhr.responseText}`, xhr));
                 }
             }
         };
@@ -83,14 +83,14 @@ export class ScoreLoader {
         for (let importer of importers) {
             bb.reset();
             try {
-                Logger.debug('ScoreLoader', 'Importing using importer ' + importer.name);
+                Logger.debug('ScoreLoader', `Importing using importer ${importer.name}`);
                 importer.init(bb, settings);
                 score = importer.readScore();
-                Logger.debug('ScoreLoader', 'Score imported using ' + importer.name);
+                Logger.debug('ScoreLoader', `Score imported using ${importer.name}`);
                 break;
             } catch (e) {
                 if (e instanceof UnsupportedFormatError) {
-                    Logger.debug('ScoreLoader', importer.name + ' does not support the file');
+                    Logger.debug('ScoreLoader', `${importer.name} does not support the file`);
                 } else {
                     Logger.error('ScoreLoader', 'Score import failed due to unexpected error: ', e);
                     throw e;

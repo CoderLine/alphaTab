@@ -65,7 +65,7 @@ export class NumberedSlurGlyph extends TabTieGlyph {
             this.startBeat!.voice.bar
         )!;
         let direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);
-        let slurId: string = 'numbered.slur.' + this.startNote.beat.id + '.' + this.endNote.beat.id + '.' + direction;
+        let slurId: string = `numbered.slur.${this.startNote.beat.id}.${this.endNote.beat.id}.${direction}`;
         let renderer = this.renderer;
         let isSlurRendered: boolean = renderer.staff.getSharedLayoutData(slurId, false);
         if (!isSlurRendered) {

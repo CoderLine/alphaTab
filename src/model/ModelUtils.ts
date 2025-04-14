@@ -283,34 +283,24 @@ export class ModelUtils {
 
     public static newGuid(): string {
         return (
-            Math.floor((1 + Math.random()) * 0x10000)
+            `${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
                 .substring(1) +
             Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
+                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
+                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
+                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
+                .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1) +
-            Math.floor((1 + Math.random()) * 0x10000)
+                .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1) +
-            Math.floor((1 + Math.random()) * 0x10000)
+                .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
-                .substring(1)
+                .substring(1)}`
         );
     }
 
@@ -326,7 +316,7 @@ export class ModelUtils {
             n = n >> 4;
         } while (n > 0);
         while (s.length < digits) {
-            s = '0' + s;
+            s = `0${s}`;
         }
         return s;
     }

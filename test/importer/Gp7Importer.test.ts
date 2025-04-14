@@ -22,7 +22,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 describe('Gp7ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
-        const data = await TestPlatform.loadFile('test-data/' + name);
+        const data = await TestPlatform.loadFile(`test-data/${name}`);
         return prepareImporterWithBytes(data);
     }
 

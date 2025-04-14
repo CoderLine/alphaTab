@@ -70,7 +70,7 @@ class GpifSound {
     public path: string = '';
     public role: string = '';
     public get uniqueId(): string {
-        return this.path + ';' + this.name + ';' + this.role;
+        return `${this.path};${this.name};${this.role}`;
     }
 
     public program: number = 0;

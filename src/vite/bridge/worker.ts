@@ -73,8 +73,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
     const newBundleChain = [...bundleChain, input];
     if (bundleChain.includes(input)) {
         throw new Error(
-            'Circular worker imports detected. Vite does not support it. ' +
-                `Import chain: ${newBundleChain.join(' -> ')}`
+            `Circular worker imports detected. Vite does not support it. Import chain: ${newBundleChain.join(' -> ')}`
         );
     }
 
@@ -134,7 +133,7 @@ function emitSourcemapForWorkerEntry(config: ResolvedConfig, chunk: OutputChunk)
     if (sourcemap) {
         if (config.build.sourcemap === 'hidden' || config.build.sourcemap === true) {
             const data = sourcemap.toString();
-            const mapFileName = chunk.fileName + '.map';
+            const mapFileName = `${chunk.fileName}.map`;
             saveEmitWorkerAsset(config, {
                 fileName: mapFileName,
                 source: data

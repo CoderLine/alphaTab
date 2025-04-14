@@ -233,7 +233,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         } else if (num === 13 && den === 8) {
             s = '13';
         } else {
-            s = num + ':' + den;
+            s = `${num}:${den}`;
         }
 
         // check if we need to paint simple footer

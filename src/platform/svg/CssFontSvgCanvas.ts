@@ -56,7 +56,7 @@ export class CssFontSvgCanvas extends SvgCanvas {
             this.buffer += ` fill="${this.color.rgba}"`;
         }
         if (centerAtPosition) {
-            this.buffer += ' text-anchor="' + this.getSvgTextAlignment(TextAlign.Center) + '"';
+            this.buffer += ` text-anchor="${this.getSvgTextAlignment(TextAlign.Center)}"`;
         }
         this.buffer += `>${symbols}</text></g>`;
     }

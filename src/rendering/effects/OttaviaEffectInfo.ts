@@ -12,7 +12,7 @@ export class OttaviaEffectInfo extends EffectBarRendererInfo {
     private _aboveStaff: boolean;
 
     public override get effectId(): string {
-        return 'ottavia-' + (this._aboveStaff ? 'above' : 'below');
+        return `ottavia-${this._aboveStaff ? 'above' : 'below'}`;
     }
 
     public get notationElement(): NotationElement {

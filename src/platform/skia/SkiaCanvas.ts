@@ -64,7 +64,7 @@ export class SkiaCanvas implements ICanvas {
     }
 
     private static customTypefaceKey(fontFamily: string, isBold: boolean, isItalic: boolean): string {
-        return fontFamily.toLowerCase() + "_" + isBold + "_" + isItalic;
+        return `${fontFamily.toLowerCase()}_${isBold}_${isItalic}`;
     }
 
     private _canvas: alphaSkia.AlphaSkiaCanvas;

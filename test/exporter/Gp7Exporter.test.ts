@@ -12,7 +12,7 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         try {
-            const data = await TestPlatform.loadFile('test-data/' + name);
+            const data = await TestPlatform.loadFile(`test-data/${name}`);
             return ScoreLoader.loadScoreFromBytes(data);
         } catch (e) {
             return null;
@@ -42,7 +42,7 @@ describe('Gp7ExporterTest', () => {
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys);
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
     async function testRoundTripFolderEqual(name: string): Promise<void> {

@@ -100,7 +100,7 @@ export class EffectBarRenderer extends BarRendererBase {
                     band.renderer = this;
                     band.doLayout();
                     this._bands.push(band);
-                    this._bandLookup.set(voice.index + '.' + info.effectId, band);
+                    this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
                 }
             }
         }
@@ -141,7 +141,7 @@ export class EffectBarRenderer extends BarRendererBase {
     }
 
     public getBand(voice: Voice, effectId: string): EffectBand | null {
-        let id: string = voice.index + '.' + effectId;
+        let id: string = `${voice.index}.${effectId}`;
         if (this._bandLookup.has(id)) {
             return this._bandLookup.get(id)!;
         }

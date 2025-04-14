@@ -61,7 +61,7 @@ export class MusicXmlImporterTestHelper {
             const deserialized = JsonConverter.jsObjectToScore(expectedJson, settings);
             const actualJson = JsonConverter.scoreToJsObject(deserialized);
 
-            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + file + '>', null);
+            ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${file}>`, null);
         } catch (e) {
             assert.fail((e as Error).message + (e as Error).stack);
         }

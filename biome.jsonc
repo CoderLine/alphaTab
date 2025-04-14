@@ -32,7 +32,6 @@
                 // temporary disabled, apply fixes gradually
                 "useEnumInitializers": "off",
                 "useConst": "off",
-                "useTemplate": "off",
                 "useExponentiationOperator": "off"
             },
             "suspicious": {

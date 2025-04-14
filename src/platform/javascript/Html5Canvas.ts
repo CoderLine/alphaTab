@@ -52,8 +52,8 @@ export class Html5Canvas implements ICanvas {
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
         this._canvas.height = (height * Environment.HighDpiFactor) | 0;
-        this._canvas.style.width = width + 'px';
-        this._canvas.style.height = height + 'px';
+        this._canvas.style.width = `${width}px`;
+        this._canvas.style.height = `${height}px`;
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
         this._context.scale(Environment.HighDpiFactor * scale, Environment.HighDpiFactor * scale);

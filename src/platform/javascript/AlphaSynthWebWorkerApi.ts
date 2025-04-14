@@ -213,7 +213,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         try {
             this._synth = Environment.createWebWorker(settings);
         } catch (e) {
-            Logger.error('AlphaSynth', 'Failed to create WebWorker: ' + e);
+            Logger.error('AlphaSynth', `Failed to create WebWorker: ${e}`);
         }
         this._synth.addEventListener('message', this.handleWorkerMessage.bind(this), false);
         this._synth.postMessage({
@@ -287,7 +287,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
             this.loadSoundFont(buffer, append);
         };
         request.onerror = e => {
-            Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
+            Logger.error('AlphaSynth', `Loading failed: ${(e as any).message}`);
             (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(
                 new FileLoadError((e as any).message, request)
             );

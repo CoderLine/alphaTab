@@ -40,7 +40,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
                 break;
         }
 
-        barre += 'B ' + BeatBarreEffectInfo.toRoman(beat.barreFret);
+        barre += `B ${BeatBarreEffectInfo.toRoman(beat.barreFret)}`;
 
         return new LineRangedGlyph(barre, false);
     }

@@ -274,7 +274,7 @@ export class PageViewLayout extends ScoreLayout {
             this.fitSystem(system);
             Logger.debug(
                 this.name,
-                'Rendering partial from bar ' + system.firstBarIndex + ' to ' + system.lastBarIndex,
+                `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`,
                 null
             );
             y += this.paintSystem(system, y);

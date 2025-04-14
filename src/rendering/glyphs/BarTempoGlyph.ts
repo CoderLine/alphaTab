@@ -41,7 +41,7 @@ export class BarTempoGlyph extends EffectGlyph {
                 true
             );
             canvas.fillText(
-                '= ' + automation.value.toString(),
+                `= ${automation.value.toString()}`,
                 x + (MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteQuarterUp)! * 0.5) + 3,
                 cy + this.y + canvas.font.size / 2
             );

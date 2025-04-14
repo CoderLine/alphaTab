@@ -105,10 +105,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                     partials.push(currentPartial);
                     Logger.debug(
                         this.name,
-                        'Finished partial from bar ' +
-                            currentPartial.masterBars[0].index +
-                            ' to ' +
-                            currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                        `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
                         null
                     );
                     currentPartial = new HorizontalScreenLayoutPartialInfo();
@@ -126,10 +123,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             partials.push(currentPartial);
             Logger.debug(
                 this.name,
-                'Finished partial from bar ' +
-                    currentPartial.masterBars[0].index +
-                    ' to ' +
-                    currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
                 null
             );
         }
@@ -171,10 +165,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 canvas.textAlign = TextAlign.Left;
                 Logger.debug(
                     this.name,
-                    'Rendering partial from bar ' +
-                        partial.masterBars[0].index +
-                        ' to ' +
-                        partial.masterBars[partial.masterBars.length - 1].index,
+                    `Rendering partial from bar ${partial.masterBars[0].index} to ${partial.masterBars[partial.masterBars.length - 1].index}`,
                     null
                 );
                 this._system!.paintPartial(

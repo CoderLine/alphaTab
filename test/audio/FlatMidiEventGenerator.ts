@@ -171,7 +171,7 @@ export class FlatTrackMidiEvent extends FlatMidiEvent {
 
 export class FlatTrackEndEvent extends FlatTrackMidiEvent {
     public override toString(): string {
-        return 'End of Track ' + super.toString();
+        return `End of Track ${super.toString()}`;
     }
 }
 

@@ -260,7 +260,7 @@ export class JsonConverter {
                 return new EndOfTrackEvent(track, tick);
         }
 
-        throw new AlphaTabError(AlphaTabErrorType.Format, 'Unknown Midi Event type: ' + type);
+        throw new AlphaTabError(AlphaTabErrorType.Format, `Unknown Midi Event type: ${type}`);
     }
 
     /**

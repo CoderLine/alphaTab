@@ -160,7 +160,7 @@ export class MidiFileSequencer {
         this._mainState.currentTime = finalTime;
 
         let duration: number = Date.now() - start;
-        Logger.debug('Sequencer', 'Silent seek finished in ' + duration + 'ms (main)');
+        Logger.debug('Sequencer', `Silent seek finished in ${duration}ms (main)`);
     }
 
     public loadOneTimeMidi(midiFile: MidiFile): void {

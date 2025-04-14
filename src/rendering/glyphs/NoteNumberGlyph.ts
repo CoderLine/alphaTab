@@ -34,26 +34,26 @@ export class NoteNumberGlyph extends Glyph {
         if (!n.isTieDestination) {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
-                this._noteString = '(' + this._noteString + ')';
+                this._noteString = `(${this._noteString})`;
             } else if (n.harmonicType === HarmonicType.Natural) {
                 // only first decimal char
                 let i: number = this._noteString.indexOf(String.fromCharCode(46));
                 if (i >= 0) {
                     this._noteString = this._noteString.substr(0, i + 2);
                 }
-                this._noteString = '<' + this._noteString + '>';
+                this._noteString = `<${this._noteString}>`;
             }
         } else if (
             (n.beat.index === 0 && this.renderer.settings.notation.notationMode == NotationMode.GuitarPro) ||
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
-            this._noteString = '(' + (n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString() + ')';
+            this._noteString = `(${(n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
         } else {
             this._noteString = '';
         }
         if (n.isTrill) {
-            this._trillNoteString = '(' + (n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString() + ')';
+            this._trillNoteString = `(${(n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
         } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
             switch (n.harmonicType) {
                 case HarmonicType.Artificial:
@@ -67,7 +67,7 @@ export class NoteNumberGlyph extends Glyph {
                     if (i >= 0) {
                         s = s.substr(0, i + 2);
                     }
-                    this._trillNoteString = '<' + s + '>';
+                    this._trillNoteString = `<${s}>`;
                     break;
                 default:
                     this._trillNoteString = '';

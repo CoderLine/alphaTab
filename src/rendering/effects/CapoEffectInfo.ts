@@ -33,7 +33,7 @@ export class CapoEffectInfo extends EffectBarRendererInfo {
         return new TextGlyph(
             0,
             0,
-            'Capo. fret ' + beat.voice.bar.staff.capo,
+            `Capo. fret ${beat.voice.bar.staff.capo}`,
             renderer.resources.effectFont,
             TextAlign.Left
         );

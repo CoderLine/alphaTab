@@ -9,15 +9,15 @@ import { Environment } from '@src/Environment';
  */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public static readonly CmdOutputPrefix: string = 'alphaSynth.output.';
-    public static readonly CmdOutputAddSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'addSamples';
-    public static readonly CmdOutputPlay: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'play';
-    public static readonly CmdOutputPause: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'pause';
-    public static readonly CmdOutputResetSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'resetSamples';
-    public static readonly CmdOutputStop: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'stop';
+    public static readonly CmdOutputAddSamples: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}addSamples`;
+    public static readonly CmdOutputPlay: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}play`;
+    public static readonly CmdOutputPause: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}pause`;
+    public static readonly CmdOutputResetSamples: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}resetSamples`;
+    public static readonly CmdOutputStop: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}stop`;
     public static readonly CmdOutputSampleRequest: string =
-        AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'sampleRequest';
+        `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}sampleRequest`;
     public static readonly CmdOutputSamplesPlayed: string =
-        AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'samplesPlayed';
+        `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}samplesPlayed`;
 
     // this value is initialized by the alphaSynth WebWorker wrapper
     // that also includes the alphaSynth library into the worker.
