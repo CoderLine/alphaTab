@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Slurs on chorded notes: Only the 
-          first note of the chord should get the slur notation. Some 
-          applications print out the slur for all notes -- these should be
-          ignored.</miscellaneous-field>
+      <miscellaneous-field name="description">Slurs on chorded notes.  The upper
+          slur connects the first and third chord; for both the start and end,
+          the &lt;slur&gt; element is attached not to the first note of the
+          chord but to the second one (tagged with &lt;chord&gt;).  The lower
+          slur connects the chord on the second beat and the note on fourth beat
+          and is attached in the normal way.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -41,9 +43,6 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <notations>
-          <slur number="1" placement="above" type="start"/>
-        </notations>
       </note>
       <note>
         <chord/>
@@ -54,6 +53,9 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <notations>
+          <slur number="1" placement="above" type="start"/>
+        </notations>
       </note>
       <note>
         <chord/>
@@ -83,6 +85,9 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
+        <notations>
+          <slur number="2" placement="below" type="start"/>
+        </notations>
       </note>
       <note>
         <pitch>
@@ -92,10 +97,6 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <notations>
-          <slur number="1" type="stop"/>
-          <slur number="1" placement="above" type="start"/>
-        </notations>
       </note>
       <note>
         <chord/>
@@ -107,7 +108,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <notations>
-          <slur number="1" placement="above" type="start"/>
+          <slur number="1" type="stop"/>
         </notations>
       </note>
       <note>
@@ -119,7 +120,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <notations>
-          <slur number="1" type="stop"/>
+          <slur number="2" type="stop"/>
         </notations>
       </note>
       <barline location="right">

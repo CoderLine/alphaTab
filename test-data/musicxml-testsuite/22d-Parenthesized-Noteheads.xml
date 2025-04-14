@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Parenthesized note heads. First,
-          a single parenthesized note is tested, once with a normal and then 
-          with a non-standard notehead, then two chords with some/all
-          parenthesized noteheads and finally a parenthesized rest.</miscellaneous-field>
+      <miscellaneous-field name="description">Parenthesized note heads.  A
+          normal parenthesized note, a parenthesized note with an ‘x’ note head,
+          a three-note chord with the middle note parenthesized, a three-note
+          chord with all notes parenthesized, a normal quarter rest in
+          parentheses, and a pitched quarter rest in
+          parentheses.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

@@ -1,10 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Repeats can also be nested.</miscellaneous-field>
+      <miscellaneous-field name="description">A repeat with two
+          alternative endings.  In the first one (enclosing bar 2 to bar 4),
+          there is a nested repeat enclosing bar 3.  In the second one (from
+          bar 5 to bar 6), there is another nested repeat starting also at bar 5
+          but ending already at the same bar.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -31,77 +35,110 @@
         </clef>
       </attributes>
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
     </measure>
     <!--=======================================================-->
     <measure number="2">
       <barline location="left">
-        <bar-style>heavy-light</bar-style>
-        <repeat direction="forward"/>
+        <ending number="1" type="start"/>
       </barline>
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
     </measure>
     <!--=======================================================-->
     <measure number="3">
+      <barline location="left">
+        <bar-style>heavy-light</bar-style>
+        <repeat direction="forward"/>
+      </barline>
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>
-        <repeat direction="backward" times="5"/>
+        <repeat direction="backward"/>
       </barline>
     </measure>
     <!--=======================================================-->
     <measure number="4">
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
+      <barline location="right">
+        <ending number="1" type="stop"/>
+        <repeat direction="backward"/>
+      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="5">
+      <barline location="left">
+        <repeat direction="forward"/>
+        <ending number="2" type="start"/>
+      </barline>
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
+      <barline location="right">
+        <repeat direction="backward"/>
+      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="6">
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
+        <type>whole</type>
       </note>
+      <barline location="right">
+        <ending number="2" type="discontinue"/>
+      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="7">
       <note>
-        <rest/>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
         <duration>4</duration>
         <voice>1</voice>
-      </note>
-      <barline location="right">
-        <bar-style>light-heavy</bar-style>
-        <repeat direction="backward" times="3"/>
-      </barline>
-    </measure>
-    <!--=======================================================-->
-    <measure number="8">
-      <note>
-        <rest/>
-        <duration>4</duration>
-        <voice>1</voice>
+        <type>whole</type>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>

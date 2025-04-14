@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Different note styles, using the 
-          &lt;notehead&gt; element. First, each note head style is printed 
-          with four quarter notes, two with filled heads, two with unfilled 
-          heads, where first the stem is up and then the stem is down. After 
-          that, each note head style is printed with a half note (should have 
-          an unfilled head by default). Finally, the Aiken note head styles are 
+      <miscellaneous-field name="description">Different note styles, using the
+          &lt;notehead&gt; element. First, each note head style is printed
+          with four quarter notes, two with filled heads, two with unfilled
+          heads, where first the stem is up and then the stem is down. After
+          that, each note head style is printed with a half note (should have
+          an unfilled head by default). Finally, the Aiken note head styles are
           tested, once with stem up and once with stem down.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -309,7 +309,8 @@
         <voice>1</voice>
         <type>quarter</type>
         <notehead>circle-x</notehead>
-        <lyric number="1"><text>circle-x</text></lyric>
+        <lyric number="1"><text>circle-</text></lyric>
+        <lyric number="2"><text>x</text></lyric>
       </note>
       <note>
         <pitch>
@@ -353,7 +354,8 @@
         <voice>1</voice>
         <type>quarter</type>
         <notehead>inverted triangle</notehead>
-        <lyric number="1"><text>inverted triangle</text></lyric>
+        <lyric number="1"><text>inverted</text></lyric>
+        <lyric number="2"><text>triangle</text></lyric>
       </note>
       <note>
         <pitch>
@@ -397,7 +399,8 @@
         <voice>1</voice>
         <type>quarter</type>
         <notehead>arrow down</notehead>
-        <lyric number="1"><text>arrow down</text></lyric>
+        <lyric number="1"><text>arrow</text></lyric>
+        <lyric number="2"><text>down</text></lyric>
       </note>
       <note>
         <pitch>
@@ -441,7 +444,8 @@
         <voice>1</voice>
         <type>quarter</type>
         <notehead>arrow up</notehead>
-        <lyric number="1"><text>arrow up</text></lyric>
+        <lyric number="1"><text>arrow</text></lyric>
+        <lyric number="2"><text>up</text></lyric>
       </note>
       <note>
         <pitch>
@@ -529,7 +533,8 @@
         <voice>1</voice>
         <type>quarter</type>
         <notehead>back slashed</notehead>
-        <lyric number="1"><text>back slashed</text></lyric>
+        <lyric number="1"><text>back</text></lyric>
+        <lyric number="2"><text>slashed</text></lyric>
       </note>
       <note>
         <pitch>
@@ -693,9 +698,13 @@
         <type>quarter</type>
         <notehead filled="no">none</notehead>
       </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="16">
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>A</step>
@@ -780,7 +789,8 @@
         <voice>1</voice>
         <type>half</type>
         <notehead>circle-x</notehead>
-        <lyric number="1"><text>circle-x</text></lyric>
+        <lyric number="1"><text>circle-</text></lyric>
+        <lyric number="2"><text>x</text></lyric>
       </note>
       <note>
         <pitch>
@@ -791,7 +801,8 @@
         <voice>1</voice>
         <type>half</type>
         <notehead>inverted triangle</notehead>
-        <lyric number="1"><text>inverted triangle</text></lyric>
+        <lyric number="1"><text>inverted</text></lyric>
+        <lyric number="2"><text>triangle</text></lyric>
       </note>
     </measure>
     <!--=======================================================-->
@@ -805,7 +816,8 @@
         <voice>1</voice>
         <type>half</type>
         <notehead>arrow down</notehead>
-        <lyric number="1"><text>arrow down</text></lyric>
+        <lyric number="1"><text>arrow</text></lyric>
+        <lyric number="2"><text>down</text></lyric>
       </note>
       <note>
         <pitch>
@@ -816,7 +828,8 @@
         <voice>1</voice>
         <type>half</type>
         <notehead>arrow up</notehead>
-        <lyric number="1"><text>arrow up</text></lyric>
+        <lyric number="1"><text>arrow</text></lyric>
+        <lyric number="2"><text>up</text></lyric>
       </note>
     </measure>
     <!--=======================================================-->
@@ -841,7 +854,8 @@
         <voice>1</voice>
         <type>half</type>
         <notehead>back slashed</notehead>
-        <lyric number="1"><text>back slashed</text></lyric>
+        <lyric number="1"><text>back</text></lyric>
+        <lyric number="2"><text>slashed</text></lyric>
       </note>
     </measure>
     <!--=======================================================-->
@@ -868,9 +882,13 @@
         <notehead>cluster</notehead>
         <lyric number="1"><text>cluster</text></lyric>
       </note>
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="23">
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>A</step>

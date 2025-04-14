@@ -202,7 +202,7 @@ internal inline fun Int?.toDouble(): Double? {
 
 internal inline fun String.toDoubleOrNaN(): Double {
     try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
+        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
         if (number != null) {
             return number.toDouble()
         }
@@ -213,7 +213,7 @@ internal inline fun String.toDoubleOrNaN(): Double {
 
 internal fun String.toIntOrNaN(): Double {
     try {
-        val number = NumberFormat.getInstance(Locale.ROOT).parse(this)
+        val number = NumberFormat.getInstance(Locale.ROOT).parse(this.trim())
         if (number != null) {
             return number.toInt().toDouble()
         }
@@ -224,7 +224,7 @@ internal fun String.toIntOrNaN(): Double {
 
 internal fun String.toIntOrNaN(radix: Double): Double {
     try {
-        return Integer.parseInt(this, radix.toInt()).toDouble();
+        return Integer.parseInt(this.trim(), radix.toInt()).toDouble();
     } catch (e: Throwable) {
     }
     return Double.NaN

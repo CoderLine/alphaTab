@@ -395,6 +395,23 @@ export class PageViewLayout extends ScoreLayout {
                 system.isLast = false;
                 this._barsFromPreviousSystem.reverse();
                 return system;
+            } else {
+                // do we need a line break after this bar
+                let anyTrackNeedsLineBreak = false;
+                let allTracksNeedLineBreak = true;
+                for(const track of this.renderer.tracks!) {
+                    if(track.lineBreaks && track.lineBreaks!.has(barIndex + 1)) {
+                        anyTrackNeedsLineBreak = true;
+                    } else {
+                        allTracksNeedLineBreak = false;
+                    }
+                }
+
+                if(anyTrackNeedsLineBreak && allTracksNeedLineBreak) {
+                    system.isFull = true;
+                    system.isLast = false;
+                    return system;
+                }
             }
             system.x = 0;
             barIndex++;

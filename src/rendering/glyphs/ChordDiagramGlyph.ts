@@ -38,7 +38,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             2 * ChordDiagramGlyph.Padding[1];
         this.width =
             this._firstFretSpacing +
-            (this._chord.staff.tuning.length - 1) * ChordDiagramGlyph.StringSpacing +
+            (this._chord.strings.length - 1) * ChordDiagramGlyph.StringSpacing +
             2 * ChordDiagramGlyph.Padding[0];
     }
 
@@ -63,10 +63,10 @@ export class ChordDiagramGlyph extends EffectGlyph {
         cy += this._textRow;
         canvas.font = res.fretboardNumberFont;
         canvas.textBaseline = TextBaseline.Middle;
-        for (let i: number = 0; i < this._chord.staff.tuning.length; i++) {
+        for (let i: number = 0; i < this._chord.strings.length; i++) {
             let x: number = cx + i * stringSpacing;
             let y: number = cy + this._fretRow / 2;
-            let fret: number = this._chord.strings[this._chord.staff.tuning.length - i - 1];
+            let fret: number = this._chord.strings[this._chord.strings.length - i - 1];
             if (fret < 0) {
                 canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardX, true);
             } else if (fret === 0) {
@@ -78,7 +78,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
         }
 
         cy += this._fretRow;
-        for (let i: number = 0; i < this._chord.staff.tuning.length; i++) {
+        for (let i: number = 0; i < this._chord.strings.length; i++) {
             let x: number = cx + i * stringSpacing;
             canvas.fillRect(x, cy, 1, fretSpacing * ChordDiagramGlyph.Frets + 1);
         }

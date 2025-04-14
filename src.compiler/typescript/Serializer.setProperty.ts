@@ -264,8 +264,8 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
                 if (collectionAddMethod) {
                     caseStatements.push(
                         createNodeFromSource<ts.ForOfStatement>(
-                            `for (const i of (v as unknown[])) {
-                                obj.${collectionAddMethod}(i as  ${elementTypeName});
+                            `for (const i of (v as ${elementTypeName}[])) {
+                                obj.${collectionAddMethod}(i);
                             }`,
                             ts.SyntaxKind.ForOfStatement
                         )

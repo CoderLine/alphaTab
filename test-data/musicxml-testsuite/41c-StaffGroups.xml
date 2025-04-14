@@ -1,19 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A huge orchestra score with 28 
-          parts and different kinds of nested bracketed groups. Each part/group 
-          is assigned a name and an abbreviation to be shown before the staff. 
-          Also, most of the groups show unbroken barlines, while the barlines 
-          are broken between the groups.</miscellaneous-field>
+      <miscellaneous-field name="description">A huge orchestra score with
+          28 parts and different kinds of nested, bracketed groups.  Each
+          part/group is assigned a name and an abbreviation to be shown before
+          the staff.  Also, most of the groups show unbroken bar lines, while
+          the bar lines are broken between the groups.
+
+          Both the harp and the organ are multi-staff parts; the latter also
+          uses a &lt;part-symbol&gt; element to set up the
+          brace delimiter (and the non-contiguous bar line of the three
+          staves).</miscellaneous-field>
     </miscellaneous>
   </identification>
+  <defaults>
+    <scaling>
+      <millimeters>3</millimeters>
+      <tenths>40</tenths>
+    </scaling>
+  </defaults>
   <part-list>
-    <part-group number="2" type="start">
-      <group-symbol>bracket</group-symbol>
+    <part-group number="1" type="start">
+      <group-symbol default-x="-8">bracket</group-symbol>
       <group-barline>yes</group-barline>
     </part-group>
     <score-part id="P1">
@@ -23,33 +34,31 @@
         <instrument-name>Piccolo</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
+
+    <part-group number="2" type="start">
+      <group-name>Flute</group-name>
+      <group-abbreviation>Fl.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
       <group-barline>no</group-barline>
     </part-group>
     <score-part id="P2">
-      <part-name>Flute 1</part-name>
-      <part-abbreviation>Fl. 1</part-abbreviation>
+      <part-name>1</part-name>
+      <part-abbreviation>1</part-abbreviation>
       <score-instrument id="P2-I2">
         <instrument-name>Flute 1</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P3">
-      <part-name>Flute 2</part-name>
-      <part-abbreviation>Fl. 2</part-abbreviation>
+      <part-name>2</part-name>
+      <part-abbreviation>2</part-abbreviation>
       <score-instrument id="P3-I3">
         <instrument-name>Flute 2</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="stop"/>
-    <part-group number="3" type="start">
-      <group-name>Oboe through Clarinet</group-name>
-      <group-abbreviation>O to Cl</group-abbreviation>
-      <group-symbol>bracket</group-symbol>
-      <group-barline>yes</group-barline>
-    </part-group>
-    <part-group number="4" type="start">
-      <group-symbol>line</group-symbol>
+    <part-group number="2" type="stop"/>
+
+    <part-group number="2" type="start">
+      <group-symbol default-x="-16">square</group-symbol>
       <group-barline>yes</group-barline>
     </part-group>
     <score-part id="P4">
@@ -66,7 +75,8 @@
         <instrument-name>English Horn</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="4" type="stop"/>
+    <part-group number="2" type="stop"/>
+
     <score-part id="P6">
       <part-name>Clarinet in Eb</part-name>
       <part-abbreviation>Eb Cl.</part-abbreviation>
@@ -74,26 +84,29 @@
         <instrument-name>Clarinet in Eb</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="3" type="stop"/>
-    <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
+
+    <part-group number="2" type="start">
+      <group-name>Clarinet in Bb</group-name>
+      <group-abbreviation>Bb Cl.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
       <group-barline>no</group-barline>
     </part-group>
     <score-part id="P7">
-      <part-name>Clarinet in Bb 1</part-name>
-      <part-abbreviation>Bb Cl. 1</part-abbreviation>
+      <part-name>1</part-name>
+      <part-abbreviation>1</part-abbreviation>
       <score-instrument id="P7-I7">
         <instrument-name>Clarinet in Bb 1</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P8">
-      <part-name>Clarinet in Bb 2</part-name>
-      <part-abbreviation>Bb Cl. 2</part-abbreviation>
+      <part-name>2</part-name>
+      <part-abbreviation>2</part-abbreviation>
       <score-instrument id="P8-I8">
         <instrument-name>Clarinet in Bb 2</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="stop"/>
+    <part-group number="2" type="stop"/>
+
     <score-part id="P9">
       <part-name>Bass Clarinet</part-name>
       <part-abbreviation>B. Cl.</part-abbreviation>
@@ -101,25 +114,29 @@
         <instrument-name>Bass Clarinet</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
+
+    <part-group number="2" type="start">
+      <group-name>Bassoon</group-name>
+      <group-abbreviation>Bsn.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
       <group-barline>no</group-barline>
     </part-group>
     <score-part id="P10">
-      <part-name>Bassoon 1</part-name>
-      <part-abbreviation>Bsn. 1</part-abbreviation>
+      <part-name>1</part-name>
+      <part-abbreviation>1</part-abbreviation>
       <score-instrument id="P10-I10">
         <instrument-name>Bassoon 1</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P11">
-      <part-name>Bassoon 2</part-name>
-      <part-abbreviation>Bsn. 2</part-abbreviation>
+      <part-name>2</part-name>
+      <part-abbreviation>2</part-abbreviation>
       <score-instrument id="P11-I11">
         <instrument-name>Bassoon 2</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="stop"/>
+    <part-group number="2" type="stop"/>
+
     <score-part id="P12">
       <part-name>Contrabassoon</part-name>
       <part-abbreviation>C. Bn.</part-abbreviation>
@@ -127,68 +144,79 @@
         <instrument-name>Contrabassoon</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="2" type="stop"/>
+    <part-group number="1" type="stop"/>
+
     <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
-      <group-barline>no</group-barline>
-    </part-group>
-    <part-group number="2" type="start">
-      <group-symbol>bracket</group-symbol>
+      <group-symbol default-x="-8">bracket</group-symbol>
       <group-barline>yes</group-barline>
     </part-group>
+
+    <part-group number="2" type="start">
+      <group-name>Horn in F</group-name>
+      <group-abbreviation>F Hn.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
+      <group-barline>no</group-barline>
+    </part-group>
     <score-part id="P13">
-      <part-name>Horn in F 1</part-name>
-      <part-abbreviation>Hn. 1</part-abbreviation>
+      <part-name>1</part-name>
+      <part-abbreviation>1</part-abbreviation>
       <score-instrument id="P13-I13">
         <instrument-name>Horn in F 1</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P14">
-      <part-name>Horn in F 2</part-name>
-      <part-abbreviation>Hn. 2</part-abbreviation>
+      <part-name>2</part-name>
+      <part-abbreviation>2</part-abbreviation>
       <score-instrument id="P14-I14">
         <instrument-name>Horn in F 2</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="stop"/>
-    <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
+    <part-group number="2" type="stop"/>
+
+    <part-group number="2" type="start">
+      <group-name>Trumpet in C</group-name>
+      <group-abbreviation>C Tpt.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
       <group-barline>no</group-barline>
     </part-group>
     <score-part id="P15">
-      <part-name>Trumpet in C 1</part-name>
-      <part-abbreviation>C Tpt. 1</part-abbreviation>
+      <part-name>1</part-name>
+      <part-abbreviation>1</part-abbreviation>
       <score-instrument id="P15-I15">
         <instrument-name>Trumpet in C 1</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P16">
-      <part-name>Trumpet in C 2</part-name>
-      <part-abbreviation>C Tpt. 2</part-abbreviation>
+      <part-name>2</part-name>
+      <part-abbreviation>2</part-abbreviation>
       <score-instrument id="P16-I16">
         <instrument-name>Trumpet in C 2</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="stop"/>
-    <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
+    <part-group number="2" type="stop"/>
+
+    <part-group number="2" type="start">
+      <group-name>Trombone</group-name>
+      <group-abbreviation>Tbn.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
       <group-barline>no</group-barline>
     </part-group>
     <score-part id="P17">
-      <part-name>Trombone 1</part-name>
-      <part-abbreviation>Tbn. 1</part-abbreviation>
+      <part-name>1</part-name>
+      <part-abbreviation>1</part-abbreviation>
       <score-instrument id="P17-I17">
         <instrument-name>Trombone 1</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P18">
-      <part-name>Trombone 2</part-name>
-      <part-abbreviation>Tbn. 2</part-abbreviation>
+      <part-name>2</part-name>
+      <part-abbreviation>2</part-abbreviation>
       <score-instrument id="P18-I18">
         <instrument-name>Trombone 2</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="1" type="stop"/>
+    <part-group number="2" type="stop"/>
+
     <score-part id="P19">
       <part-name>Tuba</part-name>
       <part-abbreviation>Tuba</part-abbreviation>
@@ -196,7 +224,8 @@
         <instrument-name>Tuba</instrument-name>
       </score-instrument>
     </score-part>
-    <part-group number="2" type="stop"/>
+    <part-group number="1" type="stop"/>
+
     <score-part id="P20">
       <part-name>Timpani</part-name>
       <part-abbreviation>Timp.</part-abbreviation>
@@ -218,31 +247,47 @@
         <instrument-name>Harp</instrument-name>
       </score-instrument>
     </score-part>
+
+    <part-group number="1" type="start">
+      <group-symbol default-x="-8">bracket</group-symbol>
+      <group-barline>no</group-barline>
+    </part-group>
     <score-part id="P23">
-      <part-name>Piano</part-name>
-      <part-abbreviation>Pno.</part-abbreviation>
+      <part-name>Organ</part-name>
+      <part-abbreviation>Org.</part-abbreviation>
       <score-instrument id="P23-I23">
-        <instrument-name>Piano</instrument-name>
+        <instrument-name>Organ</instrument-name>
       </score-instrument>
     </score-part>
+    <part-group number="1" type="stop"/>
+
     <part-group number="1" type="start">
-      <group-symbol>bracket</group-symbol>
+      <group-symbol default-x="-8">bracket</group-symbol>
       <group-barline>yes</group-barline>
     </part-group>
+
+    <part-group number="2" type="start">
+      <group-name>Violin</group-name>
+      <group-abbreviation>Vln.</group-abbreviation>
+      <group-symbol default-x="-16">square</group-symbol>
+      <group-barline>no</group-barline>
+    </part-group>
     <score-part id="P24">
-      <part-name>Violin I</part-name>
-      <part-abbreviation>Vln. I</part-abbreviation>
+      <part-name>I</part-name>
+      <part-abbreviation>I</part-abbreviation>
       <score-instrument id="P24-I24">
         <instrument-name>Violin I</instrument-name>
       </score-instrument>
     </score-part>
     <score-part id="P25">
-      <part-name>Violin II</part-name>
-      <part-abbreviation>Vln. II</part-abbreviation>
+      <part-name>II</part-name>
+      <part-abbreviation>II</part-abbreviation>
       <score-instrument id="P25-I25">
         <instrument-name>Violin II</instrument-name>
       </score-instrument>
     </score-part>
+    <part-group number="2" type="stop"/>
+
     <score-part id="P26">
       <part-name>Viola</part-name>
       <part-abbreviation>Vla.</part-abbreviation>
@@ -1324,12 +1369,19 @@
           <beats>4</beats>
           <beat-type>4</beat-type>
         </time>
-        <staves>2</staves>
+        <staves>3</staves>
+        <part-symbol top-staff="1"
+                     bottom-staff="2"
+                     default-x="16">brace</part-symbol>
         <clef number="1">
           <sign>G</sign>
           <line>2</line>
         </clef>
         <clef number="2">
+          <sign>F</sign>
+          <line>4</line>
+        </clef>
+        <clef number="3">
           <sign>F</sign>
           <line>4</line>
         </clef>
@@ -1384,6 +1436,33 @@
         <voice>2</voice>
         <type>half</type>
         <staff>2</staff>
+      </note>
+      <backup>
+        <duration>4</duration>
+      </backup>
+      <note>
+        <pitch>
+          <step>E</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>3</voice>
+        <type>quarter</type>
+        <staff>3</staff>
+      </note>
+      <note>
+        <rest/>
+        <duration>1</duration>
+        <voice>3</voice>
+        <type>quarter</type>
+        <staff>3</staff>
+      </note>
+      <note>
+        <rest/>
+        <duration>2</duration>
+        <voice>3</voice>
+        <type>half</type>
+        <staff>3</staff>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>

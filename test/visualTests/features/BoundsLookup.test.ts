@@ -16,7 +16,7 @@ describe('BoundsLookupRenderingTests', () => {
         \\track "Guitar 2"
         3.3 
         `,
-            referenceFileName
+            `test-data/visual-tests/${referenceFileName}`
         );
         o.tracks = [0, 1];
         o.prepareFullImage = (_run, api, img) => {

@@ -150,7 +150,7 @@ Map {
         "volume" => 0,
         "secondarychannel" => 1,
       },
-      "name" => "Track 1",
+      "name" => "Track 1",
       "shortname" => "T1",
     },
     Map {
@@ -272,10 +272,13 @@ Map {
         "primarychannel" => 2,
         "secondarychannel" => 3,
       },
-      "name" => "Track 2",
+      "name" => "Track 2",
       "shortname" => "T2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -382,7 +385,7 @@ Map {
         "volume" => 0,
         "secondarychannel" => 1,
       },
-      "name" => "Track 1",
+      "name" => "Track 1",
       "shortname" => "T1",
     },
     Map {
@@ -466,7 +469,7 @@ Map {
         "primarychannel" => 2,
         "secondarychannel" => 3,
       },
-      "name" => "Track 2",
+      "name" => "Track 2",
       "shortname" => "T2",
     },
     Map {
@@ -550,10 +553,13 @@ Map {
         "primarychannel" => 4,
         "secondarychannel" => 5,
       },
-      "name" => "Track 3",
+      "name" => "Track 3",
       "shortname" => "T3",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -908,8 +914,8 @@ Map {
       "playbackinfo" => Map {
         "secondarychannel" => 1,
       },
-      "name" => "Track 1",
-      "shortname" => "Track 1",
+      "name" => "Track 1",
+      "shortname" => "Track 1",
     },
     Map {
       "__kind" => "Track",
@@ -1147,10 +1153,13 @@ Map {
         "primarychannel" => 2,
         "secondarychannel" => 3,
       },
-      "name" => "Track 2",
-      "shortname" => "Track 2",
+      "name" => "Track 2",
+      "shortname" => "Track 2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -1760,8 +1769,8 @@ Map {
       "playbackinfo" => Map {
         "secondarychannel" => 1,
       },
-      "name" => "Track 1",
-      "shortname" => "Track 1",
+      "name" => "Track 1",
+      "shortname" => "Track 1",
     },
     Map {
       "__kind" => "Track",
@@ -2174,10 +2183,13 @@ Map {
         "primarychannel" => 2,
         "secondarychannel" => 3,
       },
-      "name" => "Track 2",
-      "shortname" => "Track 2",
+      "name" => "Track 2",
+      "shortname" => "Track 2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -2331,7 +2343,7 @@ Map {
         "volume" => 0,
         "secondarychannel" => 1,
       },
-      "name" => "Track 1",
+      "name" => "Track 1",
       "shortname" => "T1",
     },
     Map {
@@ -2453,10 +2465,13 @@ Map {
         "primarychannel" => 2,
         "secondarychannel" => 3,
       },
-      "name" => "Track 2",
+      "name" => "Track 2",
       "shortname" => "T2",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;
 
@@ -2563,7 +2578,7 @@ Map {
         "volume" => 0,
         "secondarychannel" => 1,
       },
-      "name" => "Track 1",
+      "name" => "Track 1",
       "shortname" => "T1",
     },
     Map {
@@ -2647,7 +2662,7 @@ Map {
         "primarychannel" => 2,
         "secondarychannel" => 3,
       },
-      "name" => "Track 2",
+      "name" => "Track 2",
       "shortname" => "T2",
     },
     Map {
@@ -2731,9 +2746,12 @@ Map {
         "primarychannel" => 4,
         "secondarychannel" => 5,
       },
-      "name" => "Track 3",
+      "name" => "Track 3",
       "shortname" => "T3",
     },
   ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
 }
 `;

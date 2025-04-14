@@ -205,8 +205,8 @@ export class MusicFontSymbolSizes {
         [MusicFontSymbol.RestSixteenth, 9],
         [MusicFontSymbol.RestThirtySecond, 12],
         [MusicFontSymbol.RestSixtyFourth, 14],
-        [MusicFontSymbol.RestOneHundredTwentyEighth, 20],
-        [MusicFontSymbol.RestTwoHundredFiftySixth, 20],
+        [MusicFontSymbol.RestOneHundredTwentyEighth, 14],
+        [MusicFontSymbol.RestTwoHundredFiftySixth, 14],
 
         [MusicFontSymbol.RestHBarLeft, 0],
         [MusicFontSymbol.RestHBarMiddle, 0],
@@ -230,7 +230,7 @@ export class MusicFontSymbolSizes {
         [MusicFontSymbol.DynamicFF, 0],
         [MusicFontSymbol.DynamicFFF, 0],
 
-        [MusicFontSymbol.OrnamentTrill, 26],
+        [MusicFontSymbol.OrnamentTrill, 20],
         [MusicFontSymbol.OrnamentTurn, 26],
         [MusicFontSymbol.OrnamentTurnInverted, 26],
         [MusicFontSymbol.OrnamentShortTrill, 0],
@@ -497,7 +497,7 @@ export class MusicFontSymbolSizes {
         [MusicFontSymbol.DynamicFF, 28.4],
         [MusicFontSymbol.DynamicFFF, 28.4],
 
-        [MusicFontSymbol.OrnamentTrill, 18],
+        [MusicFontSymbol.OrnamentTrill, 24],
         [MusicFontSymbol.OrnamentTurn, 18],
         [MusicFontSymbol.OrnamentTurnInverted, 18],
         [MusicFontSymbol.OrnamentShortTrill, 18],

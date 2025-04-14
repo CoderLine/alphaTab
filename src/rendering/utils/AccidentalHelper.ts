@@ -322,9 +322,11 @@ export class AccidentalHelper {
                     // https://ultimatemusictheory.com/tied-notes-with-accidentals/
                     if (note && note.isTieDestination && note.beat.index === 0) {
                         // candidate for skip, check further if start note is on the same line
-                        const previousRenderer = this._barRenderer.previousRenderer as ScoreBarRenderer;
-                        if (previousRenderer) {
-                            const tieOriginLine = previousRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
+                        const tieOriginBarRenderer = this._barRenderer.scoreRenderer.layout?.getRendererForBar(
+                            this._barRenderer.staff.staveId,
+                            note.tieOrigin!.beat.voice.bar) as ScoreBarRenderer | null;
+                        if (tieOriginBarRenderer && tieOriginBarRenderer.staff === this._barRenderer.staff) {
+                            const tieOriginLine = tieOriginBarRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
                             if (tieOriginLine === steps) {
                                 skipAccidental = true;
                             }

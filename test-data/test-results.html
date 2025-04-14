@@ -11,6 +11,7 @@
         body {
             padding: 1rem;
             font-family: 'Noto Sans', sans-serif;
+            min-height: 100vh;
         }
 
         .comparer {
@@ -65,10 +66,43 @@
             left: 0;
             top: 0;
         }
+
         .accepted .diff,
         .accepted .expected,
         .accepted .actual {
             border-color: green;
+        }
+
+        .drop-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            pointer-events: none;
+        }
+
+        body.drop .drop-area {
+            display: flex;
+        }
+
+        .drop-message {
+            width: 200px;
+            height: 200px;
+            font-weight: bold;
+            border: 5px dashed #426d9d;
+            color: #426d9d;
+            display: flex;
+            text-align: center;
+            border-radius: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
         }
     </style>
 </head>
@@ -76,16 +110,15 @@
 <body>
     <h1>alphaTab - Visual Test Results</h1>
     <p>
-        This page contains any failing visual tests for comparison and acceptance. 
-        Run the <code>visualTests</code> via <code>npm run test</code> or using <a href="https://marketplace.visualstudio.com/items?itemName=coderline.mocha-vscode">Mocha for VS Code</a>.
+        This page contains any failing visual tests for comparison and acceptance.
+        Run the <code>visualTests</code> via <code>npm run test</code> or using <a
+            href="https://marketplace.visualstudio.com/items?itemName=coderline.mocha-vscode">Mocha for VS Code</a>.
     </p>
     <div id="results-wrapper">
 
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
-        integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
-        crossorigin="anonymous"></script>
-    <script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
         function setupComparer(el, result) {
             const ex = el.querySelector('.expected');
             const ac = el.querySelector('.actual');
@@ -136,7 +169,7 @@
                 xhr.onload = () => {
                     acceptButton.classList.add('disabled');
                     const response = JSON.parse(xhr.responseText);
-                    if(response.message){
+                    if (response.message) {
                         acceptButton.innerText = response.message;
                     } else {
                         acceptButton.innerText = 'Accepted';
@@ -179,6 +212,7 @@
                 img.onerror = e => {
                     reject()
                 };
+
                 img.src = '/' + result.originalFile;
             })
 
@@ -190,7 +224,14 @@
                 img.onerror = e => {
                     reject()
                 };
-                img.src = '/' + result.newFile;
+
+                if (result.newFile instanceof Uint8Array) {
+                    img.src = URL.createObjectURL(
+                        new Blob([result.newFile.buffer], { type: 'image/png' })
+                    );
+                } else {
+                    img.src = '/' + result.newFile;
+                }
             })
 
 
@@ -202,13 +243,20 @@
                 img.onerror = e => {
                     reject()
                 };
-                img.src = '/' + result.diffFile;
+
+                if (result.newFile instanceof Uint8Array) {
+                    img.src = URL.createObjectURL(
+                        new Blob([result.diffFile.buffer], { type: 'image/png' })
+                    );
+                } else {
+                    img.src = '/' + result.diffFile;
+                }
             })
 
             try {
                 await Promise.allSettled([expected, actual, diff]);
             }
-            catch(e) {
+            catch (e) {
                 // ignore potentially missing images
             }
 
@@ -244,10 +292,12 @@
                 wrapper.appendChild(await createResultViewer(result));
             }
 
-            if(results.length === 0) {
+            if (results.length === 0) {
                 wrapper.innerHTML = '<div class="alert alert-success" role="alert">No reported errors on visual tests.</div>'
             }
         }
+
+
 
         function loadResults() {
             const xhr = new XMLHttpRequest();
@@ -264,7 +314,75 @@
         }
 
         loadResults();
+
+        document.body.addEventListener('dragover', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'link';
+        }, false);
+
+        document.body.addEventListener('dragenter', function (e) {
+            document.body.classList.add('drop');
+        }, true);
+
+        document.body.addEventListener('dragleave', function (e) {
+            document.body.classList.remove('drop');
+        });
+
+        import { ZipReader } from '../src/zip/ZipReader';
+        import { ByteBuffer } from '../src/io/ByteBuffer';
+        document.body.addEventListener('drop', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            document.body.classList.remove('drop');
+            const files = e.dataTransfer.files;
+            if (files.length === 1) {
+                const reader = new FileReader();
+                reader.onload = function (data) {
+                    const reader = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(data.target.result)));
+                    const entries = reader.read();
+
+                    const grouped = new Map();
+                    for (const entry of entries) {
+                        if (entry.data.length > 0) {
+                            let path = entry.fullName.startsWith('test-data/') ? entry.fullName : `test-data/${entry.fullName}`;
+                            const key = path.replace('.diff.png', '').replace('.new.png', '') + '.png';
+                            if (grouped.has(key)) {
+                                if (entry.fullName.endsWith('.diff.png')) {
+                                    grouped.get(key).diffFile = entry.data;
+                                } else if (entry.fullName.endsWith('.new.png')) {
+                                    grouped.get(key).newFile = entry.data;
+                                }
+                            } else {
+                                if (entry.fullName.endsWith('.diff.png')) {
+                                    grouped.set(key, {
+                                        originalFile: key,
+                                        diffFile: entry.data
+                                    });
+                                } else if (entry.fullName.endsWith('.new.png')) {
+                                    grouped.set(key, {
+                                        originalFile: key,
+                                        newFile: entry.data
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    const results = Array.from(grouped.values());
+                    displayResults(results);
+                };
+                reader.readAsArrayBuffer(files[0]);
+            }
+        }, true);
+
     </script>
+
+    <div class="drop-area">
+        <div class="drop-message">
+            Drop Test-Results Zip to page
+        </div>
+    </div>
 </body>
 
 </html>

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Different tuplet styles:
-          default, none, x:y, x:y-note; Each with bracket, slur and none.
-          Finally, non-standard 4:3 and 17:2 tuplets are given.</miscellaneous-field>
+      <miscellaneous-field name="description">Different tuplet styles: default,
+          none, x:y, x:y-note, and x-note:y-note; each with bracket, slur, and
+          without bracket.  Finally, non-standard 4:3 and 17:2 tuplets are
+          given.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -260,6 +261,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="2">
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>C</step>
@@ -488,6 +490,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="3">
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>C</step>
@@ -716,6 +719,7 @@
     </measure>
     <!--=======================================================-->
     <measure number="4">
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>C</step>

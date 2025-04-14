@@ -211,6 +211,12 @@ export default abstract class AstPrinterBase {
             this.writeCommaSeparated(expr.typeArguments, t => this.writeType(t));
             this.write('>');
         }
+        
+        if(expr.nullSafe) {
+            this.write('?.');
+            this.write(this._context.toMethodName("invoke"))
+        }
+
         this.write('(');
         if (expr.arguments.length > 5) {
             this.writeLine();

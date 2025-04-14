@@ -6,7 +6,6 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
-import { GraceType } from '@src/model/GraceType';
 
 export class DynamicsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
@@ -30,7 +29,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     }
 
     private internalShouldCreateGlyph(beat: Beat): boolean {
-        if (beat.voice.bar.staff.track.score.stylesheet.hideDynamics || beat.isEmpty || beat.voice.isEmpty || beat.isRest || beat.graceType !== GraceType.None) {
+        if (beat.voice.bar.staff.track.score.stylesheet.hideDynamics || beat.isEmpty || beat.voice.isEmpty || beat.isRest) {
             return false;
         }
 
@@ -59,7 +58,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     private getPreviousDynamicsBeat(beat: Beat) {
         let previousBeat = beat.previousBeat;
         while (previousBeat != null) {
-            if (!previousBeat.isRest && previousBeat.graceType === GraceType.None) {
+            if (!previousBeat.isRest) {
                 return previousBeat;
             }
             previousBeat = previousBeat.previousBeat;

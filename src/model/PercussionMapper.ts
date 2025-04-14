@@ -274,6 +274,9 @@ export class PercussionMapper {
 
     public static getArticulation(n: Note): InstrumentArticulation | null {
         const articulationIndex = n.percussionArticulation;
+        if (articulationIndex < 0) {
+            return null;
+        }
 
         const trackArticulations = n.beat.voice.bar.staff.track.percussionArticulations;
         if (articulationIndex < trackArticulations.length) {

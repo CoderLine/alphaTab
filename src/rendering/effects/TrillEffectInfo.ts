@@ -17,7 +17,7 @@ export class TrillEffectInfo extends NoteEffectInfoBase {
     }
 
     public get sizingMode(): EffectBarGlyphSizing {
-        return EffectBarGlyphSizing.SingleOnBeat;
+        return EffectBarGlyphSizing.GroupedOnBeatToEnd;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

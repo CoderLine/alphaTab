@@ -16,11 +16,13 @@ export class BarLayoutingInfo {
     private static readonly MinDurationWidth: number = 7;
 
     private _timeSortedSprings: Spring[] = [];
-    private _xMin: number = 0;
     private _minTime: number = -1;
     private _onTimePositionsForce: number = 0;
     private _onTimePositions: Map<number, number> = new Map();
     private _incompleteGraceRodsWidth: number = 0;
+
+    // the smallest duration we have between two springs to ensure we have positive spring constants
+    private _minDuration:number = BarLayoutingInfo.MinDuration;
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -95,6 +97,10 @@ export class BarLayoutingInfo {
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
                     }
+                }
+                //spring.smallestDuration = duration;
+                if(duration < this._minDuration) {
+                    this._minDuration = duration;
                 }
             }
             spring.longestDuration = duration;
@@ -203,13 +209,6 @@ export class BarLayoutingInfo {
     }
 
     private calculateSpringConstants(): void {
-        this._xMin = 0;
-        let springs: Map<number, Spring> = this.springs;
-        for (const spring of springs.values()) {
-            if (spring.springWidth < this._xMin) {
-                this._xMin = spring.springWidth;
-            }
-        }
         let totalSpringConstant: number = 0;
         let sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {
@@ -303,14 +302,18 @@ export class BarLayoutingInfo {
 
     private calculateSpringConstant(spring: Spring, duration: number): number {
         if (duration <= 0) {
-            duration = MidiUtils.toTicks(Duration.SixtyFourth);
+            duration = MidiUtils.toTicks(Duration.TwoHundredFiftySixth);
         }
         if (spring.smallestDuration === 0) {
             spring.smallestDuration = duration;
         }
-        let minDuration: number = spring.smallestDuration;
-        let phi: number = 1 + 0.85 * Math.log2(duration / BarLayoutingInfo.MinDuration);
-        return (minDuration / duration) * (1 / (phi * BarLayoutingInfo.MinDurationWidth));
+        let smallestDuration: number = spring.smallestDuration;
+
+        let minDuration = this._minDuration;
+        let minDurationWidth = BarLayoutingInfo.MinDurationWidth;
+
+        let phi: number = 1 + 0.85 * Math.log2(duration / minDuration);
+        return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 
     public spaceToForce(space: number): number {

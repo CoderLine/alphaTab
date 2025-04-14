@@ -32,7 +32,7 @@ describe('NotationElements', () => {
         }
         
         await VisualTestHelper.runVisualTestFull(
-            VisualTestOptions.tex(tex, `notation-elements/score-info-${referenceName}.png`, settings)
+            VisualTestOptions.tex(tex, `test-data/visual-tests/notation-elements/score-info-${referenceName}.png`, settings)
         );
     }
 
@@ -81,7 +81,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/guitar-tuning-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/guitar-tuning-on.png`, settings);
     });
 
     it('guitar-tuning-off', async () => {
@@ -91,7 +91,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.GuitarTuning, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/guitar-tuning-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/guitar-tuning-off.png`, settings);
     });
 
     it('track-names-off', async () => {
@@ -101,7 +101,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/track-names-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/track-names-off.png`, settings);
     });
 
     it('track-names-on', async () => {
@@ -111,7 +111,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TrackNames, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/track-names-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/track-names-on.png`, settings);
     });
 
     it('chord-diagrams-off', async () => {
@@ -121,7 +121,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/chord-diagrams-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/chord-diagrams-off.png`, settings);
     });
 
     it('chord-diagrams-on', async () => {
@@ -131,7 +131,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ChordDiagrams, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/chord-diagrams-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/chord-diagrams-on.png`, settings);
     });
 
     it('parenthesis-on-tied-bends-off', async () => {
@@ -141,7 +141,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/parenthesis-on-tied-bends-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/parenthesis-on-tied-bends-off.png`, settings);
     });
 
     it('parenthesis-on-tied-bends-on', async () => {
@@ -151,7 +151,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ParenthesisOnTiedBends, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/parenthesis-on-tied-bends-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/parenthesis-on-tied-bends-on.png`, settings);
     });
 
     it('tab-notes-on-tied-bends-off', async () => {
@@ -161,7 +161,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/tab-notes-on-tied-bends-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/tab-notes-on-tied-bends-off.png`, settings);
     });
 
     it('tab-notes-on-tied-bends-on', async () => {
@@ -171,7 +171,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.TabNotesOnTiedBends, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/tab-notes-on-tied-bends-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/tab-notes-on-tied-bends-on.png`, settings);
     });
 
     it('zeros-on-dive-whammys-off', async () => {
@@ -181,7 +181,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/zeros-on-dive-whammys-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/zeros-on-dive-whammys-off.png`, settings);
     });
 
     it('zeros-on-dive-whammys-on', async () => {
@@ -191,7 +191,7 @@ describe('NotationElements', () => {
         settings.display.layoutMode = LayoutMode.Page;
 
         settings.notation.elements.set(NotationElement.ZerosOnDiveWhammys, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/zeros-on-dive-whammys-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/zeros-on-dive-whammys-on.png`, settings);
     });
 
     it('effects-off', async () => {
@@ -202,7 +202,7 @@ describe('NotationElements', () => {
 
         settings.notation.elements.set(NotationElement.EffectTempo, false);
         settings.notation.elements.set(NotationElement.EffectTripletFeel, false);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/effects-off.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/effects-off.png`, settings);
     });
 
     it('effects-on', async () => {
@@ -213,6 +213,6 @@ describe('NotationElements', () => {
 
         settings.notation.elements.set(NotationElement.EffectTempo, true);
         settings.notation.elements.set(NotationElement.EffectTripletFeel, true);
-        await VisualTestHelper.runVisualTestTex(tex, `notation-elements/effects-on.png`, settings);
+        await VisualTestHelper.runVisualTestTex(tex, `test-data/visual-tests/notation-elements/effects-on.png`, settings);
     });
 });

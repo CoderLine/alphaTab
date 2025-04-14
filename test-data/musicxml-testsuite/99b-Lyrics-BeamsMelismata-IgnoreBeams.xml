@@ -8,9 +8,9 @@
       <software>Dolet 3.4 for Sibelius</software>
     </encoding>
     <miscellaneous>
-      <miscellaneous-field name="description">If we properly ignore all beaming 
-          information from the Dolet 3 for Sibelius export file, make sure that 
-          the lyrics syllables are still assigned to the correct 
+      <miscellaneous-field name="description">If we properly ignore all beaming
+          information from the Dolet 3 for Sibelius export file, make sure that
+          the lyrics syllables are still assigned to the correct
           notes.</miscellaneous-field>
     </miscellaneous>
   </identification>

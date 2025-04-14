@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">Several durations can be written
-      with dots. For multimeasure rests, we can also have durations that
-      cannot be expressed with dotted notes (like 5/8).</miscellaneous-field>
+          with dots.  For multi-measure rests it is also possible to have
+          durations that cannot be expressed with dotted notes (like 5/8).
+
+          In bar 15 there is only a 16th note and no rest for the remaining part
+          of the bar.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

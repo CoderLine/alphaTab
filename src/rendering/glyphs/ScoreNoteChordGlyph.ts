@@ -194,7 +194,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         if (this.beat.isTremolo && !this.beat.deadSlapped) {
             let offset: number = 0;
             let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
-            let tremoloX: number = direction === BeamDirection.Up ? this.displacedX : 0;
+            let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
             let speed: Duration = this.beat.tremoloSpeed!;
             switch (speed) {
                 case Duration.ThirtySecond:

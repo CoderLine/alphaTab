@@ -71,7 +71,8 @@ export class VisualTestHelper {
         settings?: Settings,
         configure?: (o: VisualTestOptions) => void
     ): Promise<void> {
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
+        inputFile = `test-data/visual-tests/${inputFile}`;
+        const inputFileData = await TestPlatform.loadFile(inputFile);
         const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
         let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
@@ -99,7 +100,7 @@ export class VisualTestHelper {
         let referenceFileData: Uint8Array[] = [];
         for (const run of runs) {
             try {
-                referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${run.referenceFileName}`));
+                referenceFileData.push(await TestPlatform.loadFile(run.referenceFileName));
             } catch (e) {
                 referenceFileData.push(new Uint8Array(0));
             }
@@ -313,7 +314,7 @@ export class VisualTestHelper {
         let errorMessage = '';
         const oldActual = actual;
 
-        const tolerancePercent = options.tolerancePercent ?? 1;
+        const tolerancePercent = options.tolerancePercent ?? 0;
 
         if (expected) {
             const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;
@@ -395,7 +396,6 @@ export class VisualTestHelper {
         actual: AlphaSkiaImage,
         diff: AlphaSkiaImage | undefined
     ): Promise<void> {
-        expectedFilePath = TestPlatform.joinPath('test-data', 'visual-tests', expectedFilePath);
         if (diff) {
             const diffData = diff.toPng()!;
 
@@ -409,8 +409,6 @@ export class VisualTestHelper {
     }
 
     static async deleteFiles(expectedFilePath: string): Promise<void> {
-        expectedFilePath = TestPlatform.joinPath('test-data', 'visual-tests', expectedFilePath);
-
         const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
         await TestPlatform.deleteFile(diffFileName);
 

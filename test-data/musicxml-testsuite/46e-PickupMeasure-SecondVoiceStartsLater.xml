@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
-          "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="2.0">
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
     <identification>
       <miscellaneous>
-        <miscellaneous-field name="description">Voice 2 should start at 2nd 
+        <miscellaneous-field name="description">Voice 2 should start at 2nd
             beat of first full measure.</miscellaneous-field>
       </miscellaneous>
     </identification>
@@ -13,7 +13,7 @@
             <part-name></part-name>
         </score-part>
     </part-list>
-    <!--=========================================================-->
+    <!--=======================================================-->
     <part id="P1">
         <measure implicit="yes" number="0">
             <attributes>
@@ -29,7 +29,7 @@
                 <type>quarter</type>
             </note>
         </measure>
-        <!--=======================================================-->
+        <!--===================================================-->
         <measure number="1">
             <attributes>
                 <divisions>1</divisions>
@@ -83,7 +83,7 @@
                 <type>quarter</type>
             </note>
         </measure>
-        <!--=======================================================-->
+        <!--===================================================-->
     </part>
-    <!--=========================================================-->
+    <!--=======================================================-->
 </score-partwise>

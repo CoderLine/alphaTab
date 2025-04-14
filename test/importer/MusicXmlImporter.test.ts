@@ -103,7 +103,7 @@ describe('MusicXmlImporterTests', () => {
     });
     it('bend', async () => {
         let score: Score = await MusicXmlImporterTestHelper.testReferenceFile(
-            'test-data/musicxml-testsuite/100a-Guitare-Bends.xml'
+            'test-data/musicxml4/bends.xml'
         );
         let note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         expect(note.bendType).to.equal(BendType.Bend);

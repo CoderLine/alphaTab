@@ -163,7 +163,7 @@ describe('GeneralTests', () => {
             let defaultStart: number = 0;
 
             await VisualTestHelper.runVisualTest('general/colors.gp', undefined, o => {
-                o.runs[0].referenceFileName = 'general/colors-disabled.png';
+                o.runs[0].referenceFileName = 'test-data/visual-tests/general/colors-disabled.png';
                 defaultStart = performance.now();
             });
             const defaultEnd = performance.now();

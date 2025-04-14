@@ -3705,7 +3705,8 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression,
             parent: parent,
             tsNode: expression,
-            nodeType: cs.SyntaxKind.InvocationExpression
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            nullSafe: !!expression.questionDotToken
         } as cs.InvocationExpression;
 
         // chai

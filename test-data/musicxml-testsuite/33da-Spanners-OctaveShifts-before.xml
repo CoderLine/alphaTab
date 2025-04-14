@@ -1,11 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
+    <encoding>
+      <software>Finale</software>
+    </encoding>
     <miscellaneous>
-      <miscellaneous-field name="description">All types of octave shifts (15ma,
-            15mb, 8va, 8vb)</miscellaneous-field>
+      <miscellaneous-field name="description">All types of octave shifts (15ma
+          on the third eighth note, 15mb on the fourth and fifth, 8va on the
+          sixth and seventh, and 8vb on the last two 16th notes).  This test
+          file positions &lt;octave-shift type="stop"/>&gt; before the
+          associated note, as expected in MusicXML import of Finale, for
+          example.  Consequently, it contains ‘Finale’ as the &lt;software&gt;
+          tag.
+
+          Note that the end of the last octave shift is anchored at the
+          following bar line.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -55,7 +66,13 @@
         <direction-type>
           <octave-shift size="15" type="down"/>
         </direction-type>
-        <offset>-4</offset>
+        <offset>-1</offset>
+      </direction>
+      <direction>
+        <direction-type>
+          <octave-shift size="15" type="stop"/>
+        </direction-type>
+        <offset>1</offset>
       </direction>
       <note>
         <pitch>
@@ -69,14 +86,9 @@
       </note>
       <direction>
         <direction-type>
-          <octave-shift size="15" type="stop"/>
-        </direction-type>
-        <offset>-4</offset>
-      </direction>
-      <direction>
-        <direction-type>
           <octave-shift size="15" type="up"/>
         </direction-type>
+        <offset>-1</offset>
       </direction>
       <note>
         <pitch>
@@ -88,6 +100,12 @@
         <type>eighth</type>
         <beam number="1">end</beam>
       </note>
+      <direction>
+        <direction-type>
+          <octave-shift size="15" type="stop"/>
+        </direction-type>
+        <offset>1</offset>
+      </direction>
       <note>
         <pitch>
           <step>B</step>
@@ -100,14 +118,9 @@
       </note>
       <direction>
         <direction-type>
-          <octave-shift size="15" type="stop"/>
-        </direction-type>
-        <offset>-4</offset>
-      </direction>
-      <direction>
-        <direction-type>
           <octave-shift size="8" type="down"/>
         </direction-type>
+        <offset>-1</offset>
       </direction>
       <note>
         <pitch>
@@ -119,6 +132,12 @@
         <type>eighth</type>
         <beam number="1">end</beam>
       </note>
+      <direction>
+        <direction-type>
+          <octave-shift size="8" type="stop"/>
+        </direction-type>
+        <offset>1</offset>
+      </direction>
       <note>
         <pitch>
           <step>A</step>
@@ -131,14 +150,9 @@
       </note>
       <direction>
         <direction-type>
-          <octave-shift size="8" type="stop"/>
-        </direction-type>
-        <offset>-3</offset>
-      </direction>
-      <direction>
-        <direction-type>
           <octave-shift size="8" type="up"/>
         </direction-type>
+        <offset>-1</offset>
       </direction>
       <note>
         <pitch>
@@ -166,8 +180,20 @@
         <direction-type>
           <octave-shift size="8" type="stop"/>
         </direction-type>
-        <offset>-2</offset>
+        <offset>-1</offset>
       </direction>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2">
+      <note>
+        <pitch>
+          <step>C</step>
+          <octave>5</octave>
+        </pitch>
+        <duration>32</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>
       </barline>

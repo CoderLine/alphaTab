@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Nested repeats, each with 
-          alternative endings.</miscellaneous-field>
+      <miscellaneous-field name="description">Multiple alternative endings.  The
+          first alternative starts and ends at bar 2; the second continues until
+          bar 5, the third until bar 9, the fourth until bar 10, and the fifth
+          implicitly until the end.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -80,7 +82,9 @@
         <voice>1</voice>
       </note>
       <barline location="right">
+        <bar-style>light-heavy</bar-style>
         <ending number="2" type="stop"/>
+        <repeat direction="backward"/>
       </barline>
     </measure>
     <!--=======================================================-->
@@ -93,9 +97,6 @@
         <duration>4</duration>
         <voice>1</voice>
       </note>
-      <barline location="right">
-        <ending number="3" type="discontinue"/>
-      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="7">
@@ -120,11 +121,16 @@
         <duration>4</duration>
         <voice>1</voice>
       </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+        <ending number="3" type="stop"/>
+        <repeat direction="backward"/>
+      </barline>
     </measure>
     <!--=======================================================-->
     <measure number="10">
       <barline location="left">
-        <ending number="1" type="start"/>
+        <ending number="4" type="start"/>
       </barline>
       <note>
         <rest/>
@@ -132,7 +138,9 @@
         <voice>1</voice>
       </note>
       <barline location="right">
-        <ending number="1" type="stop"/>
+        <bar-style>light-heavy</bar-style>
+        <ending number="4" type="stop"/>
+        <repeat direction="backward"/>
       </barline>
     </measure>
     <!--=======================================================-->
@@ -146,9 +154,7 @@
         <voice>1</voice>
       </note>
       <barline location="right">
-        <bar-style>light-heavy</bar-style>
-        <ending number="5" type="stop"/>
-        <repeat direction="backward"/>
+        <ending number="5" type="discontinue"/>
       </barline>
     </measure>
     <!--=======================================================-->
