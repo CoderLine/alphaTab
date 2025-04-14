@@ -1,16 +1,8 @@
 {
     "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
     "files": {
-        "include": [
-            "src/**",
-            "test/**",
-            "src.compiler/**"
-        ],
-        "ignore": [
-            "dist",
-            ".rollup.cache",
-            "node_modules"
-        ]
+        "include": ["src/**", "test/**", "src.compiler/**"],
+        "ignore": ["dist", ".rollup.cache", "node_modules", "test-data", "src/generated/**"]
     },
     "formatter": {
         "enabled": true,
