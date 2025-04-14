@@ -75,8 +75,9 @@ export class IntBitReader {
     }
 
     public tryPeekBits(count: number): IntBitReaderReadResult {
-        if (count < 0 || count > 32)
+        if (count < 0 || count > 32) {
             throw new AlphaTabError(AlphaTabErrorType.General, 'IO: Cannot read more than 32 bits in one go');
+        }
         if (count === 0) {
             return new IntBitReaderReadResult();
         }
@@ -102,7 +103,7 @@ export class IntBitReader {
 
         let bitBucket = this._bitBucket;
         if (count < 64) {
-            bitBucket = bitBucket & (1n << BigInt(count)) - 1n;
+            bitBucket = bitBucket & ((1n << BigInt(count)) - 1n);
         }
 
         result.value = Number(bitBucket);

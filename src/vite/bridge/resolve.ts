@@ -16,7 +16,7 @@ function splitFileAndPostfix(path: string) {
 export function tryFsResolve(fsPath: string, preserveSymlinks: boolean): string | undefined {
     const { file, postfix } = splitFileAndPostfix(fsPath);
     const res = tryCleanFsResolve(file, preserveSymlinks);
-    if (res) return res + postfix;
+    if (res) { return res + postfix; }
 
     return;
 }

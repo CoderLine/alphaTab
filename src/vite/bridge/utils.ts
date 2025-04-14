@@ -34,7 +34,7 @@ export function tryStatSync(file: string) {
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1030
 export function getHash(text: Buffer | string, length = 8): string {
     const h = createHash('sha256').update(text).digest('hex').substring(0, length);
-    if (length <= 64) return h;
+    if (length <= 64) { return h; }
     return h.padEnd(length, '_');
 }
 
@@ -73,7 +73,7 @@ export function injectQuery(builtUrl: string, query: string): string {
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1435
 export function partialEncodeURIPath(uri: string): string {
-    if (uri.startsWith('data:')) return uri;
+    if (uri.startsWith('data:')) { return uri; }
     const filePath = cleanUrl(uri);
     const postfix = filePath !== uri ? uri.slice(filePath.length) : '';
     return filePath.replaceAll('%', '%25') + postfix;
@@ -81,7 +81,7 @@ export function partialEncodeURIPath(uri: string): string {
 
 // https://github.com/vitejs/vite/blob/b7ddfae5f852c2948fab03e94751ce56f5f31ce0/packages/vite/src/node/utils.ts#L1424
 export function encodeURIPath(uri: string): string {
-    if (uri.startsWith('data:')) return uri;
+    if (uri.startsWith('data:')) { return uri; }
     const filePath = cleanUrl(uri);
     const postfix = filePath !== uri ? uri.slice(filePath.length) : '';
     return encodeURI(filePath) + postfix;

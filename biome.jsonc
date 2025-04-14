@@ -3,8 +3,8 @@
     "files": {
         "include": [
             "src/**",
-            "test/**"
-            // temp: "src.compiler/**"
+            "test/**",
+            "src.compiler/**"
         ],
         "ignore": [
             "dist",
@@ -29,7 +29,11 @@
                 "noInferrableTypes": "off", // we want to be explicit (for transpiler)
                 "noNonNullAssertion": "off", // we use these assertions often.
                 "noParameterAssign": "off", // useful for default values
-                "useExponentiationOperator": "off" // not supported in C# and Kotlin, lets stay with Math.pow
+                "useExponentiationOperator": "off", // not supported in C# and Kotlin, lets stay with Math.pow
+                "useBlockStatements": {
+                    "level": "error",
+                    "fix": "safe"
+                }
             },
             "suspicious": {
                 "noExplicitAny": "off" // used in areas where we work with dynamic JSON data
@@ -42,10 +46,8 @@
                 "noSwitchDeclarations": "off"
             },
             "complexity": {
-                // temporary disabled, apply fixes gradually
-                "useOptionalChain": "off",
-                // we are strictly OOP (for transpiler)
-                "noStaticOnlyClass": "off"
+                "useOptionalChain": "off", // its currently a bit sensitive with Kotlin as they evaulate things differently
+                "noStaticOnlyClass": "off" // we are strictly OOP (for transpiler)
             }
         }
     },

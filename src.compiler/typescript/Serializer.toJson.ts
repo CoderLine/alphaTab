@@ -1,7 +1,7 @@
 import * as ts from 'typescript';
 import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
 import { findSerializerModule } from './Serializer.common';
-import { TypeSchema } from './TypeSchema';
+import type { TypeSchema } from './TypeSchema';
 
 function generateToJsonBody(serializable: TypeSchema, importer: (name: string, module: string) => void) {
     const statements: ts.Statement[] = [];
@@ -26,7 +26,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         )
     );
 
-    for (let prop of serializable.properties) {
+    for (const prop of serializable.properties) {
         const fieldName = prop.name;
         const jsonName = prop.jsonNames.filter(n => n !== '')[0];
 
@@ -77,7 +77,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
         } else if (prop.type.isArray) {
             const arrayItemType = prop.type.arrayItemType!;
             if (arrayItemType.isOwnType && !arrayItemType.isEnumType) {
-                let itemSerializer = arrayItemType.typeAsString + 'Serializer';
+                const itemSerializer = `${arrayItemType.typeAsString}Serializer`;
                 importer(itemSerializer, findSerializerModule(arrayItemType));
                 if (prop.type.isNullable) {
                     propertyStatements.push(
@@ -155,7 +155,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                     ts.SyntaxKind.Block
                 );
             } else {
-                const itemSerializer = prop.type.typeArguments![1].typeAsString + 'Serializer';
+                const itemSerializer = `${prop.type.typeArguments![1].typeAsString}Serializer`;
                 importer(itemSerializer, findSerializerModule(prop.type.typeArguments![1]));
 
                 serializeBlock = createNodeFromSource<ts.Block>(
@@ -246,7 +246,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 )
             );
         } else if (serializable.isStrict) {
-            let itemSerializer = prop.type.typeAsString + 'Serializer';
+            const itemSerializer = `${prop.type.typeAsString}Serializer`;
             importer(itemSerializer, findSerializerModule(prop.type));
 
             if (prop.type.isNullable || prop.type.isOptional) {
@@ -271,7 +271,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
                 );
             }
         } else {
-            let itemSerializer = prop.type.typeAsString + 'Serializer';
+            const itemSerializer = `${prop.type.typeAsString}Serializer`;
             importer(itemSerializer, findSerializerModule(prop.type));
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
@@ -294,7 +294,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
 
     if (serializable.hasToJsonExtension) {
         statements.push(
-            createNodeFromSource<ts.ExpressionStatement>(`obj.toJson(o);`, ts.SyntaxKind.ExpressionStatement)
+            createNodeFromSource<ts.ExpressionStatement>('obj.toJson(o);', ts.SyntaxKind.ExpressionStatement)
         );
     }
 

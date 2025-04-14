@@ -219,7 +219,7 @@ export class Inflate {
                 const bytes: Uint8Array = IOHelper.readByteArray(this._input, rlen);
                 this._len -= rlen;
                 this.addBytes(bytes, 0, rlen);
-                if (this._len === 0) this._state = this._isFinal ? InflateState.Crc : InflateState.Block;
+                if (this._len === 0) { this._state = this._isFinal ? InflateState.Crc : InflateState.Block; }
                 return this._needed > 0;
             }
             case InflateState.DistOne: {

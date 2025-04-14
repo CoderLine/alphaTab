@@ -110,11 +110,12 @@ export class OggReader {
             }
 
             if ((pageFlags & PageFlags.ContinuesPacket) !== 0) {
-                if (packets.length === 0)
+                if (packets.length === 0) {
                     throw new AlphaTabError(
                         AlphaTabErrorType.Format,
                         'OGG: Continuation page without any previous packets'
                     );
+                }
                 packets[packets.length - 1].addData(packetData);
             } else {
                 const packet = new OggPacket(

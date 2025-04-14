@@ -1,6 +1,6 @@
 import * as ts from 'typescript';
 import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
-import { TypeSchema } from './TypeSchema';
+import type { TypeSchema } from './TypeSchema';
 
 function generateFromJsonBody(
     input: ts.ClassDeclaration,

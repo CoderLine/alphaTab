@@ -1,6 +1,6 @@
-import * as path from 'path';
-import ts, { isThisTypeNode, ObjectFlags } from 'typescript';
-import * as url from 'url';
+import path from 'node:path';
+import ts from 'typescript';
+import url from 'node:url';
 import { isEnumType, isNumberType, isPrimitiveType } from '../BuilderHelpers';
 
 export type TypeWithNullableInfo = {
@@ -91,7 +91,9 @@ export function buildTypeSchema(program: ts.Program, input: ts.ClassDeclaration)
     let typeArgumentMapping: Map<string, ts.Type> | undefined;
     const checker = program.getTypeChecker();
     while (hierarchy) {
-        hierarchy.members.forEach(x => handleMember(x, typeArgumentMapping));
+        for(const x of hierarchy.members) {
+            handleMember(x, typeArgumentMapping);
+        }
 
         const extendsClause = hierarchy.heritageClauses?.find(c => c.token === ts.SyntaxKind.ExtendsKeyword);
         if (extendsClause?.types.length === 1) {
@@ -175,7 +177,7 @@ export function getTypeWithNullableInfo(
                 typeInfo.isCloneable = !!typeInfo.jsDocTags.find(t => t.tagName.text === 'cloneable');
             }
 
-            if (tsType.flags & ObjectFlags.Reference) {
+            if (tsType.flags & ts.ObjectFlags.Reference) {
                 typeInfo.typeArguments = (tsType as ts.TypeReference).typeArguments?.map(p =>
                     getTypeWithNullableInfo(program, p, allowUnion, false, typeArgumentMapping)
                 );
@@ -245,9 +247,9 @@ export function getTypeWithNullableInfo(
                                 typeArgumentMapping
                             );
                         } else {
-                            throw new Error('Unresolved type parameters ' + typeInfo.typeAsString);
+                            throw new Error(`Unresolved type parameters ${typeInfo.typeAsString}`);
                         }
-                    } else if ((tsType as ts.Type).flags & ObjectFlags.Reference) {
+                    } else if ((tsType as ts.Type).flags & ts.ObjectFlags.Reference) {
                         typeInfo.typeArguments = (tsType as ts.TypeReference).typeArguments?.map(p =>
                             getTypeWithNullableInfo(program, p, allowUnion, false, typeArgumentMapping)
                         );
@@ -282,10 +284,7 @@ export function getTypeWithNullableInfo(
                     );
                 } else {
                     throw new Error(
-                        'Multi union types on not supported at this location: ' +
-                            node.getSourceFile().fileName +
-                            ':' +
-                            node.getText()
+                        `Multi union types on not supported at this location: ${node.getSourceFile().fileName}:${node.getText()}`
                     );
                 }
             }
@@ -314,7 +313,7 @@ export function getTypeWithNullableInfo(
                         getTypeWithNullableInfo(program, t, false, false, typeArgumentMapping)
                     );
                 } else {
-                    throw new Error('Multi union types on not supported at this location: ' + typeInfo.typeAsString);
+                    throw new Error(`Multi union types on not supported at this location: ${typeInfo.typeAsString}`);
                 }
             }
         } else {
@@ -398,7 +397,7 @@ const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 const root = path.resolve(__dirname, '..', '..');
 
 export function toImportPath(fileName: string) {
-    return '@' + removeExtension(path.relative(root, fileName)).split('\\').join('/');
+    return `@${removeExtension(path.relative(root, fileName)).split('\\').join('/')}`;
 }
 
 function findModule(type: ts.Type, options: ts.CompilerOptions) {
@@ -411,7 +410,7 @@ function findModule(type: ts.Type, options: ts.CompilerOptions) {
             }
         }
 
-        return './' + type.symbol.name;
+        return `./${type.symbol.name}`;
     }
 
     return '';

@@ -16,7 +16,7 @@ const quoteNewlineRegEx = /([\n\r'\u2028\u2029])/g;
 const backSlashRegEx = /\\/g;
 
 function escapeId(id: string): string {
-    if (!needsEscapeRegEx.test(id)) return id;
+    if (!needsEscapeRegEx.test(id)) { return id; }
     return id.replace(backSlashRegEx, '\\\\').replace(quoteNewlineRegEx, '\\$1');
 }
 
@@ -35,7 +35,7 @@ const getFileUrlFromRelativePath = (path: string) => getFileUrlFromFullPath(`__d
 
 const relativeUrlMechanisms: Record<InternalModuleFormat, (relativePath: string) => string> = {
     amd: relativePath => {
-        if (relativePath[0] !== '.') relativePath = `./${relativePath}`;
+        if (relativePath[0] !== '.') { relativePath = `./${relativePath}`; }
         return getResolveUrl(`require.toUrl('${escapeId(relativePath)}'), document.baseURI`);
     },
     cjs: relativePath =>
@@ -133,7 +133,7 @@ export function injectEnvironmentToHooks(environment: BuildEnvironment, plugin: 
 }
 
 function wrapEnvironmentResolveId(environment: BuildEnvironment, hook?: Plugin['resolveId']): Plugin['resolveId'] {
-    if (!hook) return;
+    if (!hook) { return; }
 
     const fn = getHookHandler(hook);
     const handler: Plugin['resolveId'] = function (id, importer, options) {
@@ -155,7 +155,7 @@ function wrapEnvironmentResolveId(environment: BuildEnvironment, hook?: Plugin['
 }
 
 function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load']): Plugin['load'] {
-    if (!hook) return;
+    if (!hook) { return; }
 
     const fn = getHookHandler(hook);
     const handler: Plugin['load'] = function (id, ...args) {
@@ -172,7 +172,7 @@ function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load'
 }
 
 function wrapEnvironmentTransform(environment: BuildEnvironment, hook?: Plugin['transform']): Plugin['transform'] {
-    if (!hook) return;
+    if (!hook) { return; }
 
     const fn = getHookHandler(hook);
     const handler: Plugin['transform'] = function (code, importer, ...args) {
@@ -197,10 +197,10 @@ function wrapEnvironmentHook<HookName extends keyof Plugin>(
     environment: BuildEnvironment,
     hook?: Plugin[HookName]
 ): Plugin[HookName] {
-    if (!hook) return;
+    if (!hook) { return; }
 
     const fn = getHookHandler(hook);
-    if (typeof fn !== 'function') return hook;
+    if (typeof fn !== 'function') { return hook; }
 
     const handler: Plugin[HookName] = function (this: PluginContext, ...args: any[]) {
         return fn.call(injectEnvironmentInContext(this, environment), ...args);

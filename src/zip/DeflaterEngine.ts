@@ -330,25 +330,25 @@ export class DeflaterEngine {
 
             switch ((scanMax - scan) % 8) {
                 case 1:
-                    if (window[++scan] === window[++match]) break;
+                    if (window[++scan] === window[++match]) { break; }
                     break;
 
                 case 2:
                     if (window[++scan] === window[++match]
-                        && window[++scan] === window[++match]) break;
+                        && window[++scan] === window[++match]) { break; }
                     break;
 
                 case 3:
                     if (window[++scan] === window[++match]
                         && window[++scan] === window[++match]
-                        && window[++scan] === window[++match]) break;
+                        && window[++scan] === window[++match]) { break; }
                     break;
 
                 case 4:
                     if (window[++scan] === window[++match]
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
-                        && window[++scan] === window[++match]) break;
+                        && window[++scan] === window[++match]) { break; }
                     break;
 
                 case 5:
@@ -356,7 +356,7 @@ export class DeflaterEngine {
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
-                        && window[++scan] === window[++match]) break;
+                        && window[++scan] === window[++match]) { break; }
                     break;
 
                 case 6:
@@ -365,7 +365,7 @@ export class DeflaterEngine {
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
-                        && window[++scan] === window[++match]) break;
+                        && window[++scan] === window[++match]) { break; }
                     break;
 
                 case 7:
@@ -375,7 +375,7 @@ export class DeflaterEngine {
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
                         && window[++scan] === window[++match]
-                        && window[++scan] === window[++match]) break;
+                        && window[++scan] === window[++match]) { break; }
                     break;
             }
 

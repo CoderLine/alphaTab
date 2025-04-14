@@ -3,9 +3,9 @@ import cloneEmit from './CloneEmitter';
 import { GENERATED_FILE_HEADER } from './EmitterBase';
 import serializerEmit from './SerializerEmitter';
 import transpiler from '../TranspilerBase';
-import fs from 'fs';
+import fs from 'node:fs';
 import jsonDeclarationEmit from './JsonDeclarationEmitter';
-import { execSync } from 'child_process';
+import { execSync } from 'node:child_process';
 
 transpiler([{
     name: 'Clone',

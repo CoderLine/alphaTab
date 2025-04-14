@@ -1,9 +1,9 @@
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as cs from '../csharp/CSharpAst';
-import * as path from 'path';
-import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
+import path from 'node:path';
+import type CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
-import KotlinEmitterContext from './KotlinEmitterContext';
+import type KotlinEmitterContext from './KotlinEmitterContext';
 
 export default class KotlinAstTransformer extends CSharpAstTransformer {
     protected override _context: KotlinEmitterContext;
@@ -24,7 +24,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     private _paramsWithAssignment: Set<string>[] = [];
 
     private getMethodLocalParameterName(name: string) {
-        return 'param' + name;
+        return `param${name}`;
     }
 
     protected override visitMethodSignature(
@@ -33,7 +33,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     ) {
         const csMethod = super.visitMethodSignature(parent, classElement);
 
-        if (!!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'async')) {
+        if (ts.getJSDocTags(classElement).find(t => t.tagName.text === 'async')) {
             csMethod.isAsync = true;
         }
 
@@ -41,7 +41,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     protected override buildFileName(fileName: string, context: CSharpEmitterContext): string {
-        let parts = this.removeExtension(fileName).split(path.sep);
+        const parts = this.removeExtension(fileName).split(path.sep);
         if (parts.length > 0) {
             switch (parts[0]) {
                 case 'src':
@@ -159,10 +159,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     private injectParametersAsLocal(block: cs.Block) {
-        let localParams: cs.VariableStatement[] = [];
+        const localParams: cs.VariableStatement[] = [];
 
-        let currentAssignments = this._paramsWithAssignment[this._paramsWithAssignment.length - 1];
-        let currentScope = this._paramReferences[this._paramReferences.length - 1];
+        const currentAssignments = this._paramsWithAssignment[this._paramsWithAssignment.length - 1];
+        const currentScope = this._paramReferences[this._paramReferences.length - 1];
         for (const p of currentAssignments) {
             const renamedP = this.getMethodLocalParameterName(p);
 
@@ -186,7 +186,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 isConst: false
             } as cs.VariableDeclarationList;
 
-            let declaration = {
+            const declaration = {
                 nodeType: cs.SyntaxKind.VariableDeclaration,
                 parent: variableStatement.declarationList,
                 tsNode: block.tsNode,
@@ -284,7 +284,9 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                     ];
 
                     return suspendToDeferred;
-                } else if (ts.isAwaitExpression(expression.parent) && !isSuspend) {
+                }
+
+                if (ts.isAwaitExpression(expression.parent) && !isSuspend) {
                     const deferredToSuspend = {
                         nodeType: cs.SyntaxKind.InvocationExpression
                     } as cs.InvocationExpression;
@@ -384,10 +386,12 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return method;
     }
 
-    protected visitFunctionDeclaration(parent: cs.Node, expression: ts.FunctionDeclaration): cs.LocalFunctionDeclaration {
+    protected visitFunctionDeclaration(
+        parent: cs.Node,
+        expression: ts.FunctionDeclaration
+    ): cs.LocalFunctionDeclaration {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
-
 
         const fun = super.visitFunctionDeclaration(parent, expression);
 
@@ -398,14 +402,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         this._paramReferences.pop();
         this._paramsWithAssignment.pop();
 
-
         return fun;
     }
 
-    protected override getSymbolName(
-        parentSymbol: ts.Symbol,
-        symbol: ts.Symbol
-    ): string | null {
+    protected override getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol): string | null {
         switch (parentSymbol.name) {
             case 'String':
                 switch (symbol.name) {
@@ -471,14 +471,16 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 arguments: []
             } as cs.InvocationExpression;
 
-            let expr = this.visitExpression(call, expression.expression);
+            const expr = this.visitExpression(call, expression.expression);
             if (!expr) {
                 return null;
             }
             call.arguments.push(expr);
 
             return call;
-        } else if (this.isCastFromEnumToNumber(expression)) {
+        }
+
+        if (this.isCastFromEnumToNumber(expression)) {
             const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 parent: parent,
@@ -487,7 +489,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 tsNode: expression
             } as cs.MemberAccessExpression;
 
-            let expr = this.visitExpression(methodAccess, expression.expression);
+            const expr = this.visitExpression(methodAccess, expression.expression);
             if (!expr) {
                 return null;
             }
@@ -501,22 +503,23 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             } as cs.InvocationExpression;
 
             return call;
-        } else {
-            return super.visitAsExpression(parent, expression);
         }
+        return super.visitAsExpression(parent, expression);
     }
 
     private isCastFromEnumToNumber(expression: ts.AsExpression) {
-        let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
-        let nonNullable = this._context.typeChecker.getNonNullableType(targetType);
+        const targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        const nonNullable = this._context.typeChecker.getNonNullableType(targetType);
         if (nonNullable.flags === ts.TypeFlags.Number) {
-            let sourceType = this._context.typeChecker.getNonNullableType(this._context.getType(expression.expression));
+            const sourceType = this._context.typeChecker.getNonNullableType(
+                this._context.getType(expression.expression)
+            );
             return sourceType.flags & ts.TypeFlags.Enum || sourceType.flags & ts.TypeFlags.EnumLiteral;
         }
         return false;
     }
     private isCastToEnum(expression: ts.AsExpression) {
-        let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        const targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
     }
 

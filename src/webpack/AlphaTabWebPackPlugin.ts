@@ -19,9 +19,9 @@ const WINDOWS_ABS_PATH_REGEXP = /^[a-zA-Z]:[\\/]/;
 const WINDOWS_PATH_SEPARATOR_REGEXP = /\\/g;
 
 const relativePathToRequest = (relativePath: string): string => {
-    if (relativePath === '') return './.';
-    if (relativePath === '..') return '../.';
-    if (relativePath.startsWith('../')) return relativePath;
+    if (relativePath === '') { return './.'; }
+    if (relativePath === '..') { return '../.'; }
+    if (relativePath.startsWith('../')) { return relativePath; }
     return `./${relativePath}`;
 };
 
@@ -64,7 +64,7 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
     const cache = new WeakMap<object, Map<string, Map<string, string>>>();
 
     const cachedFn = (context: string, identifier: string, associatedObjectForCache?: object): string => {
-        if (!associatedObjectForCache) return fn(context, identifier);
+        if (!associatedObjectForCache) { return fn(context, identifier); }
 
         let innerCache = cache.get(associatedObjectForCache);
         if (innerCache === undefined) {

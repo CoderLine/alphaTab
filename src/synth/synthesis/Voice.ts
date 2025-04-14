@@ -71,7 +71,7 @@ export class Voice {
         const note: number = this.playingKey + this.region.transpose + this.region.tune / 100.0;
         let adjustedPitch: number =
             this.region.pitchKeyCenter + (note - this.region.pitchKeyCenter) * (this.region.pitchKeyTrack / 100.0);
-        if (pitchShift !== 0) adjustedPitch += pitchShift;
+        if (pitchShift !== 0) { adjustedPitch += pitchShift; }
         this.pitchInputTimecents = adjustedPitch * 100.0;
         this.pitchOutputFactor =
             this.region.sampleRate / (SynthHelper.timecents2Secs(this.region.pitchKeyCenter * 100.0) * outSampleRate);
@@ -246,7 +246,7 @@ export class Voice {
                         let value: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
 
                         // Low-pass filter.
-                        if (tmpLowpass.active) value = tmpLowpass.process(value);
+                        if (tmpLowpass.active) { value = tmpLowpass.process(value); }
 
                         outputBuffer[offset + outL] += value * gainLeft;
                         outL++;
@@ -272,7 +272,7 @@ export class Voice {
                         let value: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
 
                         // Low-pass filter.
-                        if (tmpLowpass.active) value = tmpLowpass.process(value);
+                        if (tmpLowpass.active) { value = tmpLowpass.process(value); }
 
                         outputBuffer[offset + outL] += value * gainLeft;
                         outL++;
@@ -296,7 +296,7 @@ export class Voice {
                         let value: number = input[pos] * (1.0 - alpha) + input[nextPos] * alpha;
 
                         // Low-pass filter.
-                        if (tmpLowpass.active) value = tmpLowpass.process(value);
+                        if (tmpLowpass.active) { value = tmpLowpass.process(value); }
 
                         outputBuffer[offset + outL] = value * gainMono;
                         outL++;

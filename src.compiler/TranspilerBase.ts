@@ -72,7 +72,7 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
     }
 
     if (handleErrors) {
-        let diagnostics = ts.sortAndDeduplicateDiagnostics(allDiagnostics);
+        const diagnostics = ts.sortAndDeduplicateDiagnostics(allDiagnostics);
         let errorCount = 0;
         let warningCount = 0;
         for(const d of diagnostics) {

@@ -1,88 +1,88 @@
-import * as ts from 'typescript';
+import type * as ts from 'typescript';
 
 // Base
 export enum SyntaxKind {
-    SourceFile,
-    UsingDeclaration,
-    NamespaceDeclaration,
-    ClassDeclaration,
-    EnumDeclaration,
-    InterfaceDeclaration,
-    TypeParameterDeclaration,
-    MethodDeclaration,
-    ConstructorDeclaration,
-    FieldDeclaration,
-    PropertyDeclaration,
-    PropertyAccessorDeclaration,
-    ParameterDeclaration,
-    UnresolvedTypeNode,
-    TypeReference,
-    FunctionTypeNode,
-    PrimitiveTypeNode,
-    EnumMember,
-    ArrayTypeNode,
-    MapTypeNode,
-    ArrayTupleNode,
+    SourceFile = 0,
+    UsingDeclaration = 1,
+    NamespaceDeclaration = 2,
+    ClassDeclaration = 3,
+    EnumDeclaration = 4,
+    InterfaceDeclaration = 5,
+    TypeParameterDeclaration = 6,
+    MethodDeclaration = 7,
+    ConstructorDeclaration = 8,
+    FieldDeclaration = 9,
+    PropertyDeclaration = 10,
+    PropertyAccessorDeclaration = 11,
+    ParameterDeclaration = 12,
+    UnresolvedTypeNode = 13,
+    TypeReference = 14,
+    FunctionTypeNode = 15,
+    PrimitiveTypeNode = 16,
+    EnumMember = 17,
+    ArrayTypeNode = 18,
+    MapTypeNode = 19,
+    ArrayTupleNode = 20,
 
-    Block,
-    EmptyStatement,
-    VariableStatement,
-    ExpressionStatement,
-    IfStatement,
-    DoStatement,
-    WhileStatement,
-    ForStatement,
-    ForEachStatement,
-    BreakStatement,
-    ContinueStatement,
-    ReturnStatement,
-    SwitchStatement,
-    ThrowStatement,
-    TryStatement,
+    Block = 21,
+    EmptyStatement = 22,
+    VariableStatement = 23,
+    ExpressionStatement = 24,
+    IfStatement = 25,
+    DoStatement = 26,
+    WhileStatement = 27,
+    ForStatement = 28,
+    ForEachStatement = 29,
+    BreakStatement = 30,
+    ContinueStatement = 31,
+    ReturnStatement = 32,
+    SwitchStatement = 33,
+    ThrowStatement = 34,
+    TryStatement = 35,
 
-    VariableDeclarationList,
-    VariableDeclaration,
-    DeconstructDeclaration,
-    CaseClause,
-    DefaultClause,
-    CatchClause,
+    VariableDeclarationList = 36,
+    VariableDeclaration = 37,
+    DeconstructDeclaration = 38,
+    CaseClause = 39,
+    DefaultClause = 40,
+    CatchClause = 41,
 
-    PrefixUnaryExpression,
-    PostfixUnaryExpression,
-    NullLiteral,
-    TrueLiteral,
-    FalseLiteral,
-    ThisLiteral,
-    BaseLiteralExpression,
-    StringLiteral,
-    AwaitExpression,
-    BinaryExpression,
-    ConditionalExpression,
-    LambdaExpression,
-    NumericLiteral,
-    StringTemplateExpression,
-    IsExpression,
-    ParenthesizedExpression,
-    ArrayCreationExpression,
-    MemberAccessExpression,
-    AnonymousObjectCreationExpression,
-    AnonymousObjectProperty,
-    ElementAccessExpression,
-    InvocationExpression,
-    NewExpression,
-    CastExpression,
-    NonNullExpression,
-    NullSafeExpression,
-    Identifier,
-    DefaultExpression,
-    ToDoExpression,
-    TypeOfExpression,
+    PrefixUnaryExpression = 42,
+    PostfixUnaryExpression = 43,
+    NullLiteral = 44,
+    TrueLiteral = 45,
+    FalseLiteral = 46,
+    ThisLiteral = 47,
+    BaseLiteralExpression = 48,
+    StringLiteral = 49,
+    AwaitExpression = 50,
+    BinaryExpression = 51,
+    ConditionalExpression = 52,
+    LambdaExpression = 53,
+    NumericLiteral = 54,
+    StringTemplateExpression = 55,
+    IsExpression = 56,
+    ParenthesizedExpression = 57,
+    ArrayCreationExpression = 58,
+    MemberAccessExpression = 59,
+    AnonymousObjectCreationExpression = 60,
+    AnonymousObjectProperty = 61,
+    ElementAccessExpression = 62,
+    InvocationExpression = 63,
+    NewExpression = 64,
+    CastExpression = 65,
+    NonNullExpression = 66,
+    NullSafeExpression = 67,
+    Identifier = 68,
+    DefaultExpression = 69,
+    ToDoExpression = 70,
+    TypeOfExpression = 71,
 
-    Attribute,
+    Attribute = 72,
 
-    SpreadExpression,
-    LocalFunction,
-    YieldExpression
+    SpreadExpression = 73,
+    LocalFunction = 74,
+    YieldExpression = 75
 }
 
 export interface Node {
@@ -114,11 +114,11 @@ export interface NamespaceDeclaration extends Node {
 export type NamespaceMember = ClassDeclaration | EnumDeclaration | InterfaceDeclaration;
 
 export enum Visibility {
-    None,
-    Public,
-    Protected,
-    Private,
-    Internal
+    None = 0,
+    Public = 1,
+    Protected = 2,
+    Private = 3,
+    Internal = 4
 }
 
 export interface DocumentedElement extends Node {
@@ -294,14 +294,14 @@ export interface FunctionTypeNode extends TypeNode {
 }
 
 export enum PrimitiveType {
-    Bool,
-    String,
-    Double,
-    Int,
-    Void,
-    Object,
-    Var,
-    Long
+    Bool = 0,
+    String = 1,
+    Double = 2,
+    Int = 3,
+    Void = 4,
+    Object = 5,
+    Var = 6,
+    Long = 7
 }
 
 export interface PrimitiveTypeNode extends TypeNode {
@@ -441,7 +441,7 @@ export interface InvocationExpression extends Node {
     expression: Expression;
     arguments: Expression[];
     typeArguments?: TypeNode[];
-    nullSafe?: Boolean;
+    nullSafe?: boolean;
 }
 
 export interface NewExpression extends Node {
@@ -498,10 +498,10 @@ export interface EmptyStatement extends Statement {
 }
 
 export enum VariableStatementKind {
-    Normal,
-    Const,
-    Using,
-    AwaitUsing
+    Normal = 0,
+    Const = 1,
+    Using = 2,
+    AwaitUsing = 3
 }
 
 export interface VariableStatement extends Statement {
