@@ -3,7 +3,6 @@ import { Score } from '@src/model/Score';
 import { TextAlign } from '@src/platform/ICanvas';
 import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { Logger } from '@src/Logger';
 import { SystemsLayoutMode } from '@src/DisplaySettings';

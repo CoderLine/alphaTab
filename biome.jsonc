@@ -46,6 +46,10 @@
                 "noAssignInExpressions": "off"
             },
             "correctness": {
+                "noUnusedImports": {
+                    "level": "error",
+                    "fix": "safe"
+                },
                 // temporary disabled, apply fixes gradually
                 "noSwitchDeclarations": "off"
             },

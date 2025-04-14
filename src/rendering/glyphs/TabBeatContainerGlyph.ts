@@ -1,4 +1,3 @@
-import { Beat } from '@src/model/Beat';
 import { Note } from '@src/model/Note';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -7,7 +6,6 @@ import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
 import { TabSlideLineGlyph } from '@src/rendering/glyphs/TabSlideLineGlyph';
 import { TabSlurGlyph } from '@src/rendering/glyphs/TabSlurGlyph';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
-import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { BeamingHelper } from '../utils/BeamingHelper';
 

@@ -1,6 +1,5 @@
-import { Bar, BarSubElement, Beat, Duration, GraceType, TupletGroup } from '@src/model';
+import { BarSubElement, Beat, Duration, GraceType, TupletGroup } from '@src/model';
 import { BarRendererBase } from './BarRendererBase';
-import { ScoreRenderer } from './ScoreRenderer';
 import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { BeamingHelper } from './utils/BeamingHelper';

@@ -2,7 +2,6 @@ import { ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
 import { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { RenderingResources } from '@src/RenderingResources';

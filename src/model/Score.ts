@@ -9,6 +9,7 @@ import { Beat } from './Beat';
 import { Voice } from './Voice';
 import { Note } from './Note';
 import { TextAlign } from '@src/platform';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { NotationSettings } from '@src/NotationSettings';
 
 /**

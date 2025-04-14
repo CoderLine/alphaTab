@@ -1,4 +1,3 @@
-import { Duration } from '@src/model/Duration';
 import { ScoreRestGlyph } from './ScoreRestGlyph';
 import { ICanvas } from '@src/platform';
 import { BeatSubElement } from '@src/model';

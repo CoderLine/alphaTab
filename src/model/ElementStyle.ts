@@ -1,3 +1,4 @@
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { RenderingResources } from '@src/RenderingResources';
 import { Color } from './Color';
 

@@ -1,5 +1,6 @@
 import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import { Score } from '@src/model/Score';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { IUiFacade } from '@src/platform';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
