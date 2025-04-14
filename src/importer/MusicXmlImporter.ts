@@ -199,13 +199,6 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     public readScore(): Score {
-        this._idToTrackInfo.clear();
-        this._indexToTrackInfo.clear();
-        this._staffToContext.clear();
-        this._implicitBars = 0;
-        this._divisionsPerQuarterNote = 1;
-        this._currentDynamics = DynamicValue.F;
-
         let xml: string = this.extractMusicXml();
         let dom: XmlDocument = new XmlDocument();
         try {
@@ -221,11 +214,6 @@ export class MusicXmlImporter extends ScoreImporter {
         this.consolidate();
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
-
-        // cleanup -> GC
-        this._idToTrackInfo.clear();
-        this._indexToTrackInfo.clear();
-        this._staffToContext.clear();
 
         return this._score;
     }
@@ -284,7 +272,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    extractMusicXml(): string {
+    private extractMusicXml(): string {
         const zip = new ZipReader(this.data);
         let entries: ZipEntry[];
         try {
@@ -1672,7 +1660,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private _simileMarkAllStaves: SimileMark | null = null;
     private _simileMarkPerStaff: Map<number, SimileMark> | null = null;
     private _isBeatSlash: boolean = false;
-    parseMeasureStyle(element: XmlNode, track: Track, midBar: boolean) {
+    private parseMeasureStyle(element: XmlNode, track: Track, midBar: boolean) {
         for (let c of element.childElements()) {
             switch (c.localName) {
                 // case 'multiple-rest': Ignored, when multibar rests are enabled for rendering this info shouldn't matter.
@@ -3592,6 +3580,12 @@ export class MusicXmlImporter extends ScoreImporter {
 
         if (type === 'start') {
             if (number) {
+                // start without end
+                if(context.tieStartIds.has(number)) {
+                    const unclosed = context.tieStartIds.get(number)!;
+                    context.tieStarts.delete(unclosed);
+                }
+
                 context.tieStartIds.set(number, note);
             }
 
@@ -3605,6 +3599,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
                 tieOrigin = context.tieStartIds.get(number)!;
                 context.tieStartIds.delete(number);
+                context.tieStarts.delete(note);
             } else {
                 const realValue = this.calculatePitchedNoteValue(note);
                 for (const t of context.tieStarts) {
