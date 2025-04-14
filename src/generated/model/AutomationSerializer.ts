@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { Automation } from "@src/model/Automation";
+import { Automation } from "@src/model/Automation";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { AutomationType } from "@src/model/Automation";
 export class AutomationSerializer {

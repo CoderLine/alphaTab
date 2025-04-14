@@ -57,7 +57,13 @@ export default class CSharpEmitterContext {
         return (tsSymbol.flags & ts.SymbolFlags.Property) !== 0;
     }
 
-    public isTypeAssignable(targetType: ts.Type, actualType: ts.Type) {
+    public isTypeAssignable(targetType: ts.Type, contextualTypeNullable: ts.Type, actualType: ts.Type) {
+        if (
+            contextualTypeNullable.flags === ts.TypeFlags.Any ||
+            contextualTypeNullable.flags === ts.TypeFlags.Unknown
+        ) {
+            return true;
+        }
         if (targetType.flags === ts.TypeFlags.Any || targetType.flags === ts.TypeFlags.Unknown) {
             return true;
         }
@@ -1594,7 +1600,8 @@ export default class CSharpEmitterContext {
             return null;
         }
 
-        return contextualType !== declaredType && !this.isTypeAssignable(contextualType, declaredType)
+        return contextualType !== declaredType &&
+            !this.isTypeAssignable(contextualType, contextualTypeNullable, declaredType)
             ? contextualTypeNullable
             : null;
     }

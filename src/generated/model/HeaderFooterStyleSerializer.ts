@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { HeaderFooterStyle } from "@src/model/Score";
+import { HeaderFooterStyle } from "@src/model/Score";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { TextAlign } from "@src/platform/ICanvas";
 export class HeaderFooterStyleSerializer {

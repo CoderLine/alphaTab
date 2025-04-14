@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { Score } from "@src/model/Score";
+import { Score } from "@src/model/Score";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";

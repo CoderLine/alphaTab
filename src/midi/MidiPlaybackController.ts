@@ -351,14 +351,16 @@ export class MidiPlaybackController {
      * @returns the index of the masterbar found with the given direction or -1 if no masterbar with the given direction was found.
      */
     private findJumpTarget(toFind: Direction, searchIndex: number, backwardsFirst: boolean): number {
+        let index: number;
         if (backwardsFirst) {
-            let index = this.findJumpTargetBackwards(toFind, searchIndex);
+            index = this.findJumpTargetBackwards(toFind, searchIndex);
             if (index === -1) {
                 index = this.findJumpTargetForwards(toFind, searchIndex);
             }
             return index;
         }
-        let index = this.findJumpTargetForwards(toFind, searchIndex);
+
+        index = this.findJumpTargetForwards(toFind, searchIndex);
         if (index === -1) {
             index = this.findJumpTargetBackwards(toFind, searchIndex);
         }

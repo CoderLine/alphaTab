@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { NoteStyle } from "@src/model/Note";
+import { NoteStyle } from "@src/model/Note";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { NoteSubElement } from "@src/model/Note";

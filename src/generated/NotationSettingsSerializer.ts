@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { NotationSettings } from "@src/NotationSettings";
+import { NotationSettings } from "@src/NotationSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { NotationMode } from "@src/NotationSettings";
 import { FingeringMode } from "@src/NotationSettings";

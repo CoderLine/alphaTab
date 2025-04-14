@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { CoreSettings } from "@src/CoreSettings";
+import { CoreSettings } from "@src/CoreSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { LogLevel } from "@src/LogLevel";
 export class CoreSettingsSerializer {

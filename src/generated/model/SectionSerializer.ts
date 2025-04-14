@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { Section } from "@src/model/Section";
+import { Section } from "@src/model/Section";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class SectionSerializer {
     public static fromJson(obj: Section, m: unknown): void {

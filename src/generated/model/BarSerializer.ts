@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { Bar } from "@src/model/Bar";
+import { Bar } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { SustainPedalMarkerSerializer } from "@src/generated/model/SustainPedalMarkerSerializer";

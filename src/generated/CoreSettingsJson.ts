@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { LogLevel } from "@src/LogLevel";
+import { LogLevel } from "@src/LogLevel";
 /**
  * All main settings of alphaTab controlling rather general aspects of its behavior.
  * @json

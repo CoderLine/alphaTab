@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { LayoutMode } from "@src/LayoutMode";
-import type { StaveProfile } from "@src/StaveProfile";
-import type { RenderingResourcesJson } from "./RenderingResourcesJson";
-import type { SystemsLayoutMode } from "@src/DisplaySettings";
+import { LayoutMode } from "@src/LayoutMode";
+import { StaveProfile } from "@src/StaveProfile";
+import { RenderingResourcesJson } from "./RenderingResourcesJson";
+import { SystemsLayoutMode } from "@src/DisplaySettings";
 /**
  * The display settings control how the general layout and display of alphaTab is done.
  * @json

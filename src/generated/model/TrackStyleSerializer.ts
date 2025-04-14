@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { TrackStyle } from "@src/model/Track";
+import { TrackStyle } from "@src/model/Track";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { TrackSubElement } from "@src/model/Track";
 import { Color } from "@src/model/Color";

@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { InstrumentArticulation } from "@src/model/InstrumentArticulation";
+import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";

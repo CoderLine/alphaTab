@@ -80,7 +80,7 @@ export abstract class ScoreLayout {
 
     public systemsLayoutMode: InternalSystemsLayoutMode = InternalSystemsLayoutMode.Automatic;
 
-    protected constructor(renderer: ScoreRenderer) {
+    public constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
     }
 

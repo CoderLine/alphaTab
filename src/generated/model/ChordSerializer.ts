@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { Chord } from "@src/model/Chord";
+import { Chord } from "@src/model/Chord";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class ChordSerializer {
     public static fromJson(obj: Chord, m: unknown): void {

@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { Voice } from "@src/model/Voice";
+import { Voice } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
 import { VoiceStyleSerializer } from "@src/generated/model/VoiceStyleSerializer";

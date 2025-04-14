@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { VibratoPlaybackSettings } from "@src/PlayerSettings";
+import { VibratoPlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class VibratoPlaybackSettingsSerializer {
     public static fromJson(obj: VibratoPlaybackSettings, m: unknown): void {

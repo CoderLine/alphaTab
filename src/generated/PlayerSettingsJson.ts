@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { PlayerOutputMode } from "@src/PlayerSettings";
-import type { ScrollMode } from "@src/PlayerSettings";
-import type { VibratoPlaybackSettingsJson } from "./VibratoPlaybackSettingsJson";
-import type { SlidePlaybackSettingsJson } from "./SlidePlaybackSettingsJson";
+import { PlayerOutputMode } from "@src/PlayerSettings";
+import { ScrollMode } from "@src/PlayerSettings";
+import { VibratoPlaybackSettingsJson } from "./VibratoPlaybackSettingsJson";
+import { SlidePlaybackSettingsJson } from "./SlidePlaybackSettingsJson";
 /**
  * The player settings control how the audio playback and UI is behaving.
  * @json

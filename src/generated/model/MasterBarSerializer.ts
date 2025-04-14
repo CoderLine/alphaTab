@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { MasterBar } from "@src/model/MasterBar";
+import { MasterBar } from "@src/model/MasterBar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";

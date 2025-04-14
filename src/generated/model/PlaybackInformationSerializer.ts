@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { PlaybackInformation } from "@src/model/PlaybackInformation";
+import { PlaybackInformation } from "@src/model/PlaybackInformation";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class PlaybackInformationSerializer {
     public static fromJson(obj: PlaybackInformation, m: unknown): void {

@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { BeatStyle } from "@src/model/Beat";
+import { BeatStyle } from "@src/model/Beat";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSubElement } from "@src/model/Beat";
 import { Color } from "@src/model/Color";

@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { RenderStylesheet } from "@src/model/RenderStylesheet";
+import { RenderStylesheet } from "@src/model/RenderStylesheet";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BracketExtendMode } from "@src/model/RenderStylesheet";
 import { TrackNamePolicy } from "@src/model/RenderStylesheet";

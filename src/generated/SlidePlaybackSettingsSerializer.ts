@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import type { SlidePlaybackSettings } from "@src/PlayerSettings";
+import { SlidePlaybackSettings } from "@src/PlayerSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class SlidePlaybackSettingsSerializer {
     public static fromJson(obj: SlidePlaybackSettings, m: unknown): void {
