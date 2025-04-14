@@ -46,7 +46,8 @@ export class BoundsLookup {
                         bbd.staffIndex = beat.beat.voice.bar.staff.index;
                         bbd.trackIndex = beat.beat.voice.bar.staff.track.index;
                         if (beat.notes) {
-                            const notes: NoteBounds[] = (bb.notes = []);
+                            const notes: NoteBounds[] = [];
+                            bb.notes = notes;
                             for (const note of beat.notes) {
                                 const n: NoteBounds = {} as any;
                                 const nd: any = n;

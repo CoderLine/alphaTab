@@ -75,7 +75,8 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
         let cachedResult: string | undefined;
         let innerSubCache = innerCache.get(context);
         if (innerSubCache === undefined) {
-            innerCache.set(context, (innerSubCache = new Map()));
+            innerSubCache = new Map();
+            innerCache.set(context, innerSubCache);
         } else {
             cachedResult = innerSubCache.get(identifier);
         }
@@ -102,7 +103,8 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
 
             innerSubCache = innerCache.get(context);
             if (innerSubCache === undefined) {
-                innerCache.set(context, (innerSubCache = new Map()));
+                innerSubCache = new Map();
+                innerCache.set(context, innerSubCache);
             }
         } else {
             innerSubCache = new Map();

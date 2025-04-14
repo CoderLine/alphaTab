@@ -9,6 +9,7 @@ import * as path from 'node:path';
 import { BuildEnvironment } from 'vite';
 import { injectEnvironmentToHooks } from './build';
 
+// biome-ignore lint/suspicious/noConstEnum: Exception where we use them
 export const enum AlphaTabWorkerTypes {
     WorkerClassic = 'worker_classic',
     WorkerModule = 'worker_module',

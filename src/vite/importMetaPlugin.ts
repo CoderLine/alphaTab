@@ -8,7 +8,7 @@
 
 // With https://github.com/vitejs/vite/pull/16422 integrated this custom code should not be needed anymore
 
-// Original Sources Licensed under: 
+// Original Sources Licensed under:
 
 // MIT License
 // Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
@@ -30,7 +30,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 
 import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import MagicString from 'magic-string';
@@ -142,12 +141,12 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
             let s: MagicString | undefined;
 
             const alphaTabWorkerPattern = new RegExp(
-                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+[^ \(]+alphaTabUrl\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
-                "dg"
+                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+[^ (]+alphaTabUrl\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
+                'dg'
             );
-            
-            let match: RegExpExecArray | null;
-            while ((match = alphaTabWorkerPattern.exec(code))) {
+
+            let match: RegExpExecArray | null = alphaTabWorkerPattern.exec(code);
+            while (match) {
                 const workerType = getWorkerType(code, match);
 
                 let typeActive = false;
@@ -162,6 +161,7 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
                 }
 
                 if (!typeActive) {
+                    match = alphaTabWorkerPattern.exec(code);
                     continue;
                 }
 
@@ -188,6 +188,8 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
                     // add `'' +` to skip vite:asset-import-meta-url plugin
                     `new URL('' + ${JSON.stringify(builtUrl)}, import.meta.url)`
                 );
+
+                match = alphaTabWorkerPattern.exec(code);
             }
 
             if (s) {
