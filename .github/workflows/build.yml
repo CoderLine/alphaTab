@@ -20,7 +20,9 @@ jobs:
           node-version: 'lts/*'
       - run: npm install
       - run: npm run lint-ci
+        if: ${{ always() }}
       - run: npm run typecheck
+        if: ${{ always() }}
 
   build_web:
     name: Build and Test Web
