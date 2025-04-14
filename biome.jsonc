@@ -29,27 +29,21 @@
                 "noInferrableTypes": "off", // we want to be explicit (for transpiler)
                 "noNonNullAssertion": "off", // we use these assertions often.
                 "noParameterAssign": "off", // useful for default values
-                // temporary disabled, apply fixes gradually
-                "useExponentiationOperator": "off"
+                "useExponentiationOperator": "off" // not supported in C# and Kotlin, lets stay with Math.pow
             },
             "suspicious": {
-                "noConstEnum": "off",
-                "noExplicitAny": "off", // used in areas where we work with dynamic JSON data
-                // temporary disabled, apply fixes gradually
-                "noAssignInExpressions": "off"
+                "noExplicitAny": "off" // used in areas where we work with dynamic JSON data
             },
             "correctness": {
                 "noUnusedImports": {
                     "level": "error",
                     "fix": "safe"
                 },
-                // temporary disabled, apply fixes gradually
                 "noSwitchDeclarations": "off"
             },
             "complexity": {
                 // temporary disabled, apply fixes gradually
                 "useOptionalChain": "off",
-                "useRegexLiterals": "off",
                 // we are strictly OOP (for transpiler)
                 "noStaticOnlyClass": "off"
             }

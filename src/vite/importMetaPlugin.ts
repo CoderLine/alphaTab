@@ -140,10 +140,8 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
 
             let s: MagicString | undefined;
 
-            const alphaTabWorkerPattern = new RegExp(
-                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+[^ (]+alphaTabUrl\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
-                'dg'
-            );
+            // @ts-expect-error For the Vite plugin we expect newer node than for alphaTab itself (-> migrate to monorepo)
+            const alphaTabWorkerPattern = /\b(alphaTabWorker|alphaTabWorklet\.addModule)\s*\(\s*(new\s+[^ (]+alphaTabUrl\s*\(\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
 
             let match: RegExpExecArray | null = alphaTabWorkerPattern.exec(code);
             while (match) {
