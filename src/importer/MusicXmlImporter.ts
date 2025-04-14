@@ -1058,6 +1058,9 @@ export class MusicXmlImporter extends ScoreImporter {
             for (const s of track.staves) {
                 const bar = this.getOrCreateBar(s, masterBar);
                 bar.simileMark = this._simileMarkAllStaves!;
+                if(bar.simileMark !== SimileMark.None) {
+                    this.clearBar(bar);
+                }
             }
 
             if (this._simileMarkAllStaves == SimileMark.FirstOfDouble) {
@@ -1074,6 +1077,10 @@ export class MusicXmlImporter extends ScoreImporter {
                 const bar = this.getOrCreateBar(s, masterBar);
                 bar.simileMark = this._simileMarkPerStaff!.get(i)!;
 
+                if(bar.simileMark !== SimileMark.None) {
+                    this.clearBar(bar);
+                }
+
                 if (bar.simileMark == SimileMark.FirstOfDouble) {
                     this._simileMarkPerStaff!.set(i, SimileMark.SecondOfDouble);
                 } else {
@@ -1083,6 +1090,14 @@ export class MusicXmlImporter extends ScoreImporter {
             if (this._simileMarkPerStaff.size === 0) {
                 this._simileMarkPerStaff = null;
             }
+        }
+    }
+    
+    private clearBar(bar: Bar) {
+        for(const v of bar.voices) {
+            const emptyBeat: Beat = new Beat();
+            emptyBeat.isEmpty = true;
+            v.addBeat(emptyBeat);
         }
     }
 

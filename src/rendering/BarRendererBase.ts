@@ -577,8 +577,11 @@ export class BarRendererBase {
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
+
+
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
+                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
                 canvas.fillMusicFontSymbol(
                     cx + this.x + (this.width - 20) / 2,
                     cy + this.y + this.height / 2,
@@ -586,8 +589,12 @@ export class BarRendererBase {
                     MusicFontSymbol.Repeat1Bar,
                     false
                 );
+                canvas.endGroup();
                 break;
             case SimileMark.SecondOfDouble:
+                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
+                canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
+
                 canvas.fillMusicFontSymbol(
                     cx + this.x - 28 / 2,
                     cy + this.y + this.height / 2,
@@ -595,8 +602,13 @@ export class BarRendererBase {
                     MusicFontSymbol.Repeat2Bars,
                     false
                 );
+
+                canvas.endGroup();
+                canvas.endGroup();
+
                 break;
         }
+
     }
 
     public completeBeamingHelper(helper: BeamingHelper) {
