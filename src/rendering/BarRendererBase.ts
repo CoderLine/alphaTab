@@ -5,7 +5,7 @@ import { SimileMark } from '@src/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@src/model/Voice';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
