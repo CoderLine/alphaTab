@@ -164,7 +164,7 @@ export class VorbisStreamReader {
 
         const version = IOHelper.readUInt32LE(reader);
         // [vorbis_version] is to read ’0’ in order to be compatible with this document.
-        if (version != 0) {
+        if (version !== 0) {
             return false;
         }
 
@@ -244,7 +244,7 @@ export class VorbisStreamReader {
         }
 
         const framing = reader.readByte();
-        if (framing == 0) {
+        if (framing === 0) {
             return false;
         }
 

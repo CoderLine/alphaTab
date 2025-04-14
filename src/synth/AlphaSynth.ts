@@ -185,7 +185,7 @@ export class AlphaSynth implements IAlphaSynth {
         });
         this.output.sampleRequest.on(() => {
             if (
-                this.state == PlayerState.Playing &&
+                this.state === PlayerState.Playing &&
                 (!this._sequencer.isFinished || this._synthesizer.activeVoiceCount > 0)
             ) {
                 let samples: Float32Array = new Float32Array(

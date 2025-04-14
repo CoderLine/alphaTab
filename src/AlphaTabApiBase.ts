@@ -2198,7 +2198,7 @@ export class AlphaTabApiBase<TSettings> {
         if (this.settings.player.enableAnimatedBeatCursor && beatCursor) {
             let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
             // get position of next beat on same system
-            if (nextBeat && cursorMode == MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
+            if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
                 // if we are moving within the same bar or to the next bar
                 // transition to the next beat, otherwise transition to the end of the bar.
                 let nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);

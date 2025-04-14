@@ -120,7 +120,7 @@ export class RenderStaff {
         const barDisplayWidth = renderer.barDisplayWidth;
         if (
             barDisplayWidth > 0 &&
-            this.system.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+            this.system.layout.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithWidths
         ) {
             renderer.width = barDisplayWidth;
         }

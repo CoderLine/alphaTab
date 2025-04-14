@@ -97,7 +97,7 @@ class FontParser {
         let pos = 0;
         while (pos < familyListInput.length) {
             let c = familyListInput.charAt(pos);
-            if (c === ' ' || c == ',') {
+            if (c === ' ' || c === ',') {
                 // skip whitespace and quotes
                 pos++;
             } else if (c === '"' || c === "'") {

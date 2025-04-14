@@ -636,11 +636,11 @@ export class GpifParser {
                         articulation.noteHeadWhole = this.parseNoteHead(noteHeadsTxt[2]);
                     }
 
-                    if (articulation.noteHeadHalf == MusicFontSymbol.None) {
+                    if (articulation.noteHeadHalf === MusicFontSymbol.None) {
                         articulation.noteHeadHalf = articulation.noteHeadDefault;
                     }
 
-                    if (articulation.noteHeadWhole == MusicFontSymbol.None) {
+                    if (articulation.noteHeadWhole === MusicFontSymbol.None) {
                         articulation.noteHeadWhole = articulation.noteHeadDefault;
                     }
 

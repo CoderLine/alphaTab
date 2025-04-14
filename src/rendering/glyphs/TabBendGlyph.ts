@@ -236,7 +236,7 @@ export class TabBendGlyph extends Glyph {
                 if (
                     endNote.hasBend ||
                     !this.renderer.settings.notation.extendBendArrowsOnTiedNotes ||
-                    endNote.vibrato != VibratoType.None
+                    endNote.vibrato !== VibratoType.None
                 ) {
                     endNoteHasBend = true;
                     break;

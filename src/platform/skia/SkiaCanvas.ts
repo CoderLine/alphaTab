@@ -78,7 +78,7 @@ export class SkiaCanvas implements ICanvas {
     public settings!: Settings;
 
     private getTypeFace(): alphaSkia.AlphaSkiaTypeface {
-        if (this._typeFaceCache != this.font.toCssString(this._scale)) {
+        if (this._typeFaceCache !== this.font.toCssString(this._scale)) {
             if (this._typeFaceIsSystem) {
                 using _unused = this._typeFace!;
             }
@@ -220,7 +220,7 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public fillText(text: string, x: number, y: number): void {
-        if (text.length == 0) {
+        if (text.length === 0) {
             return;
         }
 

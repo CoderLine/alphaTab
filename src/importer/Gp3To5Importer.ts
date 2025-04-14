@@ -693,7 +693,7 @@ export class Gp3To5Importer extends ScoreImporter {
 
             // 2048 - Break Secondary Beams info set? -> read another byte for flag
             if ((flags2 & 0x800) !== 0) {
-                const breakSecondaryBeams = this.data.readByte() != 0;
+                const breakSecondaryBeams = this.data.readByte() !== 0;
                 if (newBeat.index > 0 && breakSecondaryBeams) {
                     voice.beats[newBeat.index - 1].beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
                 }

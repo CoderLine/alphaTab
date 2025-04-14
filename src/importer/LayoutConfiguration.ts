@@ -73,7 +73,7 @@ export class LayoutConfiguration {
 
         this.zoomLevel = IOHelper.readInt32BE(readable);
         this.view = readable.readByte() as GuitarProView;
-        this.muiltiVoiceCursor = readable.readByte() != 0
+        this.muiltiVoiceCursor = readable.readByte() !== 0
 
         const scoreViewCount: number = partConfiguration.scoreViews.length;
 
@@ -87,7 +87,7 @@ export class LayoutConfiguration {
             for (let j: number = 0; j < partScoreView.trackViewGroups.length; j++) {
                 
                 const trackViewGroup = new LayoutConfigurationTrackViewGroup();
-                trackViewGroup.isVisible = readable.readByte() != 0;
+                trackViewGroup.isVisible = readable.readByte() !== 0;
 
                 scoreView.trackViewGroups.push(trackViewGroup);
             }

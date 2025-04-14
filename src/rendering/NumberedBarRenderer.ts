@@ -331,8 +331,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {
             let container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = v.index == 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
-            container.onNotes = v.index == 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
+            container.preNotes = v.index === 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
+            container.onNotes = v.index === 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
     }

@@ -34,7 +34,7 @@ export class IntersectionObserverPolyfill {
 
     public unobserve(target: HTMLElement) {
         this._elements = this._elements.filter(item => {
-            return item != target;
+            return item !== target;
         });
     }
 

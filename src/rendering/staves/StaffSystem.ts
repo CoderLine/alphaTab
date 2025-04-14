@@ -86,7 +86,7 @@ class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
         }
 
         // we allow cross track merging of staffs when they have the same program
-        return this.track.playbackInfo.program == r.modelStaff.track.playbackInfo.program;
+        return this.track.playbackInfo.program === r.modelStaff.track.playbackInfo.program;
     }
 }
 

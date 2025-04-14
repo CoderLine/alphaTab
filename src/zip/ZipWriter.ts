@@ -85,7 +85,7 @@ export class ZipWriter {
     }
 
     private compress(output: IWriteable, data: Uint8Array, compressionMode: number): number {
-        if (compressionMode != ZipEntry.CompressionMethodDeflate) {
+        if (compressionMode !== ZipEntry.CompressionMethodDeflate) {
             const crc = new Crc32();
             crc.update(data, 0, data.length);
             output.write(data, 0, data.length);

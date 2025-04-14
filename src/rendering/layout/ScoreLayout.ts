@@ -123,7 +123,7 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        if (args.height == 0) {
+        if (args.height === 0) {
             return;
         }
 

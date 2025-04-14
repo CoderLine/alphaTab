@@ -26,7 +26,7 @@ export class FadeEffectInfo extends EffectBarRendererInfo {
     }
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
-        return beat.fade != FadeType.None;
+        return beat.fade !== FadeType.None;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

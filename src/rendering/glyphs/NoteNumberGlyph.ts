@@ -44,7 +44,7 @@ export class NoteNumberGlyph extends Glyph {
                 this._noteString = `<${this._noteString}>`;
             }
         } else if (
-            (n.beat.index === 0 && this.renderer.settings.notation.notationMode == NotationMode.GuitarPro) ||
+            (n.beat.index === 0 && this.renderer.settings.notation.notationMode === NotationMode.GuitarPro) ||
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {

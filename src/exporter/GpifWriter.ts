@@ -858,7 +858,7 @@ export class GpifWriter {
             }
         }
 
-        if (beat.rasgueado != Rasgueado.None) {
+        if (beat.rasgueado !== Rasgueado.None) {
             let rasgueado = '';
             switch (beat.rasgueado) {
                 case Rasgueado.Ii:
@@ -1323,13 +1323,13 @@ export class GpifWriter {
                 case 4:
                     if (staff.track.playbackInfo.program === 105) {
                         tuningProperty.addElement('Instrument').innerText = 'Banjo';
-                    } else if (staff.track.playbackInfo.program == 42) {
+                    } else if (staff.track.playbackInfo.program === 42) {
                         tuningProperty.addElement('Instrument').innerText = 'Cello';
-                    } else if (staff.track.playbackInfo.program == 43) {
+                    } else if (staff.track.playbackInfo.program === 43) {
                         tuningProperty.addElement('Instrument').innerText = 'Contrabass';
-                    } else if (staff.track.playbackInfo.program == 40) {
+                    } else if (staff.track.playbackInfo.program === 40) {
                         tuningProperty.addElement('Instrument').innerText = 'Violin';
-                    } else if (staff.track.playbackInfo.program == 41) {
+                    } else if (staff.track.playbackInfo.program === 41) {
                         tuningProperty.addElement('Instrument').innerText = 'Viola';
                     } else {
                         tuningProperty.addElement('Instrument').innerText = 'Bass';
@@ -1543,7 +1543,7 @@ export class GpifWriter {
 
                                 const line = lines[l];
                                 line.text =
-                                    line.text == '[Empty]'
+                                    line.text === '[Empty]'
                                         ? beat.lyrics[l]
                                         : `${line.text} ${beat.lyrics[l].split(' ').join('+')}`;
                             }
@@ -1731,7 +1731,7 @@ export class GpifWriter {
             const alternateEndings: number[] = [];
             let bit = 0;
             while (remainingBits > 0) {
-                if (((remainingBits >> bit) & 0x01) == 0x01) {
+                if (((remainingBits >> bit) & 0x01) === 0x01) {
                     alternateEndings.push(bit + 1);
                     // clear bit
                     remainingBits &= ~(1 << bit);

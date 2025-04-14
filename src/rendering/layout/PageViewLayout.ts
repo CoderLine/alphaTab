@@ -205,7 +205,7 @@ export class PageViewLayout extends ScoreLayout {
         // if we have a fixed number of bars per row, we only need to refit them.
         const barsPerRowActive =
             this.renderer.settings.display.barsPerRow > 0 ||
-            this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
+            this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale;
 
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._systems.length; i++) {
@@ -324,7 +324,7 @@ export class PageViewLayout extends ScoreLayout {
     private getBarsPerSystem(rowIndex: number) {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
 
-        if (this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale) {
+        if (this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale) {
             let defaultSystemsLayout: number;
             let systemsLayout: number[];
             if (this.renderer.tracks!.length > 1) {

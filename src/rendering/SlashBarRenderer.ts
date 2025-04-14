@@ -170,7 +170,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         for (const b of v.beats) {
             let container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
-            container.onNotes = v.index == 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
+            container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
     }

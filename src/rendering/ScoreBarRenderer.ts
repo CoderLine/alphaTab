@@ -180,7 +180,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 break;
         }
 
-        if (direction == BeamDirection.Down) {
+        if (direction === BeamDirection.Down) {
             line += offset;
         } else {
             line -= offset;
@@ -631,7 +631,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 offset += this.resources.effectFont.size * 2;
             }
 
-            if (helper.direction == BeamDirection.Up) {
+            if (helper.direction === BeamDirection.Up) {
                 highestNotePosition -= offset;
             } else {
                 lowestNotePosition += offset;

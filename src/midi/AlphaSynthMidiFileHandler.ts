@@ -125,7 +125,7 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
     }
 
     public finishTrack(track: number, tick: number): void {
-        if (this._midiFile.format == MidiFileFormat.MultiTrack || track == 0) {
+        if (this._midiFile.format === MidiFileFormat.MultiTrack || track === 0) {
             this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
         }
     }

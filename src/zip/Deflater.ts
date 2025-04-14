@@ -112,7 +112,7 @@ export class Deflater {
      * are available.
      */
     public get isFinished() {
-        return (this._state == Deflater.FinishedState) && this._pending.isFlushed;
+        return (this._state === Deflater.FinishedState) && this._pending.isFlushed;
     }
 
     /**
@@ -155,11 +155,11 @@ export class Deflater {
             offset += count;
             length -= count;
 
-            if (length == 0 || this._state == Deflater.FinishedState) {
+            if (length === 0 || this._state === Deflater.FinishedState) {
                 break;
             }
 
-            if (!this._engine.deflate((this._state & Deflater.IsFlushing) != 0, (this._state & Deflater.IsFinishing) != 0)) {
+            if (!this._engine.deflate((this._state & Deflater.IsFlushing) !== 0, (this._state & Deflater.IsFinishing) !== 0)) {
                 switch (this._state) {
                     case Deflater.BusyState:
                         // We need more input now

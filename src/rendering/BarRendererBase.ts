@@ -270,7 +270,7 @@ export class BarRendererBase {
         const fixedBarWidth = this.barDisplayWidth;
         if (
             fixedBarWidth > 0 &&
-            this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+            this.scoreRenderer.layout!.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithWidths
         ) {
             this.width = fixedBarWidth;
             this.computedWidth = fixedBarWidth;

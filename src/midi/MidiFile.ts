@@ -87,7 +87,7 @@ export class MidiFile {
      * Gets a list of midi events sorted by time.
      */
     public get events(): MidiEvent[] {
-        if (this.tracks.length == 1) {
+        if (this.tracks.length === 1) {
             return this.tracks[0].events;
         }
         const events: MidiEvent[] = [];
@@ -114,7 +114,7 @@ export class MidiFile {
      * Adds the given midi event a the correct time position into the file.
      */
     public addEvent(e: MidiEvent): void {
-        if (this.format == MidiFileFormat.SingleTrackMultiChannel) {
+        if (this.format === MidiFileFormat.SingleTrackMultiChannel) {
             this.ensureTracks(1);
             this.tracks[0].addEvent(e);
         } else {

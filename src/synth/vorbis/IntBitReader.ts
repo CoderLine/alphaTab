@@ -50,7 +50,7 @@ export class IntBitReader {
     }
 
     public readBit(): boolean {
-        return this.readBits(1) == 1;
+        return this.readBits(1) === 1;
     }
 
     public readBytes(count: number): Uint8Array {
@@ -63,7 +63,7 @@ export class IntBitReader {
 
     public readBits(count: number): number {
         // short-circuit 0
-        if (count == 0) {
+        if (count === 0) {
             return 0;
         }
 
@@ -77,14 +77,14 @@ export class IntBitReader {
     public tryPeekBits(count: number): IntBitReaderReadResult {
         if (count < 0 || count > 32)
             throw new AlphaTabError(AlphaTabErrorType.General, 'IO: Cannot read more than 32 bits in one go');
-        if (count == 0) {
+        if (count === 0) {
             return new IntBitReaderReadResult();
         }
 
         const result = new IntBitReaderReadResult();
         while (this._bitCount < count) {
             const val = BigInt(this._source.readByte());
-            if (val == -1n) {
+            if (val === -1n) {
                 result.bitsRead = Number(this._bitCount);
                 result.value = Number(this._bitBucket);
                 this._bitBucket = 0n;
@@ -113,7 +113,7 @@ export class IntBitReader {
 
     public skipBits(count: number) {
         let bigCount = BigInt(count);
-        if (count == 0) {
+        if (count === 0) {
             // no-op
         } else if (this._bitCount > bigCount) {
             // we still have bits left over...
@@ -133,7 +133,7 @@ export class IntBitReader {
             }
 
             this._bitCount -= bigCount;
-        } else if (this._bitCount == bigCount) {
+        } else if (this._bitCount === bigCount) {
             this._bitBucket = 0n;
             this._bitCount = 0n;
         } //  _bitCount < count
@@ -144,7 +144,7 @@ export class IntBitReader {
             this._bitBucket = 0n;
 
             while (bigCount > 8) {
-                if (this._source.readByte() == -1) {
+                if (this._source.readByte() === -1) {
                     bigCount = 0n;
                     break;
                 }
@@ -153,7 +153,7 @@ export class IntBitReader {
 
             if (bigCount > 0) {
                 const temp = BigInt(this._source.readByte());
-                if (temp == -1n) {
+                if (temp === -1n) {
                 } else {
                     this._bitBucket = temp >> bigCount;
                     this._bitCount = 8n - bigCount;

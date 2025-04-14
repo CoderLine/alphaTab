@@ -91,7 +91,7 @@ export class BeatTickLookup {
      */
     public getVisibleBeatAtStart(visibleTracks: Set<number>): Beat | null {
         for (const b of this.highlightedBeats) {
-            if (b.playbackStart == this.start && visibleTracks.has(b.beat.voice.bar.staff.track.index)) {
+            if (b.playbackStart === this.start && visibleTracks.has(b.beat.voice.bar.staff.track.index)) {
                 return b.beat;
             }
         }

@@ -112,7 +112,7 @@ export class VorbisCodebook {
     public constructor(packet: IntBitReader, huffman: Huffman) {
         // first, check the sync pattern
         const chkVal = packet.readBits(24);
-        if (chkVal != 0x564342) {
+        if (chkVal !== 0x564342) {
             throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Book header had invalid signature!');
         }
 
@@ -133,7 +133,7 @@ export class VorbisCodebook {
 
     public decodeScalar(packet: IntBitReader): number {
         let data = packet.tryPeekBits(this._prefixBitLength);
-        if (data.bitsRead == 0) return -1;
+        if (data.bitsRead === 0) return -1;
 
         // try to get the value from the prefix list...
         let node = this._prefixList![data.value];
@@ -149,7 +149,7 @@ export class VorbisCodebook {
             for (let i = 0; i < this._overflowList.length; i++) {
                 node = this._overflowList[i]!;
                 const bits = data.value & node.mask;
-                if (node.bits == bits) {
+                if (node.bits === bits) {
                     packet.skipBits(node.length);
                     return node.value;
                 }
@@ -219,7 +219,7 @@ export class VorbisCodebook {
             let codewords: Int32Array | null = null;
             if (!sparse) {
                 codewords = new Int32Array(this.entries);
-            } else if (sortedCount != 0) {
+            } else if (sortedCount !== 0) {
                 codewordLengths = new Int32Array(sortedCount);
                 codewords = new Int32Array(sortedCount);
                 values = new Int32Array(sortedCount);
@@ -256,7 +256,7 @@ export class VorbisCodebook {
                 break;
             }
         }
-        if (k == n) {
+        if (k === n) {
             return true;
         }
 
@@ -272,10 +272,10 @@ export class VorbisCodebook {
                 continue;
             }
 
-            while (z > 0 && available[z] == 0) {
+            while (z > 0 && available[z] === 0) {
                 --z;
             }
-            if (z == 0) {
+            if (z === 0) {
                 return false;
             }
 
@@ -283,7 +283,7 @@ export class VorbisCodebook {
             available[z] = 0;
             this.addEntry(sparse, codewords, codewordLengths, VorbisUtils.bitReverse(res), i, m++, len[i], values);
 
-            if (z != len[i]) {
+            if (z !== len[i]) {
                 for (let y = len[i]; y > z; --y) {
                     available[y] = res + (1 << (32 - y));
                 }
@@ -314,7 +314,7 @@ export class VorbisCodebook {
 
     private initLookupTable(packet: IntBitReader) {
         this.mapType = packet.readBits(4);
-        if (this.mapType == 0) {
+        if (this.mapType === 0) {
             return;
         }
 
@@ -325,7 +325,7 @@ export class VorbisCodebook {
 
         let lookupValueCount = this.entries * this.dimensions;
         const lookupTable = new Float32Array(lookupValueCount);
-        if (this.mapType == 1) {
+        if (this.mapType === 1) {
             lookupValueCount = this.lookup1Values();
         }
 
@@ -335,7 +335,7 @@ export class VorbisCodebook {
         }
 
         // now that we have the initial data read in, calculate the entry tree
-        if (this.mapType == 1) {
+        if (this.mapType === 1) {
             for (let idx = 0; idx < this.entries; idx++) {
                 let last = 0.0;
                 let idxDiv = 1;
@@ -507,7 +507,7 @@ export class VorbisFloor0 implements IVorbisFloor {
         this._ampOfs = packet.readBits(8);
         this._books = new Array<VorbisCodebook>(packet.readBits(4) + 1);
 
-        if (this._order < 1 || this._rate < 1 || this._bark_map_size < 1 || this._books.length == 0) {
+        if (this._order < 1 || this._rate < 1 || this._bark_map_size < 1 || this._books.length === 0) {
             throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Floor0 Data');
         }
 
@@ -521,7 +521,7 @@ export class VorbisFloor0 implements IVorbisFloor {
 
             const book = codebooks[num];
 
-            if (book.mapType == 0 || book.dimensions < 1) {
+            if (book.mapType === 0 || book.dimensions < 1) {
                 throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Floor0 Data');
             }
 
@@ -587,7 +587,7 @@ export class VorbisFloor0 implements IVorbisFloor {
             // first, the book decode...
             for (let i = 0; i < this._order; ) {
                 const entry = book.decodeScalar(packet);
-                if (entry == -1) {
+                if (entry === -1) {
                     // we ran out of data or the packet is corrupt...  0 the floor and return
                     data.amp = 0;
                     return data;
@@ -635,7 +635,7 @@ export class VorbisFloor0 implements IVorbisFloor {
                     q *= w - data.coeff[j - 1];
                     p *= w - data.coeff[j];
                 }
-                if (j == this._order) {
+                if (j === this._order) {
                     // odd order filter; slightly assymetric
 
                     q *= w - data.coeff[j - 1];
@@ -659,7 +659,7 @@ export class VorbisFloor0 implements IVorbisFloor {
 
                 residue[i] *= q;
 
-                while (barkMap[++i] == k) residue[i] *= q;
+                while (barkMap[++i] === k) residue[i] *= q;
             }
         } else {
             residue.fill(0, 0, n);
@@ -781,7 +781,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         // precalc the sort table
         for (let i = 0; i < this._sortIdx.length - 1; i++) {
             for (let j = i + 1; j < this._sortIdx.length; j++) {
-                if (this._xList[i] == this._xList[j]) {
+                if (this._xList[i] === this._xList[j]) {
                     throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Floor1 Data');
                 }
 
@@ -812,7 +812,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                 let cval = 0;
                 if (cbits > 0) {
                     cval = this._classMasterbooks[clsNum].decodeScalar(packet);
-                    if (cval == -1) {
+                    if (cval === -1) {
                         // we read a bad value...  bail
                         postCount = 0;
                         break;
@@ -823,7 +823,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                     cval = cval >> cbits;
                     if (book != null) {
                         data.posts[postCount] = book.decodeScalar(packet);
-                        if (data.posts[postCount] == -1) {
+                        if (data.posts[postCount] === -1) {
                             // we read a bad value... bail
                             postCount = 0;
                             i = this._partitionClass.length;
@@ -905,7 +905,7 @@ export class VorbisFloor1 implements IVorbisFloor {
             } else {
                 room = lowroom * 2;
             }
-            if (val != 0) {
+            if (val !== 0) {
                 stepFlags[lowOfs] = true;
                 stepFlags[highOfs] = true;
                 stepFlags[i] = true;
@@ -917,7 +917,7 @@ export class VorbisFloor1 implements IVorbisFloor {
                         finalY[i] = predicted - val + highroom - 1;
                     }
                 } else {
-                    if (val % 2 == 1) {
+                    if (val % 2 === 1) {
                         // odd
                         finalY[i] = predicted - (val + 1) / 2;
                     } else {
@@ -1078,7 +1078,7 @@ export class VorbisResidue0 implements IVorbisResidue {
         const bookNums = new Int32Array(acc);
         for (let i = 0; i < acc; i++) {
             bookNums[i] = packet.readBits(8);
-            if (codebooks[bookNums[i]].mapType == 0) {
+            if (codebooks[bookNums[i]].mapType === 0) {
                 throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Residue 0');
             }
         }
@@ -1132,7 +1132,7 @@ export class VorbisResidue0 implements IVorbisResidue {
 
     private static icount(v: number): number {
         let ret = 0;
-        while (v != 0) {
+        while (v !== 0) {
             ret += v & 1;
             v >>= 1;
         }
@@ -1159,7 +1159,7 @@ export class VorbisResidue0 implements IVorbisResidue {
 
             for (let stage = 0; stage < this._maxStages; stage++) {
                 for (let partitionIdx = 0, entryIdx = 0; partitionIdx < partitionCount; entryIdx++) {
-                    if (stage == 0) {
+                    if (stage === 0) {
                         for (let ch = 0; ch < this._channels; ch++) {
                             const idx = this._classBook.decodeScalar(packet);
                             if (idx >= 0 && idx < this._decodeMap.length) {
@@ -1179,7 +1179,7 @@ export class VorbisResidue0 implements IVorbisResidue {
                         const offset = this._begin + partitionIdx * this._partitionSize;
                         for (let ch = 0; ch < this._channels; ch++) {
                             const idx = partWordCache[ch][entryIdx][dimensionIdx];
-                            if ((this._cascade[idx] & (1 << stage)) != 0) {
+                            if ((this._cascade[idx] & (1 << stage)) !== 0) {
                                 const book = this._books[idx][stage];
                                 if (book) {
                                     if (this.writeVectors(book, packet, buffer, ch, offset, this._partitionSize)) {
@@ -1211,7 +1211,7 @@ export class VorbisResidue0 implements IVorbisResidue {
 
         for (let i = 0; i < steps; i++) {
             entryCache[i] = codebook.decodeScalar(packet);
-            if (entryCache[i] == -1) {
+            if (entryCache[i] === -1) {
                 return true;
             }
         }
@@ -1237,7 +1237,7 @@ export class VorbisResidue1 extends VorbisResidue0 {
 
         for (let i = 0; i < partitionSize; ) {
             const entry = codebook.decodeScalar(packet);
-            if (entry == -1) {
+            if (entry === -1) {
                 return true;
             }
             for (let j = 0; j < codebook.dimensions; i++, j++) {
@@ -1280,12 +1280,12 @@ export class VorbisResidue2 extends VorbisResidue0 {
         offset /= this._realChannels;
         for (let c = 0; c < partitionSize; ) {
             const entry = codebook.decodeScalar(packet);
-            if (entry == -1) {
+            if (entry === -1) {
                 return true;
             }
             for (let d = 0; d < codebook.dimensions; d++, c++) {
                 residue[chPtr][offset] += codebook.get(entry, d);
-                if (++chPtr == this._realChannels) {
+                if (++chPtr === this._realChannels) {
                     chPtr = 0;
                     offset++;
                 }
@@ -1365,7 +1365,7 @@ export class VorbisMapping {
         for (let j = 0; j < couplingSteps; j++) {
             const magnitude = packet.readBits(couplingBits);
             const angle = packet.readBits(couplingBits);
-            if (magnitude == angle || magnitude > channels - 1 || angle > channels - 1) {
+            if (magnitude === angle || magnitude > channels - 1 || angle > channels - 1) {
                 throw new AlphaTabError(
                     AlphaTabErrorType.Format,
                     'Vorbis: Invalid magnitude or angle in mapping header!'
@@ -1375,7 +1375,7 @@ export class VorbisMapping {
             this._couplingMangitude[j] = magnitude;
         }
 
-        if (packet.readBits(2) != 0) {
+        if (packet.readBits(2) !== 0) {
             throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Reserved bits not 0 in mapping header.');
         }
 
@@ -1449,8 +1449,8 @@ export class VorbisMapping {
         for (let i = 0; i < this._submapFloor.length; i++) {
             for (let j = 0; j < this._channelFloor.length; j++) {
                 if (
-                    this._submapFloor[i] != this._channelFloor[j] ||
-                    this._submapResidue[i] != this._channelResidue[j]
+                    this._submapFloor[i] !== this._channelFloor[j] ||
+                    this._submapResidue[i] !== this._channelResidue[j]
                 ) {
                     // the submap doesn't match, so this floor doesn't contribute
                     floorData[j].forceNoEnergy = true;
@@ -1551,7 +1551,7 @@ export class VorbisMode {
         this._channels = channels;
 
         this._blockFlag = packet.readBit();
-        if (0 != packet.readBits(32)) {
+        if (0 !== packet.readBits(32)) {
             throw new AlphaTabError(
                 AlphaTabErrorType.Format,
                 'Vorbis: Mode header had invalid window or transform type!'
@@ -1733,7 +1733,7 @@ class MdctImpl {
             let AA = 0; // A
             let e = 0; // buffer
             let e_stop = this._n2; // buffer
-            while (e != e_stop) {
+            while (e !== e_stop) {
                 buf2[d + 1] = buffer[e] * this._a[AA] - buffer[e + 2] * this._a[AA + 1];
                 buf2[d] = buffer[e] * this._a[AA + 1] + buffer[e + 2] * this._a[AA];
                 d -= 2;
@@ -2285,7 +2285,7 @@ export class VorbisStreamDecoder {
 
     public read(buffer: Float32Array, offset: number, count: number): number {
         // if the caller didn't ask for any data, bail early
-        if (count == 0) {
+        if (count === 0) {
             return 0;
         }
 
@@ -2296,7 +2296,7 @@ export class VorbisStreamDecoder {
         // try to fill the buffer; drain the last buffer if EOS, resync, bad packet, or parameter change
         while (idx < tgt) {
             // if we don't have any more valid data in the current packet, read in the next packet
-            if (this._prevPacketStart == this._prevPacketEnd) {
+            if (this._prevPacketStart === this._prevPacketEnd) {
                 if (this._eosFound) {
                     this._nextPacketBuf = null;
                     this._prevPacketBuf = null;

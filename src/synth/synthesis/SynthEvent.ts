@@ -13,7 +13,7 @@ export class SynthEvent {
     public constructor(eventIndex: number, e: MidiEvent) {
         this.eventIndex = eventIndex;
         this.event = e;
-        this.isMetronome = this.event.type == MidiEventType.AlphaTabMetronome;
+        this.isMetronome = this.event.type === MidiEventType.AlphaTabMetronome;
     }
 
 

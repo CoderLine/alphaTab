@@ -211,7 +211,7 @@ export class Voice {
                                 if (firstGraceBeat.previousBeat) {
                                     firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
                                     // place beats starting after new beat end
-                                    if (firstGraceBeat.previousBeat.voice == this) {
+                                    if (firstGraceBeat.previousBeat.voice === this) {
                                         currentPlaybackTick =
                                             firstGraceBeat.previousBeat.playbackStart +
                                             firstGraceBeat.previousBeat.playbackDuration;

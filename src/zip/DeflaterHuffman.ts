@@ -226,7 +226,7 @@ class Tree {
         lengths[numNodes - 1] = 0;
 
         for (let i = numNodes - 1; i >= 0; i--) {
-            if (childs[2 * i + 1] != -1) {
+            if (childs[2 * i + 1] !== -1) {
                 let bitLength = lengths[i] + 1;
                 if (bitLength > this.maxLength) {
                     bitLength = this.maxLength;
@@ -242,14 +242,14 @@ class Tree {
             }
         }
 
-        if (overflow == 0) {
+        if (overflow === 0) {
             return;
         }
 
         let incrBitLen = this.maxLength - 1;
         do {
             // Find the first bit length which could increase:
-            while (this.bitLengthCounts[--incrBitLen] == 0) {}
+            while (this.bitLengthCounts[--incrBitLen] === 0) {}
 
             // Move this node one down and remove a corresponding
             // number of overflow nodes.
@@ -275,11 +275,11 @@ class Tree {
          * array.
          */
         let nodePtr = 2 * numLeafs;
-        for (let bits = this.maxLength; bits != 0; bits--) {
+        for (let bits = this.maxLength; bits !== 0; bits--) {
             let n = this.bitLengthCounts[bits - 1];
             while (n > 0) {
                 let childPtr = 2 * childs[nodePtr++];
-                if (childs[childPtr + 1] == -1) {
+                if (childs[childPtr + 1] === -1) {
                     // We found another leaf
                     this.length[childs[childPtr]] = bits;
                     n--;
@@ -315,13 +315,13 @@ class Tree {
         while (i < this.numCodes) {
             count = 1;
             let nextlen = this.length![i];
-            if (nextlen == 0) {
+            if (nextlen === 0) {
                 max_count = 138;
                 min_count = 3;
             } else {
                 max_count = 6;
                 min_count = 3;
-                if (curlen != nextlen) {
+                if (curlen !== nextlen) {
                     blTree.freqs[nextlen]++;
                     count = 0;
                 }
@@ -329,7 +329,7 @@ class Tree {
             curlen = nextlen;
             i++;
 
-            while (i < this.numCodes && curlen == this.length![i]) {
+            while (i < this.numCodes && curlen === this.length![i]) {
                 i++;
                 if (++count >= max_count) {
                     break;
@@ -338,7 +338,7 @@ class Tree {
 
             if (count < min_count) {
                 blTree.freqs[curlen] += count;
-            } else if (curlen != 0) {
+            } else if (curlen !== 0) {
                 blTree.freqs[Tree.Repeat3To6]++;
             } else if (count <= 10) {
                 blTree.freqs[Tree.Repeat3To10]++;
@@ -395,13 +395,13 @@ class Tree {
         while (i < this.numCodes) {
             count = 1;
             let nextlen = this.length![i];
-            if (nextlen == 0) {
+            if (nextlen === 0) {
                 maxCount = 138;
                 minCount = 3;
             } else {
                 maxCount = 6;
                 minCount = 3;
-                if (curlen != nextlen) {
+                if (curlen !== nextlen) {
                     blTree.writeSymbol(nextlen);
                     count = 0;
                 }
@@ -409,7 +409,7 @@ class Tree {
             curlen = nextlen;
             i++;
 
-            while (i < this.numCodes && curlen == this.length![i]) {
+            while (i < this.numCodes && curlen === this.length![i]) {
                 i++;
                 if (++count >= maxCount) {
                     break;
@@ -420,7 +420,7 @@ class Tree {
                 while (count-- > 0) {
                     blTree.writeSymbol(curlen);
                 }
-            } else if (curlen != 0) {
+            } else if (curlen !== 0) {
                 blTree.writeSymbol(Tree.Repeat3To6);
                 this.huffman.pending.writeBits(count - 3, 2);
             } else if (count <= 10) {
@@ -630,7 +630,7 @@ export class DeflaterHuffman {
         if (storedOffset >= 0 && storedLength + 4 < opt_len >> 3) {
             // Store Block
             this.flushStoredBlock(stored, storedOffset, storedLength, lastBlock);
-        } else if (opt_len == static_len) {
+        } else if (opt_len === static_len) {
             // Encode with static tree
             this.pending.writeBits((DeflaterHuffman.STATIC_TREES << 1) + (lastBlock ? 1 : 0), 3);
             this.literalTree.setStaticCodes(DeflaterHuffman.staticLCodes, DeflaterHuffman.staticLLength);
@@ -671,7 +671,7 @@ export class DeflaterHuffman {
         for (let i = 0; i < this.last_lit; i++) {
             let litlen = this.l_buf[i] & 0xff;
             let dist = this.d_buf[i];
-            if (dist-- != 0) {
+            if (dist-- !== 0) {
                 let lc = DeflaterHuffman.Lcode(litlen);
                 this.literalTree.writeSymbol(lc);
 
@@ -732,7 +732,7 @@ export class DeflaterHuffman {
     }
 
     private static Lcode(length: number): number {
-        if (length == 255) {
+        if (length === 255) {
             return 285;
         }
 

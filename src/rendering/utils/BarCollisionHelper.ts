@@ -66,7 +66,7 @@ export class BarCollisionHelper {
     }
 
     public reserveBeatSlot(beat: Beat, topY: number, bottomY: number): void {
-        if (topY == bottomY) {
+        if (topY === bottomY) {
             return;
         }
         if (!this.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
@@ -119,7 +119,7 @@ export class BarCollisionHelper {
 
                 if (hasCollision) {
                     // second voice above, the others below
-                    if (beat.voice.index == 1) {
+                    if (beat.voice.index === 1) {
                         // move rest above top position
                         // TODO: rest must align with note lines
                         newRestTopY = reservedSlots.topY - restSizes[1] - restSizes[0];

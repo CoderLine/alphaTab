@@ -412,7 +412,7 @@ export class BinaryStylesheet {
                 return DataType.String;
             case 'number':
                 const withoutFraction: number = (value as number) | 0;
-                return (value as number) == withoutFraction ? DataType.Integer : DataType.Float;
+                return (value as number) === withoutFraction ? DataType.Integer : DataType.Float;
             case 'object':
                 if (value instanceof BendPoint) {
                     return DataType.Point;

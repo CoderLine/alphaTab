@@ -139,9 +139,9 @@ export class BeamingHelper {
         positions.up = up;
         positions.down = down;
         for (const v of this.drawingInfos.values()) {
-            if (v.startBeat == beat) {
+            if (v.startBeat === beat) {
                 v.startX = this.getBeatLineX(beat);
-            } else if (v.endBeat == beat) {
+            } else if (v.endBeat === beat) {
                 v.endX = this.getBeatLineX(beat);
             }
         }

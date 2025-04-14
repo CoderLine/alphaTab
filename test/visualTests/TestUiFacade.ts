@@ -28,7 +28,7 @@ class TestUiContainer implements IContainer {
     }
 
     public set width(value: number) {
-        if (value != this._width) {
+        if (value !== this._width) {
             this._width = value;
             (this.resize as EventEmitter).trigger();
         }
@@ -39,7 +39,7 @@ class TestUiContainer implements IContainer {
     }
 
     public set height(value: number) {
-        if (value != this._height) {
+        if (value !== this._height) {
             this._height = value;
             (this.resize as EventEmitter).trigger();
         }
@@ -58,7 +58,7 @@ class TestUiContainer implements IContainer {
     }
 
     public removeChild(child: TestUiContainer) {
-        this.childNodes = this.childNodes.filter(i => i != child);
+        this.childNodes = this.childNodes.filter(i => i !== child);
     }
 
     public appendChild(child: IContainer) {

@@ -41,7 +41,7 @@ export class FontSizes {
             return;
         }
 
-        if (!Environment.isRunningInWorker && Environment.webPlatform != WebPlatform.NodeJs) {
+        if (!Environment.isRunningInWorker && Environment.webPlatform !== WebPlatform.NodeJs) {
             let canvas: HTMLCanvasElement = document.createElement('canvas');
             let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
             const measureSize = 11;

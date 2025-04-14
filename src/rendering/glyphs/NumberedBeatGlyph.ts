@@ -58,7 +58,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     note.hasQuarterToneOffset
                 );
 
-                if (accidentalToSet == AccidentalType.Natural) {
+                if (accidentalToSet === AccidentalType.Natural) {
                     const ks: number = this.renderer.bar.masterBar.keySignature;
                     const ksi: number = ks + 7;
                     const naturalizeAccidentalForKeySignature: AccidentalType =

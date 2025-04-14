@@ -236,7 +236,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 // fill empty beats
                 for (const b of staff.bars) {
                     for (const v of b.voices) {
-                        if (v.isEmpty && v.beats.length == 0) {
+                        if (v.isEmpty && v.beats.length === 0) {
                             const emptyBeat: Beat = new Beat();
                             emptyBeat.isEmpty = true;
                             v.addBeat(emptyBeat);
@@ -503,7 +503,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._score.album = MusicXmlImporter.sanitizeDisplay(fullText);
                         return;
                     }
-                } else if (halign == 'right' || justify === 'right') {
+                } else if (halign === 'right' || justify === 'right') {
                     // in alphaTab only `music` is right
                     if (this._score.music.length === 0) {
                         this._score.music = MusicXmlImporter.sanitizeDisplay(fullText);
@@ -619,7 +619,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseMovementTitle(element: XmlNode) {
-        if (this._score.title.length == 0) {
+        if (this._score.title.length === 0) {
             // we have no "work title", then use the "movement title" as main title
             this._score.title = MusicXmlImporter.sanitizeDisplay(element.innerText);
         } else {
@@ -1042,9 +1042,9 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parsePrint(element: XmlNode, masterBar: MasterBar, track: Track) {
-        if (element.getAttribute('new-system', 'no') == 'yes') {
+        if (element.getAttribute('new-system', 'no') === 'yes') {
             track.addLineBreaks(masterBar.index);
-        } else if (element.getAttribute('new-page', 'no') == 'yes') {
+        } else if (element.getAttribute('new-page', 'no') === 'yes') {
             track.addLineBreaks(masterBar.index);
         }
     }
@@ -1056,7 +1056,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 bar.simileMark = this._simileMarkAllStaves!;
             }
 
-            if (this._simileMarkAllStaves == SimileMark.FirstOfDouble) {
+            if (this._simileMarkAllStaves === SimileMark.FirstOfDouble) {
                 this._simileMarkAllStaves = SimileMark.SecondOfDouble;
             } else {
                 this._simileMarkAllStaves = null;
@@ -1070,7 +1070,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 const bar = this.getOrCreateBar(s, masterBar);
                 bar.simileMark = this._simileMarkPerStaff!.get(i)!;
 
-                if (bar.simileMark == SimileMark.FirstOfDouble) {
+                if (bar.simileMark === SimileMark.FirstOfDouble) {
                     this._simileMarkPerStaff!.set(i, SimileMark.SecondOfDouble);
                 } else {
                     this._simileMarkPerStaff!.delete(i);
@@ -1348,7 +1348,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 case 'kind':
                     chord.name = chord.name + this.parseHarmonyKind(childNode);
-                    if (childNode.getAttribute('parentheses-degrees', 'no') == 'yes') {
+                    if (childNode.getAttribute('parentheses-degrees', 'no') === 'yes') {
                         degreeParenthesis = true;
                     }
                     break;
@@ -2035,10 +2035,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     const type = direction.getAttribute('type', 'start');
                     switch (previousWords) {
                         case 'LetRing':
-                            this._nextBeatLetRing = type === 'start' || type == 'continue';
+                            this._nextBeatLetRing = type === 'start' || type === 'continue';
                             break;
                         case 'P.M.':
-                            this._nextBeatPalmMute = type === 'start' || type == 'continue';
+                            this._nextBeatPalmMute = type === 'start' || type === 'continue';
                             break;
                     }
                     previousWords = '';
@@ -2153,7 +2153,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private hasSameTempo(masterBar: MasterBar, tempoAutomation: Automation) {
         for (const existing of masterBar.tempoAutomations) {
-            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value == existing.value) {
+            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value === existing.value) {
                 return true;
             }
         }
@@ -2429,7 +2429,7 @@ export class MusicXmlImporter extends ScoreImporter {
             if (durationInTicks < 0 && beatDuration !== null) {
                 durationInTicks = MidiUtils.toTicks(beatDuration!);
                 if (dots > 0) {
-                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots == 2);
+                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots === 2);
                 }
             }
 

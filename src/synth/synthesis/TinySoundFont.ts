@@ -202,7 +202,7 @@ export class TinySoundFont {
                 // exception. metronome is implicitly added in solo
                 const isChannelMuted: boolean =
                     this._mutedChannels.has(channel) ||
-                    (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
+                    (anySolo && channel !== SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
 
                 if (!buffer) {
                     voice.kill();
@@ -912,7 +912,7 @@ export class TinySoundFont {
 
     private channelApplyPitch(channel: number, c: Channel, key: number = -1): void {
         for (const v of this._voices) {
-            if (v.playingChannel === channel && v.playingPreset !== -1 && (key == -1 || v.playingKey === key)) {
+            if (v.playingChannel === channel && v.playingPreset !== -1 && (key === -1 || v.playingKey === key)) {
                 v.updatePitchRatio(c, this.outSampleRate);
             }
         }
@@ -1386,7 +1386,7 @@ export class TinySoundFont {
                                     zoneRegion.tune += shdr.pitchCorrection;
                                     zoneRegion.sampleRate = shdr.sampleRate;
 
-                                    const isPercussion = phdr.bank == SynthConstants.PercussionBank;
+                                    const isPercussion = phdr.bank === SynthConstants.PercussionBank;
 
                                     const shouldLoadSamples =
                                         (isPercussion &&
@@ -1540,7 +1540,7 @@ export class TinySoundFont {
         }
 
         for (const preset of presets) {
-            if (preset.bank == SynthConstants.PercussionBank) {
+            if (preset.bank === SynthConstants.PercussionBank) {
                 for (const region of preset.regions!) {
                     if (region.loKey >= key && region.hiKey <= key && region.samples.length > 0) {
                         return true;

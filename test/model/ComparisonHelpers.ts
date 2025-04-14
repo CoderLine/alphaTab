@@ -18,13 +18,13 @@ export class ComparisonHelpers {
         const expectedType = typeof expected;
         const actualType = typeof actual;
 
-        if (actualType != expectedType) {
+        if (actualType !== expectedType) {
             assert.fail(`Type Mismatch on hierarchy: ${path}, actual<'${actualType}'> != expected<'${expectedType}'>`);
         }
 
         switch (actualType) {
             case 'boolean':
-                if ((actual as boolean) != (expected as boolean)) {
+                if ((actual as boolean) !== (expected as boolean)) {
                     assert.fail(
                         `Boolean mismatch on hierarchy: ${path}, actualy<'${actual}'> != expected<'${expected}'>`
                     );

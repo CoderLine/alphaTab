@@ -256,8 +256,8 @@ export class MidiTickLookup {
                     current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToNextBext;
 
                     if (
-                        current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index + 1 &&
-                        (current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index ||
+                        current.nextBeat.masterBar.masterBar.index !== endMasterBar.masterBar.index + 1 &&
+                        (current.nextBeat.masterBar.masterBar.index !== endMasterBar.masterBar.index ||
                             current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
                     ) {
                         current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
@@ -324,8 +324,8 @@ export class MidiTickLookup {
         // we report no next beat and animate to the end
         if (
             current.nextBeat &&
-            current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index + 1 &&
-            (current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index ||
+            current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index + 1 &&
+            (current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index ||
                 current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
         ) {
             current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;

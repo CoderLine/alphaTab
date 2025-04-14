@@ -169,7 +169,7 @@ export class NumberedKeySignatureGlyph extends Glyph {
         canvas.textBaseline = TextBaseline.Middle;
         canvas.fillText(this._text, cx + this.x, cy + this.y);
 
-        if (this._accidental != AccidentalType.None) {
+        if (this._accidental !== AccidentalType.None) {
             canvas.fillMusicFontSymbol(
                 cx + this.x + this._accidentalOffset,
                 cy + this.y,

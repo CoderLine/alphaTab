@@ -161,7 +161,7 @@ export class DeflaterEngine {
      * @returns Return true if input is needed via setInput
      */
     public needsInput(): boolean {
-        return (this.inputEnd == this.inputOff);
+        return (this.inputEnd === this.inputOff);
     }
 
     /**
@@ -188,7 +188,7 @@ export class DeflaterEngine {
         let progress: boolean;
         do {
             this.fillWindow();
-            let canFlush = flush && (this.inputOff == this.inputEnd);
+            let canFlush = flush && (this.inputOff === this.inputEnd);
             progress = this.deflateSlow(canFlush, finish);
         } while (this.pending.isFlushed && progress); // repeat while we have no pending output and progress was made
         return progress;
@@ -200,7 +200,7 @@ export class DeflaterEngine {
         }
 
         while (this.lookahead >= DeflaterConstants.MIN_LOOKAHEAD || flush) {
-            if (this.lookahead == 0) {
+            if (this.lookahead === 0) {
                 if (this.prevAvailable) {
                     this.huffman.tallyLit(this.window[this.strstart - 1] & 0xff);
                 }
@@ -226,13 +226,13 @@ export class DeflaterEngine {
             if (this.lookahead >= DeflaterConstants.MIN_MATCH) {
                 let hashHead = this.insertString();
 
-                if (hashHead != 0 &&
+                if (hashHead !== 0 &&
                     this.strstart - hashHead <= DeflaterConstants.MAX_DIST &&
                     this.findLongestMatch(hashHead)) {
                     // longestMatch sets matchStart and matchLen
 
                     // Discard match if too small and too far away
-                    if (this.matchLen == DeflaterConstants.MIN_MATCH && this.strstart - this.matchStart > DeflaterEngine.TooFar) {
+                    if (this.matchLen === DeflaterConstants.MIN_MATCH && this.strstart - this.matchStart > DeflaterEngine.TooFar) {
                         this.matchLen = DeflaterConstants.MIN_MATCH - 1;
                     }
                 }
@@ -270,7 +270,7 @@ export class DeflaterEngine {
                 if (this.prevAvailable) {
                     len--;
                 }
-                let lastBlock = (finish && (this.lookahead == 0) && !this.prevAvailable);
+                let lastBlock = (finish && (this.lookahead === 0) && !this.prevAvailable);
                 this.huffman.flushBlock(this.window, this.blockStart, len, lastBlock);
                 this.blockStart += len;
                 return !lastBlock;
@@ -316,10 +316,10 @@ export class DeflaterEngine {
             match = curMatch;
             scan = this.strstart;
 
-            if (window[match + this.matchLen] != scan_end
-                || window[match + this.matchLen - 1] != scan_end1
-                || window[match] != window[scan]
-                || window[++match] != window[++scan]) {
+            if (window[match + this.matchLen] !== scan_end
+                || window[match + this.matchLen - 1] !== scan_end1
+                || window[match] !== window[scan]
+                || window[++match] !== window[++scan]) {
                 continue;
             }
 
@@ -330,76 +330,76 @@ export class DeflaterEngine {
 
             switch ((scanMax - scan) % 8) {
                 case 1:
-                    if (window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]) break;
                     break;
 
                 case 2:
-                    if (window[++scan] == window[++match]
-                        && window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]
+                        && window[++scan] === window[++match]) break;
                     break;
 
                 case 3:
-                    if (window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]) break;
                     break;
 
                 case 4:
-                    if (window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]) break;
                     break;
 
                 case 5:
-                    if (window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]) break;
                     break;
 
                 case 6:
-                    if (window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]) break;
                     break;
 
                 case 7:
-                    if (window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]
-                        && window[++scan] == window[++match]) break;
+                    if (window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]
+                        && window[++scan] === window[++match]) break;
                     break;
             }
 
-            if (window[scan] == window[match]) {
+            if (window[scan] === window[match]) {
                 /* We check for insufficient lookahead only every 8th comparison;
                  * the 256th check will be made at strstart + 258 unless lookahead is
                  * exhausted first.
                  */
                 do {
-                    if (scan == scanMax) {
+                    if (scan === scanMax) {
                         ++scan;     // advance to first position not matched
                         ++match;
 
                         break;
                     }
                 }
-                while (window[++scan] == window[++match]
-                && window[++scan] == window[++match]
-                && window[++scan] == window[++match]
-                && window[++scan] == window[++match]
-                && window[++scan] == window[++match]
-                && window[++scan] == window[++match]
-                && window[++scan] == window[++match]
-                    && window[++scan] == window[++match]);
+                while (window[++scan] === window[++match]
+                && window[++scan] === window[++match]
+                && window[++scan] === window[++match]
+                && window[++scan] === window[++match]
+                && window[++scan] === window[++match]
+                && window[++scan] === window[++match]
+                && window[++scan] === window[++match]
+                    && window[++scan] === window[++match]);
             }
 
             if (scan - this.strstart > this.matchLen) {

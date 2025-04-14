@@ -1243,7 +1243,7 @@ export class MidiFileGenerator {
             while (
                 endNote.isTieOrigin &&
                 !endNote.tieDestination!.hasBend &&
-                endNote.tieDestination!.vibrato == VibratoType.None
+                endNote.tieDestination!.vibrato === VibratoType.None
             ) {
                 endNote = endNote.tieDestination!;
             }

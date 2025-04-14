@@ -9,7 +9,7 @@ if (alphaTab.Environment.isRunningInWorker) {
 } else {
     alphaTab.Environment.initializeMain(
         settings => {
-            if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.NodeJs) {
+            if (alphaTab.Environment.webPlatform === alphaTab.WebPlatform.NodeJs) {
                 throw new alphaTab.AlphaTabError(
                     alphaTab.AlphaTabErrorType.General,
                     'Workers not yet supported in Node.js'
@@ -17,7 +17,7 @@ if (alphaTab.Environment.isRunningInWorker) {
             }
 
             if (
-                alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule ||
+                alphaTab.Environment.webPlatform === alphaTab.WebPlatform.BrowserModule ||
                 alphaTab.Environment.isWebPackBundled ||
                 alphaTab.Environment.isViteBundled
             ) {
@@ -98,7 +98,7 @@ if (alphaTab.Environment.isRunningInWorker) {
         },
 
         (context, settings) => {
-            if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.NodeJs) {
+            if (alphaTab.Environment.webPlatform === alphaTab.WebPlatform.NodeJs) {
                 throw new alphaTab.AlphaTabError(
                     alphaTab.AlphaTabErrorType.General,
                     'Audio Worklets not yet supported in Node.js'
@@ -106,7 +106,7 @@ if (alphaTab.Environment.isRunningInWorker) {
             }
 
             if (
-                alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule ||
+                alphaTab.Environment.webPlatform === alphaTab.WebPlatform.BrowserModule ||
                 alphaTab.Environment.isWebPackBundled ||
                 alphaTab.Environment.isViteBundled
             ) {

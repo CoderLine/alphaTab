@@ -36,7 +36,7 @@ export class GolpeEffectInfo extends EffectBarRendererInfo {
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
         const shouldCreate = this._shouldCreate;
-        return beat.golpe == this._type && (!shouldCreate || shouldCreate(settings, beat));
+        return beat.golpe === this._type && (!shouldCreate || shouldCreate(settings, beat));
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

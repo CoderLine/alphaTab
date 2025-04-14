@@ -59,7 +59,7 @@ export class OggReader {
         // search for sync byte (max 64KB)
         for (let i = 0; i < 65536; i++) {
             const magic = IOHelper.readInt32LE(this._readable);
-            if (magic == 0x5367674f) {
+            if (magic === 0x5367674f) {
                 return true;
             }
             this._readable.position -= 3;
@@ -81,7 +81,7 @@ export class OggReader {
         this._readable.skip(4); // Crc
 
         const segmentCount = this._readable.readByte();
-        if (segmentCount == -1) {
+        if (segmentCount === -1) {
             return false;
         }
 
@@ -91,7 +91,7 @@ export class OggReader {
             const size = this._readable.readByte();
 
             // ensure packet size exists and add size
-            if (packetIndex == packetSizes.length) {
+            if (packetIndex === packetSizes.length) {
                 packetSizes.push(0);
             }
             packetSizes[packetIndex] += size;
@@ -105,12 +105,12 @@ export class OggReader {
         for (let i = 0; i < packetSizes.length; i++) {
             const packetData = new Uint8Array(packetSizes[i]);
             const c = this._readable.read(packetData, 0, packetData.length);
-            if (c != packetData.length) {
+            if (c !== packetData.length) {
                 return false;
             }
 
-            if ((pageFlags & PageFlags.ContinuesPacket) != 0) {
-                if (packets.length == 0)
+            if ((pageFlags & PageFlags.ContinuesPacket) !== 0) {
+                if (packets.length === 0)
                     throw new AlphaTabError(
                         AlphaTabErrorType.Format,
                         'OGG: Continuation page without any previous packets'
@@ -119,8 +119,8 @@ export class OggReader {
             } else {
                 const packet = new OggPacket(
                     packetData,
-                    (pageFlags & PageFlags.BeginningOfStream) != 0 && i == 0,
-                    (pageFlags & PageFlags.EndOfStream) != 0 && i == packetSizes.length - 1,
+                    (pageFlags & PageFlags.BeginningOfStream) !== 0 && i === 0,
+                    (pageFlags & PageFlags.EndOfStream) !== 0 && i === packetSizes.length - 1,
                     pageGranulePosition
                 );
                 packets.push(packet);

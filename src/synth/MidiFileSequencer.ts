@@ -53,15 +53,15 @@ export class MidiFileSequencer {
     private _countInState: MidiSequencerState | null = null;
 
     public get isPlayingMain(): boolean {
-        return this._currentState == this._mainState;
+        return this._currentState === this._mainState;
     }
 
     public get isPlayingOneTimeMidi(): boolean {
-        return this._currentState == this._oneTimeState;
+        return this._currentState === this._oneTimeState;
     }
 
     public get isPlayingCountIn(): boolean {
-        return this._currentState == this._countInState;
+        return this._currentState === this._countInState;
     }
 
     public constructor(synthesizer: TinySoundFont) {
@@ -255,7 +255,7 @@ export class MidiFileSequencer {
                 if (!isPercussion) {
                     this.instrumentPrograms.add(programChange.program);
                 }
-            } else if (mEvent.type == MidiEventType.NoteOn) {
+            } else if (mEvent.type === MidiEventType.NoteOn) {
                 const noteOn = mEvent as NoteOnEvent;
                 const isPercussion = noteOn.channel === SynthConstants.PercussionChannel;
                 if (isPercussion) {

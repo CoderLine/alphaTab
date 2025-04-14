@@ -36,9 +36,8 @@
             },
             "suspicious": {
                 "noConstEnum": "off",
+                "noExplicitAny": "off", // used in areas where we work with dynamic JSON data
                 // temporary disabled, apply fixes gradually
-                "noDoubleEquals": "off",
-                "noExplicitAny": "off",
                 "noAssignInExpressions": "off"
             },
             "correctness": {

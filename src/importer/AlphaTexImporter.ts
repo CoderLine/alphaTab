@@ -285,7 +285,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 // fill empty beats
                 for (const b of staff.bars) {
                     for (const v of b.voices) {
-                        if (v.isEmpty && v.beats.length == 0) {
+                        if (v.isEmpty && v.beats.length === 0) {
                             const emptyBeat: Beat = new Beat();
                             emptyBeat.isEmpty = true;
                             v.addBeat(emptyBeat);
@@ -644,13 +644,13 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._ch = this.nextChar();
                         if (this._ch === 0x5c /* \\ */) {
                             s += '\\';
-                        } else if (this._ch == startChar /* \<startchar> */) {
+                        } else if (this._ch === startChar /* \<startchar> */) {
                             s += String.fromCharCode(this._ch);
-                        } else if (this._ch == 0x52 /* \R */ || this._ch == 0x72 /* \r */) {
+                        } else if (this._ch === 0x52 /* \R */ || this._ch === 0x72 /* \r */) {
                             s += '\r';
-                        } else if (this._ch == 0x4e /* \N */ || this._ch == 0x6e /* \n */) {
+                        } else if (this._ch === 0x4e /* \N */ || this._ch === 0x6e /* \n */) {
                             s += '\n';
-                        } else if (this._ch == 0x54 /* \T */ || this._ch == 0x74 /* \t */) {
+                        } else if (this._ch === 0x54 /* \T */ || this._ch === 0x74 /* \t */) {
                             s += '\t';
                         } else {
                             this.errorMessage('Unsupported escape sequence');
@@ -1515,7 +1515,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private handleNewVoice(): boolean {
         if (
             this._voiceIndex === 0 &&
-            (this._currentStaff.bars.length == 0 ||
+            (this._currentStaff.bars.length === 0 ||
                 (this._currentStaff.bars.length === 1 && this._currentStaff.bars[0].isEmpty))
         ) {
             // voice marker on the begining of the first voice without any bar yet?
@@ -1687,7 +1687,7 @@ export class AlphaTexImporter extends ScoreImporter {
             // reset to defaults
             this._currentStaff.stringTuning.tunings = [];
 
-            if (program == 15) {
+            if (program === 15) {
                 // dulcimer E4 B3 G3 D3 A2 E2
                 this._currentStaff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             } else if (program >= 24 && program <= 31) {
@@ -1697,39 +1697,39 @@ export class AlphaTexImporter extends ScoreImporter {
                 // bass G2 D2 A1 E1
                 this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (
-                program == 40 ||
-                program == 44 ||
-                program == 45 ||
-                program == 48 ||
-                program == 49 ||
-                program == 50 ||
-                program == 51
+                program === 40 ||
+                program === 44 ||
+                program === 45 ||
+                program === 48 ||
+                program === 49 ||
+                program === 50 ||
+                program === 51
             ) {
                 // violin E3 A3 D3 G2
                 this._currentStaff.stringTuning.tunings = [52, 57, 50, 43];
-            } else if (program == 41) {
+            } else if (program === 41) {
                 // viola A3 D3 G2 C2
                 this._currentStaff.stringTuning.tunings = [57, 50, 43, 36];
-            } else if (program == 42) {
+            } else if (program === 42) {
                 // cello A2 D2 G1 C1
                 this._currentStaff.stringTuning.tunings = [45, 38, 31, 24];
-            } else if (program == 43) {
+            } else if (program === 43) {
                 // contrabass
                 // G2 D2 A1 E1
                 this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
-            } else if (program == 105) {
+            } else if (program === 105) {
                 // banjo
                 // D3 B2 G2 D2 G3
                 this._currentStaff.stringTuning.tunings = [50, 47, 43, 38, 55];
-            } else if (program == 106) {
+            } else if (program === 106) {
                 // shamisen
                 // A3 E3 A2
                 this._currentStaff.stringTuning.tunings = [57, 52, 45];
-            } else if (program == 107) {
+            } else if (program === 107) {
                 // koto
                 // E3 A2 D2 G1
                 this._currentStaff.stringTuning.tunings = [52, 45, 38, 31];
-            } else if (program == 110) {
+            } else if (program === 110) {
                 // Fiddle
                 // E4 A3 D3 G2
                 this._currentStaff.stringTuning.tunings = [64, 57, 50, 43];
@@ -1743,7 +1743,7 @@ export class AlphaTexImporter extends ScoreImporter {
             if (
                 (program >= 24 && program <= 31) || // Guitar
                 (program >= 32 && program <= 39) || // Bass
-                program == 43 // Contrabass
+                program === 43 // Contrabass
             ) {
                 // guitar E4 B3 G3 D3 A2 E2
                 this._currentStaff.displayTranspositionPitch = -12;
@@ -2534,7 +2534,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 let tuning: TuningParseResult = this._syData as TuningParseResult;
                 octave = tuning.octave;
                 tone = tuning.tone.noteValue;
-                if (this._accidentalMode == AlphaTexAccidentalMode.Explicit) {
+                if (this._accidentalMode === AlphaTexAccidentalMode.Explicit) {
                     accidentalMode = tuning.tone.accidentalMode;
                 }
                 break;
@@ -2965,7 +2965,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     master.timeSignatureDenominator = this._syData as number;
                     this._sy = this.newSy();
                 }
-            } else if (syData == 'ft') {
+            } else if (syData === 'ft') {
                 master.isFreeTime = true;
                 this._sy = this.newSy();
             } else if (syData === 'ro') {

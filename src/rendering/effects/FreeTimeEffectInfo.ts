@@ -31,7 +31,7 @@ export class FreeTimeEffectInfo extends EffectBarRendererInfo {
         return (
             isFirstBeat &&
             masterBar.isFreeTime &&
-            (masterBar.index === 0 || masterBar.isFreeTime != masterBar.previousMasterBar!.isFreeTime)
+            (masterBar.index === 0 || masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
         );
     }
 
