@@ -35,7 +35,7 @@ jobs:
           cache: 'npm'
 
       - run: node ./scripts/update-version.js alpha ${{github.run_number}}
-      - run: npm install
+      - run: npm ci
       - run: npm run build
       - run: npm pack
 
@@ -66,7 +66,7 @@ jobs:
         with:
           dotnet-version: "8"
 
-      - run: npm install
+      - run: npm ci
       - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
       - run: npm run build-csharp
 
@@ -98,7 +98,7 @@ jobs:
           java-version: "19"
           distribution: "temurin"
 
-      - run: npm install
+      - run: npm ci
       - run: node ./scripts/update-kotlin-version.js SNAPSHOT
       - run: npm run build-kotlin
 

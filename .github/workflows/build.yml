@@ -18,6 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+          cache: 'npm'
       - run: npm install
       - run: npm run generate-typescript
       - run: npm run lint-ci
@@ -35,7 +36,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - run: npm install
+          cache: 'npm'
+      - run: npm ci
       - run: npm run build
       - run: npm run test
         id: test
@@ -57,10 +59,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+          cache: 'npm'
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8'
-      - run: npm install
+      - run: npm ci
       - run: npm run build-csharp
       - run: npm run test-csharp
         id: test
@@ -91,6 +94,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
+          cache: 'npm'
       - uses: actions/setup-java@v4
         with:
           java-version: '19'
@@ -98,7 +102,7 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
         with:
           cache-read-only: false
-      - run: npm install
+      - run: npm ci
       - run: npm run build-kotlin
       - run: npm run test-kotlin
         id: test
