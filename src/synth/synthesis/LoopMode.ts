@@ -4,7 +4,7 @@
 // Licensed under: MPL-2.0
 
 export enum LoopMode {
-    None,
-    Continuous,
-    Sustain
+    None = 0,
+    Continuous = 1,
+    Sustain = 2
 }

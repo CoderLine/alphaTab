@@ -5,9 +5,9 @@ export enum PlayerState {
     /**
      * Player is paused
      */
-    Paused,
+    Paused = 0,
     /**
      * Player is playing
      */
-    Playing
+    Playing = 1
 }

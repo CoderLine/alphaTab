@@ -6,14 +6,14 @@ import { Envelope } from '@src/synth/synthesis/Envelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 
 export enum VoiceEnvelopeSegment {
-    None,
-    Delay,
-    Attack,
-    Hold,
-    Decay,
-    Sustain,
-    Release,
-    Done
+    None = 0,
+    Delay = 1,
+    Attack = 2,
+    Hold = 3,
+    Decay = 4,
+    Sustain = 5,
+    Release = 6,
+    Done = 7
 }
 
 export class VoiceEnvelope {

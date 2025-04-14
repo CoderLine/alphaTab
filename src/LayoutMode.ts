@@ -5,9 +5,9 @@
     /**
      * The bars are aligned in an [vertically endless page-style fashion](https://alphatab.net/docs/showcase/layouts#page-layout)
      */
-    Page,
+    Page = 0,
     /**
      * Bars are aligned horizontally in [one horizontally endless system (row)](https://alphatab.net/docs/showcase/layouts#horizontal-layout)
      */
-    Horizontal
+    Horizontal = 1
 }

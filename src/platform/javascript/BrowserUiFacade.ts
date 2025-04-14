@@ -36,10 +36,10 @@ import type { SettingsJson } from '@src/generated/SettingsJson';
  * @target web
  */
 enum ResultState {
-    LayoutDone,
-    RenderRequested,
-    RenderDone,
-    Detached
+    LayoutDone = 0,
+    RenderRequested = 1,
+    RenderDone = 2,
+    Detached = 3
 }
 
 /**

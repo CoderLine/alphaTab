@@ -63,27 +63,27 @@ import { TextAlign } from '@src/platform';
  * A list of terminals recognized by the alphaTex-parser
  */
 export enum AlphaTexSymbols {
-    No,
-    Eof,
-    Number,
-    DoubleDot,
-    Dot,
-    String,
-    Tuning,
-    LParensis,
-    RParensis,
-    LBrace,
-    RBrace,
-    Pipe,
-    MetaCommand,
-    Multiply,
-    LowerThan
+    No = 0,
+    Eof = 1,
+    Number = 2,
+    DoubleDot = 3,
+    Dot = 4,
+    String = 5,
+    Tuning = 6,
+    LParensis = 7,
+    RParensis = 8,
+    LBrace = 9,
+    RBrace = 10,
+    Pipe = 11,
+    MetaCommand = 12,
+    Multiply = 13,
+    LowerThan = 14
 }
 
 enum StaffMetaResult {
-    KnownStaffMeta,
-    UnknownStaffMeta,
-    EndOfMetaDetected
+    KnownStaffMeta = 0,
+    UnknownStaffMeta = 1,
+    EndOfMetaDetected = 2
 }
 
 export class AlphaTexError extends AlphaTabError {
@@ -144,8 +144,8 @@ export class AlphaTexError extends AlphaTabError {
 }
 
 enum AlphaTexAccidentalMode {
-    Auto,
-    Explicit
+    Auto = 0,
+    Explicit = 1
 }
 
 /**

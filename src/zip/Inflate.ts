@@ -32,14 +32,14 @@ import {
 import { HuffTools } from '@src/zip/HuffTools';
 
 enum InflateState {
-    Head,
-    Block,
-    CData,
-    Flat,
-    Crc,
-    Dist,
-    DistOne,
-    Done
+    Head = 0,
+    Block = 1,
+    CData = 2,
+    Flat = 3,
+    Crc = 4,
+    Dist = 5,
+    DistOne = 6,
+    Done = 7
 }
 
 class InflateWindow {

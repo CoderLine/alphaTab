@@ -30,7 +30,6 @@
                 "noNonNullAssertion": "off", // we use these assertions often.
                 "noParameterAssign": "off", // useful for default values
                 // temporary disabled, apply fixes gradually
-                "useEnumInitializers": "off",
                 "useExponentiationOperator": "off"
             },
             "suspicious": {

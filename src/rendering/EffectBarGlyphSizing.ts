@@ -6,32 +6,32 @@ export enum EffectBarGlyphSizing {
      * The effect glyph is placed above the pre-beat glyph which is before
      * the actual note in the area where also accidentals are renderered.
      */
-    SinglePreBeat,
+    SinglePreBeat = 0,
     /**
      * The effect glyph is placed above the on-beat glyph which is where
      * the actual note head glyphs are placed.
      */
-    SingleOnBeat,
+    SingleOnBeat = 1,
     /**
      * The effect glyph is placed above the on-beat glyph which is where
      * the actual note head glyphs are placed. The glyph will size to the end of
      * the applied beat.
      */
-    SingleOnBeatToEnd,
+    SingleOnBeatToEnd = 2,
     /**
      * The effect glyph is placed above the on-beat glyph and expaded to the
      * on-beat position of the next beat.
      */
-    GroupedOnBeat,
+    GroupedOnBeat = 3,
     /**
      * The effect glyph is placed above the on-beat glyph and expaded to the
      * on-beat position of the next beat. The glyph will size to the end of
      * the applied beat.
      */
-    GroupedOnBeatToEnd,
+    GroupedOnBeatToEnd = 4,
     
     /**
      * The effect glyph is placed on the whole bar covering the whole width
      */
-    FullBar
+    FullBar = 5
 }

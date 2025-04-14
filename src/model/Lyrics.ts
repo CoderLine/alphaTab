@@ -1,9 +1,9 @@
 enum LyricsState {
-    IgnoreSpaces,
-    Begin,
-    Text,
-    Comment,
-    Dash
+    IgnoreSpaces = 0,
+    Begin = 1,
+    Text = 2,
+    Comment = 3,
+    Dash = 4
 }
 
 /**

@@ -31,15 +31,15 @@ export enum TrackNamePolicy {
     /**
      * Track names are hidden everywhere.
      */
-    Hidden,
+    Hidden = 0,
     /**
      * Track names are displayed on the first system.
      */
-    FirstSystem,
+    FirstSystem = 1,
     /**
      * Track names are displayed on all systems.
      */
-    AllSystems
+    AllSystems = 2
 }
 
 /**
@@ -49,11 +49,11 @@ export enum TrackNameMode {
     /**
      * Full track names are displayed {@link Track.name}
      */
-    FullName,
+    FullName = 0,
     /**
      * Short Track names (abbreviations) are displayed {@link Track.shortName}
      */
-    ShortName
+    ShortName = 1
 }
 
 /**
@@ -63,11 +63,11 @@ export enum TrackNameOrientation {
     /**
      * Text is shown horizontally (left-to-right)
      */
-    Horizontal,
+    Horizontal = 0,
     /**
      * Vertically rotated (bottom-to-top) 
      */
-    Vertical
+    Vertical = 1
 }
 
 /**

@@ -6,21 +6,21 @@ export enum LogLevel {
     /**
      * No logging
      */
-    None,
+    None = 0,
     /**
      * Debug level (internal details are displayed).
      */
-    Debug,
+    Debug = 1,
     /**
      * Info level (only important details are shown)
      */
-    Info,
+    Info = 2,
     /**
      * Warning level
      */
-    Warning,
+    Warning = 3,
     /**
      * Error level.
      */
-    Error
+    Error = 4
 }

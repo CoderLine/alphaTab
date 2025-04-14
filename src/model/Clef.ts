@@ -5,21 +5,21 @@ export enum Clef {
     /**
      * Neutral clef.
      */
-    Neutral,
+    Neutral = 0,
     /**
      * C3 clef
      */
-    C3,
+    C3 = 1,
     /**
      * C4 clef
      */
-    C4,
+    C4 = 2,
     /**
      * F4 clef
      */
-    F4,
+    F4 = 3,
     /**
      * G2 clef
      */
-    G2
+    G2 = 4
 }

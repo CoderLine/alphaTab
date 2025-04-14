@@ -5,9 +5,9 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export enum TripletFeelGlyphBarType {
-    Full,
-    PartialLeft,
-    PartialRight
+    Full = 0,
+    PartialLeft = 1,
+    PartialRight = 2
 }
 
 export class TripletFeelGlyph extends EffectGlyph {

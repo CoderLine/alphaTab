@@ -12,7 +12,7 @@ export enum VoiceSubElement {
     /**
      * All general glyphs (like notes heads and rests).
      */
-    Glyphs
+    Glyphs = 0
 }
 
 /**

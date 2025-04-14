@@ -25,27 +25,27 @@ enum MidiPlaybackControllerState {
     /**
      * Normally playing with repeats.
      */
-    PlayingNormally,
+    PlayingNormally = 0,
 
     /**
      * We "jumped" to a new location (e.g. via Da Capo). So we're ignoring repeats.
      */
-    DirectionJumped,
+    DirectionJumped = 1,
 
     /**
      * We "jumped" to a new location via a 'al Coda' jump, hence respecting 'DaCoda' now.
      */
-    DirectionJumpedAlCoda,
+    DirectionJumpedAlCoda = 2,
 
     /**
      * We "jumped" to a new location via a 'al Double Coda' jump, hence respecting 'DaDoubleCoda' now.
      */
-    DirectionJumpedAlDoubleCoda,
+    DirectionJumpedAlDoubleCoda = 3,
 
     /**
      * We "jumped" to a new location via a 'al Fine' jump, hence respecting 'Fine' now.
      */
-    DirectionJumpedAlFine
+    DirectionJumpedAlFine = 4
 }
 
 export class MidiPlaybackController {

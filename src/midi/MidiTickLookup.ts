@@ -12,17 +12,17 @@ export enum MidiTickLookupFindBeatResultCursorMode {
     /**
      * Unknown/Undetermined mode. Should not happen on user level.
      */
-    Unknown,
+    Unknown = 0,
 
     /**
      * The cursor should animate to the next beat.
      */
-    ToNextBext,
+    ToNextBext = 1,
 
     /**
      * The cursor should animate to the end of the bar (typically on repeats and jumps)
      */
-    ToEndOfBar
+    ToEndOfBar = 2
 }
 
 /**

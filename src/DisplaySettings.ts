@@ -11,12 +11,12 @@ export enum SystemsLayoutMode {
     /**
      * Use the automatic alignment system provided by alphaTab (default)
      */
-    Automatic,
+    Automatic = 0,
 
     /**
      * Use the systems layout and sizing information stored from the score model.
      */
-    UseModelLayout
+    UseModelLayout = 1
 }
 
 /**

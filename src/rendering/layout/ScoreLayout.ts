@@ -40,17 +40,17 @@ export enum InternalSystemsLayoutMode {
     /**
      * Use the automatic alignment system provided by alphaTab (default)
      */
-    Automatic,
+    Automatic = 0,
 
     /**
      * Use the relative scaling information stored in the score model.
      */
-    FromModelWithScale,
+    FromModelWithScale = 1,
 
     /**
      * Use the absolute size information stored in the score model.
      */
-    FromModelWithWidths
+    FromModelWithWidths = 2
 }
 
 /**

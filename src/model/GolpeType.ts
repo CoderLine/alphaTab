@@ -5,15 +5,15 @@ export enum GolpeType {
     /**
      * No Golpe played.
      */
-    None,
+    None = 0,
 
     /**
      * Play a golpe with the thumb.
      */
-    Thumb,
+    Thumb = 1,
 
     /**
      * Play a golpe with a finger.
      */
-    Finger
+    Finger = 2
 }

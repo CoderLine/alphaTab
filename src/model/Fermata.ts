@@ -5,15 +5,15 @@ export enum FermataType {
     /**
      * A short fermata (triangle symbol)
      */
-    Short,
+    Short = 0,
     /**
      * A medium fermata (round symbol)
      */
-    Medium,
+    Medium = 1,
     /**
      * A long fermata (rectangular symbol)
      */
-    Long
+    Long = 2
 }
 
 /**

@@ -5,29 +5,29 @@ export enum HarmonicType {
     /**
      * No harmonics.
      */
-    None,
+    None = 0,
     /**
      * Natural harmonic
      */
-    Natural,
+    Natural = 1,
     /**
      * Artificial harmonic
      */
-    Artificial,
+    Artificial = 2,
     /**
      * Pinch harmonics
      */
-    Pinch,
+    Pinch = 3,
     /**
      * Tap harmonics
      */
-    Tap,
+    Tap = 4,
     /**
      * Semi harmonics
      */
-    Semi,
+    Semi = 5,
     /**
      * Feedback harmonics
      */
-    Feedback
+    Feedback = 6
 }

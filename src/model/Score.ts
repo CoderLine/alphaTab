@@ -19,50 +19,50 @@ export enum ScoreSubElement {
     /**
      * The title of the song
      */
-    Title,
+    Title = 0,
     /**
      * The subtitle of the song
      */
-    SubTitle,
+    SubTitle = 1,
     /**
      * The artist of the song
      */
-    Artist,
+    Artist = 2,
     /**
      * The album of the song
      */
-    Album,
+    Album = 3,
     /**
      * The word author of the song
      */
-    Words,
+    Words = 4,
     /**
      * The Music author of the song
      */
-    Music,
+    Music = 5,
     /**
      * The Words&Music author of the song
      */
-    WordsAndMusic,
+    WordsAndMusic = 6,
     /**
      * The transcriber of the music sheet
      */
-    Transcriber,
+    Transcriber = 7,
 
     /**
      * The copyright holder of the song
      */
-    Copyright,
+    Copyright = 8,
 
     /**
      * The second copyright line (typically something like 'All Rights Reserved')
      */
-    CopyrightSecondLine,
+    CopyrightSecondLine = 9,
 
     /**
      * The chord diagram list shown on top of the score.
      */
-    ChordDiagramList
+    ChordDiagramList = 10
 }
 
 /**

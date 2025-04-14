@@ -36,19 +36,19 @@ export enum BeatBeamingMode {
     /**
      * Automatic beaming based on the timing rules.
      */
-    Auto,
+    Auto = 0,
     /**
      * Force a split to the next beat.
      */
-    ForceSplitToNext,
+    ForceSplitToNext = 1,
     /**
      * Force a merge with the next beat.
      */
-    ForceMergeWithNext,
+    ForceMergeWithNext = 2,
     /**
      * Force a split to the next beat on the secondary beam.
      */
-    ForceSplitOnSecondaryToNext
+    ForceSplitOnSecondaryToNext = 3
 }
 
 /**
@@ -59,121 +59,121 @@ export enum BeatSubElement {
      * The effects and annotations shown in dedicated effect bands above the staves (e.g. fermata).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    Effects,
+    Effects = 0,
 
     /**
      * The stems drawn for note heads in this beat on the standard notation staff.
      */
-    StandardNotationStem,
+    StandardNotationStem = 1,
 
     /**
      * The flags drawn for note heads in this beat on the standard notation staff.
      */
-    StandardNotationFlags,
+    StandardNotationFlags = 2,
 
     /**
      * The beams drawn between this and the next beat on the standard notation staff.
      */
-    StandardNotationBeams,
+    StandardNotationBeams = 3,
 
     /**
      * The tuplet drawn on the standard notation staff (the first beat affects the whole tuplet if grouped).
      */
-    StandardNotationTuplet,
+    StandardNotationTuplet = 4,
 
     /**
      * The effects and annotations applied to this beat on the standard notation staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    StandardNotationEffects,
+    StandardNotationEffects = 5,
 
     /**
      * The rest symbol on the standard notation staff.
      */
-    StandardNotationRests,
+    StandardNotationRests = 6,
 
     /**
      * The stems drawn for note heads in this beat on the guitar tab staff.
      */
-    GuitarTabStem,
+    GuitarTabStem = 7,
 
     /**
      * The flags drawn for note heads in this beat on the guitar tab staff.
      */
-    GuitarTabFlags,
+    GuitarTabFlags = 8,
 
     /**
      * The beams drawn between this and the next beat on the guitar tab staff.
      */
-    GuitarTabBeams,
+    GuitarTabBeams = 9,
 
     /**
      * The tuplet drawn on the guitar tab staff (the first beat affects the whole tuplet if grouped).
      */
-    GuitarTabTuplet,
+    GuitarTabTuplet = 10,
 
     /**
      * The effects and annotations applied to this beat on the guitar tab staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    GuitarTabEffects,
+    GuitarTabEffects = 11,
 
     /**
      * The rest symbol on the guitar tab staff.
      */
-    GuitarTabRests,
+    GuitarTabRests = 12,
 
     /**
      * The stems drawn for note heads in this beat on the slash staff.
      */
-    SlashStem,
+    SlashStem = 13,
 
     /**
      * The flags drawn for note heads in this beat on the slash staff.
      */
-    SlashFlags,
+    SlashFlags = 14,
 
     /**
      * The beams drawn between this and the next beat on the slash staff.
      */
-    SlashBeams,
+    SlashBeams = 15,
 
     /**
      * The tuplet drawn on the slash staff (the first beat affects the whole tuplet if grouped).
      */
-    SlashTuplet,
+    SlashTuplet = 16,
 
     /**
      * The rest symbol on the slash staff.
      */
-    SlashRests,
+    SlashRests = 17,
 
     /**
      * The effects and annotations applied to this beat on the slash staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    SlashEffects,
+    SlashEffects = 18,
 
     /**
      * The duration lines drawn for this beat on the numbered notation staff.
      */
-    NumberedDuration,
+    NumberedDuration = 19,
 
     /**
      * The effects and annotations applied to this beat on the numbered notation staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    NumberedEffects,
+    NumberedEffects = 20,
 
     /**
      * The rest (0) on the numbered notation staff.
      */
-    NumberedRests,
+    NumberedRests = 21,
 
     /**
      * The tuplet drawn on the numbered notation staff (the first beat affects the whole tuplet if grouped).
      */
-    NumberedTuplet
+    NumberedTuplet = 22
 }
 
 /**

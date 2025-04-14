@@ -25,25 +25,25 @@ import { XmlError } from '@src/xml/XmlError';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
 enum XmlState {
-    IgnoreSpaces,
-    Begin,
-    BeginNode,
-    TagName,
-    Body,
-    AttribName,
-    Equals,
-    AttvalBegin,
-    AttribVal,
-    Childs,
-    Close,
-    WaitEnd,
-    WaitEndRet,
-    Pcdata,
-    Header,
-    Comment,
-    Doctype,
-    Cdata,
-    Escape
+    IgnoreSpaces = 0,
+    Begin = 1,
+    BeginNode = 2,
+    TagName = 3,
+    Body = 4,
+    AttribName = 5,
+    Equals = 6,
+    AttvalBegin = 7,
+    AttribVal = 8,
+    Childs = 9,
+    Close = 10,
+    WaitEnd = 11,
+    WaitEndRet = 12,
+    Pcdata = 13,
+    Header = 14,
+    Comment = 15,
+    Doctype = 16,
+    Cdata = 17,
+    Escape = 18
 }
 
 export class XmlParser {

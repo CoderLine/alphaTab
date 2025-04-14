@@ -34,10 +34,10 @@ class DrawObject {
 }
 
 enum FrameType {
-    None,
-    Rectangle,
-    Ellipse,
-    Circle
+    None = 0,
+    Rectangle = 1,
+    Ellipse = 2,
+    Circle = 3
 }
 
 class TextDrawObject extends DrawObject {

@@ -5,19 +5,19 @@ export enum AutomationType {
     /**
      * Tempo change.
      */
-    Tempo,
+    Tempo = 0,
     /**
      * Colume change.
      */
-    Volume,
+    Volume = 1,
     /**
      * Instrument change.
      */
-    Instrument,
+    Instrument = 2,
     /**
      * Balance change.
      */
-    Balance
+    Balance = 3
 }
 
 /**

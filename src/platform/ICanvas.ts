@@ -10,13 +10,13 @@ export enum TextAlign {
     /**
      * Text is left aligned.
      */
-    Left,
+    Left = 0,
     /**
      * Text is centered.
-     */ Center,
+     */ Center = 1,
     /**
      * Text is right aligned.
-     */ Right
+     */ Right = 2
 }
 
 /**
@@ -26,15 +26,15 @@ export enum TextBaseline {
     /**
      * Text is aligned on top.
      */
-    Top,
+    Top = 0,
     /**
      * Text is aligned middle
      */
-    Middle,
+    Middle = 1,
     /**
      * Text is aligend on the bottom.
      */
-    Bottom
+    Bottom = 2
 }
 
 /**

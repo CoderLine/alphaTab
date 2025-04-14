@@ -12,14 +12,14 @@ import { TextAlign } from '@src/platform';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 enum DataType {
-    Boolean,
-    Integer,
-    Float,
-    String,
-    Point,
-    Size,
-    Rectangle,
-    Color
+    Boolean = 0,
+    Integer = 1,
+    Float = 2,
+    String = 3,
+    Point = 4,
+    Size = 5,
+    Rectangle = 6,
+    Color = 7
 }
 
 /**

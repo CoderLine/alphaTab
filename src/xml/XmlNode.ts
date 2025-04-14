@@ -22,12 +22,12 @@
  */
 
 export enum XmlNodeType {
-    None,
-    Element,
-    Text,
-    CDATA,
-    Document,
-    DocumentType
+    None = 0,
+    Element = 1,
+    Text = 2,
+    CDATA = 3,
+    Document = 4,
+    DocumentType = 5
 }
 
 export class XmlNode {

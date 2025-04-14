@@ -43,61 +43,61 @@ export enum NoteSubElement {
      * The effects and annotations shown in dedicated effect bands above the staves (e.g. vibrato).
      * The style of the first note with the effect wins.
      */
-    Effects,
+    Effects = 0,
 
     /**
      * The note head on the standard notation staff.
      */
-    StandardNotationNoteHead,
+    StandardNotationNoteHead = 1,
 
     /**
      * The accidentals on the standard notation staff.
      */
-    StandardNotationAccidentals,
+    StandardNotationAccidentals = 2,
 
     /**
      * The effects and annotations applied to this note on the standard notation staff (e.g. bends).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    StandardNotationEffects,
+    StandardNotationEffects = 3,
 
     /**
      * The fret number on the guitar tab staff.
      */
-    GuitarTabFretNumber,
+    GuitarTabFretNumber = 4,
 
     /**
      * The effects and annotations applied to this note on the guitar tab staff (e.g. bends).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    GuitarTabEffects,
+    GuitarTabEffects = 5,
 
     /**
      * The note head on the slash notation staff.
      */
-    SlashNoteHead,
+    SlashNoteHead = 6,
 
     /**
      * The effects and annotations applied to this note on the slash notation staff (e.g. dots).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    SlashEffects,
+    SlashEffects = 7,
 
     /**
      * The note number on the numbered notation staff.
      */
-    NumberedNumber,
+    NumberedNumber = 8,
 
     /**
      * The accidentals on the numbered notation staff.
      */
-    NumberedAccidentals,
+    NumberedAccidentals = 9,
 
     /**
      * The effects and annotations applied to this note on the number notation staff (e.g. dots).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    NumberedEffects
+    NumberedEffects = 10
 }
 
 /**

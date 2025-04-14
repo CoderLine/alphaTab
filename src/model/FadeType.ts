@@ -5,17 +5,17 @@ export enum FadeType {
     /**
      * No fading
      */
-    None,
+    None = 0,
     /**
      * Fade-in the sound.
      */
-    FadeIn,
+    FadeIn = 1,
     /**
      * Fade-out the sound.
      */
-    FadeOut,
+    FadeOut = 2,
     /**
      * Fade-in and then fade-out the sound.
      */
-    VolumeSwell
+    VolumeSwell = 3
 }

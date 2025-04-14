@@ -1,7 +1,7 @@
 export enum AlphaTabErrorType {
-    General,
-    Format,
-    AlphaTex
+    General = 0,
+    Format = 1,
+    AlphaTex = 2
 }
 
 export class AlphaTabError extends Error {

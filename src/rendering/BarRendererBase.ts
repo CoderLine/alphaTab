@@ -34,23 +34,23 @@ export enum NoteYPosition {
     /**
      * Gets the note y-position on top of the note stem or tab number.
      */
-    TopWithStem,
+    TopWithStem = 0,
     /**
      * Gets the note y-position on top of the note head or tab number.
      */
-    Top,
+    Top = 1,
     /**
      * Gets the note y-position on the center of the note head or tab number.
      */
-    Center,
+    Center = 2,
     /**
      * Gets the note y-position on the bottom of the note head or tab number.
      */
-    Bottom,
+    Bottom = 3,
     /**
      * Gets the note y-position on the bottom of the note stem or tab number.
      */
-    BottomWithStem
+    BottomWithStem = 4
 }
 
 /**
@@ -60,15 +60,15 @@ export enum NoteXPosition {
     /**
      * Gets the note x-position on left of the note head or tab number.
      */
-    Left,
+    Left = 0,
     /**
      * Gets the note x-position on the center of the note head or tab number.
      */
-    Center,
+    Center = 1,
     /**
      * Gets the note x-position on the right of the note head or tab number.
      */
-    Right
+    Right = 2
 }
 
 /**

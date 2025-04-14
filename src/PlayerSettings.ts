@@ -5,15 +5,15 @@ export enum ScrollMode {
     /**
      * Do not scroll automatically
      */
-    Off,
+    Off = 0,
     /**
      * Scrolling happens as soon the offsets of the cursors change.
      */
-    Continuous,
+    Continuous = 1,
     /**
      * Scrolling happens as soon the cursors exceed the displayed range.
      */
-    OffScreen
+    OffScreen = 2
 }
 
 /**
@@ -112,11 +112,11 @@ export enum PlayerOutputMode {
      * If audio worklets are available in the browser, they will be used for playing the audio.
      * It will fallback to the ScriptProcessor output if unavailable.
      */
-    WebAudioAudioWorklets,
+    WebAudioAudioWorklets = 0,
     /**
      * Uses the legacy ScriptProcessor output which might perform worse.
      */
-    WebAudioScriptProcessor
+    WebAudioScriptProcessor = 1
 }
 
 /**

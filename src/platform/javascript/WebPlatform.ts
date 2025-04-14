@@ -3,7 +3,7 @@
  * like browser, nodejs. 
  */
 export enum WebPlatform {
-    Browser,
-    NodeJs,
-    BrowserModule
+    Browser = 0,
+    NodeJs = 1,
+    BrowserModule = 2
 }

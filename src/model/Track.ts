@@ -15,23 +15,23 @@ export enum TrackSubElement {
     /**
      * The track names shown before the staves.
      */
-    TrackName,
+    TrackName = 0,
 
     /**
      * The braces and brackets grouping the staves.
      * If a bracket spans multiple tracks, the color of the first track counts.
      */
-    BracesAndBrackets,
+    BracesAndBrackets = 1,
 
     /**
      * The system separator.
      */
-    SystemSeparator,
+    SystemSeparator = 2,
 
     /**
      * The tuning of the strings.
      */
-    StringTuning
+    StringTuning = 3
 }
 
 /**

@@ -5,13 +5,13 @@ export enum BeamBarType {
     /**
      * Full Bar from current to next
      */
-    Full,
+    Full = 0,
     /**
      * A small Bar from current to previous
      */
-    PartLeft,
+    PartLeft = 1,
     /**
      * A small bar from current to next
      */
-    PartRight
+    PartRight = 2
 }

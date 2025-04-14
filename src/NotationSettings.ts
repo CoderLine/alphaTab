@@ -5,20 +5,20 @@ export enum TabRhythmMode {
     /**
      * Rhythm notation is hidden.
      */
-    Hidden,
+    Hidden = 0,
     /**
      * Rhythm notation is shown with individual beams per beat.
      */
-    ShowWithBeams,
+    ShowWithBeams = 1,
     /**
      * Rhythm notation is shown and behaves like normal score notation with connected bars.
      */
-    ShowWithBars,
+    ShowWithBars = 2,
     /**
      * Automatic detection whether the tabs should show rhythm based on hidden standard notation. 
      * @since 1.4.0
      */
-    Automatic,
+    Automatic = 3,
 }
 
 /**
@@ -28,23 +28,23 @@ export enum FingeringMode {
     /**
      * Fingerings will be shown in the standard notation staff.
      */
-    ScoreDefault,
+    ScoreDefault = 0,
     /**
      * Fingerings will be shown in the standard notation staff. Piano finger style is enforced, where
      * fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
      */
-    ScoreForcePiano,
+    ScoreForcePiano = 1,
     /**
      * Fingerings will be shown in a effect band above the tabs in case
      * they have only a single note on the beat.
      */
-    SingleNoteEffectBand,
+    SingleNoteEffectBand = 2,
     /**
      * Fingerings will be shown in a effect band above the tabs in case
      * they have only a single note on the beat. Piano finger style is enforced, where
      * fingers are rendered as 1-5 instead of p,i,m,a,c and T,1,2,3,4.
      */
-    SingleNoteEffectBandForcePiano
+    SingleNoteEffectBandForcePiano = 3
 }
 
 /**
@@ -54,7 +54,7 @@ export enum NotationMode {
     /**
      * Music elements will be displayed and played as in Guitar Pro.
      */
-    GuitarPro,
+    GuitarPro = 0,
 
     /**
      * Music elements will be displayed and played as in traditional songbooks.
@@ -73,7 +73,7 @@ export enum NotationMode {
      *   Tied notes with let ring are not shown in standard notation
      *   Let ring does not cause a longer playback, duration is defined via tied notes.
      */
-    SongBook
+    SongBook = 1
 }
 
 /**
@@ -85,259 +85,259 @@ export enum NotationElement {
     /**
      * The score title shown at the start of the music sheet.
      */
-    ScoreTitle,
+    ScoreTitle = 0,
 
     /**
      * The score subtitle shown at the start of the music sheet.
      */
-    ScoreSubTitle,
+    ScoreSubTitle = 1,
 
     /**
      * The score artist shown at the start of the music sheet.
      */
-    ScoreArtist,
+    ScoreArtist = 2,
 
     /**
      * The score album shown at the start of the music sheet.
      */
-    ScoreAlbum,
+    ScoreAlbum = 3,
 
     /**
      * The score words author shown at the start of the music sheet.
      */
-    ScoreWords,
+    ScoreWords = 4,
 
     /**
      * The score music author shown at the start of the music sheet.
      */
-    ScoreMusic,
+    ScoreMusic = 5,
 
     /**
      * The score words&music author shown at the start of the music sheet.
      */
-    ScoreWordsAndMusic,
+    ScoreWordsAndMusic = 6,
 
     /**
      * The score copyright owner shown at the start of the music sheet.
      */
-    ScoreCopyright,
+    ScoreCopyright = 7,
 
     /**
      * The tuning information of the guitar shown
      * above the staves.
      */
-    GuitarTuning,
+    GuitarTuning = 8,
 
     /**
      * The track names which are shown in the accolade.
      */
-    TrackNames,
+    TrackNames = 9,
 
     /**
      * The chord diagrams for guitars. Usually shown
      * below the score info.
      */
-    ChordDiagrams,
+    ChordDiagrams = 10,
 
     /**
      * Parenthesis that are shown for tied bends
      * if they are preceeded by bends.
      */
-    ParenthesisOnTiedBends,
+    ParenthesisOnTiedBends = 11,
 
     /**
      * The tab number for tied notes if the
      * bend of a note is increased at that point.
      */
-    TabNotesOnTiedBends,
+    TabNotesOnTiedBends = 12,
 
     /**
      * Zero tab numbers on "dive whammys".
      */
-    ZerosOnDiveWhammys,
+    ZerosOnDiveWhammys = 13,
 
     /**
      * The alternate endings information on repeats shown above the staff.
      */
-    EffectAlternateEndings,
+    EffectAlternateEndings = 14,
 
     /**
      * The information about the fret on which the capo is placed shown above the staff.
      */
-    EffectCapo,
+    EffectCapo = 15,
 
     /**
      * The chord names shown above beats shown above the staff.
      */
-    EffectChordNames,
+    EffectChordNames = 16,
 
     /**
      * The crescendo/decrescendo angle  shown above the staff.
      */
-    EffectCrescendo,
+    EffectCrescendo = 17,
 
     /**
      * The beat dynamics  shown above the staff.
      */
-    EffectDynamics,
+    EffectDynamics = 18,
 
     /**
      * The curved angle for fade in/out effects  shown above the staff.
      */
-    EffectFadeIn,
+    EffectFadeIn = 19,
 
     /**
      * The fermata symbol shown above the staff.
      */
-    EffectFermata,
+    EffectFermata = 20,
 
     /**
      * The fingering information.
      */
-    EffectFingering,
+    EffectFingering = 21,
 
     /**
      * The harmonics names shown above the staff.
      * (does not represent the harmonic note heads)
      */
-    EffectHarmonics,
+    EffectHarmonics = 22,
 
     /**
      * The let ring name and line above the staff.
      */
-    EffectLetRing,
+    EffectLetRing = 23,
 
     /**
      * The lyrics of the track shown above the staff.
      */
-    EffectLyrics,
+    EffectLyrics = 24,
 
     /**
      * The section markers shown above the staff.
      */
-    EffectMarker,
+    EffectMarker = 25,
 
     /**
      * The ottava symbol and lines shown above the staff.
      */
-    EffectOttavia,
+    EffectOttavia = 26,
 
     /**
      * The palm mute name and line shown above the staff.
      */
-    EffectPalmMute,
+    EffectPalmMute = 27,
 
     /**
      * The pick slide information shown above the staff.
      * (does not control the pick slide lines)
      */
-    EffectPickSlide,
+    EffectPickSlide = 28,
 
     /**
      * The pick stroke symbols shown above the staff.
      */
-    EffectPickStroke,
+    EffectPickStroke = 29,
 
     /**
      * The slight beat vibrato waves shown above the staff.
      */
-    EffectSlightBeatVibrato,
+    EffectSlightBeatVibrato = 30,
 
     /**
      * The slight note vibrato waves shown above the staff.
      */
-    EffectSlightNoteVibrato,
+    EffectSlightNoteVibrato = 31,
 
     /**
      * The tap/slap/pop effect names shown above the staff.
      */
-    EffectTap,
+    EffectTap = 32,
 
     /**
      * The tempo information shown above the staff.
      */
-    EffectTempo,
+    EffectTempo = 33,
 
     /**
      * The additional beat text shown above the staff.
      */
-    EffectText,
+    EffectText = 34,
 
     /**
      * The trill name and waves shown above the staff.
      */
-    EffectTrill,
+    EffectTrill = 35,
 
     /**
      * The triplet feel symbol shown above the staff.
      */
-    EffectTripletFeel,
+    EffectTripletFeel = 36,
 
     /**
      * The whammy bar information shown above the staff.
      * (does not control the whammy lines shown within the staff)
      */
-    EffectWhammyBar,
+    EffectWhammyBar = 37,
 
     /**
      * The wide beat vibrato waves shown above the staff.
      */
-    EffectWideBeatVibrato,
+    EffectWideBeatVibrato = 38,
 
     /**
      * The wide note vibrato waves shown above the staff.
      */
-    EffectWideNoteVibrato,
+    EffectWideNoteVibrato = 39,
 
     /**
      * The left hand tap symbol shown above the staff.
      */
-    EffectLeftHandTap,
+    EffectLeftHandTap = 40,
 
     /**
      * The "Free time" text shown above the staff.
      */
-    EffectFreeTime,
+    EffectFreeTime = 41,
 
     /**
      * The Sustain pedal effect shown above the staff "Ped.____*"
      */
-    EffectSustainPedal,
+    EffectSustainPedal = 42,
 
     /**
      * The Golpe effect signs above and below the staff.
      */
-    EffectGolpe,
+    EffectGolpe = 43,
 
     /**
      * The Wah effect signs above and below the staff.
      */
-    EffectWahPedal,
+    EffectWahPedal = 44,
 
     /**
      * The Beat barre effect signs above and below the staff "1/2B IV ─────┐"
      */
-    EffectBeatBarre,
+    EffectBeatBarre = 45,
 
     /**
      * The note ornaments like turns and mordents.
      */
-    EffectNoteOrnament,
+    EffectNoteOrnament = 46,
 
     /**
      * The Rasgueado indicator above the staff Rasg. ----|"
      */
-    EffectRasgueado,
+    EffectRasgueado = 47,
 
     /**
      * The directions indicators like coda and segno.
      */
-    EffectDirections,
+    EffectDirections = 48,
 
     /**
      * The absolute playback time of beats.
      */
-    EffectBeatTimer,
+    EffectBeatTimer = 49,
 }
 
 /**
