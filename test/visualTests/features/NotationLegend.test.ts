@@ -3,7 +3,7 @@ import { Settings } from '@src/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 
 describe('NotationLegend', () => {
     it('full-default', async () => {

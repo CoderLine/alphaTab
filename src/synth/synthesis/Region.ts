@@ -2,7 +2,7 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { HydraGenAmount } from '@src/synth/soundfont/Hydra';
+import type { HydraGenAmount } from '@src/synth/soundfont/Hydra';
 import { Envelope } from '@src/synth/synthesis/Envelope';
 import { LoopMode } from '@src/synth/synthesis/LoopMode';
 import { TypeConversions } from '@src/io/TypeConversions';

@@ -1,19 +1,19 @@
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { Note, NoteSubElement } from '@src/model/Note';
+import { type Note, NoteSubElement } from '@src/model/Note';
 import { TabRhythmMode } from '@src/NotationSettings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { TabNoteChordGlyph } from '@src/rendering/glyphs/TabNoteChordGlyph';
 import { TabRestGlyph } from '@src/rendering/glyphs/TabRestGlyph';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
 import { BeatSubElement } from '@src/model';
 

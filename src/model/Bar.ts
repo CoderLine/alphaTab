@@ -1,10 +1,10 @@
 import { Clef } from '@src/model/Clef';
-import { MasterBar } from '@src/model/MasterBar';
+import type { MasterBar } from '@src/model/MasterBar';
 import { Ottavia } from '@src/model/Ottavia';
 import { SimileMark } from '@src/model/SimileMark';
-import { Staff } from '@src/model/Staff';
-import { Voice } from '@src/model/Voice';
-import { Settings } from '@src/Settings';
+import type { Staff } from '@src/model/Staff';
+import type { Voice } from '@src/model/Voice';
+import type { Settings } from '@src/Settings';
 import { ElementStyle } from './ElementStyle';
 
 /**

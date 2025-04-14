@@ -1,13 +1,13 @@
 import { GeneralMidi } from '@src/midi/GeneralMidi';
-import { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
+import type { Beat } from '@src/model/Beat';
+import type { Duration } from '@src/model/Duration';
 import { Fingers } from '@src/model/Fingers';
-import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
+import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { NoteAccidentalMode } from './NoteAccidentalMode';
 import { MasterBar } from './MasterBar';
-import { Track } from './Track';
+import type { Track } from './Track';
 
 export class TuningParseResult {
     public note: string | null = null;

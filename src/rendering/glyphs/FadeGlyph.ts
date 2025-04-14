@@ -1,7 +1,7 @@
 import { FadeType } from '@src/model/FadeType';
 import { MusicFontGlyph } from './MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model';
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 
 export class FadeGlyph extends MusicFontGlyph {
     public constructor(type: FadeType) {

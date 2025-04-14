@@ -1,8 +1,8 @@
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { Glyph } from './Glyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { Beat, BeatSubElement, NoteSubElement } from '@src/model';
+import { type Beat, BeatSubElement, NoteSubElement } from '@src/model';
 
 export class NumberedNoteHeadGlyph extends Glyph {
     public static readonly NoteHeadHeight: number = 17;

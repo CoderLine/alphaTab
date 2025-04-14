@@ -1,9 +1,9 @@
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { Environment } from '@src/Environment';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PixelMatch, PixelMatchOptions } from '@test/visualTests/PixelMatch';

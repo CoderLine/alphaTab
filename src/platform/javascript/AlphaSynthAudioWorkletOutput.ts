@@ -4,7 +4,7 @@ import { Logger } from '@src/Logger';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
 import { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 
 /**
  * @target web

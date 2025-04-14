@@ -1,6 +1,6 @@
-import { BarSubElement, Beat, Duration, GraceType, TupletGroup } from '@src/model';
+import { type BarSubElement, type Beat, Duration, GraceType, type TupletGroup } from '@src/model';
 import { BarRendererBase } from './BarRendererBase';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { SpacingGlyph } from './glyphs/SpacingGlyph';
 import { BeamingHelper } from './utils/BeamingHelper';
 import { BeamDirection } from './utils/BeamDirection';
@@ -13,7 +13,7 @@ import { BarSeperatorGlyph } from './glyphs/BarSeperatorGlyph';
 import { RepeatCloseGlyph } from './glyphs/RepeatCloseGlyph';
 import { RepeatCountGlyph } from './glyphs/RepeatCountGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
-import { BeatBeamingMode, BeatSubElement } from '@src/model/Beat';
+import { BeatBeamingMode, type BeatSubElement } from '@src/model/Beat';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 /**

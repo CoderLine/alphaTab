@@ -1,7 +1,7 @@
 import { Clef } from '@src/model/Clef';
 import { Ottavia } from '@src/model/Ottavia';
-import { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';

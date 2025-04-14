@@ -1,4 +1,4 @@
-import { Duration } from '@src/model/Duration';
+import type { Duration } from '@src/model/Duration';
 
 export class MidiUtils {
     public static readonly QuarterTime: number = 960;

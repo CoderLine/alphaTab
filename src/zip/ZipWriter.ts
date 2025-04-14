@@ -1,6 +1,6 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
-import { IWriteable } from '@src/io/IWriteable';
+import type { IWriteable } from '@src/io/IWriteable';
 import { Crc32 } from '@src/zip/Crc32';
 import { Deflater } from '@src/zip/Deflater';
 import { ZipEntry } from '@src/zip/ZipEntry';

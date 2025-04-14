@@ -1,6 +1,6 @@
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
+import type { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 
 class AccidentalColumnInfo {
     public x: number = 0;

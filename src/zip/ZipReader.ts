@@ -1,6 +1,6 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import { Inflate } from '@src/zip/Inflate';
 import { ZipEntry } from '@src/zip/ZipEntry';
 

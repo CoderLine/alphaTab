@@ -1,14 +1,14 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendType } from '@src/model/BendType';
 import { FermataType } from '@src/model/Fermata';
 import { GraceType } from '@src/model/GraceType';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
+import type { MasterBar } from '@src/model/MasterBar';
+import type { Note } from '@src/model/Note';
 import { Ottavia } from '@src/model/Ottavia';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { VibratoType } from '@src/model/VibratoType';

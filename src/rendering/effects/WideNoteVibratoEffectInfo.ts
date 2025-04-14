@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { VibratoType } from '@src/model/VibratoType';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 import { NotationElement } from '@src/NotationSettings';
 

@@ -1,8 +1,8 @@
 import { AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
-import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
-import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
+import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+import { type MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { ControllerType } from './ControllerType';
+import type { ControllerType } from './ControllerType';
 
 /**
  * This implementation of the {@link IMidiFileHandler}

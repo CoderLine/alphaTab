@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Staff } from "@src/model/Staff";
+import type { Staff } from "@src/model/Staff";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BarSerializer } from "@src/generated/model/BarSerializer";
 import { ChordSerializer } from "@src/generated/model/ChordSerializer";

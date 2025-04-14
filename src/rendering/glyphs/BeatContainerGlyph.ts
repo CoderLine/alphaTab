@@ -1,19 +1,19 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import type { Note } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import type { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { BarBounds } from '@src/rendering/utils/BarBounds';
+import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { BeamingHelper } from '../utils/BeamingHelper';
+import type { BeamingHelper } from '../utils/BeamingHelper';
 
 export class BeatContainerGlyph extends Glyph {
     public static readonly GraceBeatPadding: number = 3;

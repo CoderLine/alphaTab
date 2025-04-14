@@ -1,7 +1,7 @@
 /**@target web */
 
-import { ObjectHook } from 'rollup';
-import { HookHandler } from 'vite';
+import type { ObjectHook } from 'rollup';
+import type { HookHandler } from 'vite';
 
 // https://github.com/vitejs/vite/blob/v6.1.1/packages/vite/src/node/plugins/index.ts#L161
 // biome-ignore lint/complexity/noBannedTypes: Function type needed here

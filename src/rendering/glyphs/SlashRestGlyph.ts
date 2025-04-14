@@ -1,5 +1,5 @@
 import { ScoreRestGlyph } from './ScoreRestGlyph';
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { BeatSubElement } from '@src/model';
 
 export class SlashRestGlyph extends ScoreRestGlyph {

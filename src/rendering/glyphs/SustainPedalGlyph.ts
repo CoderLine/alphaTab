@@ -1,6 +1,6 @@
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
-import { SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { MusicFontSymbol } from '@src/model';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 

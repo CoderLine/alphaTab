@@ -1,27 +1,27 @@
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { Environment } from '@src/Environment';
-import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
+import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Font } from '@src/model/Font';
+import type { Font } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { NotationMode } from '@src/NotationSettings';
-import { IContainer } from '@src/platform/IContainer';
+import type { IContainer } from '@src/platform/IContainer';
 import { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContainer';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { IUiFacade } from '@src/platform/IUiFacade';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IUiFacade } from '@src/platform/IUiFacade';
 import { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
-import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
+import type { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
-import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
+import type { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
@@ -30,7 +30,7 @@ import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
 import { PlayerOutputMode } from '@src/PlayerSettings';
-import { SettingsJson } from '@src/generated/SettingsJson';
+import type { SettingsJson } from '@src/generated/SettingsJson';
 
 /**
  * @target web

@@ -32,7 +32,7 @@
 // SOFTWARE.
 
 
-import { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 import MagicString from 'magic-string';
 import {
     type ResolvedConfig,

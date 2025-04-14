@@ -1,4 +1,4 @@
-import { ControllerType } from "./ControllerType";
+import type { ControllerType } from "./ControllerType";
 
 /**
  * A handler is responsible for writing midi events to a custom structure

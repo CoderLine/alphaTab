@@ -1,13 +1,13 @@
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import { IEventEmitter } from '@src/EventEmitter';
-import { Score } from '@src/model/Score';
-import { IContainer } from '@src/platform/IContainer';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { Cursors } from '@src/platform/Cursors';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { Bounds } from '@src/rendering/utils/Bounds';
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { IEventEmitter } from '@src/EventEmitter';
+import type { Score } from '@src/model/Score';
+import type { IContainer } from '@src/platform/IContainer';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { Cursors } from '@src/platform/Cursors';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { Bounds } from '@src/rendering/utils/Bounds';
 
 /**
  * This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used.

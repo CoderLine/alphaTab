@@ -1,6 +1,6 @@
 import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';

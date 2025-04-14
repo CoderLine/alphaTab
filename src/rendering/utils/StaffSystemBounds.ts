@@ -1,6 +1,6 @@
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
+import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 
 /**
  * Represents the bounds of a staff system.

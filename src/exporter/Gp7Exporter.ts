@@ -1,5 +1,5 @@
 import { Logger } from '@src/Logger';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { ZipEntry } from '@src/zip/ZipEntry';
 import { ScoreExporter } from '@src/exporter/ScoreExporter';
 import { GpifWriter } from '@src/exporter//GpifWriter';

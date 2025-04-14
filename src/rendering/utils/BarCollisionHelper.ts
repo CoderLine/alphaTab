@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { BeamingHelper } from './BeamingHelper';
 
 export class ReservedLayoutAreaSlot {

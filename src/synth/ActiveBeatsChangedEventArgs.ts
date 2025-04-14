@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 
 /**
  * Represents the information related to the beats actively being played now.

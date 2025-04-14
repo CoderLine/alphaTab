@@ -20,7 +20,7 @@
  */
 
 import { DeflaterConstants } from '@src/zip/DeflaterConstants';
-import { PendingBuffer } from '@src/zip/PendingBuffer';
+import type { PendingBuffer } from '@src/zip/PendingBuffer';
 
 class Tree {
     // repeat previous bit length 3-6 times (2 bits of repeat count)

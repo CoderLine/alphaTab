@@ -1,4 +1,4 @@
-import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
+import { type XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
 export class XmlWriter {
     public static write(xml: XmlNode, indention: string, xmlHeader: boolean): string {

@@ -3,15 +3,15 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { LayoutMode } from '@src/LayoutMode';
-import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { Track } from '@src/model/Track';
-import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
+import { type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import type { Track } from '@src/model/Track';
+import type { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
 import { BrowserUiFacade } from '@src/platform/javascript/BrowserUiFacade';
-import { ProgressEventArgs } from '@src/ProgressEventArgs';
-import { Settings } from '@src/Settings';
+import type { ProgressEventArgs } from '@src/ProgressEventArgs';
+import type { Settings } from '@src/Settings';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import { SettingsJson } from '@src/generated/SettingsJson';
+import type { SettingsJson } from '@src/generated/SettingsJson';
 
 /**
  * @target web

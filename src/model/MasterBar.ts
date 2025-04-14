@@ -1,14 +1,14 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Automation } from '@src/model/Automation';
-import { Beat } from '@src/model/Beat';
-import { Fermata } from '@src/model/Fermata';
+import type { Automation } from '@src/model/Automation';
+import type { Beat } from '@src/model/Beat';
+import type { Fermata } from '@src/model/Fermata';
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
-import { RepeatGroup } from '@src/model/RepeatGroup';
-import { Score } from '@src/model/Score';
-import { Section } from '@src/model/Section';
+import type { RepeatGroup } from '@src/model/RepeatGroup';
+import type { Score } from '@src/model/Score';
+import type { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
-import { Direction } from './Direction';
+import type { Direction } from './Direction';
 
 /**
  * The MasterBar stores information about a bar which affects

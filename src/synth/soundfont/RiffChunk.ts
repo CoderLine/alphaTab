@@ -3,7 +3,7 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 
 export class RiffChunk {
     public static readonly HeaderSize = 4 /*FourCC*/ + 4 /*Size*/;

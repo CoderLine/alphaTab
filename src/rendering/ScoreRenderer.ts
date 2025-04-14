@@ -1,14 +1,14 @@
 import { LayoutMode } from '@src/LayoutMode';
 import { Environment } from '@src/Environment';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { Score } from '@src/model/Score';
-import { Track } from '@src/model/Track';
-import { ICanvas } from '@src/platform/ICanvas';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import type { Score } from '@src/model/Score';
+import type { Track } from '@src/model/Track';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 
 /**

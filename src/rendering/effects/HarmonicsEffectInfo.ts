@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note } from '@src/model/Note';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Note } from '@src/model/Note';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@src/rendering/glyphs/LineRangedGlyph';
 import { NotationElement } from '@src/NotationSettings';
 

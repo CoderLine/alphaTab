@@ -1,7 +1,7 @@
 import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 
 export class NoteHeadGlyph extends MusicFontGlyph {
     public static readonly GraceScale: number = 0.75;

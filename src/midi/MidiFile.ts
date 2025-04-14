@@ -1,7 +1,7 @@
-import { MidiEvent } from '@src/midi/MidiEvent';
+import type { MidiEvent } from '@src/midi/MidiEvent';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IWriteable } from '@src/io/IWriteable';
+import type { IWriteable } from '@src/io/IWriteable';
 import { IOHelper } from '@src/io/IOHelper';
 
 /**

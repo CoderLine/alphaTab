@@ -1,7 +1,7 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { LineBarRenderer } from '../LineBarRenderer';
+import type { LineBarRenderer } from '../LineBarRenderer';
 
 export class RepeatCloseGlyph extends Glyph {
     public override doLayout(): void {

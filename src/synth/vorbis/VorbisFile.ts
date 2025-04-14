@@ -1,6 +1,6 @@
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import { OggReader } from './OggReader';
-import { VorbisStream } from './VorbisStream';
+import type { VorbisStream } from './VorbisStream';
 import { VorbisStreamReader } from './VorbisStreamReader';
 
 export class VorbisFile {

@@ -1,6 +1,6 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';

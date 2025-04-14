@@ -7,7 +7,7 @@ import { ScoreLoader } from "@src/importer/ScoreLoader";
 import { Color } from "@src/model/Color";
 import { Font, FontStyle } from "@src/model/Font";
 import { JsonConverter } from "@src/model/JsonConverter";
-import { Score } from "@src/model/Score";
+import type { Score } from "@src/model/Score";
 import { NotationElement, TabRhythmMode, NotationMode, FingeringMode } from "@src/NotationSettings";
 import { TestPlatform } from "@test/TestPlatform";
 import { ComparisonHelpers } from "./ComparisonHelpers";

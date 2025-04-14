@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { BendPoint } from "@src/model/BendPoint";
+import type { BendPoint } from "@src/model/BendPoint";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class BendPointSerializer {
     public static fromJson(obj: BendPoint, m: unknown): void {

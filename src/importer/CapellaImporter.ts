@@ -1,12 +1,12 @@
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 
 import { Logger } from '@src/Logger';
 
 import { ZipReader } from '@src/zip/ZipReader';
-import { ZipEntry } from "@src/zip/ZipEntry";
+import type { ZipEntry } from "@src/zip/ZipEntry";
 import { IOHelper } from '@src/io/IOHelper';
 import { CapellaParser } from '@src/importer/CapellaParser';
 

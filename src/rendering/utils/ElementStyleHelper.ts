@@ -1,20 +1,20 @@
 import {
-    Bar,
+    type Bar,
     BarSubElement,
-    Beat,
-    BeatSubElement,
-    Color,
-    Note,
-    NoteSubElement,
-    Score,
-    Voice,
-    VoiceSubElement
+    type Beat,
+    type BeatSubElement,
+    type Color,
+    type Note,
+    type NoteSubElement,
+    type Score,
+    type Voice,
+    type VoiceSubElement
 } from '@src/model';
-import { ElementStyle } from '@src/model/ElementStyle';
-import { ScoreSubElement } from '@src/model/Score';
-import { Track, TrackSubElement } from '@src/model/Track';
-import { ICanvas } from '@src/platform';
-import { RenderingResources } from '@src/RenderingResources';
+import type { ElementStyle } from '@src/model/ElementStyle';
+import type { ScoreSubElement } from '@src/model/Score';
+import { type Track, TrackSubElement } from '@src/model/Track';
+import type { ICanvas } from '@src/platform';
+import type { RenderingResources } from '@src/RenderingResources';
 
 /**
  * A helper to apply element styles in a specific rendering scope via the `using` keyword

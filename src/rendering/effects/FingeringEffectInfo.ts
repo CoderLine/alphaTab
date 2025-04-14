@@ -1,14 +1,14 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Fingers } from '@src/model/Fingers';
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { FingeringMode, NotationElement } from '@src/NotationSettings';
 import { TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 export class FingeringEffectInfo extends EffectBarRendererInfo {

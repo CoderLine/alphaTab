@@ -1,5 +1,5 @@
 import { MusicXmlImporterTestHelper } from '@test/importer/MusicXmlImporterTestHelper';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { JsonConverter } from '@src/model';
 import { BendType } from '@src/model/BendType';
 import { expect } from 'chai';

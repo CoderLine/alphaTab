@@ -1,7 +1,7 @@
-import { Beat } from '@src/model/Beat';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import type { Beat } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export abstract class GroupedEffectGlyph extends EffectGlyph {

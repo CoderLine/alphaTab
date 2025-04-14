@@ -1,9 +1,9 @@
 import { NotationElement } from '@src/NotationSettings';
 import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { Settings } from '@src/Settings';
-import { Beat } from '@src/model';
-import { BarRendererBase } from '../BarRendererBase';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
+import type { Settings } from '@src/Settings';
+import type { Beat } from '@src/model';
+import type { BarRendererBase } from '../BarRendererBase';
+import type { EffectGlyph } from '../glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
 import { SustainPedalGlyph } from '../glyphs/SustainPedalGlyph';
 

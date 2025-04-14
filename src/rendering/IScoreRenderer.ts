@@ -1,10 +1,10 @@
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import { Score } from '@src/model/Score';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { Score } from '@src/model/Score';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { IUiFacade } from '@src/platform';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { Settings } from '@src/Settings';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
+import type { Settings } from '@src/Settings';
 
 /**
  * Represents the public interface of the component that can render scores.

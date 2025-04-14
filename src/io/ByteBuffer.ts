@@ -1,5 +1,5 @@
-import { IReadable } from '@src/io/IReadable';
-import { IWriteable } from '@src/io/IWriteable';
+import type { IReadable } from '@src/io/IReadable';
+import type { IWriteable } from '@src/io/IWriteable';
 import { IOHelper } from '@src/io/IOHelper';
 
 export class ByteBuffer implements IWriteable, IReadable {

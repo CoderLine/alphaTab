@@ -1,6 +1,6 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 
 /**
  * Represents a list of beats that are grouped within the same tuplet.

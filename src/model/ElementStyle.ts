@@ -1,6 +1,6 @@
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { RenderingResources } from '@src/RenderingResources';
-import { Color } from './Color';
+import type { Color } from './Color';
 
 /**
  * Defines the custom styles for an element in the music sheet (like bars, voices, notes etc).

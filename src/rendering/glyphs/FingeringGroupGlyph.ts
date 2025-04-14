@@ -1,6 +1,6 @@
-import { Color, Note, NoteSubElement } from '@src/model';
+import { type Color, type Note, NoteSubElement } from '@src/model';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { ScoreBarRenderer } from '../ScoreBarRenderer';
+import type { ScoreBarRenderer } from '../ScoreBarRenderer';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { FingeringMode } from '@src/NotationSettings';
 import { TextGlyph } from './TextGlyph';

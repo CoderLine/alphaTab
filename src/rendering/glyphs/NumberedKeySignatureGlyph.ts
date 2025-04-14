@@ -1,4 +1,4 @@
-import { ICanvas, TextBaseline } from '@src/platform';
+import { type ICanvas, TextBaseline } from '@src/platform';
 import { Glyph } from './Glyph';
 import { AccidentalType, BarSubElement, KeySignature, KeySignatureType } from '@src/model';
 import { AccidentalGlyph } from './AccidentalGlyph';

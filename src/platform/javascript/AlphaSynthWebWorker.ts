@@ -1,13 +1,13 @@
 import { AlphaSynth } from '@src/synth/AlphaSynth';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
-import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
+import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
-import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth

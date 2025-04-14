@@ -1,11 +1,11 @@
-import { Bar } from '@src/model/Bar';
-import { Staff } from '@src/model/Staff';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
+import type { Bar } from '@src/model/Bar';
+import type { Staff } from '@src/model/Staff';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
+import type { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
 import { InternalSystemsLayoutMode } from '../layout/ScoreLayout';
 
 /**

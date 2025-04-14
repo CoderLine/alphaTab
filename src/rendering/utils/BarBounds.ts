@@ -1,7 +1,7 @@
-import { Bar } from '@src/model/Bar';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
+import type { Bar } from '@src/model/Bar';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 
 /**
  * Represents the boundaries of a single bar.

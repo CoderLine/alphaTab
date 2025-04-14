@@ -22,10 +22,10 @@
  */
 import { FormatError } from '@src/FormatError';
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import {
     Found as HuffmanFound,
-    Huffman,
+    type Huffman,
     NeedBit as HuffmanNeedBit,
     NeedBits as HuffmanNeedBits
 } from '@src/zip/Huffman';

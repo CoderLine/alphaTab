@@ -1,4 +1,4 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { RowGlyphContainer } from '@src/rendering/glyphs/RowGlyphContainer';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 

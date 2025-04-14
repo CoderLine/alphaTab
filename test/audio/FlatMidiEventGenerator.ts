@@ -1,5 +1,5 @@
-import { ControllerType } from '@src/midi/ControllerType';
-import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+import type { ControllerType } from '@src/midi/ControllerType';
+import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 
 export class FlatMidiEventGenerator implements IMidiFileHandler {
     public midiEvents: FlatMidiEvent[];

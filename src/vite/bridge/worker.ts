@@ -2,7 +2,7 @@
 
 // index.ts for more details on contents and license of this file
 
-import { ResolvedConfig } from './config';
+import type { ResolvedConfig } from './config';
 import { cleanUrl, getHash } from './utils';
 import type { OutputChunk } from 'rollup';
 import * as path from 'node:path';

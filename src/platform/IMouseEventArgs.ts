@@ -1,4 +1,4 @@
-import { IContainer } from '@src/platform/IContainer';
+import type { IContainer } from '@src/platform/IContainer';
 
 /**
  * This interface represents the information about a mouse event that occured on the UI.

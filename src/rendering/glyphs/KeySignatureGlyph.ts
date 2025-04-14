@@ -1,4 +1,4 @@
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { LeftToRightLayoutingGlyphGroup } from './LeftToRightLayoutingGlyphGroup';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { BarSubElement } from '@src/model';

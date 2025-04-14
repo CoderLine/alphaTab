@@ -1,4 +1,4 @@
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
@@ -6,8 +6,8 @@ import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
 import { TabSlideLineGlyph } from '@src/rendering/glyphs/TabSlideLineGlyph';
 import { TabSlurGlyph } from '@src/rendering/glyphs/TabSlurGlyph';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { BeamingHelper } from '../utils/BeamingHelper';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { BeamingHelper } from '../utils/BeamingHelper';
 
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;

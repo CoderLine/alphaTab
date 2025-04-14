@@ -1,15 +1,15 @@
-import { Color } from '@src/model';
+import type { Color } from '@src/model';
 import { AccidentalType } from '@src/model/AccidentalType';
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { AccidentalGroupGlyph } from '@src/rendering/glyphs/AccidentalGroupGlyph';
 import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGlyphBase';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {

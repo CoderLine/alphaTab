@@ -3,7 +3,7 @@
  */
 
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { OggPacket } from './OggReader';
+import type { OggPacket } from './OggReader';
 import { VorbisStream } from './VorbisStream';
 import { IOHelper } from '@src/io/IOHelper';
 import {

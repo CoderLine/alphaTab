@@ -1,8 +1,8 @@
-import { Chord } from '@src/model/Chord';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import type { Chord } from '@src/model/Chord';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 
 export class ChordDiagramGlyph extends EffectGlyph {
     private static readonly Padding: number[] = [5, 2];

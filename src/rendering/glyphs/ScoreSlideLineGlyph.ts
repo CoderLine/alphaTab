@@ -1,16 +1,16 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { VibratoType } from '@src/model/VibratoType';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 
 export class ScoreSlideLineGlyph extends Glyph {
     private _outType: SlideOutType;

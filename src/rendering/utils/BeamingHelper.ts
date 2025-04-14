@@ -1,16 +1,16 @@
-import { Bar } from '@src/model/Bar';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import type { Bar } from '@src/model/Bar';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note } from '@src/model/Note';
-import { Staff } from '@src/model/Staff';
-import { Voice } from '@src/model/Voice';
+import type { Note } from '@src/model/Note';
+import type { Staff } from '@src/model/Staff';
+import type { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 
 class BeatLinePositions {
     public staffId: string = '';

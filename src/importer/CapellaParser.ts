@@ -10,14 +10,14 @@ import { Duration } from '@src/model/Duration';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';
 import { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
+import type { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { XmlDocument } from '@src/xml/XmlDocument';
 
-import { XmlNode } from '@src/xml/XmlNode';
+import type { XmlNode } from '@src/xml/XmlNode';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -25,7 +25,7 @@ import { Logger } from '@src/Logger';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
-import { KeySignature } from '@src/model/KeySignature';
+import type { KeySignature } from '@src/model/KeySignature';
 
 class DrawObject {
     public noteRange: number = 1;

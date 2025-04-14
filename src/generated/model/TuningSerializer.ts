@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Tuning } from "@src/model/Tuning";
+import type { Tuning } from "@src/model/Tuning";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class TuningSerializer {
     public static fromJson(obj: Tuning, m: unknown): void {

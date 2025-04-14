@@ -1,10 +1,10 @@
-import { Note, NoteSubElement } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
+import { type Note, NoteSubElement } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NotationElement } from '@src/NotationSettings';
-import { Color } from '@src/model';
+import type { Color } from '@src/model';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class GhostNoteInfo {

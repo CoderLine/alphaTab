@@ -3,10 +3,10 @@ import {
     AlphaTabRestEvent,
     ControlChangeEvent,
     EndOfTrackEvent,
-    MidiEvent,
+    type MidiEvent,
     MidiEventType,
     NoteBendEvent,
-    NoteEvent,
+    type NoteEvent,
     NoteOffEvent,
     NoteOnEvent,
     PitchBendEvent,
@@ -20,7 +20,7 @@ import { Settings } from '@src/Settings';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { ControllerType } from '@src/midi';
+import type { ControllerType } from '@src/midi';
 import { JsonHelper } from '@src/io/JsonHelper';
 
 /**

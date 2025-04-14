@@ -1,4 +1,4 @@
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
 
 export class BeatTimerGlyph extends EffectGlyph {

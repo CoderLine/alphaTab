@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { SustainPedalMarker } from "@src/model/Bar";
+import type { SustainPedalMarker } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { SustainPedalMarkerType } from "@src/model/Bar";
 export class SustainPedalMarkerSerializer {

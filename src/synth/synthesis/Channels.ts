@@ -3,9 +3,9 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
-import { Channel } from '@src/synth/synthesis/Channel';
-import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { Voice } from '@src/synth/synthesis/Voice';
+import type { Channel } from '@src/synth/synthesis/Channel';
+import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
+import type { Voice } from '@src/synth/synthesis/Voice';
 
 export class Channels {
     public activeChannel: number = 0;

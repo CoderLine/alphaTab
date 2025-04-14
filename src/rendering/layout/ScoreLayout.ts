@@ -1,27 +1,27 @@
 import { Environment } from '@src/Environment';
-import { Bar } from '@src/model/Bar';
+import type { Bar } from '@src/model/Bar';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import { Track, TrackSubElement } from '@src/model/Track';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
+import type { Staff } from '@src/model/Staff';
+import { type Track, TrackSubElement } from '@src/model/Track';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
+import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
-import { EventEmitterOfT } from '@src/EventEmitter';
+import type { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { TuningGlyph } from '../glyphs/TuningGlyph';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 
 class LazyPartial {

@@ -2,8 +2,8 @@
 
 // index.ts for more details on contents and license of this file
 
-import { DepOptimizationMetadata, DevEnvironment, OptimizedDepInfo, normalizePath } from 'vite';
-import { ResolvedConfig } from './config';
+import { type DepOptimizationMetadata, type DevEnvironment, type OptimizedDepInfo, normalizePath } from 'vite';
+import type { ResolvedConfig } from './config';
 import { tryFsResolve } from './resolve';
 import { cleanUrl } from './utils';
 import * as path from 'node:path';

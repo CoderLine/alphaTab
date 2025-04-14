@@ -1,7 +1,7 @@
-import { GpxFile, GpxFileSystem } from '@src/importer/GpxFileSystem';
+import { type GpxFile, GpxFileSystem } from '@src/importer/GpxFileSystem';
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';

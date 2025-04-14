@@ -1,15 +1,15 @@
-import { Beat, BeatSubElement } from '@src/model/Beat';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode, NotationElement } from '@src/NotationSettings';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { RenderingResources } from '@src/RenderingResources';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { RenderingResources } from '@src/RenderingResources';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class TabWhammyBarGlyph extends Glyph {

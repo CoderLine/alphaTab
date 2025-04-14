@@ -1,6 +1,6 @@
 /**@target web */
 
-import { RollupPluginHooks } from "./typeUtils";
+import type { RollupPluginHooks } from "./typeUtils";
 
 // index.ts for more details on contents and license of this file
 

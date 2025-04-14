@@ -1,10 +1,10 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Tuning } from '@src/model/Tuning';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { Color } from '@src/model';
+import type { Color } from '@src/model';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {

@@ -1,5 +1,5 @@
 import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
-import { Color } from '@src/model/Color';
+import type { Color } from '@src/model/Color';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 

@@ -1,9 +1,9 @@
 import { Logger } from '@src/Logger';
-import { BeatTickLookup } from '@src/midi/BeatTickLookup';
+import type { BeatTickLookup } from '@src/midi/BeatTickLookup';
 import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat } from '@src/model/Beat';
-import { MasterBar } from '@src/model/MasterBar';
+import type { Beat } from '@src/model/Beat';
+import type { MasterBar } from '@src/model/MasterBar';
 
 /**
  * Describes how a cursor should be moving.

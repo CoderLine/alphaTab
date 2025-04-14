@@ -1,14 +1,14 @@
 import { BendType } from '@src/model/BendType';
-import { Font } from '@src/model/Font';
+import type { Font } from '@src/model/Font';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note, NoteSubElement } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
+import { type Note, NoteSubElement } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NotationElement, NotationMode } from '@src/NotationSettings';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class NoteNumberGlyph extends Glyph {

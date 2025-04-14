@@ -1,14 +1,14 @@
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { VibratoType } from '@src/model/VibratoType';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { type BarRendererBase, NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 
 export class TabSlideLineGlyph extends Glyph {
     private _inType: SlideInType;

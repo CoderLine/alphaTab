@@ -3,11 +3,11 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { CoreSettingsJson } from "./CoreSettingsJson";
-import { DisplaySettingsJson } from "./DisplaySettingsJson";
-import { NotationSettingsJson } from "./NotationSettingsJson";
-import { ImporterSettingsJson } from "./ImporterSettingsJson";
-import { PlayerSettingsJson } from "./PlayerSettingsJson";
+import type { CoreSettingsJson } from "./CoreSettingsJson";
+import type { DisplaySettingsJson } from "./DisplaySettingsJson";
+import type { NotationSettingsJson } from "./NotationSettingsJson";
+import type { ImporterSettingsJson } from "./ImporterSettingsJson";
+import type { PlayerSettingsJson } from "./PlayerSettingsJson";
 /**
  * This public class contains instance specific settings for alphaTab
  * @json

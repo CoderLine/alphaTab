@@ -1,6 +1,6 @@
-import { Beat } from '@src/model/Beat';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Bounds } from '../utils/Bounds';

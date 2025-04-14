@@ -1,7 +1,7 @@
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { TextBaseline } from "@src/platform/ICanvas";
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
-import { Note } from "@src/model/Note";
+import type { Note } from "@src/model/Note";
 
 export class PercussionMapper {
     private static gp6ElementAndVariationToArticulation: number[][] = [

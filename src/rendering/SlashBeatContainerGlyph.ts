@@ -1,4 +1,4 @@
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { SlashTieGlyph } from './glyphs/SlashTieGlyph';
 

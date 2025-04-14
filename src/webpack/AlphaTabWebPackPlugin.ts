@@ -8,9 +8,9 @@ import * as url from 'node:url';
 
 import { injectWorkerRuntimeModule } from './AlphaTabWorkerRuntimeModule';
 import { configureAudioWorklet } from './AlphaTabAudioWorklet';
-import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
+import type { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
 import { configureWebWorker } from './AlphaTabWebWorker';
-import { webPackWithAlphaTab, webpackTypes } from './Utils';
+import type { webPackWithAlphaTab, webpackTypes } from './Utils';
 import { injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
 import { injectWorkletRuntimeModule } from './AlphaTabWorkletStartRuntimeModule';
 import { injectWorkletDependency } from './AlphaTabWorkletDependency';

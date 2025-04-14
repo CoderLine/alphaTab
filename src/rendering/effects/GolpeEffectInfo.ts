@@ -1,11 +1,11 @@
 import { NotationElement } from '@src/NotationSettings';
 import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { Settings } from '@src/Settings';
-import { Beat } from '@src/model';
-import { GolpeType } from '@src/model/GolpeType';
+import type { Settings } from '@src/Settings';
+import type { Beat } from '@src/model';
+import type { GolpeType } from '@src/model/GolpeType';
 import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import { BarRendererBase } from '../BarRendererBase';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
+import type { BarRendererBase } from '../BarRendererBase';
+import type { EffectGlyph } from '../glyphs/EffectGlyph';
 import { GuitarGolpeGlyph } from '../glyphs/GuitarGolpeGlyph';
 
 export class GolpeEffectInfo extends EffectBarRendererInfo {

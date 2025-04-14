@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { ImporterSettings } from "@src/ImporterSettings";
+import type { ImporterSettings } from "@src/ImporterSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 export class ImporterSettingsSerializer {
     public static fromJson(obj: ImporterSettings, m: unknown): void {

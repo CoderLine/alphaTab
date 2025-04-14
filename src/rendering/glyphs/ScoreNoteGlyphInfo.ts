@@ -1,4 +1,4 @@
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 
 export class ScoreNoteGlyphInfo {
     public glyph: Glyph;

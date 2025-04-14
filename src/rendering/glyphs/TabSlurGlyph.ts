@@ -1,8 +1,8 @@
-import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Note } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class TabSlurGlyph extends TabTieGlyph {

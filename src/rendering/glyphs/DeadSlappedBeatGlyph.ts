@@ -1,6 +1,6 @@
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { Glyph } from './Glyph';
-import { LineBarRenderer } from '../LineBarRenderer';
+import type { LineBarRenderer } from '../LineBarRenderer';
 
 export class DeadSlappedBeatGlyph extends Glyph {
     public constructor() {

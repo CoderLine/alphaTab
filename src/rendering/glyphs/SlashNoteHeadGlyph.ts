@@ -1,11 +1,11 @@
 import { Duration } from '@src/model/Duration';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
-import { Glyph } from './Glyph';
-import { BeamingHelper } from '../utils/BeamingHelper';
+import type { Glyph } from './Glyph';
+import type { BeamingHelper } from '../utils/BeamingHelper';
 import { EffectGlyph } from './EffectGlyph';
-import { Beat, BeatSubElement, NoteSubElement } from '@src/model';
+import { type Beat, BeatSubElement, NoteSubElement } from '@src/model';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 

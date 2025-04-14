@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Note } from "@src/model/Note";
+import type { Note } from "@src/model/Note";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
 import { NoteStyleSerializer } from "@src/generated/model/NoteStyleSerializer";

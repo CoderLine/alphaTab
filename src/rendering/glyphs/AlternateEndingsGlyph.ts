@@ -1,6 +1,6 @@
-import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 export class AlternateEndingsGlyph extends EffectGlyph {

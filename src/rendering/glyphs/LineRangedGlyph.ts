@@ -1,7 +1,7 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 
 export class LineRangedGlyph extends GroupedEffectGlyph {
     public static readonly LineSpacing: number = 3;

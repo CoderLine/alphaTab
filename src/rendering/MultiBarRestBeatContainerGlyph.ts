@@ -1,6 +1,6 @@
 import { Beat } from '@src/model';
 import { BeatContainerGlyph } from './glyphs/BeatContainerGlyph';
-import { VoiceContainerGlyph } from './glyphs/VoiceContainerGlyph';
+import type { VoiceContainerGlyph } from './glyphs/VoiceContainerGlyph';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
 import { MultiBarRestGlyph } from './glyphs/MultiBarRestGlyph';

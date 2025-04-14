@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { BarBounds } from '@src/rendering/utils/BarBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { NoteBounds } from '@src/rendering/utils/NoteBounds';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import type { BarBounds } from '@src/rendering/utils/BarBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { NoteBounds } from '@src/rendering/utils/NoteBounds';
 
 /**
  * Represents the bounds of a single beat.

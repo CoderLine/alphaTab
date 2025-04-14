@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { NotationMode } from "@src/NotationSettings";
-import { FingeringMode } from "@src/NotationSettings";
-import { NotationElement } from "@src/NotationSettings";
-import { TabRhythmMode } from "@src/NotationSettings";
+import type { NotationMode } from "@src/NotationSettings";
+import type { FingeringMode } from "@src/NotationSettings";
+import type { NotationElement } from "@src/NotationSettings";
+import type { TabRhythmMode } from "@src/NotationSettings";
 /**
  * The notation settings control how various music notation elements are shown and behaving
  * @json

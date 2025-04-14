@@ -1,6 +1,6 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 
 export class OggPacket {
     public packetData: Uint8Array;

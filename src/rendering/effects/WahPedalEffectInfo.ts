@@ -1,11 +1,11 @@
-import { Beat } from '@src/model';
+import type { Beat } from '@src/model';
 import { NotationElement } from '@src/NotationSettings';
-import { BarRendererBase } from '../BarRendererBase';
+import type { BarRendererBase } from '../BarRendererBase';
 import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
 import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
+import type { EffectGlyph } from '../glyphs/EffectGlyph';
 import { WahPedal } from '@src/model/WahPedal';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { WahPedalGlyph } from '../glyphs/WahPedalGlyph';
 
 export class WahPedalEffectInfo extends EffectBarRendererInfo {

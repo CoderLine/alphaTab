@@ -1,5 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
-import { MidiEvent, MidiEventType, NoteOnEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
+import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -7,19 +7,19 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
-import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import type { Note } from '@src/model/Note';
+import type { PlaybackInformation } from '@src/model/PlaybackInformation';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import {
     FlatNoteBendEvent,
     FlatControlChangeEvent,
     FlatMidiEventGenerator,
-    FlatMidiEvent,
+    type FlatMidiEvent,
     FlatNoteEvent,
     FlatProgramChangeEvent,
     FlatTempoEvent,
@@ -32,7 +32,7 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { AccentuationType, Duration, VibratoType } from '@src/model';
 import { expect } from 'chai';
 import { ScoreLoader } from '@src/importer';
-import { MidiTickLookup } from '@src/midi';
+import type { MidiTickLookup } from '@src/midi';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {

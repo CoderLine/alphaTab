@@ -1,6 +1,6 @@
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { ScoreLegatoGlyph } from '@src/rendering/glyphs/ScoreLegatoGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteYPosition, NoteXPosition } from '@src/rendering/BarRendererBase';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GraceType } from '@src/model/GraceType';

@@ -26,8 +26,8 @@
  */
 
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { VorbisStream } from './VorbisStream';
-import { OggPacket } from './OggReader';
+import type { VorbisStream } from './VorbisStream';
+import type { OggPacket } from './OggReader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { TypeConversions } from '@src/io/TypeConversions';
 import { IntBitReader } from './IntBitReader';

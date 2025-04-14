@@ -1,11 +1,11 @@
 import { Environment } from '@src/Environment';
 import { FileLoadError } from '@src/FileLoadError';
 
-import { ScoreImporter } from '@src/importer/ScoreImporter';
+import type { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';

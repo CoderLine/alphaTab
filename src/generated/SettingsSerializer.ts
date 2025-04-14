@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Settings } from "@src/Settings";
+import type { Settings } from "@src/Settings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { CoreSettingsSerializer } from "@src/generated/CoreSettingsSerializer";
 import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSerializer";

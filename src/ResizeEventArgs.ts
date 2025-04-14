@@ -1,4 +1,4 @@
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { CoreSettings } from '@src/CoreSettings';
 
 /**

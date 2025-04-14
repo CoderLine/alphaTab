@@ -1,7 +1,7 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatTickLookup } from '@src/midi/BeatTickLookup';
-import { Beat } from '@src/model/Beat';
-import { MasterBar } from '@src/model/MasterBar';
+import type { Beat } from '@src/model/Beat';
+import type { MasterBar } from '@src/model/MasterBar';
 
 /**
  * Represents a single point in time defining the tempo of a {@link MasterBarTickLookup}.

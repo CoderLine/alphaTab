@@ -1,10 +1,10 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
+import type { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
-import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { RenderingResources } from '@src/RenderingResources';
+import type { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
+import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
+import type { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { ScoreSubElement } from '@src/model';

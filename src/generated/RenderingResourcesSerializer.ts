@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { RenderingResources } from "@src/RenderingResources";
+import type { RenderingResources } from "@src/RenderingResources";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";

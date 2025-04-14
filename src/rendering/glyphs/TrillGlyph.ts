@@ -1,4 +1,4 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { BeatXPosition } from '../BeatXPosition';
 import { GroupedEffectGlyph } from './GroupedEffectGlyph';

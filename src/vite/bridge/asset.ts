@@ -2,7 +2,7 @@
 
 // index.ts for more details on contents and license of this file
 
-import { type ResolvedConfig } from './config';
+import type { ResolvedConfig } from './config';
 import * as path from 'node:path';
 import { joinUrlSegments, removeLeadingSlash, withTrailingSlash } from './utils';
 

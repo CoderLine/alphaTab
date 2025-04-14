@@ -1,13 +1,13 @@
 /**@target web */
 
 import {
-    Hash,
-    ObjectSerializerContext,
-    ObjectDeserializerContext,
+    type Hash,
+    type ObjectSerializerContext,
+    type ObjectDeserializerContext,
     makeDependencySerializable,
-    webPackWithAlphaTab,
-    webpackTypes,
-    NormalModuleFactory
+    type webPackWithAlphaTab,
+    type webpackTypes,
+    type NormalModuleFactory
 } from './Utils';
 
 export function injectWebWorkerDependency(webPackWithAlphaTab: webPackWithAlphaTab) {

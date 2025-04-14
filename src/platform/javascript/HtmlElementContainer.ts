@@ -1,6 +1,6 @@
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import { IContainer } from '@src/platform/IContainer';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { IContainer } from '@src/platform/IContainer';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Lazy } from '@src/util/Lazy';

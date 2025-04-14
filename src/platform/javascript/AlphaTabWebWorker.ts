@@ -1,9 +1,9 @@
 import { JsonConverter } from '@src/model/JsonConverter';
-import { Score } from '@src/model/Score';
-import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { FontSizeDefinition, FontSizes } from '@src/platform/svg/FontSizes';
+import type { Score } from '@src/model/Score';
+import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
+import { type FontSizeDefinition, FontSizes } from '@src/platform/svg/FontSizes';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';

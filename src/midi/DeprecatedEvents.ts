@@ -1,4 +1,4 @@
-import { IWriteable } from "@src/io/IWriteable";
+import type { IWriteable } from "@src/io/IWriteable";
 import { MidiEvent, MidiEventType } from "./MidiEvent";
 import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
 

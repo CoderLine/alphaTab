@@ -1,7 +1,7 @@
 import { AutomationType } from '@src/model/Automation';
 import { BrushType } from '@src/model/BrushType';
 import { DynamicValue } from '@src/model/DynamicValue';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { HarmonicType } from '@src/model/HarmonicType';

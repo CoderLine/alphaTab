@@ -3,10 +3,10 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Score } from '@src/model/Score';
 
 import { XmlDocument } from '@src/xml/XmlDocument';
-import { XmlNode } from '@src/xml/XmlNode';
+import type { XmlNode } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
 import { ZipReader } from '@src/zip/ZipReader';
-import { ZipEntry } from '@src/zip/ZipEntry';
+import type { ZipEntry } from '@src/zip/ZipEntry';
 import {
     AccentuationType,
     Automation,

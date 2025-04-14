@@ -1,4 +1,4 @@
-import { IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 

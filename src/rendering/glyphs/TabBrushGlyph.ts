@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
 import { VibratoType } from '@src/model/VibratoType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 
 export class TabBrushGlyph extends Glyph {

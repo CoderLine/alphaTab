@@ -1,9 +1,9 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Settings } from '@src/Settings';
+import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Settings } from '@src/Settings';
 
 /**
  * A canvas implementation storing SVG data

@@ -2,12 +2,12 @@
 
 // index.ts for more details on contents and license of this file
 
-import { MinimalPluginContext, PluginContext, type InternalModuleFormat } from 'rollup';
+import type { MinimalPluginContext, PluginContext, InternalModuleFormat } from 'rollup';
 import { joinUrlSegments, partialEncodeURIPath } from './utils';
 import * as path from 'node:path';
-import { ResolvedConfig } from './config';
-import { BuildEnvironment, Plugin } from 'vite';
-import { RollupPluginHooks } from './typeUtils';
+import type { ResolvedConfig } from './config';
+import type { BuildEnvironment, Plugin } from 'vite';
+import type { RollupPluginHooks } from './typeUtils';
 import { ROLLUP_HOOKS } from './constants';
 import { getHookHandler } from './plugins';
 

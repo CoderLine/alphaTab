@@ -2,7 +2,7 @@
 // developed by Bernhard Schelling (https://github.com/schellingb/TinySoundFont)
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
-import { AlphaTabMetronomeEvent, MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { AlphaTabMetronomeEvent, type MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 
 export class SynthEvent {
     public eventIndex: number;

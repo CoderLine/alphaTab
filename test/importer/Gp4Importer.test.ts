@@ -1,4 +1,4 @@
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
 

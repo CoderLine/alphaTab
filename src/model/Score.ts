@@ -1,8 +1,8 @@
-import { MasterBar } from '@src/model/MasterBar';
+import type { MasterBar } from '@src/model/MasterBar';
 import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
-import { Track } from '@src/model/Track';
-import { Settings } from '@src/Settings';
+import type { Track } from '@src/model/Track';
+import type { Settings } from '@src/Settings';
 import { ElementStyle } from './ElementStyle';
 import { Bar } from './Bar';
 import { Beat } from './Beat';

@@ -1,12 +1,12 @@
-import { Beat, BeatSubElement } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { RenderingResources } from '@src/RenderingResources';
+import type { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { RenderingResources } from '@src/RenderingResources';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 

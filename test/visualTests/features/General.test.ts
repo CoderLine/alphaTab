@@ -10,7 +10,7 @@ import {
     Color,
     NoteStyle,
     NoteSubElement,
-    Score,
+    type Score,
     ScoreStyle,
     ScoreSubElement,
     TrackStyle,

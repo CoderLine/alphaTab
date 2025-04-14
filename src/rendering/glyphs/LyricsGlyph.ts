@@ -1,5 +1,5 @@
-import { Font } from '@src/model/Font';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import type { Font } from '@src/model/Font';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class LyricsGlyph extends EffectGlyph {

@@ -1,7 +1,7 @@
 import { StaveProfile } from '@src/StaveProfile';
 import { AlphaTexError, AlphaTexImporter, AlphaTexSymbols } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
 import { CrescendoType } from '@src/model/CrescendoType';
@@ -23,11 +23,11 @@ import {
     VibratoType,
     WhammyType
 } from '@src/model';
-import { Score, ScoreSubElement } from '@src/model/Score';
+import { type Score, ScoreSubElement } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';

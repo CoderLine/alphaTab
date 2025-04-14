@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { ScoreStyle } from "@src/model/Score";
+import type { ScoreStyle } from "@src/model/Score";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { HeaderFooterStyleSerializer } from "@src/generated/model/HeaderFooterStyleSerializer";
 import { ScoreSubElement } from "@src/model/Score";

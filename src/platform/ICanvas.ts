@@ -1,7 +1,7 @@
-import { Color } from '@src/model/Color';
-import { Font } from '@src/model/Font';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Settings } from '@src/Settings';
+import type { Color } from '@src/model/Color';
+import type { Font } from '@src/model/Font';
+import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Settings } from '@src/Settings';
 
 /**
  * This public enum lists all different text alignments

@@ -3,26 +3,26 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 import {
-    ControlChangeEvent,
-    MidiEvent,
+    type ControlChangeEvent,
+    type MidiEvent,
     MidiEventType,
-    NoteBendEvent,
-    NoteOffEvent,
-    NoteOnEvent,
-    PitchBendEvent,
-    ProgramChangeEvent,
-    TempoChangeEvent,
-    TimeSignatureEvent
+    type NoteBendEvent,
+    type NoteOffEvent,
+    type NoteOnEvent,
+    type PitchBendEvent,
+    type ProgramChangeEvent,
+    type TempoChangeEvent,
+    type TimeSignatureEvent
 } from '@src/midi/MidiEvent';
 import {
-    Hydra,
-    HydraIbag,
-    HydraIgen,
-    HydraInst,
-    HydraPbag,
+    type Hydra,
+    type HydraIbag,
+    type HydraIgen,
+    type HydraInst,
+    type HydraPbag,
     HydraPgen,
-    HydraPhdr,
-    HydraShdr
+    type HydraPhdr,
+    type HydraShdr
 } from '@src/synth/soundfont/Hydra';
 import { Channel } from '@src/synth/synthesis/Channel';
 import { Channels } from '@src/synth/synthesis/Channels';
@@ -30,7 +30,7 @@ import { LoopMode } from '@src/synth/synthesis/LoopMode';
 import { OutputMode } from '@src/synth/synthesis/OutputMode';
 import { Preset } from '@src/synth/synthesis/Preset';
 import { Region } from '@src/synth/synthesis/Region';
-import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { Voice } from '@src/synth/synthesis/Voice';
 import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { SynthHelper } from '@src/synth/SynthHelper';

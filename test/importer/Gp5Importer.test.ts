@@ -1,8 +1,8 @@
 import { Settings } from '@src/Settings';
 import { Ottavia } from '@src/model';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
-import { Score, ScoreSubElement } from '@src/model/Score';
+import { type Score, ScoreSubElement } from '@src/model/Score';
 import { WahPedal } from '@src/model/WahPedal';
 import { TextAlign } from '@src/platform';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';

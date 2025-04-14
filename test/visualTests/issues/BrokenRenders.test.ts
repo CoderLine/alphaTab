@@ -2,7 +2,7 @@ import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper } from '../VisualTestHelper';
 import { ScoreLoader } from '@src/importer';
 import { Settings } from '@src/Settings';
-import { RenderFinishedEventArgs, ScoreRenderer } from '@src/rendering';
+import { type RenderFinishedEventArgs, ScoreRenderer } from '@src/rendering';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { expect } from 'chai';
 

@@ -8,12 +8,12 @@ import {
     MidiFile,
     MidiFileGenerator,
     MidiTickLookup,
-    MidiTickLookupFindBeatResult
+    type MidiTickLookupFindBeatResult
 } from '@src/midi';
 import { MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
 import { MidiTickLookupFindBeatResultCursorMode } from '@src/midi/MidiTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat, Duration, MasterBar, Note, Score } from '@src/model';
+import { Beat, Duration, MasterBar, Note, type Score } from '@src/model';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';

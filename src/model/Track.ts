@@ -1,11 +1,11 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Color } from '@src/model/Color';
-import { Lyrics } from '@src/model/Lyrics';
+import type { Lyrics } from '@src/model/Lyrics';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
-import { Settings } from '@src/Settings';
-import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import type { Settings } from '@src/Settings';
+import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { ElementStyle } from './ElementStyle';
 
 /**

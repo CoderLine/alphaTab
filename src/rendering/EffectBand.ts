@@ -1,13 +1,13 @@
-import { Beat, BeatSubElement } from '@src/model/Beat';
-import { Voice } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
-import { EffectBandSlot } from '@src/rendering/EffectBandSlot';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { EffectBandSlot } from '@src/rendering/EffectBandSlot';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
+import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
 export class EffectBand extends Glyph {

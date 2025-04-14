@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { DisplaySettings } from "@src/DisplaySettings";
+import type { DisplaySettings } from "@src/DisplaySettings";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { RenderingResourcesSerializer } from "@src/generated/RenderingResourcesSerializer";
 import { LayoutMode } from "@src/LayoutMode";

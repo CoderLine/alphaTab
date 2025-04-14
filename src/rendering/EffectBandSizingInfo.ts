@@ -1,4 +1,4 @@
-import { EffectBand } from '@src/rendering/EffectBand';
+import type { EffectBand } from '@src/rendering/EffectBand';
 import { EffectBandSlot } from '@src/rendering/EffectBandSlot';
 
 export class EffectBandSizingInfo {

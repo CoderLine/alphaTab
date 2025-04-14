@@ -1,13 +1,13 @@
 /**@target web */
 
 import {
-    Hash,
-    NormalModuleFactory,
-    ObjectDeserializerContext,
-    ObjectSerializerContext,
+    type Hash,
+    type NormalModuleFactory,
+    type ObjectDeserializerContext,
+    type ObjectSerializerContext,
     makeDependencySerializable,
-    webPackWithAlphaTab,
-    webpackTypes
+    type webPackWithAlphaTab,
+    type webpackTypes
 } from './Utils';
 
 export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab) {

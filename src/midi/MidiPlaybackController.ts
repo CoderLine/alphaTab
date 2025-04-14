@@ -1,7 +1,7 @@
-import { RepeatGroup } from '@src/model';
+import type { RepeatGroup } from '@src/model';
 import { Direction } from '@src/model/Direction';
-import { MasterBar } from '@src/model/MasterBar';
-import { Score } from '@src/model/Score';
+import type { MasterBar } from '@src/model/MasterBar';
+import type { Score } from '@src/model/Score';
 
 /**
  * Helper container to handle repeats correctly

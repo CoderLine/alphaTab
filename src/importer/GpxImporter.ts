@@ -3,7 +3,7 @@ import { GpifParser } from '@src/importer/GpifParser';
 import { GpxFileSystem } from '@src/importer/GpxFileSystem';
 import { PartConfiguration } from '@src/importer/PartConfiguration';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Logger } from '@src/Logger';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { IOHelper } from '@src/io/IOHelper';

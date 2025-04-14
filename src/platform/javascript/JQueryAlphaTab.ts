@@ -1,12 +1,12 @@
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import { PlayerState } from '@src/synth/PlayerState';
-import { Score } from '@src/model/Score';
-import { Track } from '@src/model/Track';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { PlayerState } from '@src/synth/PlayerState';
+import type { Score } from '@src/model/Score';
+import type { Track } from '@src/model/Track';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { Settings } from '@src/Settings';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
-import { MidiEventType } from '@src/midi/MidiEvent';
+import type { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * @target web

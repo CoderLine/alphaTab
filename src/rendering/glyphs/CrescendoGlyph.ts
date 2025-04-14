@@ -1,5 +1,5 @@
 import { CrescendoType } from '@src/model/CrescendoType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';

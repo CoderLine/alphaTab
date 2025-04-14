@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';

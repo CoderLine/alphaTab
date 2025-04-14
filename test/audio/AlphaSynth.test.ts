@@ -3,7 +3,7 @@ import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { AlphaSynth } from '@src/synth/AlphaSynth';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestOutput } from '@test/audio/TestOutput';
 import { TestPlatform } from '@test/TestPlatform';

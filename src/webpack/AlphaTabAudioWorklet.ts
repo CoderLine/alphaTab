@@ -1,8 +1,8 @@
 /**@target web */
 
-import { type VariableDeclarator, type Identifier, type Expression, type CallExpression } from 'estree';
-import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
-import { getWorkerRuntime, parseModuleUrl, tapJavaScript, webPackWithAlphaTab, webpackTypes } from './Utils';
+import type { VariableDeclarator, Identifier, Expression, CallExpression } from 'estree';
+import type { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
+import { getWorkerRuntime, parseModuleUrl, tapJavaScript, type webPackWithAlphaTab, type webpackTypes } from './Utils';
 
 const AlphaTabWorkletSpecifierTag = Symbol('alphatab worklet specifier tag');
 const workletIndexMap = new WeakMap<webpackTypes.ParserState, number>();

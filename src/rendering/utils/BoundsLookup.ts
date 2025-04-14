@@ -1,7 +1,7 @@
-import { Beat } from '@src/model/Beat';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import { Score } from '@src/model/Score';
+import type { Beat } from '@src/model/Beat';
+import type { MasterBar } from '@src/model/MasterBar';
+import type { Note } from '@src/model/Note';
+import type { Score } from '@src/model/Score';
 import { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';

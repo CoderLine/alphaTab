@@ -1,11 +1,11 @@
 import { GraceType } from '@src/model/GraceType';
-import { TupletGroup } from '@src/model/TupletGroup';
-import { Voice, VoiceSubElement } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { TupletGroup } from '@src/model/TupletGroup';
+import { type Voice, VoiceSubElement } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 /**

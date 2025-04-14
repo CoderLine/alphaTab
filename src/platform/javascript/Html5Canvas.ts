@@ -2,8 +2,8 @@ import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
-import { Settings } from '@src/Settings';
+import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
+import type { Settings } from '@src/Settings';
 
 /**
  * A canvas implementation for HTML5 canvas

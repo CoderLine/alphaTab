@@ -1,9 +1,9 @@
-import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
+import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
 import { BarSubElement } from '@src/model';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { BarRendererBase } from '../BarRendererBase';

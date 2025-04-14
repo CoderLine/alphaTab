@@ -1,7 +1,7 @@
 import { ByteBuffer } from "@src/io/ByteBuffer";
 import { IOHelper } from "@src/io/IOHelper";
-import { Score } from "@src/model/Score";
-import { PartConfiguration } from "./PartConfiguration";
+import type { Score } from "@src/model/Score";
+import type { PartConfiguration } from "./PartConfiguration";
 
 // PartConfiguration File Format Notes.
 // Based off Guitar Pro 8

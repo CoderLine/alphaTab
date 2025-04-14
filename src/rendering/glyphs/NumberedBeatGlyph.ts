@@ -1,13 +1,13 @@
 import { GraceType } from '@src/model/GraceType';
-import { Note, NoteSubElement } from '@src/model/Note';
+import { type Note, NoteSubElement } from '@src/model/Note';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { NoteBounds } from '../utils/NoteBounds';
 import { Bounds } from '../utils/Bounds';
 import { NumberedNoteHeadGlyph } from './NumberedNoteHeadGlyph';
 import { AccidentalType, BeatSubElement, Duration, KeySignatureType, NoteAccidentalMode } from '@src/model';
-import { NumberedBarRenderer } from '../NumberedBarRenderer';
+import type { NumberedBarRenderer } from '../NumberedBarRenderer';
 import { AccidentalHelper } from '../utils/AccidentalHelper';
 import { BeatGlyphBase } from './BeatGlyphBase';
 import { AccidentalGroupGlyph } from './AccidentalGroupGlyph';
@@ -17,7 +17,7 @@ import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { SpacingGlyph } from './SpacingGlyph';
 import { CircleGlyph } from './CircleGlyph';
 import { NumberedDashGlyph } from './NumberedDashGlyph';
-import { Glyph } from './Glyph';
+import type { Glyph } from './Glyph';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 

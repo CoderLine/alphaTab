@@ -26,7 +26,7 @@
  */
 
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 
 class IntBitReaderReadResult {
     public value: number = 0;

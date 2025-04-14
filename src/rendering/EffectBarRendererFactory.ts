@@ -1,11 +1,11 @@
-import { Bar } from '@src/model/Bar';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Bar } from '@src/model/Bar';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { RenderStaff } from './staves/RenderStaff';
-import { Staff, Track } from '@src/model';
+import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { RenderStaff } from './staves/RenderStaff';
+import type { Staff, Track } from '@src/model';
 
 export class EffectBarRendererFactory extends BarRendererFactory {
     public infos: EffectBarRendererInfo[];

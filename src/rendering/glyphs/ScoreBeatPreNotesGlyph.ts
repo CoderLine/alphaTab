@@ -3,7 +3,7 @@ import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note, NoteSubElement } from '@src/model/Note';
+import { type Note, NoteSubElement } from '@src/model/Note';
 import { WhammyType } from '@src/model/WhammyType';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { AccidentalGroupGlyph } from '@src/rendering/glyphs/AccidentalGroupGlyph';
@@ -12,7 +12,7 @@ import { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupG
 import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
 import { ScoreBrushGlyph } from '@src/rendering/glyphs/ScoreBrushGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { FingeringGroupGlyph } from './FingeringGroupGlyph';
 import { BeatSubElement } from '@src/model';

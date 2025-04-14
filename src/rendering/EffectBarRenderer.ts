@@ -1,14 +1,14 @@
-import { Bar } from '@src/model/Bar';
-import { Voice } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { Bar } from '@src/model/Bar';
+import type { Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBand } from '@src/rendering/EffectBand';
 import { EffectBandSizingInfo } from '@src/rendering/EffectBandSizingInfo';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves

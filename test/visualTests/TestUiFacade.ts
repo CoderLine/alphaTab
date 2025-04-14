@@ -1,14 +1,14 @@
-import { AlphaTabApiBase } from "@src/AlphaTabApiBase";
-import { EventEmitter, EventEmitterOfT, IEventEmitter, IEventEmitterOfT } from "@src/EventEmitter";
+import type { AlphaTabApiBase } from "@src/AlphaTabApiBase";
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from "@src/EventEmitter";
 import { Settings } from "@src/Settings";
 import { ScoreLoader } from "@src/importer";
 import { Score } from "@src/model";
-import { Cursors } from "@src/platform/Cursors";
-import { IContainer } from "@src/platform/IContainer";
-import { IMouseEventArgs } from "@src/platform/IMouseEventArgs";
-import { IUiFacade } from "@src/platform/IUiFacade";
-import { Bounds, IScoreRenderer, RenderFinishedEventArgs } from "@src/rendering";
-import { IAlphaSynth } from "@src/synth";
+import type { Cursors } from "@src/platform/Cursors";
+import type { IContainer } from "@src/platform/IContainer";
+import type { IMouseEventArgs } from "@src/platform/IMouseEventArgs";
+import type { IUiFacade } from "@src/platform/IUiFacade";
+import { Bounds, type IScoreRenderer, type RenderFinishedEventArgs } from "@src/rendering";
+import type { IAlphaSynth } from "@src/synth";
 import { TestPlatform } from "@test/TestPlatform";
 
 class TestUiContainer implements IContainer {

@@ -1,12 +1,12 @@
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import { EventEmitter, type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 import { JsonConverter } from '@src/model/JsonConverter';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 

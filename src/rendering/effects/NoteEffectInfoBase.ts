@@ -1,7 +1,7 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 
 export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     protected lastCreateInfo: Note[] | null = null;

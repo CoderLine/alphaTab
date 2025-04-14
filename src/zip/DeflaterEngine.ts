@@ -22,7 +22,7 @@
 import { Crc32 } from "./Crc32";
 import { DeflaterConstants } from "./DeflaterConstants";
 import { DeflaterHuffman } from "./DeflaterHuffman";
-import { PendingBuffer } from "./PendingBuffer";
+import type { PendingBuffer } from "./PendingBuffer";
 
 /**
  * Low level compression engine for deflate algorithm which uses a 32K sliding window

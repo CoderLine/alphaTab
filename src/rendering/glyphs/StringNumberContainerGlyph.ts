@@ -1,4 +1,4 @@
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
 import { TuningGlyph } from './TuningGlyph';
 import { MusicFontSymbol } from '@src/model';

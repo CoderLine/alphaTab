@@ -1,13 +1,13 @@
 import { AccidentalType } from '@src/model/AccidentalType';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Bar } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import { LineBarRenderer } from '../LineBarRenderer';
-import { Clef, KeySignature } from '@src/model';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { LineBarRenderer } from '../LineBarRenderer';
+import type { Clef, KeySignature } from '@src/model';
 
 class BeatLines {
     public maxLine: number = -1000;

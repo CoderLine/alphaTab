@@ -46,53 +46,53 @@ import type {
 } from '@src/midi/DeprecatedEvents';
 
 import {
-    MidiTickLookup,
-    MidiTickLookupFindBeatResult,
+    type MidiTickLookup,
+    type MidiTickLookupFindBeatResult,
     MidiTickLookupFindBeatResultCursorMode
 } from '@src/midi/MidiTickLookup';
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { Environment } from '@src/Environment';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
-import { Beat } from '@src/model/Beat';
-import { Score } from '@src/model/Score';
-import { Track } from '@src/model/Track';
+import type { Beat } from '@src/model/Beat';
+import type { Score } from '@src/model/Score';
+import type { Track } from '@src/model/Track';
 
-import { IContainer } from '@src/platform/IContainer';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { IUiFacade } from '@src/platform/IUiFacade';
+import type { IContainer } from '@src/platform/IContainer';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IUiFacade } from '@src/platform/IUiFacade';
 import { ScrollMode } from '@src/PlayerSettings';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
+import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
+import type { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import { ResizeEventArgs } from '@src/ResizeEventArgs';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { Note } from '@src/model/Note';
-import { MidiEventType } from '@src/midi/MidiEvent';
-import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import type { Note } from '@src/model/Note';
+import type { MidiEventType } from '@src/midi/MidiEvent';
+import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
-import { BeatTickLookupItem } from './midi/BeatTickLookup';
-import { ISynthOutputDevice } from './synth/ISynthOutput';
+import type { BeatTickLookupItem } from './midi/BeatTickLookup';
+import type { ISynthOutputDevice } from './synth/ISynthOutput';
 
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { CoreSettings } from './CoreSettings';

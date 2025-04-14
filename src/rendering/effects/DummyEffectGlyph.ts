@@ -1,5 +1,5 @@
 import { Color } from '@src/model/Color';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class DummyEffectGlyph extends EffectGlyph {

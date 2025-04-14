@@ -1,7 +1,7 @@
-import { Bar } from '@src/model/Bar';
-import { Chord } from '@src/model/Chord';
-import { Track } from '@src/model/Track';
-import { Settings } from '@src/Settings';
+import type { Bar } from '@src/model/Bar';
+import type { Chord } from '@src/model/Chord';
+import type { Track } from '@src/model/Track';
+import type { Settings } from '@src/Settings';
 import { Tuning } from '@src/model/Tuning';
 
 /**

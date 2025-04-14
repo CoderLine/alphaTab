@@ -1,19 +1,19 @@
-import { Beat, BeatSubElement } from '@src/model/Beat';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Note } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGlyphBase';
-import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
+import type { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 

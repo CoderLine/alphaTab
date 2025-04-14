@@ -1,7 +1,7 @@
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import type { Bar } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { GraceGroup } from '@src/model/GraceGroup';
 import { ElementStyle } from './ElementStyle';
 

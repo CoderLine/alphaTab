@@ -3,8 +3,8 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { FontJson } from "@src/model/Font";
-import { ColorJson } from "@src/model/Color";
+import type { FontJson } from "@src/model/Font";
+import type { ColorJson } from "@src/model/Color";
 /**
  * This public class contains central definitions for controlling the visual appearance.
  * @json

@@ -4,7 +4,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
 import { GhostParenthesisGlyph } from './GhostParenthesisGlyph';
 import { BarSubElement } from '@src/model';
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export abstract class TimeSignatureGlyph extends GlyphGroup {

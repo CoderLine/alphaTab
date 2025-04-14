@@ -1,6 +1,6 @@
-import { MasterBar } from '@src/model/MasterBar';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { MasterBar } from '@src/model/MasterBar';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 
 /**
  * This container represents a single column of bar renderers independent from any staves.

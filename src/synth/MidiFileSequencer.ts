@@ -1,14 +1,14 @@
 import {
     MidiEventType,
-    NoteOnEvent,
-    ProgramChangeEvent,
-    TempoChangeEvent,
-    TimeSignatureEvent
+    type NoteOnEvent,
+    type ProgramChangeEvent,
+    type TempoChangeEvent,
+    type TimeSignatureEvent
 } from '@src/midi/MidiEvent';
-import { MidiFile } from '@src/midi/MidiFile';
-import { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { MidiFile } from '@src/midi/MidiFile';
+import type { PlaybackRange } from '@src/synth/PlaybackRange';
 import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
-import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
+import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { MidiUtils } from '@src/midi/MidiUtils';

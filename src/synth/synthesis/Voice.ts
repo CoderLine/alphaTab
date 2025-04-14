@@ -4,14 +4,14 @@
 // Licensed under: MPL-2.0
 import { LoopMode } from '@src/synth/synthesis/LoopMode';
 import { OutputMode } from '@src/synth/synthesis/OutputMode';
-import { Region } from '@src/synth/synthesis/Region';
-import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
+import type { Region } from '@src/synth/synthesis/Region';
+import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { VoiceEnvelope, VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { VoiceLfo } from '@src/synth/synthesis/VoiceLfo';
 import { VoiceLowPass } from '@src/synth/synthesis/VoiceLowPass';
 import { SynthHelper } from '@src/synth/SynthHelper';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { Channel } from '@src/synth/synthesis/Channel';
+import type { Channel } from '@src/synth/synthesis/Channel';
 
 export class Voice {
     /**

@@ -6,7 +6,7 @@
 import { RiffChunk } from '@src/synth/soundfont/RiffChunk';
 
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 
 import { FormatError } from '@src/FormatError';

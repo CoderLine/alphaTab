@@ -1,6 +1,6 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { LineBarRenderer } from '../LineBarRenderer';
+import type { LineBarRenderer } from '../LineBarRenderer';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class RepeatOpenGlyph extends Glyph {

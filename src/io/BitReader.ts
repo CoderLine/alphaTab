@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { EndOfReaderError, IReadable } from '@src/io/IReadable';
+import { EndOfReaderError, type IReadable } from '@src/io/IReadable';
 
 /**
  * This utility public class allows bitwise reading of a stream

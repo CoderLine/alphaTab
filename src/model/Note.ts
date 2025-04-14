@@ -1,6 +1,6 @@
 import { AccentuationType } from '@src/model/AccentuationType';
-import { Beat } from '@src/model/Beat';
-import { BendPoint } from '@src/model/BendPoint';
+import type { Beat } from '@src/model/Beat';
+import type { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { BendType } from '@src/model/BendType';
 import { Duration } from '@src/model/Duration';
@@ -11,10 +11,10 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
+import type { Staff } from '@src/model/Staff';
 import { VibratoType } from '@src/model/VibratoType';
 import { NotationMode } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -22,7 +22,7 @@ import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteOrnament } from './NoteOrnament';
 import { ElementStyle } from './ElementStyle';
-import { MusicFontSymbol } from './MusicFontSymbol';
+import type { MusicFontSymbol } from './MusicFontSymbol';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;

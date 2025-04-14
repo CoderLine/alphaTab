@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarCollisionHelper } from '@src/rendering/utils/BarCollisionHelper';
-import { BeamDirection } from './BeamDirection';
+import type { BeamDirection } from './BeamDirection';
 
 export class BarHelpers {
     private _renderer: BarRendererBase;

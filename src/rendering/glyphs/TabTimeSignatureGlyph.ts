@@ -1,5 +1,5 @@
 import { TimeSignatureGlyph } from '@src/rendering/glyphs/TimeSignatureGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { BarSubElement } from '@src/model';
 

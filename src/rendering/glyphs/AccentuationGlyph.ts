@@ -1,7 +1,7 @@
 import { AccentuationType } from '@src/model/AccentuationType';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas } from '@src/platform/ICanvas';
-import { Note } from '@src/model';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { Note } from '@src/model';
 import { EffectGlyph } from './EffectGlyph';
 import { BeamDirection } from '../utils/BeamDirection';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';

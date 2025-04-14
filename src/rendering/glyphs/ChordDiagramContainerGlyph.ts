@@ -1,5 +1,5 @@
-import { Chord } from '@src/model/Chord';
-import { ICanvas } from '@src/platform';
+import type { Chord } from '@src/model/Chord';
+import type { ICanvas } from '@src/platform';
 import { ChordDiagramGlyph } from '@src/rendering/glyphs/ChordDiagramGlyph';
 import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
