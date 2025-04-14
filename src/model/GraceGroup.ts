@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 
 /**
  * Represents a group of grace beats that belong together
@@ -32,7 +32,7 @@ export class GraceGroup {
 
     public finish() {
         if (this.beats.length > 0) {
-            this.id = this.beats[0].absoluteDisplayStart + '_' + this.beats[0].voice.index;
+            this.id = `${this.beats[0].absoluteDisplayStart}_${this.beats[0].voice.index}`;
         }
     }
 }

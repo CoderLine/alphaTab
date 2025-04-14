@@ -3,14 +3,20 @@ import chalk from 'chalk';
 import * as chai from 'chai';
 import url from 'node:url';
 import path from 'node:path';
-import { addSerializer, buildSnapshotResolver, SnapshotResolver, SnapshotState, toMatchSnapshot } from 'jest-snapshot';
-import { Config } from '@jest/types';
+import {
+    addSerializer,
+    buildSnapshotResolver,
+    type SnapshotResolver,
+    SnapshotState,
+    toMatchSnapshot
+} from 'jest-snapshot';
+import type { Config } from '@jest/types';
 import slash from 'slash';
 import type { SyncExpectationResult } from 'expect';
 import { equals, iterableEquality, subsetEquality } from '@jest/expect-utils';
 import * as matcherUtils from 'jest-matcher-utils';
 import { AssertionError } from 'assertion-error';
-import { PrettyFormatConfig, PrettyFormatPrinter, ScoreSerializerPlugin } from './PrettyFormat';
+import { type PrettyFormatConfig, type PrettyFormatPrinter, ScoreSerializerPlugin } from './PrettyFormat';
 
 // Mocha and Chai integration (called from global-hooks.ts)
 declare global {
@@ -51,7 +57,7 @@ export async function initializeJestSnapshot() {
                 const received = utils.flag(this, 'object');
                 const isNot = utils.flag(this, 'negate') as boolean;
 
-                let args = [received];
+                const args = [received];
                 if (message !== undefined) {
                     args.push(message);
                 }
@@ -341,7 +347,7 @@ function writeSummaryReport() {
 
     // filter out obsolete keys if we did not execute the related test
     for (const uncheckedFile of snapshots.uncheckedKeysByFile) {
-        let keysToRemove = new Set<string>();
+        const keysToRemove = new Set<string>();
         for (const key of uncheckedFile.keys) {
             let removeKey = true;
             for (const executed of executedTestNames) {

@@ -22,24 +22,24 @@
  */
 import { FormatError } from '@src/FormatError';
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import {
     Found as HuffmanFound,
-    Huffman,
+    type Huffman,
     NeedBit as HuffmanNeedBit,
     NeedBits as HuffmanNeedBits
 } from '@src/zip/Huffman';
 import { HuffTools } from '@src/zip/HuffTools';
 
 enum InflateState {
-    Head,
-    Block,
-    CData,
-    Flat,
-    Crc,
-    Dist,
-    DistOne,
-    Done
+    Head = 0,
+    Block = 1,
+    CData = 2,
+    Flat = 3,
+    Crc = 4,
+    Dist = 5,
+    DistOne = 6,
+    Done = 7
 }
 
 class InflateWindow {
@@ -50,7 +50,7 @@ class InflateWindow {
     public pos: number = 0;
 
     public slide(): void {
-        let b: Uint8Array = new Uint8Array(InflateWindow.BufferSize);
+        const b: Uint8Array = new Uint8Array(InflateWindow.BufferSize);
         this.pos -= InflateWindow.Size;
         b.set(this.buffer.subarray(InflateWindow.Size, InflateWindow.Size + this.pos), 0);
         this.buffer = b;
@@ -84,33 +84,29 @@ class InflateWindow {
 export class Inflate {
     // prettier-ignore
     private static LenExtraBitsTbl: number[] = [
-        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, -1,
-        -1
+        0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 4, 4, 4, 4, 5, 5, 5, 5, 0, -1, -1
     ];
     // prettier-ignore
     private static LenBaseValTbl: number[] = [
-        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115,
-        131, 163, 195, 227, 258
+        3, 4, 5, 6, 7, 8, 9, 10, 11, 13, 15, 17, 19, 23, 27, 31, 35, 43, 51, 59, 67, 83, 99, 115, 131, 163, 195, 227,
+        258
     ];
     // prettier-ignore
     private static DistExtraBitsTbl: number[] = [
-        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12,
-        13, 13, -1, -1
+        0, 0, 0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10, 11, 11, 12, 12, 13, 13, -1, -1
     ];
     // prettier-ignore
     private static DistBaseValTbl: number[] = [
-        1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537,
-        2049, 3073, 4097, 6145, 8193, 12289, 16385, 24577
+        1, 2, 3, 4, 5, 7, 9, 13, 17, 25, 33, 49, 65, 97, 129, 193, 257, 385, 513, 769, 1025, 1537, 2049, 3073, 4097,
+        6145, 8193, 12289, 16385, 24577
     ];
     // prettier-ignore
-    private static CodeLengthsPos: number[] = [
-        16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15
-    ];
+    private static CodeLengthsPos: number[] = [16, 17, 18, 0, 8, 7, 9, 6, 10, 5, 11, 4, 12, 3, 13, 2, 14, 1, 15];
 
     private static _fixedHuffman: Huffman = Inflate.buildFixedHuffman();
 
     private static buildFixedHuffman(): Huffman {
-        let a: number[] = [];
+        const a: number[] = [];
         for (let n: number = 0; n < 288; n++) {
             a.push(n <= 143 ? 8 : n <= 255 ? 9 : n <= 279 ? 7 : 8);
         }
@@ -154,14 +150,14 @@ export class Inflate {
     private inflateLoop(): boolean {
         switch (this._state) {
             case InflateState.Head:
-                let cmf: number = this._input.readByte();
-                let cm: number = cmf & 15;
+                const cmf: number = this._input.readByte();
+                const cm: number = cmf & 15;
                 if (cm !== 8) {
                     throw new FormatError('Invalid data');
                 }
-                let flg: number = this._input.readByte();
+                const flg: number = this._input.readByte();
                 // var fcheck = flg & 31;
-                let fdict: boolean = (flg & 32) !== 0;
+                const fdict: boolean = (flg & 32) !== 0;
                 // var flevel = flg >> 6;
                 if (((cmf << 8) + flg) % 31 !== 0) {
                     throw new FormatError('Invalid data');
@@ -182,12 +178,12 @@ export class Inflate {
                 switch (this.getBits(2)) {
                     case 0:
                         this._len = IOHelper.readUInt16LE(this._input);
-                        let nlen: number = IOHelper.readUInt16LE(this._input);
+                        const nlen: number = IOHelper.readUInt16LE(this._input);
                         if (nlen !== 0xffff - this._len) {
                             throw new FormatError('Invalid data');
                         }
                         this._state = InflateState.Flat;
-                        let r: boolean = this.inflateLoop();
+                        const r: boolean = this.inflateLoop();
                         this.resetBits();
                         return r;
                     case 1:
@@ -196,9 +192,9 @@ export class Inflate {
                         this._state = InflateState.CData;
                         return true;
                     case 2:
-                        let hlit: number = this.getBits(5) + 257;
-                        let hdist: number = this.getBits(5) + 1;
-                        let hclen: number = this.getBits(4) + 4;
+                        const hlit: number = this.getBits(5) + 257;
+                        const hdist: number = this.getBits(5) + 1;
+                        const hclen: number = this.getBits(4) + 4;
                         for (let i: number = 0; i < hclen; i++) {
                             this._lengths[Inflate.CodeLengthsPos[i]] = this.getBits(3);
                         }
@@ -206,7 +202,7 @@ export class Inflate {
                             this._lengths[Inflate.CodeLengthsPos[i]] = 0;
                         }
                         this._huffman = HuffTools.make(this._lengths, 0, 19, 8);
-                        let xlengths: number[] = [];
+                        const xlengths: number[] = [];
                         for (let i: number = 0; i < hlit + hdist; i++) {
                             xlengths.push(0);
                         }
@@ -219,15 +215,17 @@ export class Inflate {
                         throw new FormatError('Invalid data');
                 }
             case InflateState.Flat: {
-                let rlen: number = this._len < this._needed ? this._len : this._needed;
-                let bytes: Uint8Array = IOHelper.readByteArray(this._input, rlen);
+                const rlen: number = this._len < this._needed ? this._len : this._needed;
+                const bytes: Uint8Array = IOHelper.readByteArray(this._input, rlen);
                 this._len -= rlen;
                 this.addBytes(bytes, 0, rlen);
-                if (this._len === 0) this._state = this._isFinal ? InflateState.Crc : InflateState.Block;
+                if (this._len === 0) {
+                    this._state = this._isFinal ? InflateState.Crc : InflateState.Block;
+                }
                 return this._needed > 0;
             }
             case InflateState.DistOne: {
-                let rlen: number = this._len < this._needed ? this._len : this._needed;
+                const rlen: number = this._len < this._needed ? this._len : this._needed;
                 this.addDistOne(rlen);
                 this._len -= rlen;
                 if (this._len === 0) {
@@ -237,8 +235,8 @@ export class Inflate {
             }
             case InflateState.Dist:
                 while (this._len > 0 && this._needed > 0) {
-                    let rdist: number = this._len < this._dist ? this._len : this._dist;
-                    let rlen: number = this._needed < rdist ? this._needed : rdist;
+                    const rdist: number = this._len < this._dist ? this._len : this._dist;
+                    const rlen: number = this._needed < rdist ? this._needed : rdist;
                     this.addDist(this._dist, rlen);
                     this._len -= rlen;
                 }
@@ -251,35 +249,36 @@ export class Inflate {
                 if (n < 256) {
                     this.addByte(n);
                     return this._needed > 0;
-                } else if (n === 256) {
+                }
+
+                if (n === 256) {
                     this._state = this._isFinal ? InflateState.Crc : InflateState.Block;
                     return true;
-                } else {
-                    n = (n - 257) & 0xff;
-                    let extraBits: number = Inflate.LenExtraBitsTbl[n];
-                    if (extraBits === -1) {
-                        throw new FormatError('Invalid data');
-                    }
-                    this._len = Inflate.LenBaseValTbl[n] + this.getBits(extraBits);
-                    let huffdist: Huffman | null = this._huffdist;
-                    let distCode: number = !huffdist ? this.getRevBits(5) : this.applyHuffman(huffdist);
-                    extraBits = Inflate.DistExtraBitsTbl[distCode];
-                    if (extraBits === -1) {
-                        throw new FormatError('Invalid data');
-                    }
-                    this._dist = Inflate.DistBaseValTbl[distCode] + this.getBits(extraBits);
-                    if (this._dist > this._window.available()) {
-                        throw new FormatError('Invalid data');
-                    }
-                    this._state = this._dist === 1 ? InflateState.DistOne : InflateState.Dist;
-                    return true;
                 }
+                n = (n - 257) & 0xff;
+                let extraBits: number = Inflate.LenExtraBitsTbl[n];
+                if (extraBits === -1) {
+                    throw new FormatError('Invalid data');
+                }
+                this._len = Inflate.LenBaseValTbl[n] + this.getBits(extraBits);
+                const huffdist: Huffman | null = this._huffdist;
+                const distCode: number = !huffdist ? this.getRevBits(5) : this.applyHuffman(huffdist);
+                extraBits = Inflate.DistExtraBitsTbl[distCode];
+                if (extraBits === -1) {
+                    throw new FormatError('Invalid data');
+                }
+                this._dist = Inflate.DistBaseValTbl[distCode] + this.getBits(extraBits);
+                if (this._dist > this._window.available()) {
+                    throw new FormatError('Invalid data');
+                }
+                this._state = this._dist === 1 ? InflateState.DistOne : InflateState.Dist;
+                return true;
         }
         return false;
     }
 
     private addDistOne(n: number): void {
-        let c: number = this._window.getLastChar();
+        const c: number = this._window.getLastChar();
         for (let i: number = 0; i < n; i++) {
             this.addByte(c);
         }
@@ -301,7 +300,7 @@ export class Inflate {
             this._nbits = 8;
             this._bits = this._input.readByte();
         }
-        let b: boolean = (this._bits & 1) === 1;
+        const b: boolean = (this._bits & 1) === 1;
         this._nbits--;
         this._bits = this._bits >> 1;
         return b;
@@ -312,7 +311,7 @@ export class Inflate {
             this._bits = this._bits | (this._input.readByte() << this._nbits);
             this._nbits += 8;
         }
-        let b: number = this._bits & ((1 << n) - 1);
+        const b: number = this._bits & ((1 << n) - 1);
         this._nbits -= n;
         this._bits = this._bits >> n;
         return b;
@@ -338,7 +337,7 @@ export class Inflate {
         let i: number = 0;
         let prev: number = 0;
         while (i < max) {
-            let n: number = this.applyHuffman(this._huffman);
+            const n: number = this.applyHuffman(this._huffman);
             switch (n) {
                 case 0:
                 case 1:
@@ -361,7 +360,7 @@ export class Inflate {
                     i++;
                     break;
                 case 16:
-                    let end: number = i + 3 + this.getBits(2);
+                    const end: number = i + 3 + this.getBits(2);
                     if (end > max) {
                         throw new FormatError('Invalid data');
                     }

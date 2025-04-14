@@ -41,7 +41,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
     }
 
     public override getDefaultUsings(): string[] {
-        return [this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')];
+        return [`${this.toPascalCase('alphaTab')}.${this.toPascalCase('core')}`];
     }
 
     public override makeExceptionType(): string {
@@ -74,7 +74,9 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
 
         if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {
             return 'close';
-        } else if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
+        }
+
+        if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
             return this.toMethodName('iterator');
         }
 

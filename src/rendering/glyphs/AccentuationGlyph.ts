@@ -1,7 +1,7 @@
 import { AccentuationType } from '@src/model/AccentuationType';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas } from '@src/platform/ICanvas';
-import { Note } from '@src/model';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { Note } from '@src/model';
 import { EffectGlyph } from './EffectGlyph';
 import { BeamDirection } from '../utils/BeamDirection';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
@@ -35,10 +35,10 @@ export class AccentuationGlyph extends EffectGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const dir = this.renderer.getBeatDirection(this._note.beat);
-        const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir == BeamDirection.Down);
+        const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir === BeamDirection.Down);
 
         const padding = 2;
-        const y = dir == BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
+        const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
         canvas.fillMusicFontSymbol(cx + this.x - 2, y, 1, symbol, false);
     }
 }

@@ -1,7 +1,7 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 
 export class LineRangedGlyph extends GroupedEffectGlyph {
     public static readonly LineSpacing: number = 3;
@@ -27,9 +27,9 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
     }
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
-        let res: RenderingResources = this.renderer.resources;
+        const res: RenderingResources = this.renderer.resources;
         canvas.font = res.effectFont;
-        let x: TextAlign = canvas.textAlign;
+        const x: TextAlign = canvas.textAlign;
         canvas.textAlign = TextAlign.Center;
         canvas.fillText(this._label, cx + this.x, cy + this.y);
         canvas.textAlign = x;
@@ -37,11 +37,11 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         this.paintNonGrouped(cx, cy, canvas);
-        let lineSpacing: number = 3;
-        let textWidth: number = canvas.measureText(this._label).width;
-        let startX: number = cx + this.x + textWidth / 2 + lineSpacing;
-        let lineY: number = cy + this.y + 4;
-        let lineSize: number = 8;
+        const lineSpacing: number = 3;
+        const textWidth: number = canvas.measureText(this._label).width;
+        const startX: number = cx + this.x + textWidth / 2 + lineSpacing;
+        const lineY: number = cy + this.y + 4;
+        const lineSize: number = 8;
         if (this._dashed) {
             if (endX > startX) {
                 let lineX: number = startX;

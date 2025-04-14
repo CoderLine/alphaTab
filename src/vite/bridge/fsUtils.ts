@@ -10,7 +10,8 @@ export function tryResolveRealFile(file: string, preserveSymlinks?: boolean): st
     const fileStat = tryStatSync(file);
     if (fileStat?.isFile()) {
         return file;
-    } else if (fileStat?.isSymbolicLink()) {
+    }
+    if (fileStat?.isSymbolicLink()) {
         return preserveSymlinks ? file : fs.realpathSync(file);
     }
 

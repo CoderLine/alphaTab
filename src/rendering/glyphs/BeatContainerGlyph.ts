@@ -1,19 +1,19 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import type { Note } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import type { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { BarBounds } from '@src/rendering/utils/BarBounds';
+import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { BeamingHelper } from '../utils/BeamingHelper';
+import type { BeamingHelper } from '../utils/BeamingHelper';
 
 export class BeatContainerGlyph extends Glyph {
     public static readonly GraceBeatPadding: number = 3;
@@ -45,25 +45,23 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public registerLayoutingInfo(layoutings: BarLayoutingInfo): void {
-        let preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
+        const preBeatStretch: number = this.preNotes.computedWidth + this.onNotes.centerX;
 
         let postBeatStretch: number = this.onNotes.computedWidth - this.onNotes.centerX;
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
-        if(this.beat.graceType !== GraceType.None) {
+        if (this.beat.graceType !== GraceType.None) {
             // flagged grace
-            if(this.beat.graceGroup!.beats.length === 1) {
+            if (this.beat.graceGroup!.beats.length === 1) {
                 postBeatStretch += FlagGlyph.FlagWidth * NoteHeadGlyph.GraceScale;
             }
             // grace with bars, some space for bar unless last
-            else if(this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
+            else if (this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
                 postBeatStretch += 7;
-            }
-            else {
+            } else {
                 postBeatStretch += BeatContainerGlyph.GraceBeatPadding;
             }
-        }
-        else if (helper && this.drawBeamHelperAsFlags(helper)) {
+        } else if (helper && this.drawBeamHelperAsFlags(helper)) {
             postBeatStretch += FlagGlyph.FlagWidth;
         }
         for (const tie of this.ties) {
@@ -114,7 +112,7 @@ export class BeatContainerGlyph extends Glyph {
             }
         }
         let tieWidth: number = 0;
-        for (let tie of this.ties) {
+        for (const tie of this.ties) {
             if (tie.width > tieWidth) {
                 tieWidth = tie.width;
             }
@@ -133,7 +131,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public static getGroupId(beat: Beat): string {
-        return 'b' + beat.id;
+        return `b${beat.id}`;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -172,7 +170,7 @@ export class BeatContainerGlyph extends Glyph {
         // }
         // canvas.color = c;
 
-        let isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
+        const isEmptyGlyph: boolean = this.preNotes.isEmpty && this.onNotes.isEmpty && this.ties.length === 0;
         if (isEmptyGlyph) {
             return;
         }
@@ -182,10 +180,10 @@ export class BeatContainerGlyph extends Glyph {
         this.onNotes.paint(cx + this.x, cy + this.y, canvas);
 
         // reason: we have possibly multiple staves involved and need to calculate the correct positions.
-        let staffX: number = cx - this.voiceContainer.x - this.renderer.x;
-        let staffY: number = cy - this.voiceContainer.y - this.renderer.y;
+        const staffX: number = cx - this.voiceContainer.x - this.renderer.x;
+        const staffY: number = cy - this.voiceContainer.y - this.renderer.y;
         for (let i: number = 0, j: number = this.ties.length; i < j; i++) {
-            let t: Glyph = this.ties[i];
+            const t: Glyph = this.ties[i];
             t.renderer = this.renderer;
             t.paint(staffX, staffY, canvas);
         }
@@ -193,7 +191,7 @@ export class BeatContainerGlyph extends Glyph {
     }
 
     public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, isEmptyBar: boolean) {
-        let beatBoundings: BeatBounds = new BeatBounds();
+        const beatBoundings: BeatBounds = new BeatBounds();
         beatBoundings.beat = this.beat;
 
         if (this.beat.isEmpty) {

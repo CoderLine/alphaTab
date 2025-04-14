@@ -1,11 +1,11 @@
 import { Environment } from '@src/Environment';
 import { FileLoadError } from '@src/FileLoadError';
 
-import { ScoreImporter } from '@src/importer/ScoreImporter';
+import type { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
@@ -29,17 +29,17 @@ export class ScoreLoader {
         error: (error: any) => void,
         settings?: Settings
     ): void {
-        let xhr: XMLHttpRequest = new XMLHttpRequest();
+        const xhr: XMLHttpRequest = new XMLHttpRequest();
         xhr.open('GET', path, true, null, null);
         xhr.responseType = 'arraybuffer';
         xhr.onreadystatechange = () => {
             if (xhr.readyState === XMLHttpRequest.DONE) {
-                let response: unknown = xhr.response;
+                const response: unknown = xhr.response;
                 if (xhr.status === 200 || (xhr.status === 0 && response)) {
                     try {
-                        let buffer: ArrayBuffer = xhr.response;
-                        let reader: Uint8Array = new Uint8Array(buffer);
-                        let score: Score = ScoreLoader.loadScoreFromBytes(reader, settings);
+                        const buffer: ArrayBuffer = xhr.response;
+                        const reader: Uint8Array = new Uint8Array(buffer);
+                        const score: Score = ScoreLoader.loadScoreFromBytes(reader, settings);
                         success(score);
                     } catch (e) {
                         error(e);
@@ -55,7 +55,7 @@ export class ScoreLoader {
                 } else if (xhr.statusText === 'timeout') {
                     error(new FileLoadError('Request Time out.', xhr));
                 } else {
-                    error(new FileLoadError('Unknow Error: ' + xhr.responseText, xhr));
+                    error(new FileLoadError(`Unknow Error: ${xhr.responseText}`, xhr));
                 }
             }
         };
@@ -73,24 +73,21 @@ export class ScoreLoader {
             settings = new Settings();
         }
 
-        let importers: ScoreImporter[] = Environment.buildImporters();
-        Logger.debug(
-            'ScoreLoader',
-            `Loading score from ${data.length} bytes using ${importers.length} importers`
-        );
+        const importers: ScoreImporter[] = Environment.buildImporters();
+        Logger.debug('ScoreLoader', `Loading score from ${data.length} bytes using ${importers.length} importers`);
         let score: Score | null = null;
-        let bb: ByteBuffer = ByteBuffer.fromBuffer(data);
-        for (let importer of importers) {
+        const bb: ByteBuffer = ByteBuffer.fromBuffer(data);
+        for (const importer of importers) {
             bb.reset();
             try {
-                Logger.debug('ScoreLoader', 'Importing using importer ' + importer.name);
+                Logger.debug('ScoreLoader', `Importing using importer ${importer.name}`);
                 importer.init(bb, settings);
                 score = importer.readScore();
-                Logger.debug('ScoreLoader', 'Score imported using ' + importer.name);
+                Logger.debug('ScoreLoader', `Score imported using ${importer.name}`);
                 break;
             } catch (e) {
                 if (e instanceof UnsupportedFormatError) {
-                    Logger.debug('ScoreLoader', importer.name + ' does not support the file');
+                    Logger.debug('ScoreLoader', `${importer.name} does not support the file`);
                 } else {
                     Logger.error('ScoreLoader', 'Score import failed due to unexpected error: ', e);
                     throw e;

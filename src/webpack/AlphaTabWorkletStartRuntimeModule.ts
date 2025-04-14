@@ -1,5 +1,5 @@
 /**@target web */
-import { isWorkerRuntime, webPackWithAlphaTab, webpackTypes } from './Utils';
+import { isWorkerRuntime, type webPackWithAlphaTab, type webpackTypes } from './Utils';
 
 export function injectWorkletRuntimeModule(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWorkletStartRuntimeModule extends webPackWithAlphaTab.webpack.RuntimeModule {
@@ -40,7 +40,9 @@ export function injectWorkletRuntimeModule(webPackWithAlphaTab: webPackWithAlpha
                 `${AlphaTabWorkletStartRuntimeModule.RuntimeGlobalWorkletGetStartupChunks} = (() => {`,
                 webPackWithAlphaTab.webpack.Template.indent([
                     'const lookup = new Map(',
-                    webPackWithAlphaTab.webpack.Template.indent(JSON.stringify(Array.from(workletChunkLookup.entries()))),
+                    webPackWithAlphaTab.webpack.Template.indent(
+                        JSON.stringify(Array.from(workletChunkLookup.entries()))
+                    ),
                     ');',
 
                     'return (chunkId) => lookup.get(String(chunkId)) ?? [];'
@@ -53,7 +55,10 @@ export function injectWorkletRuntimeModule(webPackWithAlphaTab: webPackWithAlpha
     webPackWithAlphaTab.alphaTab.RuntimeGlobalWorkletGetStartupChunks =
         AlphaTabWorkletStartRuntimeModule.RuntimeGlobalWorkletGetStartupChunks;
 
-    webPackWithAlphaTab.alphaTab.registerWorkletRuntimeModule = (pluginName: string, compilation: webpackTypes.Compilation) => {
+    webPackWithAlphaTab.alphaTab.registerWorkletRuntimeModule = (
+        pluginName: string,
+        compilation: webpackTypes.Compilation
+    ) => {
         compilation.hooks.runtimeRequirementInTree
             .for(AlphaTabWorkletStartRuntimeModule.RuntimeGlobalWorkletGetStartupChunks)
             .tap(pluginName, (chunk: webpackTypes.Chunk) => {

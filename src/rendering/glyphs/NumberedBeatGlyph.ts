@@ -1,13 +1,13 @@
 import { GraceType } from '@src/model/GraceType';
-import { Note, NoteSubElement } from '@src/model/Note';
+import { type Note, NoteSubElement } from '@src/model/Note';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { NoteBounds } from '../utils/NoteBounds';
 import { Bounds } from '../utils/Bounds';
 import { NumberedNoteHeadGlyph } from './NumberedNoteHeadGlyph';
 import { AccidentalType, BeatSubElement, Duration, KeySignatureType, NoteAccidentalMode } from '@src/model';
-import { NumberedBarRenderer } from '../NumberedBarRenderer';
+import type { NumberedBarRenderer } from '../NumberedBarRenderer';
 import { AccidentalHelper } from '../utils/AccidentalHelper';
 import { BeatGlyphBase } from './BeatGlyphBase';
 import { AccidentalGroupGlyph } from './AccidentalGroupGlyph';
@@ -17,7 +17,7 @@ import { NoteHeadGlyph } from './NoteHeadGlyph';
 import { SpacingGlyph } from './SpacingGlyph';
 import { CircleGlyph } from './CircleGlyph';
 import { NumberedDashGlyph } from './NumberedDashGlyph';
-import { Glyph } from './Glyph';
+import type { Glyph } from './Glyph';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
@@ -31,7 +31,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
 
     public override doLayout(): void {
         if (!this.container.beat.isRest && !this.container.beat.isEmpty) {
-            let accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
+            const accidentals: AccidentalGroupGlyph = new AccidentalGroupGlyph();
             accidentals.renderer = this.renderer;
 
             if (this.container.beat.notes.length > 0) {
@@ -58,7 +58,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     note.hasQuarterToneOffset
                 );
 
-                if (accidentalToSet == AccidentalType.Natural) {
+                if (accidentalToSet === AccidentalType.Natural) {
                     const ks: number = this.renderer.bar.masterBar.keySignature;
                     const ksi: number = ks + 7;
                     const naturalizeAccidentalForKeySignature: AccidentalType =
@@ -70,10 +70,10 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                 // do we need an accidental on the note?
                 if (accidentalToSet !== AccidentalType.None) {
                     this.accidental = accidentalToSet;
-                    let sr: NumberedBarRenderer = this.renderer as NumberedBarRenderer;
+                    const sr: NumberedBarRenderer = this.renderer as NumberedBarRenderer;
                     const color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.NumberedAccidentals, note);
 
-                    let g = new AccidentalGlyph(
+                    const g = new AccidentalGlyph(
                         0,
                         sr.getLineY(0),
                         accidentalToSet,
@@ -210,7 +210,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override doLayout(): void {
         // create glyphs
-        let sr = this.renderer as NumberedBarRenderer;
+        const sr = this.renderer as NumberedBarRenderer;
 
         if (sr.shortestDuration < this.container.beat.duration) {
             sr.shortestDuration = this.container.beat.duration;
@@ -236,9 +236,9 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 if (note.isDead) {
                     numberWithinOctave = 'X';
                 } else {
-                    let noteValue = note.displayValue - oneNoteValue;
+                    const noteValue = note.displayValue - oneNoteValue;
 
-                    let index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
+                    const index = noteValue < 0 ? ((noteValue % 12) + 12) % 12 : noteValue % 12;
 
                     let dots = noteValue < 0 ? ((Math.abs(noteValue) + 12) / 12) | 0 : (noteValue / 12) | 0;
                     if (noteValue < 0) {

@@ -1,5 +1,5 @@
-import { IReadable } from '@src/io/IReadable';
-import { IWriteable } from '@src/io/IWriteable';
+import type { IReadable } from '@src/io/IReadable';
+import type { IWriteable } from '@src/io/IWriteable';
 import { IOHelper } from '@src/io/IOHelper';
 
 export class ByteBuffer implements IWriteable, IReadable {
@@ -21,20 +21,20 @@ export class ByteBuffer implements IWriteable, IReadable {
     }
 
     public static withCapacity(capacity: number): ByteBuffer {
-        let buffer: ByteBuffer = new ByteBuffer();
+        const buffer: ByteBuffer = new ByteBuffer();
         buffer._buffer = new Uint8Array(capacity);
         return buffer;
     }
 
     public static fromBuffer(data: Uint8Array): ByteBuffer {
-        let buffer: ByteBuffer = new ByteBuffer();
+        const buffer: ByteBuffer = new ByteBuffer();
         buffer._buffer = data;
-        buffer.length = data.length
+        buffer.length = data.length;
         return buffer;
     }
 
     public static fromString(contents: string): ByteBuffer {
-        let byteArray: Uint8Array = IOHelper.stringToBytes(contents);
+        const byteArray: Uint8Array = IOHelper.stringToBytes(contents);
         return ByteBuffer.fromBuffer(byteArray);
     }
 
@@ -47,7 +47,7 @@ export class ByteBuffer implements IWriteable, IReadable {
     }
 
     public readByte(): number {
-        let n: number = this.length - this.position;
+        const n: number = this.length - this.position;
         if (n <= 0) {
             return -1;
         }
@@ -68,9 +68,9 @@ export class ByteBuffer implements IWriteable, IReadable {
     }
 
     public writeByte(value: number): void {
-        let i: number = this.position + 1;
+        const i: number = this.position + 1;
         this.ensureCapacity(i);
-        this._buffer[this.position] = value & 0xFF;
+        this._buffer[this.position] = value & 0xff;
         if (i > this.length) {
             this.length = i;
         }
@@ -78,10 +78,10 @@ export class ByteBuffer implements IWriteable, IReadable {
     }
 
     public write(buffer: Uint8Array, offset: number, count: number): void {
-        let i: number = this.position + count;
+        const i: number = this.position + count;
         this.ensureCapacity(i);
-        
-        let count1: number = Math.min(count, buffer.length - offset);
+
+        const count1: number = Math.min(count, buffer.length - offset);
         this._buffer.set(buffer.subarray(offset, offset + count1), this.position);
 
         if (i > this.length) {
@@ -100,7 +100,7 @@ export class ByteBuffer implements IWriteable, IReadable {
                 newCapacity = this._buffer.length * 2;
             }
 
-            let newBuffer: Uint8Array = new Uint8Array(newCapacity);
+            const newBuffer: Uint8Array = new Uint8Array(newCapacity);
             if (this.length > 0) {
                 newBuffer.set(this._buffer.subarray(0, 0 + this.length), 0);
             }
@@ -113,12 +113,12 @@ export class ByteBuffer implements IWriteable, IReadable {
     }
 
     public toArray(): Uint8Array {
-        let copy: Uint8Array = new Uint8Array(this.length);
+        const copy: Uint8Array = new Uint8Array(this.length);
         copy.set(this._buffer.subarray(0, 0 + this.length), 0);
         return copy;
     }
 
-    public copyTo(destination:IWriteable) {
+    public copyTo(destination: IWriteable) {
         destination.write(this._buffer, 0, this.length);
     }
 }

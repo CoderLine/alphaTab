@@ -1,4 +1,4 @@
-import { ControllerType } from "./ControllerType";
+import type { ControllerType } from './ControllerType';
 
 /**
  * A handler is responsible for writing midi events to a custom structure
@@ -29,14 +29,7 @@ export interface IMidiFileHandler {
      * @param velocity The velocity which should be applied to the note (derived from the note dynamics).
      * @param channel The midi channel on which the note should be played.
      */
-    addNote(
-        track: number,
-        start: number,
-        length: number,
-        key: number,
-        velocity: number,
-        channel: number
-    ): void;
+    addNote(track: number, start: number, length: number, key: number, velocity: number, channel: number): void;
 
     /**
      * Adds a control change to the generated midi file.
@@ -66,12 +59,12 @@ export interface IMidiFileHandler {
 
     /**
      * Add a bend specific to a note to the generated midi file.
-     * The note does not need to be started, if this event is signaled, the next time a note 
-     * on this channel and key is played it will be affected. The note bend is cleared on a note-off for this key. 
+     * The note does not need to be started, if this event is signaled, the next time a note
+     * on this channel and key is played it will be affected. The note bend is cleared on a note-off for this key.
      * @param track The midi track on which the bend should change.
      * @param tick The midi ticks when the bend should change.
      * @param channel The midi channel on which the bend should change.
-     * @param channel The key of the note that should be affected by the bend. 
+     * @param channel The key of the note that should be affected by the bend.
      * @param value The new bend for the selected note.
      */
     addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void;

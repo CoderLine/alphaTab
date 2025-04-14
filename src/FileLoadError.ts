@@ -1,4 +1,4 @@
-import { AlphaTabError, AlphaTabErrorType } from "./AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
 
 /**
  * @target web

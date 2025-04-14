@@ -1,11 +1,11 @@
-import { Bar } from '@src/model/Bar';
-import { Staff } from '@src/model/Staff';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
+import type { Bar } from '@src/model/Bar';
+import type { Staff } from '@src/model/Staff';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
+import type { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
 import { InternalSystemsLayoutMode } from '../layout/ScoreLayout';
 
 /**
@@ -107,7 +107,7 @@ export class RenderStaff {
     }
 
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
-        let renderer = this._factory.create(this.system.layout.renderer, bar);
+        const renderer = this._factory.create(this.system.layout.renderer, bar);
         renderer.additionalMultiRestBars = additionalMultiBarsRestBars;
         renderer.staff = this;
         renderer.index = this.barRenderers.length;
@@ -120,7 +120,7 @@ export class RenderStaff {
         const barDisplayWidth = renderer.barDisplayWidth;
         if (
             barDisplayWidth > 0 &&
-            this.system.layout.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+            this.system.layout.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithWidths
         ) {
             renderer.width = barDisplayWidth;
         }
@@ -132,7 +132,7 @@ export class RenderStaff {
     }
 
     public revertLastBar(): BarRendererBase {
-        let lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
+        const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
         this.system.layout.unregisterBarRenderer(this.staveId, lastBar);
         for (const r of this.barRenderers) {
@@ -143,20 +143,20 @@ export class RenderStaff {
 
     public scaleToWidth(width: number): void {
         this._sharedLayoutData = new Map<string, unknown>();
-        let topOverflow: number = this.topOverflow;
+        const topOverflow: number = this.topOverflow;
         let x = 0;
 
         switch (this.system.layout.systemsLayoutMode) {
             case InternalSystemsLayoutMode.Automatic:
                 // Note: here we could do some "intelligent" distribution of
                 // the space over the bar renderers, for now we evenly apply the space to all bars
-                let difference: number = width - this.system.computedWidth;
-                let spacePerBar: number = difference / this.barRenderers.length;
+                const difference: number = width - this.system.computedWidth;
+                const spacePerBar: number = difference / this.barRenderers.length;
                 for (const renderer of this.barRenderers) {
                     renderer.x = x;
                     renderer.y = this.topSpacing + topOverflow;
 
-                    let actualBarWidth = renderer.computedWidth + spacePerBar;
+                    const actualBarWidth = renderer.computedWidth + spacePerBar;
                     renderer.scaleToWidth(actualBarWidth);
                     x += renderer.width;
                 }
@@ -199,7 +199,7 @@ export class RenderStaff {
     public get topOverflow(): number {
         let m: number = 0;
         for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            let r: BarRendererBase = this.barRenderers[i];
+            const r: BarRendererBase = this.barRenderers[i];
             if (r.topOverflow > m) {
                 m = r.topOverflow;
             }
@@ -210,7 +210,7 @@ export class RenderStaff {
     public get bottomOverflow(): number {
         let m: number = 0;
         for (let i: number = 0, j: number = this.barRenderers.length; i < j; i++) {
-            let r: BarRendererBase = this.barRenderers[i];
+            const r: BarRendererBase = this.barRenderers[i];
             if (r.bottomOverflow > m) {
                 m = r.bottomOverflow;
             }

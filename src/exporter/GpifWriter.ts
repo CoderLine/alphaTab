@@ -2,9 +2,9 @@ import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { AutomationType } from '@src/model/Automation';
-import { Bar, SustainPedalMarkerType } from '@src/model/Bar';
+import { type Bar, SustainPedalMarkerType } from '@src/model/Bar';
 import { BarreShape } from '@src/model/BarreShape';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
 import { Clef } from '@src/model/Clef';
@@ -13,33 +13,33 @@ import { Direction } from '@src/model/Direction';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { FadeType } from '@src/model/FadeType';
-import { Fermata, FermataType } from '@src/model/Fermata';
+import { type Fermata, FermataType } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
 import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
-import { MasterBar } from '@src/model/MasterBar';
+import type { MasterBar } from '@src/model/MasterBar';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
-import { PlaybackInformation } from '@src/model/PlaybackInformation';
+import type { PlaybackInformation } from '@src/model/PlaybackInformation';
 import { Rasgueado } from '@src/model/Rasgueado';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 import { WahPedal } from '@src/model/WahPedal';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
@@ -597,10 +597,10 @@ export class GpifWriter {
     private writeStandardBend(properties: XmlNode, bendPoints: BendPoint[]) {
         this.writeSimplePropertyNode(properties, 'Bended', 'Enable', null);
 
-        var bendOrigin = bendPoints[0];
-        var bendDestination = bendPoints[bendPoints.length - 1];
-        var bendMiddle1: BendPoint;
-        var bendMiddle2: BendPoint;
+        const bendOrigin = bendPoints[0];
+        const bendDestination = bendPoints[bendPoints.length - 1];
+        let bendMiddle1: BendPoint;
+        let bendMiddle2: BendPoint;
 
         switch (bendPoints.length) {
             case 4:
@@ -768,7 +768,7 @@ export class GpifWriter {
             beatNode.addElement('Wah').innerText = WahPedal[beat.wahPedal];
         }
 
-        if(beat.showTimer) {
+        if (beat.showTimer) {
             beatNode.addElement('Timer').innerText = (beat.timer ?? 0).toString();
         }
 
@@ -795,16 +795,16 @@ export class GpifWriter {
             this.writeSimpleXPropertyNode(beatProperties, '687935489', 'Int', beat.brushDuration.toString());
         }
 
-        switch(beat.beamingMode) {
+        switch (beat.beamingMode) {
             case BeatBeamingMode.ForceSplitToNext:
-                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "2");
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', '2');
                 break;
             case BeatBeamingMode.ForceMergeWithNext:
-                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', "1");
+                this.writeSimpleXPropertyNode(beatProperties, '1124204546', 'Int', '1');
                 break;
             case BeatBeamingMode.ForceSplitOnSecondaryToNext:
-                this.writeSimpleXPropertyNode(beatProperties, '1124204552', 'Int', "1");
-            break;
+                this.writeSimpleXPropertyNode(beatProperties, '1124204552', 'Int', '1');
+                break;
         }
     }
 
@@ -858,7 +858,7 @@ export class GpifWriter {
             }
         }
 
-        if (beat.rasgueado != Rasgueado.None) {
+        if (beat.rasgueado !== Rasgueado.None) {
             let rasgueado = '';
             switch (beat.rasgueado) {
                 case Rasgueado.Ii:
@@ -993,10 +993,10 @@ export class GpifWriter {
 
     private writeStandardWhammy(parent: XmlNode, whammyBarPoints: BendPoint[]) {
         const whammyNode = parent.addElement('Whammy');
-        var whammyOrigin = whammyBarPoints[0];
-        var whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
-        var whammyMiddle1: BendPoint;
-        var whammyMiddle2: BendPoint;
+        const whammyOrigin = whammyBarPoints[0];
+        const whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
+        let whammyMiddle1: BendPoint;
+        let whammyMiddle2: BendPoint;
 
         switch (whammyBarPoints.length) {
             case 4:
@@ -1262,10 +1262,10 @@ export class GpifWriter {
                         automation.addElement('Visible').innerText = 'true';
                         switch (sustainPedal.pedalType) {
                             case SustainPedalMarkerType.Down:
-                                automation.addElement('Value').innerText = `0 1`;
+                                automation.addElement('Value').innerText = '0 1';
                                 break;
                             case SustainPedalMarkerType.Up:
-                                automation.addElement('Value').innerText = `0 3`;
+                                automation.addElement('Value').innerText = '0 3';
                                 break;
                         }
                     }
@@ -1323,13 +1323,13 @@ export class GpifWriter {
                 case 4:
                     if (staff.track.playbackInfo.program === 105) {
                         tuningProperty.addElement('Instrument').innerText = 'Banjo';
-                    } else if (staff.track.playbackInfo.program == 42) {
+                    } else if (staff.track.playbackInfo.program === 42) {
                         tuningProperty.addElement('Instrument').innerText = 'Cello';
-                    } else if (staff.track.playbackInfo.program == 43) {
+                    } else if (staff.track.playbackInfo.program === 43) {
                         tuningProperty.addElement('Instrument').innerText = 'Contrabass';
-                    } else if (staff.track.playbackInfo.program == 40) {
+                    } else if (staff.track.playbackInfo.program === 40) {
                         tuningProperty.addElement('Instrument').innerText = 'Violin';
-                    } else if (staff.track.playbackInfo.program == 41) {
+                    } else if (staff.track.playbackInfo.program === 41) {
                         tuningProperty.addElement('Instrument').innerText = 'Viola';
                     } else {
                         tuningProperty.addElement('Instrument').innerText = 'Bass';
@@ -1400,7 +1400,7 @@ export class GpifWriter {
                 const fretToStrings = new Map<number, number[]>();
 
                 for (let i = 0; i < chord.strings.length; i++) {
-                    let chordFret = chord.strings[i];
+                    const chordFret = chord.strings[i];
                     if (chordFret !== -1) {
                         const fretNode = diagram.addElement('Fret');
                         const chordString = chord.strings.length - 1 - i;
@@ -1525,7 +1525,7 @@ export class GpifWriter {
         const lyrics = trackNode.addElement('Lyrics');
         lyrics.attributes.set('dispatched', 'true');
 
-        let lines: Lyrics[] = [];
+        const lines: Lyrics[] = [];
 
         for (const bar of track.staves[0].bars) {
             for (const voice of bar.voices) {
@@ -1543,9 +1543,9 @@ export class GpifWriter {
 
                                 const line = lines[l];
                                 line.text =
-                                    line.text == '[Empty]'
+                                    line.text === '[Empty]'
                                         ? beat.lyrics[l]
-                                        : line.text + ' ' + beat.lyrics[l].split(' ').join('+');
+                                        : `${line.text} ${beat.lyrics[l].split(' ').join('+')}`;
                             }
                         }
                     }
@@ -1585,19 +1585,19 @@ export class GpifWriter {
 
             instrumentSet.addElement('Name').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetName;
             instrumentSet.addElement('Type').innerText = GpifWriter.DrumKitProgramInfo.instrumentSetType;
-            let currentElementType: string = '';
+            const currentElementType: string = '';
             let currentElementName: string = '';
             let currentArticulations: XmlNode = new XmlNode();
-            let counterPerType = new Map<string, number>();
+            const counterPerType = new Map<string, number>();
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of articulations) {
                 if (!currentElementType || currentElementType !== articulation.elementType) {
-                    var currentElement = elements.addElement('Element');
+                    const currentElement = elements.addElement('Element');
 
                     let name = articulation.elementType;
                     if (counterPerType.has(name)) {
                         const counter = counterPerType.get(name)!;
-                        name += ' ' + counter;
+                        name += ` ${counter}`;
                         counterPerType.set(name, counter + 1);
                     } else {
                         counterPerType.set(name, 1);
@@ -1612,7 +1612,7 @@ export class GpifWriter {
 
                 const articulationNode = currentArticulations.addElement('Articulation');
                 articulationNode.addElement('Name').innerText =
-                    currentElementName + ' ' + currentArticulations.childNodes.length;
+                    `${currentElementName} ${currentArticulations.childNodes.length}`;
                 articulationNode.addElement('StaffLine').innerText = articulation.staffLine.toString();
                 articulationNode.addElement('Noteheads').innerText = [
                     this.mapMusicSymbol(articulation.noteHeadDefault),
@@ -1671,7 +1671,7 @@ export class GpifWriter {
         if (symbol === MusicFontSymbol.None) {
             return '';
         }
-        let s = MusicFontSymbol[symbol];
+        const s = MusicFontSymbol[symbol];
         return s.substring(0, 1).toLowerCase() + s.substring(1);
     }
 
@@ -1690,15 +1690,14 @@ export class GpifWriter {
         key.addElement('Mode').innerText = KeySignatureType[masterBar.keySignatureType];
         key.addElement('Sharps').innerText = 'Sharps';
 
-        masterBarNode.addElement(
-            'Time'
-        ).innerText = `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
+        masterBarNode.addElement('Time').innerText =
+            `${masterBar.timeSignatureNumerator}/${masterBar.timeSignatureDenominator}`;
 
         if (masterBar.isFreeTime) {
             masterBarNode.addElement('FreeTime');
         }
 
-        let bars: string[] = [];
+        const bars: string[] = [];
         for (const tracks of masterBar.score.tracks) {
             for (const staves of tracks.staves) {
                 bars.push(staves.bars[masterBar.index].id.toString());
@@ -1731,7 +1730,7 @@ export class GpifWriter {
             const alternateEndings: number[] = [];
             let bit = 0;
             while (remainingBits > 0) {
-                if (((remainingBits >> bit) & 0x01) == 0x01) {
+                if (((remainingBits >> bit) & 0x01) === 0x01) {
                     alternateEndings.push(bit + 1);
                     // clear bit
                     remainingBits &= ~(1 << bit);

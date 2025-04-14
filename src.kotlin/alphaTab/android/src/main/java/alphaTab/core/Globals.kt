@@ -233,32 +233,7 @@ internal fun String.toIntOrNaN(radix: Double): Double {
 
 internal class Globals {
     companion object {
-        const val NaN: Double = Double.NaN
         val console = Console()
-
-        public inline fun isNaN(s: Double): Boolean {
-            return s.isNaN()
-        }
-
-        public inline fun parseFloat(s: String): Double {
-            return s.toDoubleOrNaN()
-        }
-
-        inline fun parseInt(s: String): Double {
-            return s.toIntOrNaN()
-        }
-
-        inline fun parseInt(s: String, radix: Double): Double {
-            return s.toIntOrNaN(radix)
-        }
-
-        inline fun parseInt(s: Char): Double {
-            return parseInt(s.toString())
-        }
-
-        inline fun parseInt(s: Char, radix: Double): Double {
-            return parseInt(s.toString(), radix)
-        }
 
         inline fun setImmediate(action: () -> Unit) {
             action()

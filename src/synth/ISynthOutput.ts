@@ -1,4 +1,4 @@
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 
 /**
  * Represents a output device on which the synth can send the audio to.

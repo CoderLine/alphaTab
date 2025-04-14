@@ -7,7 +7,7 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         settings.display.layoutMode = LayoutMode.Page;
         settings.notation.elements.set(NotationElement.ScoreAlbum, false);
@@ -22,7 +22,7 @@ describe('MusicNotationTests', () => {
     });
 
     it('key-signatures-mixed', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/key-signatures-mixed.gp', settings, o => {
             o.tracks = [0, 1, 2, 3];
@@ -30,55 +30,55 @@ describe('MusicNotationTests', () => {
     });
 
     it('key-signatures-c3', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/key-signatures-c3.gp', settings);
     });
 
     it('key-signatures-c4', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/key-signatures-c4.gp', settings);
     });
 
     it('key-signatures-f4', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/key-signatures-f4.gp', settings);
     });
 
     it('key-signatures-g2', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/key-signatures-g2.gp', settings);
     });
 
     it('key-signatures', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/key-signatures.gp', settings);
     });
 
     it('time-signatures', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/time-signatures.gp', settings);
     });
 
     it('notes-rests-beams', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/notes-rests-beams.gp', settings);
     });
 
     it('accidentals', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/accidentals.gp', settings);
     });
 
     it('forced-accidentals', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.staveProfile = StaveProfile.Score;
         await VisualTestHelper.runVisualTest('music-notation/forced-accidentals.gp', settings, o => {
             o.tracks = [0, 1];
@@ -86,7 +86,7 @@ describe('MusicNotationTests', () => {
     });
 
     it('beams-advanced', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.barsPerRow = 4;
         await VisualTestHelper.runVisualTest('music-notation/beams-advanced.gp', settings);
     });
@@ -174,7 +174,11 @@ describe('MusicNotationTests', () => {
         // score.stylesheet.bracketExtendMode = BracketExtendMode.NoBrackets;
 
         await VisualTestHelper.runVisualTestFull(
-            new VisualTestOptions(score, [new VisualTestRun(-1, 'test-data/visual-tests/music-notation/accidentals-advanced.png')], settings)
+            new VisualTestOptions(
+                score,
+                [new VisualTestRun(-1, 'test-data/visual-tests/music-notation/accidentals-advanced.png')],
+                settings
+            )
         );
     });
 });

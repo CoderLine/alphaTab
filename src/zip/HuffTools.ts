@@ -21,13 +21,13 @@ import { FormatError } from '@src/FormatError';
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-import { Found, Huffman, NeedBit, NeedBits } from '@src/zip/Huffman';
+import { Found, type Huffman, NeedBit, NeedBits } from '@src/zip/Huffman';
 
 // This Inflater is based on the Zip Reader of the Haxe Standard Library (MIT)
 export class HuffTools {
     public static make(lengths: number[], pos: number, nlengths: number, maxbits: number): Huffman {
-        let counts: number[] = [];
-        let tmp: number[] = [];
+        const counts: number[] = [];
+        const tmp: number[] = [];
         if (maxbits > 32) {
             throw new FormatError('Invalid huffman');
         }
@@ -36,7 +36,7 @@ export class HuffTools {
             tmp.push(0);
         }
         for (let i: number = 0; i < nlengths; i++) {
-            let p: number = lengths[i + pos];
+            const p: number = lengths[i + pos];
             if (p >= maxbits) {
                 throw new FormatError('Invalid huffman');
             }
@@ -47,11 +47,11 @@ export class HuffTools {
             code = (code + counts[i]) << 1;
             tmp[i] = code;
         }
-        let bits: Map<number, number> = new Map<number, number>();
+        const bits: Map<number, number> = new Map<number, number>();
         for (let i: number = 0; i < nlengths; i++) {
-            let l: number = lengths[i + pos];
+            const l: number = lengths[i + pos];
             if (l !== 0) {
-                let n: number = tmp[l - 1];
+                const n: number = tmp[l - 1];
                 tmp[l - 1] = n + 1;
                 bits.set((n << 5) | l, i);
             }
@@ -65,7 +65,7 @@ export class HuffTools {
         if (len > maxbits) {
             throw new FormatError('Invalid huffman');
         }
-        let idx: number = (v << 5) | len;
+        const idx: number = (v << 5) | len;
         if (bits.has(idx)) {
             return new Found(bits.get(idx)!);
         }
@@ -75,19 +75,18 @@ export class HuffTools {
     }
 
     private static treeCompress(t: Huffman): Huffman {
-        let d: number = HuffTools.treeDepth(t);
+        const d: number = HuffTools.treeDepth(t);
         if (d === 0) {
             return t;
         }
         if (d === 1) {
             if (t instanceof NeedBit) {
                 return new NeedBit(HuffTools.treeCompress(t.left), HuffTools.treeCompress(t.right));
-            } else {
-                throw new FormatError('assert');
             }
+            throw new FormatError('assert');
         }
-        let size: number = 1 << d;
-        let table: Huffman[] = [];
+        const size: number = 1 << d;
+        const table: Huffman[] = [];
         for (let i: number = 0; i < size; i++) {
             table.push(new Found(-1));
         }
@@ -116,8 +115,8 @@ export class HuffTools {
             throw new FormatError('assert');
         }
         if (t instanceof NeedBit) {
-            let da: number = HuffTools.treeDepth(t.left);
-            let db: number = HuffTools.treeDepth(t.right);
+            const da: number = HuffTools.treeDepth(t.left);
+            const db: number = HuffTools.treeDepth(t.right);
             return 1 + (da < db ? da : db);
         }
         return 0;

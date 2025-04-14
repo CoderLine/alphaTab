@@ -10,7 +10,7 @@ export class VibratoPlaybackSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => VibratoPlaybackSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: VibratoPlaybackSettings | null): Map<string, unknown> | null {
         if (!obj) {

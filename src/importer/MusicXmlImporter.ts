@@ -3,10 +3,10 @@ import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { Score } from '@src/model/Score';
 
 import { XmlDocument } from '@src/xml/XmlDocument';
-import { XmlNode } from '@src/xml/XmlNode';
+import type { XmlNode } from '@src/xml/XmlNode';
 import { IOHelper } from '@src/io/IOHelper';
 import { ZipReader } from '@src/zip/ZipReader';
-import { ZipEntry } from '@src/zip/ZipEntry';
+import type { ZipEntry } from '@src/zip/ZipEntry';
 import {
     AccentuationType,
     Automation,
@@ -132,7 +132,7 @@ class TrackInfo {
 
     public getOrCreateArticulation(instrumentId: string, note: Note) {
         const noteValue = note.octave * 12 + note.tone;
-        const lookup = instrumentId + '_' + noteValue;
+        const lookup = `${instrumentId}_${noteValue}`;
         if (this._instrumentIdToArticulationIndex.has(lookup)) {
             return this._instrumentIdToArticulationIndex.get(lookup)!;
         }
@@ -149,7 +149,8 @@ class TrackInfo {
 
         // the calculation in the AccidentalHelper assumes a standard 5-line staff.
         let musicXmlStaffSteps: number;
-        if (noteValue === 0) { // no display pitch defined?
+        if (noteValue === 0) {
+            // no display pitch defined?
             musicXmlStaffSteps = 4; // middle of bar
         } else {
             musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
@@ -194,13 +195,9 @@ export class MusicXmlImporter extends ScoreImporter {
         return 'MusicXML';
     }
 
-    public constructor() {
-        super();
-    }
-
     public readScore(): Score {
-        let xml: string = this.extractMusicXml();
-        let dom: XmlDocument = new XmlDocument();
+        const xml: string = this.extractMusicXml();
+        const dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
         } catch (e) {
@@ -220,7 +217,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private consolidate() {
         const usedChannels = new Set<number>([SynthConstants.PercussionChannel]);
-        for (let track of this._score.tracks) {
+        for (const track of this._score.tracks) {
             // unique midi channels and generate secondary channels
             if (track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
                 while (usedChannels.has(track.playbackInfo.primaryChannel)) {
@@ -236,11 +233,11 @@ export class MusicXmlImporter extends ScoreImporter {
             }
             usedChannels.add(track.playbackInfo.secondaryChannel);
 
-            for (let staff of track.staves) {
+            for (const staff of track.staves) {
                 // fill empty beats
                 for (const b of staff.bars) {
                     for (const v of b.voices) {
-                        if (v.isEmpty && v.beats.length == 0) {
+                        if (v.isEmpty && v.beats.length === 0) {
                             const emptyBeat: Beat = new Beat();
                             emptyBeat.isEmpty = true;
                             v.addBeat(emptyBeat);
@@ -414,7 +411,7 @@ export class MusicXmlImporter extends ScoreImporter {
             return;
         }
 
-        let creditTypes: string[] = [];
+        const creditTypes: string[] = [];
         let firstWords: XmlNode | null = null;
 
         let fullText = '';
@@ -507,7 +504,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._score.album = MusicXmlImporter.sanitizeDisplay(fullText);
                         return;
                     }
-                } else if (halign == 'right' || justify === 'right') {
+                } else if (halign === 'right' || justify === 'right') {
                     // in alphaTab only `music` is right
                     if (this._score.music.length === 0) {
                         this._score.music = MusicXmlImporter.sanitizeDisplay(fullText);
@@ -531,11 +528,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private static sanitizeDisplay(text: string): string {
         // no newlines or tabs, and non-breaking spaces
-        return text.replaceAll('\r', '')
-            .replaceAll('\n', ' ')
-            .replaceAll('\t', '\xA0\xA0')
-            .replaceAll(' ', '\xA0');
-
+        return text.replaceAll('\r', '').replaceAll('\n', ' ').replaceAll('\t', '\xA0\xA0').replaceAll(' ', '\xA0');
     }
 
     // visual aspects of credits are ignored
@@ -623,7 +616,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseMovementTitle(element: XmlNode) {
-        if (this._score.title.length == 0) {
+        if (this._score.title.length === 0) {
             // we have no "work title", then use the "movement title" as main title
             this._score.title = MusicXmlImporter.sanitizeDisplay(element.innerText);
         } else {
@@ -679,7 +672,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'player': Ignored
                 case 'midi-device':
                     if (c.attributes.has('port')) {
-                        track.playbackInfo.port = parseInt(c.attributes.get('port')!, 10);
+                        track.playbackInfo.port = Number.parseInt(c.attributes.get('port')!, 10);
                     }
                     break;
                 case 'midi-instrument':
@@ -723,21 +716,21 @@ export class MusicXmlImporter extends ScoreImporter {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'midi-channel':
-                    articulation.outputMidiChannel = parseInt(c.innerText) - 1;
+                    articulation.outputMidiChannel = Number.parseInt(c.innerText) - 1;
                     break;
                 // case 'midi-name': Ignored
                 // case 'midi-bank': Not supported (https://github.com/CoderLine/alphaTab/issues/1986)
                 case 'midi-program':
-                    articulation.outputMidiProgram = parseInt(c.innerText) - 1;
+                    articulation.outputMidiProgram = Number.parseInt(c.innerText) - 1;
                     break;
                 case 'midi-unpitched':
-                    articulation.outputMidiNumber = parseInt(c.innerText) - 1;
+                    articulation.outputMidiNumber = Number.parseInt(c.innerText) - 1;
                     break;
                 case 'volume':
-                    articulation.outputVolume = MusicXmlImporter.interpolatePercent(parseFloat(c.innerText));
+                    articulation.outputVolume = MusicXmlImporter.interpolatePercent(Number.parseFloat(c.innerText));
                     break;
                 case 'pan':
-                    articulation.outputBalance = MusicXmlImporter.interpolatePan(parseFloat(c.innerText));
+                    articulation.outputBalance = MusicXmlImporter.interpolatePan(Number.parseFloat(c.innerText));
                     break;
                 // case 'elevation': Ignored
             }
@@ -928,7 +921,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private getOrCreateMasterBar(element: XmlNode) {
-        let number = parseInt(element.attributes.get('number')!);
+        let number = Number.parseInt(element.attributes.get('number')!);
 
         const implicit = element.attributes.get('implicit') === 'yes';
 
@@ -937,7 +930,7 @@ export class MusicXmlImporter extends ScoreImporter {
         // width="" Ignored (we cannot handle the unit 'tenths' yet - https://github.com/CoderLine/alphaTab/issues/1949)
 
         // no number specified, assume its the "next" one
-        if (isNaN(number)) {
+        if (Number.isNaN(number)) {
             if (this._previousMasterBarNumber === -1) {
                 number = 1;
             } else {
@@ -1046,9 +1039,9 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parsePrint(element: XmlNode, masterBar: MasterBar, track: Track) {
-        if (element.getAttribute('new-system', 'no') == 'yes') {
+        if (element.getAttribute('new-system', 'no') === 'yes') {
             track.addLineBreaks(masterBar.index);
-        } else if (element.getAttribute('new-page', 'no') == 'yes') {
+        } else if (element.getAttribute('new-page', 'no') === 'yes') {
             track.addLineBreaks(masterBar.index);
         }
     }
@@ -1058,12 +1051,12 @@ export class MusicXmlImporter extends ScoreImporter {
             for (const s of track.staves) {
                 const bar = this.getOrCreateBar(s, masterBar);
                 bar.simileMark = this._simileMarkAllStaves!;
-                if(bar.simileMark !== SimileMark.None) {
+                if (bar.simileMark !== SimileMark.None) {
                     this.clearBar(bar);
                 }
             }
 
-            if (this._simileMarkAllStaves == SimileMark.FirstOfDouble) {
+            if (this._simileMarkAllStaves === SimileMark.FirstOfDouble) {
                 this._simileMarkAllStaves = SimileMark.SecondOfDouble;
             } else {
                 this._simileMarkAllStaves = null;
@@ -1077,11 +1070,11 @@ export class MusicXmlImporter extends ScoreImporter {
                 const bar = this.getOrCreateBar(s, masterBar);
                 bar.simileMark = this._simileMarkPerStaff!.get(i)!;
 
-                if(bar.simileMark !== SimileMark.None) {
+                if (bar.simileMark !== SimileMark.None) {
                     this.clearBar(bar);
                 }
 
-                if (bar.simileMark == SimileMark.FirstOfDouble) {
+                if (bar.simileMark === SimileMark.FirstOfDouble) {
                     this._simileMarkPerStaff!.set(i, SimileMark.SecondOfDouble);
                 } else {
                     this._simileMarkPerStaff!.delete(i);
@@ -1092,9 +1085,9 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
     }
-    
+
     private clearBar(bar: Bar) {
-        for(const v of bar.voices) {
+        for (const v of bar.voices) {
             const emptyBeat: Beat = new Beat();
             emptyBeat.isEmpty = true;
             v.addBeat(emptyBeat);
@@ -1124,9 +1117,9 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseRepeat(element: XmlNode, masterBar: MasterBar): void {
-        let direction: string = element.getAttribute('direction');
-        let times: number = parseInt(element.getAttribute('times'));
-        if (times < 0 || isNaN(times)) {
+        const direction: string = element.getAttribute('direction');
+        let times: number = Number.parseInt(element.getAttribute('times'));
+        if (times < 0 || Number.isNaN(times)) {
             times = 2;
         }
         if (direction === 'backward') {
@@ -1141,7 +1134,7 @@ export class MusicXmlImporter extends ScoreImporter {
         const numbers = element
             .getAttribute('number')
             .split(',')
-            .map(v => parseInt(v));
+            .map(v => Number.parseInt(v));
 
         let flags = 0;
         for (const num of numbers) {
@@ -1242,7 +1235,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
             const automation = new Automation();
             automation.type = AutomationType.Balance;
-            automation.value = MusicXmlImporter.interpolatePan(parseFloat(element.attributes.get('pan')!));
+            automation.value = MusicXmlImporter.interpolatePan(Number.parseFloat(element.attributes.get('pan')!));
             this._nextBeatAutomations.push(automation);
         }
 
@@ -1253,7 +1246,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
             const automation = new Automation();
             automation.type = AutomationType.Tempo;
-            automation.value = MusicXmlImporter.interpolatePercent(parseFloat(element.attributes.get('tempo')!));
+            automation.value = MusicXmlImporter.interpolatePercent(Number.parseFloat(element.attributes.get('tempo')!));
             this._nextBeatAutomations.push(automation);
         }
     }
@@ -1267,10 +1260,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     masterBar.tripletFeel = TripletFeel.NoTripletFeel;
                     return;
                 case 'first':
-                    first = parseInt(c.innerText);
+                    first = Number.parseInt(c.innerText);
                     break;
                 case 'second':
-                    second = parseInt(c.innerText);
+                    second = Number.parseInt(c.innerText);
                     break;
                 case 'swing-type':
                     swingType = this.parseBeatDuration(c);
@@ -1325,7 +1318,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
                     automation = new Automation();
                     automation.type = AutomationType.Instrument;
-                    automation.value = parseInt(c.innerText) - 1;
+                    automation.value = Number.parseInt(c.innerText) - 1;
                     this._nextBeatAutomations!.push(automation);
 
                     break;
@@ -1337,7 +1330,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
                     automation = new Automation();
                     automation.type = AutomationType.Volume;
-                    automation.value = MusicXmlImporter.interpolatePercent(parseFloat(c.innerText));
+                    automation.value = MusicXmlImporter.interpolatePercent(Number.parseFloat(c.innerText));
                     this._nextBeatAutomations!.push(automation);
 
                     break;
@@ -1348,7 +1341,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
                     automation = new Automation();
                     automation.type = AutomationType.Balance;
-                    automation.value = MusicXmlImporter.interpolatePan(parseFloat(c.innerText));
+                    automation.value = MusicXmlImporter.interpolatePan(Number.parseFloat(c.innerText));
                     this._nextBeatAutomations!.push(automation);
                     break;
                 // case 'elevation': Ignored
@@ -1357,17 +1350,17 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseHarmony(element: XmlNode, track: Track) {
-        let chord = new Chord();
+        const chord = new Chord();
         let degreeParenthesis = false;
         let degree = '';
-        for (let childNode of element.childElements()) {
+        for (const childNode of element.childElements()) {
             switch (childNode.localName) {
                 case 'root':
                     chord.name = this.parseHarmonyRoot(childNode);
                     break;
                 case 'kind':
                     chord.name = chord.name + this.parseHarmonyKind(childNode);
-                    if (childNode.getAttribute('parentheses-degrees', 'no') == 'yes') {
+                    if (childNode.getAttribute('parentheses-degrees', 'no') === 'yes') {
                         degreeParenthesis = true;
                     }
                     break;
@@ -1393,7 +1386,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let value = '';
         let alter = '';
         let type = '';
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'degree-value':
                     value = c.innerText;
@@ -1420,13 +1413,13 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseHarmonyRoot(element: XmlNode): string {
         let rootStep: string = '';
         let rootAlter: string = '';
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'root-step':
                     rootStep = c.innerText;
                     break;
                 case 'root-alter':
-                    switch (parseFloat(c.innerText)) {
+                    switch (Number.parseFloat(c.innerText)) {
                         case -2:
                             rootAlter = 'bb';
                             break;
@@ -1559,10 +1552,10 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseHarmonyFrame(xmlNode: XmlNode, chord: Chord) {
-        for (let frameChild of xmlNode.childElements()) {
+        for (const frameChild of xmlNode.childElements()) {
             switch (frameChild.localName) {
                 case 'frame-strings':
-                    const stringsCount: number = parseInt(frameChild.innerText);
+                    const stringsCount: number = Number.parseInt(frameChild.innerText);
                     chord.strings = new Array<number>(stringsCount);
                     for (let i = 0; i < stringsCount; i++) {
                         // set strings unplayed as default
@@ -1570,18 +1563,18 @@ export class MusicXmlImporter extends ScoreImporter {
                     }
                     break;
                 case 'first-fret':
-                    chord.firstFret = parseInt(frameChild.innerText);
+                    chord.firstFret = Number.parseInt(frameChild.innerText);
                     break;
                 case 'frame-note':
                     let stringNo: number | null = null;
                     let fretNo: number | null = null;
-                    for (let noteChild of frameChild.childElements()) {
+                    for (const noteChild of frameChild.childElements()) {
                         switch (noteChild.localName) {
                             case 'string':
-                                stringNo = parseInt(noteChild.innerText);
+                                stringNo = Number.parseInt(noteChild.innerText);
                                 break;
                             case 'fret':
-                                fretNo = parseInt(noteChild.innerText);
+                                fretNo = Number.parseInt(noteChild.innerText);
                                 if (stringNo && fretNo >= 0) {
                                     chord.strings[stringNo - 1] = fretNo;
                                 }
@@ -1610,7 +1603,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     // case 'footnote': Ignored
                     // case 'level': Ignored
                     case 'divisions':
-                        this._divisionsPerQuarterNote = parseFloat(c.innerText);
+                        this._divisionsPerQuarterNote = Number.parseFloat(c.innerText);
                         break;
                     case 'key':
                         this.parseKey(c, masterBar);
@@ -1620,18 +1613,18 @@ export class MusicXmlImporter extends ScoreImporter {
                         break;
                     case 'staves':
                         // will create staves
-                        track.ensureStaveCount(parseInt(c.innerText));
+                        track.ensureStaveCount(Number.parseInt(c.innerText));
                         break;
                     // case 'part-symbol': Ignored (https://github.com/CoderLine/alphaTab/issues/1989)
                     // case 'instruments': Ignored, auto-detected via `note/instrument` and handled via instrument articulations
                     case 'clef':
-                        staffIndex = parseInt(c.getAttribute('number', '1')) - 1;
+                        staffIndex = Number.parseInt(c.getAttribute('number', '1')) - 1;
                         staff = this.getOrCreateStaff(track, staffIndex);
                         bar = this.getOrCreateBar(staff, masterBar);
                         this.parseClef(c, bar);
                         break;
                     case 'staff-details':
-                        staffIndex = parseInt(c.getAttribute('number', '1')) - 1;
+                        staffIndex = Number.parseInt(c.getAttribute('number', '1')) - 1;
                         staff = this.getOrCreateStaff(track, staffIndex);
                         this.parseStaffDetails(c, staff);
                         break;
@@ -1652,7 +1645,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     // case 'footnote': Ignored
                     // case 'level': Ignored
                     case 'divisions':
-                        this._divisionsPerQuarterNote = parseFloat(c.innerText);
+                        this._divisionsPerQuarterNote = Number.parseFloat(c.innerText);
                         break;
                     // https://github.com/CoderLine/alphaTab/issues/1991
                     // case 'key': Not supported
@@ -1676,7 +1669,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private _simileMarkPerStaff: Map<number, SimileMark> | null = null;
     private _isBeatSlash: boolean = false;
     private parseMeasureStyle(element: XmlNode, track: Track, midBar: boolean) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'multiple-rest': Ignored, when multibar rests are enabled for rendering this info shouldn't matter.
                 case 'measure-repeat':
@@ -1684,7 +1677,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         let simileMark: SimileMark | null = null;
                         switch (c.getAttribute('type')) {
                             case 'start':
-                                switch (parseInt(c.getAttribute('slashes', '1'))) {
+                                switch (Number.parseInt(c.getAttribute('slashes', '1'))) {
                                     case 1:
                                         simileMark = SimileMark.Simple;
                                         break;
@@ -1703,7 +1696,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
                         if (element.attributes.has('number')) {
                             this._simileMarkPerStaff = this._simileMarkPerStaff ?? new Map<number, SimileMark>();
-                            const staff = parseInt(element.attributes.get('number')!) - 1;
+                            const staff = Number.parseInt(element.attributes.get('number')!) - 1;
                             if (simileMark == null) {
                                 this._simileMarkPerStaff!.delete(staff);
                             } else {
@@ -1733,25 +1726,25 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseTranspose(element: XmlNode, track: Track): void {
         let semitones: number = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'diatonic': Not supported
                 case 'chromatic':
-                    semitones += parseFloat(c.innerText);
+                    semitones += Number.parseFloat(c.innerText);
                     break;
                 case 'octave-change':
-                    semitones += parseFloat(c.innerText) * 12;
+                    semitones += Number.parseFloat(c.innerText) * 12;
                     break;
                 // case 'double': Not supported
             }
         }
 
         if (element.attributes.has('number')) {
-            const staff = this.getOrCreateStaff(track, parseInt(element.attributes.get('number')!) - 1);
+            const staff = this.getOrCreateStaff(track, Number.parseInt(element.attributes.get('number')!) - 1);
             this.getStaffContext(staff).transpose = semitones;
             staff.displayTranspositionPitch = semitones;
         } else {
-            for (let staff of track.staves) {
+            for (const staff of track.staves) {
                 this.getStaffContext(staff).transpose = semitones;
                 staff.displayTranspositionPitch = semitones;
             }
@@ -1759,18 +1752,18 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseStaffDetails(element: XmlNode, staff: Staff): void {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'staff-type': Ignored
                 case 'staff-lines':
-                    staff.standardNotationLineCount = parseInt(c.innerText);
+                    staff.standardNotationLineCount = Number.parseInt(c.innerText);
                     break;
                 // case 'line-detail': Not supported
                 case 'staff-tuning':
                     this.parseStaffTuning(c, staff);
                     break;
                 case 'capo':
-                    staff.capo = parseInt(c.innerText);
+                    staff.capo = Number.parseInt(c.innerText);
                     break;
                 // case 'staff-size': Not supported
             }
@@ -1784,40 +1777,40 @@ export class MusicXmlImporter extends ScoreImporter {
             staff.stringTuning.tunings = new Array<number>(staff.standardNotationLineCount).fill(0);
         }
 
-        let line: number = parseInt(element.getAttribute('line'));
+        const line: number = Number.parseInt(element.getAttribute('line'));
         let tuningStep: string = 'C';
         let tuningOctave: string = '';
         let tuningAlter: number = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'tuning-step':
                     tuningStep = c.innerText;
                     break;
                 case 'tuning-alter':
-                    tuningAlter = parseFloat(c.innerText);
+                    tuningAlter = Number.parseFloat(c.innerText);
                     break;
                 case 'tuning-octave':
                     tuningOctave = c.innerText;
                     break;
             }
         }
-        let tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
+        const tuning: number = ModelUtils.getTuningForText(tuningStep + tuningOctave) + tuningAlter;
         staff.tuning[staff.tuning.length - line] = tuning;
     }
 
     private parseClef(element: XmlNode, bar: Bar): void {
         let sign: string = 's';
         let line: number = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'sign':
                     sign = c.innerText.toLowerCase();
                     break;
                 case 'line':
-                    line = parseInt(c.innerText);
+                    line = Number.parseInt(c.innerText);
                     break;
                 case 'clef-octave-change':
-                    switch (parseInt(c.innerText)) {
+                    switch (Number.parseInt(c.innerText)) {
                         case -2:
                             bar.clefOttava = Ottavia._15mb;
                             break;
@@ -1865,17 +1858,17 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseTime(element: XmlNode, masterBar: MasterBar): void {
         let beatsParsed: boolean = false;
         let beatTypeParsed: boolean = false;
-        for (let c of element.childElements()) {
-            let v: string = c.innerText;
+        for (const c of element.childElements()) {
+            const v: string = c.innerText;
             switch (c.localName) {
                 case 'beats':
                     if (!beatsParsed) {
                         if (v.indexOf('+') === -1) {
-                            masterBar.timeSignatureNumerator = parseInt(v);
+                            masterBar.timeSignatureNumerator = Number.parseInt(v);
                         } else {
                             masterBar.timeSignatureNumerator = v
                                 .split('+')
-                                .map(v => parseInt(v))
+                                .map(v => Number.parseInt(v))
                                 .reduce((sum, v) => v + sum, 0);
                         }
                         beatsParsed = true;
@@ -1884,11 +1877,11 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'beat-type':
                     if (!beatTypeParsed) {
                         if (v.indexOf('+') === -1) {
-                            masterBar.timeSignatureDenominator = parseInt(v);
+                            masterBar.timeSignatureDenominator = Number.parseInt(v);
                         } else {
                             masterBar.timeSignatureDenominator = v
                                 .split('+')
-                                .map(v => parseInt(v))
+                                .map(v => Number.parseInt(v))
                                 .reduce((sum, v) => v + sum, 0);
                         }
                         beatTypeParsed = true;
@@ -1915,11 +1908,11 @@ export class MusicXmlImporter extends ScoreImporter {
         let fifths: number = -(KeySignature.C as number);
         let mode: string = '';
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'cancel': not supported
                 case 'fifths':
-                    fifths = parseInt(c.innerText);
+                    fifths = Number.parseInt(c.innerText);
                     break;
                 case 'mode':
                     mode = c.innerText;
@@ -1957,7 +1950,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     directionTypes.push(c.firstElement!);
                     break;
                 case 'offset':
-                    offset = parseFloat(c.innerText);
+                    offset = Number.parseFloat(c.innerText);
                     break;
                 // case 'footnote': Ignored
                 // case 'level': Ignored
@@ -1965,11 +1958,11 @@ export class MusicXmlImporter extends ScoreImporter {
                     // voiceIndex = parseInt(c.innerText) - 1;
                     break;
                 case 'staff':
-                    staffIndex = parseInt(c.innerText) - 1;
+                    staffIndex = Number.parseInt(c.innerText) - 1;
                     break;
                 case 'sound':
                     if (c.attributes.has('tempo')) {
-                        tempo = parseFloat(c.attributes.get('tempo')!);
+                        tempo = Number.parseFloat(c.attributes.get('tempo')!);
                     }
                     break;
                 // case 'listening': Ignored
@@ -2054,10 +2047,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     const type = direction.getAttribute('type', 'start');
                     switch (previousWords) {
                         case 'LetRing':
-                            this._nextBeatLetRing = type === 'start' || type == 'continue';
+                            this._nextBeatLetRing = type === 'start' || type === 'continue';
                             break;
                         case 'P.M.':
-                            this._nextBeatPalmMute = type === 'start' || type == 'continue';
+                            this._nextBeatPalmMute = type === 'start' || type === 'continue';
                             break;
                     }
                     previousWords = '';
@@ -2105,7 +2098,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
     private parseOctaveShift(element: XmlNode): Ottavia | null {
         const type = element.getAttribute('type');
-        const size = parseInt(element.getAttribute('size', '8'));
+        const size = Number.parseInt(element.getAttribute('size', '8'));
 
         switch (size) {
             case 15:
@@ -2139,7 +2132,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private parseMetronome(element: XmlNode, masterBar: MasterBar, ratioPosition: number) {
         let unit: Duration | null = null;
         let perMinute: number = -1;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'beat-unit':
                     unit = this.parseBeatDuration(c);
@@ -2147,7 +2140,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 //  case 'beat-unit-dot' not supported
                 //  case 'beat-unit-tied' not supported
                 case 'per-minute':
-                    perMinute = parseFloat(c.innerText);
+                    perMinute = Number.parseFloat(c.innerText);
                     break;
                 // case 'metronome-arrows': not supported
                 // case 'metronome-note': not supported
@@ -2172,7 +2165,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private hasSameTempo(masterBar: MasterBar, tempoAutomation: Automation) {
         for (const existing of masterBar.tempoAutomations) {
-            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value == existing.value) {
+            if (tempoAutomation.ratioPosition === existing.ratioPosition && tempoAutomation.value === existing.value) {
                 return true;
             }
         }
@@ -2251,7 +2244,7 @@ export class MusicXmlImporter extends ScoreImporter {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'duration':
-                    this._musicalPosition += this.musicXmlDivisionsToAlphaTabTicks(parseFloat(c.innerText));
+                    this._musicalPosition += this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(c.innerText));
                     break;
                 // case 'footnote': Ignored
                 // case 'level': Ignored
@@ -2268,7 +2261,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     const beat = this._lastBeat;
                     if (beat) {
                         let musicalPosition = this._musicalPosition;
-                        musicalPosition -= this.musicXmlDivisionsToAlphaTabTicks(parseFloat(c.innerText));
+                        musicalPosition -= this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(c.innerText));
                         if (musicalPosition < 0) {
                             musicalPosition = 0;
                         }
@@ -2309,7 +2302,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
 
             for (let i = 0; i < voiceCount; i++) {
-                let voice: Voice = new Voice();
+                const voice: Voice = new Voice();
                 newBar.addVoice(voice);
             }
         }
@@ -2363,7 +2356,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let note: Note | null = null;
         let isPitched = false;
         let instrumentId: string | null = null;
-        let noteIsVisible = element.getAttribute('print-object', 'yes') !== 'no';
+        const noteIsVisible = element.getAttribute('print-object', 'yes') !== 'no';
 
         // will create new beat with all information in the correct tree
         // or add the note to an existing beat if specified accordingly.
@@ -2416,7 +2409,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     // chances are high that we have notes like this
                     // staff1Note -> staff2Note -> staff2Note -> staff1Note
                     // in this case we create rests for the gap caused by the staff2Notes
-                    let preferredDuration = voice.beats[voice.beats.length - 1].duration;
+                    const preferredDuration = voice.beats[voice.beats.length - 1].duration;
                     while (gap > 0) {
                         const restGap = this.createRestForGap(gap, preferredDuration);
                         if (restGap !== null) {
@@ -2448,7 +2441,7 @@ export class MusicXmlImporter extends ScoreImporter {
             if (durationInTicks < 0 && beatDuration !== null) {
                 durationInTicks = MidiUtils.toTicks(beatDuration!);
                 if (dots > 0) {
-                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots == 2);
+                    durationInTicks = MidiUtils.applyDot(durationInTicks, dots === 2);
                 }
             }
 
@@ -2532,7 +2525,7 @@ export class MusicXmlImporter extends ScoreImporter {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'grace':
-                    const makeTime = parseFloat(c.getAttribute('make-time', '-1'));
+                    const makeTime = Number.parseFloat(c.getAttribute('make-time', '-1'));
                     if (makeTime >= 0) {
                         graceDurationInDivisions = this.musicXmlDivisionsToAlphaTabTicks(makeTime);
                         graceType = GraceType.BeforeBeat;
@@ -2587,8 +2580,8 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'footnote': Ignored
                 // case 'level': Ignored
                 case 'voice':
-                    voiceIndex = parseInt(c.innerText);
-                    if (isNaN(voiceIndex)) {
+                    voiceIndex = Number.parseInt(c.innerText);
+                    if (Number.isNaN(voiceIndex)) {
                         Logger.warning('MusicXML', 'Voices need to be specified as numbers');
                         voiceIndex = 0;
                     } else {
@@ -2612,10 +2605,10 @@ export class MusicXmlImporter extends ScoreImporter {
                     for (const tmc of c.childElements()) {
                         switch (tmc.localName) {
                             case 'actual-notes':
-                                tupletNumerator = parseInt(tmc.innerText);
+                                tupletNumerator = Number.parseInt(tmc.innerText);
                                 break;
                             case 'normal-notes':
-                                tupletDenominator = parseInt(tmc.innerText);
+                                tupletDenominator = Number.parseInt(tmc.innerText);
                                 break;
                             // case 'normal-type': not supported
                             // case 'normal-dot': not supported
@@ -2639,7 +2632,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'notehead-text': Not supported
                 case 'staff':
-                    staffIndex = parseInt(c.innerText) - 1;
+                    staffIndex = Number.parseInt(c.innerText) - 1;
                     break;
                 case 'beam':
                     // use the first beam as indicator whether to beam or split
@@ -3043,7 +3036,9 @@ export class MusicXmlImporter extends ScoreImporter {
                 if (previousNonGraceBeat.graceType === GraceType.None) {
                     // found
                     break;
-                } else if (previousNonGraceBeat.index > 0) {
+                }
+
+                if (previousNonGraceBeat.index > 0) {
                     previousNonGraceBeat = previousNonGraceBeat.previousBeat;
                 } else {
                     previousNonGraceBeat = null;
@@ -3149,12 +3144,12 @@ export class MusicXmlImporter extends ScoreImporter {
             beat.lyrics.push('');
         }
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'syllabic' not supported
                 case 'text':
                     if (beat.lyrics[index]) {
-                        beat.lyrics[index] += ' ' + c.innerText;
+                        beat.lyrics[index] += ` ${c.innerText}`;
                     } else {
                         beat.lyrics[index] = c.innerText;
                     }
@@ -3167,7 +3162,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseNotations(element: XmlNode, note: Note | null, beat: Beat) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'footnote': Ignored
                 // case 'level': Ignored
@@ -3236,7 +3231,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseGlissando(element: XmlNode, note: Note) {
         const type = element.getAttribute('type');
-        let number = element.getAttribute('number', '1');
+        const number = element.getAttribute('number', '1');
 
         const context = this.getStaffContext(note.beat.voice.bar.staff);
 
@@ -3256,7 +3251,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseSlur(element: XmlNode, note: Note) {
-        let slurNumber: string = element.getAttribute('number', '1');
+        const slurNumber: string = element.getAttribute('number', '1');
 
         const context = this.getStaffContext(note.beat.voice.bar.staff);
 
@@ -3316,7 +3311,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseArticulations(element: XmlNode, note: Note) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'accent':
                     note.accentuated = AccentuationType.Normal;
@@ -3347,9 +3342,9 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
     private parseTechnical(element: XmlNode, note: Note | null, beat: Beat) {
-        let bends: XmlNode[] = [];
+        const bends: XmlNode[] = [];
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'up-bow':
                     beat.pickStroke = PickStroke.Up;
@@ -3377,12 +3372,12 @@ export class MusicXmlImporter extends ScoreImporter {
                 // case 'snap-pizzicato':  Not supported
                 case 'fret':
                     if (note) {
-                        note.fret = parseInt(c.innerText);
+                        note.fret = Number.parseInt(c.innerText);
                     }
                     break;
                 case 'string':
                     if (note) {
-                        note.string = beat.voice.bar.staff.tuning.length - parseInt(c.innerText) + 1;
+                        note.string = beat.voice.bar.staff.tuning.length - Number.parseInt(c.innerText) + 1;
                     }
                     break;
                 case 'hammer-on':
@@ -3433,15 +3428,15 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseBends(elements: XmlNode[], note: Note): void {
-        let baseOffset: number = BendPoint.MaxPosition / elements.length;
+        const baseOffset: number = BendPoint.MaxPosition / elements.length;
         let currentValue: number = 0; // stores the current pitch alter when going through the bends (in 1/4 tones)
         let currentOffset: number = 0; // stores the current offset when going through the bends (from 0 to 60)
         let isFirstBend: boolean = true;
 
-        for (let bend of elements) {
-            let bendAlterElement: XmlNode | null = bend.findChildElement('bend-alter');
+        for (const bend of elements) {
+            const bendAlterElement: XmlNode | null = bend.findChildElement('bend-alter');
             if (bendAlterElement) {
-                let absValue: number = Math.round(Math.abs(parseFloat(bendAlterElement.innerText)) * 2);
+                const absValue: number = Math.round(Math.abs(Number.parseFloat(bendAlterElement.innerText)) * 2);
                 if (bend.findChildElement('pre-bend')) {
                     if (isFirstBend) {
                         currentValue += absValue;
@@ -3502,10 +3497,10 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseOrnaments(element: XmlNode, note: Note): void {
         let currentTrillStep = -1;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'trill-mark':
-                    currentTrillStep = parseInt(c.getAttribute('trill-step', '2'));
+                    currentTrillStep = Number.parseInt(c.getAttribute('trill-step', '2'));
                     if (note.isStringed) {
                         note.trillValue = note.stringTuning + currentTrillStep;
                     } else if (!note.isPercussion) {
@@ -3568,7 +3563,7 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseSlide(element: XmlNode, note: Note) {
         const type = element.getAttribute('type');
-        let number = element.getAttribute('number', '1');
+        const number = element.getAttribute('number', '1');
 
         const context = this.getStaffContext(note.beat.voice.bar.staff);
 
@@ -3589,14 +3584,14 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseTied(element: XmlNode, note: Note, staff: Staff): void {
         const type = element.getAttribute('type');
-        let number = element.getAttribute('number', '');
+        const number = element.getAttribute('number', '');
 
         const context = this.getStaffContext(staff);
 
         if (type === 'start') {
             if (number) {
                 // start without end
-                if(context.tieStartIds.has(number)) {
+                if (context.tieStartIds.has(number)) {
                     const unclosed = context.tieStartIds.get(number)!;
                     context.tieStarts.delete(unclosed);
                 }
@@ -3641,7 +3636,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 return BeamDirection.Down;
             case 'up':
                 return BeamDirection.Up;
-            case 'none':
+            // case 'none':
             default:
                 return null;
         }
@@ -3716,20 +3711,20 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseDuration(element: XmlNode): number {
-        return this.musicXmlDivisionsToAlphaTabTicks(parseFloat(element.innerText));
+        return this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(element.innerText));
     }
 
     private parseUnpitched(element: XmlNode, track: Track): Note {
         let step: string = '';
         let octave: number = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'display-step':
                     step = c.innerText;
                     break;
                 case 'display-octave':
                     // 0-9, 4 for middle C
-                    octave = parseInt(c.innerText) + 1;
+                    octave = Number.parseInt(c.innerText) + 1;
                     break;
             }
         }
@@ -3739,8 +3734,7 @@ export class MusicXmlImporter extends ScoreImporter {
         if (step === '') {
             note.octave = 0;
             note.tone = 0;
-        }
-        else {
+        } else {
             const value: number = octave * 12 + ModelUtils.getToneForText(step).noteValue;
             note.octave = (value / 12) | 0;
             note.tone = value - note.octave * 12;
@@ -3753,20 +3747,20 @@ export class MusicXmlImporter extends ScoreImporter {
         let step: string = '';
         let semitones: number = 0;
         let octave: number = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'step':
                     step = c.innerText;
                     break;
                 case 'alter':
-                    semitones = parseFloat(c.innerText);
-                    if (isNaN(semitones)) {
+                    semitones = Number.parseFloat(c.innerText);
+                    if (Number.isNaN(semitones)) {
                         semitones = 0;
                     }
                     break;
                 case 'octave':
                     // 0-9, 4 for middle C
-                    octave = parseInt(c.innerText) + 1;
+                    octave = Number.parseInt(c.innerText) + 1;
                     break;
             }
         }

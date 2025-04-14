@@ -5,7 +5,7 @@ import * as path from 'node:path';
 import * as fs from 'node:fs';
 import * as url from 'node:url';
 
-import { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
 
 export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
     let resolvedConfig: ResolvedConfig;

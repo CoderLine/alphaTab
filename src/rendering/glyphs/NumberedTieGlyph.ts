@@ -1,6 +1,6 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
@@ -15,7 +15,11 @@ export class NumberedTieGlyph extends TieGlyph {
     }
 
     protected override shouldDrawBendSlur() {
-        return this.renderer.settings.notation.extendBendArrowsOnTiedNotes && !!this.startNote.bendOrigin && this.startNote.isTieOrigin;
+        return (
+            this.renderer.settings.notation.extendBendArrowsOnTiedNotes &&
+            !!this.startNote.bendOrigin &&
+            this.startNote.isTieOrigin
+        );
     }
 
     public override doLayout(): void {
@@ -24,7 +28,6 @@ export class NumberedTieGlyph extends TieGlyph {
 
     protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
         return BeamDirection.Up;
-
     }
 
     protected override getStartY(): number {
@@ -36,14 +39,14 @@ export class NumberedTieGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return this.getEndX() - 20;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }
 
     protected override getEndX(): number {
-        if(this.startNote === this.endNote) {
+        if (this.startNote === this.endNote) {
             return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
         }
         return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);

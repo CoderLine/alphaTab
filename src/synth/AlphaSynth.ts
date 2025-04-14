@@ -1,22 +1,22 @@
-import { MidiFile } from '@src/midi/MidiFile';
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import { ISynthOutput } from '@src/synth/ISynthOutput';
+import type { MidiFile } from '@src/midi/MidiFile';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { ISynthOutput } from '@src/synth/ISynthOutput';
 import { MidiFileSequencer } from '@src/synth/MidiFileSequencer';
-import { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { Hydra } from '@src/synth/soundfont/Hydra';
 import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
-import { LogLevel } from '@src/LogLevel';
+import type { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { Queue } from '@src/synth/ds/Queue';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
+import type { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ModelUtils } from '@src/model/ModelUtils';
 
@@ -101,7 +101,7 @@ export class AlphaSynth implements IAlphaSynth {
 
     public set playbackSpeed(value: number) {
         value = ModelUtils.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
-        let oldSpeed: number = this._sequencer.playbackSpeed;
+        const oldSpeed: number = this._sequencer.playbackSpeed;
         this._sequencer.playbackSpeed = value;
         this.timePosition = this.timePosition * (oldSpeed / value);
     }
@@ -185,7 +185,7 @@ export class AlphaSynth implements IAlphaSynth {
         });
         this.output.sampleRequest.on(() => {
             if (
-                this.state == PlayerState.Playing &&
+                this.state === PlayerState.Playing &&
                 (!this._sequencer.isFinished || this._synthesizer.activeVoiceCount > 0)
             ) {
                 let samples: Float32Array = new Float32Array(
@@ -223,7 +223,7 @@ export class AlphaSynth implements IAlphaSynth {
                 this.output.addSamples(samples);
             } else {
                 // Tell output that there is no data left for it.
-                let samples: Float32Array = new Float32Array(0);
+                const samples: Float32Array = new Float32Array(0);
                 this.output.addSamples(samples);
             }
         });
@@ -336,10 +336,10 @@ export class AlphaSynth implements IAlphaSynth {
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this.pause();
 
-        let input: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const input: ByteBuffer = ByteBuffer.fromBuffer(data);
         try {
             Logger.debug('AlphaSynth', 'Loading soundfont from bytes');
-            let soundFont: Hydra = new Hydra();
+            const soundFont: Hydra = new Hydra();
             soundFont.load(input);
             if (!append) {
                 this._loadedSoundFonts = [];
@@ -352,7 +352,7 @@ export class AlphaSynth implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'soundFont successfully loaded');
             this.checkReadyForPlayback();
         } catch (e) {
-            Logger.error('AlphaSynth', 'Could not load soundfont from bytes ' + e);
+            Logger.error('AlphaSynth', `Could not load soundfont from bytes ${e}`);
             (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(e as Error);
         }
     }
@@ -395,7 +395,7 @@ export class AlphaSynth implements IAlphaSynth {
             this.checkReadyForPlayback();
             this.tickPosition = 0;
         } catch (e) {
-            Logger.error('AlphaSynth', 'Could not load midi from model ' + e);
+            Logger.error('AlphaSynth', `Could not load midi from model ${e}`);
             (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(e as Error);
         }
     }
@@ -429,7 +429,7 @@ export class AlphaSynth implements IAlphaSynth {
         if (sampleCount === 0) {
             return;
         }
-        let playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
+        const playedMillis: number = (sampleCount / this._synthesizer.outSampleRate) * 1000;
         this._notPlayedSamples -= sampleCount * SynthConstants.AudioChannels;
         this.updateTimePosition(this._timePosition + playedMillis, false);
         this.checkForFinish();

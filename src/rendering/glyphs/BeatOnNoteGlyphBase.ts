@@ -1,8 +1,8 @@
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { Note } from '@src/model/Note';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { Note } from '@src/model/Note';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 
 export class BeatOnNoteGlyphBase extends BeatGlyphBase {
     public beamingHelper!: BeamingHelper;
@@ -12,7 +12,7 @@ export class BeatOnNoteGlyphBase extends BeatGlyphBase {
         //
     }
 
-    public buildBoundingsLookup(beatBounds:BeatBounds, cx:number, cy:number) {
+    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         // implemented in subclasses
     }
 

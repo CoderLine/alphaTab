@@ -5,17 +5,17 @@ export enum GraceType {
     /**
      * No grace, normal beat.
      */
-    None,
+    None = 0,
     /**
      * The beat contains on-beat grace notes.
      */
-    OnBeat,
+    OnBeat = 1,
     /**
      * The beat contains before-beat grace notes.
      */
-    BeforeBeat,
+    BeforeBeat = 2,
     /**
      * The beat contains very special bend-grace notes used in SongBook style displays.
      */
-    BendGrace
+    BendGrace = 3
 }

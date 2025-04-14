@@ -1,9 +1,9 @@
 import { Logger } from '@src/Logger';
-import { BeatTickLookup } from '@src/midi/BeatTickLookup';
+import type { BeatTickLookup } from '@src/midi/BeatTickLookup';
 import { MasterBarTickLookup } from '@src/midi/MasterBarTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat } from '@src/model/Beat';
-import { MasterBar } from '@src/model/MasterBar';
+import type { Beat } from '@src/model/Beat';
+import type { MasterBar } from '@src/model/MasterBar';
 
 /**
  * Describes how a cursor should be moving.
@@ -12,17 +12,17 @@ export enum MidiTickLookupFindBeatResultCursorMode {
     /**
      * Unknown/Undetermined mode. Should not happen on user level.
      */
-    Unknown,
+    Unknown = 0,
 
     /**
      * The cursor should animate to the next beat.
      */
-    ToNextBext,
+    ToNextBext = 1,
 
     /**
      * The cursor should animate to the end of the bar (typically on repeats and jumps)
      */
-    ToEndOfBar
+    ToEndOfBar = 2
 }
 
 /**
@@ -212,11 +212,7 @@ export class MidiTickLookup {
             return currentBeatHint;
         }
         // already on the next beat?
-        else if (
-            currentBeatHint.nextBeat &&
-            tick >= currentBeatHint.nextBeat.start &&
-            tick < currentBeatHint.nextBeat.end
-        ) {
+        if (currentBeatHint.nextBeat && tick >= currentBeatHint.nextBeat.start && tick < currentBeatHint.nextBeat.end) {
             const next = currentBeatHint.nextBeat!;
             // fill next in chain
             this.fillNextBeat(next, trackLookup);
@@ -236,9 +232,8 @@ export class MidiTickLookup {
         for (let i = 0; i < group.length; i++) {
             if (!endMasterBar) {
                 break;
-            } else {
-                endMasterBar = endMasterBar.nextMasterBar;
             }
+            endMasterBar = endMasterBar.nextMasterBar;
         }
 
         if (endMasterBar) {
@@ -257,11 +252,9 @@ export class MidiTickLookup {
                     current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToNextBext;
 
                     if (
-                        current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index + 1 &&
-                        (
-                            current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index ||
-                            current.nextBeat.beat.playbackStart <= current.beat.playbackStart
-                        )
+                        current.nextBeat.masterBar.masterBar.index !== endMasterBar.masterBar.index + 1 &&
+                        (current.nextBeat.masterBar.masterBar.index !== endMasterBar.masterBar.index ||
+                            current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
                     ) {
                         current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
                     }
@@ -327,8 +320,8 @@ export class MidiTickLookup {
         // we report no next beat and animate to the end
         if (
             current.nextBeat &&
-            current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index + 1 &&
-            (current.nextBeat.masterBar.masterBar.index != current.masterBar.masterBar.index ||
+            current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index + 1 &&
+            (current.nextBeat.masterBar.masterBar.index !== current.masterBar.masterBar.index ||
                 current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
         ) {
             current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
@@ -394,7 +387,7 @@ export class MidiTickLookup {
         // scan through beats and find first one which has a beat visible
         while (masterBar) {
             if (masterBar.firstBeat) {
-                let beat = this.findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, trackLookup, isNextSearch);
+                const beat = this.findBeatInMasterBar(masterBar, masterBar.firstBeat, tick, trackLookup, isNextSearch);
 
                 if (beat) {
                     return beat;
@@ -530,9 +523,9 @@ export class MidiTickLookup {
             for (let i = 0; i < multiRest.length; i++) {
                 if (!endMasterBar) {
                     break;
-                } else {
-                    endMasterBar = endMasterBar.nextMasterBar;
                 }
+
+                endMasterBar = endMasterBar.nextMasterBar;
             }
 
             if (endMasterBar) {

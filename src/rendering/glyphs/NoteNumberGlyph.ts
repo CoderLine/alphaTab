@@ -1,14 +1,14 @@
 import { BendType } from '@src/model/BendType';
-import { Font } from '@src/model/Font';
+import type { Font } from '@src/model/Font';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note, NoteSubElement } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
+import { type Note, NoteSubElement } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NotationElement, NotationMode } from '@src/NotationSettings';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class NoteNumberGlyph extends Glyph {
@@ -26,7 +26,7 @@ export class NoteNumberGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        let n: Note = this._note;
+        const n: Note = this._note;
         let fret: number = n.fret - n.beat.voice.bar.staff.transpositionPitch;
         if (n.harmonicType === HarmonicType.Natural && n.harmonicValue !== 0) {
             fret = n.harmonicValue - n.beat.voice.bar.staff.transpositionPitch;
@@ -34,26 +34,26 @@ export class NoteNumberGlyph extends Glyph {
         if (!n.isTieDestination) {
             this._noteString = n.isDead ? 'x' : fret.toString();
             if (n.isGhost) {
-                this._noteString = '(' + this._noteString + ')';
+                this._noteString = `(${this._noteString})`;
             } else if (n.harmonicType === HarmonicType.Natural) {
                 // only first decimal char
-                let i: number = this._noteString.indexOf(String.fromCharCode(46));
+                const i: number = this._noteString.indexOf(String.fromCharCode(46));
                 if (i >= 0) {
                     this._noteString = this._noteString.substr(0, i + 2);
                 }
-                this._noteString = '<' + this._noteString + '>';
+                this._noteString = `<${this._noteString}>`;
             }
         } else if (
-            (n.beat.index === 0 && this.renderer.settings.notation.notationMode == NotationMode.GuitarPro) ||
+            (n.beat.index === 0 && this.renderer.settings.notation.notationMode === NotationMode.GuitarPro) ||
             ((n.bendType === BendType.Bend || n.bendType === BendType.BendRelease) &&
                 this.renderer.settings.notation.isNotationElementVisible(NotationElement.TabNotesOnTiedBends))
         ) {
-            this._noteString = '(' + (n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString() + ')';
+            this._noteString = `(${(n.tieOrigin!.fret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
         } else {
             this._noteString = '';
         }
         if (n.isTrill) {
-            this._trillNoteString = '(' + (n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString() + ')';
+            this._trillNoteString = `(${(n.trillFret - n.beat.voice.bar.staff.transpositionPitch).toString()})`;
         } else if (!ModelUtils.isAlmostEqualTo(n.harmonicValue, 0)) {
             switch (n.harmonicType) {
                 case HarmonicType.Artificial:
@@ -63,11 +63,11 @@ export class NoteNumberGlyph extends Glyph {
                 case HarmonicType.Feedback:
                     let s: string = (fret + n.harmonicValue).toString();
                     // only first decimal char
-                    let i: number = s.indexOf(String.fromCharCode(46));
+                    const i: number = s.indexOf(String.fromCharCode(46));
                     if (i >= 0) {
                         s = s.substr(0, i + 2);
                     }
-                    this._trillNoteString = '<' + s + '>';
+                    this._trillNoteString = `<${s}>`;
                     break;
                 default:
                     this._trillNoteString = '';
@@ -82,7 +82,7 @@ export class NoteNumberGlyph extends Glyph {
             this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(this._noteString).width;
             this.width = this.noteStringWidth;
             this.height = this.renderer.scoreRenderer.canvas!.font.size;
-            let hasTrill: boolean = !!this._trillNoteString;
+            const hasTrill: boolean = !!this._trillNoteString;
             if (hasTrill) {
                 this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
                 this._trillNoteStringWidth =
@@ -96,8 +96,8 @@ export class NoteNumberGlyph extends Glyph {
         if (this.isEmpty) {
             return;
         }
-        let textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
-        let x: number = cx + this.x + (this.width - textWidth) / 2;
+        const textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
+        const x: number = cx + this.x + (this.width - textWidth) / 2;
 
         this.paintTrill(x, cy, canvas);
 
@@ -106,14 +106,14 @@ export class NoteNumberGlyph extends Glyph {
     }
     paintTrill(x: number, cy: number, canvas: ICanvas) {
         using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
-        let prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
+        const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
         canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + 3, cy + this.y);
         this.renderer.scoreRenderer.canvas!.font = prevFont;
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
-        let noteBounds: NoteBounds = new NoteBounds();
+        const noteBounds: NoteBounds = new NoteBounds();
         noteBounds.note = this._note;
         noteBounds.noteHeadBounds = new Bounds();
         noteBounds.noteHeadBounds.x = cx + this.x;

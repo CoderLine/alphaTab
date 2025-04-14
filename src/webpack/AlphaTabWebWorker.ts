@@ -1,8 +1,8 @@
 /**@target web */
 
-import { type Expression, type CallExpression, NewExpression } from 'estree';
-import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
-import { getWorkerRuntime, parseModuleUrl, tapJavaScript, webPackWithAlphaTab, webpackTypes } from './Utils';
+import type { Expression, CallExpression, NewExpression } from 'estree';
+import type { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
+import { getWorkerRuntime, parseModuleUrl, tapJavaScript, type webPackWithAlphaTab, type webpackTypes } from './Utils';
 
 const workerIndexMap = new WeakMap<webpackTypes.ParserState, number>();
 
@@ -34,7 +34,7 @@ export function configureWebWorker(
 
     new webPackWithAlphaTab.webpack.javascript.EnableChunkLoadingPlugin('import-scripts').apply(compiler);
 
-    const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {       
+    const handleAlphaTabWorker = (parser: any, expr: CallExpression) => {
         const [arg1, arg2] = expr.arguments;
         const parsedUrl = parseModuleUrl(parser, arg1 as Expression);
         if (!parsedUrl) {

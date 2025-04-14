@@ -1,14 +1,14 @@
-import { Bar } from '@src/model/Bar';
-import { Voice } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { Bar } from '@src/model/Bar';
+import type { Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBand } from '@src/rendering/EffectBand';
 import { EffectBandSizingInfo } from '@src/rendering/EffectBandSizingInfo';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 
 /**
  * This renderer is responsible for displaying effects above or below the other staves
@@ -47,9 +47,9 @@ export class EffectBarRenderer extends BarRendererBase {
             return false;
         }
         let y: number = 0;
-        for (let slot of this.sizingInfo.slots) {
+        for (const slot of this.sizingInfo.slots) {
             slot.shared.y = y;
-            for (let band of slot.bands) {
+            for (const band of slot.bands) {
                 band.y = y;
                 band.height = slot.shared.height;
             }
@@ -66,12 +66,12 @@ export class EffectBarRenderer extends BarRendererBase {
         const result = !super.applyLayoutingInfo();
         // we create empty slots for the same group
         if (this.index > 0) {
-            let previousRenderer: EffectBarRenderer = this.previousRenderer as EffectBarRenderer;
+            const previousRenderer: EffectBarRenderer = this.previousRenderer as EffectBarRenderer;
             this.sizingInfo = previousRenderer.sizingInfo;
         } else {
             this.sizingInfo = new EffectBandSizingInfo();
         }
-        for (let effectBand of this._bands) {
+        for (const effectBand of this._bands) {
             effectBand.resetHeight();
             effectBand.alignGlyphs();
             if (!effectBand.isEmpty) {
@@ -85,7 +85,7 @@ export class EffectBarRenderer extends BarRendererBase {
 
     public override scaleToWidth(width: number): void {
         super.scaleToWidth(width);
-        for (let effectBand of this._bands) {
+        for (const effectBand of this._bands) {
             effectBand.alignGlyphs();
         }
     }
@@ -93,19 +93,19 @@ export class EffectBarRenderer extends BarRendererBase {
     protected override createBeatGlyphs(): void {
         this._bands = [];
         this._bandLookup = new Map<string, EffectBand>();
-        for (let voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                for (let info of this._infos) {
-                    let band: EffectBand = new EffectBand(voice, info);
+                for (const info of this._infos) {
+                    const band: EffectBand = new EffectBand(voice, info);
                     band.renderer = this;
                     band.doLayout();
                     this._bands.push(band);
-                    this._bandLookup.set(voice.index + '.' + info.effectId, band);
+                    this._bandLookup.set(`${voice.index}.${info.effectId}`, band);
                 }
             }
         }
         super.createBeatGlyphs();
-        for (let effectBand of this._bands) {
+        for (const effectBand of this._bands) {
             if (effectBand.isLinkedToPrevious) {
                 this.isLinkedToPrevious = true;
             }
@@ -113,14 +113,14 @@ export class EffectBarRenderer extends BarRendererBase {
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
-        for (let b of v.beats) {
+        for (const b of v.beats) {
             // we create empty glyphs as alignment references and to get the
             // effect bar sized
-            let container: BeatContainerGlyph = new BeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: BeatContainerGlyph = new BeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
             container.onNotes = new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
-            for (let effectBand of this._bands) {
+            for (const effectBand of this._bands) {
                 effectBand.createGlyph(b);
             }
         }
@@ -131,7 +131,7 @@ export class EffectBarRenderer extends BarRendererBase {
         // canvas.color = new Color(255, 0, 0, 100);
         // canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
 
-        for (let effectBand of this._bands) {
+        for (const effectBand of this._bands) {
             canvas.color =
                 effectBand.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
             if (!effectBand.isEmpty) {
@@ -141,7 +141,7 @@ export class EffectBarRenderer extends BarRendererBase {
     }
 
     public getBand(voice: Voice, effectId: string): EffectBand | null {
-        let id: string = voice.index + '.' + effectId;
+        const id: string = `${voice.index}.${effectId}`;
         if (this._bandLookup.has(id)) {
             return this._bandLookup.get(id)!;
         }

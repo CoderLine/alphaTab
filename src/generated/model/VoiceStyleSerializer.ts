@@ -12,7 +12,7 @@ export class VoiceStyleSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => VoiceStyleSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: VoiceStyle | null): Map<string, unknown> | null {
         if (!obj) {

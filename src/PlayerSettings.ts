@@ -5,15 +5,15 @@ export enum ScrollMode {
     /**
      * Do not scroll automatically
      */
-    Off,
+    Off = 0,
     /**
      * Scrolling happens as soon the offsets of the cursors change.
      */
-    Continuous,
+    Continuous = 1,
     /**
      * Scrolling happens as soon the cursors exceed the displayed range.
      */
-    OffScreen
+    OffScreen = 2
 }
 
 /**
@@ -112,11 +112,11 @@ export enum PlayerOutputMode {
      * If audio worklets are available in the browser, they will be used for playing the audio.
      * It will fallback to the ScriptProcessor output if unavailable.
      */
-    WebAudioAudioWorklets,
+    WebAudioAudioWorklets = 0,
     /**
      * Uses the legacy ScriptProcessor output which might perform worse.
      */
-    WebAudioScriptProcessor
+    WebAudioScriptProcessor = 1
 }
 
 /**
@@ -132,7 +132,7 @@ export class PlayerSettings {
      * @defaultValue `null`
      * @category Player - JavaScript Specific
      * @remarks
-     * When the player is enabled the soundfont from this URL will be loaded automatically after the player is ready.   
+     * When the player is enabled the soundfont from this URL will be loaded automatically after the player is ready.
      */
     public soundFont: string | null = null;
 
@@ -145,9 +145,9 @@ export class PlayerSettings {
      * @defaultValue `html,body`
      * @category Player - JavaScript Specific
      * @remarks
-     * When the player is active, it by default automatically scrolls the browser window to the currently played bar. This setting 
+     * When the player is active, it by default automatically scrolls the browser window to the currently played bar. This setting
      * defines which elements should be scrolled to bring the played bar into the view port. By default scrolling happens on the `html,body`
-     * selector. 
+     * selector.
      */
     public scrollElement: string | HTMLElement = 'html,body';
 
@@ -168,9 +168,9 @@ export class PlayerSettings {
      * @defaultValue `false`
      * @category Player
      * @remarks
-     * This setting configures whether the player feature is enabled or not. Depending on the platform enabling the player needs some additional actions of the developer. 
-     * For the JavaScript version the [player.soundFont](/docs/reference/settings/player/soundfont) property must be set to the URL of the sound font that should be used or it must be loaded manually via API. 
-     * For .net manually the soundfont must be loaded. 
+     * This setting configures whether the player feature is enabled or not. Depending on the platform enabling the player needs some additional actions of the developer.
+     * For the JavaScript version the [player.soundFont](/docs/reference/settings/player/soundfont) property must be set to the URL of the sound font that should be used or it must be loaded manually via API.
+     * For .net manually the soundfont must be loaded.
      *
      * AlphaTab does not ship a default UI for the player. The API must be hooked up to some UI controls to allow the user to interact with the player.
      */
@@ -203,7 +203,7 @@ export class PlayerSettings {
      * @defaultValue `true`
      * @category Player
      * @remarks
-     * This setting configures whether the note elements are highlighted during playback. 
+     * This setting configures whether the note elements are highlighted during playback.
      * The highlighting of elements might not be available on all targets and render engine, so it might not have any effect.
      */
     public enableElementHighlighting: boolean = true;
@@ -215,7 +215,7 @@ export class PlayerSettings {
      * @category Player
      * @remarks
      * This setting configures whether alphaTab provides the default user interaction features like selection of the playback range and "seek on click".
-     * By default users can select the desired playback range with the mouse and also jump to individual beats by click. This behavior can be contolled with this setting. 
+     * By default users can select the desired playback range with the mouse and also jump to individual beats by click. This behavior can be contolled with this setting.
      */
     public enableUserInteraction: boolean = true;
 
@@ -225,9 +225,9 @@ export class PlayerSettings {
      * @defaultValue `0`
      * @category Player
      * @remarks
-     * When alphaTab does an auto-scrolling to the displayed bar, it will try to align the view port to the displayed bar. If due to 
-     * some layout specifics or for aesthetics a small padding is needed, this setting allows an additional X-offset that is added to the 
-     * scroll position. 
+     * When alphaTab does an auto-scrolling to the displayed bar, it will try to align the view port to the displayed bar. If due to
+     * some layout specifics or for aesthetics a small padding is needed, this setting allows an additional X-offset that is added to the
+     * scroll position.
      */
     public scrollOffsetX: number = 0;
 
@@ -237,9 +237,9 @@ export class PlayerSettings {
      * @defaultValue `0`
      * @category Player
      * @remarks
-     * When alphaTab does an auto-scrolling to the displayed bar, it will try to align the view port to the displayed bar. If due to 
-     * some layout specifics or for aesthetics a small padding is needed, this setting allows an additional Y-offset that is added to the 
-     * scroll position. 
+     * When alphaTab does an auto-scrolling to the displayed bar, it will try to align the view port to the displayed bar. If due to
+     * some layout specifics or for aesthetics a small padding is needed, this setting allows an additional Y-offset that is added to the
+     * scroll position.
      */
     public scrollOffsetY: number = 0;
 
@@ -284,9 +284,9 @@ export class PlayerSettings {
      * @defaultValue `75`
      * @category Player
      * @remarks
-     * If the display mode `songbook` is enabled, this has an effect on the way bends are played. For songbook bends the bend is done very quickly at the end or start of the beat. 
-     * This setting defines the play duration for those bends in milliseconds. This duration is in milliseconds unlike some other settings which are in midi ticks. The reason is that on songbook bends, 
-     * the bends should always be played in the same speed, regardless of the song tempo. Midi ticks are tempo dependent. 
+     * If the display mode `songbook` is enabled, this has an effect on the way bends are played. For songbook bends the bend is done very quickly at the end or start of the beat.
+     * This setting defines the play duration for those bends in milliseconds. This duration is in milliseconds unlike some other settings which are in midi ticks. The reason is that on songbook bends,
+     * the bends should always be played in the same speed, regardless of the song tempo. Midi ticks are tempo dependent.
      */
     public songBookBendDuration: number = 75;
 
@@ -296,22 +296,22 @@ export class PlayerSettings {
      * @defaultValue `150`
      * @category Player
      * @remarks
-     * If the display mode `songbook` is enabled, this has an effect on the way whammy dips are played. For songbook dips the whammy is pressed very quickly at the start of the beat. 
-     * This setting defines the play duration for those whammy bars in milliseconds. This duration is in milliseconds unlike some other settings which are in midi ticks. The reason is that on songbook dips, 
-     * the whammy should always be pressed in the same speed, regardless of the song tempo. Midi ticks are tempo dependent. 
+     * If the display mode `songbook` is enabled, this has an effect on the way whammy dips are played. For songbook dips the whammy is pressed very quickly at the start of the beat.
+     * This setting defines the play duration for those whammy bars in milliseconds. This duration is in milliseconds unlike some other settings which are in midi ticks. The reason is that on songbook dips,
+     * the whammy should always be pressed in the same speed, regardless of the song tempo. Midi ticks are tempo dependent.
      */
     public songBookDipDuration: number = 150;
 
     /**
-     * The Vibrato settings allow control how the different vibrato types are generated for audio. 
+     * The Vibrato settings allow control how the different vibrato types are generated for audio.
      * @json_partial_names
      * @since 0.9.6
      * @category Player
      * @remarks
      * AlphaTab supports 4 types of vibratos, for each vibrato the amplitude and the wavelength can be configured. The amplitude controls how many semitones
      * the vibrato changes the pitch up and down while playback. The wavelength controls how many midi ticks it will take to complete one up and down vibrato.
-     * The 4 vibrato types are: 
-     * 
+     * The 4 vibrato types are:
+     *
      * 1. Beat Slight - A fast vibrato on the whole beat. This vibrato is usually done with the whammy bar.
      * 2. Beat Wide - A slow vibrato on the whole beat. This vibrato is usually done with the whammy bar.
      * 3. Note Slight - A fast vibrato on a single note. This vibrato is usually done with the finger on the fretboard.
@@ -320,32 +320,32 @@ export class PlayerSettings {
     public readonly vibrato: VibratoPlaybackSettings = new VibratoPlaybackSettings();
 
     /**
-     * The slide settings allow control how the different slide types are generated for audio. 
+     * The slide settings allow control how the different slide types are generated for audio.
      * @json_partial_names
      * @since 0.9.6
      * @domWildcard
      * @category Player
      * @remarks
-     * AlphaTab supports various types of slides which can be grouped into 3 types: 
-     * 
+     * AlphaTab supports various types of slides which can be grouped into 3 types:
+     *
      * * Shift Slides
      * * Legato Slides
-     * 
-     * 
+     *
+     *
      * * Slide into from below
      * * Slide into from above
      * * Slide out to below
-     * * Slide out to above 
-     * 
-     * 
+     * * Slide out to above
+     *
+     *
      * * Pick Slide out to above
      * * Pick Slide out to below
-     * 
+     *
      * For the first 2 groups the audio generation can be adapted. For the pick slide the audio generation cannot be adapted
-     * as there is no mechanism yet in alphaTab to play pick slides to make them sound real. 
-     * 
+     * as there is no mechanism yet in alphaTab to play pick slides to make them sound real.
+     *
      * For the first group only the duration or start point of the slide can be configured while for the second group
-     * the duration/start-point and the pitch offset can be configured. 
+     * the duration/start-point and the pitch offset can be configured.
      */
     public readonly slide: SlidePlaybackSettings = new SlidePlaybackSettings();
 
@@ -355,7 +355,7 @@ export class PlayerSettings {
      * @defaultValue `true`
      * @category Player
      * @remarks
-     * If this setting is enabled alphaTab will play the triplet feels accordingly, if it is disabled the triplet feel is only displayed but not played. 
+     * If this setting is enabled alphaTab will play the triplet feels accordingly, if it is disabled the triplet feel is only displayed but not played.
      */
     public playTripletFeel: boolean = true;
 

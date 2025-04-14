@@ -1,10 +1,10 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Environment } from '@src/Environment';
-import { EventEmitter, EventEmitterOfT, IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
 import { Logger } from '@src/Logger';
-import { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
-declare var webkitAudioContext: any;
+declare const webkitAudioContext: any;
 
 /**
  * @target web
@@ -69,11 +69,11 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     private patchIosSampleRate(): void {
-        let ua: string = navigator.userAgent;
+        const ua: string = navigator.userAgent;
         if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) {
-            let context: AudioContext = this.createAudioContext();
-            let buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutputBase.PreferredSampleRate);
-            let dummy: AudioBufferSourceNode = context.createBufferSource();
+            const context: AudioContext = this.createAudioContext();
+            const buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutputBase.PreferredSampleRate);
+            const dummy: AudioBufferSourceNode = context.createBufferSource();
             dummy.buffer = buffer;
             dummy.connect(context.destination);
             dummy.start(0);
@@ -86,7 +86,8 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     private createAudioContext(): AudioContext {
         if ('AudioContext' in Environment.globalThis) {
             return new AudioContext();
-        } else if ('webkitAudioContext' in Environment.globalThis) {
+        }
+        if ('webkitAudioContext' in Environment.globalThis) {
             return new webkitAudioContext();
         }
         throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');
@@ -95,7 +96,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     public open(bufferTimeInMilliseconds: number): void {
         this.patchIosSampleRate();
         this._context = this.createAudioContext();
-        let ctx: any = this._context;
+        const ctx: any = this._context;
         if (ctx.state === 'suspended') {
             this.registerResumeHandler();
         }
@@ -120,7 +121,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     public play(): void {
-        let ctx = this._context!;
+        const ctx = this._context!;
         this.activate();
         // create an empty buffer source (silence)
         this._buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);

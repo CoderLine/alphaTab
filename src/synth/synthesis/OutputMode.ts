@@ -10,13 +10,13 @@ export enum OutputMode {
     /**
      * Two channels with single left/right samples one after another
      */
-    StereoInterleaved,
+    StereoInterleaved = 0,
     /**
      * Two channels with all samples for the left channel first then right
      */
-    StereoUnweaved,
+    StereoUnweaved = 1,
     /**
      * A single channel (stereo instruments are mixed into center)
      */
-    Mono
+    Mono = 2
 }

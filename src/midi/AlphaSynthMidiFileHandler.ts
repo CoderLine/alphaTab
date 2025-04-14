@@ -1,8 +1,19 @@
-import { AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, NoteBendEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
-import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
-import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
+import {
+    AlphaTabRestEvent,
+    ControlChangeEvent,
+    EndOfTrackEvent,
+    NoteBendEvent,
+    NoteOffEvent,
+    NoteOnEvent,
+    PitchBendEvent,
+    ProgramChangeEvent,
+    TempoChangeEvent,
+    TimeSignatureEvent
+} from '@src/midi/MidiEvent';
+import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+import { type MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import { ControllerType } from './ControllerType';
+import type { ControllerType } from './ControllerType';
 
 /**
  * This implementation of the {@link IMidiFileHandler}
@@ -34,37 +45,35 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
             }
         }
 
-        this._midiFile.addEvent(new TimeSignatureEvent(
-            0,
-            tick,
-            timeSignatureNumerator,
-            denominatorIndex,
-            48,
-            8
-        ));
+        this._midiFile.addEvent(new TimeSignatureEvent(0, tick, timeSignatureNumerator, denominatorIndex, 48, 8));
     }
 
     public addRest(track: number, tick: number, channel: number): void {
-        if(!this._smf1Mode) {
+        if (!this._smf1Mode) {
             this._midiFile.addEvent(new AlphaTabRestEvent(track, tick, channel));
         }
     }
 
-    public addNote(
-        track: number,
-        start: number,
-        length: number,
-        key: number,
-        velocity: number,
-        channel: number
-    ): void {
-        this._midiFile.addEvent(new NoteOnEvent(track, start, channel,
-            AlphaSynthMidiFileHandler.fixValue(key),
-            AlphaSynthMidiFileHandler.fixValue(velocity)));
+    public addNote(track: number, start: number, length: number, key: number, velocity: number, channel: number): void {
+        this._midiFile.addEvent(
+            new NoteOnEvent(
+                track,
+                start,
+                channel,
+                AlphaSynthMidiFileHandler.fixValue(key),
+                AlphaSynthMidiFileHandler.fixValue(velocity)
+            )
+        );
 
-        this._midiFile.addEvent(new NoteOffEvent(track, start + length, channel,
-            AlphaSynthMidiFileHandler.fixValue(key),
-            AlphaSynthMidiFileHandler.fixValue(velocity)));
+        this._midiFile.addEvent(
+            new NoteOffEvent(
+                track,
+                start + length,
+                channel,
+                AlphaSynthMidiFileHandler.fixValue(key),
+                AlphaSynthMidiFileHandler.fixValue(velocity)
+            )
+        );
     }
 
     private static fixValue(value: number): number {
@@ -77,14 +86,16 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         return value;
     }
 
-    public addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void {
-        this._midiFile.addEvent(new ControlChangeEvent(
-            track,
-            tick,
-            channel,
-            controller,
-            AlphaSynthMidiFileHandler.fixValue(value)
-        ));
+    public addControlChange(
+        track: number,
+        tick: number,
+        channel: number,
+        controller: ControllerType,
+        value: number
+    ): void {
+        this._midiFile.addEvent(
+            new ControlChangeEvent(track, tick, channel, controller, AlphaSynthMidiFileHandler.fixValue(value))
+        );
     }
 
     public addProgramChange(track: number, tick: number, channel: number, program: number): void {
@@ -112,20 +123,14 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
         } else {
             // map midi 1.0 range of 0-16384     (0x4000)
             // to midi 2.0 range of 0-4294967296 (0x100000000)
-            value = value * SynthConstants.MaxPitchWheel20 / SynthConstants.MaxPitchWheel
+            value = (value * SynthConstants.MaxPitchWheel20) / SynthConstants.MaxPitchWheel;
 
-            this._midiFile.addEvent(new NoteBendEvent(
-                track,
-                tick,
-                channel,
-                key,
-                value
-            ));
+            this._midiFile.addEvent(new NoteBendEvent(track, tick, channel, key, value));
         }
     }
 
     public finishTrack(track: number, tick: number): void {
-        if (this._midiFile.format == MidiFileFormat.MultiTrack || track == 0) {
+        if (this._midiFile.format === MidiFileFormat.MultiTrack || track === 0) {
             this._midiFile.addEvent(new EndOfTrackEvent(track, tick));
         }
     }

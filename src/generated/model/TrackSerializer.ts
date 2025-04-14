@@ -18,7 +18,7 @@ export class TrackSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => TrackSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Track | null): Map<string, unknown> | null {
         if (!obj) {

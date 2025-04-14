@@ -14,7 +14,7 @@ export class RenderStylesheetSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => RenderStylesheetSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: RenderStylesheet | null): Map<string, unknown> | null {
         if (!obj) {
@@ -73,7 +73,7 @@ export class RenderStylesheetSerializer {
             case "pertrackdisplaytuning":
                 obj.perTrackDisplayTuning = new Map<number, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackDisplayTuning!.set(parseInt(k), v as boolean);
+                    obj.perTrackDisplayTuning!.set(Number.parseInt(k), v as boolean);
                 });
                 return true;
             case "globaldisplaychorddiagramsontop":
@@ -82,7 +82,7 @@ export class RenderStylesheetSerializer {
             case "pertrackchorddiagramsontop":
                 obj.perTrackChordDiagramsOnTop = new Map<number, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackChordDiagramsOnTop!.set(parseInt(k), v as boolean);
+                    obj.perTrackChordDiagramsOnTop!.set(Number.parseInt(k), v as boolean);
                 });
                 return true;
             case "singletracktracknamepolicy":

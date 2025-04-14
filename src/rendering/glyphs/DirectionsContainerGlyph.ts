@@ -1,6 +1,6 @@
 import { Direction } from '@src/model/Direction';
 import { EffectGlyph } from './EffectGlyph';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform';
 import { Glyph } from './Glyph';
 import { MusicFontSymbol } from '@src/model';
 

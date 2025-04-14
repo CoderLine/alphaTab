@@ -5,33 +5,33 @@ export enum DynamicValue {
     /**
      * pianississimo (very very soft)
      */
-    PPP,
+    PPP = 0,
     /**
      * pianissimo (very soft)
      */
-    PP,
+    PP = 1,
     /**
      * piano (soft)
      */
-    P,
+    P = 2,
     /**
      * mezzo-piano (half soft)
      */
-    MP,
+    MP = 3,
     /**
      * mezzo-forte (half loud)
      */
-    MF,
+    MF = 4,
     /**
      * forte (loud)
      */
-    F,
+    F = 5,
     /**
      * fortissimo (very loud)
      */
-    FF,
+    FF = 6,
     /**
      * fortississimo (very very loud)
      */
-    FFF
+    FFF = 7
 }

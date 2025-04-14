@@ -1,9 +1,9 @@
-import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { Duration } from '@src/model/Duration';
-import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import type { Duration } from '@src/model/Duration';
+import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
@@ -28,7 +28,7 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
             canvas.color = this.colorOverride!;
         }
 
-        let offset: number = this._isGrace ? 1 : 0;
+        const offset: number = this._isGrace ? 1 : 0;
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
 
         if (

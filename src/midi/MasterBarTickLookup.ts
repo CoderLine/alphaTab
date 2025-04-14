@@ -1,7 +1,7 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatTickLookup } from '@src/midi/BeatTickLookup';
-import { Beat } from '@src/model/Beat';
-import { MasterBar } from '@src/model/MasterBar';
+import type { Beat } from '@src/model/Beat';
+import type { MasterBar } from '@src/model/MasterBar';
 
 /**
  * Represents a single point in time defining the tempo of a {@link MasterBarTickLookup}.
@@ -80,7 +80,7 @@ export class MasterBarTickLookup {
             }
             currentBeat.nextBeat = newBeat;
 
-            if (currentBeat == this.lastBeat) {
+            if (currentBeat === this.lastBeat) {
                 this.lastBeat = newBeat;
             }
         }
@@ -106,7 +106,7 @@ export class MasterBarTickLookup {
                 currentBeat.previousBeat.nextBeat = newBeat;
             }
             currentBeat.previousBeat = newBeat;
-            if (currentBeat == this.firstBeat) {
+            if (currentBeat === this.firstBeat) {
                 this.firstBeat = newBeat;
             }
         }
@@ -276,7 +276,7 @@ export class MasterBarTickLookup {
             if (sliceStart < l1.start) {
                 // Variant D
                 // Variant E
-                if (end == l1.start) {
+                if (end === l1.start) {
                     // using firstBeat.start here allows merge of D & E
                     const n1 = new BeatTickLookup(sliceStart, l1.start);
                     n1.highlightBeat(beat, beatPlaybackStart);
@@ -299,7 +299,7 @@ export class MasterBarTickLookup {
                     l1.start = end;
                 }
                 // Variant G
-                else if (end == l1.end) {
+                else if (end === l1.end) {
                     const n1 = new BeatTickLookup(sliceStart, l1.start);
                     n1.highlightBeat(beat, beatPlaybackStart);
 
@@ -320,7 +320,7 @@ export class MasterBarTickLookup {
                 }
             } else if (sliceStart > l1.start) {
                 // variant I
-                if (end == l1.end) {
+                if (end === l1.end) {
                     const n1 = new BeatTickLookup(l1.start, sliceStart);
                     for (const b of l1.highlightedBeats) {
                         n1.highlightBeat(b.beat, b.playbackStart);

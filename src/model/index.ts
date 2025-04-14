@@ -57,6 +57,6 @@ export { Tuning } from '@src/model/Tuning';
 export { TupletGroup } from '@src/model/TupletGroup';
 export { VibratoType } from '@src/model/VibratoType';
 export { Voice, VoiceSubElement, VoiceStyle } from '@src/model/Voice';
-export { WahPedal } from '@src/model/WahPedal'
+export { WahPedal } from '@src/model/WahPedal';
 export { WhammyType } from '@src/model/WhammyType';
 export { ElementStyle } from '@src/model/ElementStyle';

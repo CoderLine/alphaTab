@@ -3,13 +3,13 @@
  * any data models to and from JSON following certain rules.
  */
 
-import * as path from 'path';
-import * as ts from 'typescript';
+import path from 'node:path';
+import ts from 'typescript';
 import createEmitter from './EmitterBase';
 import { createSetPropertyMethod } from './Serializer.setProperty';
 import { createFromJsonMethod } from './Serializer.fromJson';
 import { createToJsonMethod } from './Serializer.toJson';
-import { buildTypeSchema, getTypeWithNullableInfo, toImportPath, TypeSchema } from './TypeSchema';
+import { buildTypeSchema, toImportPath } from './TypeSchema';
 
 export default createEmitter('json', (program, input) => {
     console.log(`Writing Serializer for ${input.name!.text}`);
@@ -46,7 +46,7 @@ export default createEmitter('json', (program, input) => {
     statements.push(
         ts.factory.createClassDeclaration(
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-            input.name!.text + 'Serializer',
+            `${input.name!.text}Serializer`,
             undefined,
             undefined,
             [

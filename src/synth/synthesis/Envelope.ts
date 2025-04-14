@@ -55,7 +55,7 @@ export class Envelope {
         if (this.keynumToDecay === 0) {
             this.decay = this.decay < -11950.0 ? 0.0 : SynthHelper.timecents2Secs(this.decay);
         }
-        
+
         if (this.sustain < 0.0) {
             this.sustain = 0.0;
         } else if (sustainIsGain) {

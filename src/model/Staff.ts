@@ -1,7 +1,7 @@
-import { Bar } from '@src/model/Bar';
-import { Chord } from '@src/model/Chord';
-import { Track } from '@src/model/Track';
-import { Settings } from '@src/Settings';
+import type { Bar } from '@src/model/Bar';
+import type { Chord } from '@src/model/Chord';
+import type { Track } from '@src/model/Track';
+import type { Settings } from '@src/Settings';
 import { Tuning } from '@src/model/Tuning';
 
 /**
@@ -128,16 +128,15 @@ export class Staff {
     }
 
     public hasChord(chordId: string): boolean {
-        return this.chords?.has(chordId) ?? false
+        return this.chords?.has(chordId) ?? false;
     }
 
     public getChord(chordId: string): Chord | null {
-        return this.chords?.get(chordId) ?? null
+        return this.chords?.get(chordId) ?? null;
     }
-    
 
     public addBar(bar: Bar): void {
-        let bars: Bar[] = this.bars;
+        const bars: Bar[] = this.bars;
         bar.staff = this;
         bar.index = bars.length;
         if (bars.length > 0) {

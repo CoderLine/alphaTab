@@ -1,22 +1,22 @@
-import { MidiFile } from '@src/midi/MidiFile';
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import { ISynthOutput } from '@src/synth/ISynthOutput';
-import { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { MidiFile } from '@src/midi/MidiFile';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { ISynthOutput } from '@src/synth/ISynthOutput';
+import type { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
 import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { Logger } from '@src/Logger';
-import { LogLevel } from '@src/LogLevel';
+import type { LogLevel } from '@src/LogLevel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import { FileLoadError } from '@src/FileLoadError';
 import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { MidiEventType } from '@src/midi/MidiEvent';
+import type { MidiEventType } from '@src/midi/MidiEvent';
 import { Environment } from '@src/Environment';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 /**
@@ -213,7 +213,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         try {
             this._synth = Environment.createWebWorker(settings);
         } catch (e) {
-            Logger.error('AlphaSynth', 'Failed to create WebWorker: ' + e);
+            Logger.error('AlphaSynth', `Failed to create WebWorker: ${e}`);
         }
         this._synth.addEventListener('message', this.handleWorkerMessage.bind(this), false);
         this._synth.postMessage({
@@ -279,15 +279,15 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
 
     public loadSoundFontFromUrl(url: string, append: boolean, progress: (e: ProgressEventArgs) => void): void {
         Logger.debug('AlphaSynth', `Start loading Soundfont from url ${url}`);
-        let request: XMLHttpRequest = new XMLHttpRequest();
+        const request: XMLHttpRequest = new XMLHttpRequest();
         request.open('GET', url, true, null, null);
         request.responseType = 'arraybuffer';
         request.onload = _ => {
-            let buffer: Uint8Array = new Uint8Array(request.response);
+            const buffer: Uint8Array = new Uint8Array(request.response);
             this.loadSoundFont(buffer, append);
         };
         request.onerror = e => {
-            Logger.error('AlphaSynth', 'Loading failed: ' + (e as any).message);
+            Logger.error('AlphaSynth', `Loading failed: ${(e as any).message}`);
             (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(
                 new FileLoadError((e as any).message, request)
             );
@@ -359,8 +359,8 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public handleWorkerMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: string = data.cmd;
+        const data: any = e.data;
+        const cmd: string = data.cmd;
         switch (cmd) {
             case 'alphaSynth.ready':
                 this._workerIsReady = true;

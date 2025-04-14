@@ -1,12 +1,12 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { RenderingResources } from '@src/RenderingResources';
-import { Settings } from '@src/Settings';
+import type { RenderingResources } from '@src/RenderingResources';
+import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
 export class TapEffectInfo extends EffectBarRendererInfo {
@@ -31,7 +31,7 @@ export class TapEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        let res: RenderingResources = renderer.resources;
+        const res: RenderingResources = renderer.resources;
         if (beat.slap) {
             return new TextGlyph(0, 0, 'S', res.effectFont, TextAlign.Left);
         }

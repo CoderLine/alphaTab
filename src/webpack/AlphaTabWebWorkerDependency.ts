@@ -1,13 +1,13 @@
 /**@target web */
 
 import {
-    Hash,
-    ObjectSerializerContext,
-    ObjectDeserializerContext,
+    type Hash,
+    type ObjectSerializerContext,
+    type ObjectDeserializerContext,
     makeDependencySerializable,
-    webPackWithAlphaTab,
-    webpackTypes,
-    NormalModuleFactory
+    type webPackWithAlphaTab,
+    type webpackTypes,
+    type NormalModuleFactory
 } from './Utils';
 
 export function injectWebWorkerDependency(webPackWithAlphaTab: webPackWithAlphaTab) {
@@ -71,7 +71,9 @@ export function injectWebWorkerDependency(webPackWithAlphaTab: webPackWithAlphaT
             const entrypoint = chunkGraph.getBlockChunkGroup(block) as any;
             const chunk = entrypoint.getEntrypointChunk() as webpackTypes.Chunk;
             // We use the workerPublicPath option if provided, else we fallback to the RuntimeGlobal publicPath
-            const workerImportBaseUrl = dep.publicPath ? `"${dep.publicPath}"` : webPackWithAlphaTab.webpack.RuntimeGlobals.publicPath;
+            const workerImportBaseUrl = dep.publicPath
+                ? `"${dep.publicPath}"`
+                : webPackWithAlphaTab.webpack.RuntimeGlobals.publicPath;
 
             runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.publicPath);
             runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.baseURI);

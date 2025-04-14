@@ -1,13 +1,13 @@
 /**@target web */
 
 import {
-    Hash,
-    NormalModuleFactory,
-    ObjectDeserializerContext,
-    ObjectSerializerContext,
+    type Hash,
+    type NormalModuleFactory,
+    type ObjectDeserializerContext,
+    type ObjectSerializerContext,
     makeDependencySerializable,
-    webPackWithAlphaTab,
-    webpackTypes
+    type webPackWithAlphaTab,
+    type webpackTypes
 } from './Utils';
 
 export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab) {
@@ -89,7 +89,10 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
 
             chunkGraph.addChunkRuntimeRequirements(
                 chunk,
-                new Set<string>([webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories, webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey])
+                new Set<string>([
+                    webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories,
+                    webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey
+                ])
             );
 
             runtimeRequirements.add(webPackWithAlphaTab.alphaTab.RuntimeGlobalWorkletGetStartupChunks);
@@ -107,7 +110,7 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
                         ]),
                         '}'
                     ]),
-                    `})(alphaTabWorklet)`
+                    '})(alphaTabWorklet)'
                 ])
             );
         }
@@ -123,7 +126,6 @@ export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab
         compilation.dependencyTemplates.set(AlphaTabWorkletDependency, new AlphaTabWorkletDependency.Template());
     };
 
-    
     webPackWithAlphaTab.alphaTab.createWorkletDependency = (
         request: string,
         range: [number, number],

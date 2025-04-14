@@ -1,5 +1,5 @@
-import { Color } from '@src/model';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { Color } from '@src/model';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
@@ -21,7 +21,7 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const c = canvas.color;
-        if(this.colorOverride) {
+        if (this.colorOverride) {
             canvas.color = this.colorOverride;
         }
         if (this._isOpen) {

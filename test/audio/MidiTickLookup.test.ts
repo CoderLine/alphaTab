@@ -8,12 +8,12 @@ import {
     MidiFile,
     MidiFileGenerator,
     MidiTickLookup,
-    MidiTickLookupFindBeatResult
+    type MidiTickLookupFindBeatResult
 } from '@src/midi';
 import { MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
 import { MidiTickLookupFindBeatResultCursorMode } from '@src/midi/MidiTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat, Duration, MasterBar, Note, Score } from '@src/model';
+import { Beat, Duration, MasterBar, Note, type Score } from '@src/model';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
@@ -623,7 +623,7 @@ describe('MidiTickLookupTest', () => {
     it('before-beat-grace-later-bars', () => {
         const settings = new Settings();
         const importer = new AlphaTexImporter();
-        importer.initFromString(`\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1`, settings);
+        importer.initFromString('\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1', settings);
         const score = importer.readScore();
         const lookup = buildLookup(score, settings);
 
@@ -884,7 +884,7 @@ describe('MidiTickLookupTest', () => {
                 5760, 6240, 6720, 7200,
                 // 5th bar (multirest with 2nd bar)
                 7680, 8160, 8640, 9120,
-                // 6th bar 
+                // 6th bar
                 9600, 10080, 10560, 11040,
                 // 7th bar (multirest start)
                 11520, 12000, 12480, 12960,
@@ -910,64 +910,107 @@ describe('MidiTickLookupTest', () => {
                 28800, 29280, 29760, 30240,
                 // 13th bar repated (multirest with 10th bar -  repeat close)
                 30720, 31200, 31680, 32160,
-                
-                // 14th bar 
+
+                // 14th bar
                 32640, 33120, 33600, 34080
             ],
             [0],
             // prettier-ignore
             [
                 // 1st bar
-                960, 960, 960, 960,
+                960,
+                960,
+                960,
+                960,
                 // 2nd bar - 5th bar (4 bars 2/4)
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
                 // 6th bar
-                960 * 2, 960 * 2, 960 * 2, 960 * 2,
+                960 * 2,
+                960 * 2,
+                960 * 2,
+                960 * 2,
                 // 7th bar - 9th bar
-                960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3,
-                960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3,
-                960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3, 960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
+                960 * 2 * 3,
                 // 10th - 13th bar
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
                 // 10th - 13th bar (repeated)
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
-                960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4, 960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
+                960 * 2 * 4,
                 // 14th bar
-                960 * 2, 960 * 2, 960 * 2, 960 * 2
+                960 * 2,
+                960 * 2,
+                960 * 2,
+                960 * 2
             ],
             // prettier-ignore
             [
                 // first bar (empty)
                 0, 0, 1, 1,
                 // 2nd bar - 5th bar (4 bars 2/4)
-                2, 2, 2, 2,
-                2, 2, 2, 2,
-                2, 2, 2, 2,
-                2, 2, 2, 2,
+                2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
                 // 6th bar
                 6, 6, 6, 6,
                 // 7th bar - 9th bar
-                7, 7, 7, 7,
-                7, 7, 7, 7,
-                7, 7, 7, 7,
+                7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
                 // 10th-13th bar
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
+                10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
                 // 10th-13th bar (repeated)
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
+                10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
                 // 14th bar
                 14, 14, 14, 14
             ],
@@ -976,26 +1019,15 @@ describe('MidiTickLookupTest', () => {
                 // first bar (empty)
                 1, 1, 2, 2,
                 // 2nd bar - 5th bar (4 bars 2/4)
-                6, 6, 6, 6,
-                6, 6, 6, 6,
-                6, 6, 6, 6,
-                6, 6, 6, 6,
+                6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
                 // 6th bar
                 7, 7, 7, 7,
                 // 7th bar - 9th bar
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10,
-                // 10th-13th bar 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
-                10, 10, 10, 10, 
+                10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
+                // 10th-13th bar
+                10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10,
                 // 10th-13th bar (repeated)
-                14, 14, 14, 14, 
-                14, 14, 14, 14, 
-                14, 14, 14, 14, 
-                14, 14, 14, 14, 
+                14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14, 14,
                 // 14th bar
                 -1, -1, -1, -1
             ],
@@ -1015,8 +1047,8 @@ describe('MidiTickLookupTest', () => {
             // prettier-ignore
             [
                 // 1st bar
-                0, 960, 
-                // 2nd bar                    
+                0, 960,
+                // 2nd bar
                 1920, 2880,
                 // 3rd bar
                 3840, 4800,
@@ -1033,8 +1065,8 @@ describe('MidiTickLookupTest', () => {
             // prettier-ignore
             [
                 // 1st bar
-                5760, 5760, 
-                // 2nd bar                    
+                5760, 5760,
+                // 2nd bar
                 5760, 5760,
                 // 3rd bar
                 5760, 5760,
@@ -1049,26 +1081,26 @@ describe('MidiTickLookupTest', () => {
             ],
             // prettier-ignore
             [
-                 // 1st bar
-                 0, 0, 
-                 // 2nd bar                    
-                 0, 0,
-                 // 3rd bar
-                 0, 0,
-                 // 1st bar (repated)
-                 0, 0,
-                 // 2nd bar (repeated)
-                 0, 0,
-                 // 3rd bar (repeated)
-                 0, 0,
-                 // 4th bar
-                 3, 3
+                // 1st bar
+                0, 0,
+                // 2nd bar
+                0, 0,
+                // 3rd bar
+                0, 0,
+                // 1st bar (repated)
+                0, 0,
+                // 2nd bar (repeated)
+                0, 0,
+                // 3rd bar (repeated)
+                0, 0,
+                // 4th bar
+                3, 3
             ],
             // prettier-ignore
             [
                 // 1st bar
-                0, 0, 
-                // 2nd bar                    
+                0, 0,
+                // 2nd bar
                 0, 0,
                 // 3rd bar
                 0, 0,
@@ -1103,7 +1135,7 @@ describe('MidiTickLookupTest', () => {
                 // 3rd bar (repeated)
                 MidiTickLookupFindBeatResultCursorMode.ToNextBext,
                 MidiTickLookupFindBeatResultCursorMode.ToNextBext,
-                
+
                 // 4th bar
                 MidiTickLookupFindBeatResultCursorMode.ToEndOfBar,
                 MidiTickLookupFindBeatResultCursorMode.ToEndOfBar

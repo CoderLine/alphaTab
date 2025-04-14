@@ -5,13 +5,13 @@ export enum SlideInType {
     /**
      * No slide.
      */
-    None,
+    None = 0,
     /**
      * Slide into the note from below on the same string.
      */
-    IntoFromBelow,
+    IntoFromBelow = 1,
     /**
      * Slide into the note from above on the same string.
      */
-    IntoFromAbove
+    IntoFromAbove = 2
 }

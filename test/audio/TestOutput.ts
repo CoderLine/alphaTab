@@ -1,5 +1,5 @@
-import { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 export class TestOutput implements ISynthOutput {
     public samples: number[] = [];

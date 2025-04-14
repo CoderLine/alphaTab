@@ -31,12 +31,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-export { type Plugin } from 'vite';
+export type { Plugin } from 'vite';
 export { fileToUrl } from './asset';
 export { createToImportMetaURLBasedRelativeRuntime, toOutputFilePathInJS } from './build';
-export { type ResolvedConfig } from './config';
+export type { ResolvedConfig } from './config';
 export { ENV_PUBLIC_PATH } from './constants';
 export { evalValue, cleanUrl, injectQuery, encodeURIPath } from './utils';
 export { tryFsResolve } from './resolve';
 export { tryOptimizedDepResolve } from './optimizer';
-export { AlphaTabWorkerTypes, WORKER_ASSET_ID, WORKER_FILE_ID, workerFileToUrl, workerCache, isSameContent } from './worker';
+export {
+    AlphaTabWorkerTypes,
+    WORKER_ASSET_ID,
+    WORKER_FILE_ID,
+    workerFileToUrl,
+    workerCache,
+    isSameContent
+} from './worker';

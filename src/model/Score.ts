@@ -1,14 +1,15 @@
-import { MasterBar } from '@src/model/MasterBar';
+import type { MasterBar } from '@src/model/MasterBar';
 import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
-import { Track } from '@src/model/Track';
-import { Settings } from '@src/Settings';
+import type { Track } from '@src/model/Track';
+import type { Settings } from '@src/Settings';
 import { ElementStyle } from './ElementStyle';
 import { Bar } from './Bar';
 import { Beat } from './Beat';
 import { Voice } from './Voice';
 import { Note } from './Note';
 import { TextAlign } from '@src/platform';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { NotationSettings } from '@src/NotationSettings';
 
 /**
@@ -18,50 +19,50 @@ export enum ScoreSubElement {
     /**
      * The title of the song
      */
-    Title,
+    Title = 0,
     /**
      * The subtitle of the song
      */
-    SubTitle,
+    SubTitle = 1,
     /**
      * The artist of the song
      */
-    Artist,
+    Artist = 2,
     /**
      * The album of the song
      */
-    Album,
+    Album = 3,
     /**
      * The word author of the song
      */
-    Words,
+    Words = 4,
     /**
      * The Music author of the song
      */
-    Music,
+    Music = 5,
     /**
      * The Words&Music author of the song
      */
-    WordsAndMusic,
+    WordsAndMusic = 6,
     /**
      * The transcriber of the music sheet
      */
-    Transcriber,
+    Transcriber = 7,
 
     /**
      * The copyright holder of the song
      */
-    Copyright,
+    Copyright = 8,
 
     /**
      * The second copyright line (typically something like 'All Rights Reserved')
      */
-    CopyrightSecondLine,
+    CopyrightSecondLine = 9,
 
     /**
      * The chord diagram list shown on top of the score.
      */
-    ChordDiagramList
+    ChordDiagramList = 10
 }
 
 /**
@@ -107,45 +108,48 @@ export class HeaderFooterStyle {
     public buildText(score: Score) {
         let anyPlaceholderFilled = false;
         let anyPlaceholder = false;
-        const replaced = this.template.replace(HeaderFooterStyle.PlaceholderPattern, (_match: string, variable: string) => {
-            anyPlaceholder = true;
-            let value = '';
-            switch (variable) {
-                case `TITLE`:
-                    value = score.title;
-                    break;
-                case `SUBTITLE`:
-                    value = score.subTitle;
-                    break;
-                case `ARTIST`:
-                    value = score.artist;
-                    break;
-                case `ALBUM`:
-                    value = score.album;
-                    break;
-                case `WORDS`:
-                case `WORDSMUSIC`:
-                    value = score.words;
-                    break;
-                case `MUSIC`:
-                    value = score.music;
-                    break;
-                case `TABBER`:
-                    value = score.tab;
-                    break;
-                case `COPYRIGHT`:
-                    value = score.copyright;
-                    break;
-                default:
-                    value = '';
-                    break;
-            }
+        const replaced = this.template.replace(
+            HeaderFooterStyle.PlaceholderPattern,
+            (_match: string, variable: string) => {
+                anyPlaceholder = true;
+                let value = '';
+                switch (variable) {
+                    case 'TITLE':
+                        value = score.title;
+                        break;
+                    case 'SUBTITLE':
+                        value = score.subTitle;
+                        break;
+                    case 'ARTIST':
+                        value = score.artist;
+                        break;
+                    case 'ALBUM':
+                        value = score.album;
+                        break;
+                    case 'WORDS':
+                    case 'WORDSMUSIC':
+                        value = score.words;
+                        break;
+                    case 'MUSIC':
+                        value = score.music;
+                        break;
+                    case 'TABBER':
+                        value = score.tab;
+                        break;
+                    case 'COPYRIGHT':
+                        value = score.copyright;
+                        break;
+                    default:
+                        value = '';
+                        break;
+                }
 
-            if (value) {
-                anyPlaceholderFilled = true;
+                if (value) {
+                    anyPlaceholderFilled = true;
+                }
+                return value;
             }
-            return value;
-        });
+        );
 
         if (anyPlaceholder && !anyPlaceholderFilled) {
             return '';
@@ -153,7 +157,7 @@ export class HeaderFooterStyle {
         return replaced;
     }
 
-    private static readonly PlaceholderPattern = new RegExp('%([^%]+)%', 'g');
+    private static readonly PlaceholderPattern = /%([^%]+)%/g;
 }
 
 /**
@@ -165,10 +169,7 @@ export class ScoreStyle extends ElementStyle<ScoreSubElement> {
     /**
      * Changes additional style aspects fo the of the specified sub-element.
      */
-    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<
-        ScoreSubElement,
-        HeaderFooterStyle
-    >();
+    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<ScoreSubElement, HeaderFooterStyle>();
 
     /**
      * The default styles applied to headers and footers if not specified

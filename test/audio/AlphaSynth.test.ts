@@ -3,7 +3,7 @@ import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { AlphaSynth } from '@src/synth/AlphaSynth';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestOutput } from '@test/audio/TestOutput';
 import { TestPlatform } from '@test/TestPlatform';
@@ -15,20 +15,20 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
         const data = await TestPlatform.loadFile('test-data/audio/default.sf2');
-        let tex: string =
+        const tex: string =
             '\\tempo 102 \\tuning E4 B3 G3 D3 A2 E2 \\instrument 25 . r.8 (0.4 0.3 ).8 ' +
             '(-.3 -.4 ).2 {d } | (0.4 0.3 ).8 r.8 (3.3 3.4 ).8 r.8 (5.4 5.3 ).4 r.8 (0.4 0.3 ).8 |' +
             ' r.8 (3.4 3.3 ).8 r.8 (6.3 6.4 ).8 (5.4 5.3 ).4 {d }r.8 |' +
             ' (0.4 0.3).8 r.8(3.4 3.3).8 r.8(5.4 5.3).4 r.8(3.4 3.3).8 | ' +
             'r.8(0.4 0.3).8(-.3 - .4).2 { d } | ';
-        let importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
-        let score: Score = importer.readScore();
-        let midi: MidiFile = new MidiFile();
-        let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        const score: Score = importer.readScore();
+        const midi: MidiFile = new MidiFile();
+        const gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
         gen.generate();
-        let testOutput: TestOutput = new TestOutput();
-        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
+        const testOutput: TestOutput = new TestOutput();
+        const synth: AlphaSynth = new AlphaSynth(testOutput, 500);
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
         synth.play();
@@ -53,14 +53,14 @@ describe('AlphaSynthTests', () => {
             \\track "T02"
             \\instrument 30
             4.4.4*4`;
-        let importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
-        let score: Score = importer.readScore();
-        let midi: MidiFile = new MidiFile();
-        let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        const score: Score = importer.readScore();
+        const midi: MidiFile = new MidiFile();
+        const gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
         gen.generate();
-        let testOutput: TestOutput = new TestOutput();
-        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
+        const testOutput: TestOutput = new TestOutput();
+        const synth: AlphaSynth = new AlphaSynth(testOutput, 500);
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
 
@@ -85,17 +85,16 @@ describe('AlphaSynthTests', () => {
             \\track "T02"
             \\instrument 30
             4.4.4*4`;
-        let importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
-        let score: Score = importer.readScore();
-        let midi: MidiFile = new MidiFile();
-        let gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
+        const score: Score = importer.readScore();
+        const midi: MidiFile = new MidiFile();
+        const gen: MidiFileGenerator = new MidiFileGenerator(score, null, new AlphaSynthMidiFileHandler(midi));
         gen.generate();
-        let testOutput: TestOutput = new TestOutput();
-        let synth: AlphaSynth = new AlphaSynth(testOutput, 500);
+        const testOutput: TestOutput = new TestOutput();
+        const synth: AlphaSynth = new AlphaSynth(testOutput, 500);
         synth.loadSoundFont(data, false);
         synth.loadMidiFile(midi);
-
 
         expect(synth.isReadyForPlayback).to.be.true;
         expect(synth.hasSamplesForProgram(24)).to.be.true;
@@ -105,7 +104,7 @@ describe('AlphaSynthTests', () => {
         expect(synth.hasSamplesForPercussion(SynthConstants.MetronomeKey)).to.be.true;
     });
 
-   async function testVorbisFile(name:string) {
+    async function testVorbisFile(name: string) {
         const data = await TestPlatform.loadFile(`test-data/audio/${name}.ogg`);
         const vorbis = new VorbisFile(ByteBuffer.fromBuffer(data));
 

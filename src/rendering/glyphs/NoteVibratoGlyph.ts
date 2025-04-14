@@ -1,5 +1,5 @@
 import { VibratoType } from '@src/model/VibratoType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
@@ -37,9 +37,9 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        let startX: number = cx + this.x;
-        let width: number = endX - startX;
-        let step: number = this._symbolSize;
+        const startX: number = cx + this.x;
+        const width: number = endX - startX;
+        const step: number = this._symbolSize;
 
         let loops: number = width / step;
         if (!this._partialWaves) {

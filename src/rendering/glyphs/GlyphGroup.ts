@@ -1,4 +1,4 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 
 /**
@@ -12,10 +12,6 @@ export class GlyphGroup extends Glyph {
         return !this.glyphs || this.glyphs.length === 0;
     }
 
-    public constructor(x: number, y: number) {
-        super(x, y);
-    }
-
     public override doLayout(): void {
         if (!this.glyphs || this.glyphs.length === 0) {
             this.width = 0;
@@ -23,7 +19,7 @@ export class GlyphGroup extends Glyph {
         }
         let w: number = 0;
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
-            let g: Glyph = this.glyphs[i];
+            const g: Glyph = this.glyphs[i];
             g.renderer = this.renderer;
             g.doLayout();
             w = Math.max(w, g.width);
@@ -35,18 +31,18 @@ export class GlyphGroup extends Glyph {
         if (!this.glyphs) {
             this.glyphs = [];
         }
-        if(this.renderer) {
+        if (this.renderer) {
             g.renderer = this.renderer;
         }
         this.glyphs.push(g);
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let glyphs = this.glyphs;
+        const glyphs = this.glyphs;
         if (!glyphs || glyphs.length === 0) {
             return;
         }
-        for (let g of glyphs) {
+        for (const g of glyphs) {
             g.paint(cx + this.x, cy + this.y, canvas);
         }
     }

@@ -1,6 +1,6 @@
 import { TextAlign } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 
 export class RowGlyphContainer extends GlyphGroup {
     private _glyphWidth: number = 0;
@@ -25,7 +25,7 @@ export class RowGlyphContainer extends GlyphGroup {
                 x = this.width - this._glyphWidth;
                 break;
         }
-        for (let glyph of this.glyphs!) {
+        for (const glyph of this.glyphs!) {
             glyph.x = x;
             x += glyph.width;
         }

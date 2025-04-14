@@ -15,7 +15,6 @@ export class SynthConstants {
     public static readonly PercussionChannel: number = 9;
     public static readonly PercussionBank: number = 128;
 
-
     /**
      * The Midi Pitch bend message is a 15-bit value
      */

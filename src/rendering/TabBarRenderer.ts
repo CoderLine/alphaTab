@@ -1,24 +1,24 @@
-import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat, BeatSubElement } from '@src/model/Beat';
+import { type Bar, BarSubElement } from '@src/model/Bar';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { TabBeatContainerGlyph } from '@src/rendering/glyphs/TabBeatContainerGlyph';
 import { TabBeatGlyph } from '@src/rendering/glyphs/TabBeatGlyph';
 import { TabBeatPreNotesGlyph } from '@src/rendering/glyphs/TabBeatPreNotesGlyph';
 import { TabClefGlyph } from '@src/rendering/glyphs/TabClefGlyph';
-import { TabNoteChordGlyph } from '@src/rendering/glyphs/TabNoteChordGlyph';
+import type { TabNoteChordGlyph } from '@src/rendering/glyphs/TabNoteChordGlyph';
 import { TabTimeSignatureGlyph } from '@src/rendering/glyphs/TabTimeSignatureGlyph';
-import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { LineBarRenderer } from './LineBarRenderer';
 import { GraceType } from '@src/model/GraceType';
-import { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
+import type { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
 import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
@@ -104,12 +104,12 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
         const padding: number = 1;
-        for (let voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
-                for (let bg of vc.beatGlyphs) {
-                    let notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
-                    let noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
+                const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
+                for (const bg of vc.beatGlyphs) {
+                    const notes: TabBeatGlyph = bg.onNotes as TabBeatGlyph;
+                    const noteNumbers: TabNoteChordGlyph | null = notes.noteNumbers;
                     if (noteNumbers) {
                         for (const [str, noteNumber] of noteNumbers.notesPerString) {
                             if (!noteNumber.isEmpty) {
@@ -138,9 +138,9 @@ export class TabBarRenderer extends LineBarRenderer {
         super.doLayout();
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
             this._hasTuplets = false;
-            for (let voice of this.bar.voices) {
+            for (const voice of this.bar.voices) {
                 if (this.hasVoiceContainer(voice)) {
-                    let c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
+                    const c: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
                     if (c.tupletGroups.length > 0) {
                         this._hasTuplets = true;
                         break;
@@ -156,7 +156,7 @@ export class TabBarRenderer extends LineBarRenderer {
     protected override createLinePreBeatGlyphs(): void {
         // Clef
         if (this.isFirstOfLine) {
-            let center: number = (this.bar.staff.tuning.length - 1) / 2;
+            const center: number = (this.bar.staff.tuning.length - 1) / 2;
             this.addPreBeatGlyph(new TabClefGlyph(5, this.getTabY(center)));
         }
         // Time Signature
@@ -197,11 +197,11 @@ export class TabBarRenderer extends LineBarRenderer {
     protected override createVoiceGlyphs(v: Voice): void {
         // multibar rest
         if (this.additionalMultiRestBars) {
-            let container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
+            const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(v)!);
             this.addBeatGlyph(container);
         } else {
             for (const b of v.beats) {
-                let container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+                const container: TabBeatContainerGlyph = new TabBeatContainerGlyph(b, this.getVoiceContainer(v)!);
                 container.preNotes = new TabBeatPreNotesGlyph();
                 container.onNotes = new TabBeatGlyph();
                 this.addBeatGlyph(container);
@@ -225,9 +225,8 @@ export class TabBarRenderer extends LineBarRenderer {
         const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
-        } else {
-            return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
         }
+        return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
@@ -239,15 +238,14 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
-        let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
+        const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
-        } else {
-            return (
-                startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
-                this.lineOffset / 2
-            );
         }
+        return (
+            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
+            this.lineOffset / 2
+        );
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {

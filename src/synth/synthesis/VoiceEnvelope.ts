@@ -6,14 +6,14 @@ import { Envelope } from '@src/synth/synthesis/Envelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
 
 export enum VoiceEnvelopeSegment {
-    None,
-    Delay,
-    Attack,
-    Hold,
-    Decay,
-    Sustain,
-    Release,
-    Done
+    None = 0,
+    Delay = 1,
+    Attack = 2,
+    Hold = 3,
+    Decay = 4,
+    Sustain = 5,
+    Release = 6,
+    Done = 7
 }
 
 export class VoiceEnvelope {
@@ -57,7 +57,6 @@ export class VoiceEnvelope {
                     this.samplesUntilNextSegment = (this.parameters.attack * outSampleRate) | 0;
 
                     if (this.samplesUntilNextSegment > 0) {
-
                         if (!this.isAmpEnv) {
                             // mod env attack duration scales with velocity (velocity of 1 is full duration, max velocity is 0.125 times duration)
                             this.samplesUntilNextSegment =
@@ -95,7 +94,7 @@ export class VoiceEnvelope {
 
                         if (this.isAmpEnv) {
                             // I don't truly understand this; just following what LinuxSampler does.
-                            let mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
+                            const mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
                             this.slope = Math.exp(mysterySlope);
                             this.segmentIsExponential = true;
                             if (this.parameters.sustain > 0.0) {
@@ -130,11 +129,12 @@ export class VoiceEnvelope {
                     this.segment = VoiceEnvelopeSegment.Release;
                     this.samplesUntilNextSegment =
                         ((this.parameters.release <= 0 ? VoiceEnvelope.FastReleaseTime : this.parameters.release) *
-                            outSampleRate) | 0;
+                            outSampleRate) |
+                        0;
 
                     if (this.isAmpEnv) {
                         // I don't truly understand this; just following what LinuxSampler does.
-                        let mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
+                        const mysterySlope: number = -9.226 / this.samplesUntilNextSegment;
                         this.slope = Math.exp(mysterySlope);
                         this.segmentIsExponential = true;
                     } else {
@@ -188,7 +188,7 @@ export class VoiceEnvelope {
                 this.level += this.slope * numSamples;
             }
         }
-        
+
         this.samplesUntilNextSegment -= numSamples;
         if (this.samplesUntilNextSegment <= 0) {
             this.nextSegment(this.segment, outSampleRate);

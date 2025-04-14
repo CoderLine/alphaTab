@@ -12,7 +12,7 @@ export class RenderingResourcesSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => RenderingResourcesSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: RenderingResources | null): Map<string, unknown> | null {
         if (!obj) {

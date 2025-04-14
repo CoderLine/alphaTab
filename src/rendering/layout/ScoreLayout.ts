@@ -1,27 +1,27 @@
 import { Environment } from '@src/Environment';
-import { Bar } from '@src/model/Bar';
+import type { Bar } from '@src/model/Bar';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import { Track, TrackSubElement } from '@src/model/Track';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
+import type { Staff } from '@src/model/Staff';
+import { type Track, TrackSubElement } from '@src/model/Track';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
+import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
-import { EventEmitterOfT } from '@src/EventEmitter';
+import type { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { TuningGlyph } from '../glyphs/TuningGlyph';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 
 class LazyPartial {
@@ -40,17 +40,17 @@ export enum InternalSystemsLayoutMode {
     /**
      * Use the automatic alignment system provided by alphaTab (default)
      */
-    Automatic,
+    Automatic = 0,
 
     /**
      * Use the relative scaling information stored in the score model.
      */
-    FromModelWithScale,
+    FromModelWithScale = 1,
 
     /**
      * Use the absolute size information stored in the score model.
      */
-    FromModelWithWidths
+    FromModelWithWidths = 2
 }
 
 /**
@@ -80,7 +80,7 @@ export abstract class ScoreLayout {
 
     public systemsLayoutMode: InternalSystemsLayoutMode = InternalSystemsLayoutMode.Automatic;
 
-    protected constructor(renderer: ScoreRenderer) {
+    public constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
     }
 
@@ -96,7 +96,7 @@ export abstract class ScoreLayout {
     public layoutAndRender(): void {
         this._lazyPartials.clear();
 
-        let score: Score = this.renderer.score!;
+        const score: Score = this.renderer.score!;
 
         this.firstBarIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.renderer.settings);
         this.lastBarIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.renderer.settings, this.firstBarIndex);
@@ -123,7 +123,7 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        if (args.height == 0) {
+        if (args.height === 0) {
             return;
         }
 
@@ -273,9 +273,9 @@ export abstract class ScoreLayout {
         const notation = settings.notation;
         const res = settings.display.resources;
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
-            let stavesWithTuning: Staff[] = [];
-            for (let track of this.renderer.tracks!) {
-                for (let staff of track.staves) {
+            const stavesWithTuning: Staff[] = [];
+            for (const track of this.renderer.tracks!) {
+                for (const staff of track.staves) {
                     let showTuning =
                         !staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature;
 
@@ -300,7 +300,7 @@ export abstract class ScoreLayout {
                 for (const staff of stavesWithTuning) {
                     if (staff.stringTuning.tunings.length > 0) {
                         const trackLabel = stavesWithTuning.length > 1 ? staff.track.name : '';
-                        let item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
+                        const item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
                         item.colorOverride = ElementStyleHelper.trackColor(
                             res,
                             TrackSubElement.StringTuning,
@@ -317,9 +317,9 @@ export abstract class ScoreLayout {
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
             this.chordDiagrams.renderer = fakeBarRenderer;
-            let chordIds: Set<string> = new Set<string>();
+            const chordIds: Set<string> = new Set<string>();
 
-            for (let track of this.renderer.tracks!) {
+            for (const track of this.renderer.tracks!) {
                 const shouldShowDiagramsForTrack =
                     score.stylesheet.globalDisplayChordDiagramsOnTop &&
                     (score.stylesheet.perTrackChordDiagramsOnTop == null ||
@@ -330,7 +330,7 @@ export abstract class ScoreLayout {
                     continue;
                 }
 
-                for (let staff of track.staves) {
+                for (const staff of track.staves) {
                     const sc = staff.chords;
                     if (sc) {
                         for (const [, chord] of sc) {
@@ -352,15 +352,15 @@ export abstract class ScoreLayout {
     public lastBarIndex: number = 0;
 
     protected createEmptyStaffSystem(): StaffSystem {
-        let system: StaffSystem = new StaffSystem(this);
+        const system: StaffSystem = new StaffSystem(this);
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
-            let track: Track = this.renderer.tracks![trackIndex];
+            const track: Track = this.renderer.tracks![trackIndex];
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
-                let staff: Staff = track.staves[staffIndex];
-                let profile: BarRendererFactory[] = Environment.staveProfiles.get(
+                const staff: Staff = track.staves[staffIndex];
+                const profile: BarRendererFactory[] = Environment.staveProfiles.get(
                     this.renderer.settings.display.staveProfile
                 )!;
-                for (let factory of profile) {
+                for (const factory of profile) {
                     if (factory.canCreate(track, staff)) {
                         system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
                     }
@@ -384,7 +384,7 @@ export abstract class ScoreLayout {
 
     public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
         if (this._barRendererLookup.has(key)) {
-            let lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
+            const lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
             lookup.delete(renderer.bar.id);
             if (renderer.additionalMultiRestBars) {
                 for (const b of renderer.additionalMultiRestBars) {
@@ -395,7 +395,7 @@ export abstract class ScoreLayout {
     }
 
     public getRendererForBar(key: string, bar: Bar): BarRendererBase | null {
-        let barRendererId: number = bar.id;
+        const barRendererId: number = bar.id;
         if (this._barRendererLookup.has(key) && this._barRendererLookup.get(key)!.has(barRendererId)) {
             return this._barRendererLookup.get(key)!.get(barRendererId)!;
         }
@@ -469,8 +469,8 @@ export abstract class ScoreLayout {
     public layoutAndRenderAnnotation(y: number): number {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
         const msg: string = 'rendered by alphaTab';
-        let resources: RenderingResources = this.renderer.settings.display.resources;
-        let size: number = 12;
+        const resources: RenderingResources = this.renderer.settings.display.resources;
+        const size: number = 12;
         const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
 
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);

@@ -1,11 +1,11 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Color } from '@src/model/Color';
-import { Lyrics } from '@src/model/Lyrics';
+import type { Lyrics } from '@src/model/Lyrics';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
-import { Settings } from '@src/Settings';
-import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import type { Settings } from '@src/Settings';
+import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
 import { ElementStyle } from './ElementStyle';
 
 /**
@@ -15,23 +15,23 @@ export enum TrackSubElement {
     /**
      * The track names shown before the staves.
      */
-    TrackName,
+    TrackName = 0,
 
     /**
      * The braces and brackets grouping the staves.
      * If a bracket spans multiple tracks, the color of the first track counts.
      */
-    BracesAndBrackets,
+    BracesAndBrackets = 1,
 
     /**
      * The system separator.
      */
-    SystemSeparator,
+    SystemSeparator = 2,
 
     /**
      * The tuning of the strings.
      */
-    StringTuning
+    StringTuning = 3
 }
 
 /**
@@ -161,12 +161,12 @@ export class Track {
     }
 
     public applyLyrics(lyrics: Lyrics[]): void {
-        for (let lyric of lyrics) {
+        for (const lyric of lyrics) {
             lyric.finish();
         }
-        let staff: Staff = this.staves[0];
+        const staff: Staff = this.staves[0];
         for (let li: number = 0; li < lyrics.length; li++) {
-            let lyric: Lyrics = lyrics[li];
+            const lyric: Lyrics = lyrics[li];
             if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
                 let beat: Beat | null = staff.bars[lyric.startBar].voices[0].beats[0];
                 for (let ci: number = 0; ci < lyric.chunks.length && beat; ci++) {

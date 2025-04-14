@@ -4,9 +4,7 @@ function createDiagnosticReporter(pretty?: boolean): ts.DiagnosticReporter {
     const host: ts.FormatDiagnosticsHost = {
         getCurrentDirectory: () => ts.sys.getCurrentDirectory(),
         getNewLine: () => ts.sys.newLine,
-        getCanonicalFileName: ts.sys.useCaseSensitiveFileNames
-            ? x => x
-            : x => x.toLowerCase(),
+        getCanonicalFileName: ts.sys.useCaseSensitiveFileNames ? x => x : x => x.toLowerCase()
     };
 
     if (!pretty) {
@@ -19,7 +17,7 @@ function createDiagnosticReporter(pretty?: boolean): ts.DiagnosticReporter {
 }
 
 interface Emitter {
-    name: string,
+    name: string;
     emit(program: ts.Program, diagnostics: ts.Diagnostic[]): void;
 }
 
@@ -38,7 +36,13 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
         ts.sys.exit(ts.ExitStatus.InvalidProject_OutputsSkipped);
     };
 
-    const parsedCommandLine = ts.getParsedCommandLineOfConfigFile(commandLine.options.project!, commandLine.options, parseConfigFileHost, /*extendedConfigCache*/ undefined, commandLine.watchOptions)!;
+    const parsedCommandLine = ts.getParsedCommandLineOfConfigFile(
+        commandLine.options.project!,
+        commandLine.options,
+        parseConfigFileHost,
+        /*extendedConfigCache*/ undefined,
+        commandLine.watchOptions
+    )!;
     const pretty = !!ts.sys.writeOutputIsTTY?.();
     if (pretty) {
         reportDiagnostic = createDiagnosticReporter(true);
@@ -48,7 +52,7 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
         rootNames: parsedCommandLine.fileNames,
         options: parsedCommandLine.options,
         projectReferences: parsedCommandLine.projectReferences,
-        host: ts.createCompilerHost(parsedCommandLine.options),
+        host: ts.createCompilerHost(parsedCommandLine.options)
     });
 
     let allDiagnostics: ts.Diagnostic[] = [];
@@ -66,19 +70,23 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
 
     program.getTypeChecker();
 
-    for(const emitter of emitters) {
+    for (const emitter of emitters) {
         console.log(`[${emitter.name}] Emitting...`);
         emitter.emit(program, allDiagnostics);
     }
 
     if (handleErrors) {
-        let diagnostics = ts.sortAndDeduplicateDiagnostics(allDiagnostics);
+        const diagnostics = ts.sortAndDeduplicateDiagnostics(allDiagnostics);
         let errorCount = 0;
         let warningCount = 0;
-        for(const d of diagnostics) {
+        for (const d of diagnostics) {
             switch (d.category) {
-                case ts.DiagnosticCategory.Error: errorCount++; break;
-                case ts.DiagnosticCategory.Warning: warningCount++; break;
+                case ts.DiagnosticCategory.Error:
+                    errorCount++;
+                    break;
+                case ts.DiagnosticCategory.Warning:
+                    warningCount++;
+                    break;
             }
             reportDiagnostic(d);
         }
@@ -90,7 +98,12 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
                 length: undefined,
                 code: 6194,
                 messageText: `Compilation completed with ${errorCount} errors and ${warningCount} warnings${ts.sys.newLine}`,
-                category: errorCount > 0 ? ts.DiagnosticCategory.Error : warningCount > 0 ? ts.DiagnosticCategory.Warning : ts.DiagnosticCategory.Message,
+                category:
+                    errorCount > 0
+                        ? ts.DiagnosticCategory.Error
+                        : warningCount > 0
+                          ? ts.DiagnosticCategory.Warning
+                          : ts.DiagnosticCategory.Message
             });
         }
 
@@ -101,7 +114,7 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
         } else {
             ts.sys.exit(ts.ExitStatus.Success);
         }
-    } else{
+    } else {
         console.log('Done transpiling');
     }
 }

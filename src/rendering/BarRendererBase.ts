@@ -1,29 +1,29 @@
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Bar } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { SimileMark } from '@src/model/SimileMark';
-import { Voice, VoiceSubElement } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
+import { type Voice, VoiceSubElement } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { RenderStaff } from '@src/rendering/staves/RenderStaff';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
+import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BarHelpers } from '@src/rendering/utils/BarHelpers';
 import { Bounds } from '@src/rendering/utils/Bounds';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
-import { RenderingResources } from '@src/RenderingResources';
-import { Settings } from '@src/Settings';
-import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
+import type { RenderingResources } from '@src/RenderingResources';
+import type { Settings } from '@src/Settings';
+import type { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
-import { BeamDirection } from './utils/BeamDirection';
+import type { BeamDirection } from './utils/BeamDirection';
 import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 
@@ -34,23 +34,23 @@ export enum NoteYPosition {
     /**
      * Gets the note y-position on top of the note stem or tab number.
      */
-    TopWithStem,
+    TopWithStem = 0,
     /**
      * Gets the note y-position on top of the note head or tab number.
      */
-    Top,
+    Top = 1,
     /**
      * Gets the note y-position on the center of the note head or tab number.
      */
-    Center,
+    Center = 2,
     /**
      * Gets the note y-position on the bottom of the note head or tab number.
      */
-    Bottom,
+    Bottom = 3,
     /**
      * Gets the note y-position on the bottom of the note stem or tab number.
      */
-    BottomWithStem
+    BottomWithStem = 4
 }
 
 /**
@@ -60,15 +60,15 @@ export enum NoteXPosition {
     /**
      * Gets the note x-position on left of the note head or tab number.
      */
-    Left,
+    Left = 0,
     /**
      * Gets the note x-position on the center of the note head or tab number.
      */
-    Center,
+    Center = 1,
     /**
      * Gets the note x-position on the right of the note head or tab number.
      */
-    Right
+    Right = 2
 }
 
 /**
@@ -176,7 +176,7 @@ export class BarRendererBase {
 
     public scaleToWidth(width: number): void {
         // preBeat and postBeat glyphs do not get resized
-        let containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
+        const containerWidth: number = width - this._preBeatGlyphs.width - this._postBeatGlyphs.width;
         for (const container of this._voiceContainers.values()) {
             container.scaleToWidth(containerWidth);
         }
@@ -219,20 +219,20 @@ export class BarRendererBase {
     }
 
     public registerLayoutingInfo(): void {
-        let info: BarLayoutingInfo = this.layoutingInfo;
-        let preSize: number = this._preBeatGlyphs.width;
+        const info: BarLayoutingInfo = this.layoutingInfo;
+        const preSize: number = this._preBeatGlyphs.width;
         if (info.preBeatSize < preSize) {
             info.preBeatSize = preSize;
         }
         let postBeatStart = 0;
         for (const container of this._voiceContainers.values()) {
             container.registerLayoutingInfo(info);
-            let x: number = container.x + container.width;
+            const x: number = container.x + container.width;
             if (postBeatStart < x) {
                 postBeatStart = x;
             }
         }
-        let postSize: number = this._postBeatGlyphs.width;
+        const postSize: number = this._postBeatGlyphs.width;
         if (info.postBeatSize < postSize) {
             info.postBeatSize = postSize;
         }
@@ -253,7 +253,7 @@ export class BarRendererBase {
         for (const c of this._voiceContainers.values()) {
             c.x = this._preBeatGlyphs.x + this._preBeatGlyphs.width;
             c.applyLayoutingInfo(this.layoutingInfo);
-            let newEnd: number = c.x + c.width;
+            const newEnd: number = c.x + c.width;
             if (voiceEnd < newEnd) {
                 voiceEnd = newEnd;
             }
@@ -270,7 +270,7 @@ export class BarRendererBase {
         const fixedBarWidth = this.barDisplayWidth;
         if (
             fixedBarWidth > 0 &&
-            this.scoreRenderer.layout!.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithWidths
+            this.scoreRenderer.layout!.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithWidths
         ) {
             this.width = fixedBarWidth;
             this.computedWidth = fixedBarWidth;
@@ -334,9 +334,9 @@ export class BarRendererBase {
         this._postBeatGlyphs = new LeftToRightLayoutingGlyphGroup();
         this._postBeatGlyphs.renderer = this;
         for (let i: number = 0; i < this.bar.voices.length; i++) {
-            let voice: Voice = this.bar.voices[i];
+            const voice: Voice = this.bar.voices[i];
             if (this.hasVoiceContainer(voice)) {
-                let c: VoiceContainerGlyph = new VoiceContainerGlyph(0, 0, voice);
+                const c: VoiceContainerGlyph = new VoiceContainerGlyph(0, 0, voice);
                 c.renderer = this;
                 this._voiceContainers.set(this.bar.voices[i].index, c);
             }
@@ -348,7 +348,7 @@ export class BarRendererBase {
 
         // multibar rest
         if (this.additionalMultiRestBars) {
-            let container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(this.bar.voices[0])!);
+            const container = new MultiBarRestBeatContainerGlyph(this.getVoiceContainer(this.bar.voices[0])!);
             this.addBeatGlyph(container);
         } else {
             this.createBeatGlyphs();
@@ -377,13 +377,13 @@ export class BarRendererBase {
     protected updateSizes(): void {
         this.staff.registerStaffTop(this.topPadding);
         this.staff.registerStaffBottom(this.height - this.bottomPadding);
-        let voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
-        let beatGlyphsStart: number = this.beatGlyphsStart;
+        const voiceContainers: Map<number, VoiceContainerGlyph> = this._voiceContainers;
+        const beatGlyphsStart: number = this.beatGlyphsStart;
         let postBeatStart: number = beatGlyphsStart;
         for (const c of voiceContainers.values()) {
             c.x = beatGlyphsStart;
             c.doLayout();
-            let x: number = c.x + c.width;
+            const x: number = c.x + c.width;
             if (postBeatStart < x) {
                 postBeatStart = x;
             }
@@ -427,7 +427,7 @@ export class BarRendererBase {
 
         canvas.color = this.resources.mainGlyphColor;
         this._preBeatGlyphs.paint(cx + this.x, cy + this.y, canvas);
-        
+
         for (const c of this._voiceContainers.values()) {
             c.paint(cx + this.x, cy + this.y, canvas);
         }
@@ -447,7 +447,7 @@ export class BarRendererBase {
     }
 
     public buildBoundingsLookup(masterBarBounds: MasterBarBounds, cx: number, cy: number): void {
-        let barBounds: BarBounds = new BarBounds();
+        const barBounds: BarBounds = new BarBounds();
         barBounds.bar = this.bar;
         barBounds.visualBounds = new Bounds();
         barBounds.visualBounds.x = cx + this.x;
@@ -463,10 +463,10 @@ export class BarRendererBase {
 
         masterBarBounds.addBar(barBounds);
         for (const [index, c] of this._voiceContainers) {
-            let isEmptyBar: boolean = this.bar.isEmpty && index === 0;
+            const isEmptyBar: boolean = this.bar.isEmpty && index === 0;
             if (!c.voice.isEmpty || isEmptyBar) {
                 for (let i: number = 0, j: number = c.beatGlyphs.length; i < j; i++) {
-                    let bc: BeatContainerGlyph = c.beatGlyphs[i];
+                    const bc: BeatContainerGlyph = c.beatGlyphs[i];
                     bc.buildBoundingsLookup(barBounds, cx + this.x + c.x, cy + this.y + c.y, isEmptyBar);
                 }
             }
@@ -506,7 +506,7 @@ export class BarRendererBase {
     }
 
     public getBeatX(beat: Beat, requestedPosition: BeatXPosition = BeatXPosition.PreNotes): number {
-        let container = this.getBeatContainer(beat);
+        const container = this.getBeatContainer(beat);
         if (container) {
             switch (requestedPosition) {
                 case BeatXPosition.PreNotes:
@@ -539,7 +539,7 @@ export class BarRendererBase {
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
-        let container = this.getBeatContainer(note.beat);
+        const container = this.getBeatContainer(note.beat);
         if (container) {
             return (
                 container.voiceContainer.x +
@@ -552,11 +552,11 @@ export class BarRendererBase {
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
-        let beat = this.getOnNotesGlyphForBeat(note.beat);
+        const beat = this.getOnNotesGlyphForBeat(note.beat);
         if (beat) {
             return beat.getNoteY(note, requestedPosition);
         }
-        return NaN;
+        return Number.NaN;
     }
 
     public reLayout(): void {
@@ -577,7 +577,6 @@ export class BarRendererBase {
 
     protected paintSimileMark(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.voice(canvas, VoiceSubElement.Glyphs, this.bar.voices[0], true);
-
 
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
@@ -608,7 +607,6 @@ export class BarRendererBase {
 
                 break;
         }
-
     }
 
     public completeBeamingHelper(helper: BeamingHelper) {

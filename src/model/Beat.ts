@@ -4,22 +4,22 @@ import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
-import { Chord } from '@src/model/Chord';
+import type { Chord } from '@src/model/Chord';
 import { CrescendoType } from '@src/model/CrescendoType';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
-import { Fermata } from '@src/model/Fermata';
+import type { Fermata } from '@src/model/Fermata';
 import { GraceType } from '@src/model/GraceType';
 import { Note } from '@src/model/Note';
 import { Ottavia } from '@src/model/Ottavia';
 import { PickStroke } from '@src/model/PickStroke';
 import { TupletGroup } from '@src/model/TupletGroup';
 import { VibratoType } from '@src/model/VibratoType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { Settings } from '@src/Settings';
+import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
 import { GolpeType } from './GolpeType';
@@ -36,19 +36,19 @@ export enum BeatBeamingMode {
     /**
      * Automatic beaming based on the timing rules.
      */
-    Auto,
+    Auto = 0,
     /**
      * Force a split to the next beat.
      */
-    ForceSplitToNext,
+    ForceSplitToNext = 1,
     /**
      * Force a merge with the next beat.
      */
-    ForceMergeWithNext,
+    ForceMergeWithNext = 2,
     /**
      * Force a split to the next beat on the secondary beam.
      */
-    ForceSplitOnSecondaryToNext
+    ForceSplitOnSecondaryToNext = 3
 }
 
 /**
@@ -59,121 +59,121 @@ export enum BeatSubElement {
      * The effects and annotations shown in dedicated effect bands above the staves (e.g. fermata).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    Effects,
+    Effects = 0,
 
     /**
      * The stems drawn for note heads in this beat on the standard notation staff.
      */
-    StandardNotationStem,
+    StandardNotationStem = 1,
 
     /**
      * The flags drawn for note heads in this beat on the standard notation staff.
      */
-    StandardNotationFlags,
+    StandardNotationFlags = 2,
 
     /**
      * The beams drawn between this and the next beat on the standard notation staff.
      */
-    StandardNotationBeams,
+    StandardNotationBeams = 3,
 
     /**
      * The tuplet drawn on the standard notation staff (the first beat affects the whole tuplet if grouped).
      */
-    StandardNotationTuplet,
+    StandardNotationTuplet = 4,
 
     /**
      * The effects and annotations applied to this beat on the standard notation staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    StandardNotationEffects,
+    StandardNotationEffects = 5,
 
     /**
      * The rest symbol on the standard notation staff.
      */
-    StandardNotationRests,
+    StandardNotationRests = 6,
 
     /**
      * The stems drawn for note heads in this beat on the guitar tab staff.
      */
-    GuitarTabStem,
+    GuitarTabStem = 7,
 
     /**
      * The flags drawn for note heads in this beat on the guitar tab staff.
      */
-    GuitarTabFlags,
+    GuitarTabFlags = 8,
 
     /**
      * The beams drawn between this and the next beat on the guitar tab staff.
      */
-    GuitarTabBeams,
+    GuitarTabBeams = 9,
 
     /**
      * The tuplet drawn on the guitar tab staff (the first beat affects the whole tuplet if grouped).
      */
-    GuitarTabTuplet,
+    GuitarTabTuplet = 10,
 
     /**
      * The effects and annotations applied to this beat on the guitar tab staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    GuitarTabEffects,
+    GuitarTabEffects = 11,
 
     /**
      * The rest symbol on the guitar tab staff.
      */
-    GuitarTabRests,
+    GuitarTabRests = 12,
 
     /**
      * The stems drawn for note heads in this beat on the slash staff.
      */
-    SlashStem,
+    SlashStem = 13,
 
     /**
      * The flags drawn for note heads in this beat on the slash staff.
      */
-    SlashFlags,
+    SlashFlags = 14,
 
     /**
      * The beams drawn between this and the next beat on the slash staff.
      */
-    SlashBeams,
+    SlashBeams = 15,
 
     /**
      * The tuplet drawn on the slash staff (the first beat affects the whole tuplet if grouped).
      */
-    SlashTuplet,
+    SlashTuplet = 16,
 
     /**
      * The rest symbol on the slash staff.
      */
-    SlashRests,
+    SlashRests = 17,
 
     /**
      * The effects and annotations applied to this beat on the slash staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    SlashEffects,
+    SlashEffects = 18,
 
     /**
      * The duration lines drawn for this beat on the numbered notation staff.
      */
-    NumberedDuration,
+    NumberedDuration = 19,
 
     /**
      * The effects and annotations applied to this beat on the numbered notation staff (e.g. brushes).
      * Only applies to items which are on beat level but not any individual note level effects.
      */
-    NumberedEffects,
+    NumberedEffects = 20,
 
     /**
      * The rest (0) on the numbered notation staff.
      */
-    NumberedRests,
+    NumberedRests = 21,
 
     /**
      * The tuplet drawn on the numbered notation staff (the first beat affects the whole tuplet if grouped).
      */
-    NumberedTuplet
+    NumberedTuplet = 22
 }
 
 /**
@@ -197,7 +197,7 @@ export class Beat {
      * @internal
      */
     public static resetIds() {
-        this._globalBeatId = 0;
+        Beat._globalBeatId = 0;
     }
 
     /**
@@ -709,12 +709,12 @@ export class Beat {
 
         // remove point
         points.splice(index, 1);
-        let point: BendPoint = points[index];
+        const point: BendPoint = points[index];
 
         // update maxWhammy point if required
         if (point === this.maxWhammyPoint) {
             this.maxWhammyPoint = null;
-            for (let currentPoint of points) {
+            for (const currentPoint of points) {
                 if (!this.maxWhammyPoint || currentPoint.value > this.maxWhammyPoint.value) {
                     this.maxWhammyPoint = currentPoint;
                 }
@@ -723,7 +723,7 @@ export class Beat {
 
         if (point === this.minWhammyPoint) {
             this.minWhammyPoint = null;
-            for (let currentPoint of points) {
+            for (const currentPoint of points) {
                 if (!this.minWhammyPoint || currentPoint.value < this.minWhammyPoint.value) {
                     this.minWhammyPoint = currentPoint;
                 }
@@ -741,7 +741,7 @@ export class Beat {
     }
 
     public removeNote(note: Note): void {
-        let index: number = this.notes.indexOf(note);
+        const index: number = this.notes.indexOf(note);
         if (index >= 0) {
             this.notes.splice(index, 1);
             if (note.isStringed) {
@@ -752,7 +752,7 @@ export class Beat {
 
     public getAutomation(type: AutomationType): Automation | null {
         for (let i: number = 0, j: number = this.automations.length; i < j; i++) {
-            let automation: Automation = this.automations[i];
+            const automation: Automation = this.automations[i];
             if (automation.type === type) {
                 return automation;
             }
@@ -787,7 +787,7 @@ export class Beat {
     }
 
     public updateDurations(): void {
-        let ticks: number = this.calculateDuration();
+        const ticks: number = this.calculateDuration();
         this.playbackDuration = ticks;
 
         switch (this.graceType) {
@@ -812,7 +812,7 @@ export class Beat {
                 break;
             default:
                 this.displayDuration = ticks;
-                let previous: Beat | null = this.previousBeat;
+                const previous: Beat | null = this.previousBeat;
                 if (previous && previous.graceType === GraceType.BendGrace) {
                     this.playbackDuration = previous.playbackDuration;
                 }
@@ -821,7 +821,7 @@ export class Beat {
     }
 
     public finishTuplet(): void {
-        let previousBeat: Beat | null = this.previousBeat;
+        const previousBeat: Beat | null = this.previousBeat;
         let currentTupletGroup: TupletGroup | null = previousBeat ? previousBeat.tupletGroup : null;
         if (this.hasTuplet || (this.graceType !== GraceType.None && currentTupletGroup)) {
             if (!previousBeat || !currentTupletGroup || !currentTupletGroup.check(this)) {
@@ -864,7 +864,7 @@ export class Beat {
         switch (this.graceType) {
             case GraceType.OnBeat:
             case GraceType.BeforeBeat:
-                let numberOfGraceBeats: number = this.graceGroup!.beats.length;
+                const numberOfGraceBeats: number = this.graceGroup!.beats.length;
                 // set right duration for beaming/display
                 if (numberOfGraceBeats === 1) {
                     this.duration = Duration.Eighth;
@@ -876,7 +876,7 @@ export class Beat {
                 break;
         }
 
-        let displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
+        const displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;
         let isGradual: boolean = this.text === 'grad' || this.text === 'grad.';
         if (isGradual && displayMode === NotationMode.SongBook) {
             this.text = '';
@@ -889,7 +889,7 @@ export class Beat {
         let visibleNotes: number = 0;
         let isEffectSlurBeat: boolean = false;
         for (let i: number = 0, j: number = this.notes.length; i < j; i++) {
-            let note: Note = this.notes[i];
+            const note: Note = this.notes[i];
             note.dynamics = this.dynamics;
             note.finish(settings, sharedDataBag);
             if (note.isLetRing) {
@@ -995,10 +995,10 @@ export class Beat {
                 this.whammyStyle = isGradual ? BendStyle.Gradual : BendStyle.Fast;
             }
             if (points!.length === 4) {
-                let origin: BendPoint = points[0];
-                let middle1: BendPoint = points[1];
-                let middle2: BendPoint = points[2];
-                let destination: BendPoint = points[3];
+                const origin: BendPoint = points[0];
+                const middle1: BendPoint = points[1];
+                const middle2: BendPoint = points[2];
+                const destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // constant decrease or increase
@@ -1038,12 +1038,12 @@ export class Beat {
         if (needCopyBeatForBend) {
             // if this beat is a simple bend convert it to a grace beat
             // and generate a placeholder beat with tied notes
-            let cloneBeat: Beat = BeatCloner.clone(this);
+            const cloneBeat: Beat = BeatCloner.clone(this);
             cloneBeat.id = Beat._globalBeatId++;
             cloneBeat.pickStroke = PickStroke.None;
             for (let i: number = 0, j: number = cloneBeat.notes.length; i < j; i++) {
-                let cloneNote: Note = cloneBeat.notes[i];
-                let note: Note = this.notes[i];
+                const cloneNote: Note = cloneBeat.notes[i];
+                const note: Note = this.notes[i];
 
                 // remove bend on cloned note
                 cloneNote.bendType = BendType.None;
@@ -1065,10 +1065,10 @@ export class Beat {
                 // if the note has a bend which is continued on the next note
                 // we need to convert this note into a hold bend
                 if (note.hasBend && note.isTieOrigin) {
-                    let tieDestination: Note | null = Note.findTieOrigin(note);
+                    const tieDestination: Note | null = Note.findTieOrigin(note);
                     if (tieDestination && tieDestination.hasBend) {
                         cloneNote.bendType = BendType.Hold;
-                        let lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
+                        const lastPoint: BendPoint = note.bendPoints![note.bendPoints!.length - 1];
                         cloneNote.addBendPoint(new BendPoint(0, lastPoint.value));
                         cloneNote.addBendPoint(new BendPoint(BendPoint.MaxPosition, lastPoint.value));
                     }

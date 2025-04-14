@@ -30,11 +30,7 @@ export class Color {
 
     public updateRgba(): void {
         if (this.a === 0xff) {
-            this.rgba =
-                '#' +
-                ModelUtils.toHexString(this.r, 2) +
-                ModelUtils.toHexString(this.g, 2) +
-                ModelUtils.toHexString(this.b, 2);
+            this.rgba = `#${ModelUtils.toHexString(this.r, 2)}${ModelUtils.toHexString(this.g, 2)}${ModelUtils.toHexString(this.b, 2)}`;
         } else {
             this.rgba = `rgba(${this.r},${this.g},${this.b},${this.a / 255.0})`;
         }
@@ -88,38 +84,38 @@ export class Color {
                     if (json.length === 4) {
                         // #RGB
                         return new Color(
-                            parseInt(json[1], 16) * 17,
-                            parseInt(json[2], 16) * 17,
-                            parseInt(json[3], 16) * 17
+                            Number.parseInt(json[1], 16) * 17,
+                            Number.parseInt(json[2], 16) * 17,
+                            Number.parseInt(json[3], 16) * 17
                         );
                     }
 
                     if (json.length === 5) {
                         // #RGBA
                         return new Color(
-                            parseInt(json[1], 16) * 17,
-                            parseInt(json[2], 16) * 17,
-                            parseInt(json[3], 16) * 17,
-                            parseInt(json[4], 16) * 17
+                            Number.parseInt(json[1], 16) * 17,
+                            Number.parseInt(json[2], 16) * 17,
+                            Number.parseInt(json[3], 16) * 17,
+                            Number.parseInt(json[4], 16) * 17
                         );
                     }
 
                     if (json.length === 7) {
                         // #RRGGBB
                         return new Color(
-                            parseInt(json.substring(1, 3), 16),
-                            parseInt(json.substring(3, 5), 16),
-                            parseInt(json.substring(5, 7), 16)
+                            Number.parseInt(json.substring(1, 3), 16),
+                            Number.parseInt(json.substring(3, 5), 16),
+                            Number.parseInt(json.substring(5, 7), 16)
                         );
                     }
 
                     if (json.length === 9) {
                         // #RRGGBBAA
                         return new Color(
-                            parseInt(json.substring(1, 3), 16),
-                            parseInt(json.substring(3, 5), 16),
-                            parseInt(json.substring(5, 7), 16),
-                            parseInt(json.substring(7, 9), 16)
+                            Number.parseInt(json.substring(1, 3), 16),
+                            Number.parseInt(json.substring(3, 5), 16),
+                            Number.parseInt(json.substring(5, 7), 16),
+                            Number.parseInt(json.substring(7, 9), 16)
                         );
                     }
                 } else if (json.startsWith('rgba') || json.startsWith('rgb')) {
@@ -132,15 +128,19 @@ export class Color {
                     const numbers = json.substring(start + 1, end).split(',');
 
                     if (numbers.length === 3) {
-                        return new Color(parseInt(numbers[0]), parseInt(numbers[1]), parseInt(numbers[2]));
+                        return new Color(
+                            Number.parseInt(numbers[0]),
+                            Number.parseInt(numbers[1]),
+                            Number.parseInt(numbers[2])
+                        );
                     }
 
                     if (numbers.length === 4) {
                         return new Color(
-                            parseInt(numbers[0]),
-                            parseInt(numbers[1]),
-                            parseInt(numbers[2]),
-                            parseFloat(numbers[3]) * 255
+                            Number.parseInt(numbers[0]),
+                            Number.parseInt(numbers[1]),
+                            Number.parseInt(numbers[2]),
+                            Number.parseFloat(numbers[3]) * 255
                         );
                     }
                 }

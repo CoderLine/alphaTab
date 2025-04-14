@@ -1,25 +1,30 @@
-import { HeaderFooterStyle, Score, ScoreSubElement } from '@src/model/Score';
+import { type HeaderFooterStyle, type Score, ScoreSubElement } from '@src/model/Score';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { IWriteable } from '@src/io/IWriteable';
+import {
+    type BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@src/model/RenderStylesheet';
+import type { IWriteable } from '@src/io/IWriteable';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { TextAlign } from '@src/platform';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 enum DataType {
-    Boolean,
-    Integer,
-    Float,
-    String,
-    Point,
-    Size,
-    Rectangle,
-    Color
+    Boolean = 0,
+    Integer = 1,
+    Float = 2,
+    String = 3,
+    Point = 4,
+    Size = 5,
+    Rectangle = 6,
+    Color = 7
 }
 
 /**
@@ -74,41 +79,41 @@ export class BinaryStylesheet {
 
     private read(data: Uint8Array) {
         // BinaryStylesheet apears to be big-endien
-        let readable: ByteBuffer = ByteBuffer.fromBuffer(data);
-        let entryCount: number = IOHelper.readInt32BE(readable);
+        const readable: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const entryCount: number = IOHelper.readInt32BE(readable);
         for (let i: number = 0; i < entryCount; i++) {
-            let key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
-            let type: DataType = readable.readByte() as DataType;
+            const key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
+            const type: DataType = readable.readByte() as DataType;
             this._types.set(key, type);
             switch (type) {
                 case DataType.Boolean:
-                    let flag: boolean = readable.readByte() === 1;
+                    const flag: boolean = readable.readByte() === 1;
                     this.addValue(key, flag);
                     break;
                 case DataType.Integer:
-                    let ivalue: number = IOHelper.readInt32BE(readable);
+                    const ivalue: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, ivalue);
                     break;
                 case DataType.Float:
-                    let fvalue: number = IOHelper.readFloat32BE(readable);
+                    const fvalue: number = IOHelper.readFloat32BE(readable);
                     this.addValue(key, fvalue);
                     break;
                 case DataType.String:
-                    let s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
+                    const s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
                     this.addValue(key, s);
                     break;
                 case DataType.Point:
-                    let x: number = IOHelper.readInt32BE(readable);
-                    let y: number = IOHelper.readInt32BE(readable);
+                    const x: number = IOHelper.readInt32BE(readable);
+                    const y: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, new BendPoint(x, y));
                     break;
                 case DataType.Size:
-                    let width: number = IOHelper.readInt32BE(readable);
-                    let height: number = IOHelper.readInt32BE(readable);
+                    const width: number = IOHelper.readInt32BE(readable);
+                    const height: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, new BendPoint(width, height));
                     break;
                 case DataType.Rectangle:
-                    let rect = new Bounds();
+                    const rect = new Bounds();
                     rect.x = IOHelper.readInt32BE(readable);
                     rect.y = IOHelper.readInt32BE(readable);
                     rect.w = IOHelper.readInt32BE(readable);
@@ -116,7 +121,7 @@ export class BinaryStylesheet {
                     this.addValue(key, rect);
                     break;
                 case DataType.Color:
-                    let color: Color = GpBinaryHelpers.gpReadColor(readable, true);
+                    const color: Color = GpBinaryHelpers.gpReadColor(readable, true);
                     this.addValue(key, color);
                     break;
             }
@@ -412,7 +417,7 @@ export class BinaryStylesheet {
                 return DataType.String;
             case 'number':
                 const withoutFraction: number = (value as number) | 0;
-                return (value as number) == withoutFraction ? DataType.Integer : DataType.Float;
+                return (value as number) === withoutFraction ? DataType.Integer : DataType.Float;
             case 'object':
                 if (value instanceof BendPoint) {
                     return DataType.Point;
@@ -514,34 +519,34 @@ export class BinaryStylesheet {
             for (const [k, v] of scoreStyle.headerAndFooter) {
                 switch (k) {
                     case ScoreSubElement.Title:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
                         break;
                     case ScoreSubElement.SubTitle:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
                         break;
                     case ScoreSubElement.Artist:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
                         break;
                     case ScoreSubElement.Album:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
                         break;
                     case ScoreSubElement.Words:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
                         break;
                     case ScoreSubElement.Music:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
                         break;
                     case ScoreSubElement.WordsAndMusic:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
                         break;
                     case ScoreSubElement.Transcriber:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
                         break;
                     case ScoreSubElement.Copyright:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
                         break;
                     case ScoreSubElement.CopyrightSecondLine:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
                         break;
                 }
             }
@@ -563,7 +568,7 @@ export class BinaryStylesheet {
         }
 
         binaryStylesheet.addValue(`${prefix}${name}Alignment`, style.textAlign as number, DataType.Integer);
-        
+
         if (style.isVisible !== undefined) {
             binaryStylesheet.addValue(`${prefix}draw${name}`, style.isVisible! as boolean, DataType.Boolean);
         }

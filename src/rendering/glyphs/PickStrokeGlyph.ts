@@ -1,11 +1,10 @@
 import { PickStroke } from '@src/model/PickStroke';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class PickStrokeGlyph extends MusicFontGlyph {
-
     public constructor(x: number, y: number, pickStroke: PickStroke) {
         super(x, y, NoteHeadGlyph.GraceScale, PickStrokeGlyph.getSymbol(pickStroke));
     }

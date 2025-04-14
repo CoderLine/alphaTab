@@ -5,13 +5,13 @@ export enum CrescendoType {
     /**
      * No crescendo applied.
      */
-    None,
+    None = 0,
     /**
      * Normal crescendo applied.
      */
-    Crescendo,
+    Crescendo = 1,
     /**
      * Normal decrescendo applied.
      */
-    Decrescendo
+    Decrescendo = 2
 }

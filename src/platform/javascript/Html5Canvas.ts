@@ -2,8 +2,8 @@ import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
-import { Settings } from '@src/Settings';
+import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
+import type { Settings } from '@src/Settings';
 
 /**
  * A canvas implementation for HTML5 canvas
@@ -22,15 +22,15 @@ export class Html5Canvas implements ICanvas {
     public settings!: Settings;
 
     public constructor() {
-        let fontElement: HTMLElement = document.createElement('span');
+        const fontElement: HTMLElement = document.createElement('span');
         fontElement.classList.add('at');
         document.body.appendChild(fontElement);
-        let style: CSSStyleDeclaration = window.getComputedStyle(fontElement);
+        const style: CSSStyleDeclaration = window.getComputedStyle(fontElement);
         let family: string = style.fontFamily;
         if (family.startsWith('"') || family.startsWith("'")) {
             family = family.substr(1, family.length - 2);
         }
-        this._musicFont = new Font(family, parseFloat(style.fontSize), FontStyle.Plain);
+        this._musicFont = new Font(family, Number.parseFloat(style.fontSize), FontStyle.Plain);
         this._measureCanvas = document.createElement('canvas');
         this._measureCanvas.width = 10;
         this._measureCanvas.height = 10;
@@ -52,8 +52,8 @@ export class Html5Canvas implements ICanvas {
         this._canvas = document.createElement('canvas');
         this._canvas.width = (width * Environment.HighDpiFactor) | 0;
         this._canvas.height = (height * Environment.HighDpiFactor) | 0;
-        this._canvas.style.width = width + 'px';
-        this._canvas.style.height = height + 'px';
+        this._canvas.style.width = `${width}px`;
+        this._canvas.style.height = `${height}px`;
         this._context = this._canvas.getContext('2d')!;
         this._context.textBaseline = 'hanging';
         this._context.scale(Environment.HighDpiFactor * scale, Environment.HighDpiFactor * scale);
@@ -61,7 +61,7 @@ export class Html5Canvas implements ICanvas {
     }
 
     public endRender(): unknown {
-        let result: HTMLCanvasElement = this._canvas!;
+        const result: HTMLCanvasElement = this._canvas!;
         this._canvas = null;
         return result;
     }
@@ -251,7 +251,7 @@ export class Html5Canvas implements ICanvas {
         centerAtPosition: boolean = false
     ): void {
         let s: string = '';
-        for (let symbol of symbols) {
+        for (const symbol of symbols) {
             if (symbol !== MusicFontSymbol.None) {
                 s += String.fromCharCode(symbol);
             }
@@ -266,9 +266,9 @@ export class Html5Canvas implements ICanvas {
         symbols: string,
         centerAtPosition: boolean
     ): void {
-        let textAlign = this._context.textAlign;
-        let baseLine = this._context.textBaseline;
-        let font: string = this._context.font;
+        const textAlign = this._context.textAlign;
+        const baseLine = this._context.textBaseline;
+        const font: string = this._context.font;
         this._context.font = this._musicFont.toCssString(relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {

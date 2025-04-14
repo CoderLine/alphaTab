@@ -1,4 +1,4 @@
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { CoreSettings } from '@src/CoreSettings';
 
 /**
@@ -20,8 +20,8 @@ export class ResizeEventArgs {
      */
     public settings: Settings | null = null;
 
-    public core() : CoreSettings  {
-        if(this.settings && this.causeIssue()) {
+    public core(): CoreSettings {
+        if (this.settings && this.causeIssue()) {
             return this.settings.core;
         }
         return new CoreSettings();

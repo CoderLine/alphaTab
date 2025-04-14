@@ -1,10 +1,10 @@
-import { BeatSubElement } from '@src/model';
-import { Note } from '@src/model/Note';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { BeatSubElement } from '@src/model';
+import type { Note } from '@src/model/Note';
+import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 
 export class BeatGlyphBase extends GlyphGroup {
     private _effectGlyphs: Glyph[] = [];
@@ -22,7 +22,7 @@ export class BeatGlyphBase extends GlyphGroup {
         let w: number = 0;
         if (this.glyphs) {
             for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
-                let g: Glyph = this.glyphs[i];
+                const g: Glyph = this.glyphs[i];
                 g.x = w;
                 g.renderer = this.renderer;
                 g.doLayout();

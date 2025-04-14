@@ -5,21 +5,21 @@ export enum BrushType {
     /**
      * No brush.
      */
-    None,
+    None = 0,
     /**
      * Normal brush up.
      */
-    BrushUp,
+    BrushUp = 1,
     /**
      * Normal brush down.
      */
-    BrushDown,
+    BrushDown = 2,
     /**
      * Arpeggio up.
      */
-    ArpeggioUp,
+    ArpeggioUp = 3,
     /**
      * Arpeggio down.
      */
-    ArpeggioDown
+    ArpeggioDown = 4
 }

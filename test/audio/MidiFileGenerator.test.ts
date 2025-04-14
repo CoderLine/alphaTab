@@ -1,5 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
-import { MidiEvent, MidiEventType, NoteOnEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
+import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@src/midi/MidiEvent';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -7,19 +7,19 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
-import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import type { Note } from '@src/model/Note';
+import type { PlaybackInformation } from '@src/model/PlaybackInformation';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import {
     FlatNoteBendEvent,
     FlatControlChangeEvent,
     FlatMidiEventGenerator,
-    FlatMidiEvent,
+    type FlatMidiEvent,
     FlatNoteEvent,
     FlatProgramChangeEvent,
     FlatTempoEvent,
@@ -32,11 +32,11 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { AccentuationType, Duration, VibratoType } from '@src/model';
 import { expect } from 'chai';
 import { ScoreLoader } from '@src/importer';
-import { MidiTickLookup } from '@src/midi';
+import type { MidiTickLookup } from '@src/midi';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
-        let importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
         return importer.readScore();
     };
@@ -59,15 +59,15 @@ describe('MidiFileGeneratorTest', () => {
 
     it('full-song', async () => {
         const buffer = await TestPlatform.loadFile('test-data/audio/full-song.gp5');
-        let readerBase: Gp3To5Importer = new Gp3To5Importer();
+        const readerBase: Gp3To5Importer = new Gp3To5Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
-        let score: Score = readerBase.readScore();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, new FlatMidiEventGenerator());
+        const score: Score = readerBase.readScore();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, new FlatMidiEventGenerator());
         generator.generate();
     });
 
     it('midi-order', () => {
-        let midiFile: MidiFile = new MidiFile();
+        const midiFile: MidiFile = new MidiFile();
         midiFile.addEvent(new NoteOnEvent(0, 0, 0, 0, 0));
         midiFile.addEvent(new NoteOnEvent(0, 0, 0, 1, 0));
         midiFile.addEvent(new NoteOnEvent(0, 100, 0, 2, 0));
@@ -81,20 +81,20 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('bend', () => {
-        let tex: string = ':4 15.6{b(0 4)} 15.6';
-        let score: Score = parseTex(tex);
+        const tex: string = ':4 15.6{b(0 4)} 15.6';
+        const score: Score = parseTex(tex);
         expect(score.tracks.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).to.equal(1);
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -162,17 +162,17 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('grace-beats', async () => {
-        let reader: Gp7To8Importer = new Gp7To8Importer();
+        const reader: Gp7To8Importer = new Gp7To8Importer();
         const buffer = await TestPlatform.loadFile('test-data/audio/grace-beats.gp');
-        let settings: Settings = Settings.songBook;
+        const settings: Settings = Settings.songBook;
         reader.init(ByteBuffer.fromBuffer(buffer), settings);
-        let score: Score = reader.readScore();
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const score: Score = reader.readScore();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.generate();
         // on beat
         let tick: number = 0;
-        let ticks: number[] = [];
+        const ticks: number[] = [];
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].absolutePlaybackStart).to.equal(tick);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].playbackDuration).to.equal(3840);
         ticks.push(tick);
@@ -208,9 +208,9 @@ describe('MidiFileGeneratorTest', () => {
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[1].playbackDuration).to.equal(1920);
         ticks.push(tick);
         tick += score.tracks[0].staves[0].bars[4].voices[0].beats[1].playbackDuration;
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
         const mfVelocity = MidiUtils.dynamicToVelocity(DynamicValue.MF as number);
-        let expectedEvents: FlatMidiEvent[] = [
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -278,20 +278,20 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('bend-multi-point', () => {
-        let tex: string = ':4 15.6{b(0 4 0)} 15.6';
-        let score: Score = parseTex(tex);
+        const tex: string = ':4 15.6{b(0 4 0)} 15.6';
+        const score: Score = parseTex(tex);
         expect(score.tracks.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).to.equal(1);
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -370,15 +370,15 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('bend-continued', () => {
-        let tex: string = '7.3{b (0 4)} -.3{b (4 0)}';
-        let score: Score = parseTex(tex);
+        const tex: string = '7.3{b (0 4)} -.3{b (4 0)}';
+        const score: Score = parseTex(tex);
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -450,15 +450,15 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('pre-bend-release-continued', () => {
-        let tex: string = '7.3{b (4 0)} -.3';
-        let score: Score = parseTex(tex);
+        const tex: string = '7.3{b (4 0)} -.3';
+        const score: Score = parseTex(tex);
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -514,17 +514,17 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('pre-bend-release-continued-songbook', () => {
-        let tex: string = '7.3{b (4 0)} -.3';
-        let score: Score = parseTex(tex);
+        const tex: string = '7.3{b (4 0)} -.3';
+        const score: Score = parseTex(tex);
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let settings = new Settings();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const settings = new Settings();
         settings.setSongBookModeSettings();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -580,29 +580,21 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('triplet-feel', () => {
-        let tex: string =
+        const tex: string =
             '\\ts 2 4 \\tf t8 3.2.8*4 | \\tf t16 3.2.16*8 | \\tf d8 3.2.8*4 | \\tf d16 3.2.16*8 | \\tf s8 3.2.8*4 | \\tf s16 3.2.16*8';
-        let score: Score = parseTex(tex);
+        const score: Score = parseTex(tex);
         // prettier-ignore
-        let expectedPlaybackStartTimes: number[] = [
-            0, 480, 960, 1440,
-            0, 240, 480, 720, 960, 1200, 1440, 1680,
-            0, 480, 960, 1440,
-            0, 240, 480, 720, 960, 1200, 1440, 1680,
-            0, 480, 960, 1440,
-            0, 240, 480, 720, 960, 1200, 1440, 1680
+        const expectedPlaybackStartTimes: number[] = [
+            0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200,
+            1440, 1680, 0, 480, 960, 1440, 0, 240, 480, 720, 960, 1200, 1440, 1680
         ];
         // prettier-ignore
-        let expectedPlaybackDurations: number[] = [
-            480, 480, 480, 480,
-            240, 240, 240, 240, 240, 240, 240, 240,
-            480, 480, 480, 480,
-            240, 240, 240, 240, 240, 240, 240, 240,
-            480, 480, 480, 480,
-            240, 240, 240, 240, 240, 240, 240, 240
+        const expectedPlaybackDurations: number[] = [
+            480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240,
+            240, 240, 240, 480, 480, 480, 480, 240, 240, 240, 240, 240, 240, 240, 240
         ];
-        let actualPlaybackStartTimes: number[] = [];
-        let actualPlaybackDurations: number[] = [];
+        const actualPlaybackStartTimes: number[] = [];
+        const actualPlaybackDurations: number[] = [];
         let beat: Beat | null = score.tracks[0].staves[0].bars[0].voices[0].beats[0];
         while (beat) {
             actualPlaybackStartTimes.push(beat.playbackStart);
@@ -612,30 +604,22 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualPlaybackStartTimes.join(',')).to.equal(expectedPlaybackStartTimes.join(','));
         expect(actualPlaybackDurations.join(',')).to.equal(expectedPlaybackDurations.join(','));
         // prettier-ignore
-        let expectedMidiStartTimes: number[] = [
-            0, 640, 960, 1600,
-            1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680,
-            3840, 4560, 4800, 5520,
-            5760, 6120, 6240, 6600, 6720, 7080, 7200, 7560,
-            7680, 7920, 8640, 8880,
-            9600, 9720, 10080, 10200, 10560, 10680, 11040, 11160
+        const expectedMidiStartTimes: number[] = [
+            0, 640, 960, 1600, 1920, 2240, 2400, 2720, 2880, 3200, 3360, 3680, 3840, 4560, 4800, 5520, 5760, 6120, 6240,
+            6600, 6720, 7080, 7200, 7560, 7680, 7920, 8640, 8880, 9600, 9720, 10080, 10200, 10560, 10680, 11040, 11160
         ];
         // prettier-ignore
-        let expectedMidiDurations: number[] = [
-            640, 320, 640, 320,
-            320, 160, 320, 160, 320, 160, 320, 160,
-            720, 240, 720, 240,
-            360, 120, 360, 120, 360, 120, 360, 120,
-            240, 720, 240, 720,
-            120, 360, 120, 360, 120, 360, 120, 360
+        const expectedMidiDurations: number[] = [
+            640, 320, 640, 320, 320, 160, 320, 160, 320, 160, 320, 160, 720, 240, 720, 240, 360, 120, 360, 120, 360,
+            120, 360, 120, 240, 720, 240, 720, 120, 360, 120, 360, 120, 360, 120, 360
         ];
 
-        let actualMidiStartTimes: number[] = [];
-        let actualMidiDurations: number[] = [];
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const actualMidiStartTimes: number[] = [];
+        const actualMidiDurations: number[] = [];
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        for (let midiEvent of handler.midiEvents) {
+        for (const midiEvent of handler.midiEvents) {
             if (midiEvent instanceof FlatNoteEvent) {
                 actualMidiStartTimes.push(midiEvent.tick);
                 actualMidiDurations.push(midiEvent.length);
@@ -646,21 +630,21 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('beat-multi-bend', () => {
-        let tex: string = ':4 (15.6{b(0 4)} 14.6{b(0 8)}) 15.6';
-        let score: Score = parseTex(tex);
+        const tex: string = ':4 (15.6{b(0 4)} 14.6{b(0 8)}) 15.6';
+        const score: Score = parseTex(tex);
         expect(score.tracks.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes.length).to.equal(1);
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[1];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -766,20 +750,20 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('tied-vibrato', () => {
-        let tex: string = '3.3{v}.4 -.3{v}.4';
-        let score: Score = parseTex(tex);
+        const tex: string = '3.3{v}.4 -.3{v}.4';
+        const score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).to.equal(VibratoType.Slight);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isTieDestination).to.be.true;
         score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].vibrato = VibratoType.None;
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const settings = new Settings();
         settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -839,18 +823,18 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('bend-tied-no-vibrato', () => {
-        let tex: string = '3.3{b (0 4)}.4 -.3.4';
-        let score: Score = parseTex(tex);
+        const tex: string = '3.3{b (0 4)}.4 -.3.4';
+        const score: Score = parseTex(tex);
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const settings = new Settings();
         settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -905,18 +889,18 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('tied-bend', () => {
-        let tex: string = '3.3.4 -.3.8 -.3{b (0 4)}.8';
-        let score: Score = parseTex(tex);
+        const tex: string = '3.3.4 -.3.8 -.3{b (0 4)}.8';
+        const score: Score = parseTex(tex);
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const settings = new Settings();
         settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -975,20 +959,20 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('tied-bend-hammer', async () => {
-        let score: Score = ScoreLoader.loadScoreFromBytes(
+        const score: Score = ScoreLoader.loadScoreFromBytes(
             await TestPlatform.loadFile('test-data/audio/tied-bend-hammer.gp')
         );
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const settings = new Settings();
         settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -1067,18 +1051,18 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('bend-tied-vibrato', () => {
-        let tex: string = '3.3{b (0 4)}.4 -.3{v}.4';
-        let score: Score = parseTex(tex);
+        const tex: string = '3.3{b (0 4)}.4 -.3{v}.4';
+        const score: Score = parseTex(tex);
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
         const settings = new Settings();
         settings.player.vibrato.noteSlightLength = MidiUtils.QuarterTime / 2; // to reduce the number of vibrato events
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, settings, handler);
         generator.vibratoResolution = settings.player.vibrato.noteSlightLength / 4;
         generator.generate();
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let expectedEvents: FlatMidiEvent[] = [
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -1144,11 +1128,11 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('full-bar-rest', () => {
-        let tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4 | r.1 | 3.3.4 3.3.4 3.3.4';
-        let score: Score = parseTex(tex);
+        const tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4 | r.1 | 3.3.4 3.3.4 3.3.4';
+        const score: Score = parseTex(tex);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].isFullBarRest).to.be.true;
 
-        let expectedNoteOnTimes: number[] = [
+        const expectedNoteOnTimes: number[] = [
             0 * MidiUtils.QuarterTime, // note 1
             1 * MidiUtils.QuarterTime, // note 2
             2 * MidiUtils.QuarterTime, // note 3
@@ -1166,8 +1150,8 @@ describe('MidiFileGeneratorTest', () => {
 
         expect(noteOnTimes.join(',')).to.equal(expectedNoteOnTimes.join(','));
 
-        let handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const handler: FlatMidiEventGenerator = new FlatMidiEventGenerator();
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
         noteOnTimes = [];
         for (const evt of handler.midiEvents) {
@@ -1181,12 +1165,12 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('time-signature', () => {
-        let tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4';
-        let score: Score = parseTex(tex);
+        const tex: string = '\\ts 3 4 3.3.4 3.3.4 3.3.4';
+        const score: Score = parseTex(tex);
 
-        let file = new MidiFile();
-        let handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(file);
-        let generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
+        const file = new MidiFile();
+        const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(file);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, null, handler);
         generator.generate();
 
         let timeSignature: MidiEvent | null = null;
@@ -1206,8 +1190,8 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('first-bar-tempo', () => {
-        let tex: string = '\\tempo 120 . \\tempo 60 3.3*4 | \\tempo 80 3.3*4';
-        let score: Score = parseTex(tex);
+        const tex: string = '\\tempo 120 . \\tempo 60 3.3*4 | \\tempo 80 3.3*4';
+        const score: Score = parseTex(tex);
 
         expect(score.tempo).to.be.equal(120);
         expect(score.masterBars[0].tempoAutomations).to.have.length(1);
@@ -1229,12 +1213,12 @@ describe('MidiFileGeneratorTest', () => {
     });
 
     it('has-valid-dynamics', () => {
-        let tex: string = ':2 1.1{dy fff ac} 1.1{dy ppp g}';
-        let score: Score = parseTex(tex);
+        const tex: string = ':2 1.1{dy fff ac} 1.1{dy ppp g}';
+        const score: Score = parseTex(tex);
 
-        let info: PlaybackInformation = score.tracks[0].playbackInfo;
-        let note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        let note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0];
+        const info: PlaybackInformation = score.tracks[0].playbackInfo;
+        const note1: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
+        const note2: Note = score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0];
         // First note has already highest dynamics which is increased due to accentuation
         expect(note1.dynamics).to.be.equal(DynamicValue.FFF);
         expect(note1.accentuated).to.be.equal(AccentuationType.Normal);
@@ -1243,7 +1227,7 @@ describe('MidiFileGeneratorTest', () => {
         expect(note2.dynamics).to.be.equal(DynamicValue.PPP);
         expect(note2.isGhost).to.be.true;
 
-        let expectedEvents: FlatMidiEvent[] = [
+        const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 120),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.PanCoarse, 64),
@@ -1764,7 +1748,7 @@ describe('MidiFileGeneratorTest', () => {
         expect(actualTimers.join(',')).to.equal(expectedTimers.join(','));
     });
 
-    it('transpose', ()=>{
+    it('transpose', () => {
         const score = parseTex(`
             \\track \\staff \\instrument piano 
                     C4.4| r.1
@@ -1805,5 +1789,5 @@ describe('MidiFileGeneratorTest', () => {
 
         expect(generator.transpositionPitches.has(5)).to.be.true;
         expect(generator.transpositionPitches.get(5)!).to.equal(12);
-    })
+    });
 });

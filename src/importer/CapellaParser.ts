@@ -10,14 +10,14 @@ import { Duration } from '@src/model/Duration';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';
 import { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
+import type { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { XmlDocument } from '@src/xml/XmlDocument';
 
-import { XmlNode } from '@src/xml/XmlNode';
+import type { XmlNode } from '@src/xml/XmlNode';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -25,7 +25,7 @@ import { Logger } from '@src/Logger';
 import { Fermata, FermataType } from '@src/model/Fermata';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { Ottavia } from '@src/model/Ottavia';
-import { KeySignature } from '@src/model/KeySignature';
+import type { KeySignature } from '@src/model/KeySignature';
 
 class DrawObject {
     public noteRange: number = 1;
@@ -34,10 +34,10 @@ class DrawObject {
 }
 
 enum FrameType {
-    None,
-    Rectangle,
-    Ellipse,
-    Circle
+    None = 0,
+    Rectangle = 1,
+    Ellipse = 2,
+    Circle = 3
 }
 
 class TextDrawObject extends DrawObject {
@@ -122,7 +122,7 @@ export class CapellaParser {
         this._crescendo = new Map<Beat, WedgeDrawObject>();
         this._isFirstSystem = true;
 
-        let dom: XmlDocument = new XmlDocument();
+        const dom: XmlDocument = new XmlDocument();
         try {
             dom.parse(xml);
         } catch (e) {
@@ -195,7 +195,7 @@ export class CapellaParser {
     }
 
     private parseDom(dom: XmlDocument): void {
-        let root: XmlNode | null = dom.firstElement;
+        const root: XmlNode | null = dom.firstElement;
         if (!root) {
             throw new UnsupportedFormatError('No valid XML');
         }
@@ -203,7 +203,7 @@ export class CapellaParser {
             this.score = new Score();
             this.score.tempo = 120;
             // parse all children
-            for (let n of root.childElements()) {
+            for (const n of root.childElements()) {
                 switch (n.localName) {
                     case 'info':
                         this.parseInfo(n);
@@ -230,7 +230,7 @@ export class CapellaParser {
 
     private _staffLookup: Map<number, Staff> = new Map();
     private parseLayout(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staves':
                     this.parseLayoutStaves(c);
@@ -294,7 +294,7 @@ export class CapellaParser {
 
     private _brackets: Bracket[] = [];
     private parseBrackets(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'bracket':
                     this.parseBracket(c);
@@ -305,8 +305,8 @@ export class CapellaParser {
 
     private parseBracket(element: XmlNode) {
         const bracket = new Bracket();
-        bracket.from = parseInt(element.getAttribute('from'));
-        bracket.to = parseInt(element.getAttribute('to'));
+        bracket.from = Number.parseInt(element.getAttribute('from'));
+        bracket.to = Number.parseInt(element.getAttribute('to'));
         if (element.attributes.has('curly')) {
             bracket.curly = element.attributes.get('curly') === 'true';
         }
@@ -314,7 +314,7 @@ export class CapellaParser {
     }
 
     private parseLayoutStaves(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staffLayout':
                     this.parseStaffLayout(c);
@@ -330,7 +330,7 @@ export class CapellaParser {
         const layout = new StaffLayout();
         layout.description = element.getAttribute('description');
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'notation':
                     if (c.attributes.has('defaultClef')) {
@@ -343,13 +343,13 @@ export class CapellaParser {
                         layout.percussion = c.attributes.get('percussion') === 'true';
                     }
                     if (c.attributes.has('instr')) {
-                        layout.instrument = parseInt(c.attributes.get('instr')!);
+                        layout.instrument = Number.parseInt(c.attributes.get('instr')!);
                     }
                     if (c.attributes.has('volume')) {
-                        layout.volume = parseInt(c.attributes.get('volume')!);
+                        layout.volume = Number.parseInt(c.attributes.get('volume')!);
                     }
                     if (c.attributes.has('transpose')) {
-                        layout.transpose = parseInt(c.attributes.get('transpose')!);
+                        layout.transpose = Number.parseInt(c.attributes.get('transpose')!);
                     }
                     break;
             }
@@ -377,7 +377,8 @@ export class CapellaParser {
     private parseClefOttava(v: string): Ottavia {
         if (v.endsWith('-')) {
             return Ottavia._8vb;
-        } else if (v.endsWith('+')) {
+        }
+        if (v.endsWith('+')) {
             return Ottavia._8va;
         }
 
@@ -385,7 +386,7 @@ export class CapellaParser {
     }
 
     private parseSystems(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'system':
                     this.parseSystem(c);
@@ -397,7 +398,7 @@ export class CapellaParser {
     private parseSystem(element: XmlNode) {
         if (element.attributes.has('tempo')) {
             if (this.score.masterBars.length === 0) {
-                this.score.tempo = parseInt(element.attributes.get('tempo')!);
+                this.score.tempo = Number.parseInt(element.attributes.get('tempo')!);
             }
         }
 
@@ -405,7 +406,7 @@ export class CapellaParser {
             this._beamingMode = BeatBeamingMode.ForceSplitToNext;
         }
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staves':
                     this.parseStaves(element, c);
@@ -417,8 +418,8 @@ export class CapellaParser {
     }
 
     private parseStaves(systemElement: XmlNode, element: XmlNode) {
-        let firstBarIndex = this.score.masterBars.length;
-        for (let c of element.childElements()) {
+        const firstBarIndex = this.score.masterBars.length;
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'staff':
                     this.parseStaff(systemElement, firstBarIndex, c);
@@ -447,7 +448,7 @@ export class CapellaParser {
             this.addNewBar(staff);
         }
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'voices':
                     this.parseVoices(staffId, staff, systemElement, firstBarIndex, c);
@@ -471,8 +472,8 @@ export class CapellaParser {
             default:
                 if (value.indexOf('/') > 0) {
                     const parts = value.split('/');
-                    this._timeSignature.timeSignatureNumerator = parseInt(parts[0]);
-                    this._timeSignature.timeSignatureDenominator = parseInt(parts[1]);
+                    this._timeSignature.timeSignatureNumerator = Number.parseInt(parts[0]);
+                    this._timeSignature.timeSignatureDenominator = Number.parseInt(parts[1]);
                     this._timeSignature.timeSignatureCommon = false;
                 }
                 break;
@@ -486,7 +487,7 @@ export class CapellaParser {
         element: XmlNode
     ) {
         let voiceIndex = 0;
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'voice':
                     this.parseVoice(staffId, staff, systemElement, voiceIndex, firstBarIndex, c);
@@ -505,7 +506,7 @@ export class CapellaParser {
 
     private addNewBar(staff: Staff) {
         // voice tags always start a new bar
-        let currentBar: Bar = new Bar();
+        const currentBar: Bar = new Bar();
         if (staff.bars.length > 0) {
             currentBar.clef = staff.bars[staff.bars.length - 1].clef;
             currentBar.clefOttava = staff.bars[staff.bars.length - 1].clefOttava;
@@ -516,7 +517,7 @@ export class CapellaParser {
 
         // create masterbar if needed
         if (staff.bars.length > this.score.masterBars.length) {
-            let master: MasterBar = new MasterBar();
+            const master: MasterBar = new MasterBar();
             this.score.addMasterBar(master);
             if (master.index > 0) {
                 master.keySignature = master.previousMasterBar!.keySignature;
@@ -553,7 +554,7 @@ export class CapellaParser {
         firstBarIndex: number,
         element: XmlNode
     ) {
-        const voiceStateKey = staffId + '_' + voiceIndex;
+        const voiceStateKey = `${staffId}_${voiceIndex}`;
         if (this._currentVoiceState && !this._currentVoiceState.currentBarComplete) {
             this._currentBar.masterBar.isAnacrusis = true;
         }
@@ -592,14 +593,14 @@ export class CapellaParser {
             const automation = new Automation();
             automation.isLinear = true;
             automation.type = AutomationType.Tempo;
-            automation.value = parseInt(systemElement.attributes.get('tempo')!);
+            automation.value = Number.parseInt(systemElement.attributes.get('tempo')!);
             automation.ratioPosition =
                 this._currentVoiceState.currentPosition / this._currentVoiceState.currentBarDuration;
             this._currentBar.masterBar.tempoAutomations.push(automation);
         }
 
         if (noteObjects) {
-            for (let c of noteObjects.childElements()) {
+            for (const c of noteObjects.childElements()) {
                 if (this._currentVoiceState.currentBarComplete && c.localName !== 'barline') {
                     this.newBar(staff, voiceIndex);
                 }
@@ -610,7 +611,9 @@ export class CapellaParser {
                         this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
                         break;
                     case 'keySign':
-                        this._currentBar.masterBar.keySignature = parseInt(c.getAttribute('fifths')) as KeySignature;
+                        this._currentBar.masterBar.keySignature = Number.parseInt(
+                            c.getAttribute('fifths')
+                        ) as KeySignature;
                         break;
                     case 'timeSign':
                         this.parseTime(c.getAttribute('time'));
@@ -679,7 +682,7 @@ export class CapellaParser {
                         }
                         break;
                     case 'chord':
-                        let chordBeat = new Beat();
+                        const chordBeat = new Beat();
                         this.initFromPreviousBeat(chordBeat, this._currentVoice);
                         chordBeat.beamingMode = this._beamingMode;
                         if (this._currentVoiceState.voiceStemDir) {
@@ -715,7 +718,7 @@ export class CapellaParser {
     }
 
     private initFromPreviousBeat(chordBeat: Beat, currentVoice: Voice) {
-        let previousBeat = this.getLastBeat(currentVoice);
+        const previousBeat = this.getLastBeat(currentVoice);
         if (previousBeat) {
             chordBeat.dynamics = previousBeat.dynamics;
         }
@@ -724,7 +727,8 @@ export class CapellaParser {
     private getLastBeat(voice: Voice): Beat | null {
         if (voice.beats.length > 0) {
             return voice.beats[voice.beats.length - 1];
-        } else if (voice.bar.index > 0) {
+        }
+        if (voice.bar.index > 0) {
             const previousBar = voice.bar.staff.bars[voice.bar.index - 1];
             if (voice.index < previousBar.voices.length) {
                 const previousVoice = previousBar.voices[voice.index];
@@ -751,7 +755,7 @@ export class CapellaParser {
 
     private parseChord(beat: Beat, element: XmlNode) {
         const articulation: Note = new Note();
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'stem':
                     switch (c.getAttribute('dir')) {
@@ -801,7 +805,7 @@ export class CapellaParser {
     }
 
     private parseHeads(beat: Beat, articulation: Note, element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'head':
                     this.parseHead(beat, articulation, c);
@@ -827,11 +831,11 @@ export class CapellaParser {
         // TODO: based on the shape attribute apply effects or
         // right percussion value
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'alter':
                     if (c.attributes.has('step')) {
-                        note.tone += parseInt(c.attributes.get('step')!);
+                        note.tone += Number.parseInt(c.attributes.get('step')!);
                     }
                     break;
                 case 'tie':
@@ -852,7 +856,7 @@ export class CapellaParser {
     }
 
     private parseBeatDrawObject(beat: Beat, element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -915,7 +919,7 @@ export class CapellaParser {
     }
 
     private parseBarDrawObject(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -962,7 +966,7 @@ export class CapellaParser {
     }
 
     private parseLyric(beat: Beat, element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'verse':
                     if (!beat.lyrics) {
@@ -981,24 +985,23 @@ export class CapellaParser {
     private parseRestDurations(bar: Bar, element: XmlNode): Beat | null {
         const durationBase = element.getAttribute('base');
         if (durationBase.indexOf('/') !== -1) {
-            let restBeat = new Beat();
+            const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
             this.parseDuration(bar, restBeat, element);
             return restBeat;
         }
 
         // for
-        const fullBars = parseInt(durationBase);
+        const fullBars = Number.parseInt(durationBase);
         if (fullBars === 1) {
-            let restBeat = new Beat();
+            const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
             restBeat.duration = Duration.Whole;
             return restBeat;
-        } else {
-            // TODO: multibar rests
-            Logger.warning('Importer', `Multi-Bar rests are not supported`);
-            return null;
         }
+        // TODO: multibar rests
+        Logger.warning('Importer', 'Multi-Bar rests are not supported');
+        return null;
     }
 
     private parseDurationValue(s: string): Duration {
@@ -1032,12 +1035,12 @@ export class CapellaParser {
         beat.duration = this.parseDurationValue(durationBase);
 
         if (element.attributes.has('dots')) {
-            beat.dots = parseInt(element.attributes.get('dots')!);
+            beat.dots = Number.parseInt(element.attributes.get('dots')!);
         }
 
         const tuplet = element.findChildElement('tuplet');
         if (tuplet) {
-            beat.tupletNumerator = parseInt(tuplet.getAttribute('count'));
+            beat.tupletNumerator = Number.parseInt(tuplet.getAttribute('count'));
             const tripartiteMultiplicator = tuplet.getAttribute('tripartite') === 'true' ? 3 : 1;
             const prolongDiff = tuplet.getAttribute('prolong') === 'true' ? 0 : 1;
 
@@ -1050,7 +1053,7 @@ export class CapellaParser {
     }
 
     private parsePageObjects(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -1079,7 +1082,7 @@ export class CapellaParser {
     }
 
     private parseGallery(element: XmlNode) {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'drawObj':
                     const obj = this.parseDrawObj(c);
@@ -1096,7 +1099,7 @@ export class CapellaParser {
 
         let noteRange = 1;
 
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'text':
                     obj = this.parseText(c);
@@ -1127,7 +1130,7 @@ export class CapellaParser {
                     break;
                 case 'basic':
                     if (c.attributes.has('noteRange')) {
-                        noteRange = parseInt(c.attributes.get('noteRange')!);
+                        noteRange = Number.parseInt(c.attributes.get('noteRange')!);
                     }
                     break;
             }
@@ -1149,7 +1152,7 @@ export class CapellaParser {
         const obj = new OctaveClefDrawObject();
 
         if (element.attributes.has('octave')) {
-            obj.octave = parseInt(element.attributes.get('octave')!);
+            obj.octave = Number.parseInt(element.attributes.get('octave')!);
         }
 
         return obj;
@@ -1160,10 +1163,10 @@ export class CapellaParser {
 
         obj.allNumbers = element.attributes.get('allNumbers') === 'true';
         if (element.attributes.has('firstNumber')) {
-            obj.firstNumber = parseInt(element.attributes.get('firstNumber')!);
+            obj.firstNumber = Number.parseInt(element.attributes.get('firstNumber')!);
         }
         if (element.attributes.has('lastNumber')) {
-            obj.lastNumber = parseInt(element.attributes.get('lastNumber')!);
+            obj.lastNumber = Number.parseInt(element.attributes.get('lastNumber')!);
         }
 
         return obj;
@@ -1181,7 +1184,7 @@ export class CapellaParser {
         const obj = new TupletBracketDrawObject();
 
         if (element.attributes.has('number')) {
-            obj.number = parseInt(element.attributes.get('number')!);
+            obj.number = Number.parseInt(element.attributes.get('number')!);
         }
 
         return obj;
@@ -1206,7 +1209,7 @@ export class CapellaParser {
             if (strings.charAt(i) === '/') {
                 obj.chord.strings.push(0);
             } else {
-                obj.chord.strings.push(parseInt(strings.charAt(i)));
+                obj.chord.strings.push(Number.parseInt(strings.charAt(i)));
             }
         }
 
@@ -1217,10 +1220,10 @@ export class CapellaParser {
         const obj = new TextDrawObject();
 
         if (element.attributes.has('x')) {
-            obj.x = parseFloat(element.attributes.get('x')!);
+            obj.x = Number.parseFloat(element.attributes.get('x')!);
         }
         if (element.attributes.has('x')) {
-            obj.y = parseFloat(element.attributes.get('y')!);
+            obj.y = Number.parseFloat(element.attributes.get('y')!);
         }
 
         switch (element.getAttribute('align')) {
@@ -1251,17 +1254,17 @@ export class CapellaParser {
         }
 
         if (element.firstElement) {
-            for (let c of element.childElements()) {
+            for (const c of element.childElements()) {
                 switch (c.localName) {
                     case 'font':
                         obj.fontFace = c.getAttribute('face');
 
                         if (c.attributes.has('weight')) {
-                            obj.weight = parseInt(c.attributes.get('weight')!);
+                            obj.weight = Number.parseInt(c.attributes.get('weight')!);
                         }
 
                         if (c.attributes.has('height')) {
-                            obj.height = parseInt(c.attributes.get('height')!);
+                            obj.height = Number.parseInt(c.attributes.get('height')!);
                         }
 
                         break;
@@ -1278,7 +1281,7 @@ export class CapellaParser {
     }
 
     private parseInfo(element: XmlNode): void {
-        for (let c of element.childElements()) {
+        for (const c of element.childElements()) {
             switch (c.localName) {
                 // encodingSoftware ignored
                 case 'author':

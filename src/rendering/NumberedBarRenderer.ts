@@ -1,12 +1,12 @@
-import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat, BeatSubElement } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { Voice } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { type Bar, BarSubElement } from '@src/model/Bar';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import type { Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { LineBarRenderer } from './LineBarRenderer';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
@@ -96,9 +96,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public override doLayout(): void {
         super.doLayout();
         let hasTuplets: boolean = false;
-        for (let voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let c = this.getVoiceContainer(voice)!;
+                const c = this.getVoiceContainer(voice)!;
                 if (c.tupletGroups.length > 0) {
                     hasTuplets = true;
                     break;
@@ -110,11 +110,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
         }
 
         if (!this.bar.isEmpty) {
-            let barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
+            const barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
             if (barCount > 0) {
-                let barSpacing: number = NumberedBarRenderer.BarSpacing;
-                let barSize: number = NumberedBarRenderer.BarSize;
-                let barOverflow = (barCount - 1) * barSpacing + barSize;
+                const barSpacing: number = NumberedBarRenderer.BarSpacing;
+                const barSize: number = NumberedBarRenderer.BarSize;
+                const barOverflow = (barCount - 1) * barSpacing + barSize;
 
                 let dotOverflow = 0;
                 const lowestOctave = this.lowestOctave;
@@ -140,41 +140,49 @@ export class NumberedBarRenderer extends LineBarRenderer {
     private static DotSpacing = 5;
     public static DotSize = 2;
 
-    protected override paintFlag(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
+    protected override paintFlag(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement
+    ): void {
         this.paintBar(cx, cy, canvas, h, flagsElement);
     }
 
-    protected override paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, flagsElement: BeatSubElement): void {
-        if(h.beats.length === 0){
+    protected override paintBar(
+        cx: number,
+        cy: number,
+        canvas: ICanvas,
+        h: BeamingHelper,
+        flagsElement: BeatSubElement
+    ): void {
+        if (h.beats.length === 0) {
             return;
         }
         const res = this.resources;
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
-            let beat: Beat = h.beats[i];
+            const beat: Beat = h.beats[i];
 
-            using _ = ElementStyleHelper.beat(
-                canvas,
-                flagsElement,
-                beat    
-            )
-    
+            using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
+
             //
             // draw line
             //
-            let barSpacing: number = NumberedBarRenderer.BarSpacing;
-            let barSize: number = NumberedBarRenderer.BarSize;
-            let barCount: number = ModelUtils.getIndex(beat.duration) - 2;
-            let barStart: number = cy + this.y;
+            const barSpacing: number = NumberedBarRenderer.BarSpacing;
+            const barSize: number = NumberedBarRenderer.BarSize;
+            const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
+            const barStart: number = cy + this.y;
 
-            let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes) - this.beatGlyphsStart;
+            const beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes) - this.beatGlyphsStart;
 
-            var beamY = this.calculateBeamY(h, beatLineX);
+            const beamY = this.calculateBeamY(h, beatLineX);
 
             for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
                 let barStartX: number = 0;
                 let barEndX: number = 0;
                 let barStartY: number = 0;
-                let barY: number = barStart + barIndex * barSpacing;
+                const barY: number = barStart + barIndex * barSpacing;
                 if (i === h.beats.length - 1) {
                     barStartX = beatLineX;
                     barEndX = this.getBeatX(beat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
@@ -205,7 +213,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 dotsY = barStart + beamY + barCount * barSpacing;
                 dotsOffset = NumberedBarRenderer.DotSpacing;
             }
-            let dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + 4 - this.beatGlyphsStart;
+            const dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + 4 - this.beatGlyphsStart;
 
             dotCount = Math.abs(dotCount);
 
@@ -244,7 +252,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let y = super.getNoteY(note, requestedPosition);
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.getLineY(0);
         }
         return y;
@@ -330,9 +338,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {
-            let container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
-            container.preNotes = v.index == 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
-            container.onNotes = v.index == 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
+            const container: NumberedBeatContainerGlyph = new NumberedBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            container.preNotes = v.index === 0 ? new NumberedBeatPreNotesGlyph() : new BeatGlyphBase();
+            container.onNotes = v.index === 0 ? new NumberedBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
     }
@@ -344,6 +352,5 @@ export class NumberedBarRenderer extends LineBarRenderer {
         topY: number,
         bottomY: number,
         canvas: ICanvas
-    ): void {
-    }
+    ): void {}
 }

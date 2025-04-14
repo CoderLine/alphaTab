@@ -1,5 +1,6 @@
 import { Environment } from '@src/Environment';
 import { LogLevel } from '@src/LogLevel';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { BoundsLookup } from './rendering';
 
 /**

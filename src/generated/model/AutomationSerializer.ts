@@ -11,7 +11,7 @@ export class AutomationSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => AutomationSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Automation | null): Map<string, unknown> | null {
         if (!obj) {

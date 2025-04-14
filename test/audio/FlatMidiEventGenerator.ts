@@ -1,5 +1,5 @@
-import { ControllerType } from '@src/midi/ControllerType';
-import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+import type { ControllerType } from '@src/midi/ControllerType';
+import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 
 export class FlatMidiEventGenerator implements IMidiFileHandler {
     public midiEvents: FlatMidiEvent[];
@@ -9,54 +9,53 @@ export class FlatMidiEventGenerator implements IMidiFileHandler {
     }
 
     public addTimeSignature(tick: number, timeSignatureNumerator: number, timeSignatureDenominator: number): void {
-        let e = new FlatTimeSignatureEvent(tick, timeSignatureNumerator, timeSignatureDenominator);
+        const e = new FlatTimeSignatureEvent(tick, timeSignatureNumerator, timeSignatureDenominator);
         this.midiEvents.push(e);
     }
 
     public addRest(track: number, tick: number, channel: number): void {
-        let e = new FlatRestEvent(tick, track, channel);
+        const e = new FlatRestEvent(tick, track, channel);
         this.midiEvents.push(e);
     }
 
-    public addNote(
+    public addNote(track: number, start: number, length: number, key: number, velocity: number, channel: number): void {
+        const e = new FlatNoteEvent(start, track, channel, length, key, velocity);
+        this.midiEvents.push(e);
+    }
+
+    public addControlChange(
         track: number,
-        start: number,
-        length: number,
-        key: number,
-        velocity: number,
-        channel: number
+        tick: number,
+        channel: number,
+        controller: ControllerType,
+        value: number
     ): void {
-        let e = new FlatNoteEvent(start, track, channel, length, key, velocity);
-        this.midiEvents.push(e);
-    }
-
-    public addControlChange(track: number, tick: number, channel: number, controller: ControllerType, value: number): void {
-        let e = new FlatControlChangeEvent(tick, track, channel, controller, value);
+        const e = new FlatControlChangeEvent(tick, track, channel, controller, value);
         this.midiEvents.push(e);
     }
 
     public addProgramChange(track: number, tick: number, channel: number, program: number): void {
-        let e = new FlatProgramChangeEvent(tick, track, channel, program);
+        const e = new FlatProgramChangeEvent(tick, track, channel, program);
         this.midiEvents.push(e);
     }
 
     public addTempo(tick: number, tempo: number): void {
-        let e = new FlatTempoEvent(tick, tempo);
+        const e = new FlatTempoEvent(tick, tempo);
         this.midiEvents.push(e);
     }
 
     public addBend(track: number, tick: number, channel: number, value: number): void {
-        let e = new FlatBendEvent(tick, track, channel, value);
+        const e = new FlatBendEvent(tick, track, channel, value);
         this.midiEvents.push(e);
     }
 
     public addNoteBend(track: number, tick: number, channel: number, key: number, value: number): void {
-        let e = new FlatNoteBendEvent(tick, track, channel, key, value);
+        const e = new FlatNoteBendEvent(tick, track, channel, key, value);
         this.midiEvents.push(e);
     }
 
     public finishTrack(track: number, tick: number): void {
-        let e = new FlatTrackEndEvent(tick, track);
+        const e = new FlatTrackEndEvent(tick, track);
         this.midiEvents.push(e);
     }
 }
@@ -170,12 +169,8 @@ export class FlatTrackMidiEvent extends FlatMidiEvent {
 }
 
 export class FlatTrackEndEvent extends FlatTrackMidiEvent {
-    public constructor(tick: number, track: number) {
-        super(tick, track);
-    }
-
     public override toString(): string {
-        return 'End of Track ' + super.toString();
+        return `End of Track ${super.toString()}`;
     }
 }
 
@@ -232,10 +227,6 @@ export class FlatControlChangeEvent extends FlatChannelMidiEvent {
 }
 
 export class FlatRestEvent extends FlatChannelMidiEvent {
-    public constructor(tick: number, track: number, channel: number) {
-        super(tick, track, channel);
-    }
-
     public override toString(): string {
         return `Rest: ${super.toString()}`;
     }
@@ -282,14 +273,7 @@ export class FlatNoteEvent extends FlatChannelMidiEvent {
     public key: number = 0;
     public velocity: number;
 
-    public constructor(
-        tick: number,
-        track: number,
-        channel: number,
-        length: number,
-        key: number,
-        velocity: number
-    ) {
+    public constructor(tick: number, track: number, channel: number, length: number, key: number, velocity: number) {
         super(tick, track, channel);
         this.length = length;
         this.key = key;

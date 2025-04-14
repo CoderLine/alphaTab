@@ -1,9 +1,9 @@
-import { Beat } from '@src/model/Beat';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 import { FadeType } from '@src/model/FadeType';
 import { FadeGlyph } from '../glyphs/FadeGlyph';
@@ -26,7 +26,7 @@ export class FadeEffectInfo extends EffectBarRendererInfo {
     }
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
-        return beat.fade != FadeType.None;
+        return beat.fade !== FadeType.None;
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

@@ -26,7 +26,7 @@ export class Queue<T> {
             this._items = this._items.slice(this._position);
             this._position = 0;
         }
-        this.isEmpty = this._items.length == 0;
+        this.isEmpty = this._items.length === 0;
         return item;
     }
 

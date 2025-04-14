@@ -9,7 +9,7 @@ if (alphaTab.Environment.isRunningInWorker) {
 } else {
     alphaTab.Environment.initializeMain(
         settings => {
-            if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.NodeJs) {
+            if (alphaTab.Environment.webPlatform === alphaTab.WebPlatform.NodeJs) {
                 throw new alphaTab.AlphaTabError(
                     alphaTab.AlphaTabErrorType.General,
                     'Workers not yet supported in Node.js'
@@ -17,17 +17,20 @@ if (alphaTab.Environment.isRunningInWorker) {
             }
 
             if (
-                alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule ||
+                alphaTab.Environment.webPlatform === alphaTab.WebPlatform.BrowserModule ||
                 alphaTab.Environment.isWebPackBundled ||
                 alphaTab.Environment.isViteBundled
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating webworker');
                 try {
-                    return new alphaTab.Environment.alphaTabWorker(new alphaTab.Environment.alphaTabUrl('./alphaTab.worker.ts', import.meta.url), {
-                        type: 'module'
-                    });
+                    return new alphaTab.Environment.alphaTabWorker(
+                        new alphaTab.Environment.alphaTabUrl('./alphaTab.worker.ts', import.meta.url),
+                        {
+                            type: 'module'
+                        }
+                    );
                 } catch (e) {
-                    alphaTab.Logger.debug('AlphaTab', `ESM webworker construction with direct URL failed`, e);
+                    alphaTab.Logger.debug('AlphaTab', 'ESM webworker construction with direct URL failed', e);
                     // continue with fallbacks
                 }
 
@@ -46,7 +49,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 } catch (e) {
                     alphaTab.Logger.debug(
                         'AlphaTab',
-                        `ESM webworker construction with blob import failed`,
+                        'ESM webworker construction with blob import failed',
                         workerUrl,
                         e
                     );
@@ -69,7 +72,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                 } catch (e) {
                     alphaTab.Logger.debug(
                         'AlphaTab',
-                        `ESM webworker construction with blob import failed`,
+                        'ESM webworker construction with blob import failed',
                         settings.core.scriptFile,
                         e
                     );
@@ -98,7 +101,7 @@ if (alphaTab.Environment.isRunningInWorker) {
         },
 
         (context, settings) => {
-            if (alphaTab.Environment.webPlatform == alphaTab.WebPlatform.NodeJs) {
+            if (alphaTab.Environment.webPlatform === alphaTab.WebPlatform.NodeJs) {
                 throw new alphaTab.AlphaTabError(
                     alphaTab.AlphaTabErrorType.General,
                     'Audio Worklets not yet supported in Node.js'
@@ -106,13 +109,15 @@ if (alphaTab.Environment.isRunningInWorker) {
             }
 
             if (
-                alphaTab.Environment.webPlatform == alphaTab.WebPlatform.BrowserModule ||
+                alphaTab.Environment.webPlatform === alphaTab.WebPlatform.BrowserModule ||
                 alphaTab.Environment.isWebPackBundled ||
                 alphaTab.Environment.isViteBundled
             ) {
                 alphaTab.Logger.debug('AlphaTab', 'Creating Module worklet');
                 const alphaTabWorklet = context.audioWorklet; // this name triggers the WebPack Plugin
-                return alphaTabWorklet.addModule(new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet.ts', import.meta.url));
+                return alphaTabWorklet.addModule(
+                    new alphaTab.Environment.alphaTabUrl('./alphaTab.worklet.ts', import.meta.url)
+                );
             }
 
             alphaTab.Logger.debug('AlphaTab', 'Creating Script worklet');

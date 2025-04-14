@@ -1,7 +1,7 @@
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import type { Bar } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { GraceGroup } from '@src/model/GraceGroup';
 import { ElementStyle } from './ElementStyle';
 
@@ -12,7 +12,7 @@ export enum VoiceSubElement {
     /**
      * All general glyphs (like notes heads and rests).
      */
-    Glyphs
+    Glyphs = 0
 }
 
 /**
@@ -122,7 +122,7 @@ export class Voice {
             beat.nextBeat = this.beats[beat.index + 1];
             beat.nextBeat.previousBeat = beat;
         } else if (beat.isLastOfVoice && beat.voice.bar.nextBar) {
-            let nextVoice: Voice = this.bar.nextBar!.voices[this.index];
+            const nextVoice: Voice = this.bar.nextBar!.voices[this.index];
             if (nextVoice.beats.length > 0) {
                 beat.nextBeat = nextVoice.beats[0];
                 beat.nextBeat.previousBeat = beat;
@@ -140,7 +140,7 @@ export class Voice {
             return;
         }
         // remove last beat
-        let lastBeat: Beat = this.beats[this.beats.length - 1];
+        const lastBeat: Beat = this.beats[this.beats.length - 1];
         this.beats.splice(this.beats.length - 1, 1);
         // insert grace beat
         this.addBeat(beat);
@@ -163,7 +163,7 @@ export class Voice {
         this._beatLookup = new Map<number, Beat>();
         let currentGraceGroup: GraceGroup | null = null;
         for (let index: number = 0; index < this.beats.length; index++) {
-            let beat: Beat = this.beats[index];
+            const beat: Beat = this.beats[index];
             beat.index = index;
             this.chain(beat, sharedDataBag);
             if (beat.graceType === GraceType.None) {
@@ -189,7 +189,7 @@ export class Voice {
         let currentDisplayTick: number = 0;
         let currentPlaybackTick: number = 0;
         for (let i: number = 0; i < this.beats.length; i++) {
-            let beat: Beat = this.beats[i];
+            const beat: Beat = this.beats[i];
             beat.index = i;
             beat.finish(settings, sharedDataBag);
 
@@ -202,7 +202,7 @@ export class Voice {
                     const lastGraceBeat = beat.graceGroup!.beats[beat.graceGroup!.beats.length - 1];
                     if (firstGraceBeat.graceType !== GraceType.BendGrace) {
                         // find out the stolen duration first
-                        let stolenDuration: number =
+                        const stolenDuration: number =
                             lastGraceBeat.playbackStart + lastGraceBeat.playbackDuration - firstGraceBeat.playbackStart;
 
                         switch (firstGraceBeat.graceType) {
@@ -211,7 +211,7 @@ export class Voice {
                                 if (firstGraceBeat.previousBeat) {
                                     firstGraceBeat.previousBeat.playbackDuration -= stolenDuration;
                                     // place beats starting after new beat end
-                                    if (firstGraceBeat.previousBeat.voice == this) {
+                                    if (firstGraceBeat.previousBeat.voice === this) {
                                         currentPlaybackTick =
                                             firstGraceBeat.previousBeat.playbackStart +
                                             firstGraceBeat.previousBeat.playbackDuration;
@@ -275,8 +275,8 @@ export class Voice {
         if (this.isEmpty || this.beats.length === 0) {
             return 0;
         }
-        let lastBeat: Beat = this.beats[this.beats.length - 1];
-        let firstBeat: Beat = this.beats[0];
+        const lastBeat: Beat = this.beats[this.beats.length - 1];
+        const firstBeat: Beat = this.beats[0];
         return lastBeat.playbackStart + lastBeat.playbackDuration - firstBeat.playbackStart;
     }
 }

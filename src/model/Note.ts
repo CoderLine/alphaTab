@@ -1,6 +1,6 @@
 import { AccentuationType } from '@src/model/AccentuationType';
-import { Beat } from '@src/model/Beat';
-import { BendPoint } from '@src/model/BendPoint';
+import type { Beat } from '@src/model/Beat';
+import type { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { BendType } from '@src/model/BendType';
 import { Duration } from '@src/model/Duration';
@@ -11,10 +11,10 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { Ottavia } from '@src/model/Ottavia';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
+import type { Staff } from '@src/model/Staff';
 import { VibratoType } from '@src/model/VibratoType';
 import { NotationMode } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
@@ -22,7 +22,7 @@ import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { NoteOrnament } from './NoteOrnament';
 import { ElementStyle } from './ElementStyle';
-import { MusicFontSymbol } from './MusicFontSymbol';
+import type { MusicFontSymbol } from './MusicFontSymbol';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;
@@ -43,61 +43,61 @@ export enum NoteSubElement {
      * The effects and annotations shown in dedicated effect bands above the staves (e.g. vibrato).
      * The style of the first note with the effect wins.
      */
-    Effects,
+    Effects = 0,
 
     /**
      * The note head on the standard notation staff.
      */
-    StandardNotationNoteHead,
+    StandardNotationNoteHead = 1,
 
     /**
      * The accidentals on the standard notation staff.
      */
-    StandardNotationAccidentals,
+    StandardNotationAccidentals = 2,
 
     /**
      * The effects and annotations applied to this note on the standard notation staff (e.g. bends).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    StandardNotationEffects,
+    StandardNotationEffects = 3,
 
     /**
      * The fret number on the guitar tab staff.
      */
-    GuitarTabFretNumber,
+    GuitarTabFretNumber = 4,
 
     /**
      * The effects and annotations applied to this note on the guitar tab staff (e.g. bends).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    GuitarTabEffects,
+    GuitarTabEffects = 5,
 
     /**
      * The note head on the slash notation staff.
      */
-    SlashNoteHead,
+    SlashNoteHead = 6,
 
     /**
      * The effects and annotations applied to this note on the slash notation staff (e.g. dots).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    SlashEffects,
+    SlashEffects = 7,
 
     /**
      * The note number on the numbered notation staff.
      */
-    NumberedNumber,
+    NumberedNumber = 8,
 
     /**
      * The accidentals on the numbered notation staff.
      */
-    NumberedAccidentals,
+    NumberedAccidentals = 9,
 
     /**
      * The effects and annotations applied to this note on the number notation staff (e.g. dots).
      * If effects on beats result in individual note elements shown, this color will apply.
      */
-    NumberedEffects
+    NumberedEffects = 10
 }
 
 /**
@@ -106,16 +106,15 @@ export enum NoteSubElement {
  * @json_strict
  */
 export class NoteStyle extends ElementStyle<NoteSubElement> {
-
     /**
-     * The symbol that should be used as note head. 
+     * The symbol that should be used as note head.
      */
-    public noteHead?:MusicFontSymbol;
+    public noteHead?: MusicFontSymbol;
 
     /**
      * Whether the note head symbol should be centered on the stem (e.g. for arrow notes)
      */
-    public noteHeadCenterOnStem?:boolean;
+    public noteHeadCenterOnStem?: boolean;
 }
 
 /**
@@ -648,25 +647,25 @@ export class Note {
                 }
             }
             return realValue;
-        } else {
-            if (this.isPercussion) {
-                return this.percussionArticulation;
-            }
-            if (this.isStringed) {
-                return this.fret + this.stringTuning - transpositionPitch;
-            }
-            if (this.isPiano) {
-                return this.octave * 12 + this.tone - transpositionPitch;
-            }
-            return 0;
         }
+
+        if (this.isPercussion) {
+            return this.percussionArticulation;
+        }
+        if (this.isStringed) {
+            return this.fret + this.stringTuning - transpositionPitch;
+        }
+        if (this.isPiano) {
+            return this.octave * 12 + this.tone - transpositionPitch;
+        }
+        return 0;
     }
 
     public get harmonicPitch(): number {
         if (this.harmonicType === HarmonicType.None || !this.isStringed) {
             return 0;
         }
-        let value: number = this.harmonicValue;
+        const value: number = this.harmonicValue;
         // add semitones to reach corresponding harmonic frets
         if (ModelUtils.isAlmostEqualTo(value, 2.4)) {
             return 36;
@@ -745,15 +744,19 @@ export class Note {
     public get initialBendValue(): number {
         if (this.hasBend) {
             return Math.floor(this.bendPoints![0].value / 2);
-        } else if (this.bendOrigin) {
+        }
+        if (this.bendOrigin) {
             return Math.floor(this.bendOrigin.bendPoints![this.bendOrigin.bendPoints!.length - 1].value / 2);
-        } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
+        }
+        if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
             return Math.floor(
                 this.tieOrigin!.bendOrigin.bendPoints![this.tieOrigin!.bendOrigin.bendPoints!.length - 1].value / 2
             );
-        } else if (this.beat.hasWhammyBar) {
+        }
+        if (this.beat.hasWhammyBar) {
             return Math.floor(this.beat.whammyBarPoints![0].value / 2);
-        } else if (this.beat.isContinuedWhammy) {
+        }
+        if (this.beat.isContinuedWhammy) {
             return Math.floor(
                 this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value / 2
             );
@@ -841,8 +844,8 @@ export class Note {
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        let nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
-        let isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
+        const nextNoteOnLine: Lazy<Note | null> = new Lazy<Note | null>(() => Note.nextNoteOnSameLine(this));
+        const isSongBook: boolean = settings && settings.notation.notationMode === NotationMode.SongBook;
 
         // connect ties
         if (this.isTieDestination) {
@@ -873,7 +876,7 @@ export class Note {
         }
         // set hammeron/pulloffs
         if (this.isHammerPullOrigin) {
-            let hammerPullDestination = Note.findHammerPullDestination(this);
+            const hammerPullDestination = Note.findHammerPullDestination(this);
             if (!hammerPullDestination) {
                 this.isHammerPullOrigin = false;
             } else {
@@ -885,7 +888,7 @@ export class Note {
         switch (this.slideOutType) {
             case SlideOutType.Shift:
             case SlideOutType.Legato:
-                if(!this.slideTarget) {
+                if (!this.slideTarget) {
                     this.slideTarget = nextNoteOnLine.value;
                 }
 
@@ -920,7 +923,7 @@ export class Note {
         const hasBend = points != null && points.length > 0;
 
         if (hasBend) {
-            let isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
+            const isContinuedBend: boolean = this.isTieDestination && this.tieOrigin!.hasBend;
             this.isContinuedBend = isContinuedBend;
         } else {
             this.bendType = BendType.None;
@@ -928,10 +931,10 @@ export class Note {
 
         if (hasBend && this.bendType === BendType.Custom) {
             if (points!.length === 4) {
-                let origin: BendPoint = points[0];
-                let middle1: BendPoint = points[1];
-                let middle2: BendPoint = points[2];
-                let destination: BendPoint = points[3];
+                const origin: BendPoint = points[0];
+                const middle1: BendPoint = points[1];
+                const middle2: BendPoint = points[2];
+                const destination: BendPoint = points[3];
                 // the middle points are used for holds, anything else is a new feature we do not support yet
                 if (middle1.value === middle2.value) {
                     // bend higher?
@@ -975,8 +978,8 @@ export class Note {
                     Logger.warning('Model', 'Unsupported bend type detected, fallback to custom', null);
                 }
             } else if (points.length === 2) {
-                let origin: BendPoint = points[0];
-                let destination: BendPoint = points[1];
+                const origin: BendPoint = points[0];
+                const destination: BendPoint = points[1];
                 // bend higher?
                 if (destination.value > origin.value) {
                     if (!this.isContinuedBend && origin.value > 0) {
@@ -1014,7 +1017,7 @@ export class Note {
         let nextBeat: Beat | null = note.beat.nextBeat;
         // keep searching in same bar
         while (nextBeat && nextBeat.voice.bar.index <= note.beat.voice.bar.index + Note.MaxOffsetForSameLineSearch) {
-            let noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
+            const noteOnString: Note | null = nextBeat.getNoteOnString(note.string);
             if (noteOnString) {
                 return noteOnString;
             }
@@ -1048,9 +1051,8 @@ export class Note {
                 if (noteOnString) {
                     if (noteOnString.isLeftHandTapped) {
                         return noteOnString;
-                    } else {
-                        break;
                     }
+                    break;
                 }
             }
 
@@ -1060,9 +1062,8 @@ export class Note {
                 if (noteOnString) {
                     if (noteOnString.isLeftHandTapped) {
                         return noteOnString;
-                    } else {
-                        break;
                     }
+                    break;
                 }
             }
 
@@ -1080,7 +1081,7 @@ export class Note {
             previousBeat.voice.bar.index >= note.beat.voice.bar.index - Note.MaxOffsetForSameLineSearch
         ) {
             if (note.isStringed) {
-                let noteOnString: Note | null = previousBeat.getNoteOnString(note.string);
+                const noteOnString: Note | null = previousBeat.getNoteOnString(note.string);
                 if (noteOnString) {
                     return noteOnString;
                 }
@@ -1092,7 +1093,7 @@ export class Note {
                         return previousBeat.notes[note.index];
                     }
                 } else {
-                    let noteWithValue: Note | null = previousBeat.getNoteWithRealValue(note.realValue);
+                    const noteWithValue: Note | null = previousBeat.getNoteWithRealValue(note.realValue);
                     if (noteWithValue) {
                         return noteWithValue;
                     }
@@ -1162,7 +1163,7 @@ export class Note {
                 return;
             }
 
-            let tieOrigin = this.tieOrigin ?? Note.findTieOrigin(this);
+            const tieOrigin = this.tieOrigin ?? Note.findTieOrigin(this);
             if (!tieOrigin) {
                 this.isTieDestination = false;
             } else {

@@ -5,7 +5,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class FlagGlyph extends MusicFontGlyph {
-    public static readonly FlagWidth:number = 11;
+    public static readonly FlagWidth: number = 11;
 
     public constructor(x: number, y: number, duration: Duration, direction: BeamDirection, isGrace: boolean) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));

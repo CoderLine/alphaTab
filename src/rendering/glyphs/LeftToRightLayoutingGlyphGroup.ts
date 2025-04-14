@@ -1,4 +1,4 @@
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
 export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {

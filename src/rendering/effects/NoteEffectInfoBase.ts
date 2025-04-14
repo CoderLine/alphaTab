@@ -1,7 +1,7 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 
 export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     protected lastCreateInfo: Note[] | null = null;
@@ -9,7 +9,7 @@ export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
         this.lastCreateInfo = [];
         for (let i: number = 0, j: number = beat.notes.length; i < j; i++) {
-            let n: Note = beat.notes[i];
+            const n: Note = beat.notes[i];
             if (this.shouldCreateGlyphForNote(n)) {
                 this.lastCreateInfo.push(n);
             }

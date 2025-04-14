@@ -5,31 +5,31 @@ export enum WhammyType {
     /**
      * No whammy at all
      */
-    None,
+    None = 0,
     /**
      * Individual points define the whammy in a flexible manner.
      * This system was mainly used in Guitar Pro 3-5
      */
-    Custom,
+    Custom = 1,
     /**
      * Simple dive to a lower or higher note.
      */
-    Dive,
+    Dive = 2,
     /**
      * A dive to a lower or higher note and releasing it back to normal.
      */
-    Dip,
+    Dip = 3,
     /**
      * Continue to hold the whammy at the position from a previous whammy.
      */
-    Hold,
+    Hold = 4,
     /**
      * Dive to a lower or higher note before playing it.
      */
-    Predive,
+    Predive = 5,
     /**
      * Dive to a lower or higher note before playing it, then change to another
      * note.
      */
-    PrediveDive
+    PrediveDive = 6
 }

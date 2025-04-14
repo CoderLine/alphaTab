@@ -1,6 +1,6 @@
-import { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
+import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 
@@ -9,15 +9,15 @@ import { Environment } from '@src/Environment';
  */
 export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public static readonly CmdOutputPrefix: string = 'alphaSynth.output.';
-    public static readonly CmdOutputAddSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'addSamples';
-    public static readonly CmdOutputPlay: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'play';
-    public static readonly CmdOutputPause: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'pause';
-    public static readonly CmdOutputResetSamples: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'resetSamples';
-    public static readonly CmdOutputStop: string = AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'stop';
+    public static readonly CmdOutputAddSamples: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}addSamples`;
+    public static readonly CmdOutputPlay: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}play`;
+    public static readonly CmdOutputPause: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}pause`;
+    public static readonly CmdOutputResetSamples: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}resetSamples`;
+    public static readonly CmdOutputStop: string = `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}stop`;
     public static readonly CmdOutputSampleRequest: string =
-        AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'sampleRequest';
+        `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}sampleRequest`;
     public static readonly CmdOutputSamplesPlayed: string =
-        AlphaSynthWorkerSynthOutput.CmdOutputPrefix + 'samplesPlayed';
+        `${AlphaSynthWorkerSynthOutput.CmdOutputPrefix}samplesPlayed`;
 
     // this value is initialized by the alphaSynth WebWorker wrapper
     // that also includes the alphaSynth library into the worker.
@@ -43,8 +43,8 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     }
 
     private handleMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: any = data.cmd;
+        const data: any = e.data;
+        const cmd: any = data.cmd;
         switch (cmd) {
             case AlphaSynthWorkerSynthOutput.CmdOutputSampleRequest:
                 (this.sampleRequest as EventEmitter).trigger();

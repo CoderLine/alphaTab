@@ -1,7 +1,7 @@
 import { Clef } from '@src/model/Clef';
 import { Ottavia } from '@src/model/Ottavia';
-import { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
@@ -35,11 +35,7 @@ export class ClefGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(
-            canvas,
-            BarSubElement.StandardNotationClef,
-            this.renderer.bar
-        );
+        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationClef, this.renderer.bar);
 
         super.paint(cx, cy, canvas);
         let numberGlyph: Glyph;
@@ -90,7 +86,7 @@ export class ClefGlyph extends MusicFontGlyph {
         }
         numberGlyph.renderer = this.renderer;
         numberGlyph.doLayout();
-        let x: number = this.width / 2;
+        const x: number = this.width / 2;
         numberGlyph.paint(cx + this.x + x + offsetX, cy + this.y + offsetY, canvas);
     }
 }

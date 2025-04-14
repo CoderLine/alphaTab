@@ -1,4 +1,4 @@
-import { ICanvas, TextBaseline } from '@src/platform';
+import { type ICanvas, TextBaseline } from '@src/platform';
 import { Glyph } from './Glyph';
 import { AccidentalType, BarSubElement, KeySignature, KeySignatureType } from '@src/model';
 import { AccidentalGlyph } from './AccidentalGlyph';
@@ -163,13 +163,13 @@ export class NumberedKeySignatureGlyph extends Glyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.NumberedKeySignature, this.renderer.bar);
-        
+
         const res = this.renderer.resources;
         canvas.font = res.numberedNotationFont;
         canvas.textBaseline = TextBaseline.Middle;
         canvas.fillText(this._text, cx + this.x, cy + this.y);
 
-        if (this._accidental != AccidentalType.None) {
+        if (this._accidental !== AccidentalType.None) {
             canvas.fillMusicFontSymbol(
                 cx + this.x + this._accidentalOffset,
                 cy + this.y,

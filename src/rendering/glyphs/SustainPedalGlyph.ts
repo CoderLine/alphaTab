@@ -1,6 +1,6 @@
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 import { EffectGlyph } from './EffectGlyph';
-import { SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { MusicFontSymbol } from '@src/model';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
@@ -23,7 +23,7 @@ export class SustainPedalGlyph extends EffectGlyph {
         const y = cy + this.y;
         const h = this.height;
 
-        let markers = renderer.bar.sustainPedals;
+        const markers = renderer.bar.sustainPedals;
 
         const textWidth = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.KeyboardPedalPed)!;
         const starSize = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.KeyboardPedalUp)!;

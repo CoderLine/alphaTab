@@ -2,13 +2,14 @@
 
 // index.ts for more details on contents and license of this file
 
-import { ResolvedConfig } from './config';
+import type { ResolvedConfig } from './config';
 import { cleanUrl, getHash } from './utils';
 import type { OutputChunk } from 'rollup';
 import * as path from 'node:path';
 import { BuildEnvironment } from 'vite';
 import { injectEnvironmentToHooks } from './build';
 
+// biome-ignore lint/suspicious/noConstEnum: Exception where we use them
 export const enum AlphaTabWorkerTypes {
     WorkerClassic = 'worker_classic',
     WorkerModule = 'worker_module',
@@ -73,8 +74,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
     const newBundleChain = [...bundleChain, input];
     if (bundleChain.includes(input)) {
         throw new Error(
-            'Circular worker imports detected. Vite does not support it. ' +
-                `Import chain: ${newBundleChain.join(' -> ')}`
+            `Circular worker imports detected. Vite does not support it. Import chain: ${newBundleChain.join(' -> ')}`
         );
     }
 
@@ -111,7 +111,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
             sourcemap: config.build.sourcemap
         });
         chunk = outputChunk;
-        outputChunks.forEach(outputChunk => {
+        for (const outputChunk of outputChunks) {
             if (outputChunk.type === 'asset') {
                 saveEmitWorkerAsset(config, outputChunk);
             } else if (outputChunk.type === 'chunk') {
@@ -120,7 +120,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
                     source: outputChunk.code
                 });
             }
-        });
+        }
     } finally {
         await bundle.close();
     }
@@ -134,7 +134,7 @@ function emitSourcemapForWorkerEntry(config: ResolvedConfig, chunk: OutputChunk)
     if (sourcemap) {
         if (config.build.sourcemap === 'hidden' || config.build.sourcemap === true) {
             const data = sourcemap.toString();
-            const mapFileName = chunk.fileName + '.map';
+            const mapFileName = `${chunk.fileName}.map`;
             saveEmitWorkerAsset(config, {
                 fileName: mapFileName,
                 source: data

@@ -1,10 +1,10 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Tuning } from '@src/model/Tuning';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { Color } from '@src/model';
+import type { Color } from '@src/model';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {
@@ -81,14 +81,14 @@ export class TuningGlyph extends GlyphGroup {
             const circleHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
             // Strings
-            let stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
+            const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
             let currentY: number = this.height;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
                 this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 2.5, circleScale, symbol));
 
-                const str: string = '= ' + Tuning.getTextForTuning(tuning.tunings[i], false);
+                const str: string = `= ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
                 this.addGlyph(
                     new TextGlyph(currentX + circleHeight + 1, currentY, str, res.effectFont, TextAlign.Left)
                 );

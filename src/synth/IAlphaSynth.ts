@@ -1,14 +1,14 @@
-import { MidiFile } from '@src/midi/MidiFile';
-import { PlaybackRange } from '@src/synth/PlaybackRange';
-import { PlayerState } from '@src/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import { LogLevel } from '@src/LogLevel';
-import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { MidiEventType } from '@src/midi/MidiEvent';
-import { ISynthOutput } from './ISynthOutput';
+import type { MidiFile } from '@src/midi/MidiFile';
+import type { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { PlayerState } from '@src/synth/PlayerState';
+import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { LogLevel } from '@src/LogLevel';
+import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import type { MidiEventType } from '@src/midi/MidiEvent';
+import type { ISynthOutput } from './ISynthOutput';
 
 /**
  * The public API interface for interacting with the synthesizer.
@@ -114,7 +114,7 @@ export interface IAlphaSynth {
     stop(): void;
 
     /**
-     * Stops any ongoing playback and plays the given midi file instead. 
+     * Stops any ongoing playback and plays the given midi file instead.
      * @param midi The midi file to play
      */
     playOneTimeMidiFile(midi: MidiFile): void;
@@ -144,7 +144,7 @@ export interface IAlphaSynth {
     applyTranspositionPitches(transpositionPitches: Map<number, number>): void;
 
     /**
-     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the 
+     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the
      * ones applied already via {@link applyTranspositionPitches}.
      * @param channel The channel number
      * @param semitones The number of semitones to apply as pitch offset.
@@ -215,7 +215,7 @@ export interface IAlphaSynth {
      * This event is fired when the loading of the Midi file failed.
      * @eventProperty
      */
-    readonly midiLoadFailed: IEventEmitterOfT<Error>
+    readonly midiLoadFailed: IEventEmitterOfT<Error>;
 
     /**
      * This event is fired when the playback state changed.

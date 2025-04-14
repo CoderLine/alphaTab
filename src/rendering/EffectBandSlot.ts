@@ -1,5 +1,5 @@
-import { Beat } from '@src/model/Beat';
-import { EffectBand } from '@src/rendering/EffectBand';
+import type { Beat } from '@src/model/Beat';
+import type { EffectBand } from '@src/rendering/EffectBand';
 
 export class EffectBandSlotShared {
     public uniqueEffectId: string | null = null;

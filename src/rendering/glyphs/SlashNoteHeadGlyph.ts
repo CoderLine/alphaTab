@@ -1,11 +1,11 @@
 import { Duration } from '@src/model/Duration';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from './NoteHeadGlyph';
-import { Glyph } from './Glyph';
-import { BeamingHelper } from '../utils/BeamingHelper';
+import type { Glyph } from './Glyph';
+import type { BeamingHelper } from '../utils/BeamingHelper';
 import { EffectGlyph } from './EffectGlyph';
-import { Beat, BeatSubElement, NoteSubElement } from '@src/model';
+import { type Beat, BeatSubElement, NoteSubElement } from '@src/model';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
@@ -30,7 +30,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
             this.beat!.notes.length === 0
                 ? undefined
                 : ElementStyleHelper.note(canvas, this.noteHeadElement, this.beat!.notes[0]);
-        let offset: number = this._isGrace ? 1 : 0;
+        const offset: number = this._isGrace ? 1 : 0;
         const glyphScale = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, glyphScale, this._symbol, false);
 
@@ -49,7 +49,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
         this.width = MusicFontSymbolSizes.Widths.get(this._symbol)! * scale;
         this.height = MusicFontSymbolSizes.Heights.get(this._symbol)! * scale;
 
-        let effectSpacing: number = 7;
+        const effectSpacing: number = 7;
         let effectY = MusicFontSymbolSizes.Heights.get(this._symbol)!;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;

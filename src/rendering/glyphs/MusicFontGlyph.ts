@@ -1,7 +1,7 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Color } from '@src/model';
+import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Color } from '@src/model';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class MusicFontGlyph extends EffectGlyph {

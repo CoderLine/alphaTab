@@ -3,7 +3,7 @@
  */
 
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { OggPacket } from './OggReader';
+import type { OggPacket } from './OggReader';
 import { VorbisStream } from './VorbisStream';
 import { IOHelper } from '@src/io/IOHelper';
 import {
@@ -53,7 +53,7 @@ export class VorbisStreamReader {
             }
 
             if (packet.isBeginningOfStream) {
-                var stream = this.readStream(packet);
+                const stream = this.readStream(packet);
                 if (stream != null) {
                     return stream;
                 }
@@ -164,7 +164,7 @@ export class VorbisStreamReader {
 
         const version = IOHelper.readUInt32LE(reader);
         // [vorbis_version] is to read ’0’ in order to be compatible with this document.
-        if (version != 0) {
+        if (version !== 0) {
             return false;
         }
 
@@ -180,7 +180,7 @@ export class VorbisStreamReader {
         stream.bitrateNominal = IOHelper.readInt32LE(reader);
         stream.bitrateMinimum = IOHelper.readInt32LE(reader);
 
-        var blockSize = reader.readByte();
+        const blockSize = reader.readByte();
         stream.blocksize0 = 1 << (blockSize & 0x0f);
         stream.blocksize1 = 1 << (blockSize >> 4);
         if (
@@ -229,7 +229,7 @@ export class VorbisStreamReader {
             return false;
         }
 
-        var reader = ByteBuffer.fromBuffer(packet.packetData);
+        const reader = ByteBuffer.fromBuffer(packet.packetData);
         if (!this.comonHeaderDecode(VorbisPacketTypes.Comment, reader)) {
             return false;
         }
@@ -237,14 +237,14 @@ export class VorbisStreamReader {
         const vendorLength = IOHelper.readUInt32LE(reader);
         reader.skip(vendorLength); // vendor (unused)
 
-        var userCommentListLength = IOHelper.readUInt32LE(reader);
+        const userCommentListLength = IOHelper.readUInt32LE(reader);
         for (let index = 0; index < userCommentListLength; index++) {
             const length = IOHelper.readUInt32LE(reader);
             reader.skip(length); // comment (unused)
         }
 
-        var framing = reader.readByte();
-        if (framing == 0) {
+        const framing = reader.readByte();
+        if (framing === 0) {
             return false;
         }
 

@@ -1,15 +1,15 @@
-import { Beat } from '@src/model/Beat';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import { DynamicsGlyph } from '@src/rendering/glyphs/DynamicsGlyph';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
 export class DynamicsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
-        return NotationElement.EffectDynamics
+        return NotationElement.EffectDynamics;
     }
 
     public get hideOnMultiTrack(): boolean {
@@ -29,20 +29,23 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
     }
 
     private internalShouldCreateGlyph(beat: Beat): boolean {
-        if (beat.voice.bar.staff.track.score.stylesheet.hideDynamics || beat.isEmpty || beat.voice.isEmpty || beat.isRest) {
+        if (
+            beat.voice.bar.staff.track.score.stylesheet.hideDynamics ||
+            beat.isEmpty ||
+            beat.voice.isEmpty ||
+            beat.isRest
+        ) {
             return false;
         }
 
-        let previousBeat = this.getPreviousDynamicsBeat(beat);
+        const previousBeat = this.getPreviousDynamicsBeat(beat);
 
-        let show: boolean =
-            (beat.voice.index === 0 && !previousBeat) ||
-            (beat.dynamics !== previousBeat?.dynamics);
+        let show: boolean = (beat.voice.index === 0 && !previousBeat) || beat.dynamics !== previousBeat?.dynamics;
         // ensure we do not show duplicate dynamics
         if (show && beat.voice.index > 0) {
-            for (let voice of beat.voice.bar.voices) {
+            for (const voice of beat.voice.bar.voices) {
                 if (voice.index < beat.voice.index) {
-                    let beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
+                    const beatAtSamePos = voice.getBeatAtPlaybackStart(beat.playbackStart);
                     if (
                         beatAtSamePos &&
                         beat.dynamics === beatAtSamePos.dynamics &&

@@ -1,6 +1,6 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 
 /**
  * Represents a list of beats that are grouped within the same tuplet.
@@ -14,7 +14,7 @@ export class TupletGroup {
     private static readonly SixtyFourthTicks: number = 60;
     private static readonly OneHundredTwentyEighthTicks: number = 30;
     private static readonly TwoHundredFiftySixthTicks: number = 15;
-    
+
     private static AllTicks: number[] = [
         TupletGroup.HalfTicks,
         TupletGroup.QuarterTicks,
@@ -91,8 +91,8 @@ export class TupletGroup {
                 this.isFull = true;
             }
         } else {
-            let factor: number = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
-            for (let potentialMatch of TupletGroup.AllTicks) {
+            const factor: number = (this.beats[0].tupletNumerator / this.beats[0].tupletDenominator) | 0;
+            for (const potentialMatch of TupletGroup.AllTicks) {
                 if (this.totalDuration === potentialMatch * factor) {
                     this.isFull = true;
                     break;

@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { BarBounds } from '@src/rendering/utils/BarBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { NoteBounds } from '@src/rendering/utils/NoteBounds';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import type { BarBounds } from '@src/rendering/utils/BarBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { NoteBounds } from '@src/rendering/utils/NoteBounds';
 
 /**
  * Represents the bounds of a single beat.
@@ -19,7 +19,7 @@ export class BeatBounds {
     public visualBounds!: Bounds;
 
     /**
-     * Gets or sets x-position where the timely center of the notes for this beat is. 
+     * Gets or sets x-position where the timely center of the notes for this beat is.
      * This is where the cursor should be at the time when this beat is played.
      */
     public onNotesX: number = 0;
@@ -65,9 +65,9 @@ export class BeatBounds {
         // TODO: can be likely optimized
         // a beat is mostly vertically aligned, we could sort the note bounds by Y
         // and then do a binary search on the Y-axis.
-        for (let note of notes) {
-            let bottom: number = note.noteHeadBounds.y + note.noteHeadBounds.h;
-            let right: number = note.noteHeadBounds.x + note.noteHeadBounds.w;
+        for (const note of notes) {
+            const bottom: number = note.noteHeadBounds.y + note.noteHeadBounds.h;
+            const right: number = note.noteHeadBounds.x + note.noteHeadBounds.w;
             if (note.noteHeadBounds.x <= x && note.noteHeadBounds.y <= y && x <= right && y <= bottom) {
                 return note.note;
             }
@@ -83,8 +83,8 @@ export class BeatBounds {
         this.visualBounds.scaleWith(scale);
         this.onNotesX *= scale;
 
-        if(this.notes){
-            for(const n of this.notes!){
+        if (this.notes) {
+            for (const n of this.notes!) {
                 n.finish(scale);
             }
         }

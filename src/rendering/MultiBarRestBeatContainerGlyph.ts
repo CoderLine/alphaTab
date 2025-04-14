@@ -1,10 +1,9 @@
 import { Beat } from '@src/model';
 import { BeatContainerGlyph } from './glyphs/BeatContainerGlyph';
-import { VoiceContainerGlyph } from './glyphs/VoiceContainerGlyph';
+import type { VoiceContainerGlyph } from './glyphs/VoiceContainerGlyph';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
 import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
 import { MultiBarRestGlyph } from './glyphs/MultiBarRestGlyph';
-
 
 export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyph {
     public constructor(voiceContainer: VoiceContainerGlyph) {
@@ -24,10 +23,9 @@ export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyph {
     private static getOrCreatePlaceholderBeat(voiceContainer: VoiceContainerGlyph): Beat {
         if (voiceContainer.voice.beats.length > 1) {
             return voiceContainer.voice.beats[0];
-        } else {
-            const placeholder = new Beat();
-            placeholder.voice = voiceContainer.voice;
-            return placeholder;
         }
+        const placeholder = new Beat();
+        placeholder.voice = voiceContainer.voice;
+        return placeholder;
     }
 }

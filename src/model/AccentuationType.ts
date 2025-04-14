@@ -5,17 +5,17 @@ export enum AccentuationType {
     /**
      * No accentuation
      */
-    None,
+    None = 0,
     /**
      * Normal accentuation
      */
-    Normal,
+    Normal = 1,
     /**
      * Heavy accentuation
      */
-    Heavy,
+    Heavy = 2,
     /**
      * Tenuto accentuation
      */
-    Tenuto
+    Tenuto = 3
 }

@@ -1,7 +1,12 @@
 import emit from './CSharpEmitter';
-import transpiler from '../TranspilerBase'
+import transpiler from '../TranspilerBase';
 
-transpiler([{
-    name: 'C#',
-    emit: emit
-}], true);
+transpiler(
+    [
+        {
+            name: 'C#',
+            emit: emit
+        }
+    ],
+    true
+);

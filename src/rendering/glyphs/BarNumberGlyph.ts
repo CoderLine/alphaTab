@@ -1,7 +1,7 @@
-import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { RenderingResources } from '@src/RenderingResources';
-import { LineBarRenderer } from '../LineBarRenderer';
+import type { RenderingResources } from '@src/RenderingResources';
+import type { LineBarRenderer } from '../LineBarRenderer';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 export class BarNumberGlyph extends Glyph {
@@ -29,7 +29,7 @@ export class BarNumberGlyph extends Glyph {
             true
         );
 
-        let res: RenderingResources = this.renderer.resources;
+        const res: RenderingResources = this.renderer.resources;
         const baseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Top;
         canvas.font = res.barNumberFont;

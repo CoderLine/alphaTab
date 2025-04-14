@@ -537,7 +537,6 @@ export class MusicFontSymbolSizes {
         [MusicFontSymbol.WiggleVibratoMediumFast, 10],
 
         [MusicFontSymbol.OctaveBaselineM, 0],
-        [MusicFontSymbol.OctaveBaselineB, 0],
-
+        [MusicFontSymbol.OctaveBaselineB, 0]
     ]);
 }

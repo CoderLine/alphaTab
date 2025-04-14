@@ -1,10 +1,9 @@
-import { MasterBar } from '@src/model/MasterBar';
-import { Score } from '@src/model/Score';
+import type { MasterBar } from '@src/model/MasterBar';
+import type { Score } from '@src/model/Score';
 import { TextAlign } from '@src/platform/ICanvas';
 import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { StaffSystem } from '@src/rendering/staves/StaffSystem';
+import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import { Logger } from '@src/Logger';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 
@@ -22,10 +21,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
 
     public get name(): string {
         return 'HorizontalScreen';
-    }
-
-    public constructor(renderer: ScoreRenderer) {
-        super(renderer);
     }
 
     public get supportsResize(): boolean {
@@ -54,7 +49,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 break;
         }
 
-        let score: Score = this.renderer.score!;
+        const score: Score = this.renderer.score!;
 
         let startIndex: number = this.renderer.settings.display.startBar;
         startIndex--; // map to array index
@@ -72,8 +67,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         this._system.isLast = true;
         this._system.x = this.pagePadding![0];
         this._system.y = this.pagePadding![1];
-        let countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
-        let partials: HorizontalScreenLayoutPartialInfo[] = [];
+        const countPerPartial: number = this.renderer.settings.display.barCountPerPartial;
+        const partials: HorizontalScreenLayoutPartialInfo[] = [];
         let currentPartial: HorizontalScreenLayoutPartialInfo = new HorizontalScreenLayoutPartialInfo();
         let renderX = 0;
         while (currentBarIndex <= endBarIndex) {
@@ -110,10 +105,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                     partials.push(currentPartial);
                     Logger.debug(
                         this.name,
-                        'Finished partial from bar ' +
-                            currentPartial.masterBars[0].index +
-                            ' to ' +
-                            currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                        `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
                         null
                     );
                     currentPartial = new HorizontalScreenLayoutPartialInfo();
@@ -131,10 +123,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
             partials.push(currentPartial);
             Logger.debug(
                 this.name,
-                'Finished partial from bar ' +
-                    currentPartial.masterBars[0].index +
-                    ' to ' +
-                    currentPartial.masterBars[currentPartial.masterBars.length - 1].index,
+                `Finished partial from bar ${currentPartial.masterBars[0].index} to ${currentPartial.masterBars[currentPartial.masterBars.length - 1].index}`,
                 null
             );
         }
@@ -176,13 +165,10 @@ export class HorizontalScreenLayout extends ScoreLayout {
                 canvas.textAlign = TextAlign.Left;
                 Logger.debug(
                     this.name,
-                    'Rendering partial from bar ' +
-                        partial.masterBars[0].index +
-                        ' to ' +
-                        partial.masterBars[partial.masterBars.length - 1].index,
+                    `Rendering partial from bar ${partial.masterBars[0].index} to ${partial.masterBars[partial.masterBars.length - 1].index}`,
                     null
                 );
-                this._system!!.paintPartial(
+                this._system!.paintPartial(
                     -renderX,
                     this._system!.y,
                     canvas,
@@ -195,8 +181,8 @@ export class HorizontalScreenLayout extends ScoreLayout {
         }
 
         this.height = this.layoutAndRenderBottomScoreInfo(this.height);
-        this.height = this.layoutAndRenderAnnotation(this.height) 
-        
+        this.height = this.layoutAndRenderAnnotation(this.height);
+
         this.height += this.pagePadding![3];
     }
 

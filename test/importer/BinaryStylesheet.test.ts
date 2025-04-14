@@ -1,12 +1,12 @@
 import { BinaryStylesheet } from '@src/importer/BinaryStylesheet';
-import { Color } from '@src/model/Color';
+import type { Color } from '@src/model/Color';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 describe('BinaryStylesheetParserTest', () => {
     it('testRead', async () => {
         const data = await TestPlatform.loadFile('test-data/guitarpro7/BinaryStylesheet');
-        let stylesheet: BinaryStylesheet = new BinaryStylesheet(data);
+        const stylesheet: BinaryStylesheet = new BinaryStylesheet(data);
 
         expect(stylesheet.raw.has('Global/chordNameStyle')).to.be.true;
         expect(stylesheet.raw.get('Global/chordNameStyle')).to.equal(2);

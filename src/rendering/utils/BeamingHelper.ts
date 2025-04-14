@@ -1,16 +1,16 @@
-import { Bar } from '@src/model/Bar';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import type { Bar } from '@src/model/Bar';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { Note } from '@src/model/Note';
-import { Staff } from '@src/model/Staff';
-import { Voice } from '@src/model/Voice';
+import type { Note } from '@src/model/Note';
+import type { Staff } from '@src/model/Staff';
+import type { Voice } from '@src/model/Voice';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 
 class BeatLinePositions {
     public staffId: string = '';
@@ -108,7 +108,9 @@ export class BeamingHelper {
     }
 
     private beatHasFlag(beat: Beat) {
-        return !beat.deadSlapped && !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None);
+        return (
+            !beat.deadSlapped && !beat.isRest && (beat.duration > Duration.Quarter || beat.graceType !== GraceType.None)
+        );
     }
 
     public constructor(staff: Staff, renderer: BarRendererBase) {
@@ -134,14 +136,14 @@ export class BeamingHelper {
     }
 
     public registerBeatLineX(staffId: string, beat: Beat, up: number, down: number): void {
-        let positions: BeatLinePositions = this.getOrCreateBeatPositions(beat);
+        const positions: BeatLinePositions = this.getOrCreateBeatPositions(beat);
         positions.staffId = staffId;
         positions.up = up;
         positions.down = down;
         for (const v of this.drawingInfos.values()) {
-            if (v.startBeat == beat) {
+            if (v.startBeat === beat) {
                 v.startX = this.getBeatLineX(beat);
-            } else if (v.endBeat == beat) {
+            } else if (v.endBeat === beat) {
                 v.endX = this.getBeatLineX(beat);
             }
         }
@@ -182,8 +184,8 @@ export class BeamingHelper {
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         if (this.highestNoteInHelper && this.lowestNoteInHelper) {
-            let highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
-            let lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
+            const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
+            const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
 
             if (direction === null) {
                 const avg = (highestNotePosition + lowestNotePosition) / 2;
@@ -415,16 +417,16 @@ export class BeamingHelper {
         if (b1.graceType !== GraceType.None && b2.graceType !== GraceType.None) {
             return true;
         }
-        let m1: Bar = b1.voice.bar;
-        let m2: Bar = b2.voice.bar;
+        const m1: Bar = b1.voice.bar;
+        const m2: Bar = b2.voice.bar;
         // only join on same measure
         if (m1 !== m2) {
             return false;
         }
         // get times of those voices and check if the times
         // are in the same division
-        let start1: number = b1.playbackStart;
-        let start2: number = b2.playbackStart;
+        const start1: number = b1.playbackStart;
+        const start2: number = b2.playbackStart;
         // we can only join 8th, 16th, 32th and 64th voices
         if (!BeamingHelper.canJoinDuration(b1.duration) || !BeamingHelper.canJoinDuration(b2.duration)) {
             return start1 === start2;
@@ -449,8 +451,8 @@ export class BeamingHelper {
                 break;
         }
         // check if they are on the same division
-        let division1: number = ((divisionLength + start1) / divisionLength) | 0 | 0;
-        let division2: number = ((divisionLength + start2) / divisionLength) | 0 | 0;
+        const division1: number = ((divisionLength + start1) / divisionLength) | 0 | 0;
+        const division2: number = ((divisionLength + start2) / divisionLength) | 0 | 0;
         return division1 === division2;
     }
 

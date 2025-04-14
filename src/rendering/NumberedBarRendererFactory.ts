@@ -1,11 +1,11 @@
-import { Bar } from '@src/model/Bar';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Bar } from '@src/model/Bar';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { SlashBarRenderer } from '@src/rendering/SlashBarRenderer';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { Track } from '@src/model/Track';
-import { Staff } from '@src/model';
-import { RenderStaff } from './staves/RenderStaff';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { Track } from '@src/model/Track';
+import type { Staff } from '@src/model';
+import type { RenderStaff } from './staves/RenderStaff';
 import { NumberedBarRenderer } from './NumberedBarRenderer';
 
 /**
@@ -30,9 +30,5 @@ export class NumberedBarRendererFactory extends BarRendererFactory {
 
     public override canCreate(track: Track, staff: Staff): boolean {
         return super.canCreate(track, staff) && staff.showNumbered;
-    }
-
-    public constructor() {
-        super();
     }
 }

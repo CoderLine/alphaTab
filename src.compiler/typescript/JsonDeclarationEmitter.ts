@@ -5,7 +5,7 @@
 
 import * as ts from 'typescript';
 import createEmitter, { generateFile } from './EmitterBase';
-import { getTypeWithNullableInfo, TypeWithNullableInfo } from './TypeSchema';
+import { getTypeWithNullableInfo, type TypeWithNullableInfo } from './TypeSchema';
 
 function createDefaultJsonTypeNode(checker: ts.TypeChecker, type: TypeWithNullableInfo, isNullable: boolean) {
     if (isNullable) {
@@ -37,18 +37,21 @@ function createJsonTypeNode(
                 )
             ])
         ]);
-    } else if (typeInfo.isArray) {
+    }
+
+    if (typeInfo.isArray) {
         const arrayItemType = typeInfo.arrayItemType;
         if (arrayItemType) {
             const result = createJsonTypeNode(checker, arrayItemType, importer);
             if (result) {
                 return ts.factory.createArrayTypeNode(result);
-            } else {
-                return ts.factory.createArrayTypeNode(createDefaultJsonTypeNode(checker, arrayItemType, false));
             }
+            return ts.factory.createArrayTypeNode(createDefaultJsonTypeNode(checker, arrayItemType, false));
         }
         return undefined;
-    } else if (!typeInfo.isPrimitiveType && typeInfo.isUnionType) {
+    }
+
+    if (!typeInfo.isPrimitiveType && typeInfo.isUnionType) {
         const types: ts.TypeNode[] = [];
         for (const type of typeInfo.unionTypes!) {
             const mapped = createJsonTypeNode(checker, type, importer);
@@ -59,40 +62,39 @@ function createJsonTypeNode(
             }
         }
         return ts.factory.createUnionTypeNode(types);
-    } else {
-        if (typeInfo.modulePath) {
-            const isOwnType = typeInfo.isOwnType;
+    }
+    if (typeInfo.modulePath) {
+        const isOwnType = typeInfo.isOwnType;
 
-            if (isOwnType) {
-                const isGeneratedJsonDeclaration = typeInfo.jsDocTags?.some(t => t.tagName.text === 'json_declaration');
-                if (isGeneratedJsonDeclaration) {
-                    importer(typeInfo.typeAsString + 'Json', './' + typeInfo.typeAsString + 'Json');
-                } else {
-                    importer(typeInfo.typeAsString + 'Json', typeInfo.modulePath);
-                }
+        if (isOwnType) {
+            const isGeneratedJsonDeclaration = typeInfo.jsDocTags?.some(t => t.tagName.text === 'json_declaration');
+            if (isGeneratedJsonDeclaration) {
+                importer(`${typeInfo.typeAsString}Json`, `./${typeInfo.typeAsString}Json`);
+            } else {
+                importer(`${typeInfo.typeAsString}Json`, typeInfo.modulePath);
             }
-
-            let args: ts.TypeNode[] | undefined = undefined;
-            if (typeInfo.typeArguments) {
-                args = [];
-                for (const arg of typeInfo.typeArguments) {
-                    const mapped = createJsonTypeNode(checker, arg, importer);
-
-                    if (mapped) {
-                        args.push(mapped);
-                    } else {
-                        args.push(createDefaultJsonTypeNode(checker, arg, arg.isNullable));
-                    }
-                }
-            }
-
-            let symbolType: ts.TypeNode = ts.factory.createTypeReferenceNode(
-                typeInfo.typeAsString + (isOwnType ? 'Json' : ''),
-                args
-            );
-
-            return symbolType;
         }
+
+        let args: ts.TypeNode[] | undefined = undefined;
+        if (typeInfo.typeArguments) {
+            args = [];
+            for (const arg of typeInfo.typeArguments) {
+                const mapped = createJsonTypeNode(checker, arg, importer);
+
+                if (mapped) {
+                    args.push(mapped);
+                } else {
+                    args.push(createDefaultJsonTypeNode(checker, arg, arg.isNullable));
+                }
+            }
+        }
+
+        const symbolType: ts.TypeNode = ts.factory.createTypeReferenceNode(
+            typeInfo.typeAsString + (isOwnType ? 'Json' : ''),
+            args
+        );
+
+        return symbolType;
     }
     return undefined;
 }
@@ -108,7 +110,7 @@ function cloneJsDoc<T extends ts.Node>(node: T, source: ts.Node, additionalTags:
             text = text
                 .substring(2, text.length - 2)
                 .split('\n')
-                .map(l => ' ' + l.trimStart())
+                .map(l => ` ${l.trimStart()}`)
                 .join('\n')
                 .trimStart();
 
@@ -131,9 +133,9 @@ function createJsonMember(
     importer: (name: string, module: string) => void
 ): ts.TypeElement {
     const typeInfo = getTypeWithNullableInfo(program, input.type!, true, false, undefined);
-    let type = createJsonTypeNode(program.getTypeChecker(), typeInfo, importer) ?? typeInfo.createTypeNode();
+    const type = createJsonTypeNode(program.getTypeChecker(), typeInfo, importer) ?? typeInfo.createTypeNode();
 
-    let prop = ts.factory.createPropertySignature(
+    const prop = ts.factory.createPropertySignature(
         undefined,
         input.name,
         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
@@ -193,7 +195,7 @@ const emit = createEmitter('json_declaration', (program, input) => {
         cloneJsDoc(
             ts.factory.createInterfaceDeclaration(
                 [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-                input.name!.text + 'Json',
+                `${input.name!.text}Json`,
                 undefined,
                 undefined,
                 createJsonMembers(program, input, importer)
@@ -203,7 +205,7 @@ const emit = createEmitter('json_declaration', (program, input) => {
         )
     );
 
-    allJsonTypes.set(input.name!.text + 'Json', './' + input.name!.text + 'Json');
+    allJsonTypes.set(`${input.name!.text}Json`, `./${input.name!.text}Json`);
     const sourceFile = ts.factory.createSourceFile(
         [...statements],
         ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),

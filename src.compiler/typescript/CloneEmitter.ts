@@ -2,8 +2,8 @@
  * This file contains an emitter which generates classes to clone
  * any data models following certain rules.
  */
-import * as path from 'path';
-import * as ts from 'typescript';
+import path from 'node:path';
+import ts from 'typescript';
 import createEmitter from './EmitterBase';
 import { getTypeWithNullableInfo } from './TypeSchema';
 
@@ -12,7 +12,7 @@ function removeExtension(fileName: string) {
 }
 
 function toImportPath(fileName: string) {
-    return '@' + removeExtension(fileName).split('\\').join('/');
+    return `@${removeExtension(fileName).split('\\').join('/')}`;
 }
 
 function isClonable(type: ts.Type): boolean {
@@ -80,7 +80,7 @@ function generateClonePropertyStatements(
                 .filter(t => t.tagName.text === 'clone_add')
                 .map(t => t.comment ?? '')[0] as string;
 
-            importer(arrayItemType.typeAsString + 'Cloner', './' + arrayItemType.typeAsString + 'Cloner');
+            importer(`${arrayItemType.typeAsString}Cloner`, `./${arrayItemType.typeAsString}Cloner`);
             const loopItems = [
                 ...assign(ts.factory.createArrayLiteralExpression(undefined)),
 
@@ -108,7 +108,7 @@ function generateClonePropertyStatements(
                                               ts.factory.createCallExpression(
                                                   ts.factory.createPropertyAccessExpression(
                                                       ts.factory.createIdentifier(
-                                                          arrayItemType.typeAsString + 'Cloner'
+                                                          `${arrayItemType.typeAsString}Cloner`
                                                       ),
                                                       'clone'
                                                   ),
@@ -131,7 +131,7 @@ function generateClonePropertyStatements(
                                               ts.factory.createCallExpression(
                                                   ts.factory.createPropertyAccessExpression(
                                                       ts.factory.createIdentifier(
-                                                          arrayItemType.typeAsString + 'Cloner'
+                                                          `${arrayItemType.typeAsString}Cloner`
                                                       ),
                                                       'clone'
                                                   ),
@@ -206,7 +206,7 @@ function generateClonePropertyStatements(
         }
     } else {
         if (propertyType.isCloneable) {
-            importer(propertyType.typeAsString + 'Cloner', './' + propertyType.typeAsString + 'Cloner');
+            importer(`${propertyType.typeAsString}Cloner`, `./${propertyType.typeAsString}Cloner`);
 
             // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : null
             // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : undefined
@@ -223,7 +223,7 @@ function generateClonePropertyStatements(
                         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
                         ts.factory.createCallExpression(
                             ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier(propertyType.typeAsString + 'Cloner'),
+                                ts.factory.createIdentifier(`${propertyType.typeAsString}Cloner`),
                                 'clone'
                             ),
                             undefined,
@@ -348,7 +348,7 @@ export default createEmitter('cloneable', (program, input) => {
     statements.push(
         ts.factory.createClassDeclaration(
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-            input.name!.text + 'Cloner',
+            `${input.name!.text}Cloner`,
             undefined,
             undefined,
             [createCloneMethod(program, input, importer)]

@@ -8,10 +8,10 @@ import * as url from 'node:url';
 
 import { injectWorkerRuntimeModule } from './AlphaTabWorkerRuntimeModule';
 import { configureAudioWorklet } from './AlphaTabAudioWorklet';
-import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
+import type { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
 import { configureWebWorker } from './AlphaTabWebWorker';
-import { webPackWithAlphaTab, webpackTypes } from './Utils';
-import { injectWebWorkerDependency as injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
+import type { webPackWithAlphaTab, webpackTypes } from './Utils';
+import { injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
 import { injectWorkletRuntimeModule } from './AlphaTabWorkletStartRuntimeModule';
 import { injectWorkletDependency } from './AlphaTabWorkletDependency';
 
@@ -19,9 +19,15 @@ const WINDOWS_ABS_PATH_REGEXP = /^[a-zA-Z]:[\\/]/;
 const WINDOWS_PATH_SEPARATOR_REGEXP = /\\/g;
 
 const relativePathToRequest = (relativePath: string): string => {
-    if (relativePath === '') return './.';
-    if (relativePath === '..') return '../.';
-    if (relativePath.startsWith('../')) return relativePath;
+    if (relativePath === '') {
+        return './.';
+    }
+    if (relativePath === '..') {
+        return '../.';
+    }
+    if (relativePath.startsWith('../')) {
+        return relativePath;
+    }
     return `./${relativePath}`;
 };
 
@@ -64,7 +70,9 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
     const cache = new WeakMap<object, Map<string, Map<string, string>>>();
 
     const cachedFn = (context: string, identifier: string, associatedObjectForCache?: object): string => {
-        if (!associatedObjectForCache) return fn(context, identifier);
+        if (!associatedObjectForCache) {
+            return fn(context, identifier);
+        }
 
         let innerCache = cache.get(associatedObjectForCache);
         if (innerCache === undefined) {
@@ -72,28 +80,28 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
             cache.set(associatedObjectForCache, innerCache);
         }
 
-        let cachedResult;
+        let cachedResult: string | undefined;
         let innerSubCache = innerCache.get(context);
         if (innerSubCache === undefined) {
-            innerCache.set(context, (innerSubCache = new Map()));
+            innerSubCache = new Map();
+            innerCache.set(context, innerSubCache);
         } else {
             cachedResult = innerSubCache.get(identifier);
         }
 
         if (cachedResult !== undefined) {
             return cachedResult;
-        } else {
-            const result = fn(context, identifier);
-            innerSubCache.set(identifier, result);
-            return result;
         }
+        const result = fn(context, identifier);
+        innerSubCache.set(identifier, result);
+        return result;
     };
 
     cachedFn.bindContextCache = (
         context: string,
         associatedObjectForCache?: object
     ): ((identifier: string) => string) => {
-        let innerSubCache;
+        let innerSubCache: Map<string, string> | undefined;
         if (associatedObjectForCache) {
             let innerCache = cache.get(associatedObjectForCache);
             if (innerCache === undefined) {
@@ -103,7 +111,8 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
 
             innerSubCache = innerCache.get(context);
             if (innerSubCache === undefined) {
-                innerCache.set(context, (innerSubCache = new Map()));
+                innerSubCache = new Map();
+                innerCache.set(context, innerSubCache);
             }
         } else {
             innerSubCache = new Map();
@@ -113,11 +122,10 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
             const cachedResult = innerSubCache.get(identifier);
             if (cachedResult !== undefined) {
                 return cachedResult;
-            } else {
-                const result = fn(context, identifier);
-                innerSubCache.set(identifier, result);
-                return result;
             }
+            const result = fn(context, identifier);
+            innerSubCache.set(identifier, result);
+            return result;
         };
 
         return boundFn;
@@ -293,7 +301,7 @@ export class AlphaTabWebPackPlugin {
                                 // see https://github.com/nodejs/node/pull/50976
                                 const sourceFilename = path.join(file.parentPath ?? file.path, file.name);
                                 await fs.promises.copyFile(sourceFilename, path.join(outputPath!, subdir, file.name));
-                                const assetFileName = subdir + '/' + file.name;
+                                const assetFileName = `${subdir}/${file.name}`;
                                 const existingAsset = compilation.getAsset(assetFileName);
 
                                 const data = await fs.promises.readFile(sourceFilename);

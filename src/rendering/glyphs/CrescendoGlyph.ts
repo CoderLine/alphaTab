@@ -1,5 +1,5 @@
 import { CrescendoType } from '@src/model/CrescendoType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
@@ -22,8 +22,8 @@ export class CrescendoGlyph extends GroupedEffectGlyph {
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        let startX: number = cx + this.x;
-        let height: number = this.height;
+        const startX: number = cx + this.x;
+        const height: number = this.height;
         const padding = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteheadBlack)! / 2;
         canvas.beginPath();
         if (this._crescendo === CrescendoType.Crescendo) {

@@ -1,7 +1,7 @@
-import { Beat } from '@src/model/Beat';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import type { Beat } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export abstract class GroupedEffectGlyph extends EffectGlyph {
@@ -47,18 +47,18 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
             }
         }
         // use start position of next beat when possible
-        let endBeatRenderer: BarRendererBase = lastLinkedGlyph.renderer;
-        let endBeat: Beat = lastLinkedGlyph.beat!;
-        let position: BeatXPosition = this.endPosition;
+        const endBeatRenderer: BarRendererBase = lastLinkedGlyph.renderer;
+        const endBeat: Beat = lastLinkedGlyph.beat!;
+        const position: BeatXPosition = this.endPosition;
         // calculate end X-position
-        let cxRenderer: number = cx - this.renderer.x;
-        let endX: number = this.calculateEndX(endBeatRenderer, endBeat, cxRenderer, position);
+        const cxRenderer: number = cx - this.renderer.x;
+        const endX: number = this.calculateEndX(endBeatRenderer, endBeat, cxRenderer, position);
         this.paintGrouped(cx, cy, endX, canvas);
     }
 
     protected calculateEndX(
         endBeatRenderer: BarRendererBase,
-        endBeat: Beat|null,
+        endBeat: Beat | null,
         cx: number,
         endPosition: BeatXPosition
     ): number {
@@ -69,8 +69,8 @@ export abstract class GroupedEffectGlyph extends EffectGlyph {
     }
 
     protected paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
-        let cxRenderer: number = cx - this.renderer.x;
-        let endX: number = this.calculateEndX(this.renderer, this.beat, cxRenderer, this.endPosition);
+        const cxRenderer: number = cx - this.renderer.x;
+        const endX: number = this.calculateEndX(this.renderer, this.beat, cxRenderer, this.endPosition);
         this.paintGrouped(cx, cy, endX, canvas);
     }
 

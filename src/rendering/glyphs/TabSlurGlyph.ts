@@ -1,8 +1,8 @@
-import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Note } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class TabSlurGlyph extends TabTieGlyph {
@@ -65,14 +65,14 @@ export class TabSlurGlyph extends TabTieGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
+        const startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
             this.renderer.staff.staveId,
             this.startBeat!.voice.bar
         )!;
-        let direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);
-        let slurId: string = 'tab.slur.' + this.startNote.beat.id + '.' + this.endNote.beat.id + '.' + direction;
-        let renderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        let isSlurRendered: boolean = renderer.staff.getSharedLayoutData(slurId, false);
+        const direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);
+        const slurId: string = `tab.slur.${this.startNote.beat.id}.${this.endNote.beat.id}.${direction}`;
+        const renderer: TabBarRenderer = this.renderer as TabBarRenderer;
+        const isSlurRendered: boolean = renderer.staff.getSharedLayoutData(slurId, false);
         if (!isSlurRendered) {
             renderer.staff.setSharedLayoutData(slurId, true);
             super.paint(cx, cy, canvas);

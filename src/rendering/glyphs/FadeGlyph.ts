@@ -1,7 +1,7 @@
 import { FadeType } from '@src/model/FadeType';
 import { MusicFontGlyph } from './MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model';
-import { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform';
 
 export class FadeGlyph extends MusicFontGlyph {
     public constructor(type: FadeType) {
@@ -21,6 +21,6 @@ export class FadeGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height, canvas)
+        super.paint(cx, cy + this.height, canvas);
     }
 }

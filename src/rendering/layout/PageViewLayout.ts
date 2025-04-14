@@ -1,11 +1,10 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
+import type { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { InternalSystemsLayoutMode, ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
-import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { RenderingResources } from '@src/RenderingResources';
+import type { MasterBarsRenderers } from '@src/rendering/staves/MasterBarsRenderers';
+import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
+import type { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { ScoreSubElement } from '@src/model';
@@ -20,10 +19,6 @@ export class PageViewLayout extends ScoreLayout {
 
     public get name(): string {
         return 'PageView';
-    }
-
-    public constructor(renderer: ScoreRenderer) {
-        super(renderer);
     }
 
     protected doLayoutAndRender(): void {
@@ -74,7 +69,7 @@ export class PageViewLayout extends ScoreLayout {
     public doResize(): void {
         let y: number = this.pagePadding![1];
         this.width = this.renderer.width;
-        let oldHeight: number = this.height;
+        const oldHeight: number = this.height;
         //
         // 1. Score Info
         y = this.layoutAndRenderScoreInfo(y, oldHeight);
@@ -100,12 +95,12 @@ export class PageViewLayout extends ScoreLayout {
             return y;
         }
 
-        let res: RenderingResources = this.renderer.settings.display.resources;
+        const res: RenderingResources = this.renderer.settings.display.resources;
         this.tuningGlyph.x = this.pagePadding![0];
         this.tuningGlyph.width = this.scaledWidth;
         this.tuningGlyph.doLayout();
 
-        let tuningHeight = Math.round(this.tuningGlyph.height);
+        const tuningHeight = Math.round(this.tuningGlyph.height);
 
         const e = new RenderFinishedEventArgs();
         e.x = 0;
@@ -160,7 +155,7 @@ export class PageViewLayout extends ScoreLayout {
 
         let infoHeight = 0;
 
-        let res: RenderingResources = this.renderer.settings.display.resources;
+        const res: RenderingResources = this.renderer.settings.display.resources;
 
         const scoreInfoGlyphs: TextGlyph[] = [];
 
@@ -210,18 +205,18 @@ export class PageViewLayout extends ScoreLayout {
         // if we have a fixed number of bars per row, we only need to refit them.
         const barsPerRowActive =
             this.renderer.settings.display.barsPerRow > 0 ||
-            this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale;
+            this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale;
 
         if (barsPerRowActive) {
             for (let i: number = 0; i < this._systems.length; i++) {
-                let system: StaffSystem = this._systems[i];
+                const system: StaffSystem = this._systems[i];
                 this.fitSystem(system);
                 y += this.paintSystem(system, oldHeight);
             }
         } else {
             this._systems = [];
             let currentIndex: number = 0;
-            let maxWidth: number = this.maxWidth;
+            const maxWidth: number = this.maxWidth;
             let system: StaffSystem = this.createEmptyStaffSystem();
             system.index = this._systems.length;
             system.x = this.pagePadding![0];
@@ -263,14 +258,14 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private layoutAndRenderScore(y: number): number {
-        let startIndex: number = this.firstBarIndex;
+        const startIndex: number = this.firstBarIndex;
         let currentBarIndex: number = startIndex;
-        let endBarIndex: number = this.lastBarIndex;
+        const endBarIndex: number = this.lastBarIndex;
 
         this._systems = [];
         while (currentBarIndex <= endBarIndex) {
             // create system and align set proper coordinates
-            let system: StaffSystem = this.createStaffSystem(currentBarIndex, endBarIndex);
+            const system: StaffSystem = this.createStaffSystem(currentBarIndex, endBarIndex);
             this._systems.push(system);
             system.x = this.pagePadding![0];
             system.y = y;
@@ -279,7 +274,7 @@ export class PageViewLayout extends ScoreLayout {
             this.fitSystem(system);
             Logger.debug(
                 this.name,
-                'Rendering partial from bar ' + system.firstBarIndex + ' to ' + system.lastBarIndex,
+                `Rendering partial from bar ${system.firstBarIndex} to ${system.lastBarIndex}`,
                 null
             );
             y += this.paintSystem(system, y);
@@ -289,7 +284,7 @@ export class PageViewLayout extends ScoreLayout {
 
     private paintSystem(system: StaffSystem, totalHeight: number): number {
         // paint into canvas
-        let height: number = Math.floor(system.height);
+        const height: number = Math.floor(system.height);
 
         const args: RenderFinishedEventArgs = new RenderFinishedEventArgs();
         args.x = 0;
@@ -329,7 +324,7 @@ export class PageViewLayout extends ScoreLayout {
     private getBarsPerSystem(rowIndex: number) {
         let barsPerRow: number = this.renderer.settings.display.barsPerRow;
 
-        if (this.systemsLayoutMode == InternalSystemsLayoutMode.FromModelWithScale) {
+        if (this.systemsLayoutMode === InternalSystemsLayoutMode.FromModelWithScale) {
             let defaultSystemsLayout: number;
             let systemsLayout: number[];
             if (this.renderer.tracks!.length > 1) {
@@ -348,16 +343,16 @@ export class PageViewLayout extends ScoreLayout {
     }
 
     private createStaffSystem(currentBarIndex: number, endIndex: number): StaffSystem {
-        let system: StaffSystem = this.createEmptyStaffSystem();
+        const system: StaffSystem = this.createEmptyStaffSystem();
         system.index = this._systems.length;
-        let barsPerRow: number = this.getBarsPerSystem(system.index);
-        let maxWidth: number = this.maxWidth;
-        let end: number = endIndex + 1;
+        const barsPerRow: number = this.getBarsPerSystem(system.index);
+        const maxWidth: number = this.maxWidth;
+        const end: number = endIndex + 1;
 
         let barIndex = currentBarIndex;
         while (barIndex < end) {
             if (this._barsFromPreviousSystem.length > 0) {
-                for (let renderer of this._barsFromPreviousSystem) {
+                for (const renderer of this._barsFromPreviousSystem) {
                     system.addMasterBarRenderers(this.renderer.tracks!, renderer);
                     barIndex = renderer.lastMasterBarIndex;
                 }
@@ -395,23 +390,22 @@ export class PageViewLayout extends ScoreLayout {
                 system.isLast = false;
                 this._barsFromPreviousSystem.reverse();
                 return system;
-            } else {
-                // do we need a line break after this bar
-                let anyTrackNeedsLineBreak = false;
-                let allTracksNeedLineBreak = true;
-                for(const track of this.renderer.tracks!) {
-                    if(track.lineBreaks && track.lineBreaks!.has(barIndex + 1)) {
-                        anyTrackNeedsLineBreak = true;
-                    } else {
-                        allTracksNeedLineBreak = false;
-                    }
+            }
+            // do we need a line break after this bar
+            let anyTrackNeedsLineBreak = false;
+            let allTracksNeedLineBreak = true;
+            for (const track of this.renderer.tracks!) {
+                if (track.lineBreaks && track.lineBreaks!.has(barIndex + 1)) {
+                    anyTrackNeedsLineBreak = true;
+                } else {
+                    allTracksNeedLineBreak = false;
                 }
+            }
 
-                if(anyTrackNeedsLineBreak && allTracksNeedLineBreak) {
-                    system.isFull = true;
-                    system.isLast = false;
-                    return system;
-                }
+            if (anyTrackNeedsLineBreak && allTracksNeedLineBreak) {
+                system.isFull = true;
+                system.isLast = false;
+                return system;
             }
             system.x = 0;
             barIndex++;

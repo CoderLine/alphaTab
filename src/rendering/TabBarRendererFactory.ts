@@ -1,19 +1,19 @@
-import { Bar } from '@src/model/Bar';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Bar } from '@src/model/Bar';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { RenderStaff } from './staves/RenderStaff';
+import type { RenderStaff } from './staves/RenderStaff';
 
 /**
  * This Factory produces TabBarRenderer instances
  */
 export class TabBarRendererFactory extends BarRendererFactory {
     public showTimeSignature: boolean | null = null;
-    public showRests: boolean| null = null;
-    public showTiedNotes: boolean| null = null;
+    public showRests: boolean | null = null;
+    public showTiedNotes: boolean | null = null;
 
     public get staffId(): string {
         return TabBarRenderer.StaffId;
@@ -37,14 +37,14 @@ export class TabBarRendererFactory extends BarRendererFactory {
     }
 
     public create(renderer: ScoreRenderer, bar: Bar): BarRendererBase {
-        let tabBarRenderer: TabBarRenderer = new TabBarRenderer(renderer, bar);
-        if(this.showRests !== null){
+        const tabBarRenderer: TabBarRenderer = new TabBarRenderer(renderer, bar);
+        if (this.showRests !== null) {
             tabBarRenderer.showRests = this.showRests!;
         }
-        if(this.showTimeSignature !== null){
+        if (this.showTimeSignature !== null) {
             tabBarRenderer.showTimeSignature = this.showTimeSignature!;
         }
-        if(this.showTiedNotes !== null){
+        if (this.showTiedNotes !== null) {
             tabBarRenderer.showTiedNotes = this.showTiedNotes!;
         }
         return tabBarRenderer;

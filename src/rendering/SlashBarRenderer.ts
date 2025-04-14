@@ -1,12 +1,12 @@
-import { Bar, BarSubElement } from '@src/model/Bar';
-import { Beat, BeatSubElement } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { Voice } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { type Bar, BarSubElement } from '@src/model/Bar';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import type { Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { LineBarRenderer } from './LineBarRenderer';
 import { SlashBeatContainerGlyph } from './SlashBeatContainerGlyph';
 import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
@@ -75,9 +75,9 @@ export class SlashBarRenderer extends LineBarRenderer {
     public override doLayout(): void {
         super.doLayout();
         let hasTuplets: boolean = false;
-        for (let voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let c = this.getVoiceContainer(voice)!;
+                const c = this.getVoiceContainer(voice)!;
                 if (c.tupletGroups.length > 0) {
                     hasTuplets = true;
                     break;
@@ -109,7 +109,7 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let y = super.getNoteY(note, requestedPosition);
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.getLineY(0);
         }
         return y;
@@ -164,9 +164,9 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {
-            let container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
-            container.onNotes = v.index == 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
+            container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
     }

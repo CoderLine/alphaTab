@@ -3,7 +3,7 @@ import * as chai from 'chai';
 import { afterAll, beforeEachTest, initializeJestSnapshot } from './mocha.jest-snapshot';
 
 export const mochaHooks = {
-    beforeAll: async function () {
+    async beforeAll() {
         chai.config.truncateThreshold = 0; // disable truncating
         await initializeJestSnapshot();
     },
@@ -13,7 +13,7 @@ export const mochaHooks = {
         done();
     },
 
-    afterAll: function (done) {
+    afterAll(done) {
         afterAll();
         done();
     }

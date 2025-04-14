@@ -139,19 +139,26 @@ export class PrettyFormat {
     static tryGetIterableType(val: unknown): string {
         if (val instanceof Float32Array) {
             return 'Float32Array';
-        } else if (val instanceof Int16Array) {
+        }
+        if (val instanceof Int16Array) {
             return 'Int16Array';
-        } else if (val instanceof Int32Array) {
+        }
+        if (val instanceof Int32Array) {
             return 'Int32Array';
-        } else if (val instanceof Uint8Array) {
+        }
+        if (val instanceof Uint8Array) {
             return 'Uint8Array';
-        } else if (val instanceof Uint16Array) {
+        }
+        if (val instanceof Uint16Array) {
             return 'Uint16Array';
-        } else if (val instanceof Uint32Array) {
+        }
+        if (val instanceof Uint32Array) {
             return 'Uint32Array';
-        } else if (Array.isArray(val)) {
+        }
+        if (Array.isArray(val)) {
             return 'Array';
-        } else if (val instanceof Set) {
+        }
+        if (val instanceof Set) {
             return 'Set';
         }
 
@@ -505,7 +512,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
      */
     private static isPlatformTypeEqual(v: unknown, dv: unknown): boolean {
         // we should not have any other types in our JSONs, if we extend it, this will catch it
-        throw new Error('Unexpected value in serialized json' + String(v));
+        throw new Error(`Unexpected value in serialized json${String(v)}`);
     }
 }
 
@@ -550,7 +557,7 @@ export class SnapshotFile {
         const actual = PrettyFormat.format(value, SnapshotFile.matchOptions).split('\n');
 
         const lines = Math.min(expected.length, actual.length);
-        let errors: string[] = [];
+        const errors: string[] = [];
 
         if (expected.length !== actual.length) {
             errors.push(`Expected ${expected.length} lines, but only got ${actual.length}`);
@@ -582,7 +589,7 @@ export class SnapshotFile {
                 // start of snapshot
                 const endOfName = lines[i].indexOf('`]', 9);
                 if (endOfName === -1) {
-                    throw new Error('Failed to parse snapshot file, missing `] on line ' + (i + 1));
+                    throw new Error(`Failed to parse snapshot file, missing \`] on line ${i + 1}`);
                 }
 
                 const name = lines[i].substring(9, endOfName);
@@ -597,7 +604,7 @@ export class SnapshotFile {
                         break;
                     }
 
-                    value += line.trimEnd() + '\n';
+                    value += `${line.trimEnd()}\n`;
                 }
 
                 this.snapshots.set(name, value.trimEnd());

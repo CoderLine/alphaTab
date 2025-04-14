@@ -1,14 +1,14 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Automation } from '@src/model/Automation';
-import { Beat } from '@src/model/Beat';
-import { Fermata } from '@src/model/Fermata';
+import type { Automation } from '@src/model/Automation';
+import type { Beat } from '@src/model/Beat';
+import type { Fermata } from '@src/model/Fermata';
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
-import { RepeatGroup } from '@src/model/RepeatGroup';
-import { Score } from '@src/model/Score';
-import { Section } from '@src/model/Section';
+import type { RepeatGroup } from '@src/model/RepeatGroup';
+import type { Score } from '@src/model/Score';
+import type { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
-import { Direction } from './Direction';
+import type { Direction } from './Direction';
 
 /**
  * The MasterBar stores information about a bar which affects
@@ -168,9 +168,9 @@ export class MasterBar {
     public calculateDuration(respectAnacrusis: boolean = true): number {
         if (this.isAnacrusis && respectAnacrusis) {
             let duration: number = 0;
-            for (let track of this.score.tracks) {
-                for (let staff of track.staves) {
-                    let barDuration: number =
+            for (const track of this.score.tracks) {
+                for (const staff of track.staves) {
+                    const barDuration: number =
                         this.index < staff.bars.length ? staff.bars[this.index].calculateDuration() : 0;
                     if (barDuration > duration) {
                         duration = barDuration;
@@ -200,8 +200,8 @@ export class MasterBar {
      * Adds a direction to the masterbar.
      * @param direction The direction to add.
      */
-    public addDirection(direction:Direction):void {
-        if(this.directions == null){
+    public addDirection(direction: Direction): void {
+        if (this.directions == null) {
             this.directions = new Set<Direction>();
         }
         this.directions.add(direction);

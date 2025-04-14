@@ -20,7 +20,7 @@ export class MasterBarSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => MasterBarSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: MasterBar | null): Map<string, unknown> | null {
         if (!obj) {
@@ -119,7 +119,7 @@ export class MasterBarSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Fermata();
                     FermataSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.addFermata(parseInt(k), i);
+                    obj.addFermata(Number.parseInt(k), i);
                 });
                 return true;
             case "start":

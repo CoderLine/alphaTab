@@ -16,8 +16,4 @@ export class TabBeatPreNotesGlyph extends BeatGlyphBase {
     protected override get effectElement() {
         return BeatSubElement.GuitarTabEffects;
     }
-
-    public constructor() {
-        super();
-    }
 }

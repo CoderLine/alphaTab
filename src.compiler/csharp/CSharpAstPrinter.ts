@@ -1,13 +1,8 @@
 import * as cs from './CSharpAst';
 import * as ts from 'typescript';
-import CSharpEmitterContext from './CSharpEmitterContext';
 import AstPrinterBase from '../AstPrinterBase';
 
 export default class CSharpAstPrinter extends AstPrinterBase {
-    public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
-        super(sourceFile, context);
-    }
-
     private keywords: Set<string> = new Set<string>([
         'abstract',
         'as',
@@ -90,7 +85,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected override escapeIdentifier(identifier: string): string {
         if (this.keywords.has(identifier)) {
-            return '@' + identifier;
+            return `@${identifier}`;
         }
         return identifier;
     }
@@ -186,7 +181,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeLine();
         this.beginBlock();
 
-        d.members.forEach(m => this.writeMember(m));
+        for (const m of d.members) {
+            this.writeMember(m);
+        }
 
         this.endBlock();
     }
@@ -198,7 +195,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeLine();
         this.beginBlock();
 
-        d.members.forEach(m => this.writeEnumMember(m));
+        for (const m of d.members) {
+            this.writeEnumMember(m);
+        }
 
         this.endBlock();
     }
@@ -250,12 +249,12 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.beginBlock();
 
         let hasConstuctor = false;
-        d.members.forEach(m => {
+        for (const m of d.members) {
             this.writeMember(m);
             if (cs.isConstructorDeclaration(m) && !m.isStatic) {
                 hasConstuctor = true;
             }
-        });
+        }
 
         if (d.baseClass && !hasConstuctor) {
             let baseClass: cs.TypeReferenceType | undefined = d;
@@ -264,7 +263,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 if (typeof baseClass === 'string') {
                     constructorDeclaration = undefined;
                     break;
-                } else if (cs.isClassDeclaration(baseClass)) {
+                }
+
+                if (cs.isClassDeclaration(baseClass)) {
                     constructorDeclaration = baseClass.members.find(m =>
                         cs.isConstructorDeclaration(m)
                     ) as cs.ConstructorDeclaration;
@@ -660,7 +661,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 } else {
                     if (typeReference.isAsync) {
                         this.write('System.Threading.Tasks.Task');
-                        if (!cs.isPrimitiveTypeNode(targetType) || targetType.type != cs.PrimitiveType.Void) {
+                        if (!cs.isPrimitiveTypeNode(targetType) || targetType.type !== cs.PrimitiveType.Void) {
                             this.write('<');
                             this.writeType(targetType, forNew);
                         } else {
@@ -696,7 +697,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write(this._context.getFullName((type as cs.EnumMember).parent as cs.NamedTypeDeclaration));
                 break;
             default:
-                this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
+                this.write(`TODO: ${cs.SyntaxKind[type.nodeType]}`);
                 break;
         }
         if (type.isNullable && !forNew && !forTypeConstraint) {
@@ -760,8 +761,8 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
         this.write('string.Format(System.Globalization.CultureInfo.InvariantCulture, @"');
-        let exprs: cs.Expression[] = [];
-        expr.chunks.forEach(c => {
+        const exprs: cs.Expression[] = [];
+        for (const c of expr.chunks) {
             if (cs.isStringLiteral(c)) {
                 const escapedText = c.text.replaceAll('"', '""').replaceAll('{', '{{').replaceAll('}', '}}');
                 this.write(escapedText);
@@ -769,11 +770,11 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write(`{${exprs.length}}`);
                 exprs.push(c as cs.Expression);
             }
-        });
+        }
         this.write('"');
-        exprs.forEach(expr => {
+        for (const expr of exprs) {
             this.write(', ');
-            
+
             if (cs.isStringLiteral(expr)) {
                 this.writeExpression(expr);
             } else {
@@ -781,7 +782,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.writeExpression(expr);
                 this.write(').ToTemplate()');
             }
-        });
+        }
         this.write(')');
     }
 
@@ -880,13 +881,13 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeLine(')');
         this.beginBlock();
 
-        s.caseClauses.forEach(c => {
+        for (const c of s.caseClauses) {
             if (cs.isDefaultClause(c)) {
                 this.writeDefaultClause(c);
             } else if (cs.isCaseClause(c)) {
                 this.writeCaseClause(c);
             }
-        });
+        }
 
         this.endBlock();
     }
@@ -896,14 +897,19 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeExpression(c.expression);
         this.writeLine(':');
         this._indent++;
-        c.statements.forEach(s => this.writeStatement(s));
+
+        for (const s of c.statements) {
+            this.writeStatement(s);
+        }
         this._indent--;
     }
 
     protected writeDefaultClause(c: cs.DefaultClause) {
         this.writeLine('default:');
         this._indent++;
-        c.statements.forEach(s => this.writeStatement(s));
+        for (const s of c.statements) {
+            this.writeStatement(s);
+        }
         this._indent--;
     }
 
@@ -1006,7 +1012,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeBlock(b: cs.Block) {
         this.beginBlock();
-        b.statements.forEach(s => this.writeStatement(s));
+        for (const s of b.statements) {
+            this.writeStatement(s);
+        }
         this.endBlock();
     }
 

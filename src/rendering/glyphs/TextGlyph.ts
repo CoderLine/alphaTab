@@ -1,6 +1,6 @@
-import { Color } from '@src/model';
-import { Font } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import type { Color } from '@src/model';
+import type { Font } from '@src/model/Font';
+import { type ICanvas, TextAlign, type TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class TextGlyph extends EffectGlyph {
@@ -46,11 +46,11 @@ export class TextGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let color = canvas.color;
-        canvas.color = this.colorOverride ?? color;;
+        const color = canvas.color;
+        canvas.color = this.colorOverride ?? color;
         canvas.font = this.font;
-        let old = canvas.textAlign;
-        let oldBaseLine = canvas.textBaseline;
+        const old = canvas.textAlign;
+        const oldBaseLine = canvas.textBaseline;
         canvas.textAlign = this.textAlign;
         if (this.textBaseline !== null) {
             canvas.textBaseline = this.textBaseline!;

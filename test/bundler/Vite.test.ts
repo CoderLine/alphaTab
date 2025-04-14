@@ -1,7 +1,7 @@
 /**@target web */
 import { alphaTab } from '../../src/alphaTab.vite';
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 import { expect } from 'chai';
 
 describe('Vite', () => {
@@ -17,9 +17,11 @@ describe('Vite', () => {
             await vite.build(
                 vite.defineConfig({
                     base: '/test-data/bundler/vite/dist/',
-                    plugins: [alphaTab({
-                        alphaTabSourceDir: '../../../dist/'
-                    })]
+                    plugins: [
+                        alphaTab({
+                            alphaTabSourceDir: '../../../dist/'
+                        })
+                    ]
                 })
             );
         } catch (e) {
@@ -69,7 +71,7 @@ describe('Vite', () => {
                     expect(text).to.include("font-family: 'alphaTab';");
 
                     workerValidated = true;
-                } else if(file.name.startsWith('alphaTab.worklet-')) {
+                } else if (file.name.startsWith('alphaTab.worklet-')) {
                     expect(text).to.include('initializeAudioWorklet()');
                     // without custom chunking the app will bundle alphatab directly
                     expect(text).to.include("font-family: 'alphaTab';");

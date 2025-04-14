@@ -1,18 +1,18 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Ottavia } from '@src/model/Ottavia';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { OttavaGlyph } from '@src/rendering/glyphs/OttavaGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
 export class OttaviaEffectInfo extends EffectBarRendererInfo {
     private _aboveStaff: boolean;
 
     public override get effectId(): string {
-        return 'ottavia-' + (this._aboveStaff ? 'above' : 'below');
+        return `ottavia-${this._aboveStaff ? 'above' : 'below'}`;
     }
 
     public get notationElement(): NotationElement {

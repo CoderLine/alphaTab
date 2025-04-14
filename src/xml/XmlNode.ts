@@ -22,12 +22,12 @@
  */
 
 export enum XmlNodeType {
-    None,
-    Element,
-    Text,
-    CDATA,
-    Document,
-    DocumentType
+    None = 0,
+    Element = 1,
+    Text = 2,
+    CDATA = 3,
+    Document = 4,
+    DocumentType = 5
 }
 
 export class XmlNode {
@@ -63,13 +63,13 @@ export class XmlNode {
     }
 
     public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {
-        let tags: XmlNode[] = [];
+        const tags: XmlNode[] = [];
         this.searchElementsByTagName(this.childNodes, tags, name, recursive);
         return tags;
     }
 
     private searchElementsByTagName(all: XmlNode[], result: XmlNode[], name: string, recursive: boolean = false): void {
-        for (let c of all) {
+        for (const c of all) {
             if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
                 result.push(c);
             }
@@ -80,7 +80,7 @@ export class XmlNode {
     }
 
     public findChildElement(name: string): XmlNode | null {
-        for (let c of this.childNodes) {
+        for (const c of this.childNodes) {
             if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
                 return c;
             }
@@ -102,10 +102,10 @@ export class XmlNode {
                 return this.firstElement.innerText;
             }
             let txt: string = '';
-            for (let c of this.childNodes) {
+            for (const c of this.childNodes) {
                 txt += c.innerText?.toString();
             }
-            let s: string = txt;
+            const s: string = txt;
             return s.trim();
         }
         return this.value ?? '';

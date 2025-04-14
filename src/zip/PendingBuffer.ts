@@ -7,10 +7,10 @@
  * without restriction, including without limitation the rights to use, copy, modify, merge,
  * publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
  * to whom the Software is furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in all copies or
  * substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
  * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
  * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
@@ -64,8 +64,8 @@ export class PendingBuffer {
      * @param s value to write
      */
     public writeShortMSB(s: number) {
-        this._buffer[this._end++] = (s >> 8) & 0xFF;
-        this._buffer[this._end++] = s & 0xFF;
+        this._buffer[this._end++] = (s >> 8) & 0xff;
+        this._buffer[this._end++] = s & 0xff;
     }
 
     /**
@@ -74,9 +74,8 @@ export class PendingBuffer {
      */
     public writeShort(value: number) {
         this._buffer[this._end++] = value;
-        this._buffer[this._end++] = (value >> 8);
+        this._buffer[this._end++] = value >> 8;
     }
-
 
     /**
      * Write a block of data to buffer
@@ -99,7 +98,7 @@ export class PendingBuffer {
      */
     public flush(output: Uint8Array, offset: number, length: number) {
         if (this.bitCount >= 8) {
-            this._buffer[this._end++] = this._bits & 0xFF;
+            this._buffer[this._end++] = this._bits & 0xff;
             this._bits >>= 8;
             this.bitCount -= 8;
         }
@@ -109,8 +108,7 @@ export class PendingBuffer {
             output.set(this._buffer.subarray(this._start, this._start + length), offset);
             this._start = 0;
             this._end = 0;
-        }
-        else {
+        } else {
             output.set(this._buffer.subarray(this._start, this._start + length), offset);
             this._start += length;
         }
@@ -126,8 +124,8 @@ export class PendingBuffer {
         this._bits |= b << this.bitCount;
         this.bitCount += count;
         if (this.bitCount >= 16) {
-            this._buffer[this._end++] = this._bits & 0xFF;
-            this._buffer[this._end++] = (this._bits >> 8) & 0xFF;
+            this._buffer[this._end++] = this._bits & 0xff;
+            this._buffer[this._end++] = (this._bits >> 8) & 0xff;
             this._bits >>= 16;
             this.bitCount -= 16;
         }
@@ -138,9 +136,9 @@ export class PendingBuffer {
      */
     public alignToByte() {
         if (this.bitCount > 0) {
-            this._buffer[this._end++] = this._bits & 0xFF;
+            this._buffer[this._end++] = this._bits & 0xff;
             if (this.bitCount > 8) {
-                this._buffer[this._end++] = (this._bits >> 8) & 0xFF;
+                this._buffer[this._end++] = (this._bits >> 8) & 0xff;
             }
         }
         this._bits = 0;

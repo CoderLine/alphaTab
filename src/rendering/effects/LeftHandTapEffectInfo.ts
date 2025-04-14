@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { NotationElement } from '@src/NotationSettings';
 import { NoteEffectInfoBase } from '@src/rendering/effects/NoteEffectInfoBase';
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { LeftHandTapGlyph } from '@src/rendering/glyphs/LeftHandTapGlyph';
 
 export class LeftHandTapEffectInfo extends NoteEffectInfoBase {

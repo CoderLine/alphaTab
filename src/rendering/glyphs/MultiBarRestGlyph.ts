@@ -1,6 +1,6 @@
 import { MusicFontSymbol } from '@src/model';
-import { ICanvas } from '@src/platform';
-import { LineBarRenderer } from '../LineBarRenderer';
+import type { ICanvas } from '@src/platform';
+import type { LineBarRenderer } from '../LineBarRenderer';
 import { Glyph } from './Glyph';
 import { NumberGlyph } from './NumberGlyph';
 

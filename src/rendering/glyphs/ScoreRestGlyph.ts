@@ -1,8 +1,8 @@
 import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { ICanvas } from '@src/platform';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { ICanvas } from '@src/platform';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { BeatSubElement } from '@src/model';
 
@@ -56,13 +56,8 @@ export class ScoreRestGlyph extends MusicFontGlyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         this.internalPaint(cx, cy, canvas, BeatSubElement.StandardNotationRests);
     }
-    
-    protected internalPaint(
-        cx: number,
-        cy: number,
-        canvas: ICanvas,
-        element: BeatSubElement
-    ): void {
+
+    protected internalPaint(cx: number, cy: number, canvas: ICanvas, element: BeatSubElement): void {
         using _ = ElementStyleHelper.beat(canvas, element, this.beat!);
         super.paint(cx, cy, canvas);
     }

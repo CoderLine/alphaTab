@@ -3,7 +3,7 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 
 export class RiffChunk {
     public static readonly HeaderSize = 4 /*FourCC*/ + 4 /*Size*/;
@@ -34,8 +34,8 @@ export class RiffChunk {
             parent.size -= RiffChunk.HeaderSize + chunk.size;
         }
 
-        let isRiff: boolean = chunk.id === 'RIFF';
-        let isList: boolean = chunk.id === 'LIST';
+        const isRiff: boolean = chunk.id === 'RIFF';
+        const isList: boolean = chunk.id === 'LIST';
         if (isRiff && parent) {
             // not allowed
             return false;
@@ -45,7 +45,7 @@ export class RiffChunk {
             // custom type without sub type
             return true;
         }
-        
+
         // for lists unwrap the list type
         chunk.id = IOHelper.read8BitStringLength(stream, 4);
         if (chunk.id.charCodeAt(0) <= 32 || chunk.id.charCodeAt(0) >= 122) {

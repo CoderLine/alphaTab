@@ -1,10 +1,10 @@
 import { Clef } from '@src/model/Clef';
-import { MasterBar } from '@src/model/MasterBar';
+import type { MasterBar } from '@src/model/MasterBar';
 import { Ottavia } from '@src/model/Ottavia';
 import { SimileMark } from '@src/model/SimileMark';
-import { Staff } from '@src/model/Staff';
-import { Voice } from '@src/model/Voice';
-import { Settings } from '@src/Settings';
+import type { Staff } from '@src/model/Staff';
+import type { Voice } from '@src/model/Voice';
+import type { Settings } from '@src/Settings';
 import { ElementStyle } from './ElementStyle';
 
 /**
@@ -14,15 +14,15 @@ export enum SustainPedalMarkerType {
     /**
      * Indicates that the pedal should be pressed from this time on.
      */
-    Down,
+    Down = 0,
     /**
      * Indicates that the pedal should be held on this marker (used when the pedal is held for the whole bar)
      */
-    Hold,
+    Hold = 1,
     /**
      * indicates that the pedal should be lifted up at this time.
      */
-    Up
+    Up = 2
 }
 
 /**
@@ -68,122 +68,122 @@ export enum BarSubElement {
     /**
      * The repeat signs on the standard notation staff.
      */
-    StandardNotationRepeats,
+    StandardNotationRepeats = 0,
 
     /**
      * The repeat signs on the guitar tab staff.
      */
-    GuitarTabsRepeats,
+    GuitarTabsRepeats = 1,
 
     /**
      * The repeat signs on the slash staff.
      */
-    SlashRepeats,
+    SlashRepeats = 2,
 
     /**
      * The repeat signs on the numbered notation staff.
      */
-    NumberedRepeats,
+    NumberedRepeats = 3,
 
     /**
      * The bar numbers on the standard notation staff.
      */
-    StandardNotationBarNumber,
+    StandardNotationBarNumber = 4,
 
     /**
      * The bar numbers on the guitar tab staff.
      */
-    GuitarTabsBarNumber,
+    GuitarTabsBarNumber = 5,
 
     /**
      * The bar numbers on the slash staff.
      */
-    SlashBarNumber,
+    SlashBarNumber = 6,
 
     /**
      * The bar numbers on the numbered notation staff.
      */
-    NumberedBarNumber,
+    NumberedBarNumber = 7,
 
     /**
      * The bar separator lines on the standard notation staff.
      */
-    StandardNotationBarSeparator,
+    StandardNotationBarSeparator = 8,
 
     /**
      * The bar separator lines on the guitar tab staff.
      */
-    GuitarTabsBarSeparator,
+    GuitarTabsBarSeparator = 9,
 
     /**
      * The bar separator lines on the slash staff.
      */
-    SlashBarSeparator,
+    SlashBarSeparator = 10,
 
     /**
      * The bar separator lines on the numbered notation staff.
      */
-    NumberedBarSeparator,
+    NumberedBarSeparator = 11,
 
     /**
      * The clefs on the standard notation staff.
      */
-    StandardNotationClef,
+    StandardNotationClef = 12,
 
     /**
      * The clefs on the guitar tab staff.
      */
-    GuitarTabsClef,
+    GuitarTabsClef = 13,
 
     /**
      * The key signatures on the standard notation staff.
      */
-    StandardNotationKeySignature,
+    StandardNotationKeySignature = 14,
 
     /**
      * The key signatures on the numbered notation staff.
      */
-    NumberedKeySignature,
+    NumberedKeySignature = 15,
 
     /**
      * The time signatures on the standard notation staff.
      */
-    StandardNotationTimeSignature,
+    StandardNotationTimeSignature = 16,
 
     /**
      * The time signatures on the guitar tab staff.
      */
-    GuitarTabsTimeSignature,
+    GuitarTabsTimeSignature = 17,
 
     /**
      * The time signatures on the slash staff.
      */
-    SlashTimeSignature,
+    SlashTimeSignature = 18,
 
     /**
      * The time signature on the numbered notation staff.
      */
-    NumberedTimeSignature,
+    NumberedTimeSignature = 19,
 
     /**
      * The staff lines on the standard notation staff.
      */
-    StandardNotationStaffLine,
+    StandardNotationStaffLine = 20,
 
     /**
      * The staff lines on the guitar tab staff.
      */
-    GuitarTabsStaffLine,
+    GuitarTabsStaffLine = 21,
 
     /**
      * The staff lines on the slash staff.
      */
-    SlashStaffLine,
+    SlashStaffLine = 22,
 
     /**
      * The staff lines on the numbered notation staff.
      */
-    NumberedStaffLine
+    NumberedStaffLine = 23
 }
 
 /**
@@ -318,7 +318,7 @@ export class Bar {
         this._isEmpty = true;
         this._isRestOnly = true;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
-            let voice: Voice = this.voices[i];
+            const voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
             if (i > 0 && !voice.isEmpty) {
                 this.isMultiVoice = true;
@@ -343,13 +343,12 @@ export class Bar {
                 previousMarker = this.previousBar.sustainPedals[this.previousBar.sustainPedals.length - 1];
             }
 
-            let isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
+            const isDown = previousMarker !== null && previousMarker.pedalType !== SustainPedalMarkerType.Up;
 
             for (const marker of sustainPedals) {
                 if (previousMarker && previousMarker.pedalType !== SustainPedalMarkerType.Up) {
-
                     //duplicate or out-of-order markers
-                    if(previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {
+                    if (previousMarker.bar === this && marker.ratioPosition <= previousMarker.ratioPosition) {
                         continue;
                     }
 
@@ -357,12 +356,12 @@ export class Bar {
                     marker.previousPedalMarker = previousMarker;
                 }
 
-                if(isDown && marker.pedalType === SustainPedalMarkerType.Down) {
+                if (isDown && marker.pedalType === SustainPedalMarkerType.Down) {
                     marker.pedalType = SustainPedalMarkerType.Hold;
                 }
 
                 marker.bar = this;
-                this.sustainPedals.push(marker)
+                this.sustainPedals.push(marker);
                 previousMarker = marker;
             }
         } else if (this.previousBar && this.previousBar.sustainPedals.length > 0) {
@@ -383,8 +382,8 @@ export class Bar {
 
     public calculateDuration(): number {
         let duration: number = 0;
-        for (let voice of this.voices) {
-            let voiceDuration: number = voice.calculateDuration();
+        for (const voice of this.voices) {
+            const voiceDuration: number = voice.calculateDuration();
             if (voiceDuration > duration) {
                 duration = voiceDuration;
             }

@@ -1,6 +1,6 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
@@ -12,7 +12,7 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         try {
-            const data = await TestPlatform.loadFile('test-data/' + name);
+            const data = await TestPlatform.loadFile(`test-data/${name}`);
             return ScoreLoader.loadScoreFromBytes(data);
         } catch (e) {
             return null;
@@ -20,7 +20,7 @@ describe('Gp7ExporterTest', () => {
     }
 
     function prepareImporterWithBytes(buffer: Uint8Array): Gp7To8Importer {
-        let readerBase: Gp7To8Importer = new Gp7To8Importer();
+        const readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }
@@ -42,7 +42,7 @@ describe('Gp7ExporterTest', () => {
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys);
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
     async function testRoundTripFolderEqual(name: string): Promise<void> {
@@ -91,7 +91,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp5-to-gp7', async () => {
-        await testRoundTripEqual(`conversion/full-song.gp5`, [
+        await testRoundTripEqual('conversion/full-song.gp5', [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'automations' // volume automations are not yet supported in gpif
@@ -99,7 +99,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp6-to-gp7', async () => {
-        await testRoundTripEqual(`conversion/full-song.gpx`, [
+        await testRoundTripEqual('conversion/full-song.gpx', [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'percussionarticulation' // gets added

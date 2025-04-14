@@ -14,7 +14,7 @@ export class DisplaySettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => DisplaySettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: DisplaySettings | null): Map<string, unknown> | null {
         if (!obj) {
@@ -127,12 +127,10 @@ export class DisplaySettingsSerializer {
             RenderingResourcesSerializer.fromJson(obj.resources, v as Map<string, unknown>);
             return true;
         }
-        else {
-            for (const c of ["resources"]) {
-                if (property.indexOf(c) === 0) {
-                    if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), v)) {
-                        return true;
-                    }
+        for (const c of ["resources"]) {
+            if (property.indexOf(c) === 0) {
+                if (RenderingResourcesSerializer.setProperty(obj.resources, property.substring(c.length), v)) {
+                    return true;
                 }
             }
         }

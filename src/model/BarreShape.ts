@@ -5,15 +5,15 @@ export enum BarreShape {
     /**
      * No Barré
      */
-    None,
+    None = 0,
 
     /**
      * Full Barré (play all strings)
      */
-    Full,
+    Full = 1,
 
     /**
      * 1/2 Barré (play only half the strings)
      */
-    Half
+    Half = 2
 }

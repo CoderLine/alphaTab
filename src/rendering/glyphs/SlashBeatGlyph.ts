@@ -1,17 +1,17 @@
 import { GraceType } from '@src/model/GraceType';
-import { Note } from '@src/model/Note';
+import type { Note } from '@src/model/Note';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
-import { SlashBarRenderer } from '../SlashBarRenderer';
+import type { SlashBarRenderer } from '../SlashBarRenderer';
 import { NoteBounds } from '../utils/NoteBounds';
 import { Bounds } from '../utils/Bounds';
 import { SlashRestGlyph } from './SlashRestGlyph';
 import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
-import { Glyph } from './Glyph';
+import type { Glyph } from './Glyph';
 import { BeatSubElement } from '@src/model';
 
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
@@ -110,7 +110,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override doLayout(): void {
         // create glyphs
-        let sr = this.renderer as SlashBarRenderer;
+        const sr = this.renderer as SlashBarRenderer;
 
         const line: number = sr.getNoteLine();
         const glyphY = sr.getLineY(line);
@@ -123,7 +123,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         } else if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
                 const isGrace: boolean = this.container.beat.graceType !== GraceType.None;
-                const noteHeadGlyph = new SlashNoteHeadGlyph(0, glyphY, this.container.beat.duration, isGrace, this.container.beat);
+                const noteHeadGlyph = new SlashNoteHeadGlyph(
+                    0,
+                    glyphY,
+                    this.container.beat.duration,
+                    isGrace,
+                    this.container.beat
+                );
                 this.noteHeads = noteHeadGlyph;
                 noteHeadGlyph.beat = this.container.beat;
                 noteHeadGlyph.beamingHelper = this.beamingHelper;
