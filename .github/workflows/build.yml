@@ -19,6 +19,7 @@ jobs:
         with:
           node-version: 'lts/*'
       - run: npm install
+      - run: npm run generate-typescript
       - run: npm run lint-ci
         if: ${{ always() }}
       - run: npm run typecheck
