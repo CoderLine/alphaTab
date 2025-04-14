@@ -23,8 +23,4 @@ export class PalmMuteEffectInfo extends NoteEffectInfoBase {
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new LineRangedGlyph('P.M.');
     }
-
-    public constructor() {
-        super();
-    }
 }

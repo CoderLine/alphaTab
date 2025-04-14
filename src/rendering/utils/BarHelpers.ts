@@ -19,8 +19,8 @@ export class BarHelpers {
     }
 
     public initialize() {
-        var barRenderer = this._renderer;
-        var bar = this._renderer.bar;
+        const barRenderer = this._renderer;
+        const bar = this._renderer.bar;
 
         let currentBeamHelper: BeamingHelper | null = null;
         let currentGraceBeamHelper: BeamingHelper | null = null;

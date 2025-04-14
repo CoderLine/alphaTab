@@ -1,14 +1,15 @@
 /**@target web */
 import { AlphaTabWebPackPlugin } from '../../src/alphaTab.webpack';
 import webpack from 'webpack';
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { expect } from 'chai';
 
 describe('WebPack', () => {
     it('bundle-correctly', async () => {
         const bundlerProject = './test-data/bundler/webpack';
+        // biome-ignore lint/suspicious/noAsyncPromiseExecutor: resolve/reject called accordingly
         await new Promise(async (resolve, reject) => {
             const cwd = process.cwd();
             process.chdir(bundlerProject);

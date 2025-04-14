@@ -4,7 +4,7 @@ import { EventEmitter, EventEmitterOfT, IEventEmitter, IEventEmitterOfT } from '
 import { Logger } from '@src/Logger';
 import { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
-declare var webkitAudioContext: any;
+declare const webkitAudioContext: any;
 
 /**
  * @target web
@@ -86,7 +86,8 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     private createAudioContext(): AudioContext {
         if ('AudioContext' in Environment.globalThis) {
             return new AudioContext();
-        } else if ('webkitAudioContext' in Environment.globalThis) {
+        }
+        if ('webkitAudioContext' in Environment.globalThis) {
             return new webkitAudioContext();
         }
         throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');

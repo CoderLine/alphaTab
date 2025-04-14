@@ -229,7 +229,7 @@ export class Environment {
             }
         }
 
-        return this._globalThis;
+        return Environment._globalThis;
     }
 
     /**
@@ -347,7 +347,7 @@ export class Environment {
 
         if (!relativeUrl.startsWith('http') && !relativeUrl.startsWith('https') && !relativeUrl.startsWith('file')) {
             let root: string = '';
-            let location: Location = Environment.globalThis['location'];
+            let location: Location = Environment.globalThis.location;
             root += location.protocol?.toString();
             root += '//'?.toString();
             if (location.hostname) {
@@ -393,7 +393,7 @@ export class Environment {
      */
     private static detectFontDirectory(): string | null {
         if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_FONT) {
-            return Environment.ensureFullUrl(Environment.globalThis['ALPHATAB_FONT']);
+            return Environment.ensureFullUrl(Environment.globalThis.ALPHATAB_FONT);
         }
 
         const scriptFile = Environment.scriptFile;
@@ -412,9 +412,10 @@ export class Environment {
      */
     private static registerJQueryPlugin(): void {
         if (!Environment.isRunningInWorker && Environment.globalThis && 'jQuery' in Environment.globalThis) {
-            let jquery: any = Environment.globalThis['jQuery'];
+            let jquery: any = Environment.globalThis.jQuery;
             let api: JQueryAlphaTab = new JQueryAlphaTab();
             jquery.fn.alphaTab = function (this: any, method: string) {
+                // biome-ignore lint/style/noArguments: Legacy jQuery plugin argument forwarding
                 const args = Array.prototype.slice.call(arguments, 1);
                 // if only a single element is affected, we use this
                 if (this.length === 1) {
@@ -756,7 +757,7 @@ export class Environment {
      * @internal
      */
     public static get alphaTabWorker(): any {
-        return this.globalThis.Worker;
+        return Environment.globalThis.Worker;
     }
 
     /**
@@ -764,7 +765,7 @@ export class Environment {
      * @internal
      */
     public static get alphaTabUrl(): any {
-        return this.globalThis.URL;
+        return Environment.globalThis.URL;
     }
 
     /**

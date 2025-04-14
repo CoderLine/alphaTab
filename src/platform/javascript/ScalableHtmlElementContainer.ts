@@ -45,18 +45,18 @@ export class ScalableHtmlElementContainer extends HtmlElementContainer {
     }
 
     public override setBounds(x: number, y: number, w: number, h: number) {
-        if (isNaN(x)) {
+        if (Number.isNaN(x)) {
             x = this.lastBounds.x;
         }
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.lastBounds.y;
         }
-        if (isNaN(w)) {
+        if (Number.isNaN(w)) {
             w = this.lastBounds.w;
         } else {
             w = w / this._xscale;
         }
-        if (isNaN(h)) {
+        if (Number.isNaN(h)) {
             h = this.lastBounds.h;
         } else {
             h = h / this._yscale;

@@ -514,34 +514,34 @@ export class BinaryStylesheet {
             for (const [k, v] of scoreStyle.headerAndFooter) {
                 switch (k) {
                     case ScoreSubElement.Title:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
                         break;
                     case ScoreSubElement.SubTitle:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
                         break;
                     case ScoreSubElement.Artist:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
                         break;
                     case ScoreSubElement.Album:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
                         break;
                     case ScoreSubElement.Words:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
                         break;
                     case ScoreSubElement.Music:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
                         break;
                     case ScoreSubElement.WordsAndMusic:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
                         break;
                     case ScoreSubElement.Transcriber:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
                         break;
                     case ScoreSubElement.Copyright:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
                         break;
                     case ScoreSubElement.CopyrightSecondLine:
-                        this.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
                         break;
                 }
             }

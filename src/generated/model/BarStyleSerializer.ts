@@ -12,7 +12,7 @@ export class BarStyleSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => BarStyleSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: BarStyle | null): Map<string, unknown> | null {
         if (!obj) {

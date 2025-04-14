@@ -11,7 +11,7 @@ import { configureAudioWorklet } from './AlphaTabAudioWorklet';
 import { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
 import { configureWebWorker } from './AlphaTabWebWorker';
 import { webPackWithAlphaTab, webpackTypes } from './Utils';
-import { injectWebWorkerDependency as injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
+import { injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
 import { injectWorkletRuntimeModule } from './AlphaTabWorkletStartRuntimeModule';
 import { injectWorkletDependency } from './AlphaTabWorkletDependency';
 
@@ -72,7 +72,7 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
             cache.set(associatedObjectForCache, innerCache);
         }
 
-        let cachedResult;
+        let cachedResult: string | undefined;
         let innerSubCache = innerCache.get(context);
         if (innerSubCache === undefined) {
             innerCache.set(context, (innerSubCache = new Map()));
@@ -82,18 +82,17 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
 
         if (cachedResult !== undefined) {
             return cachedResult;
-        } else {
-            const result = fn(context, identifier);
-            innerSubCache.set(identifier, result);
-            return result;
         }
+        const result = fn(context, identifier);
+        innerSubCache.set(identifier, result);
+        return result;
     };
 
     cachedFn.bindContextCache = (
         context: string,
         associatedObjectForCache?: object
     ): ((identifier: string) => string) => {
-        let innerSubCache;
+        let innerSubCache: Map<string, string> | undefined;
         if (associatedObjectForCache) {
             let innerCache = cache.get(associatedObjectForCache);
             if (innerCache === undefined) {
@@ -113,11 +112,10 @@ const makeCacheableWithContext = (fn: (text: string, request: string) => string)
             const cachedResult = innerSubCache.get(identifier);
             if (cachedResult !== undefined) {
                 return cachedResult;
-            } else {
-                const result = fn(context, identifier);
-                innerSubCache.set(identifier, result);
-                return result;
             }
+            const result = fn(context, identifier);
+            innerSubCache.set(identifier, result);
+            return result;
         };
 
         return boundFn;

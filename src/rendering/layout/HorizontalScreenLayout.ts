@@ -24,10 +24,6 @@ export class HorizontalScreenLayout extends ScoreLayout {
         return 'HorizontalScreen';
     }
 
-    public constructor(renderer: ScoreRenderer) {
-        super(renderer);
-    }
-
     public get supportsResize(): boolean {
         return false;
     }
@@ -182,7 +178,7 @@ export class HorizontalScreenLayout extends ScoreLayout {
                         partial.masterBars[partial.masterBars.length - 1].index,
                     null
                 );
-                this._system!!.paintPartial(
+                this._system!.paintPartial(
                     -renderX,
                     this._system!.y,
                     canvas,

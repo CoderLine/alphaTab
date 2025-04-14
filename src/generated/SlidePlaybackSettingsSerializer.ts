@@ -10,7 +10,7 @@ export class SlidePlaybackSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => SlidePlaybackSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: SlidePlaybackSettings | null): Map<string, unknown> | null {
         if (!obj) {

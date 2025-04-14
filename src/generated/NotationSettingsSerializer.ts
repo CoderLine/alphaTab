@@ -14,7 +14,7 @@ export class NotationSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => NotationSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: NotationSettings | null): Map<string, unknown> | null {
         if (!obj) {

@@ -380,9 +380,8 @@ export class MidiFileSequencer {
     private get internalEndTime(): number {
         if (this.isPlayingMain) {
             return !this.mainPlaybackRange ? this._currentState.endTime : this._currentState.playbackRangeEndTime;
-        } else {
-            return this._currentState.endTime;
         }
+        return this._currentState.endTime;
     }
 
     public get isFinished(): boolean {

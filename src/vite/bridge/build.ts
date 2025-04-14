@@ -150,9 +150,8 @@ function wrapEnvironmentResolveId(environment: BuildEnvironment, hook?: Plugin['
             ...hook,
             handler
         } as Plugin['resolveId'];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load']): Plugin['load'] {
@@ -168,9 +167,8 @@ function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load'
             ...hook,
             handler
         } as Plugin['load'];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function wrapEnvironmentTransform(environment: BuildEnvironment, hook?: Plugin['transform']): Plugin['transform'] {
@@ -191,9 +189,8 @@ function wrapEnvironmentTransform(environment: BuildEnvironment, hook?: Plugin['
             ...hook,
             handler
         } as Plugin['transform'];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function wrapEnvironmentHook<HookName extends keyof Plugin>(
@@ -214,9 +211,8 @@ function wrapEnvironmentHook<HookName extends keyof Plugin>(
             ...hook,
             handler
         } as Plugin[HookName];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function injectEnvironmentInContext<Context extends MinimalPluginContext>(

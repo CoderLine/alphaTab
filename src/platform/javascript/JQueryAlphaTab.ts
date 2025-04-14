@@ -49,14 +49,14 @@ export class JQueryAlphaTab {
         if (method !== 'init' && !context) {
             throw new Error('alphaTab not initialized');
         }
+        // biome-ignore lint/complexity/noBannedTypes: Special use within jQuery plugin
         let apiMethod: Function = (this as any)[method];
         if (apiMethod) {
             let realArgs: string[] = ([jElement, context] as any[]).concat(args);
             return apiMethod.apply(this, realArgs);
-        } else {
-            Logger.error('Api', "Method '" + method + "' does not exist on jQuery.alphaTab");
-            return null;
         }
+        Logger.error('Api', "Method '" + method + "' does not exist on jQuery.alphaTab");
+        return null;
     }
 
     public init(element: jQuery, context: AlphaTabApi, options: any): void {
@@ -175,7 +175,11 @@ export class JQueryAlphaTab {
         return context.countInVolume;
     }
 
-    public midiEventsPlayedFilter(element: jQuery, context: AlphaTabApi, midiEventsPlayedFilter?: MidiEventType[]): MidiEventType[] {
+    public midiEventsPlayedFilter(
+        element: jQuery,
+        context: AlphaTabApi,
+        midiEventsPlayedFilter?: MidiEventType[]
+    ): MidiEventType[] {
         if (Array.isArray(midiEventsPlayedFilter)) {
             context.midiEventsPlayedFilter = midiEventsPlayedFilter;
         }

@@ -65,7 +65,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
         let str = '';
 
         if (num > 0) {
-            for (var [romanLetter, romanNumber] of BeatBarreEffectInfo.RomanLetters) {
+            for (const [romanLetter, romanNumber] of BeatBarreEffectInfo.RomanLetters) {
                 const q = Math.floor(num / romanNumber);
                 num -= q * romanNumber;
                 str += romanLetter.repeat(q);

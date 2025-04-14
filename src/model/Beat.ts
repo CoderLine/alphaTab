@@ -197,7 +197,7 @@ export class Beat {
      * @internal
      */
     public static resetIds() {
-        this._globalBeatId = 0;
+        Beat._globalBeatId = 0;
     }
 
     /**

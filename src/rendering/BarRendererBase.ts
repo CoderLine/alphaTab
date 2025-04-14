@@ -556,7 +556,7 @@ export class BarRendererBase {
         if (beat) {
             return beat.getNoteY(note, requestedPosition);
         }
-        return NaN;
+        return Number.NaN;
     }
 
     public reLayout(): void {

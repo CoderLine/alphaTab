@@ -15,10 +15,6 @@ export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;
     private _effectSlurs: TabSlurGlyph[] = [];
 
-    public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
-        super(beat, voiceContainer);
-    }
-
     protected override drawBeamHelperAsFlags(helper: BeamingHelper): boolean {
         return helper.hasFlag((this.renderer as TabBarRenderer).drawBeamHelperAsFlags(helper), this.beat);
     }

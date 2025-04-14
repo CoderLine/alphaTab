@@ -71,7 +71,7 @@ export class BoundsLookup {
      */
     public static fromJson(json: unknown, score: Score): BoundsLookup {
         let lookup: BoundsLookup = new BoundsLookup();
-        let staffSystems: StaffSystemBounds[] = (json as any)['staffSystems'];
+        let staffSystems: StaffSystemBounds[] = (json as any).staffSystems;
         for (let staffSystem of staffSystems) {
             let sg: StaffSystemBounds = new StaffSystemBounds();
             sg.visualBounds = BoundsLookup.boundsFromJson(staffSystem.visualBounds);

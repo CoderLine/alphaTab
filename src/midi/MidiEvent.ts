@@ -172,10 +172,6 @@ export abstract class AlphaTabSysExEvent extends MidiEvent {
     public static readonly MetronomeEventId = 0x00;
     public static readonly RestEventId = 0x01;
 
-    public constructor(track: number, tick: number, type: MidiEventType) {
-        super(track, tick, type);
-    }
-
     public override writeTo(s: IWriteable): void {
         // sysex
         s.writeByte(0xF0);

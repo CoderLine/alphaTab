@@ -12,10 +12,6 @@ export class GlyphGroup extends Glyph {
         return !this.glyphs || this.glyphs.length === 0;
     }
 
-    public constructor(x: number, y: number) {
-        super(x, y);
-    }
-
     public override doLayout(): void {
         if (!this.glyphs || this.glyphs.length === 0) {
             this.width = 0;

@@ -28,10 +28,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public beat!: Beat;
     public beamingHelper!: BeamingHelper;
 
-    public constructor() {
-        super();
-    }
-
     public get direction(): BeamDirection {
         return this.beamingHelper.direction;
     }

@@ -30,7 +30,7 @@ export class Html5Canvas implements ICanvas {
         if (family.startsWith('"') || family.startsWith("'")) {
             family = family.substr(1, family.length - 2);
         }
-        this._musicFont = new Font(family, parseFloat(style.fontSize), FontStyle.Plain);
+        this._musicFont = new Font(family, Number.parseFloat(style.fontSize), FontStyle.Plain);
         this._measureCanvas = document.createElement('canvas');
         this._measureCanvas.width = 10;
         this._measureCanvas.height = 10;

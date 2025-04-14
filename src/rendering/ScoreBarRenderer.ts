@@ -259,7 +259,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         let y = super.getNoteY(note, requestedPosition);
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             // NOTE: some might request the note position before the glyphs have been created
             // e.g. the beaming helper, for these we just need a rough
             // estimate on the position

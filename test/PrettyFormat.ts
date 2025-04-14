@@ -139,19 +139,26 @@ export class PrettyFormat {
     static tryGetIterableType(val: unknown): string {
         if (val instanceof Float32Array) {
             return 'Float32Array';
-        } else if (val instanceof Int16Array) {
+        }
+        if (val instanceof Int16Array) {
             return 'Int16Array';
-        } else if (val instanceof Int32Array) {
+        }
+        if (val instanceof Int32Array) {
             return 'Int32Array';
-        } else if (val instanceof Uint8Array) {
+        }
+        if (val instanceof Uint8Array) {
             return 'Uint8Array';
-        } else if (val instanceof Uint16Array) {
+        }
+        if (val instanceof Uint16Array) {
             return 'Uint16Array';
-        } else if (val instanceof Uint32Array) {
+        }
+        if (val instanceof Uint32Array) {
             return 'Uint32Array';
-        } else if (Array.isArray(val)) {
+        }
+        if (Array.isArray(val)) {
             return 'Array';
-        } else if (val instanceof Set) {
+        }
+        if (val instanceof Set) {
             return 'Set';
         }
 

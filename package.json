@@ -41,6 +41,8 @@
     },
     "scripts": {
         "clean": "rimraf dist",
+        "lint": "biome lint",
+        "format": "biome format --write",
         "start": "node scripts/setup-playground.js && npm run generate-typescript && vite",
         "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
         "generate-csharp": "npm run generate-typescript && tsx src.compiler/csharp/CSharpTranspiler.ts --outDir dist/lib.csharp",

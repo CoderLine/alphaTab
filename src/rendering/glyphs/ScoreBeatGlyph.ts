@@ -261,12 +261,8 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation) {
                 return new PercussionNoteHeadGlyph(0, 0, articulation, n.beat.duration, isGrace);
-            } else {
-                Logger.warning(
-                    'Rendering',
-                    `No articulation found for percussion instrument ${n.percussionArticulation}`
-                );
             }
+            Logger.warning('Rendering', `No articulation found for percussion instrument ${n.percussionArticulation}`);
         }
         if (n.isDead) {
             return new DeadNoteHeadGlyph(0, 0, isGrace);

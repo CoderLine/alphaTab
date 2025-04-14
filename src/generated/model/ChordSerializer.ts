@@ -10,7 +10,7 @@ export class ChordSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => ChordSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Chord | null): Map<string, unknown> | null {
         if (!obj) {

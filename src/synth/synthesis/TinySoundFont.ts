@@ -279,7 +279,7 @@ export class TinySoundFont {
     }
 
     public set masterVolume(value: number) {
-        var gainDb = SynthHelper.gainToDecibels(value);
+        const gainDb = SynthHelper.gainToDecibels(value);
         const gainDBChange: number = gainDb - this.globalGainDb;
         if (gainDBChange === 0) {
             return;
@@ -510,7 +510,9 @@ export class TinySoundFont {
                 v.ampEnv.segment >= VoiceEnvelopeSegment.Release
             ) {
                 continue;
-            } else if (!matchFirst || v.playIndex < matchFirst.playIndex) {
+            }
+
+            if (!matchFirst || v.playIndex < matchFirst.playIndex) {
                 matchFirst = v;
                 matchLast = v;
                 matches.push(v);
@@ -1411,11 +1413,7 @@ export class TinySoundFont {
                                         const decompressVorbis = (shdr.sampleType & 0x10) !== 0;
                                         if (decompressVorbis) {
                                             // for SF3 the shdr contains the byte offsets within the overall buffer holding the OGG container
-                                            zoneRegion.samples = hydra.decodeSamples(
-                                                shdr.start,
-                                                shdr.end,
-                                                true
-                                            );
+                                            zoneRegion.samples = hydra.decodeSamples(shdr.start, shdr.end, true);
                                             // loop points are already relative within the individual samples.
                                         } else {
                                             zoneRegion.samples = hydra.decodeSamples(
@@ -1434,7 +1432,7 @@ export class TinySoundFont {
                                             // The DWORD dwEndloop contains the index, in sample data points, from the beginning of the sample data field to the first
                                             // data point following the loop of this sample. Note that this is the data point “equivalent to” the first loop data point, and that
                                             // to produce portable artifact free loops, the eight proximal data points surrounding both the Startloop and Endloop points
-                                            // should be identical. 
+                                            // should be identical.
 
                                             // reset offsets relative to sub-buffer
                                             if (zoneRegion.loopStart > 0) {

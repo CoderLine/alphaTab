@@ -191,10 +191,6 @@ export class AlphaTexImporter extends ScoreImporter {
 
     public logErrors: boolean = false;
 
-    public constructor() {
-        super();
-    }
-
     public get name(): string {
         return 'AlphaTex';
     }
@@ -251,9 +247,8 @@ export class AlphaTexImporter extends ScoreImporter {
         } catch (e) {
             if (e instanceof AlphaTexError) {
                 throw new UnsupportedFormatError(e.message, e);
-            } else {
-                throw e;
             }
+            throw e;
         }
     }
 
@@ -749,7 +744,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
         if (isNumber) {
             this._sy = AlphaTexSymbols.Number;
-            this._syData = this._allowFloat ? parseFloat(str) : parseInt(str);
+            this._syData = this._allowFloat ? Number.parseFloat(str) : Number.parseInt(str);
         } else {
             this._sy = AlphaTexSymbols.String;
             this._syData = str;
@@ -1104,7 +1099,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return TrackNamePolicy.Hidden;
             case 'allsystems':
                 return TrackNamePolicy.AllSystems;
-            case 'firstsystem':
+            // case 'firstsystem':
             default:
                 return TrackNamePolicy.FirstSystem;
         }
@@ -1114,7 +1109,7 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (v.toLowerCase()) {
             case 'fullname':
                 return TrackNameMode.FullName;
-            case 'shortname':
+            // case 'shortname':
             default:
                 return TrackNameMode.ShortName;
         }
@@ -1124,7 +1119,7 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (v.toLowerCase()) {
             case 'horizontal':
                 return TrackNameOrientation.Horizontal;
-            case 'vertical':
+            //case 'vertical':
             default:
                 return TrackNameOrientation.Vertical;
         }
@@ -1317,9 +1312,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
                 if (this.handleNewVoice()) {
                     return StaffMetaResult.EndOfMetaDetected;
-                } else {
-                    return StaffMetaResult.KnownStaffMeta;
                 }
+                return StaffMetaResult.KnownStaffMeta;
             default:
                 return StaffMetaResult.UnknownStaffMeta;
         }
@@ -1355,7 +1349,7 @@ export class AlphaTexImporter extends ScoreImporter {
      * Encodes a given string to a shorthand text form without spaces or special characters
      */
     private static toArticulationId(plain: string): string {
-        return plain.replace(new RegExp('[^a-zA-Z0-9]', 'g'), '').toLowerCase();
+        return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
     private applyPercussionStaff(staff: Staff) {
@@ -1527,17 +1521,16 @@ export class AlphaTexImporter extends ScoreImporter {
             // voice marker on the begining of the first voice without any bar yet?
             // -> ignore
             return false;
-        } else {
-            // create directly a new empty voice for all bars
-            for (const b of this._currentStaff.bars) {
-                const v = new Voice();
-                b.addVoice(v);
-            }
-            // start using the new voice (see newBar for details on matching)
-            this._voiceIndex++;
-            this._barIndex = 0;
-            return true;
         }
+        // create directly a new empty voice for all bars
+        for (const b of this._currentStaff.bars) {
+            const v = new Voice();
+            b.addVoice(v);
+        }
+        // start using the new voice (see newBar for details on matching)
+        this._voiceIndex++;
+        this._barIndex = 0;
+        return true;
     }
 
     private beginStaff(staff: Staff) {

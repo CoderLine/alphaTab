@@ -29,10 +29,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
     private _startSpacing = false;
     protected tupletSize: number = 0;
 
-    public constructor(renderer: ScoreRenderer, bar: Bar) {
-        super(renderer, bar);
-    }
-
     public get lineOffset(): number {
         return this.lineSpacing + 1;
     }

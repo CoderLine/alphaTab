@@ -9,17 +9,12 @@ import { ScoreLegatoGlyph } from '@src/rendering/glyphs/ScoreLegatoGlyph';
 import { ScoreSlideLineGlyph } from '@src/rendering/glyphs/ScoreSlideLineGlyph';
 import { ScoreSlurGlyph } from '@src/rendering/glyphs/ScoreSlurGlyph';
 import { ScoreTieGlyph } from '@src/rendering/glyphs/ScoreTieGlyph';
-import { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class ScoreBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: ScoreBendGlyph | null = null;
     private _effectSlur: ScoreSlurGlyph | null = null;
     private _effectEndSlur: ScoreSlurGlyph | null = null;
-
-    public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
-        super(beat, voiceContainer);
-    }
 
     public override doLayout(): void {
         this._effectSlur = null;

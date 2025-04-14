@@ -31,8 +31,4 @@ export class NumberedBarRendererFactory extends BarRendererFactory {
     public override canCreate(track: Track, staff: Staff): boolean {
         return super.canCreate(track, staff) && staff.showNumbered;
     }
-
-    public constructor() {
-        super();
-    }
 }

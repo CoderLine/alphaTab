@@ -6,10 +6,6 @@ import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { ScoreSubElement } from '@src/model/Score';
 
 export class ChordDiagramContainerGlyph extends RowContainerGlyph {
-    public constructor(x: number, y: number) {
-        super(x, y);
-    }
-
     public addChord(chord: Chord): void {
         if (chord.strings.length > 0) {
             let chordDiagram: ChordDiagramGlyph = new ChordDiagramGlyph(0, 0, chord);

@@ -1,0 +1,80 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "files": {
+        "include": [
+            "src/**",
+            "test/**"
+            // temp: "src.compiler/**"
+        ],
+        "ignore": [
+            "dist",
+            ".rollup.cache",
+            "node_modules"
+        ]
+    },
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": true,
+        "ignore": [],
+        "attributePosition": "auto",
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120,
+        "lineEnding": "lf"
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "style": {
+                "noInferrableTypes": "off", // we want to be explicit (for transpiler)
+                "noNonNullAssertion": "off", // we use these assertions often.
+                "noParameterAssign": "off", // useful for default values
+                // temporary disabled, apply fixes gradually
+                "useEnumInitializers": "off",
+                "useImportType": "off",
+                "noUnusedTemplateLiteral": "off",
+                "useConst": "off",
+                "useTemplate": "off",
+                "useExportType": "off",
+                "useExponentiationOperator": "off"
+            },
+            "suspicious": {
+                "noConstEnum": "off",
+                // temporary disabled, apply fixes gradually
+                "noDoubleEquals": "off",
+                "noExplicitAny": "off",
+                "noAssignInExpressions": "off"
+            },
+            "correctness": {
+                // temporary disabled, apply fixes gradually
+                "noSwitchDeclarations": "off"
+            },
+            "complexity": {
+                // temporary disabled, apply fixes gradually
+                "useOptionalChain": "off",
+                "useRegexLiterals": "off",
+                // we are strictly OOP (for transpiler)
+                "noStaticOnlyClass": "off"
+            }
+        }
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "javascript": {
+        "formatter": {
+            "arrowParentheses": "asNeeded",
+            "bracketSameLine": true,
+            "bracketSpacing": true,
+            "quoteProperties": "asNeeded",
+            "semicolons": "always",
+            "trailingCommas": "none",
+            "quoteStyle": "single"
+        }
+    },
+    "json": {
+        "formatter": {
+            "trailingCommas": "none"
+        }
+    }
+}

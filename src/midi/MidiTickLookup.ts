@@ -212,7 +212,7 @@ export class MidiTickLookup {
             return currentBeatHint;
         }
         // already on the next beat?
-        else if (
+        if (
             currentBeatHint.nextBeat &&
             tick >= currentBeatHint.nextBeat.start &&
             tick < currentBeatHint.nextBeat.end
@@ -236,9 +236,8 @@ export class MidiTickLookup {
         for (let i = 0; i < group.length; i++) {
             if (!endMasterBar) {
                 break;
-            } else {
-                endMasterBar = endMasterBar.nextMasterBar;
             }
+            endMasterBar = endMasterBar.nextMasterBar;
         }
 
         if (endMasterBar) {
@@ -258,10 +257,8 @@ export class MidiTickLookup {
 
                     if (
                         current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index + 1 &&
-                        (
-                            current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index ||
-                            current.nextBeat.beat.playbackStart <= current.beat.playbackStart
-                        )
+                        (current.nextBeat.masterBar.masterBar.index != endMasterBar.masterBar.index ||
+                            current.nextBeat.beat.playbackStart <= current.beat.playbackStart)
                     ) {
                         current.cursorMode = MidiTickLookupFindBeatResultCursorMode.ToEndOfBar;
                     }
@@ -530,9 +527,9 @@ export class MidiTickLookup {
             for (let i = 0; i < multiRest.length; i++) {
                 if (!endMasterBar) {
                     break;
-                } else {
-                    endMasterBar = endMasterBar.nextMasterBar;
                 }
+
+                endMasterBar = endMasterBar.nextMasterBar;
             }
 
             if (endMasterBar) {

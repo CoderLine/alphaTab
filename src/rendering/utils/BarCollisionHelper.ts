@@ -1,5 +1,5 @@
-import { Beat } from "@src/model/Beat";
-import { BeamingHelper } from "./BeamingHelper";
+import { Beat } from '@src/model/Beat';
+import { BeamingHelper } from './BeamingHelper';
 
 export class ReservedLayoutAreaSlot {
     public topY: number = 0;
@@ -40,12 +40,12 @@ export class ReservedLayoutArea {
 
 export class BarCollisionHelper {
     public reservedLayoutAreasByDisplayTime: Map<number, ReservedLayoutArea> = new Map();
-    public restDurationsByDisplayTime: Map<number/*start*/, Map<number/*duration*/, number/*beat id*/>> = new Map();
+    public restDurationsByDisplayTime: Map<number /*start*/, Map<number /*duration*/, number /*beat id*/>> = new Map();
 
     public getBeatMinMaxY(): number[] {
         let minY = -1000;
         let maxY = -1000;
-        for(const v of this.reservedLayoutAreasByDisplayTime.values()) {
+        for (const v of this.reservedLayoutAreasByDisplayTime.values()) {
             if (minY === -1000) {
                 minY = v.topY;
                 maxY = v.bottomY;
@@ -92,14 +92,14 @@ export class BarCollisionHelper {
         // we just place it normally
         if (beat.voice.index > 0) {
             // From the Spring-Rod poisitioning we have the guarantee
-            // that 2 timewise subsequent elements can never collide 
+            // that 2 timewise subsequent elements can never collide
             // on the horizontal axis. So we only need to check for collisions
             // of elements at the current time position
             // if there are none, we can just use the line
             if (this.reservedLayoutAreasByDisplayTime.has(beat.playbackStart)) {
-                // do check for collisions we need to obtain the range on which the 
+                // do check for collisions we need to obtain the range on which the
                 // restglyph is placed
-                // rest glyphs have their ancor 
+                // rest glyphs have their ancor
                 const restSizes = BeamingHelper.computeLineHeightsForRest(beat.duration).map(i => i * linesToPixel);
                 let oldRestTopY = currentY - restSizes[0];
                 let oldRestBottomY = currentY + restSizes[1];
@@ -108,8 +108,10 @@ export class BarCollisionHelper {
                 const reservedSlots = this.reservedLayoutAreasByDisplayTime.get(beat.playbackStart)!;
                 let hasCollision = false;
                 for (const slot of reservedSlots.slots) {
-                    if ((oldRestTopY >= slot.topY && oldRestTopY <= slot.bottomY) ||
-                        (oldRestBottomY >= slot.topY && oldRestBottomY <= slot.bottomY)) {
+                    if (
+                        (oldRestTopY >= slot.topY && oldRestTopY <= slot.bottomY) ||
+                        (oldRestBottomY >= slot.topY && oldRestBottomY <= slot.bottomY)
+                    ) {
                         hasCollision = true;
                         break;
                     }
@@ -138,9 +140,8 @@ export class BarCollisionHelper {
 
                     if (newRestTopY < oldRestTopY) {
                         return distanceInLines * -staveSpace;
-                    } else {
-                        return distanceInLines * staveSpace;
                     }
+                    return distanceInLines * staveSpace;
                 }
             }
         }

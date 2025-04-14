@@ -173,8 +173,4 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             accidentals.addGlyph(g);
         }
     }
-
-    public constructor() {
-        super();
-    }
 }

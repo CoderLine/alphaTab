@@ -153,7 +153,7 @@ export class HeaderFooterStyle {
         return replaced;
     }
 
-    private static readonly PlaceholderPattern = new RegExp('%([^%]+)%', 'g');
+    private static readonly PlaceholderPattern = /%([^%]+)%/g;
 }
 
 /**

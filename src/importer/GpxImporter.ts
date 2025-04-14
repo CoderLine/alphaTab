@@ -17,10 +17,6 @@ export class GpxImporter extends ScoreImporter {
         return 'Guitar Pro 6';
     }
 
-    public constructor() {
-        super();
-    }
-
     public readScore(): Score {
         // at first we need to load the binary file system
         // from the GPX container

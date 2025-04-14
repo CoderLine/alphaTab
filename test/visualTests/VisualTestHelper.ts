@@ -185,7 +185,8 @@ export class VisualTestHelper {
 
             if (errors.length === 1) {
                 throw errors[0];
-            } else if (errors.length > 0) {
+            } 
+             if (errors.length > 0) {
                 const errorMessages = errors.map(e => e.message ?? 'Unknown error').join('\n');
                 throw new Error(errorMessages);
             }
@@ -386,9 +387,8 @@ export class VisualTestHelper {
 
         if (!pass) {
             throw new Error(errorMessage);
-        } else {
-            await VisualTestHelper.deleteFiles(expectedFileName);
         }
+        await VisualTestHelper.deleteFiles(expectedFileName);
     }
 
     static async saveFiles(

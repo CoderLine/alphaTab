@@ -111,7 +111,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
             sourcemap: config.build.sourcemap
         });
         chunk = outputChunk;
-        outputChunks.forEach(outputChunk => {
+        for(const outputChunk of outputChunks) {
             if (outputChunk.type === 'asset') {
                 saveEmitWorkerAsset(config, outputChunk);
             } else if (outputChunk.type === 'chunk') {
@@ -120,7 +120,7 @@ async function bundleWorkerEntry(config: ResolvedConfig, id: string): Promise<Ou
                     source: outputChunk.code
                 });
             }
-        });
+        }
     } finally {
         await bundle.close();
     }

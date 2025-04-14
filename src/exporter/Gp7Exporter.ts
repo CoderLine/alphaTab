@@ -16,10 +16,6 @@ export class Gp7Exporter extends ScoreExporter {
         return 'Guitar Pro 7';
     }
 
-    public constructor() {
-        super();
-    }
-
     public writeScore(score: Score): void {
         Logger.debug(this.name, 'Writing data entries');
         const gpifWriter: GpifWriter = new GpifWriter();

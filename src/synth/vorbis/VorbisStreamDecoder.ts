@@ -340,7 +340,7 @@ export class VorbisCodebook {
                 let last = 0.0;
                 let idxDiv = 1;
                 for (let i = 0; i < this.dimensions; i++) {
-                    const moff = (idx / idxDiv) % lookupValueCount | 0;
+                    const moff = ((idx / idxDiv) % lookupValueCount) | 0;
                     const value = multiplicands[moff] * deltaValue + minValue + last;
                     lookupTable[idx * this.dimensions + i] = value;
 
@@ -569,7 +569,7 @@ export class VorbisFloor0 implements IVorbisFloor {
     }
 
     public unpack(packet: IntBitReader, blockSize: number, channel: number): IVorbisFloorData {
-        var data = new VorbisFloorData0(new Float32Array(this._order + 1));
+        const data = new VorbisFloorData0(new Float32Array(this._order + 1));
 
         data.amp = packet.readBits(this._ampBits);
 
@@ -612,7 +612,7 @@ export class VorbisFloor0 implements IVorbisFloor {
 
     public apply(floorData: IVorbisFloorData, blockSize: number, residue: Float32Array): void {
         const data = floorData as VorbisFloorData0;
-        var n = blockSize / 2;
+        const n = blockSize / 2;
 
         if (data.amp > 0) {
             // this is pretty well stolen directly from libvorbis...  BSD license
@@ -637,12 +637,17 @@ export class VorbisFloor0 implements IVorbisFloor {
                 }
                 if (j == this._order) {
                     // odd order filter; slightly assymetric
+
                     q *= w - data.coeff[j - 1];
+                    // biome-ignore lint/suspicious/noMisrefactoredShorthandAssign: Correct calculation here
                     p *= p * (4 - w * w);
                     q *= q;
                 } else {
                     // even order filter; still symetric
+
+                    // biome-ignore lint/suspicious/noMisrefactoredShorthandAssign: Correct calculation here
                     p *= p * (2 - w);
+                    // biome-ignore lint/suspicious/noMisrefactoredShorthandAssign: Correct calculation here
                     q *= q * (2 + w);
                 }
 
@@ -791,7 +796,7 @@ export class VorbisFloor1 implements IVorbisFloor {
     }
 
     public unpack(packet: IntBitReader, blockSize: number, channel: number): IVorbisFloorData {
-        var data = new VorbisFloor1Data();
+        const data = new VorbisFloor1Data();
 
         // hoist ReadPosts to here since that's all we're doing...
         if (packet.readBit()) {
@@ -847,11 +852,11 @@ export class VorbisFloor1 implements IVorbisFloor {
 
             let ly = data.posts[0] * this._multiplier;
             for (let i = 1; i < data.postCount; i++) {
-                var idx = this._sortIdx[i];
+                const idx = this._sortIdx[i];
 
                 if (stepFlags[idx]) {
-                    var hx = this._xList[idx];
-                    var hy = data.posts[idx] * this._multiplier;
+                    const hx = this._xList[idx];
+                    const hy = data.posts[idx] * this._multiplier;
                     if (lx < n) {
                         this.renderLineMulti(lx, ly, Math.min(hx, n), hy, residue);
                     }
@@ -934,16 +939,15 @@ export class VorbisFloor1 implements IVorbisFloor {
     }
 
     private renderPoint(x0: number, y0: number, x1: number, y1: number, X: number) {
-        var dy = y1 - y0;
-        var adx = x1 - x0;
-        var ady = Math.abs(dy);
-        var err = ady * (X - x0);
-        var off = (err / adx) | 0;
+        const dy = y1 - y0;
+        const adx = x1 - x0;
+        const ady = Math.abs(dy);
+        const err = ady * (X - x0);
+        const off = (err / adx) | 0;
         if (dy < 0) {
             return y0 - off;
-        } else {
-            return y0 + off;
         }
+        return y0 + off;
     }
 
     private renderLineMulti(x0: number, y0: number, x1: number, y1: number, v: Float32Array) {
@@ -972,70 +976,39 @@ export class VorbisFloor1 implements IVorbisFloor {
 
     // prettier-ignore
     private static readonly inverse_dB_table = new Float32Array([
-        1.0649863e-07, 1.1341951e-07, 1.2079015e-07, 1.2863978e-07,
-        1.3699951e-07, 1.4590251e-07, 1.5538408e-07, 1.6548181e-07,
-        1.7623575e-07, 1.8768855e-07, 1.9988561e-07, 2.1287530e-07,
-        2.2670913e-07, 2.4144197e-07, 2.5713223e-07, 2.7384213e-07,
-        2.9163793e-07, 3.1059021e-07, 3.3077411e-07, 3.5226968e-07,
-        3.7516214e-07, 3.9954229e-07, 4.2550680e-07, 4.5315863e-07,
-        4.8260743e-07, 5.1396998e-07, 5.4737065e-07, 5.8294187e-07,
-        6.2082472e-07, 6.6116941e-07, 7.0413592e-07, 7.4989464e-07,
-        7.9862701e-07, 8.5052630e-07, 9.0579828e-07, 9.6466216e-07,
-        1.0273513e-06, 1.0941144e-06, 1.1652161e-06, 1.2409384e-06,
-        1.3215816e-06, 1.4074654e-06, 1.4989305e-06, 1.5963394e-06,
-        1.7000785e-06, 1.8105592e-06, 1.9282195e-06, 2.0535261e-06,
-        2.1869758e-06, 2.3290978e-06, 2.4804557e-06, 2.6416497e-06,
-        2.8133190e-06, 2.9961443e-06, 3.1908506e-06, 3.3982101e-06,
-        3.6190449e-06, 3.8542308e-06, 4.1047004e-06, 4.3714470e-06,
-        4.6555282e-06, 4.9580707e-06, 5.2802740e-06, 5.6234160e-06,
-        5.9888572e-06, 6.3780469e-06, 6.7925283e-06, 7.2339451e-06,
-        7.7040476e-06, 8.2047000e-06, 8.7378876e-06, 9.3057248e-06,
-        9.9104632e-06, 1.0554501e-05, 1.1240392e-05, 1.1970856e-05,
-        1.2748789e-05, 1.3577278e-05, 1.4459606e-05, 1.5399272e-05,
-        1.6400004e-05, 1.7465768e-05, 1.8600792e-05, 1.9809576e-05,
-        2.1096914e-05, 2.2467911e-05, 2.3928002e-05, 2.5482978e-05,
-        2.7139006e-05, 2.8902651e-05, 3.0780908e-05, 3.2781225e-05,
-        3.4911534e-05, 3.7180282e-05, 3.9596466e-05, 4.2169667e-05,
-        4.4910090e-05, 4.7828601e-05, 5.0936773e-05, 5.4246931e-05,
-        5.7772202e-05, 6.1526565e-05, 6.5524908e-05, 6.9783085e-05,
-        7.4317983e-05, 7.9147585e-05, 8.4291040e-05, 8.9768747e-05,
-        9.5602426e-05, 0.00010181521, 0.00010843174, 0.00011547824,
-        0.00012298267, 0.00013097477, 0.00013948625, 0.00014855085,
-        0.00015820453, 0.00016848555, 0.00017943469, 0.00019109536,
-        0.00020351382, 0.00021673929, 0.00023082423, 0.00024582449,
-        0.00026179955, 0.00027881276, 0.00029693158, 0.00031622787,
-        0.00033677814, 0.00035866388, 0.00038197188, 0.00040679456,
-        0.00043323036, 0.00046138411, 0.00049136745, 0.00052329927,
-        0.00055730621, 0.00059352311, 0.00063209358, 0.00067317058,
-        0.00071691700, 0.00076350630, 0.00081312324, 0.00086596457,
-        0.00092223983, 0.00098217216, 0.0010459992,  0.0011139742,
-        0.0011863665,  0.0012634633,  0.0013455702,  0.0014330129,
-        0.0015261382,  0.0016253153,  0.0017309374,  0.0018434235,
-        0.0019632195,  0.0020908006,  0.0022266726,  0.0023713743,
-        0.0025254795,  0.0026895994,  0.0028643847,  0.0030505286,
-        0.0032487691,  0.0034598925,  0.0036847358,  0.0039241906,
-        0.0041792066,  0.0044507950,  0.0047400328,  0.0050480668,
-        0.0053761186,  0.0057254891,  0.0060975636,  0.0064938176,
-        0.0069158225,  0.0073652516,  0.0078438871,  0.0083536271,
-        0.0088964928,  0.009474637,   0.010090352,   0.010746080,
-        0.011444421,   0.012188144,   0.012980198,   0.013823725,
-        0.014722068,   0.015678791,   0.016697687,   0.017782797,
-        0.018938423,   0.020169149,   0.021479854,   0.022875735,
-        0.024362330,   0.025945531,   0.027631618,   0.029427276,
-        0.031339626,   0.033376252,   0.035545228,   0.037855157,
-        0.040315199,   0.042935108,   0.045725273,   0.048696758,
-        0.051861348,   0.055231591,   0.058820850,   0.062643361,
-        0.066714279,   0.071049749,   0.075666962,   0.080584227,
-        0.085821044,   0.091398179,   0.097337747,   0.10366330,
-        0.11039993,    0.11757434,    0.12521498,    0.13335215,
-        0.14201813,    0.15124727,    0.16107617,    0.17154380,
-        0.18269168,    0.19456402,    0.20720788,    0.22067342,
-        0.23501402,    0.25028656,    0.26655159,    0.28387361,
-        0.30232132,    0.32196786,    0.34289114,    0.36517414,
-        0.38890521,    0.41417847,    0.44109412,    0.46975890,
-        0.50028648,    0.53279791,    0.56742212,    0.60429640,
-        0.64356699,    0.68538959,    0.72993007,    0.77736504,
-        0.82788260,    0.88168307,    0.9389798,     1.0
+        1.0649863e-7, 1.1341951e-7, 1.2079015e-7, 1.2863978e-7, 1.3699951e-7, 1.4590251e-7, 1.5538408e-7, 1.6548181e-7,
+        1.7623575e-7, 1.8768855e-7, 1.9988561e-7, 2.128753e-7, 2.2670913e-7, 2.4144197e-7, 2.5713223e-7, 2.7384213e-7,
+        2.9163793e-7, 3.1059021e-7, 3.3077411e-7, 3.5226968e-7, 3.7516214e-7, 3.9954229e-7, 4.255068e-7, 4.5315863e-7,
+        4.8260743e-7, 5.1396998e-7, 5.4737065e-7, 5.8294187e-7, 6.2082472e-7, 6.6116941e-7, 7.0413592e-7, 7.4989464e-7,
+        7.9862701e-7, 8.505263e-7, 9.0579828e-7, 9.6466216e-7, 1.0273513e-6, 1.0941144e-6, 1.1652161e-6, 1.2409384e-6,
+        1.3215816e-6, 1.4074654e-6, 1.4989305e-6, 1.5963394e-6, 1.7000785e-6, 1.8105592e-6, 1.9282195e-6, 2.0535261e-6,
+        2.1869758e-6, 2.3290978e-6, 2.4804557e-6, 2.6416497e-6, 2.813319e-6, 2.9961443e-6, 3.1908506e-6, 3.3982101e-6,
+        3.6190449e-6, 3.8542308e-6, 4.1047004e-6, 4.371447e-6, 4.6555282e-6, 4.9580707e-6, 5.280274e-6, 5.623416e-6,
+        5.9888572e-6, 6.3780469e-6, 6.7925283e-6, 7.2339451e-6, 7.7040476e-6, 8.2047e-6, 8.7378876e-6, 9.3057248e-6,
+        9.9104632e-6, 1.0554501e-5, 1.1240392e-5, 1.1970856e-5, 1.2748789e-5, 1.3577278e-5, 1.4459606e-5, 1.5399272e-5,
+        1.6400004e-5, 1.7465768e-5, 1.8600792e-5, 1.9809576e-5, 2.1096914e-5, 2.2467911e-5, 2.3928002e-5, 2.5482978e-5,
+        2.7139006e-5, 2.8902651e-5, 3.0780908e-5, 3.2781225e-5, 3.4911534e-5, 3.7180282e-5, 3.9596466e-5, 4.2169667e-5,
+        4.491009e-5, 4.7828601e-5, 5.0936773e-5, 5.4246931e-5, 5.7772202e-5, 6.1526565e-5, 6.5524908e-5, 6.9783085e-5,
+        7.4317983e-5, 7.9147585e-5, 8.429104e-5, 8.9768747e-5, 9.5602426e-5, 0.00010181521, 0.00010843174,
+        0.00011547824, 0.00012298267, 0.00013097477, 0.00013948625, 0.00014855085, 0.00015820453, 0.00016848555,
+        0.00017943469, 0.00019109536, 0.00020351382, 0.00021673929, 0.00023082423, 0.00024582449, 0.00026179955,
+        0.00027881276, 0.00029693158, 0.00031622787, 0.00033677814, 0.00035866388, 0.00038197188, 0.00040679456,
+        0.00043323036, 0.00046138411, 0.00049136745, 0.00052329927, 0.00055730621, 0.00059352311, 0.00063209358,
+        0.00067317058, 0.000716917, 0.0007635063, 0.00081312324, 0.00086596457, 0.00092223983, 0.00098217216,
+        0.0010459992, 0.0011139742, 0.0011863665, 0.0012634633, 0.0013455702, 0.0014330129, 0.0015261382, 0.0016253153,
+        0.0017309374, 0.0018434235, 0.0019632195, 0.0020908006, 0.0022266726, 0.0023713743, 0.0025254795, 0.0026895994,
+        0.0028643847, 0.0030505286, 0.0032487691, 0.0034598925, 0.0036847358, 0.0039241906, 0.0041792066, 0.004450795,
+        0.0047400328, 0.0050480668, 0.0053761186, 0.0057254891, 0.0060975636, 0.0064938176, 0.0069158225, 0.0073652516,
+        0.0078438871, 0.0083536271, 0.0088964928, 0.009474637, 0.010090352, 0.01074608, 0.011444421, 0.012188144,
+        0.012980198, 0.013823725, 0.014722068, 0.015678791, 0.016697687, 0.017782797, 0.018938423, 0.020169149,
+        0.021479854, 0.022875735, 0.02436233, 0.025945531, 0.027631618, 0.029427276, 0.031339626, 0.033376252,
+        0.035545228, 0.037855157, 0.040315199, 0.042935108, 0.045725273, 0.048696758, 0.051861348, 0.055231591,
+        0.05882085, 0.062643361, 0.066714279, 0.071049749, 0.075666962, 0.080584227, 0.085821044, 0.091398179,
+        0.097337747, 0.1036633, 0.11039993, 0.11757434, 0.12521498, 0.13335215, 0.14201813, 0.15124727, 0.16107617,
+        0.1715438, 0.18269168, 0.19456402, 0.20720788, 0.22067342, 0.23501402, 0.25028656, 0.26655159, 0.28387361,
+        0.30232132, 0.32196786, 0.34289114, 0.36517414, 0.38890521, 0.41417847, 0.44109412, 0.4697589, 0.50028648,
+        0.53279791, 0.56742212, 0.6042964, 0.64356699, 0.68538959, 0.72993007, 0.77736504, 0.8278826, 0.88168307,
+        0.9389798, 1.0
     ]);
 }
 
@@ -1054,7 +1027,6 @@ export class VorbisFloor implements IVorbisFloor {
 
             default:
                 throw new AlphaTabError(AlphaTabErrorType.Format, 'Vorbis: Invalid Floor type: ' + type);
-                break;
         }
     }
     public apply(floorData: IVorbisFloorData, blockSize: number, residue: Float32Array): void {
@@ -1253,10 +1225,6 @@ export class VorbisResidue0 implements IVorbisResidue {
 }
 
 export class VorbisResidue1 extends VorbisResidue0 {
-    public constructor(packet: IntBitReader, channels: number, codebooks: VorbisCodebook[]) {
-        super(packet, channels, codebooks);
-    }
-
     protected override writeVectors(
         codebook: VorbisCodebook,
         packet: IntBitReader,
@@ -1502,7 +1470,7 @@ export class VorbisMapping {
                 const angle = buffer[this._couplingAngle[i]];
 
                 // we only have to do the first half; MDCT ignores the last half
-                for (var j = 0; j < halfBlockSize; j++) {
+                for (let j = 0; j < halfBlockSize; j++) {
                     let newM: number;
                     let newA: number;
 
@@ -1699,7 +1667,9 @@ export class VorbisMode {
 }
 
 class MdctImpl {
-    private static readonly M_PI = 3.14159265358979323846264;
+    // biome-ignore lint/correctness/noPrecisionLoss: High precision PI
+    // biome-ignore lint/suspicious/noApproximativeNumericConstant: High precision PI
+        private static readonly M_PI = 3.14159265358979323846264;
 
     private readonly _n: number;
     private readonly _n2: number;
@@ -1896,9 +1866,9 @@ class MdctImpl {
 
         // step 7
         {
-            var c = 0; // C
-            var d = 0; // v
-            var e = this._n2 - 4; // v
+            let c = 0; // C
+            let d = 0; // v
+            let e = this._n2 - 4; // v
 
             while (d < e) {
                 let a02: number;
@@ -2049,9 +2019,9 @@ class MdctImpl {
     }
 
     private step3_iter0_loop(n: number, e: Float32Array, i_off: number, k_off: number) {
-        var ee0 = i_off; // e
-        var ee2 = ee0 + k_off; // e
-        var a = 0;
+        let ee0 = i_off; // e
+        let ee2 = ee0 + k_off; // e
+        let a = 0;
         for (let i = n >> 2; i > 0; --i) {
             let k00_20: number;
             let k01_21: number;
@@ -2102,14 +2072,14 @@ class MdctImpl {
         a_off: number,
         k0: number
     ) {
-        var A0 = this._a[a];
-        var A1 = this._a[a + 1];
-        var A2 = this._a[a + a_off];
-        var A3 = this._a[a + a_off + 1];
-        var A4 = this._a[a + a_off * 2];
-        var A5 = this._a[a + a_off * 2 + 1];
-        var A6 = this._a[a + a_off * 3];
-        var A7 = this._a[a + a_off * 3 + 1];
+        let A0 = this._a[a];
+        let A1 = this._a[a + 1];
+        let A2 = this._a[a + a_off];
+        let A3 = this._a[a + a_off + 1];
+        let A4 = this._a[a + a_off * 2];
+        let A5 = this._a[a + a_off * 2 + 1];
+        let A6 = this._a[a + a_off * 3];
+        let A7 = this._a[a + a_off * 3 + 1];
 
         let k00: number;
         let k11: number;

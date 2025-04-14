@@ -18,7 +18,6 @@ export enum MidiFileFormat {
     MultiTrack = 1
 }
 
-
 export class MidiTrack {
     /**
      * Gets a list of midi events sorted by time.
@@ -31,8 +30,7 @@ export class MidiTrack {
     public addEvent(e: MidiEvent): void {
         if (this.events.length === 0 || e.tick >= this.events[this.events.length - 1].tick) {
             this.events.push(e);
-        }
-        else {
+        } else {
             let insertPos: number = this.events.length;
             while (insertPos > 0) {
                 const prevItem: MidiEvent = this.events[insertPos - 1];
@@ -91,15 +89,14 @@ export class MidiFile {
     public get events(): MidiEvent[] {
         if (this.tracks.length == 1) {
             return this.tracks[0].events;
-        } else {
-            const events: MidiEvent[] = [];
-            for (const t of this.tracks) {
-                this.events.push(...t.events);
-            }
-
-            events.sort((a, b) => a.tick - b.tick);
-            return events;
         }
+        const events: MidiEvent[] = [];
+        for (const t of this.tracks) {
+            this.events.push(...t.events);
+        }
+
+        events.sort((a, b) => a.tick - b.tick);
+        return events;
     }
 
     /**

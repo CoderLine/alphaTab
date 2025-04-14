@@ -30,8 +30,4 @@ export class ScoreBarRendererFactory extends BarRendererFactory {
     public override canCreate(track: Track, staff: Staff): boolean {
         return super.canCreate(track, staff) && staff.showStandardNotation;
     }
-
-    public constructor() {
-        super();
-    }
 }

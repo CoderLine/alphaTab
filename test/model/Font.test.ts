@@ -12,42 +12,42 @@ describe('FontTests', () => {
         expect(font!.weight).to.equal(expected.weight);
     }
 
-    it('parses-full', function () {
+    it('parses-full', () => {
         parseText('italic small-caps bold 12px/1.5em "Arial"', Font.withFamilyList(["Arial"], 12, FontStyle.Italic, FontWeight.Bold))
     });
 
-    it('parses-partial-options', function () {
+    it('parses-partial-options', () => {
         parseText('italic bold 12px/1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Italic, FontWeight.Bold))
         parseText('bold italic 12px/1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Italic, FontWeight.Bold))
         parseText('bold 12px/1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Plain, FontWeight.Bold))
         parseText('italic 12px/1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Italic))
     });
 
-    it('parses-no-options', function () {
+    it('parses-no-options', () => {
         parseText('12px/1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Plain))
     });
 
-    it('parses-line-height-spaces', function () {
+    it('parses-line-height-spaces', () => {
         parseText('12px/1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Plain))
         parseText('12px /1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Plain))
         parseText('12px / 1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Plain))
         parseText('12px  /  1.5em "Arial", sans', Font.withFamilyList(["Arial", "sans"], 12, FontStyle.Plain))
     });
 
-    it('parses-multiple-families', function () {
+    it('parses-multiple-families', () => {
         parseText('12px/1.5em Arial, Verdana, sans', Font.withFamilyList(["Arial", "Verdana", "sans"], 12, FontStyle.Plain))
         parseText("12px/1.5em 'Arial', 'Verdana', 'sans'", Font.withFamilyList(["Arial", "Verdana", "sans"], 12, FontStyle.Plain))
         parseText('12px/1.5em "Arial", "Verdana", "sans"', Font.withFamilyList(["Arial", "Verdana", "sans"], 12, FontStyle.Plain))
         parseText('12px/1.5em Arial, "Verdana", sans', Font.withFamilyList(["Arial", "Verdana", "sans"], 12, FontStyle.Plain))
         parseText('12px/1.5em Arial, \'Verdana\', "sans"', Font.withFamilyList(["Arial", "Verdana", "sans"], 12, FontStyle.Plain))
     });
-    it('parses-escaped-quotes', function () {
+    it('parses-escaped-quotes', () => {
         parseText("12px/1.5em \"Ari\\\"al\"", Font.withFamilyList(["Ari\"al"], 12, FontStyle.Plain))
         parseText('12px/1.5em \'Ari\\\'al\'', Font.withFamilyList(["Ari'al"], 12, FontStyle.Plain))
         parseText('12px/1.5em \'Ari\\\'\'', Font.withFamilyList(['Ari\''], 12, FontStyle.Plain))
         parseText("12px/1.5em 'Ari\\al'", Font.withFamilyList(["Ari\\al"], 12, FontStyle.Plain))
     });
-    it('parses-with-spaces-and-quotes', function () {
+    it('parses-with-spaces-and-quotes', () => {
         parseText("12px/1.5em \"Times New Roman\"", Font.withFamilyList(["Times New Roman"], 12, FontStyle.Plain))
         parseText("12px/1.5em \"Times New Roman\", Arial, 'Open Sans'", Font.withFamilyList(["Times New Roman", "Arial", "Open Sans"], 12, FontStyle.Plain))
     });
@@ -56,7 +56,7 @@ describe('FontTests', () => {
         expect(f.toCssString()).to.equal(expected)
     }
 
-    it('css-string-tests', function () {
+    it('css-string-tests', () => {
         toCssStringTest(Font.withFamilyList(["Arial"], 12, FontStyle.Plain), "12px Arial")
         toCssStringTest(Font.withFamilyList(["Arial"], 12, FontStyle.Italic), "italic 12px Arial")
         toCssStringTest(Font.withFamilyList(["Arial"], 12, FontStyle.Italic, FontWeight.Bold), "bold italic 12px Arial")

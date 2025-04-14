@@ -17,7 +17,7 @@ interface AudioWorkletProcessor {
 /**
  * @target web
  */
-declare var AudioWorkletProcessor: {
+declare let AudioWorkletProcessor: {
     prototype: AudioWorkletProcessor;
     new(options?: AudioWorkletNodeOptions): AudioWorkletProcessor;
 };
@@ -28,11 +28,11 @@ declare var AudioWorkletProcessor: {
 /**
  * @target web
  */
-declare var registerProcessor: any;
+declare let registerProcessor: any;
 /**
  * @target web
  */
-declare var sampleRate: number;
+declare let sampleRate: number;
 
 /**
  * This class implements a HTML5 Web Audio API based audio output device

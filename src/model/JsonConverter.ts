@@ -1,4 +1,19 @@
-import { AlphaTabMetronomeEvent, AlphaTabRestEvent, ControlChangeEvent, EndOfTrackEvent, MidiEvent, MidiEventType, NoteBendEvent, NoteEvent, NoteOffEvent, NoteOnEvent, PitchBendEvent, ProgramChangeEvent, TempoChangeEvent, TimeSignatureEvent } from '@src/midi/MidiEvent';
+import {
+    AlphaTabMetronomeEvent,
+    AlphaTabRestEvent,
+    ControlChangeEvent,
+    EndOfTrackEvent,
+    MidiEvent,
+    MidiEventType,
+    NoteBendEvent,
+    NoteEvent,
+    NoteOffEvent,
+    NoteOnEvent,
+    PitchBendEvent,
+    ProgramChangeEvent,
+    TempoChangeEvent,
+    TimeSignatureEvent
+} from '@src/midi/MidiEvent';
 import { MidiFile, MidiTrack } from '@src/midi/MidiFile';
 import { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
@@ -20,13 +35,14 @@ export class JsonConverter {
         if (v instanceof Map) {
             if ('fromEntries' in Object) {
                 return Object.fromEntries(v);
-            } else {
-                const o: any = {};
-                for (const [k, mv] of v) { o[k] = mv; }
-                return o;
             }
+            const o: any = {};
+            for (const [k, mv] of v) {
+                o[k] = mv;
+            }
+            return o;
         }
-        else if (ArrayBuffer.isView(v)) {
+        if (ArrayBuffer.isView(v)) {
             return Array.apply([], [v]);
         }
         return v;
@@ -76,7 +92,6 @@ export class JsonConverter {
         return score;
     }
 
-
     /**
      * Converts the given settings into a JSON encoded string.
      * @param settings The settings to serialize.
@@ -120,7 +135,7 @@ export class JsonConverter {
 
     /**
      * Converts the given JavaScript object into a MidiFile object.
-     * @param jsObject The javascript object to deserialize. 
+     * @param jsObject The javascript object to deserialize.
      * @returns The converted MidiFile.
      */
     public static jsObjectToMidiFile(jsObject: unknown): MidiFile {
@@ -132,7 +147,7 @@ export class JsonConverter {
                     midi2.division = v as number;
                     break;
                 case 'tracks':
-                    for (let midiTrack of (v as unknown[])) {
+                    for (let midiTrack of v as unknown[]) {
                         let midiTrack2: MidiTrack = JsonConverter.jsObjectToMidiTrack(midiTrack);
                         midi2.tracks.push(midiTrack2);
                     }
@@ -143,13 +158,13 @@ export class JsonConverter {
         return midi2;
     }
 
-    private static jsObjectToMidiTrack(jsObject:unknown): MidiTrack {
+    private static jsObjectToMidiTrack(jsObject: unknown): MidiTrack {
         let midi2: MidiTrack = new MidiTrack();
 
         JsonHelper.forEach(jsObject, (v, k) => {
             switch (k) {
                 case 'events':
-                    for (let midiEvent of (v as unknown[])) {
+                    for (let midiEvent of v as unknown[]) {
                         let midiEvent2: MidiEvent = JsonConverter.jsObjectToMidiEvent(midiEvent);
                         midi2.events.push(midiEvent2);
                     }
@@ -162,7 +177,7 @@ export class JsonConverter {
 
     /**
      * Converts the given JavaScript object into a MidiEvent object.
-     * @param jsObject The javascript object to deserialize. 
+     * @param jsObject The javascript object to deserialize.
      * @returns The converted MidiEvent.
      */
     public static jsObjectToMidiEvent(midiEvent: unknown): MidiEvent {
@@ -181,11 +196,7 @@ export class JsonConverter {
                     JsonHelper.getValue(midiEvent, 'thirdySecondNodesInQuarter') as number
                 );
             case MidiEventType.AlphaTabRest:
-                return new AlphaTabRestEvent(
-                    track,
-                    tick,
-                    JsonHelper.getValue(midiEvent, 'channel') as number
-                );
+                return new AlphaTabRestEvent(track, tick, JsonHelper.getValue(midiEvent, 'channel') as number);
             case MidiEventType.AlphaTabMetronome:
                 return new AlphaTabMetronomeEvent(
                     track,
@@ -254,7 +265,7 @@ export class JsonConverter {
 
     /**
      * Converts the given MidiFile object into a serialized JavaScript object.
-     * @param midi The midi file to convert. 
+     * @param midi The midi file to convert.
      * @returns A serialized MidiFile object without ciruclar dependencies that can be used for further serializations.
      */
     public static midiFileToJsObject(midi: MidiFile): Map<string, unknown> {
@@ -284,7 +295,7 @@ export class JsonConverter {
 
     /**
      * Converts the given MidiEvent object into a serialized JavaScript object.
-     * @param midi The midi file to convert. 
+     * @param midi The midi file to convert.
      * @returns A serialized MidiEvent object without ciruclar dependencies that can be used for further serializations.
      */
     public static midiEventToJsObject(midiEvent: MidiEvent): Map<string, unknown> {
@@ -304,7 +315,10 @@ export class JsonConverter {
                 break;
             case MidiEventType.AlphaTabMetronome:
                 o.set('metronomeNumerator', (midiEvent as AlphaTabMetronomeEvent).metronomeNumerator);
-                o.set('metronomeDurationInMilliseconds', (midiEvent as AlphaTabMetronomeEvent).metronomeDurationInMilliseconds);
+                o.set(
+                    'metronomeDurationInMilliseconds',
+                    (midiEvent as AlphaTabMetronomeEvent).metronomeDurationInMilliseconds
+                );
                 o.set('metronomeDurationInTicks', (midiEvent as AlphaTabMetronomeEvent).metronomeDurationInTicks);
                 break;
             case MidiEventType.NoteOn:

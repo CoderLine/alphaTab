@@ -4,10 +4,6 @@ import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { LineBarRenderer } from '../LineBarRenderer';
 
 export class RepeatCloseGlyph extends Glyph {
-    public constructor(x: number, y: number) {
-        super(x, y);
-    }
-
     public override doLayout(): void {
         this.width = 11;
     }

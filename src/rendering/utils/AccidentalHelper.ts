@@ -52,7 +52,18 @@ export class AccidentalHelper {
      */
     // prettier-ignore
     public static AccidentalNotes: boolean[] = [
-        false, true, false, true, false, false, true, false, true, false, true, false
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false
     ];
 
     /**
@@ -112,9 +123,8 @@ export class AccidentalHelper {
     public static getPercussionLine(bar: Bar, noteValue: number): number {
         if (noteValue < bar.staff.track.percussionArticulations.length) {
             return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
-        } else {
-            return PercussionMapper.getArticulationByValue(noteValue)?.staffLine ?? 0;
         }
+        return PercussionMapper.getArticulationByValue(noteValue)?.staffLine ?? 0;
     }
 
     public static getNoteValue(note: Note) {
@@ -324,7 +334,8 @@ export class AccidentalHelper {
                         // candidate for skip, check further if start note is on the same line
                         const tieOriginBarRenderer = this._barRenderer.scoreRenderer.layout?.getRendererForBar(
                             this._barRenderer.staff.staveId,
-                            note.tieOrigin!.beat.voice.bar) as ScoreBarRenderer | null;
+                            note.tieOrigin!.beat.voice.bar
+                        ) as ScoreBarRenderer | null;
                         if (tieOriginBarRenderer && tieOriginBarRenderer.staff === this._barRenderer.staff) {
                             const tieOriginLine = tieOriginBarRenderer.accidentalHelper.getNoteLine(note.tieOrigin!);
                             if (tieOriginLine === steps) {

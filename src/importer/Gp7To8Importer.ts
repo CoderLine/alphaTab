@@ -21,10 +21,6 @@ export class Gp7To8Importer extends ScoreImporter {
         return 'Guitar Pro 7-8';
     }
 
-    public constructor() {
-        super();
-    }
-
     public readScore(): Score {
         // at first we need to load the binary file system
         // from the GPX container

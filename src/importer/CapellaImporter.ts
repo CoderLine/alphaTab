@@ -18,10 +18,6 @@ export class CapellaImporter extends ScoreImporter {
         return 'Capella';
     }
 
-    public constructor() {
-        super();
-    }
-
     public readScore(): Score {
         Logger.debug(this.name, 'Loading ZIP entries');
         let fileSystem: ZipReader = new ZipReader(this.data);

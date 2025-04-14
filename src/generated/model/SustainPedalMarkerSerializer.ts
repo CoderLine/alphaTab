@@ -11,7 +11,7 @@ export class SustainPedalMarkerSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => SustainPedalMarkerSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: SustainPedalMarker | null): Map<string, unknown> | null {
         if (!obj) {

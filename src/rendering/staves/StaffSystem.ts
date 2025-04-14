@@ -74,10 +74,6 @@ class SingleTrackSystemBracket extends SystemBracket {
 }
 
 class SimilarInstrumentSystemBracket extends SingleTrackSystemBracket {
-    public constructor(track: Track) {
-        super(track);
-    }
-
     public override includesStaff(r: RenderStaff): boolean {
         // allow merging on same track (for braces, percussion and items belonging together)
         if (r.modelStaff.track === this.track) {

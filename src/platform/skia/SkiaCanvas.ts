@@ -57,7 +57,7 @@ export class SkiaCanvas implements ICanvas {
         }
 
         for (const family of fontInfo.families) {
-            this.customTypeFaces.set(SkiaCanvas.customTypefaceKey(family, fontInfo.isBold, fontInfo.isItalic), typeface);
+            SkiaCanvas.customTypeFaces.set(SkiaCanvas.customTypefaceKey(family, fontInfo.isBold, fontInfo.isItalic), typeface);
         }
 
         return fontInfo;
@@ -84,7 +84,7 @@ export class SkiaCanvas implements ICanvas {
             }
 
             for (const family of this.font.families) {
-                var key = SkiaCanvas.customTypefaceKey(family, this.font.isBold, this.font.isItalic);
+                const key = SkiaCanvas.customTypefaceKey(family, this.font.isBold, this.font.isItalic);
                 if (!SkiaCanvas.customTypeFaces.has(key)) {
                     this._typeFaceIsSystem = true;
                     this._typeFace = SkiaCanvas.alphaSkia.AlphaSkiaTypeface.create(family,

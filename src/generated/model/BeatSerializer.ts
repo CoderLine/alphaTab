@@ -35,7 +35,7 @@ export class BeatSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => BeatSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Beat | null): Map<string, unknown> | null {
         if (!obj) {

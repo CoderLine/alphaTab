@@ -597,10 +597,10 @@ export class GpifWriter {
     private writeStandardBend(properties: XmlNode, bendPoints: BendPoint[]) {
         this.writeSimplePropertyNode(properties, 'Bended', 'Enable', null);
 
-        var bendOrigin = bendPoints[0];
-        var bendDestination = bendPoints[bendPoints.length - 1];
-        var bendMiddle1: BendPoint;
-        var bendMiddle2: BendPoint;
+        let bendOrigin = bendPoints[0];
+        let bendDestination = bendPoints[bendPoints.length - 1];
+        let bendMiddle1: BendPoint;
+        let bendMiddle2: BendPoint;
 
         switch (bendPoints.length) {
             case 4:
@@ -993,10 +993,10 @@ export class GpifWriter {
 
     private writeStandardWhammy(parent: XmlNode, whammyBarPoints: BendPoint[]) {
         const whammyNode = parent.addElement('Whammy');
-        var whammyOrigin = whammyBarPoints[0];
-        var whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
-        var whammyMiddle1: BendPoint;
-        var whammyMiddle2: BendPoint;
+        let whammyOrigin = whammyBarPoints[0];
+        let whammyDestination = whammyBarPoints[whammyBarPoints.length - 1];
+        let whammyMiddle1: BendPoint;
+        let whammyMiddle2: BendPoint;
 
         switch (whammyBarPoints.length) {
             case 4:
@@ -1592,7 +1592,7 @@ export class GpifWriter {
             const elements = instrumentSet.addElement('Elements');
             for (const articulation of articulations) {
                 if (!currentElementType || currentElementType !== articulation.elementType) {
-                    var currentElement = elements.addElement('Element');
+                    const currentElement = elements.addElement('Element');
 
                     let name = articulation.elementType;
                     if (counterPerType.has(name)) {

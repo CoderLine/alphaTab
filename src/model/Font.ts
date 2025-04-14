@@ -89,9 +89,8 @@ class FontParser {
         if (!this._currentToken) {
             if (this.parseOnlyFamilies) {
                 return;
-            } else {
-                throw new Error(`Missing font list`);
             }
+            throw new Error(`Missing font list`);
         }
 
         const familyListInput = this._input.substr(this._currentToken.startPos).trim();
@@ -317,7 +316,7 @@ export enum FontWeight {
 }
 
 /**
- * Describes a font to be used. 
+ * Describes a font to be used.
  * If specified as string, a CSS `font` shorthand property compliant value needs to be used.
  * @target web
  */
@@ -450,7 +449,7 @@ export class Font {
         this._css = this.toCssString();
     }
 
-    public withSize(newSize:number) : Font {
+    public withSize(newSize: number): Font {
         return Font.withFamilyList(this._families, newSize, this._style, this._weight);
     }
 
@@ -491,7 +490,7 @@ export class Font {
     }
 
     public static fromJson(v: unknown): Font | null {
-        if(v instanceof Font) {
+        if (v instanceof Font) {
             return v;
         }
 
@@ -542,12 +541,13 @@ export class Font {
                     default:
                         try {
                             if (fontSizeString.endsWith('em')) {
-                                fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16;
+                                fontSize = Number.parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16;
                             } else if (fontSizeString.endsWith('pt')) {
                                 fontSize =
-                                    (parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16.0) / 12.0;
+                                    (Number.parseFloat(fontSizeString.substr(0, fontSizeString.length - 2)) * 16.0) /
+                                    12.0;
                             } else if (fontSizeString.endsWith('px')) {
-                                fontSize = parseFloat(fontSizeString.substr(0, fontSizeString.length - 2));
+                                fontSize = Number.parseFloat(fontSizeString.substr(0, fontSizeString.length - 2));
                             } else {
                                 fontSize = 12;
                             }

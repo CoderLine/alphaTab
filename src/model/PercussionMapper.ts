@@ -283,7 +283,7 @@ export class PercussionMapper {
             return trackArticulations[articulationIndex];
         }
 
-        return PercussionMapper.getArticulationByValue(articulationIndex);;
+        return PercussionMapper.getArticulationByValue(articulationIndex);
     }
 
     public static getElementAndVariation(n: Note): number[] {

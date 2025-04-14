@@ -22,7 +22,7 @@ export class BarLayoutingInfo {
     private _incompleteGraceRodsWidth: number = 0;
 
     // the smallest duration we have between two springs to ensure we have positive spring constants
-    private _minDuration:number = BarLayoutingInfo.MinDuration;
+    private _minDuration: number = BarLayoutingInfo.MinDuration;
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -45,14 +45,13 @@ export class BarLayoutingInfo {
             const groupId = beat.graceGroup!.id;
             const graceRod = this.allGraceRods.get(groupId)![beat.graceIndex];
             return graceRod.preBeatWidth;
-        } else {
-            const start: number = beat.absoluteDisplayStart;
-            if (!this.springs.has(start)) {
-                return 0;
-            }
-
-            return this.springs.get(start)!.preBeatWidth;
         }
+        const start: number = beat.absoluteDisplayStart;
+        if (!this.springs.has(start)) {
+            return 0;
+        }
+
+        return this.springs.get(start)!.preBeatWidth;
     }
 
     public getPostBeatSize(beat: Beat) {
@@ -60,14 +59,13 @@ export class BarLayoutingInfo {
             const groupId = beat.graceGroup!.id;
             const graceRod = this.allGraceRods.get(groupId)![beat.graceIndex];
             return graceRod.postSpringWidth;
-        } else {
-            const start: number = beat.absoluteDisplayStart;
-            if (!this.springs.has(start)) {
-                return 0;
-            }
-
-            return this.springs.get(start)!.postSpringWidth;
         }
+        const start: number = beat.absoluteDisplayStart;
+        if (!this.springs.has(start)) {
+            return 0;
+        }
+
+        return this.springs.get(start)!.postSpringWidth;
     }
 
     public incompleteGraceRods: Map<string, Spring[]> = new Map();
@@ -99,7 +97,7 @@ export class BarLayoutingInfo {
                     }
                 }
                 //spring.smallestDuration = duration;
-                if(duration < this._minDuration) {
+                if (duration < this._minDuration) {
                     this._minDuration = duration;
                 }
             }

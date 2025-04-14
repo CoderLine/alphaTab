@@ -7,18 +7,16 @@ export class VorbisFile {
     public streams: VorbisStream[] = [];
 
     public constructor(readable: IReadable) {
-        var oggContainer = new OggReader(readable);
-        var packets = oggContainer.read();
+        const oggContainer = new OggReader(readable);
+        const packets = oggContainer.read();
 
-        var decoder = new VorbisStreamReader(packets);
-        while(true){
+        const decoder = new VorbisStreamReader(packets);
+        while (true) {
             let stream = decoder.read();
-            if(stream == null){
+            if (stream == null) {
                 break;
             }
-            else{
-                this.streams.push(stream);
-            }
+            this.streams.push(stream);
         }
     }
 }

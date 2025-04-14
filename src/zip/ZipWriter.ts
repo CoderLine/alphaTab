@@ -12,11 +12,13 @@ class ZipCentralDirectoryHeader {
     public crc32: number;
     public compressionMode: number;
 
-    public constructor(entry: ZipEntry,
+    public constructor(
+        entry: ZipEntry,
         crc32: number,
         localHeaderOffset: number,
         compressionMode: number,
-        compressedSize: number) {
+        compressedSize: number
+    ) {
         this.entry = entry;
         this.crc32 = crc32;
         this.localHeaderOffset = localHeaderOffset;
@@ -41,7 +43,13 @@ export class ZipWriter {
         const compressedData = ByteBuffer.empty();
         const crc32 = this.compress(compressedData, entry.data, compressionMode);
         const compressedDataArray = compressedData.toArray();
-        const directoryHeader = new ZipCentralDirectoryHeader(entry, crc32, this._data.bytesWritten, compressionMode, compressedData.length);
+        const directoryHeader = new ZipCentralDirectoryHeader(
+            entry,
+            crc32,
+            this._data.bytesWritten,
+            compressionMode,
+            compressedData.length
+        );
         this._centralDirectoryHeaders.push(directoryHeader);
 
         // Signature
@@ -82,36 +90,35 @@ export class ZipWriter {
             crc.update(data, 0, data.length);
             output.write(data, 0, data.length);
             return crc.value;
-        } else {
-            let buffer: Uint8Array = new Uint8Array(512);
-
-            // init deflater
-            this._deflater.reset();
-
-            // write data
-            this._deflater.setInput(data, 0, data.length);
-            while (!this._deflater.isNeedingInput) {
-                const len = this._deflater.deflate(buffer, 0, buffer.length);
-                if (len <= 0) {
-                    break;
-                }
-
-                output.write(buffer, 0, len);
-            }
-
-            // let deflater finish up
-            this._deflater.finish();
-            while (!this._deflater.isFinished) {
-                const len = this._deflater.deflate(buffer, 0, buffer.length);
-                if (len <= 0) {
-                    break;
-                }
-
-                output.write(buffer, 0, len);
-            }
-
-            return this._deflater.inputCrc;
         }
+        let buffer: Uint8Array = new Uint8Array(512);
+
+        // init deflater
+        this._deflater.reset();
+
+        // write data
+        this._deflater.setInput(data, 0, data.length);
+        while (!this._deflater.isNeedingInput) {
+            const len = this._deflater.deflate(buffer, 0, buffer.length);
+            if (len <= 0) {
+                break;
+            }
+
+            output.write(buffer, 0, len);
+        }
+
+        // let deflater finish up
+        this._deflater.finish();
+        while (!this._deflater.isFinished) {
+            const len = this._deflater.deflate(buffer, 0, buffer.length);
+            if (len <= 0) {
+                break;
+            }
+
+            output.write(buffer, 0, len);
+        }
+
+        return this._deflater.inputCrc;
     }
 
     public end() {

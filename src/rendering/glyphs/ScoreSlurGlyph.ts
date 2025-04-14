@@ -43,17 +43,15 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
                     default:
                         return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.BottomWithStem);
                 }
-            } else {
-                switch (this.tieDirection) {
-                    case BeamDirection.Up:
-                        return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Top);
-                    default:
-                        return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Bottom);
-                }
             }
-        } else {
-            return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Center);
+            switch (this.tieDirection) {
+                case BeamDirection.Up:
+                    return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Top);
+                default:
+                    return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Bottom);
+            }
         }
+        return this.endNoteRenderer!.getNoteY(this._endNote, NoteYPosition.Center);
     }
 
     private isStartCentered() {
@@ -63,9 +61,10 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         );
     }
     private isEndCentered() {
-        return this._startNote.beat.graceType === GraceType.None && (
-            (this._endNote === this._endNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
-            (this._endNote === this._endNote.beat.minNote && this.tieDirection === BeamDirection.Down)
+        return (
+            this._startNote.beat.graceType === GraceType.None &&
+            ((this._endNote === this._endNote.beat.maxNote && this.tieDirection === BeamDirection.Up) ||
+                (this._endNote === this._endNote.beat.minNote && this.tieDirection === BeamDirection.Down))
         );
     }
 
@@ -88,11 +87,9 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         if (this.isEndCentered()) {
             if (this.isEndOnStem()) {
                 return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.Stem);
-            } else {
-                return this.endNoteRenderer!.getNoteX(this._endNote, NoteXPosition.Center);
             }
-        } else {
-            return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.PreNotes);
+            return this.endNoteRenderer!.getNoteX(this._endNote, NoteXPosition.Center);
         }
+        return this.endNoteRenderer!.getBeatX(this._endNote.beat, BeatXPosition.PreNotes);
     }
 }

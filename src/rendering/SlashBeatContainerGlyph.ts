@@ -7,10 +7,6 @@ import { SlashTieGlyph } from './glyphs/SlashTieGlyph';
 export class SlashBeatContainerGlyph extends BeatContainerGlyph {
     private _tiedNoteTie: SlashTieGlyph | null = null;
 
-    public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
-        super(beat, voiceContainer);
-    }
-
     protected override createTies(n: Note): void {
         // create a tie if any effect requires it
         if (!n.isVisible) {

@@ -109,7 +109,7 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let y = super.getNoteY(note, requestedPosition);
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.getLineY(0);
         }
         return y;

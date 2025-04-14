@@ -19,7 +19,7 @@ export class BarSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => BarSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Bar | null): Map<string, unknown> | null {
         if (!obj) {

@@ -138,22 +138,22 @@ export class HtmlElementContainer implements IContainer {
 
     public transitionToX(duration: number, x: number): void {
         this.element.style.transition = `transform ${duration}ms linear`;
-        this.setBounds(x, NaN, NaN, NaN);
+        this.setBounds(x, Number.NaN, Number.NaN, Number.NaN);
     }
 
     protected lastBounds: Bounds = new Bounds();
 
     public setBounds(x: number, y: number, w: number, h: number) {
-        if (isNaN(x)) {
+        if (Number.isNaN(x)) {
             x = this.lastBounds.x;
         }
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.lastBounds.y;
         }
-        if (isNaN(w)) {
+        if (Number.isNaN(w)) {
             w = this.lastBounds.w;
         }
-        if (isNaN(h)) {
+        if (Number.isNaN(h)) {
             h = this.lastBounds.h;
         }
         this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;

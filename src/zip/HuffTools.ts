@@ -82,9 +82,8 @@ export class HuffTools {
         if (d === 1) {
             if (t instanceof NeedBit) {
                 return new NeedBit(HuffTools.treeCompress(t.left), HuffTools.treeCompress(t.right));
-            } else {
-                throw new FormatError('assert');
             }
+            throw new FormatError('assert');
         }
         let size: number = 1 << d;
         let table: Huffman[] = [];

@@ -6,10 +6,6 @@ import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 export class BarSeperatorGlyph extends Glyph {
     private static readonly DashSize: number = 4;
 
-    public constructor(x: number, y: number) {
-        super(x, y);
-    }
-
     public override doLayout(): void {
         if (this.renderer.isLast) {
             this.width = 15;

@@ -1,6 +1,6 @@
 import { IOHelper } from '@src/io/IOHelper';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * @partial
@@ -62,9 +62,8 @@ export class TestPlatform {
         let lastDot: number = file.lastIndexOf('.');
         if (lastDot === -1) {
             return file + extension;
-        } else {
-            return file.substr(0, lastDot) + extension;
         }
+        return file.substr(0, lastDot) + extension;
     }
 
     /**

@@ -108,11 +108,11 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         }
         preview.document.body.appendChild(a4);
         let dualScreenLeft: number =
-            typeof (window as any)['screenLeft'] !== 'undefined'
-                ? (window as any)['screenLeft']
-                : (window as any)['left'];
+            typeof (window as any).screenLeft !== 'undefined'
+                ? (window as any).screenLeft
+                : (window as any).left;
         let dualScreenTop: number =
-            typeof (window as any)['screenTop'] !== 'undefined' ? (window as any)['screenTop'] : (window as any)['top'];
+            typeof (window as any).screenTop !== 'undefined' ? (window as any).screenTop : (window as any).top;
         let screenWidth: number =
             "innerWidth" in window
                 ? window.innerWidth

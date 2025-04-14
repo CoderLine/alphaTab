@@ -71,16 +71,16 @@ class TestUiContainer implements IContainer {
     protected lastBounds: Bounds = new Bounds();
 
     public setBounds(x: number, y: number, w: number, h: number): void {
-        if (isNaN(x)) {
+        if (Number.isNaN(x)) {
             x = this.lastBounds.x;
         }
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.lastBounds.y;
         }
-        if (isNaN(w)) {
+        if (Number.isNaN(w)) {
             w = this.lastBounds.w;
         }
-        if (isNaN(h)) {
+        if (Number.isNaN(h)) {
             h = this.lastBounds.h;
         }
         this.left = x;
@@ -90,7 +90,7 @@ class TestUiContainer implements IContainer {
     }
 
     public transitionToX(_duration: number, x: number): void {
-        this.setBounds(x, NaN, NaN, NaN);
+        this.setBounds(x, Number.NaN, Number.NaN, Number.NaN);
     }
 
     public clear(): void {

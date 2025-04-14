@@ -106,16 +106,15 @@ export enum NoteSubElement {
  * @json_strict
  */
 export class NoteStyle extends ElementStyle<NoteSubElement> {
-
     /**
-     * The symbol that should be used as note head. 
+     * The symbol that should be used as note head.
      */
-    public noteHead?:MusicFontSymbol;
+    public noteHead?: MusicFontSymbol;
 
     /**
      * Whether the note head symbol should be centered on the stem (e.g. for arrow notes)
      */
-    public noteHeadCenterOnStem?:boolean;
+    public noteHeadCenterOnStem?: boolean;
 }
 
 /**
@@ -648,18 +647,18 @@ export class Note {
                 }
             }
             return realValue;
-        } else {
-            if (this.isPercussion) {
-                return this.percussionArticulation;
-            }
-            if (this.isStringed) {
-                return this.fret + this.stringTuning - transpositionPitch;
-            }
-            if (this.isPiano) {
-                return this.octave * 12 + this.tone - transpositionPitch;
-            }
-            return 0;
         }
+
+        if (this.isPercussion) {
+            return this.percussionArticulation;
+        }
+        if (this.isStringed) {
+            return this.fret + this.stringTuning - transpositionPitch;
+        }
+        if (this.isPiano) {
+            return this.octave * 12 + this.tone - transpositionPitch;
+        }
+        return 0;
     }
 
     public get harmonicPitch(): number {
@@ -745,15 +744,19 @@ export class Note {
     public get initialBendValue(): number {
         if (this.hasBend) {
             return Math.floor(this.bendPoints![0].value / 2);
-        } else if (this.bendOrigin) {
+        }
+        if (this.bendOrigin) {
             return Math.floor(this.bendOrigin.bendPoints![this.bendOrigin.bendPoints!.length - 1].value / 2);
-        } else if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
+        }
+        if (this.isTieDestination && this.tieOrigin!.bendOrigin) {
             return Math.floor(
                 this.tieOrigin!.bendOrigin.bendPoints![this.tieOrigin!.bendOrigin.bendPoints!.length - 1].value / 2
             );
-        } else if (this.beat.hasWhammyBar) {
+        }
+        if (this.beat.hasWhammyBar) {
             return Math.floor(this.beat.whammyBarPoints![0].value / 2);
-        } else if (this.beat.isContinuedWhammy) {
+        }
+        if (this.beat.isContinuedWhammy) {
             return Math.floor(
                 this.beat.previousBeat!.whammyBarPoints![this.beat.previousBeat!.whammyBarPoints!.length - 1].value / 2
             );
@@ -885,7 +888,7 @@ export class Note {
         switch (this.slideOutType) {
             case SlideOutType.Shift:
             case SlideOutType.Legato:
-                if(!this.slideTarget) {
+                if (!this.slideTarget) {
                     this.slideTarget = nextNoteOnLine.value;
                 }
 
@@ -1048,9 +1051,8 @@ export class Note {
                 if (noteOnString) {
                     if (noteOnString.isLeftHandTapped) {
                         return noteOnString;
-                    } else {
-                        break;
                     }
+                    break;
                 }
             }
 
@@ -1060,9 +1062,8 @@ export class Note {
                 if (noteOnString) {
                     if (noteOnString.isLeftHandTapped) {
                         return noteOnString;
-                    } else {
-                        break;
                     }
+                    break;
                 }
             }
 

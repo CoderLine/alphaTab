@@ -190,7 +190,7 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                 return;
             }
             const workerMap = workerCache.get(resolvedConfig)!;
-            workerMap.assets.forEach(asset => {
+            for(const asset of workerMap.assets.values()) {
                 const duplicateAsset = bundle[asset.fileName];
                 if (duplicateAsset) {
                     const content = duplicateAsset.type === 'asset' ? duplicateAsset.source : duplicateAsset.code;
@@ -205,7 +205,7 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                     fileName: asset.fileName,
                     source: asset.source
                 });
-            });
+            }
             workerMap.assets.clear();
         }
     };

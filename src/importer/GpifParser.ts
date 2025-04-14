@@ -255,10 +255,10 @@ export class GpifParser {
                     this.score.notices = c.firstChild!.innerText;
                     break;
                 case 'ScoreSystemsDefaultLayout':
-                    this.score.defaultSystemsLayout = parseInt(c.innerText);
+                    this.score.defaultSystemsLayout = Number.parseInt(c.innerText);
                     break;
                 case 'ScoreSystemsLayout':
-                    this.score.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
+                    this.score.systemsLayout = c.innerText.split(' ').map(i => Number.parseInt(i));
                     break;
             }
         }
@@ -321,10 +321,10 @@ export class GpifParser {
                     isLinear = c.innerText.toLowerCase() === 'true';
                     break;
                 case 'Bar':
-                    barIndex = parseInt(c.innerText);
+                    barIndex = Number.parseInt(c.innerText);
                     break;
                 case 'Position':
-                    ratioPosition = parseFloat(c.innerText);
+                    ratioPosition = Number.parseFloat(c.innerText);
                     break;
                 case 'Value':
                     if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
@@ -334,11 +334,11 @@ export class GpifParser {
                         // Issue 391: Some GPX files might have
                         // single floating point value.
                         if (parts.length === 1) {
-                            numberValue = parseFloat(parts[0]);
+                            numberValue = Number.parseFloat(parts[0]);
                             reference = 1;
                         } else {
-                            numberValue = parseFloat(parts[0]);
-                            reference = parseInt(parts[1]);
+                            numberValue = Number.parseFloat(parts[0]);
+                            reference = Number.parseInt(parts[1]);
                         }
                     }
                     break;
@@ -435,9 +435,9 @@ export class GpifParser {
                 case 'Color':
                     let parts: string[] = c.innerText.split(' ');
                     if (parts.length >= 3) {
-                        let r: number = parseInt(parts[0]);
-                        let g: number = parseInt(parts[1]);
-                        let b: number = parseInt(parts[2]);
+                        let r: number = Number.parseInt(parts[0]);
+                        let g: number = Number.parseInt(parts[1]);
+                        let b: number = Number.parseInt(parts[2]);
                         track.color = new Color(r, g, b, 0xff);
                     }
                     break;
@@ -458,10 +458,10 @@ export class GpifParser {
                     track.shortName = c.innerText;
                     break;
                 case 'SystemsDefautLayout': // not a typo by alphaTab, this is a typo in the GPIF files.
-                    track.defaultSystemsLayout = parseInt(c.innerText);
+                    track.defaultSystemsLayout = Number.parseInt(c.innerText);
                     break;
                 case 'SystemsLayout':
-                    track.systemsLayout = c.innerText.split(' ').map(i => parseInt(i));
+                    track.systemsLayout = c.innerText.split(' ').map(i => Number.parseInt(i));
                     break;
                 case 'Lyrics':
                     this.parseLyrics(trackId, c);
@@ -516,7 +516,7 @@ export class GpifParser {
         for (let c of node.childElements()) {
             switch (c.localName) {
                 case 'LineCount':
-                    const lineCount = parseInt(c.innerText);
+                    const lineCount = Number.parseInt(c.innerText);
                     for (let staff of track.staves) {
                         staff.standardNotationLineCount = lineCount;
                     }
@@ -549,7 +549,7 @@ export class GpifParser {
                     this.parseElements(track, c);
                     break;
                 case 'LineCount':
-                    const lineCount = parseInt(c.innerText);
+                    const lineCount = Number.parseInt(c.innerText);
                     for (let staff of track.staves) {
                         staff.standardNotationLineCount = lineCount;
                     }
@@ -602,7 +602,7 @@ export class GpifParser {
                     break;
                 case 'OutputMidiNumber':
                     if (txt.length > 0) {
-                        articulation.outputMidiNumber = parseInt(txt);
+                        articulation.outputMidiNumber = Number.parseInt(txt);
                     }
                     break;
                 case 'TechniqueSymbol':
@@ -647,7 +647,7 @@ export class GpifParser {
                     break;
                 case 'StaffLine':
                     if (txt.length > 0) {
-                        articulation.staffLine = parseInt(txt);
+                        articulation.staffLine = Number.parseInt(txt);
                     }
                     break;
             }
@@ -778,7 +778,7 @@ export class GpifParser {
                             let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
                             let tuning = new Array<number>(tuningParts.length);
                             for (let i: number = 0; i < tuning.length; i++) {
-                                tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                                tuning[tuning.length - 1 - i] = Number.parseInt(tuningParts[i]);
                             }
                             staff.stringTuning.tunings = tuning;
                             break;
@@ -798,7 +798,7 @@ export class GpifParser {
                 this.parseDiagramCollectionForStaff(staff, node);
                 break;
             case 'CapoFret':
-                let capo: number = parseInt(node.findChildElement('Fret')!.innerText);
+                let capo: number = Number.parseInt(node.findChildElement('Fret')!.innerText);
                 staff.capo = capo;
                 break;
         }
@@ -821,7 +821,7 @@ export class GpifParser {
         for (let c of node.childElements()) {
             switch (c.localName) {
                 case 'Offset':
-                    lyrics.startBar = parseInt(c.innerText);
+                    lyrics.startBar = Number.parseInt(c.innerText);
                     break;
                 case 'Text':
                     lyrics.text = c.innerText;
@@ -878,8 +878,8 @@ export class GpifParser {
             chord.showFingering = false;
             return;
         }
-        let stringCount: number = parseInt(diagram.getAttribute('stringCount'));
-        let baseFret: number = diagram.attributes.has('baseFret') ? parseInt(diagram.getAttribute('baseFret')) : 0;
+        let stringCount: number = Number.parseInt(diagram.getAttribute('stringCount'));
+        let baseFret: number = diagram.attributes.has('baseFret') ? Number.parseInt(diagram.getAttribute('baseFret')) : 0;
         chord.firstFret = baseFret + 1;
         for (let i: number = 0; i < stringCount; i++) {
             chord.strings.push(-1);
@@ -887,8 +887,8 @@ export class GpifParser {
         for (let c of diagram.childElements()) {
             switch (c.localName) {
                 case 'Fret':
-                    let guitarString: number = parseInt(c.getAttribute('string'));
-                    chord.strings[stringCount - guitarString - 1] = baseFret + parseInt(c.getAttribute('fret'));
+                    let guitarString: number = Number.parseInt(c.getAttribute('string'));
+                    chord.strings[stringCount - guitarString - 1] = baseFret + Number.parseInt(c.getAttribute('fret'));
                     break;
                 case 'Fingering':
                     let existingFingers: Map<Fingers, boolean> = new Map<Fingers, boolean>();
@@ -896,7 +896,7 @@ export class GpifParser {
                         switch (p.localName) {
                             case 'Position':
                                 let finger: Fingers = Fingers.Unknown;
-                                let fret: number = baseFret + parseInt(p.getAttribute('fret'));
+                                let fret: number = baseFret + Number.parseInt(p.getAttribute('fret'));
                                 switch (p.getAttribute('finger')) {
                                     case 'Index':
                                         finger = Fingers.IndexFinger;
@@ -961,7 +961,7 @@ export class GpifParser {
                 let tuningParts: string[] = node.findChildElement('Pitches')!.innerText.split(' ');
                 let tuning = new Array<number>(tuningParts.length);
                 for (let i: number = 0; i < tuning.length; i++) {
-                    tuning[tuning.length - 1 - i] = parseInt(tuningParts[i]);
+                    tuning[tuning.length - 1 - i] = Number.parseInt(tuningParts[i]);
                 }
                 for (let staff of track.staves) {
                     staff.stringTuning.tunings = tuning;
@@ -974,7 +974,7 @@ export class GpifParser {
                 this.parseDiagramCollectionForTrack(track, node);
                 break;
             case 'CapoFret':
-                let capo: number = parseInt(node.findChildElement('Fret')!.innerText);
+                let capo: number = Number.parseInt(node.findChildElement('Fret')!.innerText);
                 for (let staff of track.staves) {
                     staff.capo = capo;
                 }
@@ -986,16 +986,16 @@ export class GpifParser {
         for (let c of node.childElements()) {
             switch (c.localName) {
                 case 'Program':
-                    track.playbackInfo.program = parseInt(c.innerText);
+                    track.playbackInfo.program = Number.parseInt(c.innerText);
                     break;
                 case 'Port':
-                    track.playbackInfo.port = parseInt(c.innerText);
+                    track.playbackInfo.port = Number.parseInt(c.innerText);
                     break;
                 case 'PrimaryChannel':
-                    track.playbackInfo.primaryChannel = parseInt(c.innerText);
+                    track.playbackInfo.primaryChannel = Number.parseInt(c.innerText);
                     break;
                 case 'SecondaryChannel':
-                    track.playbackInfo.secondaryChannel = parseInt(c.innerText);
+                    track.playbackInfo.secondaryChannel = Number.parseInt(c.innerText);
                     break;
             }
         }
@@ -1051,7 +1051,7 @@ export class GpifParser {
         for (let c of node.childElements()) {
             switch (c.localName) {
                 case 'Program':
-                    sound.program = parseInt(c.innerText);
+                    sound.program = Number.parseInt(c.innerText);
                     break;
             }
         }
@@ -1062,7 +1062,7 @@ export class GpifParser {
             switch (c.localName) {
                 case 'TranspositionPitch':
                     for (let staff of track.staves) {
-                        staff.displayTranspositionPitch = parseInt(c.innerText);
+                        staff.displayTranspositionPitch = Number.parseInt(c.innerText);
                     }
                     break;
             }
@@ -1075,10 +1075,10 @@ export class GpifParser {
         for (let c of node.childElements()) {
             switch (c.localName) {
                 case 'Chromatic':
-                    chromatic = parseInt(c.innerText);
+                    chromatic = Number.parseInt(c.innerText);
                     break;
                 case 'Octave':
-                    octave = parseInt(c.innerText);
+                    octave = Number.parseInt(c.innerText);
                     break;
             }
         }
@@ -1111,8 +1111,8 @@ export class GpifParser {
         if (node.firstChild && node.firstChild.value) {
             let parameters = node.firstChild.value.split(' ');
             if (parameters.length >= 12) {
-                track.playbackInfo.balance = Math.floor(parseFloat(parameters[11]) * 16);
-                track.playbackInfo.volume = Math.floor(parseFloat(parameters[12]) * 16);
+                track.playbackInfo.balance = Math.floor(Number.parseFloat(parameters[11]) * 16);
+                track.playbackInfo.volume = Math.floor(Number.parseFloat(parameters[12]) * 16);
             }
         }
     }
@@ -1139,8 +1139,8 @@ export class GpifParser {
             switch (c.localName) {
                 case 'Time':
                     let timeParts: string[] = c.innerText.split('/');
-                    masterBar.timeSignatureNumerator = parseInt(timeParts[0]);
-                    masterBar.timeSignatureDenominator = parseInt(timeParts[1]);
+                    masterBar.timeSignatureNumerator = Number.parseInt(timeParts[0]);
+                    masterBar.timeSignatureDenominator = Number.parseInt(timeParts[1]);
                     break;
                 case 'FreeTime':
                     masterBar.isFreeTime = true;
@@ -1158,14 +1158,14 @@ export class GpifParser {
                         masterBar.isRepeatStart = true;
                     }
                     if (c.getAttribute('end').toLowerCase() === 'true' && c.getAttribute('count')) {
-                        masterBar.repeatCount = parseInt(c.getAttribute('count'));
+                        masterBar.repeatCount = Number.parseInt(c.getAttribute('count'));
                     }
                     break;
                 case 'AlternateEndings':
                     let alternateEndings: string[] = c.innerText.split(' ');
                     let i: number = 0;
                     for (let k: number = 0; k < alternateEndings.length; k++) {
-                        i = i | (1 << (-1 + parseInt(alternateEndings[k])));
+                        i = i | (1 << (-1 + Number.parseInt(alternateEndings[k])));
                     }
                     masterBar.alternateEndings = i;
                     break;
@@ -1198,7 +1198,7 @@ export class GpifParser {
                     }
                     break;
                 case 'Key':
-                    masterBar.keySignature = parseInt(c.findChildElement('AccidentalCount')!.innerText) as KeySignature;
+                    masterBar.keySignature = Number.parseInt(c.findChildElement('AccidentalCount')!.innerText) as KeySignature;
                     let mode: XmlNode = c.findChildElement('Mode')!;
                     if (mode) {
                         switch (mode.innerText.toLowerCase()) {
@@ -1330,13 +1330,13 @@ export class GpifParser {
                     }
                     break;
                 case 'Length':
-                    fermata.length = parseFloat(c.innerText);
+                    fermata.length = Number.parseFloat(c.innerText);
                     break;
                 case 'Offset':
                     let parts: string[] = c.innerText.split('/');
                     if (parts.length === 2) {
-                        let numerator: number = parseInt(parts[0]);
-                        let denominator: number = parseInt(parts[1]);
+                        let numerator: number = Number.parseInt(parts[0]);
+                        let denominator: number = Number.parseInt(parts[1]);
                         offset = ((numerator / denominator) * MidiUtils.QuarterTime) | 0;
                     }
                     break;
@@ -1582,20 +1582,20 @@ export class GpifParser {
                     break;
                 case 'Whammy':
                     let whammyOrigin: BendPoint = new BendPoint(0, 0);
-                    whammyOrigin.value = this.toBendValue(parseFloat(c.getAttribute('originValue')));
-                    whammyOrigin.offset = this.toBendOffset(parseFloat(c.getAttribute('originOffset')));
+                    whammyOrigin.value = this.toBendValue(Number.parseFloat(c.getAttribute('originValue')));
+                    whammyOrigin.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('originOffset')));
                     beat.addWhammyBarPoint(whammyOrigin);
                     let whammyMiddle1: BendPoint = new BendPoint(0, 0);
-                    whammyMiddle1.value = this.toBendValue(parseFloat(c.getAttribute('middleValue')));
-                    whammyMiddle1.offset = this.toBendOffset(parseFloat(c.getAttribute('middleOffset1')));
+                    whammyMiddle1.value = this.toBendValue(Number.parseFloat(c.getAttribute('middleValue')));
+                    whammyMiddle1.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('middleOffset1')));
                     beat.addWhammyBarPoint(whammyMiddle1);
                     let whammyMiddle2: BendPoint = new BendPoint(0, 0);
-                    whammyMiddle2.value = this.toBendValue(parseFloat(c.getAttribute('middleValue')));
-                    whammyMiddle2.offset = this.toBendOffset(parseFloat(c.getAttribute('middleOffset2')));
+                    whammyMiddle2.value = this.toBendValue(Number.parseFloat(c.getAttribute('middleValue')));
+                    whammyMiddle2.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('middleOffset2')));
                     beat.addWhammyBarPoint(whammyMiddle2);
                     let whammyDestination: BendPoint = new BendPoint(0, 0);
-                    whammyDestination.value = this.toBendValue(parseFloat(c.getAttribute('destinationValue')));
-                    whammyDestination.offset = this.toBendOffset(parseFloat(c.getAttribute('destinationOffset')));
+                    whammyDestination.value = this.toBendValue(Number.parseFloat(c.getAttribute('destinationValue')));
+                    whammyDestination.offset = this.toBendOffset(Number.parseFloat(c.getAttribute('destinationOffset')));
                     beat.addWhammyBarPoint(whammyDestination);
                     break;
                 case 'Ottavia':
@@ -1657,7 +1657,7 @@ export class GpifParser {
                 case 'Timer':
                     beat.showTimer = true;
                     if (c.innerText.length > 0) {
-                        beat.timer = parseInt(c.innerText);
+                        beat.timer = Number.parseInt(c.innerText);
                     }
                     break;
             }
@@ -1687,7 +1687,7 @@ export class GpifParser {
                     let value: number = 0;
                     switch (id) {
                         case '1124204546':
-                            value = parseInt(c.findChildElement('Int')!.innerText);
+                            value = Number.parseInt(c.findChildElement('Int')!.innerText);
                             switch (value) {
                                 case 1:
                                     beat.beamingMode = BeatBeamingMode.ForceMergeWithNext;
@@ -1698,7 +1698,7 @@ export class GpifParser {
                             }
                             break;
                         case '1124204552':
-                            value = parseInt(c.findChildElement('Int')!.innerText);
+                            value = Number.parseInt(c.findChildElement('Int')!.innerText);
                             switch (value) {
                                 case 1:
                                     if (beat.beamingMode !== BeatBeamingMode.ForceSplitToNext) {
@@ -1708,11 +1708,11 @@ export class GpifParser {
                             }
                             break;
                         case '1124204545':
-                            value = parseInt(c.findChildElement('Int')!.innerText);
+                            value = Number.parseInt(c.findChildElement('Int')!.innerText);
                             beat.invertBeamDirection = value === 1;
                             break;
                         case '687935489':
-                            value = parseInt(c.findChildElement('Int')!.innerText);
+                            value = Number.parseInt(c.findChildElement('Int')!.innerText);
                             beat.brushDuration = value;
                             break;
                     }
@@ -1729,7 +1729,7 @@ export class GpifParser {
                     switch (id) {
                         case '1124139520':
                             const childNode = c.findChildElement('Double') ?? c.findChildElement('Float');
-                            bar.displayScale = parseFloat(childNode!.innerText);
+                            bar.displayScale = Number.parseFloat(childNode!.innerText);
                             break;
                     }
                     break;
@@ -1744,7 +1744,7 @@ export class GpifParser {
                     const id: string = c.getAttribute('id');
                     switch (id) {
                         case '1124073984':
-                            masterBar.displayScale = parseFloat(c.findChildElement('Double')!.innerText);
+                            masterBar.displayScale = Number.parseFloat(c.findChildElement('Double')!.innerText);
                             break;
                     }
                     break;
@@ -1808,29 +1808,29 @@ export class GpifParser {
                             if (!whammyOrigin) {
                                 whammyOrigin = new BendPoint(0, 0);
                             }
-                            whammyOrigin.value = this.toBendValue(parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyOrigin.value = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'WhammyBarOriginOffset':
                             if (!whammyOrigin) {
                                 whammyOrigin = new BendPoint(0, 0);
                             }
-                            whammyOrigin.offset = this.toBendOffset(parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyOrigin.offset = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'WhammyBarMiddleValue':
-                            whammyMiddleValue = this.toBendValue(parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyMiddleValue = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'WhammyBarMiddleOffset1':
-                            whammyMiddleOffset1 = this.toBendOffset(parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyMiddleOffset1 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'WhammyBarMiddleOffset2':
-                            whammyMiddleOffset2 = this.toBendOffset(parseFloat(c.findChildElement('Float')!.innerText));
+                            whammyMiddleOffset2 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'WhammyBarDestinationValue':
                             if (!whammyDestination) {
                                 whammyDestination = new BendPoint(BendPoint.MaxPosition, 0);
                             }
                             whammyDestination.value = this.toBendValue(
-                                parseFloat(c.findChildElement('Float')!.innerText)
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
                             );
                             break;
                         case 'WhammyBarDestinationOffset':
@@ -1838,11 +1838,11 @@ export class GpifParser {
                                 whammyDestination = new BendPoint(0, 0);
                             }
                             whammyDestination.offset = this.toBendOffset(
-                                parseFloat(c.findChildElement('Float')!.innerText)
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
                             );
                             break;
                         case 'BarreFret':
-                            beat.barreFret = parseInt(c.findChildElement('Fret')!.innerText);
+                            beat.barreFret = Number.parseInt(c.findChildElement('Fret')!.innerText);
                             break;
                         case 'BarreString':
                             switch (c.findChildElement('String')!.innerText) {
@@ -1967,11 +1967,11 @@ export class GpifParser {
                     note.isLetRing = true;
                     break;
                 case 'Trill':
-                    note.trillValue = parseInt(c.innerText);
+                    note.trillValue = Number.parseInt(c.innerText);
                     note.trillSpeed = Duration.Sixteenth;
                     break;
                 case 'Accent':
-                    let accentFlags: number = parseInt(c.innerText);
+                    let accentFlags: number = Number.parseInt(c.innerText);
                     if ((accentFlags & 0x01) !== 0) {
                         note.isStaccato = true;
                     }
@@ -2039,7 +2039,7 @@ export class GpifParser {
                     }
                     break;
                 case 'InstrumentArticulation':
-                    note.percussionArticulation = parseInt(c.innerText);
+                    note.percussionArticulation = Number.parseInt(c.innerText);
                     break;
                 case 'Ornament':
                     switch (c.innerText) {
@@ -2084,16 +2084,16 @@ export class GpifParser {
                             }
                             break;
                         case 'String':
-                            note.string = parseInt(c.findChildElement('String')!.innerText) + 1;
+                            note.string = Number.parseInt(c.findChildElement('String')!.innerText) + 1;
                             break;
                         case 'Fret':
-                            note.fret = parseInt(c.findChildElement('Fret')!.innerText);
+                            note.fret = Number.parseInt(c.findChildElement('Fret')!.innerText);
                             break;
                         case 'Element':
-                            element = parseInt(c.findChildElement('Element')!.innerText);
+                            element = Number.parseInt(c.findChildElement('Element')!.innerText);
                             break;
                         case 'Variation':
-                            variation = parseInt(c.findChildElement('Variation')!.innerText);
+                            variation = Number.parseInt(c.findChildElement('Variation')!.innerText);
                             break;
                         case 'Tapped':
                             this._tappedNotes.set(noteId, true);
@@ -2129,7 +2129,7 @@ export class GpifParser {
                         case 'HarmonicFret':
                             let hfret: XmlNode = c.findChildElement('HFret')!;
                             if (hfret) {
-                                note.harmonicValue = parseFloat(hfret.innerText);
+                                note.harmonicValue = Number.parseFloat(hfret.innerText);
                             }
                             break;
                         case 'Muted':
@@ -2143,14 +2143,14 @@ export class GpifParser {
                             }
                             break;
                         case 'Octave':
-                            note.octave = parseInt(c.findChildElement('Number')!.innerText);
+                            note.octave = Number.parseInt(c.findChildElement('Number')!.innerText);
                             // when exporting GP6 from GP7 the tone might be missing
                             if (note.tone === -1) {
                                 note.tone = 0;
                             }
                             break;
                         case 'Tone':
-                            note.tone = parseInt(c.findChildElement('Step')!.innerText);
+                            note.tone = Number.parseInt(c.findChildElement('Step')!.innerText);
                             break;
                         case 'ConcertPitch':
                             this.parseConcertPitch(c, note);
@@ -2162,29 +2162,29 @@ export class GpifParser {
                             if (!bendOrigin) {
                                 bendOrigin = new BendPoint(0, 0);
                             }
-                            bendOrigin.value = this.toBendValue(parseFloat(c.findChildElement('Float')!.innerText));
+                            bendOrigin.value = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'BendOriginOffset':
                             if (!bendOrigin) {
                                 bendOrigin = new BendPoint(0, 0);
                             }
-                            bendOrigin.offset = this.toBendOffset(parseFloat(c.findChildElement('Float')!.innerText));
+                            bendOrigin.offset = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'BendMiddleValue':
-                            bendMiddleValue = this.toBendValue(parseFloat(c.findChildElement('Float')!.innerText));
+                            bendMiddleValue = this.toBendValue(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'BendMiddleOffset1':
-                            bendMiddleOffset1 = this.toBendOffset(parseFloat(c.findChildElement('Float')!.innerText));
+                            bendMiddleOffset1 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'BendMiddleOffset2':
-                            bendMiddleOffset2 = this.toBendOffset(parseFloat(c.findChildElement('Float')!.innerText));
+                            bendMiddleOffset2 = this.toBendOffset(Number.parseFloat(c.findChildElement('Float')!.innerText));
                             break;
                         case 'BendDestinationValue':
                             if (!bendDestination) {
                                 bendDestination = new BendPoint(BendPoint.MaxPosition, 0);
                             }
                             bendDestination.value = this.toBendValue(
-                                parseFloat(c.findChildElement('Float')!.innerText)
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
                             );
                             break;
                         case 'BendDestinationOffset':
@@ -2192,7 +2192,7 @@ export class GpifParser {
                                 bendDestination = new BendPoint(0, 0);
                             }
                             bendDestination.offset = this.toBendOffset(
-                                parseFloat(c.findChildElement('Float')!.innerText)
+                                Number.parseFloat(c.findChildElement('Float')!.innerText)
                             );
                             break;
                         case 'HopoOrigin':
@@ -2209,7 +2209,7 @@ export class GpifParser {
                             note.isLeftHandTapped = true;
                             break;
                         case 'Slide':
-                            let slideFlags: number = parseInt(c.findChildElement('Flags')!.innerText);
+                            let slideFlags: number = Number.parseInt(c.findChildElement('Flags')!.innerText);
                             if ((slideFlags & 1) !== 0) {
                                 note.slideOutType = SlideOutType.Shift;
                             } else if ((slideFlags & 2) !== 0) {
@@ -2349,11 +2349,11 @@ export class GpifParser {
                     }
                     break;
                 case 'PrimaryTuplet':
-                    rhythm.tupletNumerator = parseInt(c.getAttribute('num'));
-                    rhythm.tupletDenominator = parseInt(c.getAttribute('den'));
+                    rhythm.tupletNumerator = Number.parseInt(c.getAttribute('num'));
+                    rhythm.tupletDenominator = Number.parseInt(c.getAttribute('den'));
                     break;
                 case 'AugmentationDot':
-                    rhythm.dots = parseInt(c.getAttribute('count'));
+                    rhythm.dots = Number.parseInt(c.getAttribute('count'));
                     break;
             }
         }

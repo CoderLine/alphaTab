@@ -6,10 +6,6 @@ import { BarSubElement } from '@src/model';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
 
 export class TabClefGlyph extends Glyph {
-    public constructor(x: number, y: number) {
-        super(x, y);
-    }
-
     public override doLayout(): void {
         this.width = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.SixStringTabClef)!;
     } 

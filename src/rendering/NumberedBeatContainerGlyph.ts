@@ -8,10 +8,6 @@ import { NumberedSlurGlyph } from './glyphs/NumberedSlurGlyph';
 export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
     private _effectSlurs: NumberedSlurGlyph[] = [];
 
-    public constructor(beat: Beat, voiceContainer: VoiceContainerGlyph) {
-        super(beat, voiceContainer);
-    }
-
     protected override createTies(n: Note): void {
         // create a tie if any effect requires it
         if (!n.isVisible) {

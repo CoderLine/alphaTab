@@ -213,28 +213,90 @@ export class MidiPlaybackController {
             case MidiPlaybackControllerState.PlayingNormally:
                 // Da capo Jumps (to start)
                 // prettier-ignore
-                if (this.handleDaCapo(masterBar.directions!, Direction.JumpDaCapo, MidiPlaybackControllerState.DirectionJumped) || 
-                    this.handleDaCapo(masterBar.directions!, Direction.JumpDaCapoAlCoda, MidiPlaybackControllerState.DirectionJumpedAlCoda) ||
-                    this.handleDaCapo(masterBar.directions!, Direction.JumpDaCapoAlDoubleCoda, MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda) || 
-                    this.handleDaCapo(masterBar.directions!, Direction.JumpDaCapoAlFine, MidiPlaybackControllerState.DirectionJumpedAlFine)) {
+                if (
+                    this.handleDaCapo(
+                        masterBar.directions!,
+                        Direction.JumpDaCapo,
+                        MidiPlaybackControllerState.DirectionJumped
+                    ) ||
+                    this.handleDaCapo(
+                        masterBar.directions!,
+                        Direction.JumpDaCapoAlCoda,
+                        MidiPlaybackControllerState.DirectionJumpedAlCoda
+                    ) ||
+                    this.handleDaCapo(
+                        masterBar.directions!,
+                        Direction.JumpDaCapoAlDoubleCoda,
+                        MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda
+                    ) ||
+                    this.handleDaCapo(
+                        masterBar.directions!,
+                        Direction.JumpDaCapoAlFine,
+                        MidiPlaybackControllerState.DirectionJumpedAlFine
+                    )
+                ) {
                     return true;
                 }
 
                 // Dal Segno Jumps
                 // prettier-ignore
-                if (this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegno, MidiPlaybackControllerState.DirectionJumped, Direction.TargetSegno) || 
-                    this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoAlCoda, MidiPlaybackControllerState.DirectionJumpedAlCoda, Direction.TargetSegno) ||
-                    this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoAlDoubleCoda, MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda, Direction.TargetSegno) || 
-                    this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoAlFine, MidiPlaybackControllerState.DirectionJumpedAlFine, Direction.TargetSegno)) {
+                if (
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegno,
+                        MidiPlaybackControllerState.DirectionJumped,
+                        Direction.TargetSegno
+                    ) ||
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoAlCoda,
+                        MidiPlaybackControllerState.DirectionJumpedAlCoda,
+                        Direction.TargetSegno
+                    ) ||
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoAlDoubleCoda,
+                        MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda,
+                        Direction.TargetSegno
+                    ) ||
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoAlFine,
+                        MidiPlaybackControllerState.DirectionJumpedAlFine,
+                        Direction.TargetSegno
+                    )
+                ) {
                     return true;
                 }
 
                 // Dal SegnoSegno Jumps
                 // prettier-ignore
-                if (this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoSegno, MidiPlaybackControllerState.DirectionJumped, Direction.TargetSegnoSegno) || 
-                    this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoSegnoAlCoda, MidiPlaybackControllerState.DirectionJumpedAlCoda, Direction.TargetSegnoSegno) ||
-                    this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoSegnoAlDoubleCoda, MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda, Direction.TargetSegnoSegno) || 
-                    this.handleDalSegno(masterBar.directions!, Direction.JumpDalSegnoSegnoAlFine, MidiPlaybackControllerState.DirectionJumpedAlFine, Direction.TargetSegnoSegno)) {
+                if (
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoSegno,
+                        MidiPlaybackControllerState.DirectionJumped,
+                        Direction.TargetSegnoSegno
+                    ) ||
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoSegnoAlCoda,
+                        MidiPlaybackControllerState.DirectionJumpedAlCoda,
+                        Direction.TargetSegnoSegno
+                    ) ||
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoSegnoAlDoubleCoda,
+                        MidiPlaybackControllerState.DirectionJumpedAlDoubleCoda,
+                        Direction.TargetSegnoSegno
+                    ) ||
+                    this.handleDalSegno(
+                        masterBar.directions!,
+                        Direction.JumpDalSegnoSegnoAlFine,
+                        MidiPlaybackControllerState.DirectionJumpedAlFine,
+                        Direction.TargetSegnoSegno
+                    )
+                ) {
                     return true;
                 }
 
@@ -295,13 +357,12 @@ export class MidiPlaybackController {
                 index = this.findJumpTargetForwards(toFind, searchIndex);
             }
             return index;
-        } else {
-            let index = this.findJumpTargetForwards(toFind, searchIndex);
-            if (index === -1) {
-                index = this.findJumpTargetBackwards(toFind, searchIndex);
-            }
-            return index;
         }
+        let index = this.findJumpTargetForwards(toFind, searchIndex);
+        if (index === -1) {
+            index = this.findJumpTargetBackwards(toFind, searchIndex);
+        }
+        return index;
     }
 
     private findJumpTargetForwards(toFind: Direction, searchIndex: number): number {

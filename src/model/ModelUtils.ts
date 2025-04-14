@@ -165,7 +165,7 @@ export class ModelUtils {
         }
         let result: TuningParseResult = new TuningParseResult();
 
-        result.octave = parseInt(octave) + 1;
+        result.octave = Number.parseInt(octave) + 1;
         result.note = note.toLowerCase();
         result.tone = ModelUtils.getToneForText(result.note);
 

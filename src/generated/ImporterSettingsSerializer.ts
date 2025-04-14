@@ -10,7 +10,7 @@ export class ImporterSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => ImporterSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: ImporterSettings | null): Map<string, unknown> | null {
         if (!obj) {

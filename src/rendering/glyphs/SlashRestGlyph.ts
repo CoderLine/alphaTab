@@ -4,10 +4,6 @@ import { ICanvas } from '@src/platform';
 import { BeatSubElement } from '@src/model';
 
 export class SlashRestGlyph extends ScoreRestGlyph {
-    public constructor(x: number, y: number, duration: Duration) {
-        super(x, y, duration);
-    }
-
     public override updateBeamingHelper(cx: number): void {
         if (this.beamingHelper) {
             this.beamingHelper.registerBeatLineX(

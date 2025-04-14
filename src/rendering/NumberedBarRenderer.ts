@@ -168,7 +168,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
             let beatLineX: number = this.getBeatX(beat, BeatXPosition.PreNotes) - this.beatGlyphsStart;
 
-            var beamY = this.calculateBeamY(h, beatLineX);
+            const beamY = this.calculateBeamY(h, beatLineX);
 
             for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
                 let barStartX: number = 0;
@@ -244,7 +244,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let y = super.getNoteY(note, requestedPosition);
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.getLineY(0);
         }
         return y;

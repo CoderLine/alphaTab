@@ -250,7 +250,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
         element.dispatchEvent(e);
         if (window && 'jQuery' in window) {
-            let jquery: any = (window as any)['jQuery'];
+            let jquery: any = (window as any).jQuery;
             let args: unknown[] = [];
             args.push(details);
             if (originalMouseEvent) {
@@ -373,7 +373,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 } else if ('index' in (item as any)) {
                     value = (item as any).index;
                 } else {
-                    value = parseInt((item as any).toString());
+                    value = Number.parseInt((item as any).toString());
                 }
                 if (value >= 0 || value === -1) {
                     tracks.push(value);
@@ -472,8 +472,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             placeholder.style.display = 'inline-block';
             placeholder.layoutResultId = renderResult.id;
             placeholder.resultState = ResultState.LayoutDone;
-            delete placeholder.renderedResultId;
-            delete placeholder.renderedResult;
+            placeholder.renderedResultId = undefined;
+            placeholder.renderedResult = undefined;
 
             this._resultIdToElementLookup.set(renderResult.id, placeholder);
 

@@ -170,10 +170,6 @@ export class FlatTrackMidiEvent extends FlatMidiEvent {
 }
 
 export class FlatTrackEndEvent extends FlatTrackMidiEvent {
-    public constructor(tick: number, track: number) {
-        super(tick, track);
-    }
-
     public override toString(): string {
         return 'End of Track ' + super.toString();
     }
@@ -232,10 +228,6 @@ export class FlatControlChangeEvent extends FlatChannelMidiEvent {
 }
 
 export class FlatRestEvent extends FlatChannelMidiEvent {
-    public constructor(tick: number, track: number, channel: number) {
-        super(tick, track, channel);
-    }
-
     public override toString(): string {
         return `Rest: ${super.toString()}`;
     }

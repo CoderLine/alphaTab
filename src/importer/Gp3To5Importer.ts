@@ -67,10 +67,6 @@ export class Gp3To5Importer extends ScoreImporter {
         return 'Guitar Pro 3-5';
     }
 
-    public constructor() {
-        super();
-    }
-
     public readScore(): Score {
         this._directionLookup.clear();
 
@@ -190,7 +186,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         version = version.substr(Gp3To5Importer.VersionString.length + 1);
         let dot: number = version.indexOf(String.fromCharCode(46));
-        this._versionNumber = 100 * parseInt(version.substr(0, dot)) + parseInt(version.substr(dot + 1));
+        this._versionNumber = 100 * Number.parseInt(version.substr(0, dot)) + Number.parseInt(version.substr(dot + 1));
         Logger.debug(this.name, 'Guitar Pro version ' + version + ' detected');
     }
 
@@ -239,7 +235,7 @@ export class Gp3To5Importer extends ScoreImporter {
         // Size Proportion(4)
         this.data.skip(28);
 
-        var flags = IOHelper.readInt16LE(this.data);
+        const flags = IOHelper.readInt16LE(this.data);
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).isVisible = (flags & (0x01 << 0)) !== 0;
         ModelUtils.getOrCreateHeaderFooterStyle(this._score, ScoreSubElement.Title).template = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
 
@@ -892,7 +888,8 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber < 400) {
             if ((flags & 0x04) !== 0) {
                 return HarmonicType.Natural;
-            } else if ((flags & 0x08) !== 0) {
+            } 
+            if ((flags & 0x08) !== 0) {
                 return HarmonicType.Artificial;
             }
         }

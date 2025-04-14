@@ -230,9 +230,8 @@ export class TabBarRenderer extends LineBarRenderer {
         const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
-        } else {
-            return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
         }
+        return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
@@ -247,12 +246,11 @@ export class TabBarRenderer extends LineBarRenderer {
         let startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
-        } else {
-            return (
-                startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
-                this.lineOffset / 2
-            );
         }
+        return (
+            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
+            this.lineOffset / 2
+        );
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
