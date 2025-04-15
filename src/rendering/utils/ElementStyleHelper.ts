@@ -77,10 +77,10 @@ export class ElementStyleHelper {
             case BarSubElement.NumberedTimeSignature:
                 break;
 
-            case BarSubElement.StandardNotationBarSeparator:
-            case BarSubElement.GuitarTabsBarSeparator:
-            case BarSubElement.SlashBarSeparator:
-            case BarSubElement.NumberedBarSeparator:
+            case BarSubElement.StandardNotationBarLines:
+            case BarSubElement.GuitarTabsBarLines:
+            case BarSubElement.SlashBarLines:
+            case BarSubElement.NumberedBarLines:
                 defaultColor = canvas.settings.display.resources.barSeparatorColor;
                 break;
 

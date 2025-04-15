@@ -579,7 +579,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     public abstract get repeatsBarSubElement(): BarSubElement;
     public abstract get barNumberBarSubElement(): BarSubElement;
-    public abstract get barSeparatorBarSubElement(): BarSubElement;
+    public abstract get barLineBarSubElement(): BarSubElement;
     public abstract get staffLineBarSubElement(): BarSubElement;
 
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, beamsElement: BeatSubElement): void {

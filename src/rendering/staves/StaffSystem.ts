@@ -14,9 +14,10 @@ import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import type { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { MusicFontSymbol } from '@src/model';
+import { BarSubElement, MusicFontSymbol } from '@src/model';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { LineBarRenderer } from '../LineBarRenderer';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -597,8 +598,6 @@ export class StaffSystem {
                 }
             }
 
-            using _ = ElementStyleHelper.track(canvas, TrackSubElement.BracesAndBrackets, this.staves[0].track);
-
             if (this._allStaves.length > 0) {
                 let previousStaffInBracket:RenderStaff|null=null;
                 for(const s of this._allStaves) {
@@ -609,6 +608,9 @@ export class StaffSystem {
 
                             const accoladeX: number = cx + previousStaffInBracket.x;
 
+                            const firstLineBarRenderer = previousStaffInBracket.barRenderers[0] as LineBarRenderer;
+
+                            using _ = ElementStyleHelper.bar(canvas, firstLineBarRenderer.staffLineBarSubElement, firstLineBarRenderer.bar);
                             const h = Math.ceil(thisTop - previousBottom);
                             canvas.fillRect(accoladeX, cy + previousBottom, 1, h);
                         }

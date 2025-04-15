@@ -1,8 +1,9 @@
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { BarLineStyle } from '@src/model/Bar';
+import { BarLineStyle, BarSubElement } from '@src/model/Bar';
 import { LeftToRightLayoutingGlyphGroup } from './LeftToRightLayoutingGlyphGroup';
 import type { LineBarRenderer } from '../LineBarRenderer';
+import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 
 abstract class BarLineGlyphBase extends Glyph {
     public override doLayout(): void {
@@ -232,5 +233,11 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                 this.addGlyph(new BarLineRepeatDotsGlyph(0, 0));
             }
         }
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const renderer = this.renderer as LineBarRenderer;
+        using _ = ElementStyleHelper.bar(canvas, renderer.barLineBarSubElement, this.renderer.bar, true);
+        super.paint(cx, cy, canvas);
     }
 }

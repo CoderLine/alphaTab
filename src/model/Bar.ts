@@ -106,24 +106,24 @@ export enum BarSubElement {
     NumberedBarNumber = 7,
 
     /**
-     * The bar separator lines on the standard notation staff.
+     * The bar lines on the standard notation staff.
      */
-    StandardNotationBarSeparator = 8,
+    StandardNotationBarLines = 8,
 
     /**
-     * The bar separator lines on the guitar tab staff.
+     * The bar lines on the guitar tab staff.
      */
-    GuitarTabsBarSeparator = 9,
+    GuitarTabsBarLines = 9,
 
     /**
-     * The bar separator lines on the slash staff.
+     * The bar lines on the slash staff.
      */
-    SlashBarSeparator = 10,
+    SlashBarLines = 10,
 
     /**
-     * The bar separator lines on the numbered notation staff.
+     * The bar lines on the numbered notation staff.
      */
-    NumberedBarSeparator = 11,
+    NumberedBarLines = 11,
 
     /**
      * The clefs on the standard notation staff.

@@ -58,8 +58,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
         return BarSubElement.NumberedBarNumber;
     }
 
-    public override get barSeparatorBarSubElement(): BarSubElement {
-        return BarSubElement.NumberedBarSeparator;
+    public override get barLineBarSubElement(): BarSubElement {
+        return BarSubElement.NumberedBarLines;
     }
 
     public override get staffLineBarSubElement(): BarSubElement {
@@ -270,7 +270,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override createPreBeatGlyphs(): void {
         this.wasFirstOfLine = this.isFirstOfLine;
-        this.addPreBeatGlyph(new BarLineGlyph(false));
+        if (this.index === 0 || (this.bar.masterBar.isRepeatStart && this._isOnlyNumbered)) {
+            this.addPreBeatGlyph(new BarLineGlyph(false));
+        }
         this.createLinePreBeatGlyphs();
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
     }
