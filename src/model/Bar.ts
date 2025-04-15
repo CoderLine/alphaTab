@@ -363,12 +363,12 @@ export class Bar {
         if (isRight) {
             if (masterBar.isRepeatEnd) {
                 actualLineType = BarLineStyle.LightHeavy;
+            } else if (!masterBar.nextMasterBar) {
+                actualLineType = BarLineStyle.LightHeavy;
             } else if (masterBar.isFreeTime) {
                 actualLineType = BarLineStyle.Dashed;
             } else if (masterBar.isDoubleBar) {
                 actualLineType = BarLineStyle.LightLight;
-            } else if (!masterBar.nextMasterBar) {
-                actualLineType = BarLineStyle.LightHeavy;
             } else {
                 actualLineType = BarLineStyle.Regular;
             }

@@ -103,7 +103,7 @@ class BarLineShortGlyph extends BarLineGlyphBase {
         const lineHeight = renderer.getLineHeight(1);
         const height = lineHeight * 2;
         const centerY = (gaps / 2) * lineHeight;
-        const lineY = centerY - (height / 2);
+        const lineY = centerY - height / 2;
 
         canvas.fillRect(left, top + lineY, 1, height);
     }
@@ -135,20 +135,19 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             : bar.getActualBarLineLeft(this.renderer.index === 0);
 
         // ensure we don't draw the same line type twice (we prefer drawing it as part of the "right" line)
+        let previousLineType = BarLineStyle.Automatic;
         if (!this._isRight) {
             const previousRenderer = this.renderer.previousRenderer;
-            if (
-                previousRenderer &&
-                previousRenderer.staff === this.renderer.staff &&
-                previousRenderer.bar.getActualBarLineRight()
-            ) {
-                // no glyphs
-                return;
+            if (previousRenderer && previousRenderer.staff === this.renderer.staff) {
+                previousLineType = previousRenderer.bar.getActualBarLineRight();
+                if (actualLineType === previousLineType) {
+                    return;
+                }
             }
         }
 
         const barLineSpace = 3;
-        
+
         if (this._isRight) {
             if (masterBar.isRepeatEnd) {
                 this.addGlyph(new BarLineRepeatDotsGlyph(0, 0));
@@ -164,33 +163,59 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                 this.addGlyph(new BarLineDottedGlyph(0, 0));
                 break;
             case BarLineStyle.Heavy:
-                this.addGlyph(new BarLineHeavyGlyph(0, 0));
+                // use previous heavy bar (no double heavy)
+                if (previousLineType !== BarLineStyle.LightHeavy && previousLineType !== BarLineStyle.HeavyHeavy) {
+                    this.addGlyph(new BarLineHeavyGlyph(0, 0));
+                }
                 break;
             case BarLineStyle.HeavyHeavy:
-                this.addGlyph(new BarLineHeavyGlyph(0, 0));
+                // use previous heavy bar (no double heavy)
+                if (previousLineType !== BarLineStyle.LightHeavy && previousLineType !== BarLineStyle.Heavy) {
+                    this.addGlyph(new BarLineHeavyGlyph(0, 0));
+                }
                 this.width += barLineSpace;
                 this.addGlyph(new BarLineHeavyGlyph(0, 0));
                 break;
             case BarLineStyle.HeavyLight:
-                this.addGlyph(new BarLineHeavyGlyph(0, 0));
+                // use previous heavy bar (no double heavy)
+                if (
+                    previousLineType !== BarLineStyle.LightHeavy &&
+                    previousLineType !== BarLineStyle.Heavy &&
+                    previousLineType !== BarLineStyle.HeavyHeavy
+                ) {
+                    this.addGlyph(new BarLineHeavyGlyph(0, 0));
+                }
                 this.width += barLineSpace;
                 this.addGlyph(new BarLineLightGlyph(0, 0));
                 break;
 
             case BarLineStyle.LightHeavy:
-                this.addGlyph(new BarLineLightGlyph(0, 0));
+                // use previous light bar
+                if (
+                    previousLineType !== BarLineStyle.HeavyLight &&
+                    previousLineType !== BarLineStyle.Regular &&
+                    previousLineType !== BarLineStyle.LightLight
+                ) {
+                    this.addGlyph(new BarLineLightGlyph(0, 0));
+                }
                 this.width += barLineSpace;
                 this.addGlyph(new BarLineHeavyGlyph(0, 0));
                 break;
             case BarLineStyle.LightLight:
-                this.addGlyph(new BarLineLightGlyph(0, 0));
+                // use previous light bar
+                if (previousLineType !== BarLineStyle.HeavyLight && previousLineType !== BarLineStyle.Regular) {
+                    this.addGlyph(new BarLineLightGlyph(0, 0));
+                }
                 this.width += barLineSpace;
                 this.addGlyph(new BarLineLightGlyph(0, 0));
                 break;
             case BarLineStyle.None:
                 break;
             case BarLineStyle.Regular:
-                this.addGlyph(new BarLineLightGlyph(0, 0));
+                // use previous light bar
+                if (previousLineType !== BarLineStyle.HeavyLight && previousLineType !== BarLineStyle.LightLight) {
+                    this.addGlyph(new BarLineLightGlyph(0, 0));
+                }
                 break;
             case BarLineStyle.Short:
                 this.addGlyph(new BarLineShortGlyph(0, 0));
@@ -201,7 +226,6 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                 break;
         }
 
-        
         if (!this._isRight) {
             if (masterBar.isRepeatStart) {
                 this.width += barLineSpace;
