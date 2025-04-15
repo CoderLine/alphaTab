@@ -171,6 +171,7 @@ export default defineConfig(({ command, mode }) => {
                         : {}),
                     ...o,
                     transformers: {
+                        before: [elementStyleUsingTransformer()],
                         afterDeclarations: [
                             dtsPathsTransformer({
                                 '@src/': path.resolve(__dirname, 'src')
