@@ -14,10 +14,10 @@ import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import type { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { BarSubElement, MusicFontSymbol } from '@src/model';
+import { MusicFontSymbol } from '@src/model';
 import { ElementStyleHelper } from '../utils/ElementStyleHelper';
 import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
-import { LineBarRenderer } from '../LineBarRenderer';
+import type { LineBarRenderer } from '../LineBarRenderer';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
