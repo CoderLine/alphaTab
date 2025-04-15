@@ -309,9 +309,9 @@ export default defineConfig(({ command, mode }) => {
                             const modifiedCode = new MagicString(code);
                             const extension = min ? '.min.mjs' : '.mjs';
                             modifiedCode
-                                .replaceAll(/alphaTab.core(.ts)?'/g, `alphaTab.core${extension}'`)
-                                .replaceAll(/alphaTab.worker(.ts)?'/g, `alphaTab.worker${extension}'`)
-                                .replaceAll(/alphaTab.worklet(.ts)?'/g, `alphaTab.worklet${extension}'`);
+                                .replaceAll(/alphaTab.core(.ts)?(['"])/g, `alphaTab.core${extension}$2`)
+                                .replaceAll(/alphaTab.worker(.ts)?(['"])/g, `alphaTab.worker${extension}$2`)
+                                .replaceAll(/alphaTab.worklet(.ts)?(['"])/g, `alphaTab.worklet${extension}$2`);
 
                             return {
                                 code: modifiedCode.toString(),
