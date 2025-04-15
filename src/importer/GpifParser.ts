@@ -2395,6 +2395,15 @@ export class GpifParser {
             const masterBar: MasterBar = this._masterBars[i];
             this.score.addMasterBar(masterBar);
         }
+
+        // Its a bit wierd. but the last bar might be flagged as "DoubleBar" 
+        // we have to clear this 
+        const lastMasterBar = this._masterBars[this._masterBars.length -1];
+        if(this._doubleBars.has(lastMasterBar)) {
+            this._doubleBars.delete(lastMasterBar);
+            lastMasterBar.isDoubleBar = false;
+        }
+
         // add tracks to score
         for (const trackId of this._tracksMapping) {
             if (!trackId) {
