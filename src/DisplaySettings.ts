@@ -233,9 +233,9 @@ export class DisplaySettings {
      * The padding left to the track name label of the system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `3`
      */
-    public systemLabelPaddingRight: number = 5;
+    public systemLabelPaddingRight: number = 3;
 
     /**
      * The padding between the accolade bar and the start of the bar itself.
