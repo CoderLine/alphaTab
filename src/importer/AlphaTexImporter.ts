@@ -2109,30 +2109,35 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'dy') {
             this._sy = this.newSy();
-            switch ((this._syData as string).toLowerCase()) {
-                case 'ppp':
-                    beat.dynamics = DynamicValue.PPP;
-                    break;
-                case 'pp':
-                    beat.dynamics = DynamicValue.PP;
-                    break;
-                case 'p':
-                    beat.dynamics = DynamicValue.P;
-                    break;
-                case 'mp':
-                    beat.dynamics = DynamicValue.MP;
-                    break;
-                case 'mf':
-                    beat.dynamics = DynamicValue.MF;
-                    break;
-                case 'f':
-                    beat.dynamics = DynamicValue.F;
-                    break;
-                case 'ff':
-                    beat.dynamics = DynamicValue.FF;
-                    break;
-                case 'fff':
-                    beat.dynamics = DynamicValue.FFF;
+            const dynamicString = (this._syData as string).toUpperCase() as keyof typeof DynamicValue;
+            switch (dynamicString) {
+                case 'PPP':
+                case 'PP':
+                case 'P':
+                case 'MP':
+                case 'MF':
+                case 'F':
+                case 'FF':
+                case 'FFF':
+                case 'PPPP':
+                case 'PPPPP':
+                case 'PPPPPP':
+                case 'FFFF':
+                case 'FFFFF':
+                case 'FFFFFF':
+                case 'SF':
+                case 'SFP':
+                case 'SFPP':
+                case 'FP':
+                case 'RF':
+                case 'RFZ':
+                case 'SFZ':
+                case 'SFFZ':
+                case 'FZ':
+                case 'N':
+                case 'PF':
+                case 'SFZP':
+                    beat.dynamics = DynamicValue[dynamicString];
                     break;
             }
             this._currentDynamics = beat.dynamics;

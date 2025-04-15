@@ -543,7 +543,7 @@ export class MidiFileGenerator {
                     beatStart,
                     deadSlapDuration,
                     t,
-                    MidiUtils.dynamicToVelocity(DynamicValue.F as number),
+                    MidiUtils.dynamicToVelocity(DynamicValue.F),
                     staff.track.playbackInfo.primaryChannel
                 );
             }
@@ -923,26 +923,26 @@ export class MidiFileGenerator {
     }
 
     private static getNoteVelocity(note: Note): number {
-        let dynamicValue: number = note.dynamics as number;
+        let adjustment: number = 0;
         // more silent on hammer destination
         if (!note.beat.voice.bar.staff.isPercussion && note.hammerPullOrigin) {
-            dynamicValue--;
+            adjustment--;
         }
         // more silent on ghost notes
         if (note.isGhost) {
-            dynamicValue--;
+            adjustment--;
         }
         // louder on accent
         switch (note.accentuated) {
             case AccentuationType.Normal:
-                dynamicValue++;
+                adjustment++;
                 break;
             case AccentuationType.Heavy:
-                dynamicValue += 2;
+                adjustment += 2;
                 break;
         }
 
-        return MidiUtils.dynamicToVelocity(dynamicValue);
+        return MidiUtils.dynamicToVelocity(note.dynamics, adjustment);
     }
 
     private generateFade(beat: Beat, beatStart: number, beatDuration: number): void {
