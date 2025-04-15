@@ -7,7 +7,7 @@ import { IOHelper } from '@src/io/IOHelper';
 import type { IReadable } from '@src/io/IReadable';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
+import { Bar, BarLineStyle } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -58,6 +58,7 @@ export class Gp3To5Importer extends ScoreImporter {
     private _barCount: number = 0;
     private _trackCount: number = 0;
     private _playbackInfos: PlaybackInformation[] = [];
+    private _doubleBars: Set<number> = new Set<number>();
 
     private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
 
@@ -394,7 +395,8 @@ export class Gp3To5Importer extends ScoreImporter {
         } else {
             newMasterBar.tripletFeel = this._globalTripletFeel;
         }
-        newMasterBar.isDoubleBar = (flags & 0x80) !== 0;
+        const isDoubleBar = (flags & 0x80) !== 0;
+        newMasterBar.isDoubleBar = isDoubleBar;
 
         const barIndexForDirection = this._score.masterBars.length;
         if (this._directionLookup.has(barIndexForDirection)) {
@@ -404,6 +406,10 @@ export class Gp3To5Importer extends ScoreImporter {
         }
 
         this._score.addMasterBar(newMasterBar);
+
+        if (isDoubleBar) {
+            this._doubleBars.add(newMasterBar.index);
+        }
     }
 
     public readTracks(): void {
@@ -514,6 +520,11 @@ export class Gp3To5Importer extends ScoreImporter {
             newBar.clef = Clef.Neutral;
         }
         mainStaff.addBar(newBar);
+
+        if (this._doubleBars.has(newBar.index)) {
+            newBar.barLineRight = BarLineStyle.LightLight;
+        }
+
         let voiceCount: number = 1;
         if (this._versionNumber >= 500) {
             this.data.readByte();

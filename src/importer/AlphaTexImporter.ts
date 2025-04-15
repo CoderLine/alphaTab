@@ -3073,6 +3073,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 master.isAnacrusis = true;
                 this._sy = this.newSy();
             } else if (syData === 'db') {
+                master.isDoubleBar = true;
                 bar.barLineRight = BarLineStyle.LightLight;
                 this._sy = this.newSy();
             } else if (syData === 'barlineleft') {
