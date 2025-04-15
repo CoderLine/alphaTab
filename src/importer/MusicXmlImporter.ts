@@ -894,6 +894,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         const track = this._idToTrackInfo.get(id)!.track;
         this._previousMasterBarNumber = -1;
+        this._implicitBars = 0;
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -937,9 +938,11 @@ export class MusicXmlImporter extends ScoreImporter {
             } else {
                 number = this._previousMasterBarNumber + 1;
             }
+            this._implicitBars++;
         } else if (number === 0) {
             // anacrusis
             number++;
+            this._implicitBars++;
         } else {
             number += this._implicitBars;
         }
@@ -948,7 +951,6 @@ export class MusicXmlImporter extends ScoreImporter {
             const newMasterBar = new MasterBar();
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
-                this._implicitBars++;
             }
             this._score.addMasterBar(newMasterBar);
             if (newMasterBar.index > 0) {
