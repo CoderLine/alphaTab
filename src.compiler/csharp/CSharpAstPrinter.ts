@@ -707,11 +707,14 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeTypeOfExpression(expr: cs.TypeOfExpression) {
         this.write('typeof');
+
+        this.write('(');
         if (expr.expression) {
-            this.write('(');
             this.writeExpression(expr.expression);
-            this.write(')');
+        } else if (expr.type) {
+            this.writeType(expr.type);
         }
+        this.write(')');
     }
 
     protected writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {

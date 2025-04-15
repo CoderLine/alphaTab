@@ -463,7 +463,8 @@ export interface NonNullExpression extends Node {
 
 export interface TypeOfExpression extends Node {
     nodeType: SyntaxKind.TypeOfExpression;
-    expression: Expression;
+    expression?: Expression;
+    type?: TypeNode;
 }
 
 export interface NullSafeExpression extends Node {

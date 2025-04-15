@@ -3546,8 +3546,37 @@ export default class CSharpAstTransformer {
     }
 
     protected visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {
-        // Enum[value] => value.ToString()
-        if (this.isEnumToString(expression)) {
+        // Enum[enumValue] => value.toString()
+        // Enum[string] => TypeHelper.parseEnum<Type>(value, Type)
+        if (this.isEnumFromOrToString(expression)) {
+            const elementType = this._context.typeChecker.getTypeAtLocation(expression.argumentExpression);
+
+            if (this._context.isEnum(elementType)) {
+                const callExpr = {
+                    parent: parent,
+                    arguments: [],
+                    expression: {} as cs.Expression,
+                    nodeType: cs.SyntaxKind.InvocationExpression,
+                    tsNode: expression
+                } as cs.InvocationExpression;
+
+                const memberAccess = {
+                    expression: {} as cs.Expression,
+                    member: this._context.toPascalCase('toString'),
+                    parent: callExpr,
+                    tsNode: expression,
+                    nodeType: cs.SyntaxKind.MemberAccessExpression
+                } as cs.MemberAccessExpression;
+                callExpr.expression = memberAccess;
+
+                memberAccess.expression = this.visitExpression(memberAccess, expression.argumentExpression)!;
+                if (!memberAccess.expression) {
+                    return null;
+                }
+
+                return callExpr;
+            }
+
             const callExpr = {
                 parent: parent,
                 arguments: [],
@@ -3556,23 +3585,32 @@ export default class CSharpAstTransformer {
                 tsNode: expression
             } as cs.InvocationExpression;
 
-            const memberAccess = {
-                expression: {} as cs.Expression,
-                member: this._context.toPascalCase('toString'),
-                parent: callExpr,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.MemberAccessExpression
-            } as cs.MemberAccessExpression;
-            callExpr.expression = memberAccess;
+            callExpr.expression = this.makeMemberAccess(
+                callExpr,
+                this._context.makeTypeName('alphaTab.core.TypeHelper'),
+                this._context.toMethodName('parseEnum')
+            );
 
-            memberAccess.expression = this.visitExpression(memberAccess, expression.argumentExpression)!;
-            if (!memberAccess.expression) {
-                return null;
-            }
+            const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
+            callExpr.typeArguments = [
+                this.createUnresolvedTypeNode(callExpr, expression.argumentExpression, enumType, enumType.symbol)
+            ];
+
+            const typeOf: cs.TypeOfExpression = {
+                nodeType: cs.SyntaxKind.TypeOfExpression,
+                parent: callExpr
+            };
+            typeOf.type = this.createUnresolvedTypeNode(
+                typeOf,
+                expression.argumentExpression,
+                enumType,
+                enumType.symbol
+            );
+
+            callExpr.arguments = [this.visitExpression(callExpr, expression.argumentExpression)!, typeOf];
 
             return callExpr;
         }
-
         const elementAccess = {
             expression: {} as cs.Expression,
             argumentExpression: {} as cs.Expression,
@@ -3656,7 +3694,7 @@ export default class CSharpAstTransformer {
         return this.wrapToSmartCast(parent, elementAccess, expression, forceCast);
     }
 
-    protected isEnumToString(expression: ts.ElementAccessExpression): boolean {
+    protected isEnumFromOrToString(expression: ts.ElementAccessExpression): boolean {
         const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
         return !!(enumType?.symbol && enumType.symbol.flags & ts.SymbolFlags.RegularEnum);
     }

@@ -15,6 +15,11 @@ namespace AlphaTab.Core
             return new List<T>(values);
         }
 
+        public static T ParseEnum<T>(string s, Type _) where T : struct
+        {
+            return Enum.TryParse(s, true, out T value) ? value : default;
+        }
+
         public static void Add<T>(this IList<T> list, IList<T> newItems)
         {
             if (list is List<T> l)
