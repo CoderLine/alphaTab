@@ -72,6 +72,10 @@ Map {
       "__kind" => "MasterBar",
       "start" => 61440,
     },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 65280,
+    },
   ],
   "tracks" => Array [
     Map {
@@ -108,7 +112,7 @@ Map {
                 },
               ],
               "barlineleft" => 1,
-              "barlineright" => 1,
+              "barlineright" => 2,
             },
             Map {
               "__kind" => "Bar",
@@ -433,6 +437,25 @@ Map {
                 },
               ],
               "barlineright" => 11,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 17,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 17,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 17,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
             },
           ],
         },
