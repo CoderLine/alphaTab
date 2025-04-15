@@ -166,7 +166,6 @@ export class StaffSystem {
         }
         this.calculateAccoladeSpacing(tracks);
 
-        // Width += renderers.Width;
         this.updateWidthFromLastBar();
         return renderers;
     }
@@ -496,9 +495,6 @@ export class StaffSystem {
             //
             canvas.color = res.barSeparatorColor;
 
-            const firstStaffInBracket = this._firstStaffInBrackets;
-            const lastStaffInBracket = this._lastStaffInBrackets;
-
             //
             // Draw track names
             const settings = this.layout.renderer.settings;
@@ -603,17 +599,23 @@ export class StaffSystem {
 
             using _ = ElementStyleHelper.track(canvas, TrackSubElement.BracesAndBrackets, this.staves[0].track);
 
-            if (firstStaffInBracket && lastStaffInBracket) {
-                //
-                // draw grouping line for all staves
-                //
-                const firstStart: number = cy + firstStaffInBracket.contentTop;
-                const lastEnd: number = cy + lastStaffInBracket.contentBottom;
-                const acooladeX: number = cx + firstStaffInBracket.x;
-                canvas.beginPath();
-                canvas.moveTo(acooladeX, firstStart);
-                canvas.lineTo(acooladeX, lastEnd);
-                canvas.stroke();
+            if (this._allStaves.length > 0) {
+                let previousStaffInBracket:RenderStaff|null=null;
+                for(const s of this._allStaves) {
+                    if(s.isInsideBracket) {
+                        if(previousStaffInBracket !== null) {
+                            const previousBottom = previousStaffInBracket.contentBottom;
+                            const thisTop = s.contentTop;
+
+                            const accoladeX: number = cx + previousStaffInBracket.x;
+
+                            const h = Math.ceil(thisTop - previousBottom);
+                            canvas.fillRect(accoladeX, cy + previousBottom, 1, h);
+                        }
+
+                        previousStaffInBracket = s;
+                    }
+                }
             }
 
             //

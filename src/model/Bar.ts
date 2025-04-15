@@ -342,6 +342,64 @@ export class Bar {
     public barLineRight: BarLineStyle = BarLineStyle.Automatic;
 
     /**
+     * The bar line to draw on the left side of the bar with an "automatic" type resolved to the actual one.
+     * @param isFirstOfSystem  Whether the bar is the first one in the system.
+     */
+    public getActualBarLineLeft(isFirstOfSystem: boolean): BarLineStyle {
+        return Bar.actualBarLine(this, false, isFirstOfSystem);
+    }
+
+    /**
+     * The bar line to draw on the right side of the bar with an "automatic" type resolved to the actual one.
+     * @param isFirstOfSystem  Whether the bar is the first one in the system.
+     */
+    public getActualBarLineRight(): BarLineStyle {
+        return Bar.actualBarLine(this, true, false /* not relevant */);
+    }
+
+    private static automaticToActualType(masterBar: MasterBar, isRight: boolean, firstOfSystem: boolean) {
+        let actualLineType: BarLineStyle;
+
+        if (isRight) {
+            if (masterBar.isRepeatEnd) {
+                actualLineType = BarLineStyle.LightHeavy;
+            } else if (masterBar.isFreeTime) {
+                actualLineType = BarLineStyle.Dashed;
+            } else if (masterBar.isDoubleBar) {
+                actualLineType = BarLineStyle.LightLight;
+            } else if (!masterBar.nextMasterBar) {
+                actualLineType = BarLineStyle.LightHeavy;
+            } else {
+                actualLineType = BarLineStyle.Regular;
+            }
+        } else {
+            if (masterBar.isRepeatStart) {
+                actualLineType = BarLineStyle.HeavyLight;
+            } else if (firstOfSystem) {
+                actualLineType = BarLineStyle.Regular;
+            } else {
+                actualLineType = BarLineStyle.None;
+            }
+        }
+
+        return actualLineType;
+    }
+
+    private static actualBarLine(bar: Bar, isRight: boolean, firstOfSystem: boolean) {
+        const masterBar = bar.masterBar;
+        const requestedLineType = isRight ? bar.barLineRight : bar.barLineLeft;
+
+        let actualLineType: BarLineStyle;
+        if (requestedLineType === BarLineStyle.Automatic) {
+            actualLineType = Bar.automaticToActualType(masterBar, isRight, firstOfSystem);
+        } else {
+            actualLineType = requestedLineType;
+        }
+
+        return actualLineType;
+    }
+
+    /**
      * The style customizations for this item.
      */
     public style?: BarStyle;

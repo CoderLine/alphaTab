@@ -18,10 +18,10 @@ import { NumberedKeySignatureGlyph } from './glyphs/NumberedKeySignatureGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { Duration, MusicFontSymbol } from '@src/model';
 import { BeatXPosition } from './BeatXPosition';
-import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
 import { ElementStyleHelper } from './utils/ElementStyleHelper';
 import { MusicFontSymbolSizes } from './utils/MusicFontSymbolSizes';
+import { BarLineGlyph } from './glyphs/BarLineGlyph';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation
@@ -270,9 +270,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override createPreBeatGlyphs(): void {
         this.wasFirstOfLine = this.isFirstOfLine;
-        if (this.bar.masterBar.isRepeatStart && this._isOnlyNumbered) {
-            this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
-        }
+        this.addPreBeatGlyph(new BarLineGlyph(false));
         this.createLinePreBeatGlyphs();
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
     }

@@ -8,9 +8,7 @@ import { NotationMode } from '@src/NotationSettings';
 import { FlagGlyph } from './glyphs/FlagGlyph';
 import { NoteHeadGlyph } from './glyphs/NoteHeadGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { RepeatOpenGlyph } from './glyphs/RepeatOpenGlyph';
-import { BarSeperatorGlyph } from './glyphs/BarSeperatorGlyph';
-import { RepeatCloseGlyph } from './glyphs/RepeatCloseGlyph';
+import { BarLineGlyph } from './glyphs/BarLineGlyph';
 import { RepeatCountGlyph } from './glyphs/RepeatCountGlyph';
 import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
 import { BeatBeamingMode, type BeatSubElement } from '@src/model/Beat';
@@ -125,6 +123,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
             });
         }
 
+        // during system fitting it can happen that we have fraction widths
+        // but to have lines until the full end-pixel we round up. 
+        // this way we avoid holes
+        const lineWidth = Math.ceil(this.width);
+
         for (let i: number = 0; i < this.drawnLineCount; i++) {
             const lineY = this.getLineY(i);
 
@@ -141,7 +144,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             canvas.fillRect(
                 cx + this.x + lineX,
                 (cy + this.y + lineY) | 0,
-                this.width - lineX,
+                lineWidth - lineX,
                 BarRendererBase.StaffLineThickness
             );
         }
@@ -554,9 +557,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected override createPreBeatGlyphs(): void {
         super.createPreBeatGlyphs();
-        if (this.bar.masterBar.isRepeatStart) {
-            this.addPreBeatGlyph(new RepeatOpenGlyph(0, 0, 1.5, 3));
-        }
+        this.addPreBeatGlyph(new BarLineGlyph(false));
         this.createLinePreBeatGlyphs();
         this.addPreBeatGlyph(new BarNumberGlyph(0, this.getLineHeight(-0.25), this.bar.index + 1));
     }
@@ -566,15 +567,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected override createPostBeatGlyphs(): void {
         super.createPostBeatGlyphs();
         const lastBar = this.lastBar;
-        if (lastBar.masterBar.isRepeatEnd) {
-            this.addPostBeatGlyph(new RepeatCloseGlyph(this.x, 0));
-            if (lastBar.masterBar.repeatCount > 2) {
-                this.addPostBeatGlyph(
-                    new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
-                );
-            }
-        } else if (this.lastBar) {
-            this.addPostBeatGlyph(new BarSeperatorGlyph(0, 0));
+
+        this.addPostBeatGlyph(new BarLineGlyph(true));
+
+        if (lastBar.masterBar.isRepeatEnd && lastBar.masterBar.repeatCount > 2) {
+            this.addPostBeatGlyph(
+                new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
+            );
         }
     }
 
