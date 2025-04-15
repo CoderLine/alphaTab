@@ -1,5 +1,453 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`MusicXmlImporterTests barlines 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturecommon" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 11520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 15360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 19200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 23040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 26880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 30720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 34560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 38400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 42240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 46080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 49920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 53760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 57600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 61440,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 1,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 4,
+              "barlineright" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 9,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 1,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 9,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 1,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 2,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 3,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 9,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 9,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 9,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 10,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 10,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 10,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 5,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 11,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 11,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 11,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 6,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 12,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 12,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 12,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 7,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 13,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 13,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 13,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 8,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 14,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 14,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 14,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 9,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 15,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 15,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 15,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 10,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 16,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 16,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 16,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 11,
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
 exports[`MusicXmlImporterTests partwise-anacrusis 1`] = `
 Map {
   "__kind" => "Score",

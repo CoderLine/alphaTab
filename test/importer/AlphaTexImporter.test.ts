@@ -1913,4 +1913,26 @@ describe('AlphaTexImporterTest', () => {
             TextAlign.Right
         );
     });
+
+    it('barlines', () => {
+        const score = parseTex(`
+            \\instrument piano
+            .
+            \\track "T1"
+                \\staff 
+                    \\barlineleft dashed 
+                    \\barlineright dotted 
+                    | 
+                    \\barlineleft heavyheavy
+                    \\barlineright heavyheavy
+                    
+                \\staff 
+                    \\barlineleft lightlight 
+                    \\barlineright lightheavy 
+                    | 
+                    \\barlineleft heavylight
+                    \\barlineright dashed
+            `);
+        expect(score).toMatchSnapshot();
+    });
 });

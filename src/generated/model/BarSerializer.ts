@@ -13,6 +13,7 @@ import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 import { SustainPedalMarker } from "@src/model/Bar";
+import { BarLineStyle } from "@src/model/Bar";
 import { BarStyle } from "@src/model/Bar";
 export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
@@ -34,6 +35,8 @@ export class BarSerializer {
         o.set("displayscale", obj.displayScale);
         o.set("displaywidth", obj.displayWidth);
         o.set("sustainpedals", obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJson(i)));
+        o.set("barlineleft", obj.barLineLeft as number);
+        o.set("barlineright", obj.barLineRight as number);
         if (obj.style) {
             o.set("style", BarStyleSerializer.toJson(obj.style));
         }
@@ -74,6 +77,12 @@ export class BarSerializer {
                     SustainPedalMarkerSerializer.fromJson(i, o);
                     obj.sustainPedals.push(i);
                 }
+                return true;
+            case "barlineleft":
+                obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(v, BarLineStyle)!;
+                return true;
+            case "barlineright":
+                obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(v, BarLineStyle)!;
                 return true;
             case "style":
                 if (v) {

@@ -194,6 +194,27 @@ export enum BarSubElement {
 export class BarStyle extends ElementStyle<BarSubElement> {}
 
 /**
+ * Lists all bar line styles.
+ */
+export enum BarLineStyle {
+    /**
+     * No special custom line style, automatic handling (e.g. last bar might be LightHeavy)
+     */
+    Automatic = 0,
+    Dashed = 1,
+    Dotted = 2,
+    Heavy = 3,
+    HeavyHeavy = 4,
+    HeavyLight = 5,
+    LightHeavy = 6,
+    LightLight = 7,
+    None = 8,
+    Regular = 9,
+    Short = 10,
+    Tick = 11
+}
+
+/**
  * A bar is a single block within a track, also known as Measure.
  * @json
  * @json_strict
@@ -301,6 +322,24 @@ export class Bar {
     public get isRestOnly(): boolean {
         return this._isRestOnly;
     }
+
+    /**
+     * The bar line to draw on the left side of the bar.
+     * @remarks
+     * Note that the combination with {@link barLineRight} of the previous bar matters.
+     * If this bar has a Regular/Automatic style but the previous bar is customized, no additional line is drawn by this bar.
+     * If both bars have a custom style, both bar styles are drawn.
+     */
+    public barLineLeft: BarLineStyle = BarLineStyle.Automatic;
+
+    /**
+     * The bar line to draw on the right side of the bar.
+     * @remarks
+     * Note that the combination with {@link barLineLeft} of the next bar matters.
+     * If this bar has a Regular/Automatic style but the next bar is customized, no additional line is drawn by this bar.
+     * If both bars have a custom style, both bar styles are drawn.
+     */
+    public barLineRight: BarLineStyle = BarLineStyle.Automatic;
 
     /**
      * The style customizations for this item.

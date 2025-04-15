@@ -248,4 +248,9 @@ describe('MusicXmlImporterTests', () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/partwise-staff-change.xml');
         expect(score).toMatchSnapshot();
     });
+
+    it('barlines', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/barlines.xml');
+        expect(score).toMatchSnapshot();
+    });
 });
