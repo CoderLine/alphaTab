@@ -333,6 +333,17 @@ export default class CSharpEmitterContext {
             return this.applyNullable(csType, typeNode);
         }
 
+        if (typeNode && ts.isTypeOperatorNode(typeNode)) {
+            if (typeNode.operator === ts.SyntaxKind.KeyOfKeyword) {
+                return {
+                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                    type: cs.PrimitiveType.String,
+                    isNullable: false
+                } as cs.PrimitiveTypeNode;
+            }
+            return null;
+        }
+
         csType = this.resolvePrimitiveType(node, tsType);
         if (csType) {
             return this.applyNullable(csType, typeNode);

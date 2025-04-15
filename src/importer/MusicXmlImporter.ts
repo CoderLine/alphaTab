@@ -2196,43 +2196,36 @@ export class MusicXmlImporter extends ScoreImporter {
 
     private parseDynamics(element: XmlNode) {
         for (const c of element.childElements()) {
-            switch (c.localName) {
-                case 'p':
-                    return DynamicValue.P;
-                case 'pp':
-                    return DynamicValue.PP;
-                case 'ppp':
-                    return DynamicValue.PPP;
-                // case 'pppp': not supported
-                // case 'ppppp': not supported
-                // case 'pppppp': not supported
-
-                case 'f':
-                    return DynamicValue.F;
-                case 'ff':
-                    return DynamicValue.FF;
-                case 'fff':
-                    return DynamicValue.FFF;
-                // case 'ffff': not supported
-                // case 'fffff': not supported
-                // case 'ffffff': not supported
-
-                case 'mp':
-                    return DynamicValue.MP;
-                case 'mf':
-                    return DynamicValue.MF;
-                // case 'sf': not supported
-                // case 'sfp': not supported
-                // case 'sfpp': not supported
-                // case 'fp': not supported
-                // case 'rf': not supported
-                // case 'rfz': not supported
-                // case 'sfz': not supported
-                // case 'sffz': not supported
-                // case 'fz': not supported
-                // case 'n': not supported
-                // case 'pf': not supported
-                // case 'sfzp': not supported
+            // we are having the same enum names as MusicXML uses as tagnames
+            const dynamicString = c.localName!.toUpperCase() as keyof typeof DynamicValue;
+            switch (dynamicString) {
+                case 'PPP':
+                case 'PP':
+                case 'P':
+                case 'MP':
+                case 'MF':
+                case 'F':
+                case 'FF':
+                case 'FFF':
+                case 'PPPP':
+                case 'PPPPP':
+                case 'PPPPPP':
+                case 'FFFF':
+                case 'FFFFF':
+                case 'FFFFFF':
+                case 'SF':
+                case 'SFP':
+                case 'SFPP':
+                case 'FP':
+                case 'RF':
+                case 'RFZ':
+                case 'SFZ':
+                case 'SFFZ':
+                case 'FZ':
+                case 'N':
+                case 'PF':
+                case 'SFZP':
+                    return DynamicValue[dynamicString];
                 // case 'other-dynamics': not supported
             }
         }

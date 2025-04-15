@@ -140,7 +140,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ),
 
             // reset bend
@@ -151,7 +151,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ),
 
             // end of track
@@ -209,7 +209,7 @@ describe('MidiFileGeneratorTest', () => {
         ticks.push(tick);
         tick += score.tracks[0].staves[0].bars[4].voices[0].beats[1].playbackDuration;
         const info: PlaybackInformation = score.tracks[0].playbackInfo;
-        const mfVelocity = MidiUtils.dynamicToVelocity(DynamicValue.MF as number);
+        const mfVelocity = MidiUtils.dynamicToVelocity(DynamicValue.MF);
         const expectedEvents: FlatMidiEvent[] = [
             // channel init
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.VolumeCoarse, 96),
@@ -350,7 +350,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ),
 
             // reset bend
@@ -361,7 +361,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note.beat.duration),
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ), // end of track
             new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
         ];
@@ -424,7 +424,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ),
 
             // release on tied note
@@ -504,7 +504,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ),
 
             new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
@@ -570,7 +570,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note.beat.duration) * 2,
                 note.realValue,
-                MidiUtils.dynamicToVelocity(note.dynamics as number)
+                MidiUtils.dynamicToVelocity(note.dynamics)
             ),
 
             new FlatTrackEndEvent(3840, 0) // 3840 = end of bar
@@ -690,7 +690,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note1.beat.duration),
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             // bend effect (note 2)
@@ -728,7 +728,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 MidiUtils.toTicks(note2.beat.duration),
                 note2.realValue,
-                MidiUtils.dynamicToVelocity(note2.dynamics as number)
+                MidiUtils.dynamicToVelocity(note2.dynamics)
             ),
 
             // reset bend
@@ -739,7 +739,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 MidiUtils.toTicks(note1.beat.duration),
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             // end of track
@@ -802,7 +802,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             new FlatNoteBendEvent(960, 0, info.primaryChannel, note1.realValue, 8192), // no bend (vibrato start on main note)
@@ -878,7 +878,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 1920,
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             // end of track
@@ -930,7 +930,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 1920,
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             // tied note (no bend)
@@ -1002,7 +1002,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 2880,
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             // tied note (with bend)
@@ -1040,7 +1040,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note2.realValue,
-                MidiUtils.dynamicToVelocity((note2.dynamics as number) - 1) // -1 on velocity because of pull-off
+                MidiUtils.dynamicToVelocity((note2.dynamics),  -1) // -1 on velocity because of pull-off
             ),
 
             // end of track
@@ -1106,7 +1106,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.secondaryChannel,
                 1920,
                 note1.realValue,
-                MidiUtils.dynamicToVelocity(note1.dynamics as number)
+                MidiUtils.dynamicToVelocity(note1.dynamics)
             ),
 
             // vibrato starts on tied note on height of the bend-end
@@ -1257,7 +1257,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note1.realValue,
-                MidiUtils.dynamicToVelocity((note1.dynamics as number) + 1)
+                MidiUtils.dynamicToVelocity(note1.dynamics, 1)
             ),
 
             new FlatNoteBendEvent(1920, 0, info.primaryChannel, note2.realValue, 8192),
@@ -1267,7 +1267,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note2.realValue,
-                MidiUtils.dynamicToVelocity((note2.dynamics as number) - 1)
+                MidiUtils.dynamicToVelocity(note2.dynamics, -1)
             ),
 
             // end of track
@@ -1364,7 +1364,7 @@ describe('MidiFileGeneratorTest', () => {
 
         const info: PlaybackInformation = score.tracks[0].playbackInfo;
         const sixtyFourth = MidiUtils.toTicks(Duration.SixtyFourth);
-        const forte = MidiUtils.dynamicToVelocity(DynamicValue.F as number);
+        const forte = MidiUtils.dynamicToVelocity(DynamicValue.F);
         const expectedEvents: FlatMidiEvent[] = [
             new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[0], forte),
             new FlatNoteEvent(0, 0, info.primaryChannel, sixtyFourth, score.tracks[0].staves[0].tuning[1], forte),
@@ -1530,7 +1530,7 @@ describe('MidiFileGeneratorTest', () => {
 
         const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
         const noteKey = note.realValue;
-        const noteVelocity = MidiUtils.dynamicToVelocity((note.dynamics as number) - 1);
+        const noteVelocity = MidiUtils.dynamicToVelocity(note.dynamics, -1);
         const expectedEvents: FlatMidiEvent[] = [
             // Upper Mordent (shortened)
             new FlatNoteEvent(0, 0, 0, 60, noteKey, noteVelocity),
@@ -1612,7 +1612,7 @@ describe('MidiFileGeneratorTest', () => {
         const score = ScoreLoader.loadScoreFromBytes(buffer);
 
         const note = score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0];
-        const noteVelocity = MidiUtils.dynamicToVelocity(note.dynamics as number);
+        const noteVelocity = MidiUtils.dynamicToVelocity(note.dynamics);
         const expectedEvents: FlatMidiEvent[] = [
             // ii - A string
             new FlatNoteEvent(0, 0, 0, 480, 48, noteVelocity), // down - no brush offset

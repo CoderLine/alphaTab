@@ -968,8 +968,13 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeTypeOfExpression(expr: cs.TypeOfExpression) {
         if (expr.expression) {
             this.writeExpression(expr.expression);
-            this.write('::class');
         }
+        if (expr.type) {
+            this.writeType(expr.type);
+        }
+
+        this.write('::class');
+
     }
 
     protected writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {
