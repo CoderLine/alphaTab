@@ -1,11 +1,11 @@
 /**@target web */
 
-import type { Plugin, ResolvedConfig } from './bridge';
+import type { Plugin, ResolvedConfig } from '@src/vite/bridge';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import * as url from 'node:url';
 
-import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from '@src/vite/AlphaTabVitePluginOptions';
 
 export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
     let resolvedConfig: ResolvedConfig;

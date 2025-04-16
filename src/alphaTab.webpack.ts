@@ -1,2 +1,2 @@
 /**@target web */
-export { AlphaTabWebPackPlugin } from './webpack/AlphaTabWebPackPlugin';
+export { AlphaTabWebPackPlugin } from '@src/webpack/AlphaTabWebPackPlugin';

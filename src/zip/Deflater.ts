@@ -19,9 +19,9 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { DeflaterConstants } from './DeflaterConstants';
-import { DeflaterEngine } from './DeflaterEngine';
-import { PendingBuffer } from './PendingBuffer';
+import { DeflaterConstants } from '@src/zip/DeflaterConstants';
+import { DeflaterEngine } from '@src/zip/DeflaterEngine';
+import { PendingBuffer } from '@src/zip/PendingBuffer';
 
 /**
  * This is the Deflater class.  The deflater class compresses input

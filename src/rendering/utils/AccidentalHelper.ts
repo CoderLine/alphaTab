@@ -6,8 +6,9 @@ import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
-import type { LineBarRenderer } from '../LineBarRenderer';
-import type { Clef, KeySignature } from '@src/model';
+import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import type { Clef } from '@src/model/Clef';
+import type { KeySignature } from '@src/model/KeySignature';
 
 class BeatLines {
     public maxLine: number = -1000;

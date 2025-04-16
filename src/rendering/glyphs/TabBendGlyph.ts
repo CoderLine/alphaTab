@@ -11,8 +11,8 @@ import { TabBendRenderPoint } from '@src/rendering/glyphs/TabBendRenderPoint';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import type { RenderingResources } from '@src/RenderingResources';
 import { BendPoint } from '@src/model/BendPoint';
-import { VibratoType } from '@src/model';
-import { NoteVibratoGlyph } from './NoteVibratoGlyph';
+import { VibratoType } from '@src/model/VibratoType';
+import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 
 export class TabBendGlyph extends Glyph {
     private static readonly ArrowSize: number = 6;

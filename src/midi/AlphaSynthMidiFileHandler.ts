@@ -13,7 +13,7 @@ import {
 import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 import { type MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { SynthConstants } from '@src/synth/SynthConstants';
-import type { ControllerType } from './ControllerType';
+import type { ControllerType } from '@src/midi/ControllerType';
 
 /**
  * This implementation of the {@link IMidiFileHandler}

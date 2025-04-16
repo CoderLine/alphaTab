@@ -1,4 +1,4 @@
-import { BeatSubElement } from '@src/model';
+import { BeatSubElement } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
 import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';

@@ -1,6 +1,6 @@
 import { TextBaseline } from '@src/platform/ICanvas';
-import { Duration } from './Duration';
-import { MusicFontSymbol } from './MusicFontSymbol';
+import { Duration } from '@src/model/Duration';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * Describes an instrument articulation which is used for percussions.

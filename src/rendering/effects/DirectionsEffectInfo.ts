@@ -5,7 +5,7 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
-import { DirectionsContainerGlyph } from '../glyphs/DirectionsContainerGlyph';
+import { DirectionsContainerGlyph } from '@src/rendering/glyphs/DirectionsContainerGlyph';
 
 export class DirectionsEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {

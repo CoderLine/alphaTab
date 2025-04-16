@@ -7,7 +7,7 @@ import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import type { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
 import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { ScoreSubElement } from '@src/model';
+import { ScoreSubElement } from '@src/model/Score';
 
 /**
  * This layout arranges the bars into a fixed width and dynamic height region.

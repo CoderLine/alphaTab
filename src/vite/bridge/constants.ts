@@ -1,6 +1,6 @@
 /**@target web */
 
-import type { RollupPluginHooks } from './typeUtils';
+import type { RollupPluginHooks } from '@src/vite/bridge/typeUtils';
 
 // index.ts for more details on contents and license of this file
 

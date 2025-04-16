@@ -31,7 +31,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from '@src/vite/AlphaTabVitePluginOptions';
 import MagicString from 'magic-string';
 import {
     type ResolvedConfig,
@@ -45,7 +45,7 @@ import {
     workerFileToUrl,
     AlphaTabWorkerTypes,
     WORKER_FILE_ID
-} from './bridge';
+} from '@src/vite/bridge';
 import path from 'node:path';
 
 const alphaTabWorkerPatterns = [

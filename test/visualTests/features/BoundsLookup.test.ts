@@ -1,7 +1,8 @@
+import { Color } from '@src/model/Color';
 import { VisualTestHelper, VisualTestOptions } from '../VisualTestHelper';
 import { AlphaSkiaCanvas } from '@coderline/alphaskia';
-import { Color } from '@src/model';
-import { Bounds, type BoundsLookup } from '@src/rendering';
+import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
+import { Bounds } from '@src/rendering/utils/Bounds';
 
 describe('BoundsLookupRenderingTests', () => {
     async function runTest(referenceFileName: string, color: Color, collectBounds: (bounds: BoundsLookup) => Bounds[]) {

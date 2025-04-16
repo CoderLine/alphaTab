@@ -1,2 +1,2 @@
 /**@target web */
-export { alphaTab } from './vite/alphaTabVitePlugin';
+export { alphaTab } from '@src/vite/alphaTabVitePlugin';

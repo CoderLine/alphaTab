@@ -1,4 +1,4 @@
-import type { RepeatGroup } from '@src/model';
+import type { RepeatGroup } from '@src/model/RepeatGroup';
 import { Direction } from '@src/model/Direction';
 import type { MasterBar } from '@src/model/MasterBar';
 import type { Score } from '@src/model/Score';

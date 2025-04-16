@@ -1,4 +1,4 @@
-import type { Color } from '@src/model';
+import type { Color } from '@src/model/Color';
 import type { Font } from '@src/model/Font';
 import { type ICanvas, TextAlign, type TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';

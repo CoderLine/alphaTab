@@ -19,10 +19,10 @@
  * DEALINGS IN THE SOFTWARE.
  */
 
-import { Crc32 } from './Crc32';
-import { DeflaterConstants } from './DeflaterConstants';
-import { DeflaterHuffman } from './DeflaterHuffman';
-import type { PendingBuffer } from './PendingBuffer';
+import { Crc32 } from '@src/zip/Crc32';
+import { DeflaterConstants } from '@src/zip/DeflaterConstants';
+import { DeflaterHuffman } from '@src/zip/DeflaterHuffman';
+import type { PendingBuffer } from '@src/zip/PendingBuffer';
 
 /**
  * Low level compression engine for deflate algorithm which uses a 32K sliding window

@@ -29,10 +29,12 @@ import {
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
 import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
-import { AccentuationType, Duration, VibratoType } from '@src/model';
 import { expect } from 'chai';
-import { ScoreLoader } from '@src/importer';
-import type { MidiTickLookup } from '@src/midi';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import type { MidiTickLookup } from '@src/midi/MidiTickLookup';
+import { AccentuationType } from '@src/model/AccentuationType';
+import { Duration } from '@src/model/Duration';
+import { VibratoType } from '@src/model/VibratoType';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
@@ -1040,7 +1042,7 @@ describe('MidiFileGeneratorTest', () => {
                 info.primaryChannel,
                 1920,
                 note2.realValue,
-                MidiUtils.dynamicToVelocity((note2.dynamics),  -1) // -1 on velocity because of pull-off
+                MidiUtils.dynamicToVelocity(note2.dynamics, -1) // -1 on velocity because of pull-off
             ),
 
             // end of track

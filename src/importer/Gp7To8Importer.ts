@@ -11,7 +11,7 @@ import { Logger } from '@src/Logger';
 import { ZipReader } from '@src/zip/ZipReader';
 import type { ZipEntry } from '@src/zip/ZipEntry';
 import { IOHelper } from '@src/io/IOHelper';
-import { LayoutConfiguration } from './LayoutConfiguration';
+import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 and 8 (gp) files.

@@ -1,10 +1,10 @@
 import { AccentuationType } from '@src/model/AccentuationType';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { ICanvas } from '@src/platform/ICanvas';
-import type { Note } from '@src/model';
-import { EffectGlyph } from './EffectGlyph';
-import { BeamDirection } from '../utils/BeamDirection';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import type { Note } from '@src/model/Note';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class AccentuationGlyph extends EffectGlyph {
     private _note: Note;

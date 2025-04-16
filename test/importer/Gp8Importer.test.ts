@@ -1,10 +1,10 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { ScoreSubElement } from '@src/model';
 import { BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { TextAlign } from '@src/platform';
+import { ScoreSubElement } from '@src/model/Score';
+import { TextAlign } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Settings } from '@src/Settings';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';

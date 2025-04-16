@@ -3,7 +3,7 @@ import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class OttavaGlyph extends GroupedEffectGlyph {
     private _ottava: Ottavia;

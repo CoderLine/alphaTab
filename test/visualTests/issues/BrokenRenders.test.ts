@@ -1,10 +1,11 @@
 import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper } from '../VisualTestHelper';
-import { ScoreLoader } from '@src/importer';
 import { Settings } from '@src/Settings';
-import { type RenderFinishedEventArgs, ScoreRenderer } from '@src/rendering';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { expect } from 'chai';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {

@@ -22,12 +22,12 @@ import type { Settings } from '@src/Settings';
 import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { GraceGroup } from '@src/model/GraceGroup';
-import { GolpeType } from './GolpeType';
-import { FadeType } from './FadeType';
-import { WahPedal } from './WahPedal';
-import { BarreShape } from './BarreShape';
-import { Rasgueado } from './Rasgueado';
-import { ElementStyle } from './ElementStyle';
+import { GolpeType } from '@src/model/GolpeType';
+import { FadeType } from '@src/model/FadeType';
+import { WahPedal } from '@src/model/WahPedal';
+import { BarreShape } from '@src/model/BarreShape';
+import { Rasgueado } from '@src/model/Rasgueado';
+import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * Lists the different modes on how beaming for a beat should be done.

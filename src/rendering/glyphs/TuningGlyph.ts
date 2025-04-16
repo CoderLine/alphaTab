@@ -4,8 +4,8 @@ import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import type { Color } from '@src/model';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import type { Color } from '@src/model/Color';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;

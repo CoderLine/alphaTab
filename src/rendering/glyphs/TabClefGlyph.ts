@@ -1,9 +1,9 @@
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { BarSubElement } from '@src/model';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@src/model/Bar';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class TabClefGlyph extends Glyph {
     public override doLayout(): void {

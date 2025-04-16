@@ -26,11 +26,11 @@
  */
 
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import type { VorbisStream } from './VorbisStream';
-import type { OggPacket } from './OggReader';
+import type { VorbisStream } from '@src/synth/vorbis/VorbisStream';
+import type { OggPacket } from '@src/synth/vorbis/OggReader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { IntBitReader } from './IntBitReader';
+import { IntBitReader } from '@src/synth/vorbis/IntBitReader';
 
 export class VorbisSetupHeader {
     public codebooks: VorbisCodebook[] = [];

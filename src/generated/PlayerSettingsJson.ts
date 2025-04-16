@@ -5,8 +5,8 @@
 // </auto-generated>
 import { PlayerOutputMode } from "@src/PlayerSettings";
 import { ScrollMode } from "@src/PlayerSettings";
-import { VibratoPlaybackSettingsJson } from "./VibratoPlaybackSettingsJson";
-import { SlidePlaybackSettingsJson } from "./SlidePlaybackSettingsJson";
+import { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";
+import { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJson";
 /**
  * The player settings control how the audio playback and UI is behaving.
  * @json

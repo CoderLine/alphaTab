@@ -2,8 +2,8 @@ import { CrescendoType } from '@src/model/CrescendoType';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
-import { MusicFontSymbol } from '@src/model';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class CrescendoGlyph extends GroupedEffectGlyph {
     private _crescendo: CrescendoType;

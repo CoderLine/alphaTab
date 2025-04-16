@@ -1,12 +1,12 @@
-import type { Beat } from '@src/model';
-import { NotationElement } from '@src/NotationSettings';
-import type { BarRendererBase } from '../BarRendererBase';
-import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import type { EffectGlyph } from '../glyphs/EffectGlyph';
-import type { Settings } from '@src/Settings';
+import type { Beat } from '@src/model/Beat';
 import { NoteOrnament } from '@src/model/NoteOrnament';
-import { NoteOrnamentGlyph } from '../glyphs/NoteOrnamentGlyph';
+import { NotationElement } from '@src/NotationSettings';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { NoteOrnamentGlyph } from '@src/rendering/glyphs/NoteOrnamentGlyph';
+import type { Settings } from '@src/Settings';
 
 export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {

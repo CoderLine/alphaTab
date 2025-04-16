@@ -20,7 +20,7 @@ import { Settings } from '@src/Settings';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import type { ControllerType } from '@src/midi';
+import type { ControllerType } from '@src/midi/ControllerType';
 import { JsonHelper } from '@src/io/JsonHelper';
 
 /**

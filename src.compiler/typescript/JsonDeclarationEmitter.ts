@@ -69,7 +69,7 @@ function createJsonTypeNode(
         if (isOwnType) {
             const isGeneratedJsonDeclaration = typeInfo.jsDocTags?.some(t => t.tagName.text === 'json_declaration');
             if (isGeneratedJsonDeclaration) {
-                importer(`${typeInfo.typeAsString}Json`, `./${typeInfo.typeAsString}Json`);
+                importer(`${typeInfo.typeAsString}Json`, `@src/generated/${typeInfo.typeAsString}Json`);
             } else {
                 importer(`${typeInfo.typeAsString}Json`, typeInfo.modulePath);
             }
@@ -205,7 +205,7 @@ const emit = createEmitter('json_declaration', (program, input) => {
         )
     );
 
-    allJsonTypes.set(`${input.name!.text}Json`, `./${input.name!.text}Json`);
+    allJsonTypes.set(`${input.name!.text}Json`, `@src/generated/${input.name!.text}Json`);
     const sourceFile = ts.factory.createSourceFile(
         [...statements],
         ts.factory.createToken(ts.SyntaxKind.EndOfFileToken),
@@ -236,5 +236,5 @@ export default function emitWithIndex(program: ts.Program, _diagnostics: ts.Diag
         ts.NodeFlags.None
     );
 
-    generateFile(program, sourceFile, 'json.ts');
+    generateFile(program, sourceFile, '_jsonbarrel.ts');
 }

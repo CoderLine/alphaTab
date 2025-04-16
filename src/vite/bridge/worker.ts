@@ -2,12 +2,12 @@
 
 // index.ts for more details on contents and license of this file
 
-import type { ResolvedConfig } from './config';
-import { cleanUrl, getHash } from './utils';
+import type { ResolvedConfig } from '@src/vite/bridge/config';
+import { cleanUrl, getHash } from '@src/vite/bridge/utils';
 import type { OutputChunk } from 'rollup';
 import * as path from 'node:path';
 import { BuildEnvironment } from 'vite';
-import { injectEnvironmentToHooks } from './build';
+import { injectEnvironmentToHooks } from '@src/vite/bridge/build';
 
 // biome-ignore lint/suspicious/noConstEnum: Exception where we use them
 export const enum AlphaTabWorkerTypes {

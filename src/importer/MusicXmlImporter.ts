@@ -1,61 +1,51 @@
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
+import { IOHelper } from '@src/io/IOHelper';
+import { Logger } from '@src/Logger';
+import { MidiUtils } from '@src/midi/MidiUtils';
+import { AccentuationType } from '@src/model/AccentuationType';
+import { Automation, AutomationType } from '@src/model/Automation';
+import { Bar, BarLineStyle, SustainPedalMarkerType, SustainPedalMarker } from '@src/model/Bar';
+import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { BendPoint } from '@src/model/BendPoint';
+import { BrushType } from '@src/model/BrushType';
+import { Chord } from '@src/model/Chord';
+import { Clef } from '@src/model/Clef';
+import { CrescendoType } from '@src/model/CrescendoType';
+import { Direction } from '@src/model/Direction';
+import { Duration } from '@src/model/Duration';
+import { DynamicValue } from '@src/model/DynamicValue';
+import { FermataType, Fermata } from '@src/model/Fermata';
+import { Fingers } from '@src/model/Fingers';
+import { GolpeType } from '@src/model/GolpeType';
+import { GraceType } from '@src/model/GraceType';
+import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { KeySignature } from '@src/model/KeySignature';
+import { KeySignatureType } from '@src/model/KeySignatureType';
+import { MasterBar } from '@src/model/MasterBar';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { Note, NoteStyle } from '@src/model/Note';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Ottavia } from '@src/model/Ottavia';
+import { PickStroke } from '@src/model/PickStroke';
 import { Score } from '@src/model/Score';
-
+import { Section } from '@src/model/Section';
+import { SimileMark } from '@src/model/SimileMark';
+import { SlideOutType } from '@src/model/SlideOutType';
+import { Staff } from '@src/model/Staff';
+import { Track } from '@src/model/Track';
+import { TripletFeel } from '@src/model/TripletFeel';
+import { VibratoType } from '@src/model/VibratoType';
+import { Voice } from '@src/model/Voice';
+import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { SynthConstants } from '@src/synth/SynthConstants';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import type { XmlNode } from '@src/xml/XmlNode';
-import { IOHelper } from '@src/io/IOHelper';
-import { ZipReader } from '@src/zip/ZipReader';
 import type { ZipEntry } from '@src/zip/ZipEntry';
-import {
-    AccentuationType,
-    Automation,
-    AutomationType,
-    Bar,
-    Beat,
-    BeatBeamingMode,
-    BendPoint,
-    BrushType,
-    Chord,
-    Clef,
-    CrescendoType,
-    Direction,
-    Duration,
-    DynamicValue,
-    Fermata,
-    FermataType,
-    Fingers,
-    GolpeType,
-    GraceType,
-    InstrumentArticulation,
-    KeySignature,
-    KeySignatureType,
-    MasterBar,
-    MusicFontSymbol,
-    Note,
-    NoteAccidentalMode,
-    NoteOrnament,
-    NoteStyle,
-    Ottavia,
-    PickStroke,
-    Section,
-    SimileMark,
-    SlideOutType,
-    Staff,
-    SustainPedalMarker,
-    SustainPedalMarkerType,
-    Track,
-    TripletFeel,
-    VibratoType,
-    Voice
-} from '@src/model';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { Logger } from '@src/Logger';
-import { BeamDirection } from '@src/rendering';
-import { ModelUtils } from '@src/model/ModelUtils';
-import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { BarLineStyle } from '@src/model/Bar';
+import { ZipReader } from '@src/zip/ZipReader';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;

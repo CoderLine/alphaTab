@@ -1,13 +1,13 @@
 import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
-import { BarSubElement } from '@src/model';
+import { BarSubElement } from '@src/model/Bar';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { BarRendererBase } from '../BarRendererBase';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];

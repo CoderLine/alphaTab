@@ -1,8 +1,8 @@
-import type { ICanvas } from '@src/platform';
-import { Glyph } from './Glyph';
-import { NumberedBarRenderer } from '../NumberedBarRenderer';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { type Beat, BeatSubElement } from '@src/model';
+import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { NumberedBarRenderer } from '@src/rendering/NumberedBarRenderer';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class NumberedDashGlyph extends Glyph {
     private static Padding = 3;

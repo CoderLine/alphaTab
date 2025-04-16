@@ -1,7 +1,7 @@
 import { NoteOrnament } from '@src/model/NoteOrnament';
-import { MusicFontGlyph } from './MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model';
-import type { ICanvas } from '@src/platform';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class NoteOrnamentGlyph extends MusicFontGlyph {
     constructor(ornament: NoteOrnament) {

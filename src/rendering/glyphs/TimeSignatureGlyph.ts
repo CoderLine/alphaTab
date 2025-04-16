@@ -2,10 +2,10 @@ import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
-import { GhostParenthesisGlyph } from './GhostParenthesisGlyph';
-import { BarSubElement } from '@src/model';
-import type { ICanvas } from '@src/platform';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@src/model/Bar';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export abstract class TimeSignatureGlyph extends GlyphGroup {
     private _numerator: number = 0;

@@ -33,7 +33,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from '@src/vite/AlphaTabVitePluginOptions';
 import {
     type ResolvedConfig,
     type Plugin,
@@ -46,8 +46,8 @@ import {
     AlphaTabWorkerTypes,
     WORKER_ASSET_ID,
     WORKER_FILE_ID
-} from './bridge';
-import {} from './bridge';
+} from '@src/vite/bridge';
+import {} from '@src/vite/bridge';
 import * as path from 'node:path';
 import MagicString from 'magic-string';
 

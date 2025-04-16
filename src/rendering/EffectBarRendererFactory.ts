@@ -4,8 +4,9 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRenderer } from '@src/rendering/EffectBarRenderer';
 import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import type { RenderStaff } from './staves/RenderStaff';
-import type { Staff, Track } from '@src/model';
+import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 
 export class EffectBarRendererFactory extends BarRendererFactory {
     public infos: EffectBarRendererInfo[];

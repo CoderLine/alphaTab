@@ -6,6 +6,7 @@
             "**/node_modules/.vite-temp/**"
         ]
     },
+    "typescript.preferences.importModuleSpecifier": "non-relative",
     "[typescript]": {
         "editor.defaultFormatter": "biomejs.biome"
     },

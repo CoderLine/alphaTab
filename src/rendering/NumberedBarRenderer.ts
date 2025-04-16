@@ -7,21 +7,22 @@ import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererB
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from './LineBarRenderer';
-import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
-import { NumberedBeatContainerGlyph } from './NumberedBeatContainerGlyph';
-import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from './glyphs/NumberedBeatGlyph';
-import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
-import { SpacingGlyph } from './glyphs/SpacingGlyph';
-import { NumberedKeySignatureGlyph } from './glyphs/NumberedKeySignatureGlyph';
+import { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import { NumberedBeatContainerGlyph } from '@src/rendering/NumberedBeatContainerGlyph';
+import { NumberedBeatGlyph, NumberedBeatPreNotesGlyph } from '@src/rendering/glyphs/NumberedBeatGlyph';
+import { ScoreTimeSignatureGlyph } from '@src/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
+import { NumberedKeySignatureGlyph } from '@src/rendering/glyphs/NumberedKeySignatureGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { Duration, MusicFontSymbol } from '@src/model';
-import { BeatXPosition } from './BeatXPosition';
-import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from './utils/MusicFontSymbolSizes';
-import { BarLineGlyph } from './glyphs/BarLineGlyph';
+import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { BarLineGlyph } from '@src/rendering/glyphs/BarLineGlyph';
+import { Duration } from '@src/model/Duration';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using (Jianpu) Numbered Music Notation

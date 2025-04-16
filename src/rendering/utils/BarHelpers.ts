@@ -4,7 +4,7 @@ import type { Voice } from '@src/model/Voice';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarCollisionHelper } from '@src/rendering/utils/BarCollisionHelper';
-import type { BeamDirection } from './BeamDirection';
+import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class BarHelpers {
     private _renderer: BarRendererBase;

@@ -2,24 +2,15 @@ import { StaveProfile } from '@src/StaveProfile';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
-import {
-    BarStyle,
-    BarSubElement,
-    BeatStyle,
-    BeatSubElement,
-    Color,
-    NoteStyle,
-    NoteSubElement,
-    type Score,
-    ScoreStyle,
-    ScoreSubElement,
-    TrackStyle,
-    TrackSubElement,
-    VoiceStyle,
-    VoiceSubElement
-} from '@src/model';
 import { expect } from 'chai';
 import { Logger } from '@src/Logger';
+import { BarStyle, BarSubElement } from '@src/model/Bar';
+import { BeatStyle, BeatSubElement } from '@src/model/Beat';
+import { Color } from '@src/model/Color';
+import { NoteStyle, NoteSubElement } from '@src/model/Note';
+import { type Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
+import { TrackStyle, TrackSubElement } from '@src/model/Track';
+import { VoiceStyle, VoiceSubElement } from '@src/model/Voice';
 
 describe('GeneralTests', () => {
     it('song-details', async () => {

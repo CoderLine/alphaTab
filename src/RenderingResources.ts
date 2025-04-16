@@ -1,6 +1,6 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { ScoreSubElement } from './model';
+import { ScoreSubElement } from '@src/model/Score';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.

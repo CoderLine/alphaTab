@@ -7,16 +7,16 @@ import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererB
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from './LineBarRenderer';
-import { SlashBeatContainerGlyph } from './SlashBeatContainerGlyph';
-import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
-import { SlashBeatGlyph } from './glyphs/SlashBeatGlyph';
-import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
-import { SpacingGlyph } from './glyphs/SpacingGlyph';
-import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from './utils/MusicFontSymbolSizes';
-import { MusicFontSymbol } from '@src/model';
+import { LineBarRenderer } from '@src/rendering//LineBarRenderer';
+import { SlashBeatContainerGlyph } from '@src/rendering/SlashBeatContainerGlyph';
+import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import { SlashBeatGlyph } from '@src/rendering/glyphs/SlashBeatGlyph';
+import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
+import { ScoreTimeSignatureGlyph } from '@src/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation

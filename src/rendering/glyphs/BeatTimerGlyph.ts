@@ -1,5 +1,5 @@
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform';
-import { EffectGlyph } from './EffectGlyph';
+import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class BeatTimerGlyph extends EffectGlyph {
     private static readonly PaddingX = 2;

@@ -1,8 +1,8 @@
 import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { RenderingResources } from '@src/RenderingResources';
-import type { LineBarRenderer } from '../LineBarRenderer';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class BarNumberGlyph extends Glyph {
     private _number: number = 0;

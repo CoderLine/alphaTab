@@ -229,7 +229,7 @@ export default defineConfig(({ command, mode }) => {
                 [name]: path.resolve(__dirname, entry)
             };
 
-            (config.build!.rollupOptions!.external as string[]).push('./alphaTab.core');
+            (config.build!.rollupOptions!.external as string[]).push('@src/alphaTab.core');
 
             (config.build!.rollupOptions!.output as OutputOptions[]).push({
                 ...commonOutput,
@@ -309,9 +309,8 @@ export default defineConfig(({ command, mode }) => {
                             const modifiedCode = new MagicString(code);
                             const extension = min ? '.min.mjs' : '.mjs';
                             modifiedCode
-                                .replaceAll(/alphaTab.core(.ts)?(['"])/g, `alphaTab.core${extension}$2`)
-                                .replaceAll(/alphaTab.worker(.ts)?(['"])/g, `alphaTab.worker${extension}$2`)
-                                .replaceAll(/alphaTab.worklet(.ts)?(['"])/g, `alphaTab.worklet${extension}$2`);
+                                 .replaceAll(/(@src|\.)\/alphaTab\.(core|worker|worklet)(\.ts)?(['"])/g, 
+                                    `./alphaTab.$2${extension}$4`)
 
                             return {
                                 code: modifiedCode.toString(),

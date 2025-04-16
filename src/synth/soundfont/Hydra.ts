@@ -10,7 +10,7 @@ import type { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 
 import { FormatError } from '@src/FormatError';
-import { VorbisFile } from '../vorbis/VorbisFile';
+import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 
 export class Hydra {

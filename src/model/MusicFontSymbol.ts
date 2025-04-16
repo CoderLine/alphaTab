@@ -239,7 +239,7 @@ export enum MusicFontSymbol {
     DynamicSforzandoPiano = 0xe537,
     DynamicSforzandoPianissimo = 0xe538,
     DynamicSforzato = 0xe539,
-    DynamicSforzatoPiano = 0xE53A,
+    DynamicSforzatoPiano = 0xe53a,
     DynamicSforzatoFF = 0xe53b,
     DynamicRinforzando1 = 0xe53c,
     DynamicRinforzando2 = 0xe53d,

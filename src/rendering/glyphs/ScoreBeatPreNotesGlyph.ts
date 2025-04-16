@@ -14,9 +14,9 @@ import { ScoreBrushGlyph } from '@src/rendering/glyphs/ScoreBrushGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { FingeringGroupGlyph } from './FingeringGroupGlyph';
-import { BeatSubElement } from '@src/model';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { FingeringGroupGlyph } from '@src/rendering/glyphs/FingeringGroupGlyph';
+import { BeatSubElement } from '@src/model/Beat';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;

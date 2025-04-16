@@ -1,10 +1,10 @@
-import { BeatSubElement } from '@src/model';
+import { BeatSubElement } from '@src/model/Beat';
 import type { Duration } from '@src/model/Duration';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabRestGlyph extends MusicFontGlyph {
     private _isVisibleRest: boolean;

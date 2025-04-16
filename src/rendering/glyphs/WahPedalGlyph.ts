@@ -1,7 +1,7 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { WahPedal } from '@src/model/WahPedal';
-import { MusicFontGlyph } from './MusicFontGlyph';
-import type { ICanvas } from '@src/platform';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class WahPedalGlyph extends MusicFontGlyph {
     public constructor(wahPedal: WahPedal) {

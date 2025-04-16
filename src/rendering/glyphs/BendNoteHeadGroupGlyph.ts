@@ -1,4 +1,4 @@
-import type { Color } from '@src/model';
+import type { Color } from '@src/model/Color';
 import { AccidentalType } from '@src/model/AccidentalType';
 import type { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';

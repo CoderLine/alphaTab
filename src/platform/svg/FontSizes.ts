@@ -1,7 +1,7 @@
 import { FontStyle, FontWeight } from '@src/model/Font';
 import { Environment } from '@src/Environment';
-import { MeasuredText } from '../ICanvas';
-import { WebPlatform } from '../javascript/WebPlatform';
+import { MeasuredText } from '@src/platform/ICanvas';
+import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 /**
  * Describes the sizes of a font for measuring purposes.

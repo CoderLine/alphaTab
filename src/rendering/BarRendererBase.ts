@@ -22,10 +22,10 @@ import type { RenderingResources } from '@src/RenderingResources';
 import type { Settings } from '@src/Settings';
 import type { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { InternalSystemsLayoutMode } from './layout/ScoreLayout';
-import type { BeamDirection } from './utils/BeamDirection';
-import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import { InternalSystemsLayoutMode } from '@src/rendering/layout/ScoreLayout';
+import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { MultiBarRestBeatContainerGlyph } from '@src/rendering/MultiBarRestBeatContainerGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 /**
  * Lists the different position modes for {@link BarRendererBase.getNoteY}

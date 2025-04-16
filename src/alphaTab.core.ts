@@ -30,12 +30,15 @@ export { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@src/generated/VersionInfo';
 
-export * as importer from './importer';
-export * as io from './io';
-export * as exporter from './exporter';
-export * as midi from './midi';
-export * as model from './model';
-export * as rendering from './rendering';
-export * as platform from './platform';
-export * as synth from './synth';
-export * as json from './generated/json';
+// alphaTab2.0: We should reliminate the big bundles but ship individual 
+// modules which can be imported. e.g. import { Track } from '@coderline/alphatab/model/Track'
+// for this generally some reoganization is likely needed to void circular dependencies better
+export * as importer from '@src/importer/_barrel';
+export * as io from '@src/io/_barrel';
+export * as exporter from '@src/exporter/_barrel';
+export * as midi from '@src/midi/_barrel';
+export * as model from '@src/model/_barrel';
+export * as rendering from '@src/rendering/_barrel';
+export * as platform from '@src/platform/_barrel';
+export * as synth from '@src/synth/_barrel';
+export * as json from '@src/generated/_jsonbarrel';

@@ -1,5 +1,5 @@
 /**@target web */
-import { isWorkerRuntime, type webPackWithAlphaTab, type webpackTypes } from './Utils';
+import { isWorkerRuntime, type webPackWithAlphaTab, type webpackTypes } from '@src/webpack/Utils';
 
 export function injectWorkletRuntimeModule(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWorkletStartRuntimeModule extends webPackWithAlphaTab.webpack.RuntimeModule {

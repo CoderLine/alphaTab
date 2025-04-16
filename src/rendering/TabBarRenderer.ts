@@ -16,11 +16,11 @@ import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGl
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from './LineBarRenderer';
+import { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { GraceType } from '@src/model/GraceType';
-import type { ReservedLayoutAreaSlot } from './utils/BarCollisionHelper';
-import { MultiBarRestBeatContainerGlyph } from './MultiBarRestBeatContainerGlyph';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import type { ReservedLayoutAreaSlot } from '@src/rendering/utils/BarCollisionHelper';
+import { MultiBarRestBeatContainerGlyph } from '@src/rendering/MultiBarRestBeatContainerGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
