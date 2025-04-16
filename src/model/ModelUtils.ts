@@ -409,7 +409,6 @@ export class ModelUtils {
                 if (
                     masterBar.alternateEndings ||
                     (masterBar.isRepeatStart && masterBar.index !== currentGroupStartIndex) ||
-                    masterBar.isDoubleBar ||
                     masterBar.isFreeTime ||
                     masterBar.isAnacrusis ||
                     masterBar.section !== null ||

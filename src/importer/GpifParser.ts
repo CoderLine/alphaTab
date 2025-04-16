@@ -1,7 +1,7 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -118,6 +118,8 @@ export class GpifParser {
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
+
+    private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<number, Automation[]>();
@@ -1149,6 +1151,7 @@ export class GpifParser {
                     break;
                 case 'DoubleBar':
                     masterBar.isDoubleBar = true;
+                    this._doubleBars.add(masterBar);
                     break;
                 case 'Section':
                     masterBar.section = new Section();
@@ -2392,6 +2395,15 @@ export class GpifParser {
             const masterBar: MasterBar = this._masterBars[i];
             this.score.addMasterBar(masterBar);
         }
+
+        // Its a bit wierd. but the last bar might be flagged as "DoubleBar" 
+        // we have to clear this 
+        const lastMasterBar = this._masterBars[this._masterBars.length -1];
+        if(this._doubleBars.has(lastMasterBar)) {
+            this._doubleBars.delete(lastMasterBar);
+            lastMasterBar.isDoubleBar = false;
+        }
+
         // add tracks to score
         for (const trackId of this._tracksMapping) {
             if (!trackId) {
@@ -2415,6 +2427,11 @@ export class GpifParser {
                     const track: Track = this.score.tracks[trackIndex];
                     const staff: Staff = track.staves[staffIndex];
                     staff.addBar(bar);
+
+                    if (this._doubleBars.has(bar.masterBar)) {
+                        bar.barLineRight = BarLineStyle.LightLight;
+                    }
+
                     if (this._voicesOfBar.has(barId)) {
                         // add voices to bars
                         for (const voiceId of this._voicesOfBar.get(barId)!) {

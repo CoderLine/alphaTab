@@ -12,10 +12,7 @@ export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
     }
 
     public override addGlyph(g: Glyph): void {
-        g.x =
-            this.glyphs!.length === 0
-                ? 0
-                : this.glyphs![this.glyphs!.length - 1].x + this.glyphs![this.glyphs!.length - 1].width;
+        g.x = this.width;
         g.renderer = this.renderer;
         g.doLayout();
         this.width = g.x + g.width;

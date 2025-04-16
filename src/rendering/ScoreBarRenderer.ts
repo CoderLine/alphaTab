@@ -54,8 +54,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return BarSubElement.StandardNotationBarNumber;
     }
 
-    public override get barSeparatorBarSubElement(): BarSubElement {
-        return BarSubElement.StandardNotationBarSeparator;
+    public override get barLineBarSubElement(): BarSubElement {
+        return BarSubElement.StandardNotationBarLines;
     }
 
     public override get staffLineBarSubElement(): BarSubElement {

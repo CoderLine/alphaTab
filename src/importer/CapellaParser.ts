@@ -1,7 +1,7 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
+import { Bar, BarLineStyle } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
@@ -629,7 +629,7 @@ export class CapellaParser {
                     case 'barline':
                         switch (c.getAttribute('type')) {
                             case 'double':
-                                this._currentBar.masterBar.isDoubleBar = true;
+                                this._currentBar.barLineRight = BarLineStyle.LightLight;
                                 if (!this._currentVoiceState.currentBarComplete) {
                                     this._currentBar.masterBar.isAnacrusis = true;
                                 }

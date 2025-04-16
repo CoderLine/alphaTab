@@ -20,9 +20,9 @@ public class Set<T> : Set, IEnumerable<T>, ICollection
 
     public double Size => _data.Count;
 
-    public Set(IEnumerable<T> values)
+    public Set(IEnumerable<T>? values)
     {
-        _data = new HashSet<T>(values);
+        _data = values == null ? new HashSet<T>() : new HashSet<T>(values);
     }
 
     public void Clear()

@@ -49,8 +49,8 @@ export class TabBarRenderer extends LineBarRenderer {
         return BarSubElement.GuitarTabsBarNumber;
     }
 
-    public override get barSeparatorBarSubElement(): BarSubElement {
-        return BarSubElement.GuitarTabsBarSeparator;
+    public override get barLineBarSubElement(): BarSubElement {
+        return BarSubElement.GuitarTabsBarLines;
     }
 
     public override get staffLineBarSubElement(): BarSubElement {

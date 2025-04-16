@@ -106,24 +106,24 @@ export enum BarSubElement {
     NumberedBarNumber = 7,
 
     /**
-     * The bar separator lines on the standard notation staff.
+     * The bar lines on the standard notation staff.
      */
-    StandardNotationBarSeparator = 8,
+    StandardNotationBarLines = 8,
 
     /**
-     * The bar separator lines on the guitar tab staff.
+     * The bar lines on the guitar tab staff.
      */
-    GuitarTabsBarSeparator = 9,
+    GuitarTabsBarLines = 9,
 
     /**
-     * The bar separator lines on the slash staff.
+     * The bar lines on the slash staff.
      */
-    SlashBarSeparator = 10,
+    SlashBarLines = 10,
 
     /**
-     * The bar separator lines on the numbered notation staff.
+     * The bar lines on the numbered notation staff.
      */
-    NumberedBarSeparator = 11,
+    NumberedBarLines = 11,
 
     /**
      * The clefs on the standard notation staff.
@@ -192,6 +192,27 @@ export enum BarSubElement {
  * @json_strict
  */
 export class BarStyle extends ElementStyle<BarSubElement> {}
+
+/**
+ * Lists all bar line styles.
+ */
+export enum BarLineStyle {
+    /**
+     * No special custom line style, automatic handling (e.g. last bar might be LightHeavy)
+     */
+    Automatic = 0,
+    Dashed = 1,
+    Dotted = 2,
+    Heavy = 3,
+    HeavyHeavy = 4,
+    HeavyLight = 5,
+    LightHeavy = 6,
+    LightLight = 7,
+    None = 8,
+    Regular = 9,
+    Short = 10,
+    Tick = 11
+}
 
 /**
  * A bar is a single block within a track, also known as Measure.
@@ -300,6 +321,82 @@ export class Bar {
      */
     public get isRestOnly(): boolean {
         return this._isRestOnly;
+    }
+
+    /**
+     * The bar line to draw on the left side of the bar.
+     * @remarks
+     * Note that the combination with {@link barLineRight} of the previous bar matters.
+     * If this bar has a Regular/Automatic style but the previous bar is customized, no additional line is drawn by this bar.
+     * If both bars have a custom style, both bar styles are drawn.
+     */
+    public barLineLeft: BarLineStyle = BarLineStyle.Automatic;
+
+    /**
+     * The bar line to draw on the right side of the bar.
+     * @remarks
+     * Note that the combination with {@link barLineLeft} of the next bar matters.
+     * If this bar has a Regular/Automatic style but the next bar is customized, no additional line is drawn by this bar.
+     * If both bars have a custom style, both bar styles are drawn.
+     */
+    public barLineRight: BarLineStyle = BarLineStyle.Automatic;
+
+    /**
+     * The bar line to draw on the left side of the bar with an "automatic" type resolved to the actual one.
+     * @param isFirstOfSystem  Whether the bar is the first one in the system.
+     */
+    public getActualBarLineLeft(isFirstOfSystem: boolean): BarLineStyle {
+        return Bar.actualBarLine(this, false, isFirstOfSystem);
+    }
+
+    /**
+     * The bar line to draw on the right side of the bar with an "automatic" type resolved to the actual one.
+     * @param isFirstOfSystem  Whether the bar is the first one in the system.
+     */
+    public getActualBarLineRight(): BarLineStyle {
+        return Bar.actualBarLine(this, true, false /* not relevant */);
+    }
+
+    private static automaticToActualType(masterBar: MasterBar, isRight: boolean, firstOfSystem: boolean) {
+        let actualLineType: BarLineStyle;
+
+        if (isRight) {
+            if (masterBar.isRepeatEnd) {
+                actualLineType = BarLineStyle.LightHeavy;
+            } else if (!masterBar.nextMasterBar) {
+                actualLineType = BarLineStyle.LightHeavy;
+            } else if (masterBar.isFreeTime) {
+                actualLineType = BarLineStyle.Dashed;
+            } else if (masterBar.isDoubleBar) {
+                actualLineType = BarLineStyle.LightLight;
+            } else {
+                actualLineType = BarLineStyle.Regular;
+            }
+        } else {
+            if (masterBar.isRepeatStart) {
+                actualLineType = BarLineStyle.HeavyLight;
+            } else if (firstOfSystem) {
+                actualLineType = BarLineStyle.Regular;
+            } else {
+                actualLineType = BarLineStyle.None;
+            }
+        }
+
+        return actualLineType;
+    }
+
+    private static actualBarLine(bar: Bar, isRight: boolean, firstOfSystem: boolean) {
+        const masterBar = bar.masterBar;
+        const requestedLineType = isRight ? bar.barLineRight : bar.barLineLeft;
+
+        let actualLineType: BarLineStyle;
+        if (requestedLineType === BarLineStyle.Automatic) {
+            actualLineType = Bar.automaticToActualType(masterBar, isRight, firstOfSystem);
+        } else {
+            actualLineType = requestedLineType;
+        }
+
+        return actualLineType;
     }
 
     /**

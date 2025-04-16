@@ -2,6 +2,8 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import type { Automation } from '@src/model/Automation';
 import type { Beat } from '@src/model/Beat';
 import type { Fermata } from '@src/model/Fermata';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
+import type { Bar } from '@src/model/Bar'
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import type { RepeatGroup } from '@src/model/RepeatGroup';
@@ -54,6 +56,7 @@ export class MasterBar {
 
     /**
      * Gets or sets whether a double bar is shown for this masterbar.
+     * @deprecated Use {@link Bar.barLineLeft} and {@link Bar.barLineRight}
      */
     public isDoubleBar: boolean = false;
 

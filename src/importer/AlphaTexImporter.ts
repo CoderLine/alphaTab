@@ -3,7 +3,7 @@ import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -199,6 +199,8 @@ export class AlphaTexImporter extends ScoreImporter {
         this.data = ByteBuffer.empty();
         this._input = tex;
         this.settings = settings;
+        // when beginning reading a new score we reset the IDs.
+        Score.resetIds();
     }
 
     public readScore(): Score {
@@ -3074,6 +3076,23 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else if (syData === 'db') {
                 master.isDoubleBar = true;
+                bar.barLineRight = BarLineStyle.LightLight;
+                this._sy = this.newSy();
+            } else if (syData === 'barlineleft') {
+                this._sy = this.newSy();
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('barlineleft', AlphaTexSymbols.String, true);
+                }
+
+                bar.barLineLeft = this.parseBarLineStyle(this._syData as string);
+                this._sy = this.newSy();
+            } else if (syData === 'barlineright') {
+                this._sy = this.newSy();
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('barlineright', AlphaTexSymbols.String, true);
+                }
+
+                bar.barLineRight = this.parseBarLineStyle(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'accidentals') {
                 this.handleAccidentalMode();
@@ -3133,7 +3152,14 @@ export class AlphaTexImporter extends ScoreImporter {
                             break;
                     }
                 } else {
-                    this.error('measure-effects', AlphaTexSymbols.String, false);
+                    switch (this.handleStaffMeta()) {
+                        case StaffMetaResult.EndOfMetaDetected:
+                            endOfMeta = true;
+                            break;
+                        default:
+                            this.error('measure-effects', AlphaTexSymbols.String, false);
+                            break;
+                    }
                 }
             }
         }
@@ -3147,6 +3173,37 @@ export class AlphaTexImporter extends ScoreImporter {
             master.tempoAutomations.push(tempoAutomation);
         }
         return anyMeta;
+    }
+
+    private parseBarLineStyle(v: string): BarLineStyle {
+        switch (v.toLowerCase()) {
+            case 'automatic':
+                return BarLineStyle.Automatic;
+            case 'dashed':
+                return BarLineStyle.Dashed;
+            case 'dotted':
+                return BarLineStyle.Dotted;
+            case 'heavy':
+                return BarLineStyle.Heavy;
+            case 'heavyheavy':
+                return BarLineStyle.HeavyHeavy;
+            case 'heavylight':
+                return BarLineStyle.HeavyLight;
+            case 'lightheavy':
+                return BarLineStyle.LightHeavy;
+            case 'lightlight':
+                return BarLineStyle.LightLight;
+            case 'none':
+                return BarLineStyle.None;
+            case 'regular':
+                return BarLineStyle.Regular;
+            case 'short':
+                return BarLineStyle.Short;
+            case 'tick':
+                return BarLineStyle.Tick;
+        }
+
+        return BarLineStyle.Automatic;
     }
 
     private parseSimileMarkFromString(str: string): SimileMark {

@@ -255,9 +255,13 @@ export class RenderStaff {
         // 2nd pass: move renderers to correct position respecting the new overflows
         if (needsSecondPass) {
             topOverflow = this.topOverflow;
+            // shift all the renderers to the new position to match required spacing 
             for (let i: number = 0; i < this.barRenderers.length; i++) {
                 this.barRenderers[i].y = this.topSpacing + topOverflow;
-                this.height = Math.max(this.height, this.barRenderers[i].height);
+            }
+
+            // finalize again (to align ties) 
+            for (let i: number = 0; i < this.barRenderers.length; i++) {
                 this.barRenderers[i].finalizeRenderer();
             }
         }

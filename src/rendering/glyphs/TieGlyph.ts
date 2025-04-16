@@ -93,7 +93,8 @@ export class TieGlyph extends Glyph {
                 this._tieHeight = 0; // TODO: Bend slur height to be considered?
             } else {
                 this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
-                this.height = TieGlyph.calculateActualTieHeight(
+
+                const tieBoundingBox = TieGlyph.calculateActualTieHeight(
                     1,
                     this._startX,
                     this._startY,
@@ -102,11 +103,19 @@ export class TieGlyph extends Glyph {
                     this.tieDirection === BeamDirection.Down,
                     this._tieHeight,
                     4
-                ).h;
-            }
+                );
 
-            if (this.tieDirection === BeamDirection.Up) {
-                this.y -= this.height;
+                this.height = tieBoundingBox.h;
+
+                if (this.tieDirection === BeamDirection.Up) {
+                    // the tie might go above `this.y` due to its shape
+                    // here we calculate how much this is so we can consider the
+                    // respective overflow
+                    const overlap = this.y - tieBoundingBox.y;
+                    if (overlap > 0) {
+                        this.y -= overlap;
+                    }
+                }
             }
         }
     }

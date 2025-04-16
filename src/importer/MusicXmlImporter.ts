@@ -55,6 +55,7 @@ import { BeamDirection } from '@src/rendering';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
 import { SynthConstants } from '@src/synth/SynthConstants';
+import { BarLineStyle } from '@src/model/Bar';
 
 class StaffContext {
     public slurStarts!: Map<string, Note>;
@@ -893,6 +894,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
         const track = this._idToTrackInfo.get(id)!.track;
         this._previousMasterBarNumber = -1;
+        this._implicitBars = 0;
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -936,9 +938,11 @@ export class MusicXmlImporter extends ScoreImporter {
             } else {
                 number = this._previousMasterBarNumber + 1;
             }
+            this._implicitBars++;
         } else if (number === 0) {
             // anacrusis
             number++;
+            this._implicitBars++;
         } else {
             number += this._implicitBars;
         }
@@ -947,7 +951,6 @@ export class MusicXmlImporter extends ScoreImporter {
             const newMasterBar = new MasterBar();
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
-                this._implicitBars++;
             }
             this._score.addMasterBar(newMasterBar);
             if (newMasterBar.index > 0) {
@@ -998,6 +1001,8 @@ export class MusicXmlImporter extends ScoreImporter {
 
         masterBar.alternateEndings = this._nextMasterBarRepeatEnding;
 
+        const barLines: XmlNode[] = [];
+
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'note':
@@ -1027,12 +1032,17 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'listening': Ignored
                 case 'barline':
-                    this.parseBarLine(c, masterBar);
+                    barLines.push(c); // delayed
                     break;
                 // case 'grouping': Ignored
                 // case 'link': Not supported
                 // case 'bookmark': Not supported
             }
+        }
+
+        // parse barline at end of bar (to apply style to all bars of all staves)
+        for (const barLine of barLines) {
+            this.parseBarLine(barLine, masterBar, track);
         }
 
         this.applySimileMarks(masterBar, track);
@@ -1094,11 +1104,11 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseBarLine(element: XmlNode, masterBar: MasterBar) {
+    private parseBarLine(element: XmlNode, masterBar: MasterBar, track: Track) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'bar-style':
-                    this.parseBarStyle(c, masterBar);
+                    this.parseBarStyle(c, masterBar, track, element.getAttribute('location', 'right'));
                     break;
                 // case 'footnote' Ignored
                 // case 'level' Ignored
@@ -1157,23 +1167,55 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseBarStyle(element: XmlNode, masterBar: MasterBar) {
-        switch (element.innerText) {
-            // case 'dashed':  Not Supported
-            // case 'dotted': Not Supported
-            // case 'heavy': Not Supported
-            // case 'heavy-heavy': Not Supported
-            // case 'heavy-light': Not Supported
-            // case 'light-heavy': Not Supported
-            case 'light-light':
-                // NOTE: temporary until we have full support for custom styles
-                masterBar.isDoubleBar = true;
-                break;
+    private parseBarStyle(element: XmlNode, masterBar: MasterBar, track: Track, location: string) {
+        let style = BarLineStyle.Automatic;
 
-            // case 'none': Not Supported
-            // case 'regular': Default
-            // case 'short': Not Supported
-            // case 'tick': Not Supported
+        switch (element.innerText) {
+            case 'dashed':
+                style = BarLineStyle.Dashed;
+                break;
+            case 'dotted':
+                style = BarLineStyle.Dotted;
+                break;
+            case 'heavy':
+                style = BarLineStyle.Heavy;
+                break;
+            case 'heavy-heavy':
+                style = BarLineStyle.HeavyHeavy;
+                break;
+            case 'heavy-light':
+                style = BarLineStyle.HeavyLight;
+                break;
+            case 'light-heavy':
+                style = BarLineStyle.LightHeavy;
+                break;
+            case 'light-light':
+                style = BarLineStyle.LightLight;
+                break;
+            case 'none':
+                style = BarLineStyle.None;
+                break;
+            case 'regular':
+                style = BarLineStyle.Regular;
+                break;
+            case 'short':
+                style = BarLineStyle.Short;
+                break;
+            case 'tick':
+                style = BarLineStyle.Tick;
+                break;
+        }
+
+        for (const s of track.staves) {
+            const bar = this.getOrCreateBar(s, masterBar);
+            switch (location) {
+                case 'left':
+                    bar.barLineLeft = style;
+                    break;
+                case 'right':
+                    bar.barLineRight = style;
+                    break;
+            }
         }
     }
 
