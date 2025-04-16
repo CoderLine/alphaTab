@@ -206,7 +206,7 @@ export interface DisplaySettingsJson {
      * The padding left to the track name label of the system.
      * @since 1.4.0
      * @category Display
-     * @defaultValue `5`
+     * @defaultValue `3`
      */
     systemLabelPaddingRight?: number;
     /**
