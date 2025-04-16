@@ -30,15 +30,15 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 1,
+              "id" => 0,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 1,
+                  "id" => 0,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
-                      "id" => 1,
+                      "id" => 0,
                       "isempty" => true,
                       "automations" => Array [
                         Map {
@@ -60,15 +60,15 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 2,
+              "id" => 1,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 2,
+                  "id" => 1,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
-                      "id" => 2,
+                      "id" => 1,
                       "isempty" => true,
                       "displayduration" => 960,
                       "playbackduration" => 960,
@@ -86,15 +86,15 @@ Map {
           "bars" => Array [
             Map {
               "__kind" => "Bar",
-              "id" => 3,
+              "id" => 2,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 3,
+                  "id" => 2,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
-                      "id" => 3,
+                      "id" => 2,
                       "isempty" => true,
                       "displayduration" => 960,
                       "playbackduration" => 960,
@@ -107,15 +107,15 @@ Map {
             },
             Map {
               "__kind" => "Bar",
-              "id" => 4,
+              "id" => 3,
               "voices" => Array [
                 Map {
                   "__kind" => "Voice",
-                  "id" => 4,
+                  "id" => 3,
                   "beats" => Array [
                     Map {
                       "__kind" => "Beat",
-                      "id" => 4,
+                      "id" => 3,
                       "isempty" => true,
                       "displayduration" => 960,
                       "playbackduration" => 960,

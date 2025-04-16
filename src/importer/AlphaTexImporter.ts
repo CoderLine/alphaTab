@@ -199,6 +199,8 @@ export class AlphaTexImporter extends ScoreImporter {
         this.data = ByteBuffer.empty();
         this._input = tex;
         this.settings = settings;
+        // when beginning reading a new score we reset the IDs.
+        Score.resetIds();
     }
 
     public readScore(): Score {
