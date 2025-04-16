@@ -1,7 +1,7 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { LayoutMode } from '@src/LayoutMode';
 import { Settings } from '@src/Settings';
-import { ScoreLoader } from '@src/importer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 

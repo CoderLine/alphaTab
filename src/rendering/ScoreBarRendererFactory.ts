@@ -3,7 +3,7 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import type { RenderStaff } from './staves/RenderStaff';
+import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import type { Track } from '@src/model/Track';
 import type { Staff } from '@src/model/Staff';
 

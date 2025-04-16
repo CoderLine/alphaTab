@@ -19,8 +19,8 @@ import type { EventEmitterOfT } from '@src/EventEmitter';
 import { NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { TuningGlyph } from '../glyphs/TuningGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
 import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 

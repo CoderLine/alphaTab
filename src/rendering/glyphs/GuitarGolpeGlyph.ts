@@ -1,7 +1,7 @@
 import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import { MusicFontGlyph } from './MusicFontGlyph';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export class GuitarGolpeGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, center: boolean = false) {

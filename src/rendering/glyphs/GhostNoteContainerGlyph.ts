@@ -4,8 +4,8 @@ import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGly
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { NotationElement } from '@src/NotationSettings';
-import type { Color } from '@src/model';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import type { Color } from '@src/model/Color';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class GhostNoteInfo {
     public line: number = 0;

@@ -1,7 +1,8 @@
-import { type ICanvas, TextBaseline } from '@src/platform';
-import { EffectGlyph } from './EffectGlyph';
-import { type Automation, MusicFontSymbol } from '@src/model';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import type { Automation } from '@src/model/Automation';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 /**
  * This glyph renders tempo annotations for tempo automations

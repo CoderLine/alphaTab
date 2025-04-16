@@ -13,8 +13,8 @@ import {
 } from '@src/model/RenderStylesheet';
 import type { IWriteable } from '@src/io/IWriteable';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { TextAlign } from '@src/platform';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { TextAlign } from '@src/platform/ICanvas';
 
 enum DataType {
     Boolean = 0,

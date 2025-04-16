@@ -1,8 +1,8 @@
 import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { BeatXPosition } from '../BeatXPosition';
-import { GroupedEffectGlyph } from './GroupedEffectGlyph';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { BeatXPosition } from '@src/rendering/BeatXPosition';
+import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class TrillGlyph extends GroupedEffectGlyph {
     public constructor(x: number, y: number) {

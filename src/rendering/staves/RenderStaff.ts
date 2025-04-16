@@ -6,7 +6,7 @@ import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import type { StaffSystem } from '@src/rendering/staves/StaffSystem';
 import type { StaffTrackGroup } from '@src/rendering/staves/StaffTrackGroup';
-import { InternalSystemsLayoutMode } from '../layout/ScoreLayout';
+import { InternalSystemsLayoutMode } from '@src/rendering/layout/ScoreLayout';
 
 /**
  * A Staff represents a single line within a StaffSystem.
@@ -255,12 +255,12 @@ export class RenderStaff {
         // 2nd pass: move renderers to correct position respecting the new overflows
         if (needsSecondPass) {
             topOverflow = this.topOverflow;
-            // shift all the renderers to the new position to match required spacing 
+            // shift all the renderers to the new position to match required spacing
             for (let i: number = 0; i < this.barRenderers.length; i++) {
                 this.barRenderers[i].y = this.topSpacing + topOverflow;
             }
 
-            // finalize again (to align ties) 
+            // finalize again (to align ties)
             for (let i: number = 0; i < this.barRenderers.length; i++) {
                 this.barRenderers[i].finalizeRenderer();
             }

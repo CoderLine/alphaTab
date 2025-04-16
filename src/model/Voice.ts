@@ -3,7 +3,7 @@ import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
 import type { Settings } from '@src/Settings';
 import { GraceGroup } from '@src/model/GraceGroup';
-import { ElementStyle } from './ElementStyle';
+import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Voice} which can be styled via {@link Voice.style}

@@ -5,9 +5,9 @@ import { Fingers } from '@src/model/Fingers';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
 import type { Settings } from '@src/Settings';
-import { NoteAccidentalMode } from './NoteAccidentalMode';
-import { MasterBar } from './MasterBar';
-import type { Track } from './Track';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { MasterBar } from '@src/model/MasterBar';
+import type { Track } from '@src/model/Track';
 
 export class TuningParseResult {
     public note: string | null = null;

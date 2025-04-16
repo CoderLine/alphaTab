@@ -5,7 +5,7 @@ import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
-import { BarTempoGlyph } from '../glyphs/BarTempoGlyph';
+import { BarTempoGlyph } from '@src/rendering/glyphs/BarTempoGlyph';
 
 export class TempoEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {

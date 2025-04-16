@@ -1,6 +1,6 @@
-import { ScoreRestGlyph } from './ScoreRestGlyph';
-import type { ICanvas } from '@src/platform';
-import { BeatSubElement } from '@src/model';
+import { BeatSubElement } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 
 export class SlashRestGlyph extends ScoreRestGlyph {
     public override updateBeamingHelper(cx: number): void {

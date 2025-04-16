@@ -3,7 +3,7 @@ import type { ICanvas } from '@src/platform/ICanvas';
 import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { Bounds } from '../utils/Bounds';
+import { Bounds } from '@src/rendering/utils/Bounds';
 
 export class TieGlyph extends Glyph {
     protected startBeat: Beat | null;

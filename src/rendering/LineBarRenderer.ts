@@ -1,18 +1,21 @@
-import { type BarSubElement, type Beat, Duration, GraceType, type TupletGroup } from '@src/model';
-import { BarRendererBase } from './BarRendererBase';
+import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import { SpacingGlyph } from './glyphs/SpacingGlyph';
-import { BeamingHelper } from './utils/BeamingHelper';
-import { BeamDirection } from './utils/BeamDirection';
+import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
+import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NotationMode } from '@src/NotationSettings';
-import { FlagGlyph } from './glyphs/FlagGlyph';
-import { NoteHeadGlyph } from './glyphs/NoteHeadGlyph';
+import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { BarLineGlyph } from './glyphs/BarLineGlyph';
-import { RepeatCountGlyph } from './glyphs/RepeatCountGlyph';
-import { BarNumberGlyph } from './glyphs/BarNumberGlyph';
-import { BeatBeamingMode, type BeatSubElement } from '@src/model/Beat';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import { BarLineGlyph } from '@src/rendering/glyphs/BarLineGlyph';
+import { RepeatCountGlyph } from '@src/rendering/glyphs/RepeatCountGlyph';
+import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
+import { type Beat, BeatBeamingMode, type BeatSubElement } from '@src/model/Beat';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import type { BarSubElement } from '@src/model/Bar';
+import { Duration } from '@src/model/Duration';
+import { GraceType } from '@src/model/GraceType';
+import type { TupletGroup } from '@src/model/TupletGroup';
 
 /**
  * This is a base class for any bar renderer which renders music notation on a staff
@@ -124,7 +127,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
 
         // during system fitting it can happen that we have fraction widths
-        // but to have lines until the full end-pixel we round up. 
+        // but to have lines until the full end-pixel we round up.
         // this way we avoid holes
         const lineWidth = Math.ceil(this.width);
 
@@ -571,9 +574,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this.addPostBeatGlyph(new BarLineGlyph(true));
 
         if (lastBar.masterBar.isRepeatEnd && lastBar.masterBar.repeatCount > 2) {
-            this.addPostBeatGlyph(
-                new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount)
-            );
+            this.addPostBeatGlyph(new RepeatCountGlyph(0, this.getLineHeight(-0.25), this.bar.masterBar.repeatCount));
         }
     }
 

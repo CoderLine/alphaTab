@@ -182,7 +182,6 @@ describe('MusicNotationTests', () => {
         );
     });
 
-    
     it('bar-lines', async () => {
         await VisualTestHelper.runVisualTest('music-notation/barlines.xml');
     });

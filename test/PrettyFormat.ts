@@ -312,7 +312,6 @@ export class PrettyFormat {
     }
 }
 
-import { Bar, Beat, JsonConverter, MasterBar, Note, Score, Staff, Track, Voice } from '@src/model';
 import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
 import { MasterBarSerializer } from '@src/generated/model/MasterBarSerializer';
 import { TrackSerializer } from '@src/generated/model/TrackSerializer';
@@ -322,6 +321,15 @@ import { VoiceSerializer } from '@src/generated/model/VoiceSerializer';
 import { BeatSerializer } from '@src/generated/model/BeatSerializer';
 import { NoteSerializer } from '@src/generated/model/NoteSerializer';
 import { TestPlatform } from './TestPlatform';
+import { Bar } from '@src/model/Bar';
+import { Beat } from '@src/model/Beat';
+import { JsonConverter } from '@src/model/JsonConverter';
+import { MasterBar } from '@src/model/MasterBar';
+import { Note } from '@src/model/Note';
+import { Score } from '@src/model/Score';
+import { Staff } from '@src/model/Staff';
+import { Track } from '@src/model/Track';
+import { Voice } from '@src/model/Voice';
 
 /**
  * A serializer plugin for pretty-format for creating simple Score model snapshots

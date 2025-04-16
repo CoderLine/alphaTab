@@ -20,9 +20,9 @@ import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { PickStroke } from '@src/model/PickStroke';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { NoteOrnament } from './NoteOrnament';
-import { ElementStyle } from './ElementStyle';
-import type { MusicFontSymbol } from './MusicFontSymbol';
+import { NoteOrnament } from '@src/model/NoteOrnament';
+import { ElementStyle } from '@src/model/ElementStyle';
+import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 class NoteIdBag {
     public tieDestinationNoteId: number = -1;

@@ -1,7 +1,7 @@
 import { Environment } from '@src/Environment';
 import { LogLevel } from '@src/LogLevel';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
-import type { BoundsLookup } from './rendering';
+import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 
 /**
  * All main settings of alphaTab controlling rather general aspects of its behavior.

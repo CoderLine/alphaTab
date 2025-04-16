@@ -10,7 +10,7 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import type { RenderingResources } from '@src/RenderingResources';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabWhammyBarGlyph extends Glyph {
     private static readonly TopOffsetSharedDataKey: string = 'tab.whammy.topoffset';

@@ -1,5 +1,5 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
-import { ScoreLoader } from '@src/importer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';

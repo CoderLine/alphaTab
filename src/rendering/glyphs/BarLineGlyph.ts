@@ -1,9 +1,9 @@
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BarLineStyle } from '@src/model/Bar';
-import { LeftToRightLayoutingGlyphGroup } from './LeftToRightLayoutingGlyphGroup';
-import type { LineBarRenderer } from '../LineBarRenderer';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
+import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 abstract class BarLineGlyphBase extends Glyph {
     public override doLayout(): void {

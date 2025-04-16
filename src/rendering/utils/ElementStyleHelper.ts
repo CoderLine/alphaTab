@@ -1,19 +1,12 @@
-import {
-    type Bar,
-    BarSubElement,
-    type Beat,
-    type BeatSubElement,
-    type Color,
-    type Note,
-    type NoteSubElement,
-    type Score,
-    type Voice,
-    type VoiceSubElement
-} from '@src/model';
+import { BarSubElement, type Bar } from '@src/model/Bar';
+import type { BeatSubElement, Beat } from '@src/model/Beat';
+import type { Color } from '@src/model/Color';
 import type { ElementStyle } from '@src/model/ElementStyle';
-import type { ScoreSubElement } from '@src/model/Score';
+import type { NoteSubElement, Note } from '@src/model/Note';
+import type { Score, ScoreSubElement } from '@src/model/Score';
 import { type Track, TrackSubElement } from '@src/model/Track';
-import type { ICanvas } from '@src/platform';
+import type { VoiceSubElement, Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
 import type { RenderingResources } from '@src/RenderingResources';
 
 /**

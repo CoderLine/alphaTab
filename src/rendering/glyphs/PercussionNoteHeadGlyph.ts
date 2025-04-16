@@ -4,7 +4,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { Duration } from '@src/model/Duration';
 import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;

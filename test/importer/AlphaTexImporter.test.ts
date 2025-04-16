@@ -10,19 +10,6 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import {
-    AutomationType,
-    BendStyle,
-    BendType,
-    FermataType,
-    KeySignature,
-    KeySignatureType,
-    NoteAccidentalMode,
-    Ottavia,
-    SimileMark,
-    VibratoType,
-    WhammyType
-} from '@src/model';
 import { type Score, ScoreSubElement } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
@@ -43,7 +30,18 @@ import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { TextAlign } from '@src/platform';
+import { AutomationType } from '@src/model/Automation';
+import { BendStyle } from '@src/model/BendStyle';
+import { BendType } from '@src/model/BendType';
+import { FermataType } from '@src/model/Fermata';
+import { KeySignature } from '@src/model/KeySignature';
+import { KeySignatureType } from '@src/model/KeySignatureType';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { Ottavia } from '@src/model/Ottavia';
+import { SimileMark } from '@src/model/SimileMark';
+import { VibratoType } from '@src/model/VibratoType';
+import { WhammyType } from '@src/model/WhammyType';
+import { TextAlign } from '@src/platform/ICanvas';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {

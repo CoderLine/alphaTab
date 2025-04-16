@@ -1,8 +1,8 @@
 import type { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { Color } from '@src/model';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import type { Color } from '@src/model/Color';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class MusicFontGlyph extends EffectGlyph {
     protected glyphScale: number = 0;

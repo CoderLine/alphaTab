@@ -3,13 +3,13 @@
 // index.ts for more details on contents and license of this file
 
 import type { MinimalPluginContext, PluginContext, InternalModuleFormat } from 'rollup';
-import { joinUrlSegments, partialEncodeURIPath } from './utils';
+import { joinUrlSegments, partialEncodeURIPath } from '@src/vite/bridge/utils';
 import * as path from 'node:path';
-import type { ResolvedConfig } from './config';
+import type { ResolvedConfig } from '@src/vite/bridge/config';
 import type { BuildEnvironment, Plugin } from 'vite';
-import type { RollupPluginHooks } from './typeUtils';
-import { ROLLUP_HOOKS } from './constants';
-import { getHookHandler } from './plugins';
+import type { RollupPluginHooks } from '@src/vite/bridge/typeUtils';
+import { ROLLUP_HOOKS } from '@src/vite/bridge/constants';
+import { getHookHandler } from '@src/vite/bridge/plugins';
 
 const needsEscapeRegEx = /[\n\r'\\\u2028\u2029]/;
 const quoteNewlineRegEx = /([\n\r'\u2028\u2029])/g;
@@ -82,7 +82,7 @@ export function toOutputFilePathInJS(
     toRelative: (filename: string, hostType: string) => string | { runtime: string }
 ): string | { runtime: string } {
     const { renderBuiltUrl } = config.experimental;
-    let relative = config.base === '' || config.base === './';
+    let relative = config.base === '' || config.base === '@src/vite/bridge/';
     if (renderBuiltUrl) {
         const result = renderBuiltUrl(filename, {
             hostId,

@@ -4,8 +4,8 @@ import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { SlashBarRenderer } from '@src/rendering/SlashBarRenderer';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import type { Track } from '@src/model/Track';
-import type { Staff } from '@src/model';
-import type { RenderStaff } from './staves/RenderStaff';
+import type { Staff } from '@src/model/Staff';
+import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 
 /**
  * This Factory produces SlashBarRenderer instances

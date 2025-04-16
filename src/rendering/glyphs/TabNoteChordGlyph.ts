@@ -7,8 +7,8 @@ import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import type { RenderingResources } from '@src/RenderingResources';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];

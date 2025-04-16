@@ -1,6 +1,6 @@
 import type { IWriteable } from '@src/io/IWriteable';
-import { MidiFile } from './MidiFile';
-import type { ControllerType } from './ControllerType';
+import { MidiFile } from '@src/midi/MidiFile';
+import type { ControllerType } from '@src/midi/ControllerType';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';

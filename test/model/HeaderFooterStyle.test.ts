@@ -1,4 +1,4 @@
-import { Score } from '@src/model';
+import { Score } from '@src/model/Score';
 import { HeaderFooterStyle } from '@src/model/Score';
 import { expect } from 'chai';
 

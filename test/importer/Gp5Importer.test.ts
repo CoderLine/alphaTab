@@ -1,10 +1,10 @@
 import { Settings } from '@src/Settings';
-import { Ottavia } from '@src/model';
 import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
+import { Ottavia } from '@src/model/Ottavia';
 import { type Score, ScoreSubElement } from '@src/model/Score';
 import { WahPedal } from '@src/model/WahPedal';
-import { TextAlign } from '@src/platform';
+import { TextAlign } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';

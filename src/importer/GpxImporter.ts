@@ -7,7 +7,7 @@ import type { Score } from '@src/model/Score';
 import { Logger } from '@src/Logger';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { IOHelper } from '@src/io/IOHelper';
-import { LayoutConfiguration } from './LayoutConfiguration';
+import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 6 (gpx) files.

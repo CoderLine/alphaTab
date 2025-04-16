@@ -6,7 +6,7 @@ import type { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import type { Settings } from '@src/Settings';
 import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
-import { ElementStyle } from './ElementStyle';
+import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * Lists all graphical sub elements within a {@link Track} which can be styled via {@link Track.style}

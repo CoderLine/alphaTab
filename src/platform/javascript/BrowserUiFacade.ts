@@ -28,7 +28,7 @@ import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
+import { ScalableHtmlElementContainer } from '@src/platform/javascript/ScalableHtmlElementContainer';
 import { PlayerOutputMode } from '@src/PlayerSettings';
 import type { SettingsJson } from '@src/generated/SettingsJson';
 

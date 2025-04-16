@@ -5,7 +5,7 @@ import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import type { RenderStaff } from './staves/RenderStaff';
+import type { RenderStaff } from '@src/rendering/staves/RenderStaff';
 
 /**
  * This Factory produces TabBarRenderer instances

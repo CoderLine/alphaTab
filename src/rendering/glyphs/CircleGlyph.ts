@@ -1,4 +1,4 @@
-import type { Color } from '@src/model';
+import type { Color } from '@src/model/Color';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 

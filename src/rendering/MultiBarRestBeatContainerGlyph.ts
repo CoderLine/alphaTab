@@ -1,9 +1,9 @@
-import { Beat } from '@src/model';
-import { BeatContainerGlyph } from './glyphs/BeatContainerGlyph';
-import type { VoiceContainerGlyph } from './glyphs/VoiceContainerGlyph';
-import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
-import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
-import { MultiBarRestGlyph } from './glyphs/MultiBarRestGlyph';
+import { Beat } from '@src/model/Beat';
+import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { VoiceContainerGlyph } from '@src/rendering/glyphs/VoiceContainerGlyph';
+import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import { MultiBarRestGlyph } from '@src/rendering/glyphs/MultiBarRestGlyph';
 
 export class MultiBarRestBeatContainerGlyph extends BeatContainerGlyph {
     public constructor(voiceContainer: VoiceContainerGlyph) {

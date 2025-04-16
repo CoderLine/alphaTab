@@ -5,7 +5,7 @@ import { SimileMark } from '@src/model/SimileMark';
 import type { Staff } from '@src/model/Staff';
 import type { Voice } from '@src/model/Voice';
 import type { Settings } from '@src/Settings';
-import { ElementStyle } from './ElementStyle';
+import { ElementStyle } from '@src/model/ElementStyle';
 
 /**
  * The different pedal marker types.

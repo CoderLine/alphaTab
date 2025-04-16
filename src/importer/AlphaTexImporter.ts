@@ -57,7 +57,7 @@ import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy
 import { Color } from '@src/model/Color';
 import { BendStyle } from '@src/model/BendStyle';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { TextAlign } from '@src/platform';
+import { TextAlign } from '@src/platform/ICanvas';
 
 /**
  * A list of terminals recognized by the alphaTex-parser

@@ -8,7 +8,7 @@ import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyp
 import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class EffectBand extends Glyph {
     private _uniqueEffectGlyphs: EffectGlyph[][] = [];

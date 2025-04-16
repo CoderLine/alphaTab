@@ -4,8 +4,8 @@ import type { ICanvas } from '@src/platform/ICanvas';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { BarSubElement } from '@src/model';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@src/model/Bar';
 
 export class ClefGlyph extends MusicFontGlyph {
     private _clef: Clef;

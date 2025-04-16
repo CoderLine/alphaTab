@@ -1,5 +1,5 @@
 import type { Beat } from '@src/model/Beat';
-import { BeamingHelper } from './BeamingHelper';
+import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
 export class ReservedLayoutAreaSlot {
     public topY: number = 0;

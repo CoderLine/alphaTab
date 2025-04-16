@@ -1,7 +1,7 @@
 import type { IReadable } from '@src/io/IReadable';
-import { OggReader } from './OggReader';
-import type { VorbisStream } from './VorbisStream';
-import { VorbisStreamReader } from './VorbisStreamReader';
+import { OggReader } from '@src/synth/vorbis/OggReader';
+import type { VorbisStream } from '@src/synth/vorbis/VorbisStream';
+import { VorbisStreamReader } from '@src/synth/vorbis/VorbisStreamReader';
 
 export class VorbisFile {
     public streams: VorbisStream[] = [];

@@ -1,8 +1,8 @@
 /**@target web */
 
 import type { Expression, CallExpression, NewExpression } from 'estree';
-import type { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
-import { getWorkerRuntime, parseModuleUrl, tapJavaScript, type webPackWithAlphaTab, type webpackTypes } from './Utils';
+import type { AlphaTabWebPackPluginOptions } from '@src/webpack/AlphaTabWebPackPluginOptions';
+import { getWorkerRuntime, parseModuleUrl, tapJavaScript, type webPackWithAlphaTab, type webpackTypes } from '@src/webpack/Utils';
 
 const workerIndexMap = new WeakMap<webpackTypes.ParserState, number>();
 

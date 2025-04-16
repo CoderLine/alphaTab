@@ -3,14 +3,14 @@ import type { Automation } from '@src/model/Automation';
 import type { Beat } from '@src/model/Beat';
 import type { Fermata } from '@src/model/Fermata';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
-import type { Bar } from '@src/model/Bar'
+import type { Bar } from '@src/model/Bar';
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import type { RepeatGroup } from '@src/model/RepeatGroup';
 import type { Score } from '@src/model/Score';
 import type { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
-import type { Direction } from './Direction';
+import type { Direction } from '@src/model/Direction';
 
 /**
  * The MasterBar stores information about a bar which affects

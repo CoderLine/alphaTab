@@ -1,8 +1,8 @@
-import { MusicFontSymbol } from '@src/model';
-import type { ICanvas } from '@src/platform';
-import type { LineBarRenderer } from '../LineBarRenderer';
-import { Glyph } from './Glyph';
-import { NumberGlyph } from './NumberGlyph';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
 
 export class MultiBarRestGlyph extends Glyph {
     private _numberGlyph: MusicFontSymbol[] = [];

@@ -4,7 +4,7 @@
 // the code is regenerated.
 // </auto-generated>
 import { Note } from "@src/model/Note";
-import { BendPointCloner } from "./BendPointCloner";
+import { BendPointCloner } from "@src/generated/model/BendPointCloner";
 export class NoteCloner {
     public static clone(original: Note): Note {
         const clone = new Note();

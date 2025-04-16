@@ -1,8 +1,8 @@
-import type { ICanvas } from '@src/platform';
-import { EffectGlyph } from './EffectGlyph';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
-import { MusicFontSymbol } from '@src/model';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class SustainPedalGlyph extends EffectGlyph {
     private static readonly TextLinePadding = 3;

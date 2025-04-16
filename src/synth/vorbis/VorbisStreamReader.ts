@@ -3,8 +3,8 @@
  */
 
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import type { OggPacket } from './OggReader';
-import { VorbisStream } from './VorbisStream';
+import type { OggPacket } from '@src/synth/vorbis/OggReader';
+import { VorbisStream } from '@src/synth/vorbis/VorbisStream';
 import { IOHelper } from '@src/io/IOHelper';
 import {
     Huffman,
@@ -17,8 +17,8 @@ import {
     VorbisSetupHeader,
     VorbisStreamDecoder,
     VorbisTimeDomainTransform
-} from './VorbisStreamDecoder';
-import { IntBitReader } from './IntBitReader';
+} from '@src/synth/vorbis/VorbisStreamDecoder';
+import { IntBitReader } from '@src/synth/vorbis/IntBitReader';
 
 enum VorbisPacketTypes {
     IdentificationHeader = 1,

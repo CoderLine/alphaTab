@@ -1,13 +1,14 @@
 import { Duration } from '@src/model/Duration';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
-import type { Glyph } from './Glyph';
-import type { BeamingHelper } from '../utils/BeamingHelper';
-import { EffectGlyph } from './EffectGlyph';
-import { type Beat, BeatSubElement, NoteSubElement } from '@src/model';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { NoteSubElement } from '@src/model/Note';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 
 export class SlashNoteHeadGlyph extends EffectGlyph {
     private _isGrace: boolean;

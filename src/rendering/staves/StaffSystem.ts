@@ -14,10 +14,10 @@ import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 import type { RenderingResources } from '@src/RenderingResources';
 import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { MusicFontSymbol } from '@src/model';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
-import type { LineBarRenderer } from '../LineBarRenderer';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -599,10 +599,10 @@ export class StaffSystem {
             }
 
             if (this._allStaves.length > 0) {
-                let previousStaffInBracket:RenderStaff|null=null;
-                for(const s of this._allStaves) {
-                    if(s.isInsideBracket) {
-                        if(previousStaffInBracket !== null) {
+                let previousStaffInBracket: RenderStaff | null = null;
+                for (const s of this._allStaves) {
+                    if (s.isInsideBracket) {
+                        if (previousStaffInBracket !== null) {
                             const previousBottom = previousStaffInBracket.contentBottom;
                             const thisTop = s.contentTop;
 
@@ -610,7 +610,11 @@ export class StaffSystem {
 
                             const firstLineBarRenderer = previousStaffInBracket.barRenderers[0] as LineBarRenderer;
 
-                            using _ = ElementStyleHelper.bar(canvas, firstLineBarRenderer.staffLineBarSubElement, firstLineBarRenderer.bar);
+                            using _ = ElementStyleHelper.bar(
+                                canvas,
+                                firstLineBarRenderer.staffLineBarSubElement,
+                                firstLineBarRenderer.bar
+                            );
                             const h = Math.ceil(thisTop - previousBottom);
                             canvas.fillRect(accoladeX, cy + previousBottom, 1, h);
                         }

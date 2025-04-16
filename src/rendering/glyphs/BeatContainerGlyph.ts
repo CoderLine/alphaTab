@@ -13,7 +13,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
-import type { BeamingHelper } from '../utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
 export class BeatContainerGlyph extends Glyph {
     public static readonly GraceBeatPadding: number = 3;

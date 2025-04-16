@@ -91,11 +91,11 @@ import type { MidiEventType } from '@src/midi/MidiEvent';
 import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventArgs';
-import type { BeatTickLookupItem } from './midi/BeatTickLookup';
-import type { ISynthOutputDevice } from './synth/ISynthOutput';
+import type { BeatTickLookupItem } from '@src/midi/BeatTickLookup';
+import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
-import type { CoreSettings } from './CoreSettings';
+import type { CoreSettings } from '@src/CoreSettings';
 
 class SelectionInfo {
     public beat: Beat;

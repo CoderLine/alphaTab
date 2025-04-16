@@ -45,7 +45,7 @@ import { FadeType } from '@src/model/FadeType';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { Ottavia } from '@src/model';
+import { Ottavia } from '@src/model/Ottavia';
 import { WahPedal } from '@src/model/WahPedal';
 
 export class Gp3To5Importer extends ScoreImporter {

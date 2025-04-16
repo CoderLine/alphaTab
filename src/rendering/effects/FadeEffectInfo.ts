@@ -6,7 +6,7 @@ import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 import { FadeType } from '@src/model/FadeType';
-import { FadeGlyph } from '../glyphs/FadeGlyph';
+import { FadeGlyph } from '@src/rendering/glyphs/FadeGlyph';
 
 export class FadeEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {

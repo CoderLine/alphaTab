@@ -45,11 +45,11 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
-    async function testRoundTripFolderEqual(name: string, ignoredFiles?:string[]): Promise<void> {
+    async function testRoundTripFolderEqual(name: string, ignoredFiles?: string[]): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
         const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
-            if(!ignoredFilesLookup.has(file)) {
+            if (!ignoredFilesLookup.has(file)) {
                 await testRoundTripEqual(`${name}/${file}`, null);
             }
         }
@@ -78,7 +78,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-music-notation', async () => {
-        await testRoundTripFolderEqual('visual-tests/music-notation', ["barlines.xml"]);
+        await testRoundTripFolderEqual('visual-tests/music-notation', ['barlines.xml']);
     });
 
     it('visual-notation-legend', async () => {

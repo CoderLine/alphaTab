@@ -1,7 +1,7 @@
 import type { Note } from '@src/model/Note';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
-import { NumberedTieGlyph } from './glyphs/NumberedTieGlyph';
-import { NumberedSlurGlyph } from './glyphs/NumberedSlurGlyph';
+import { NumberedTieGlyph } from '@src/rendering//glyphs/NumberedTieGlyph';
+import { NumberedSlurGlyph } from '@src/rendering/glyphs/NumberedSlurGlyph';
 
 export class NumberedBeatContainerGlyph extends BeatContainerGlyph {
     private _effectSlurs: NumberedSlurGlyph[] = [];

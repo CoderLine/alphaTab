@@ -1,4 +1,4 @@
-import { MusicFontSymbol } from '@src/model';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * Stores the sizes for the {@link MusicFontSymbol} glyphs.
@@ -532,7 +532,6 @@ export class MusicFontSymbolSizes {
         [MusicFontSymbol.DynamicRinforzando1, 28.4],
         [MusicFontSymbol.DynamicRinforzando2, 28.4],
         [MusicFontSymbol.DynamicForzando, 28.4],
-        
 
         [MusicFontSymbol.OrnamentTrill, 24],
         [MusicFontSymbol.OrnamentTurn, 18],

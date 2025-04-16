@@ -14,8 +14,8 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();

@@ -6,21 +6,21 @@ import * as url from 'node:url';
 // webpack doesn't defined properly types for all these internals
 // needed for the plugin
 
-import { injectWorkerRuntimeModule } from './AlphaTabWorkerRuntimeModule';
-import { configureAudioWorklet } from './AlphaTabAudioWorklet';
-import type { AlphaTabWebPackPluginOptions } from './AlphaTabWebPackPluginOptions';
-import { configureWebWorker } from './AlphaTabWebWorker';
-import type { webPackWithAlphaTab, webpackTypes } from './Utils';
-import { injectWebWorkerDependency } from './AlphaTabWebWorkerDependency';
-import { injectWorkletRuntimeModule } from './AlphaTabWorkletStartRuntimeModule';
-import { injectWorkletDependency } from './AlphaTabWorkletDependency';
+import { injectWorkerRuntimeModule } from '@src/webpack/AlphaTabWorkerRuntimeModule';
+import { configureAudioWorklet } from '@src/webpack/AlphaTabAudioWorklet';
+import type { AlphaTabWebPackPluginOptions } from '@src/webpack/AlphaTabWebPackPluginOptions';
+import { configureWebWorker } from '@src/webpack/AlphaTabWebWorker';
+import type { webPackWithAlphaTab, webpackTypes } from '@src/webpack/Utils';
+import { injectWebWorkerDependency } from '@src/webpack/AlphaTabWebWorkerDependency';
+import { injectWorkletRuntimeModule } from '@src/webpack/AlphaTabWorkletStartRuntimeModule';
+import { injectWorkletDependency } from '@src/webpack/AlphaTabWorkletDependency';
 
 const WINDOWS_ABS_PATH_REGEXP = /^[a-zA-Z]:[\\/]/;
 const WINDOWS_PATH_SEPARATOR_REGEXP = /\\/g;
 
 const relativePathToRequest = (relativePath: string): string => {
     if (relativePath === '') {
-        return './.';
+        return '@src/webpack/.';
     }
     if (relativePath === '..') {
         return '../.';

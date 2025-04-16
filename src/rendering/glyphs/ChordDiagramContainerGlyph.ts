@@ -1,8 +1,8 @@
 import type { Chord } from '@src/model/Chord';
-import type { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { ChordDiagramGlyph } from '@src/rendering/glyphs/ChordDiagramGlyph';
 import { RowContainerGlyph } from '@src/rendering/glyphs/RowContainerGlyph';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { ScoreSubElement } from '@src/model/Score';
 
 export class ChordDiagramContainerGlyph extends RowContainerGlyph {

@@ -22,9 +22,9 @@ import { type BeamingHelper, BeamingHelperDrawInfo } from '@src/rendering/utils/
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { KeySignature } from '@src/model/KeySignature';
-import { LineBarRenderer } from './LineBarRenderer';
-import { KeySignatureGlyph } from './glyphs/KeySignatureGlyph';
-import { ElementStyleHelper } from './utils/ElementStyleHelper';
+import { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import { KeySignatureGlyph } from '@src/rendering/glyphs/KeySignatureGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 /**
  * This BarRenderer renders a bar using standard music notation.

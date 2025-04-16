@@ -2,19 +2,23 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+
+import { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
+import { MidiFile } from '@src/midi/MidiFile';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import {
-    AlphaSynthMidiFileHandler,
-    MasterBarTickLookup,
-    MidiFile,
-    MidiFileGenerator,
     MidiTickLookup,
-    type MidiTickLookupFindBeatResult
-} from '@src/midi';
-import { MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
-import { MidiTickLookupFindBeatResultCursorMode } from '@src/midi/MidiTickLookup';
+    type MidiTickLookupFindBeatResult,
+    MidiTickLookupFindBeatResultCursorMode
+} from '@src/midi/MidiTickLookup';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat, Duration, MasterBar, Note, type Score } from '@src/model';
+import { Beat } from '@src/model/Beat';
+import { Duration } from '@src/model/Duration';
+import { MasterBar } from '@src/model/MasterBar';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { Note } from '@src/model/Note';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';

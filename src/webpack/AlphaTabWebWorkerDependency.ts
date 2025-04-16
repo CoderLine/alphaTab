@@ -8,7 +8,7 @@ import {
     type webPackWithAlphaTab,
     type webpackTypes,
     type NormalModuleFactory
-} from './Utils';
+} from '@src/webpack/Utils';
 
 export function injectWebWorkerDependency(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWebWorkerDependency extends webPackWithAlphaTab.webpack.dependencies.ModuleDependency {

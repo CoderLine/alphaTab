@@ -1,8 +1,11 @@
-import { type ICanvas, TextBaseline } from '@src/platform';
-import { Glyph } from './Glyph';
-import { AccidentalType, BarSubElement, KeySignature, KeySignatureType } from '@src/model';
-import { AccidentalGlyph } from './AccidentalGlyph';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { AccidentalType } from '@src/model/AccidentalType';
+import { KeySignatureType } from '@src/model/KeySignatureType';
+import { KeySignature } from '@src/model/KeySignature';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { BarSubElement } from '@src/model/Bar';
 
 export class NumberedKeySignatureGlyph extends Glyph {
     private _keySignature: KeySignature;

@@ -1,7 +1,7 @@
-import { MusicFontSymbol } from '@src/model';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
-import type { ICanvas } from '@src/platform';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class NumberGlyph extends Glyph {
     public static readonly numberHeight: number = 18;

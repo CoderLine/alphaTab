@@ -1,5 +1,5 @@
 import type { IWriteable } from '@src/io/IWriteable';
-import { MidiEvent, MidiEventType } from './MidiEvent';
+import { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**

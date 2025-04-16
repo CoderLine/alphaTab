@@ -55,25 +55,25 @@ import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverP
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { SkiaCanvas } from './platform/skia/SkiaCanvas';
-import type { Font } from './model';
-import type { Settings } from './Settings';
-import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
-import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
-import { NumberedBarRendererFactory } from './rendering/NumberedBarRendererFactory';
-import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
-import { ScoreBarRenderer } from './rendering/ScoreBarRenderer';
-import { TabBarRenderer } from './rendering/TabBarRenderer';
-import { SustainPedalEffectInfo } from './rendering/effects/SustainPedalEffectInfo';
-import { GolpeEffectInfo } from './rendering/effects/GolpeEffectInfo';
-import { GolpeType } from './model/GolpeType';
-import { WahPedalEffectInfo } from './rendering/effects/WahPedalEffectInfo';
-import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
-import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
-import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
-import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
-import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
-import { VersionInfo } from './generated/VersionInfo';
+import { SkiaCanvas } from '@src/platform/skia/SkiaCanvas';
+import type { Font } from '@src/model/Font';
+import type { Settings } from '@src/Settings';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { SlashBarRendererFactory } from '@src/rendering/SlashBarRendererFactory';
+import { NumberedBarRendererFactory } from '@src/rendering/NumberedBarRendererFactory';
+import { FreeTimeEffectInfo } from '@src/rendering/effects/FreeTimeEffectInfo';
+import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import { SustainPedalEffectInfo } from '@src/rendering/effects/SustainPedalEffectInfo';
+import { GolpeEffectInfo } from '@src/rendering/effects/GolpeEffectInfo';
+import { GolpeType } from '@src/model/GolpeType';
+import { WahPedalEffectInfo } from '@src/rendering/effects/WahPedalEffectInfo';
+import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
+import { NoteOrnamentEffectInfo } from '@src/rendering/effects/NoteOrnamentEffectInfo';
+import { RasgueadoEffectInfo } from '@src/rendering/effects/RasgueadoEffectInfo';
+import { DirectionsEffectInfo } from '@src/rendering/effects/DirectionsEffectInfo';
+import { BeatTimerEffectInfo } from '@src/rendering/effects/BeatTimerEffectInfo';
+import { VersionInfo } from '@src/generated/VersionInfo';
 
 /**
  * A factory for custom layout engines.

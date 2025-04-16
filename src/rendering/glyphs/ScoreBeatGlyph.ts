@@ -29,11 +29,11 @@ import { PickStrokeGlyph } from '@src/rendering/glyphs/PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { StringNumberContainerGlyph } from './StringNumberContainerGlyph';
-import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
-import { BeatSubElement } from '@src/model';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import type { MusicFontGlyph } from './MusicFontGlyph';
+import { StringNumberContainerGlyph } from '@src/rendering/glyphs/StringNumberContainerGlyph';
+import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
+import { BeatSubElement } from '@src/model/Beat';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;

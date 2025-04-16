@@ -1,10 +1,10 @@
-import type { BeatSubElement } from '@src/model';
+import type { BeatSubElement } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
 import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import type { ICanvas } from '@src/platform';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class BeatGlyphBase extends GlyphGroup {
     private _effectGlyphs: Glyph[] = [];

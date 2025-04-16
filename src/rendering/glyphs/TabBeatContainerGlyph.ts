@@ -7,7 +7,7 @@ import { TabSlideLineGlyph } from '@src/rendering/glyphs/TabSlideLineGlyph';
 import { TabSlurGlyph } from '@src/rendering/glyphs/TabSlurGlyph';
 import { TabTieGlyph } from '@src/rendering/glyphs/TabTieGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import type { BeamingHelper } from '../utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
 export class TabBeatContainerGlyph extends BeatContainerGlyph {
     private _bend: TabBendGlyph | null = null;

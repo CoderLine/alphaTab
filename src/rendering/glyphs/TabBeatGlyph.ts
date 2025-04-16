@@ -14,8 +14,8 @@ import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
-import { BeatSubElement } from '@src/model';
+import { BeatSubElement } from '@src/model/Beat';
+import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;

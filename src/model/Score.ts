@@ -3,14 +3,14 @@ import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
 import type { Track } from '@src/model/Track';
 import type { Settings } from '@src/Settings';
-import { ElementStyle } from './ElementStyle';
-import { Bar } from './Bar';
-import { Beat } from './Beat';
-import { Voice } from './Voice';
-import { Note } from './Note';
-import { TextAlign } from '@src/platform';
+import { ElementStyle } from '@src/model/ElementStyle';
+import { Bar } from '@src/model/Bar';
+import { Beat } from '@src/model/Beat';
+import { Voice } from '@src/model/Voice';
+import { Note } from '@src/model/Note';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { NotationSettings } from '@src/NotationSettings';
+import { TextAlign } from '@src/platform/ICanvas';
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}

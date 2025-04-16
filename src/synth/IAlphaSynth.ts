@@ -8,7 +8,7 @@ import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
 import type { LogLevel } from '@src/LogLevel';
 import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import type { MidiEventType } from '@src/midi/MidiEvent';
-import type { ISynthOutput } from './ISynthOutput';
+import type { ISynthOutput } from '@src/synth/ISynthOutput';
 
 /**
  * The public API interface for interacting with the synthesizer.

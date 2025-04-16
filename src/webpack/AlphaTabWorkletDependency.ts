@@ -8,7 +8,7 @@ import {
     makeDependencySerializable,
     type webPackWithAlphaTab,
     type webpackTypes
-} from './Utils';
+} from '@src/webpack/Utils';
 
 export function injectWorkletDependency(webPackWithAlphaTab: webPackWithAlphaTab) {
     /**

@@ -1,8 +1,8 @@
-import type { ICanvas } from '@src/platform';
-import { EffectGlyph } from './EffectGlyph';
-import { TuningGlyph } from './TuningGlyph';
-import { MusicFontSymbol } from '@src/model';
-import { MusicFontSymbolSizes } from '../utils/MusicFontSymbolSizes';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class StringNumberContainerGlyph extends EffectGlyph {
     private _strings: Set<number> = new Set<number>();

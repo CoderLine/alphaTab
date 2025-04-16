@@ -35,7 +35,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { DynamicValue } from '@src/model';
+import { DynamicValue } from '@src/model/DynamicValue';
 import { FadeType } from '@src/model/FadeType';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';

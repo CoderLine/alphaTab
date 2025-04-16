@@ -1,11 +1,12 @@
-import { type Color, type Note, NoteSubElement } from '@src/model';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import type { ScoreBarRenderer } from '../ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { FingeringMode } from '@src/NotationSettings';
-import { TextGlyph } from './TextGlyph';
-import { TextAlign, TextBaseline } from '@src/platform';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Note, NoteSubElement } from '@src/model/Note';
+import { TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import type { Color } from '@src/model/Color';
 
 export class FingeringInfo {
     public line: number = 0;

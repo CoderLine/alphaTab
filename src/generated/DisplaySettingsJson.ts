@@ -5,7 +5,7 @@
 // </auto-generated>
 import { LayoutMode } from "@src/LayoutMode";
 import { StaveProfile } from "@src/StaveProfile";
-import { RenderingResourcesJson } from "./RenderingResourcesJson";
+import { RenderingResourcesJson } from "@src/generated/RenderingResourcesJson";
 import { SystemsLayoutMode } from "@src/DisplaySettings";
 /**
  * The display settings control how the general layout and display of alphaTab is done.

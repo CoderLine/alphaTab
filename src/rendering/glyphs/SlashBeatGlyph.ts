@@ -5,14 +5,14 @@ import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { SlashNoteHeadGlyph } from './SlashNoteHeadGlyph';
-import type { SlashBarRenderer } from '../SlashBarRenderer';
-import { NoteBounds } from '../utils/NoteBounds';
-import { Bounds } from '../utils/Bounds';
-import { SlashRestGlyph } from './SlashRestGlyph';
-import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
-import type { Glyph } from './Glyph';
-import { BeatSubElement } from '@src/model';
+import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
+import type { SlashBarRenderer } from '@src/rendering/SlashBarRenderer';
+import { NoteBounds } from '@src/rendering/utils/NoteBounds';
+import { Bounds } from '@src/rendering/utils/Bounds';
+import { SlashRestGlyph } from '@src/rendering/glyphs/SlashRestGlyph';
+import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
+import { BeatSubElement } from '@src/model/Beat';
 
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: SlashNoteHeadGlyph | null = null;

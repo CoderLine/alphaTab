@@ -3,11 +3,11 @@
 // index.ts for more details on contents and license of this file
 
 import { type DepOptimizationMetadata, type DevEnvironment, type OptimizedDepInfo, normalizePath } from 'vite';
-import type { ResolvedConfig } from './config';
-import { tryFsResolve } from './resolve';
-import { cleanUrl } from './utils';
+import type { ResolvedConfig } from '@src/vite/bridge/config';
+import { tryFsResolve } from '@src/vite/bridge/resolve';
+import { cleanUrl } from '@src/vite/bridge/utils';
 import * as path from 'node:path';
-import { METADATA_FILENAME } from './constants';
+import { METADATA_FILENAME } from '@src/vite/bridge/constants';
 import * as fs from 'node:fs';
 
 // https://github.com/Danielku15/vite/blob/88b7def341f12d07d7d4f83cbe3dc73cc8c6b7be/packages/vite/src/node/optimizer/index.ts#L1356

@@ -6,7 +6,7 @@ import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 /**
  * This glyph acts as container for handling

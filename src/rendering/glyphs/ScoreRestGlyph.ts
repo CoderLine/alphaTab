@@ -2,9 +2,9 @@ import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import type { ICanvas } from '@src/platform';
-import { ElementStyleHelper } from '../utils/ElementStyleHelper';
-import { BeatSubElement } from '@src/model';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { BeatSubElement } from '@src/model/Beat';
 
 export class ScoreRestGlyph extends MusicFontGlyph {
     public beamingHelper!: BeamingHelper;

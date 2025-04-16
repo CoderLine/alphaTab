@@ -1,4 +1,4 @@
-import { DynamicValue } from '@src/model';
+import { DynamicValue } from '@src/model/DynamicValue';
 import type { Duration } from '@src/model/Duration';
 
 export class MidiUtils {
@@ -128,8 +128,8 @@ export class MidiUtils {
                 velocity = MidiUtils.MinVelocity + 5 * MidiUtils.VelocityIncrement;
                 break;
 
-            // "rinforced" varaints -> like "forced" but typically for a whole passage 
-            // not a single note, same as FF for us 
+            // "rinforced" varaints -> like "forced" but typically for a whole passage
+            // not a single note, same as FF for us
             case DynamicValue.RF:
             case DynamicValue.RFZ:
             case DynamicValue.SFFZ:
@@ -140,7 +140,7 @@ export class MidiUtils {
             case DynamicValue.N:
                 velocity = 1;
                 break;
-            // A bit weaker than standard F but stronger than MF 
+            // A bit weaker than standard F but stronger than MF
             case DynamicValue.PF:
                 velocity = MidiUtils.MinVelocity + ((4.5 * MidiUtils.VelocityIncrement) | 0);
                 break;

@@ -1,4 +1,4 @@
-import { HtmlElementContainer } from './HtmlElementContainer';
+import { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContainer';
 
 /**
  * An IContainer implementation which can be used for cursors and select ranges
