@@ -4108,7 +4108,7 @@ export default class CSharpAstTransformer {
                     castExpression.type.parent = castExpression;
                     castExpression.expression.parent = castExpression;
 
-                    return paren;
+                    return this.makeTruthy(paren);
                 }
 
                 const isValueTypeNotNullSmartCast = this._context.isValueTypeNotNullSmartCast(expression);
@@ -4122,21 +4122,21 @@ export default class CSharpAstTransformer {
                             member: 'Value'
                         } as cs.MemberAccessExpression;
                     }
-                    return {
+                    return this.makeTruthy({
                         parent: parent,
                         nodeType: cs.SyntaxKind.NonNullExpression,
                         tsNode: expression,
                         expression: node
-                    } as cs.NonNullExpression;
+                    } as cs.NonNullExpression);
                 }
 
                 if (this._context.isNonNullSmartCast(expression)) {
-                    return {
+                    return this.makeTruthy({
                         parent: parent,
                         nodeType: cs.SyntaxKind.NonNullExpression,
                         tsNode: expression,
                         expression: node
-                    } as cs.NonNullExpression;
+                    } as cs.NonNullExpression);
                 }
             }
         }

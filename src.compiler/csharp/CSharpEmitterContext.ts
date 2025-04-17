@@ -659,7 +659,6 @@ export default class CSharpEmitterContext {
                 case cs.SyntaxKind.ArrayTupleNode:
                     return true;
             }
-
         }
         return false;
     }
@@ -1459,7 +1458,7 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-        const contextualType = this.typeChecker.getContextualType(expression);
+        const contextualType = this.typeChecker.getTypeAtLocation(expression);
         if (!contextualType) {
             return false;
         }
@@ -1479,12 +1478,7 @@ export default class CSharpEmitterContext {
             symbol = this.typeChecker.getAliasedSymbol(symbol);
         }
 
-        if (
-            symbol.flags & ts.SymbolFlags.Interface ||
-            symbol.flags & ts.SymbolFlags.Class ||
-            symbol.flags & ts.SymbolFlags.BlockScopedVariable ||
-            symbol.flags & ts.SymbolFlags.FunctionScopedVariable
-        ) {
+        if (symbol.flags & ts.SymbolFlags.Interface || symbol.flags & ts.SymbolFlags.Class) {
             return false;
         }
 
@@ -1493,7 +1487,11 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-        return contextualType === this.typeChecker.getNonNullableType(declaredType);
+        return (
+            this.typeChecker.getNonNullableType(declaredType) === this.typeChecker.getNonNullableType(contextualType) &&
+            this.isNullableType(declaredType) &&
+            !this.isNullableType(contextualType)
+        );
     }
 
     public getSmartCastType(expression: ts.Expression): ts.Type | null {
