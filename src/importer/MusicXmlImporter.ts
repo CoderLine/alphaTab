@@ -2353,8 +2353,8 @@ export class MusicXmlImporter extends ScoreImporter {
             }
 
             if(this._keyAllStaves != null) {
-                newBar.keySignature = this._keyAllStaves[0];
-                newBar.keySignatureType = this._keyAllStaves[1];
+                newBar.keySignature = this._keyAllStaves![0];
+                newBar.keySignatureType = this._keyAllStaves![1];
             }
 
             for (let i = 0; i < voiceCount; i++) {

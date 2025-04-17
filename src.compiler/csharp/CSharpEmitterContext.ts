@@ -656,7 +656,10 @@ export default class CSharpEmitterContext {
                         }
                     }
                     break;
+                case cs.SyntaxKind.ArrayTupleNode:
+                    return true;
             }
+
         }
         return false;
     }
@@ -1759,7 +1762,7 @@ export default class CSharpEmitterContext {
             return true;
         }
 
-        return this.isEnum(tsType);
+        return this.isEnum(tsType) || this.typeChecker.isTupleType(tsType);
     }
 
     public isEnum(tsType: ts.Type) {

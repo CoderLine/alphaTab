@@ -864,7 +864,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        if (!cs.isNonNullExpression(expr)) {
+        if (!cs.isNonNullExpression(expr.expression)) {
             this.write('!');
         }
     }

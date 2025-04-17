@@ -69,6 +69,13 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return undefined;
     }
 
+    protected isCsValueType(mapValueType: cs.TypeNode | null): boolean {
+        if(mapValueType?.nodeType === cs.SyntaxKind.ArrayTupleNode) {
+            return false;
+        }
+        return super.isCsValueType(mapValueType);
+    }
+
     public override getMethodNameFromSymbol(symbol: ts.Symbol): string {
         const parent = 'parent' in symbol ? (symbol.parent as ts.Symbol) : undefined;
 

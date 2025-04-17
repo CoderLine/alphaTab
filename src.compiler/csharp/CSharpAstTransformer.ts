@@ -3217,11 +3217,18 @@ export default class CSharpAstTransformer {
 
             csExpr.type = this._context.makeArrayTupleType(csExpr, []);
 
-            const tupleType = this._context.typeChecker.getContextualType(expression) ?? type;
+            let tupleType = this._context.typeChecker.getContextualType(expression);
+            let typeArgs = tupleType
+                ? this._context.typeChecker.getTypeArguments(tupleType as ts.TypeReference)
+                : undefined;
+            if (!typeArgs || typeArgs.length !== expression.elements.length) {
+                tupleType = type;
+                typeArgs = this._context.typeChecker.getTypeArguments(tupleType as ts.TypeReference);
+            }
 
-            (csExpr.type as cs.ArrayTupleNode).types = this._context.typeChecker
-                .getTypeArguments(tupleType as ts.TypeReference)
-                .map((p, i) => this.createUnresolvedTypeNode(csExpr.type, expression.elements[i], p));
+            (csExpr.type as cs.ArrayTupleNode).types = typeArgs!.map((p, i) =>
+                this.createUnresolvedTypeNode(csExpr.type, expression.elements[i], p)
+            );
 
             for (const e of expression.elements) {
                 const ex = this.visitExpression(csExpr, e);
