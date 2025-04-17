@@ -54,6 +54,7 @@ class StaffContext {
     public tieStartIds!: Map<string, Note>;
     public slideOrigins: Map<string, Note> = new Map<string, Note>();
     public transpose: number = 0;
+    public isExplicitlyBeamed = false;
 
     constructor() {
         this.tieStarts = new Set<Note>();
@@ -177,8 +178,6 @@ export class MusicXmlImporter extends ScoreImporter {
     private _indexToTrackInfo: Map<number, TrackInfo> = new Map<number, TrackInfo>();
     private _staffToContext: Map<Staff, StaffContext> = new Map<Staff, StaffContext>();
 
-    private _previousMasterBarNumber = -1;
-    private _implicitBars: number = 0;
     private _divisionsPerQuarterNote: number = 1;
     private _currentDynamics = DynamicValue.F;
 
@@ -368,6 +367,7 @@ export class MusicXmlImporter extends ScoreImporter {
     }
 
     private parseTimewise(element: XmlNode): void {
+        let index = 0;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'credit':
@@ -388,7 +388,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     this.parseWork(c);
                     break;
                 case 'measure':
-                    this.parseTimewiseMeasure(c);
+                    this.parseTimewiseMeasure(c, index);
+                    index++;
                     break;
             }
         }
@@ -885,25 +886,24 @@ export class MusicXmlImporter extends ScoreImporter {
             return;
         }
         const track = this._idToTrackInfo.get(id)!.track;
-        this._previousMasterBarNumber = -1;
-        this._implicitBars = 0;
-
+        let index = 0;
         for (const c of element.childElements()) {
             switch (c.localName) {
                 case 'measure':
-                    this.parsePartwiseMeasure(c, track);
+                    this.parsePartwiseMeasure(c, track, index);
+                    index++;
                     break;
             }
         }
     }
 
-    private parsePartwiseMeasure(element: XmlNode, track: Track) {
-        const masterBar = this.getOrCreateMasterBar(element);
+    private parsePartwiseMeasure(element: XmlNode, track: Track, index: number) {
+        const masterBar = this.getOrCreateMasterBar(element, index);
         this.parsePartMeasure(element, masterBar, track);
     }
 
-    private parseTimewiseMeasure(element: XmlNode) {
-        const masterBar = this.getOrCreateMasterBar(element);
+    private parseTimewiseMeasure(element: XmlNode, index: number) {
+        const masterBar = this.getOrCreateMasterBar(element, index);
 
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -914,32 +914,9 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private getOrCreateMasterBar(element: XmlNode) {
-        let number = Number.parseInt(element.attributes.get('number')!);
-
+    private getOrCreateMasterBar(element: XmlNode, index: number) {
         const implicit = element.attributes.get('implicit') === 'yes';
-
-        // non-controlling="" Ignored
-        // text="" Ignored
-        // width="" Ignored (we cannot handle the unit 'tenths' yet - https://github.com/CoderLine/alphaTab/issues/1949)
-
-        // no number specified, assume its the "next" one
-        if (Number.isNaN(number)) {
-            if (this._previousMasterBarNumber === -1) {
-                number = 1;
-            } else {
-                number = this._previousMasterBarNumber + 1;
-            }
-            this._implicitBars++;
-        } else if (number === 0) {
-            // anacrusis
-            number++;
-            this._implicitBars++;
-        } else {
-            number += this._implicitBars;
-        }
-
-        while (this._score.masterBars.length < number) {
+        while (this._score.masterBars.length <= index) {
             const newMasterBar = new MasterBar();
             if (implicit) {
                 newMasterBar.isAnacrusis = true;
@@ -952,9 +929,7 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
-        this._previousMasterBarNumber = number;
-        const masterBar = this._score.masterBars[number - 1];
-
+        const masterBar = this._score.masterBars[index];
         return masterBar;
     }
 
@@ -1984,8 +1959,8 @@ export class MusicXmlImporter extends ScoreImporter {
             // remember for bars which will be created
             this._keyAllStaves = [keySignature, keySignatureType];
             // apply to potentially created bars
-            for(const s of track.staves) {
-                if(s.bars.length > masterBar.index) {
+            for (const s of track.staves) {
+                if (s.bars.length > masterBar.index) {
                     s.bars[masterBar.index].keySignature = keySignature;
                     s.bars[masterBar.index].keySignatureType = keySignatureType;
                 }
@@ -2352,7 +2327,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 newBar.keySignatureType = newBar.previousBar!.keySignatureType;
             }
 
-            if(this._keyAllStaves != null) {
+            if (this._keyAllStaves != null) {
                 newBar.keySignature = this._keyAllStaves![0];
                 newBar.keySignatureType = this._keyAllStaves![1];
             }
@@ -2390,7 +2365,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let beat: Beat | null = null;
         let graceType = GraceType.None;
         let graceDurationInDivisions = 0;
-        let beamMode: BeatBeamingMode = BeatBeamingMode.ForceSplitToNext;
+        let beamMode: BeatBeamingMode | null = null;
         // let graceTimeStealPrevious = 0;
         // let graceTimeStealFollowing = 0;
 
@@ -2503,7 +2478,14 @@ export class MusicXmlImporter extends ScoreImporter {
 
             const newBeat = new Beat();
             beat = newBeat;
-            newBeat.beamingMode = beamMode;
+            if (beamMode === null) {
+                newBeat.beamingMode = this.getStaffContext(staff).isExplicitlyBeamed
+                    ? BeatBeamingMode.ForceSplitToNext
+                    : BeatBeamingMode.Auto;
+            } else {
+                newBeat.beamingMode = beamMode;
+                this.getStaffContext(staff).isExplicitlyBeamed = true;
+            }
             newBeat.isEmpty = false;
             newBeat.dynamics = this._currentDynamics;
             if (this._isBeatSlash) {
@@ -2626,11 +2608,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     break;
                 // case 'tie': Ignored -> "tie" is sound, "tied" is notation
                 case 'instrument':
-                    if (note === null) {
-                        Logger.warning('MusicXML', 'Malformed MusicXML, missing pitch or unpitched for note');
-                    } else {
-                        instrumentId = c.getAttribute('id', '');
-                    }
+                    instrumentId = c.getAttribute('id', '');
                     break;
 
                 // case 'footnote': Ignored
