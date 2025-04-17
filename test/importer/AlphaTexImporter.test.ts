@@ -761,53 +761,78 @@ describe('AlphaTexImporterTest', () => {
         \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks Ebminor 3.3 |
         \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks d#minor 3.3`;
         const score: Score = parseTex(tex);
-        expect(score.masterBars[0].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[0].keySignatureType).to.equal(KeySignatureType.Major);
 
-        expect(score.masterBars[1].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[1].keySignatureType).to.equal(KeySignatureType.Major);
+        const bars = score.tracks[0].staves[0].bars;
+        const expected: [KeySignature, KeySignatureType][] = [
+            [KeySignature.C, KeySignatureType.Major],
+            [KeySignature.C, KeySignatureType.Major],
+            [KeySignature.C, KeySignatureType.Major],
+            [KeySignature.C, KeySignatureType.Minor],
+            [KeySignature.F, KeySignatureType.Major],
+            [KeySignature.Bb, KeySignatureType.Major],
+            [KeySignature.Eb, KeySignatureType.Minor],
+            [KeySignature.Ab, KeySignatureType.Major],
+            [KeySignature.Db, KeySignatureType.Major],
+            [KeySignature.Gb, KeySignatureType.Minor],
+            [KeySignature.G, KeySignatureType.Major],
+            [KeySignature.D, KeySignatureType.Major],
+            [KeySignature.A, KeySignatureType.Minor],
+            [KeySignature.E, KeySignatureType.Major],
+            [KeySignature.B, KeySignatureType.Major],
+            [KeySignature.FSharp, KeySignatureType.Minor]
+        ];
+        
+        for (let i = 0; i < expected.length; i++) {
+            expect(bars[i].keySignature).to.equal(expected[i][0]);
+            expect(bars[i].keySignatureType).to.equal(expected[i][1]);
+        }
+    });
 
-        expect(score.masterBars[2].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[2].keySignatureType).to.equal(KeySignatureType.Major);
+    it('key-signature-multi-staff', () => {
+        const tex: string = `
+        \\track T1
+            \\staff 
+                :1 3.3 | \\ks C 3.3 | \\ks Cmajor 3.3 | \\ks Aminor 3.3 |
+                \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks Ebminor 3.3 |
+                \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks d#minor 3.3
+            \\staff
+                \\ks d#minor :1 3.3 | \\ks Bmajor 3.3 | \\ks E 3.3 |
+                \\ks f#minor 3.3 | \\ks Dmajor 3.3 | \\ks g 3.3 | \\ks Ebminor 3.3 | \\ks db 3.3 | \\ks aB 3.3 |
+                \\ks CMINOR 3.3 | \\ks bbmajor 3.3 | \\ks F 3.3 | \\ks Aminor 3.3 | \\ks Cmajor 3.3 | \\ks C 3.3 | \\ks C 3.3  
+        `;
+        const score: Score = parseTex(tex);
 
-        expect(score.masterBars[3].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[3].keySignatureType).to.equal(KeySignatureType.Minor);
+        let bars = score.tracks[0].staves[0].bars;
+        const expected: [KeySignature, KeySignatureType][] = [
+            [KeySignature.C, KeySignatureType.Major],
+            [KeySignature.C, KeySignatureType.Major],
+            [KeySignature.C, KeySignatureType.Major],
+            [KeySignature.C, KeySignatureType.Minor],
+            [KeySignature.F, KeySignatureType.Major],
+            [KeySignature.Bb, KeySignatureType.Major],
+            [KeySignature.Eb, KeySignatureType.Minor],
+            [KeySignature.Ab, KeySignatureType.Major],
+            [KeySignature.Db, KeySignatureType.Major],
+            [KeySignature.Gb, KeySignatureType.Minor],
+            [KeySignature.G, KeySignatureType.Major],
+            [KeySignature.D, KeySignatureType.Major],
+            [KeySignature.A, KeySignatureType.Minor],
+            [KeySignature.E, KeySignatureType.Major],
+            [KeySignature.B, KeySignatureType.Major],
+            [KeySignature.FSharp, KeySignatureType.Minor]
+        ];
 
-        expect(score.masterBars[4].keySignature).to.equal(KeySignature.F);
-        expect(score.masterBars[4].keySignatureType).to.equal(KeySignatureType.Major);
+        for (let i = 0; i < expected.length; i++) {
+            expect(bars[i].keySignature).to.equal(expected[i][0]);
+            expect(bars[i].keySignatureType).to.equal(expected[i][1]);
+        }
 
-        expect(score.masterBars[5].keySignature).to.equal(KeySignature.Bb);
-        expect(score.masterBars[5].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[6].keySignature).to.equal(KeySignature.Eb);
-        expect(score.masterBars[6].keySignatureType).to.equal(KeySignatureType.Minor);
-
-        expect(score.masterBars[7].keySignature).to.equal(KeySignature.Ab);
-        expect(score.masterBars[7].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[8].keySignature).to.equal(KeySignature.Db);
-        expect(score.masterBars[8].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[9].keySignature).to.equal(KeySignature.Gb);
-        expect(score.masterBars[9].keySignatureType).to.equal(KeySignatureType.Minor);
-
-        expect(score.masterBars[10].keySignature).to.equal(KeySignature.G);
-        expect(score.masterBars[10].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[11].keySignature).to.equal(KeySignature.D);
-        expect(score.masterBars[11].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[12].keySignature).to.equal(KeySignature.A);
-        expect(score.masterBars[12].keySignatureType).to.equal(KeySignatureType.Minor);
-
-        expect(score.masterBars[13].keySignature).to.equal(KeySignature.E);
-        expect(score.masterBars[13].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[14].keySignature).to.equal(KeySignature.B);
-        expect(score.masterBars[14].keySignatureType).to.equal(KeySignatureType.Major);
-
-        expect(score.masterBars[15].keySignature).to.equal(KeySignature.FSharp);
-        expect(score.masterBars[15].keySignatureType).to.equal(KeySignatureType.Minor);
+        bars = score.tracks[0].staves[1].bars;
+        expected.reverse();
+        for (let i = 0; i < expected.length; i++) {
+            expect(bars[i].keySignature).to.equal(expected[i][0], `at ${i}`);
+            expect(bars[i].keySignatureType).to.equal(expected[i][1], `at ${i}`);
+        }
     });
 
     it('pop-slap-tap', () => {

@@ -426,9 +426,7 @@ export class ModelUtils {
                     (masterBar.timeSignatureCommon !== masterBar.previousMasterBar!.timeSignatureCommon ||
                         masterBar.timeSignatureNumerator !== masterBar.previousMasterBar!.timeSignatureNumerator ||
                         masterBar.timeSignatureDenominator !== masterBar.previousMasterBar!.timeSignatureDenominator ||
-                        masterBar.tripletFeel !== masterBar.previousMasterBar!.tripletFeel ||
-                        masterBar.keySignature !== masterBar.previousMasterBar!.keySignature ||
-                        masterBar.keySignatureType !== masterBar.previousMasterBar!.keySignatureType)
+                        masterBar.tripletFeel !== masterBar.previousMasterBar!.tripletFeel)
                 ) {
                     break;
                 }
@@ -440,6 +438,15 @@ export class ModelUtils {
                         const bar = s.bars[masterBar.index];
 
                         if (!bar.isRestOnly) {
+                            areAllBarsSuitable = false;
+                            break;
+                        }
+
+                        if (
+                            bar.index > 0 &&
+                            (bar.keySignature !== bar.previousBar!.keySignature ||
+                                bar.keySignatureType !== bar.previousBar!.keySignatureType)
+                        ) {
                             areAllBarsSuitable = false;
                             break;
                         }

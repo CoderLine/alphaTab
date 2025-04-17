@@ -494,8 +494,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
         // Key signature
         if (
             hasClef ||
-            (this.index === 0 && this.bar.masterBar.keySignature !== KeySignature.C) ||
-            (this.bar.previousBar && this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature)
+            (this.index === 0 && this.bar.keySignature !== KeySignature.C) ||
+            (this.bar.previousBar && this.bar.keySignature !== this.bar.previousBar.keySignature)
         ) {
             this.createStartSpacing();
             this.createKeySignatureGlyphs();
@@ -519,8 +519,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     private createKeySignatureGlyphs(): void {
         let offsetClef: number = 0;
-        const currentKey: number = this.bar.masterBar.keySignature;
-        const previousKey: number = !this.bar.previousBar ? 0 : this.bar.previousBar.masterBar.keySignature;
+        const currentKey: number = this.bar.keySignature;
+        const previousKey: number = !this.bar.previousBar ? 0 : this.bar.previousBar.keySignature;
         switch (this.bar.clef) {
             case Clef.Neutral:
                 offsetClef = 0;
@@ -562,7 +562,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
         }
         // naturalize previous key if naturalizing
-        if (this.bar.masterBar.keySignature === KeySignature.C) {
+        if (this.bar.keySignature === KeySignature.C) {
             const naturalizeSymbols: number = Math.abs(previousKey);
             const previousKeyPositions = ModelUtils.keySignatureIsSharp(previousKey)
                 ? ScoreBarRenderer.SharpKsSteps

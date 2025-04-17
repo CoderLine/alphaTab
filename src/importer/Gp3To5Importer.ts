@@ -59,7 +59,10 @@ export class Gp3To5Importer extends ScoreImporter {
     private _trackCount: number = 0;
     private _playbackInfos: PlaybackInformation[] = [];
     private _doubleBars: Set<number> = new Set<number>();
-
+    private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
+        number,
+        [KeySignature, KeySignatureType]
+    >();
     private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
 
     private _directionLookup: Map<number, Direction[]> = new Map<number, Direction[]>();
@@ -367,11 +370,10 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         // keysignature
         if ((flags & 0x40) !== 0) {
-            newMasterBar.keySignature = IOHelper.readSInt8(this.data) as KeySignature;
-            newMasterBar.keySignatureType = this.data.readByte() as KeySignatureType;
-        } else if (previousMasterBar) {
-            newMasterBar.keySignature = previousMasterBar.keySignature;
-            newMasterBar.keySignatureType = previousMasterBar.keySignatureType;
+            this._keySignatures.set(this._score.masterBars.length, [
+                IOHelper.readSInt8(this.data) as KeySignature,
+                this.data.readByte() as KeySignatureType
+            ]);
         }
         if (this._versionNumber >= 500 && (flags & 0x03) !== 0) {
             this.data.skip(4);
@@ -520,6 +522,15 @@ export class Gp3To5Importer extends ScoreImporter {
             newBar.clef = Clef.Neutral;
         }
         mainStaff.addBar(newBar);
+
+        if (this._keySignatures.has(newBar.index)) {
+            const newKeySignature = this._keySignatures.get(newBar.index)!;
+            newBar.keySignature = newKeySignature[0];
+            newBar.keySignatureType = newKeySignature[1];
+        } else if (newBar.index > 0) {
+            newBar.keySignature = newBar.previousBar!.keySignature;
+            newBar.keySignatureType = newBar.previousBar!.keySignatureType;
+        }
 
         if (this._doubleBars.has(newBar.index)) {
             newBar.barLineRight = BarLineStyle.LightLight;
