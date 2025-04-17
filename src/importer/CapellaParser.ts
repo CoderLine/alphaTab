@@ -510,6 +510,9 @@ export class CapellaParser {
         if (staff.bars.length > 0) {
             currentBar.clef = staff.bars[staff.bars.length - 1].clef;
             currentBar.clefOttava = staff.bars[staff.bars.length - 1].clefOttava;
+            currentBar.keySignature = staff.bars[staff.bars.length - 1].keySignature;
+            currentBar.keySignatureType = staff.bars[staff.bars.length - 1].keySignatureType;
+
         } else {
             currentBar.clef = this._currentStaffLayout.defaultClef;
         }
@@ -520,8 +523,6 @@ export class CapellaParser {
             const master: MasterBar = new MasterBar();
             this.score.addMasterBar(master);
             if (master.index > 0) {
-                master.keySignature = master.previousMasterBar!.keySignature;
-                master.keySignatureType = master.previousMasterBar!.keySignatureType;
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
             }
 
@@ -611,7 +612,7 @@ export class CapellaParser {
                         this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
                         break;
                     case 'keySign':
-                        this._currentBar.masterBar.keySignature = Number.parseInt(
+                        this._currentBar.keySignature = Number.parseInt(
                             c.getAttribute('fifths')
                         ) as KeySignature;
                         break;

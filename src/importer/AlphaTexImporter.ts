@@ -1674,8 +1674,6 @@ export class AlphaTexImporter extends ScoreImporter {
             const master: MasterBar = new MasterBar();
             this._score.addMasterBar(master);
             if (master.index > 0) {
-                master.keySignature = master.previousMasterBar!.keySignature;
-                master.keySignatureType = master.previousMasterBar!.keySignatureType;
                 master.timeSignatureDenominator = master.previousMasterBar!.timeSignatureDenominator;
                 master.timeSignatureNumerator = master.previousMasterBar!.timeSignatureNumerator;
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
@@ -1797,6 +1795,8 @@ export class AlphaTexImporter extends ScoreImporter {
         if (newBar.previousBar) {
             newBar.clef = newBar.previousBar.clef;
             newBar.clefOttava = newBar.previousBar.clefOttava;
+            newBar.keySignature = newBar.previousBar!.keySignature;
+            newBar.keySignatureType = newBar.previousBar!.keySignatureType;
         }
         this._barIndex++;
 
@@ -3014,8 +3014,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.String) {
                     this.error('keysignature', AlphaTexSymbols.String, true);
                 }
-                master.keySignature = this.parseKeySignature(this._syData as string);
-                master.keySignatureType = this.parseKeySignatureType(this._syData as string);
+                bar.keySignature = this.parseKeySignature(this._syData as string);
+                bar.keySignatureType = this.parseKeySignatureType(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'clef') {
                 this._sy = this.newSy();

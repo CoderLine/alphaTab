@@ -56,14 +56,14 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                 const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
                 const noteValue = AccidentalHelper.getNoteValue(note);
                 let accidentalToSet: AccidentalType = AccidentalHelper.computeAccidental(
-                    this.renderer.bar.masterBar.keySignature,
+                    this.renderer.bar.keySignature,
                     accidentalMode,
                     noteValue,
                     note.hasQuarterToneOffset
                 );
 
                 if (accidentalToSet === AccidentalType.Natural) {
-                    const ks: number = this.renderer.bar.masterBar.keySignature;
+                    const ks: number = this.renderer.bar.keySignature;
                     const ksi: number = ks + 7;
                     const naturalizeAccidentalForKeySignature: AccidentalType =
                         ksi < 7 ? AccidentalType.Sharp : AccidentalType.Flat;
@@ -225,8 +225,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         if (!this.container.beat.isEmpty) {
             let numberWithinOctave = '0';
             if (this.container.beat.notes.length > 0) {
-                const kst: number = this.renderer.bar.masterBar.keySignatureType;
-                const ks: number = this.renderer.bar.masterBar.keySignature;
+                const kst: number = this.renderer.bar.keySignatureType;
+                const ks: number = this.renderer.bar.keySignature;
                 const ksi: number = ks + 7;
 
                 const oneNoteValues =

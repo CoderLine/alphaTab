@@ -280,7 +280,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
     protected override createLinePreBeatGlyphs(): void {
         // Key signature
-        if (!this.bar.previousBar || this.bar.masterBar.keySignature !== this.bar.previousBar.masterBar.keySignature) {
+        if (!this.bar.previousBar || this.bar.keySignature !== this.bar.previousBar.keySignature) {
             this.createStartSpacing();
             this.createKeySignatureGlyphs();
         }
@@ -307,8 +307,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
             new NumberedKeySignatureGlyph(
                 0,
                 this.getLineY(0),
-                this.bar.masterBar.keySignature,
-                this.bar.masterBar.keySignatureType
+                this.bar.keySignature,
+                this.bar.keySignatureType
             )
         );
     }

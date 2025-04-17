@@ -1040,7 +1040,6 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
-      "keysignature" => 4,
       "timesignaturecommon" => true,
     },
     Map {
@@ -1509,6 +1508,7 @@ Map {
                   ],
                 },
               ],
+              "keysignature" => 4,
             },
             Map {
               "__kind" => "Bar",
@@ -1616,6 +1616,7 @@ Map {
                   ],
                 },
               ],
+              "keysignature" => 4,
             },
           ],
         },
@@ -1640,7 +1641,6 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
-      "keysignature" => 4,
       "timesignaturecommon" => true,
     },
   ],
@@ -1772,6 +1772,7 @@ Map {
                   ],
                 },
               ],
+              "keysignature" => 4,
             },
           ],
         },
@@ -2233,6 +2234,7 @@ Map {
                   ],
                 },
               ],
+              "keysignature" => 4,
             },
           ],
         },

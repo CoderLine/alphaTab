@@ -4,8 +4,8 @@ import type { Beat } from '@src/model/Beat';
 import type { Fermata } from '@src/model/Fermata';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { Bar } from '@src/model/Bar';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
+import type { KeySignature } from '@src/model/KeySignature';
+import type { KeySignatureType } from '@src/model/KeySignatureType';
 import type { RepeatGroup } from '@src/model/RepeatGroup';
 import type { Score } from '@src/model/Score';
 import type { Section } from '@src/model/Section';
@@ -45,14 +45,36 @@ export class MasterBar {
     public index: number = 0;
 
     /**
-     * Gets or sets the key signature used on all bars.
+     * The key signature used on all bars.
+     * @deprecated Use key signatures on bar level
      */
-    public keySignature: KeySignature = KeySignature.C;
+    public get keySignature(): KeySignature {
+        return this.score.tracks[0].staves[0].bars[this.index].keySignature;
+    }
 
     /**
-     * Gets or sets the type of key signature (major/minor)
+     * The key signature used on all bars.
+     * @deprecated Use key signatures on bar level
      */
-    public keySignatureType: KeySignatureType = KeySignatureType.Major;
+    public set keySignature(value: KeySignature) {
+        this.score.tracks[0].staves[0].bars[this.index].keySignature = value;
+    }
+
+    /**
+     * The type of key signature (major/minor)
+     * @deprecated Use key signatures on bar level
+     */
+    public get keySignatureType(): KeySignatureType {
+        return this.score.tracks[0].staves[0].bars[this.index].keySignatureType;
+    }
+
+    /**
+     * The type of key signature (major/minor)
+     * @deprecated Use key signatures on bar level
+     */
+    public set keySignatureType(value: KeySignatureType) {
+        this.score.tracks[0].staves[0].bars[this.index].keySignatureType = value;
+    }
 
     /**
      * Gets or sets whether a double bar is shown for this masterbar.

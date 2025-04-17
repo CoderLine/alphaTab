@@ -8,8 +8,6 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
-import { KeySignature } from "@src/model/KeySignature";
-import { KeySignatureType } from "@src/model/KeySignatureType";
 import { TripletFeel } from "@src/model/TripletFeel";
 import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
@@ -28,8 +26,6 @@ export class MasterBarSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("alternateendings", obj.alternateEndings);
-        o.set("keysignature", obj.keySignature as number);
-        o.set("keysignaturetype", obj.keySignatureType as number);
         o.set("isdoublebar", obj.isDoubleBar);
         o.set("isrepeatstart", obj.isRepeatStart);
         o.set("repeatcount", obj.repeatCount);
@@ -66,12 +62,6 @@ export class MasterBarSerializer {
         switch (property) {
             case "alternateendings":
                 obj.alternateEndings = v! as number;
-                return true;
-            case "keysignature":
-                obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;
-                return true;
-            case "keysignaturetype":
-                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
                 return true;
             case "isdoublebar":
                 obj.isDoubleBar = v! as boolean;

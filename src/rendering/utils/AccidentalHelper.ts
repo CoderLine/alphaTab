@@ -191,7 +191,7 @@ export class AccidentalHelper {
         if (note.isPercussion) {
             line = AccidentalHelper.getPercussionLine(bar, noteValue);
         } else {
-            line = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
+            line = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
         }
         return line;
     }
@@ -306,14 +306,14 @@ export class AccidentalHelper {
             steps = AccidentalHelper.getPercussionLine(this._bar, noteValue);
         } else {
             const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
-            steps = AccidentalHelper.calculateNoteSteps(this._bar.masterBar.keySignature, this._bar.clef, noteValue);
+            steps = AccidentalHelper.calculateNoteSteps(this._bar.keySignature, this._bar.clef, noteValue);
 
             const currentAccidental = this._registeredAccidentals.has(steps)
                 ? this._registeredAccidentals.get(steps)!
                 : null;
 
             accidentalToSet = AccidentalHelper.computeAccidental(
-                this._bar.masterBar.keySignature,
+                this._bar.keySignature,
                 accidentalMode,
                 noteValue,
                 quarterBend,

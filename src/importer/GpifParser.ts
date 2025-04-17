@@ -15,7 +15,7 @@ import { Fermata, FermataType } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import type { KeySignature } from '@src/model/KeySignature';
+import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
@@ -120,6 +120,10 @@ export class GpifParser {
     private _skipApplyLyrics: boolean = false;
 
     private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
+    private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
+        number,
+        [KeySignature, KeySignatureType]
+    >();
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<number, Automation[]>();
@@ -1203,20 +1207,23 @@ export class GpifParser {
                     }
                     break;
                 case 'Key':
-                    masterBar.keySignature = Number.parseInt(
+                    const keySignature = Number.parseInt(
                         c.findChildElement('AccidentalCount')!.innerText
                     ) as KeySignature;
                     const mode: XmlNode = c.findChildElement('Mode')!;
+                    let keySignatureType = KeySignatureType.Major;
                     if (mode) {
                         switch (mode.innerText.toLowerCase()) {
                             case 'major':
-                                masterBar.keySignatureType = KeySignatureType.Major;
+                                keySignatureType = KeySignatureType.Major;
                                 break;
                             case 'minor':
-                                masterBar.keySignatureType = KeySignatureType.Minor;
+                                keySignatureType = KeySignatureType.Minor;
                                 break;
                         }
                     }
+
+                    this._keySignatures.set(this._masterBars.length, [keySignature, keySignatureType]);
                     break;
                 case 'Fermatas':
                     this.parseFermatas(masterBar, c);
@@ -2413,9 +2420,12 @@ export class GpifParser {
             this.score.addTrack(track);
         }
         // process all masterbars
+        let keySignature: [KeySignature, KeySignatureType];
+
         for (const barIds of this._barsOfMasterBar) {
             // add all bars of masterbar vertically to all tracks
             let staffIndex: number = 0;
+            keySignature = [KeySignature.C, KeySignatureType.Major];
             for (
                 let barIndex: number = 0, trackIndex: number = 0;
                 barIndex < barIds.length && trackIndex < this.score.tracks.length;
@@ -2427,6 +2437,14 @@ export class GpifParser {
                     const track: Track = this.score.tracks[trackIndex];
                     const staff: Staff = track.staves[staffIndex];
                     staff.addBar(bar);
+
+                    const masterBarIndex = staff.bars.length - 1;
+                    if (this._keySignatures.has(masterBarIndex)) {
+                        keySignature = this._keySignatures.get(masterBarIndex)!;
+                    }
+
+                    bar.keySignature = keySignature[0];
+                    bar.keySignatureType = keySignature[1];
 
                     if (this._doubleBars.has(bar.masterBar)) {
                         bar.barLineRight = BarLineStyle.LightLight;
@@ -2490,8 +2508,10 @@ export class GpifParser {
                     if (staffIndex === track.staves.length - 1) {
                         trackIndex++;
                         staffIndex = 0;
+                        keySignature = [KeySignature.C, KeySignatureType.Major];
                     } else {
                         staffIndex++;
+                        keySignature = [KeySignature.C, KeySignatureType.Major];
                     }
                 } else {
                     // no bar for track

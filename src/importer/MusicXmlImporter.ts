@@ -144,7 +144,7 @@ class TrackInfo {
             // no display pitch defined?
             musicXmlStaffSteps = 4; // middle of bar
         } else {
-            musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.masterBar.keySignature, bar.clef, noteValue);
+            musicXmlStaffSteps = AccidentalHelper.calculateNoteSteps(bar.keySignature, bar.clef, noteValue);
         }
 
         // to translate this into the "staffLine" semantics we need to subtract additionally the steps "missing" from the absent lines
@@ -245,6 +245,8 @@ export class MusicXmlImporter extends ScoreImporter {
                     if (previousBar) {
                         bar.clef = previousBar.clef;
                         bar.clefOttava = previousBar.clefOttava;
+                        bar.keySignature = bar.previousBar!.keySignature;
+                        bar.keySignatureType = bar.previousBar!.keySignatureType;
                     }
 
                     for (let i = 0; i < voiceCount; i++) {
@@ -944,8 +946,6 @@ export class MusicXmlImporter extends ScoreImporter {
             }
             this._score.addMasterBar(newMasterBar);
             if (newMasterBar.index > 0) {
-                newMasterBar.keySignature = newMasterBar.previousMasterBar!.keySignature;
-                newMasterBar.keySignatureType = newMasterBar.previousMasterBar!.keySignatureType;
                 newMasterBar.timeSignatureDenominator = newMasterBar.previousMasterBar!.timeSignatureDenominator;
                 newMasterBar.timeSignatureNumerator = newMasterBar.previousMasterBar!.timeSignatureNumerator;
                 newMasterBar.tripletFeel = newMasterBar.previousMasterBar!.tripletFeel;
@@ -984,10 +984,6 @@ export class MusicXmlImporter extends ScoreImporter {
     private parsePartMeasure(element: XmlNode, masterBar: MasterBar, track: Track) {
         this._musicalPosition = 0;
         this._lastBeat = null;
-
-        // initial empty staff and voice
-        const staff = this.getOrCreateStaff(track, 0);
-        this.getOrCreateBar(staff, masterBar);
 
         masterBar.alternateEndings = this._nextMasterBarRepeatEnding;
 
@@ -1036,6 +1032,13 @@ export class MusicXmlImporter extends ScoreImporter {
         }
 
         this.applySimileMarks(masterBar, track);
+
+        // initial empty staff and voice (if no other elements created something already)
+        const staff = this.getOrCreateStaff(track, 0);
+        this.getOrCreateBar(staff, masterBar);
+
+        // clear measure attribute
+        this._keyAllStaves = null;
     }
 
     private parsePrint(element: XmlNode, masterBar: MasterBar, track: Track) {
@@ -1638,7 +1641,7 @@ export class MusicXmlImporter extends ScoreImporter {
                         this._divisionsPerQuarterNote = Number.parseFloat(c.innerText);
                         break;
                     case 'key':
-                        this.parseKey(c, masterBar);
+                        this.parseKey(c, masterBar, track);
                         break;
                     case 'time':
                         this.parseTime(c, masterBar);
@@ -1936,7 +1939,9 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseKey(element: XmlNode, masterBar: MasterBar): void {
+    private _keyAllStaves: [KeySignature, KeySignatureType] | null = null;
+
+    private parseKey(element: XmlNode, masterBar: MasterBar, track: Track): void {
         let fifths: number = -(KeySignature.C as number);
         let mode: string = '';
 
@@ -1957,15 +1962,34 @@ export class MusicXmlImporter extends ScoreImporter {
             }
         }
 
+        let keySignature: KeySignature;
         if (-7 <= fifths && fifths <= 7) {
-            masterBar.keySignature = fifths as KeySignature;
+            keySignature = fifths as KeySignature;
         } else {
-            masterBar.keySignature = KeySignature.C;
+            keySignature = KeySignature.C;
         }
+        let keySignatureType: KeySignatureType;
         if (mode === 'minor') {
-            masterBar.keySignatureType = KeySignatureType.Minor;
+            keySignatureType = KeySignatureType.Minor;
         } else {
-            masterBar.keySignatureType = KeySignatureType.Major;
+            keySignatureType = KeySignatureType.Major;
+        }
+
+        if (element.attributes.has('number')) {
+            const staff = this.getOrCreateStaff(track, Number.parseInt(element.attributes.get('number')!) - 1);
+            const bar = this.getOrCreateBar(staff, masterBar);
+            bar.keySignature = keySignature;
+            bar.keySignatureType = keySignatureType;
+        } else {
+            // remember for bars which will be created
+            this._keyAllStaves = [keySignature, keySignatureType];
+            // apply to potentially created bars
+            for(const s of track.staves) {
+                if(s.bars.length > masterBar.index) {
+                    s.bars[masterBar.index].keySignature = keySignature;
+                    s.bars[masterBar.index].keySignatureType = keySignatureType;
+                }
+            }
         }
     }
 
@@ -2324,6 +2348,13 @@ export class MusicXmlImporter extends ScoreImporter {
             if (newBar.previousBar) {
                 newBar.clef = newBar.previousBar.clef;
                 newBar.clefOttava = newBar.previousBar.clefOttava;
+                newBar.keySignature = newBar.previousBar!.keySignature;
+                newBar.keySignatureType = newBar.previousBar!.keySignatureType;
+            }
+
+            if(this._keyAllStaves != null) {
+                newBar.keySignature = this._keyAllStaves![0];
+                newBar.keySignatureType = this._keyAllStaves![1];
             }
 
             for (let i = 0; i < voiceCount; i++) {

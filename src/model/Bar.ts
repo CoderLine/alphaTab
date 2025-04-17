@@ -6,6 +6,8 @@ import type { Staff } from '@src/model/Staff';
 import type { Voice } from '@src/model/Voice';
 import type { Settings } from '@src/Settings';
 import { ElementStyle } from '@src/model/ElementStyle';
+import { KeySignature } from '@src/model/KeySignature';
+import { KeySignatureType } from '@src/model/KeySignatureType';
 
 /**
  * The different pedal marker types.
@@ -340,6 +342,16 @@ export class Bar {
      * If both bars have a custom style, both bar styles are drawn.
      */
     public barLineRight: BarLineStyle = BarLineStyle.Automatic;
+
+    /**
+     * Gets or sets the key signature used on all bars.
+     */
+    public keySignature: KeySignature = KeySignature.C;
+
+    /**
+     * Gets or sets the type of key signature (major/minor)
+     */
+    public keySignatureType: KeySignatureType = KeySignatureType.Major;
 
     /**
      * The bar line to draw on the left side of the bar with an "automatic" type resolved to the actual one.
