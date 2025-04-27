@@ -1,6 +1,6 @@
 {
     "name": "@coderline/alphatab",
-    "version": "1.4.3",
+    "version": "1.4.4",
     "description": "alphaTab is a music notation and guitar tablature rendering library",
     "keywords": [
         "guitar",
