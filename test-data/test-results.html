@@ -73,6 +73,14 @@
             border-color: green;
         }
 
+        .card.accepted {
+            border-color: green;
+        }
+
+        body.hide-accepted .accepted {
+            display: none;
+        }
+
         .drop-area {
             position: absolute;
             top: 0;
@@ -114,12 +122,16 @@
         Run the <code>visualTests</code> via <code>npm run test</code> or using <a
             href="https://marketplace.visualstudio.com/items?itemName=coderline.mocha-vscode">Mocha for VS Code</a>.
     </p>
+    <p>
+        <input type="checkbox" id="hide-accepted" />
+        <label for="hide-accepted">Hide accepted</label>
+    </p>
     <div id="results-wrapper">
 
     </div>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script type="module">
-        function setupComparer(el, result) {
+        function setupComparer(card, el, result) {
             const ex = el.querySelector('.expected');
             const ac = el.querySelector('.actual');
             const df = el.querySelector('.diff');
@@ -174,7 +186,7 @@
                     } else {
                         acceptButton.innerText = 'Accepted';
                     }
-                    el.classList.add('accepted');
+                    card.classList.add('accepted');
                 };
                 xhr.onerror = () => {
                     alert('error accepting test result');
@@ -185,7 +197,7 @@
             };
         }
 
-        async function createComparer(result) {
+        async function createComparer(card, result) {
             const comparer = document.createElement('div');
             comparer.classList.add('comparer');
             comparer.innerHTML = `
@@ -260,7 +272,7 @@
                 // ignore potentially missing images
             }
 
-            setupComparer(comparer, result);
+            setupComparer(card, comparer, result);
 
             return comparer;
         }
@@ -279,7 +291,7 @@
             resultTitle.innerText = result.originalFile;
             resultBody.appendChild(resultTitle);
 
-            resultBody.appendChild(await createComparer(result));
+            resultBody.appendChild(await createComparer(resultItem, result));
 
             return resultItem;
         }
@@ -375,6 +387,14 @@
                 reader.readAsArrayBuffer(files[0]);
             }
         }, true);
+
+        document.querySelector('#hide-accepted').onchange = (e)=>{
+            if(e.target.checked) {
+                document.body.classList.add('hide-accepted');
+            } else {
+                document.body.classList.remove('hide-accepted');
+            }
+        };
 
     </script>
 

@@ -227,7 +227,7 @@ export class Html5Canvas implements ICanvas {
 
     public measureText(text: string): MeasuredText {
         const metrics = this._measureContext.measureText(text);
-        return new MeasuredText(metrics.width, metrics.actualBoundingBoxDescent - metrics.actualBoundingBoxAscent);
+        return new MeasuredText(metrics.width, metrics.actualBoundingBoxDescent + metrics.actualBoundingBoxAscent);
     }
 
     public fillMusicFontSymbol(

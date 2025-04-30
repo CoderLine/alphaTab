@@ -213,7 +213,9 @@ export class VisualTestHelper {
             'font/noto-serif/NotoSerif-Regular.otf',
             'font/noto-serif/NotoSerif-Italic.otf',
             'font/noto-serif/NotoSerif-Bold.otf',
-            'font/noto-serif/NotoSerif-BoldItalic.otf'
+            'font/noto-serif/NotoSerif-BoldItalic.otf',
+            'font/noto-music/NotoMusic-Regular.otf',
+            'font/noto-color-emoji/NotoColorEmoji_WindowsCompatible.ttf',
         ];
 
         for (const font of fonts) {
@@ -239,22 +241,22 @@ export class VisualTestHelper {
         Environment.HighDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;
 
-        settings.display.resources.copyrightFont.families = ['Noto Sans'];
-        settings.display.resources.titleFont.families = ['Noto Serif'];
-        settings.display.resources.subTitleFont.families = ['Noto Serif'];
-        settings.display.resources.wordsFont.families = ['Noto Serif'];
-        settings.display.resources.effectFont.families = ['Noto Serif'];
-        settings.display.resources.timerFont.families = ['Noto Serif'];
-        settings.display.resources.fretboardNumberFont.families = ['Noto Sans'];
-        settings.display.resources.tablatureFont.families = ['Noto Sans'];
-        settings.display.resources.graceFont.families = ['Noto Sans'];
-        settings.display.resources.barNumberFont.families = ['Noto Sans'];
-        settings.display.resources.fingeringFont.families = ['Noto Serif'];
-        settings.display.resources.inlineFingeringFont.families = ['Noto Serif'];
-        settings.display.resources.markerFont.families = ['Noto Serif'];
-        settings.display.resources.directionsFont.families = ['Noto Serif'];
-        settings.display.resources.numberedNotationFont.families = ['Noto Sans'];
-        settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans'];
+        settings.display.resources.copyrightFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.titleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.subTitleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.wordsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.effectFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.timerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.fretboardNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.tablatureFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.graceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.barNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.fingeringFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.inlineFingeringFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.markerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.directionsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.numberedNotationFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
     }
 
     public static async compareVisualResult(

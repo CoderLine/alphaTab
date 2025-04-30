@@ -178,4 +178,15 @@ describe('GeneralTests', () => {
             Logger.info('Test-color-performance', 'Default', i, defaultDuration);
         }
     });
+
+    it('font-fallback', async () => {
+        await VisualTestHelper.runVisualTestTex(
+            `\\title "Normal ♮♯ 🎸"
+            .
+            \\track "Track 🎸"
+            \\lyrics "Test Lyrics 🤘"
+            (1.2 1.1).4 x.2.8 0.1 1.1 | 1.2 3.2 0.1 1.1`,
+            'test-data/visual-tests/general/font-fallback.png'
+        );
+    });
 });

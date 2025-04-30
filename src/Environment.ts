@@ -510,14 +510,12 @@ export class Environment {
     }
 
     /**
-     * Registers a new custom font for the usage in the alphaSkia rendering backend using
-     * provided font information.
+     * Registers a new custom font for the usage in the alphaSkia rendering backend.
      * @param fontData The raw binary data of the font.
-     * @param fontInfo If provided the font info provided overrules
      * @returns The font info under which the font was registered.
      */
-    public static registerAlphaSkiaCustomFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
-        return SkiaCanvas.registerFont(fontData, fontInfo);
+    public static registerAlphaSkiaCustomFont(fontData: Uint8Array): Font {
+        return SkiaCanvas.registerFont(fontData);
     }
 
     /**
