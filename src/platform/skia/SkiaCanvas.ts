@@ -58,7 +58,7 @@ export class SkiaCanvas implements ICanvas {
                 [typeface.familyName],
                 12,
                 typeface.isItalic ? FontStyle.Italic : FontStyle.Plain,
-                typeface.isBold ? FontWeight.Bold : FontWeight.Regular
+                typeface.weight > 400 ? FontWeight.Bold : FontWeight.Regular
             );
         }
 
