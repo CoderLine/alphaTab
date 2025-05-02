@@ -2693,7 +2693,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     this.parseLyric(c, beat!, track);
                     break;
                 case 'play':
-                    this.parsePlay(c, note, beat);
+                    this.parsePlay(c, note);
                     break;
                 // case 'listen': Ignored
             }
@@ -2713,7 +2713,7 @@ export class MusicXmlImporter extends ScoreImporter {
         ensureBeat();
     }
 
-    private parsePlay(element: XmlNode, note: Note | null, beat: null) {
+    private parsePlay(element: XmlNode, note: Note | null) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'ipa': Ignored
