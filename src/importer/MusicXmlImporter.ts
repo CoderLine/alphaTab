@@ -2692,7 +2692,9 @@ export class MusicXmlImporter extends ScoreImporter {
                     ensureBeat();
                     this.parseLyric(c, beat!, track);
                     break;
-                // case 'play': Ignored
+                case 'play':
+                    this.parsePlay(c, note, beat);
+                    break;
                 // case 'listen': Ignored
             }
         }
@@ -2709,6 +2711,22 @@ export class MusicXmlImporter extends ScoreImporter {
 
         // if not yet created do it befor we exit to ensure we created the beat/note
         ensureBeat();
+    }
+
+    private parsePlay(element: XmlNode, note: Note | null, beat: null) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                // case 'ipa': Ignored
+                case 'mute':
+                    if(note && c.innerText === 'palm') {
+                        note.isPalmMute = true;
+                    }                    
+                    break;
+                case 'semi-pitched':
+                    break;
+                // case 'other-play': Ignored
+            }
+        }
     }
 
     private static readonly B4Value = 71;
