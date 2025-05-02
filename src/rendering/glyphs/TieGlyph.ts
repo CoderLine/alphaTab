@@ -38,12 +38,12 @@ export class TieGlyph extends Glyph {
         }
 
         const startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+            this.renderer.staff.staffId,
             this.startBeat!.voice.bar
         );
         this.startNoteRenderer = startNoteRenderer;
         const endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+            this.renderer.staff.staffId,
             this.endBeat.voice.bar
         );
         this.endNoteRenderer = endNoteRenderer;

@@ -116,7 +116,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         // Draw note heads
         const startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+            this.renderer.staff.staffId,
             this._beat.voice.bar
         )! as ScoreBarRenderer;
         const startX: number =
@@ -166,7 +166,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                 const endNoteRenderer: ScoreBarRenderer | null = !endNote
                     ? null
                     : (this.renderer.scoreRenderer.layout!.getRendererForBar(
-                          this.renderer.staff.staveId,
+                          this.renderer.staff.staffId,
                           endNote.beat.voice.bar
                       ) as ScoreBarRenderer);
                 // if we have a line break we draw only a line until the end

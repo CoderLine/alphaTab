@@ -225,7 +225,7 @@ export class TabBendGlyph extends Glyph {
             while (endNote.isTieOrigin) {
                 const nextNote: Note = endNote.tieDestination!;
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                    this.renderer.staff.staveId,
+                    this.renderer.staff.staffId,
                     nextNote.beat.voice.bar
                 );
                 if (!endNoteRenderer || startNoteRenderer.staff !== endNoteRenderer.staff) {
@@ -245,7 +245,7 @@ export class TabBendGlyph extends Glyph {
 
             endBeat = endNote.beat;
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staveId,
+                this.renderer.staff.staffId,
                 endBeat.voice.bar
             ) as TabBarRenderer;
             if (

@@ -113,7 +113,7 @@ export class TabWhammyBarGlyph extends Glyph {
         let endXPositionType: BeatXPosition = BeatXPosition.PreNotes;
         if (endBeat) {
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staveId,
+                this.renderer.staff.staffId,
                 endBeat.voice.bar
             ) as TabBarRenderer | null;
             if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {

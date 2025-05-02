@@ -113,7 +113,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         }
         const whammyMode: NotationMode = this.renderer.settings.notation.notationMode;
         const startNoteRenderer: ScoreBarRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+            this.renderer.staff.staffId,
             beat.voice.bar
         )! as ScoreBarRenderer;
 
@@ -151,7 +151,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             let endNoteRenderer: ScoreBarRenderer | null = null;
             if (note.isTieOrigin) {
                 endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                    this.renderer.staff.staveId,
+                    this.renderer.staff.staffId,
                     note.tieDestination!.beat.voice.bar
                 ) as ScoreBarRenderer | null;
                 if (endNoteRenderer && endNoteRenderer.staff === startNoteRenderer.staff) {
