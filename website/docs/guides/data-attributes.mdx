@@ -2,4 +2,79 @@
 title: Data Attributes
 ---
 
-TODO: Document deprecation of Data Attributes integration and move reference doc here.
+> [!WARNING]
+> Configuring alphaTab via data attributes has been deprecated in 1.5 and will be removed in 2.x. 
+
+HTML Data Attributes are quite a common mechanism to pass configurations from the DOM to JavaScript frameworks. This practice
+is quite common outside frontend frameworks like Angular or React and is known from frameworks like Bootstrap and jQuery.
+
+To reduce the number of configuration mechanisms we need to maintain and support, the configuration with data attributes will be removed in 2.x as a breaking change. 
+alphaTab anyhow requires a minimum degree of initialization via JavaScript (e.g. `new AlphaTabApi(element, settings)`) and therefore a migration to the settings object is fairly simple.
+Developers can still decide to fill a settings object based on custom attribute needs.
+
+Until the removal we will maintain backwards compatibility but at the same time we removed any documentation from the API reference related to it. 
+
+## Migration
+
+To migrate, move any properties from the respective data attributes in the HTML DOM to a JavaScript settings object.
+
+### Before
+
+The data attributes are added as `data-category-setting` to the DOM element. 
+
+```html
+<div id="alphaTab" 
+        data-core-file="test.gp"
+        data-display-layoutmode="horizontal" 
+        data-player-enableplayer="true"></div>
+<script type="module">
+import * as alphaTab from '@coderline/alphaTab';
+const element = document.querySelector('#alphaTab');
+const api = new alphaTab.AlphaTabApi(element);
+</script>
+```
+
+### After (JSON object)
+
+The settings are defined in a plain JSON object (we have type definitions for it) according to the reference docs. 
+The JSON object will be converted internally to the real settings object. Later motifications have to be done on `api.settings`.
+
+```html
+<div id="alphaTab"></div>
+<script type="module">
+import * as alphaTab from '@coderline/alphaTab';
+const element = document.querySelector('#alphaTab');
+/** @type {alphaTab.json.SettingsJson} */
+const settings = {
+    core: {
+        file: element.dataset.file // you could still load data attributes yourself
+    },
+    display: {
+        layoutMode: "horizontal" // or better: alphaTab.LayoutMode.Horizontal
+    },
+    player: {
+        enablePlayer: true
+    }
+};
+const api = new alphaTab.AlphaTabApi(element, settings);
+</script>
+```
+
+### After (Settings object)
+
+A new `Settings` instance is created and filled with the respective values on the defined properties. 
+This is useful to make decisions based on default values or if you want to share the same object across 
+multiple alphaTab instances.
+
+```html
+<div id="alphaTab"></div>
+<script type="module">
+import * as alphaTab from '@coderline/alphaTab';
+const element = document.querySelector('#alphaTab');
+const settings = new alphaTab.Settings();
+settings.core.file = "test.gp";
+settings.display.layoutMode = alphaTab.LayoutMode.Horizontal;
+settings.player.enablePlayer = true;
+const api = new alphaTab.AlphaTabApi(element, settings);
+</script>
+```

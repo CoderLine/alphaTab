@@ -1,5 +1,57 @@
 --- 
-title: Data Events
+title: DOM Events
 ---
 
-TODO: DOM Events deprecation of Data Attributes integration and move reference doc here.
+> [!WARNING]
+> Listening to alphaTab via DOM events has been deprecated in 1.5 and will be removed in 2.x. 
+
+DOM Events are quite a common mechanism to signal special events from JavaScript frameworks. This practice
+is quite common outside frontend frameworks like Angular or React and is known from frameworks like Bootstrap and jQuery.
+
+To reduce the number of event mechanisms we need to maintain and support, and to improve performance, DOM events will be removed in 2.x as a breaking change.
+alphaTab anyhow requires a minimum degree of initialization via JavaScript (e.g. `new AlphaTabApi(element, settings)`) and therefore a migration to the JavaScript events is fairly simple.
+
+Until the removal we will maintain backwards compatibility but at the same time we removed any documentation from the API reference related to it. 
+^
+## Migration
+
+To migrate, move any properties from the respective data attributes in the HTML DOM to a JavaScript settings object.
+
+### Before
+
+The event listeners are registered on the DOM element via `alphaTab.eventName`. The event data is contained in `e.detail`.
+
+```html
+<div id="alphaTab"></div>
+<script type="module">
+import * as alphaTab from '@coderline/alphaTab';
+const element = document.querySelector('#alphaTab');
+element.addEventListener('alphaTab.error', e => {
+    sendErrorToAnalytics(e.detail);
+}, false);
+element.addEventListener('alphaTab.playerPositionChanged', e => {
+    updatePlayerTime(e.detail);
+}, false)
+
+const api = new alphaTab.AlphaTabApi(element);
+</script>
+```
+
+### After
+
+The event listeners are registered via `api.eventName.on(listener)`. The event data is directly passed to the listener.
+
+```html
+<div id="alphaTab"></div>
+<script type="module">
+import * as alphaTab from '@coderline/alphaTab';
+const element = document.querySelector('#alphaTab');
+const api = new alphaTab.AlphaTabApi(element, settings);
+api.error.on(error => {
+    sendErrorToAnalytics(error);
+});
+api.playerPositionChanged.on(args => {
+    updatePlayerTime(args);
+});
+</script>
+```
