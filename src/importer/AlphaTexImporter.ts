@@ -2588,7 +2588,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 articulationIndex = this._articulationValueToIndex.get(articulationValue)!;
             } else {
                 articulationIndex = this._currentTrack.percussionArticulations.length;
-                const articulation = PercussionMapper.getArticulationByValue(articulationValue);
+                const articulation = PercussionMapper.getArticulationByInputMidiNumber(articulationValue);
                 if (articulation === null) {
                     this.errorMessage(`Unknown articulation value ${articulationValue}`);
                 }

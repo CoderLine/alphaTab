@@ -125,7 +125,7 @@ export class AccidentalHelper {
         if (noteValue < bar.staff.track.percussionArticulations.length) {
             return bar.staff.track.percussionArticulations[noteValue]!.staffLine;
         }
-        return PercussionMapper.getArticulationByValue(noteValue)?.staffLine ?? 0;
+        return PercussionMapper.getArticulationByInputMidiNumber(noteValue)?.staffLine ?? 0;
     }
 
     public static getNoteValue(note: Note) {
