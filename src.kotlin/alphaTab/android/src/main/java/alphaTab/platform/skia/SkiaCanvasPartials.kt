@@ -2,7 +2,7 @@ package alphaTab.platform.skia
 
 import kotlin.contracts.ExperimentalContracts
 
-class SkiaCanvasPartials {
+internal class SkiaCanvasPartials {
     companion object {
         @Suppress("UNUSED_PARAMETER")
         @ExperimentalContracts

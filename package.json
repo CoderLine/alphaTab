@@ -65,8 +65,9 @@
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
-        "@coderline/alphaskia": "^2.3.120",
-        "@coderline/alphaskia-windows": "^2.3.120",
+        "@coderline/alphaskia": "^3.3.135",
+        "@coderline/alphaskia-windows": "^3.3.135",
+        "@coderline/alphaskia-linux": "^3.3.135",
         "@fontsource/noto-sans": "^5.1.1",
         "@fontsource/noto-serif": "^5.1.1",
         "@fortawesome/fontawesome-free": "^6.7.2",

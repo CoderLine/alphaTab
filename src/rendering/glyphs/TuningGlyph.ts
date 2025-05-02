@@ -48,13 +48,16 @@ export class TuningGlyph extends GlyphGroup {
         this.height = 0;
 
         const rowHeight = 15;
+        const textPadding = 1;
 
         // Track name
         if (this._trackLabel.length > 0) {
+            this.height += textPadding;
+
             const trackName = new TextGlyph(0, this.height, this._trackLabel, res.effectFont, TextAlign.Left);
             trackName.renderer = this.renderer;
             trackName.doLayout();
-            this.height += trackName.height;
+            this.height += trackName.height + textPadding;
             trackName.y += trackName.height / 2;
             this.addGlyph(trackName);
         }

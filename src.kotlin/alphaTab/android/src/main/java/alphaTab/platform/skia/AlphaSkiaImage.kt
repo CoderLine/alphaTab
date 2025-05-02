@@ -3,7 +3,7 @@ package alphaTab.platform.skia
 import alphaTab.core.ecmaScript.ArrayBuffer
 
 @ExperimentalUnsignedTypes
-class AlphaSkiaImage internal constructor(internal val image: alphaTab.alphaSkia.AlphaSkiaImage) :
+public class AlphaSkiaImage internal constructor(internal val image: alphaTab.alphaSkia.AlphaSkiaImage) :
     AutoCloseable {
     companion object {
         fun decode(data: ArrayBuffer): AlphaSkiaImage? {

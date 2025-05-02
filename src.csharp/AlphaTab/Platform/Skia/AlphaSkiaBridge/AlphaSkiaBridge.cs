@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Platform.Skia.AlphaSkiaBridge;
@@ -27,7 +29,9 @@ public class AlphaSkiaImage : IDisposable
     /// Gets the target <see cref="AlphaSkia.AlphaSkiaImage"/>.
     /// </summary>
     public AlphaSkia.AlphaSkiaImage Image { get; }
+
     internal double Width => Image.Width;
+
     internal double Height => Image.Height;
 
     internal AlphaSkiaImage(AlphaSkia.AlphaSkiaImage image)
@@ -40,34 +44,28 @@ public class AlphaSkiaImage : IDisposable
         Image.Dispose();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal ArrayBuffer? ReadPixels()
     {
         var data = Image.ReadPixels();
-        if (data == null)
-        {
-            return null;
-        }
-
-        return new ArrayBuffer(data);
+        return data == null ? null : new ArrayBuffer(data);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal ArrayBuffer? ToPng()
     {
         var data = Image.ToPng();
-        if (data == null)
-        {
-            return null;
-        }
-
-        return new ArrayBuffer(data);
+        return data == null ? null : new ArrayBuffer(data);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static AlphaSkiaImage? Decode(ArrayBuffer buffer)
     {
         var underlying = AlphaSkia.AlphaSkiaImage.Decode(buffer.Raw);
         return underlying == null ? null : new AlphaSkiaImage(underlying);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     internal static AlphaSkiaImage? FromPixels(double width, double height, ArrayBuffer pixels)
     {
         var underlying =
@@ -85,7 +83,9 @@ internal class AlphaSkiaCanvas : IDisposable
 
     public uint Color
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => _canvas.Color;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set => _canvas.Color = value;
     }
 
@@ -184,18 +184,22 @@ internal class AlphaSkiaCanvas : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void FillText(string text, AlphaSkiaTypeface typeface, double fontSize, double x,
+    public void FillText(string text, AlphaSkiaTextStyle textStyle, double fontSize, double x,
         double y,
-        AlphaSkiaTextAlign textAlign, AlphaSkiaTextBaseline baselineBridge)
+        AlphaSkiaTextAlign textAlign, AlphaSkiaTextBaseline baseline)
     {
-        _canvas.FillText(text, typeface.Typeface, (float)fontSize, (float)x, (float)y,
-            (AlphaSkia.AlphaSkiaTextAlign)textAlign, (AlphaSkia.AlphaSkiaTextBaseline)baselineBridge);
+        _canvas.FillText(text, textStyle.TextStyle, (float)fontSize, (float)x, (float)y,
+            (AlphaSkia.AlphaSkiaTextAlign)textAlign, (AlphaSkia.AlphaSkiaTextBaseline)baseline);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public double MeasureText(string text, AlphaSkiaTypeface typeface, double fontSize)
+    public AlphaSkiaTextMetrics MeasureText(string text, AlphaSkiaTextStyle textStyle,
+        double fontSize,
+        AlphaSkiaTextAlign textAlign, AlphaSkiaTextBaseline baseline)
     {
-        return _canvas.MeasureText(text, typeface.Typeface, (float)fontSize);
+        return new AlphaSkiaTextMetrics(_canvas.MeasureText(text, textStyle.TextStyle,
+            (float)fontSize,
+            (AlphaSkia.AlphaSkiaTextAlign)textAlign, (AlphaSkia.AlphaSkiaTextBaseline)baseline));
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -231,25 +235,46 @@ internal class AlphaSkiaCanvas : IDisposable
         _canvas.EndRotate();
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void DrawImage(AlphaSkiaImage image, double x, double y, double width, double height)
     {
         _canvas.DrawImage(image.Image, (float)x, (float)y, (float)width, (float)height);
     }
 }
 
-internal class AlphaSkiaTypeface : IDisposable
+internal sealed class AlphaSkiaTypeface : IDisposable
 {
-    internal AlphaSkia.AlphaSkiaTypeface Typeface { get; }
+    public AlphaSkia.AlphaSkiaTypeface Typeface
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get;
+    }
 
-    internal AlphaSkiaTypeface(AlphaSkia.AlphaSkiaTypeface typeface)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public AlphaSkiaTypeface(AlphaSkia.AlphaSkiaTypeface typeface)
     {
         Typeface = typeface;
     }
 
-    public string FamilyName => Typeface.FamilyName;
-    public bool IsBold => Typeface.IsBold;
-    public bool IsItalic => Typeface.IsItalic;
+    public string FamilyName
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Typeface.FamilyName;
+    }
 
+    public double Weight
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Typeface.Weight;
+    }
+
+    public bool IsItalic
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => Typeface.IsItalic;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Dispose()
     {
         Typeface.Dispose();
@@ -265,11 +290,151 @@ internal class AlphaSkiaTypeface : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static AlphaSkiaTypeface? Create(string name, bool bold, bool italic)
+    public static AlphaSkiaTypeface? Create(string name, double weight, bool italic)
     {
-        var underlying = AlphaSkia.AlphaSkiaTypeface.Create(name, bold, italic);
+        var underlying = AlphaSkia.AlphaSkiaTypeface.Create(name, (ushort)weight, italic);
         return underlying == null
             ? null
             : new AlphaSkiaTypeface(underlying);
+    }
+}
+
+internal sealed class AlphaSkiaTextStyle : IDisposable
+{
+    public AlphaSkia.AlphaSkiaTextStyle TextStyle
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get;
+    }
+
+    public AlphaSkiaTextStyle(AlphaSkia.AlphaSkiaTextStyle textStyle)
+    {
+        TextStyle = textStyle;
+    }
+
+    public AlphaSkiaTextStyle(IList<string> fontFamilies, double weight, bool isItalic)
+        : this(new AlphaSkia.AlphaSkiaTextStyle(
+            fontFamilies.ToArray(),
+            (ushort)weight,
+            isItalic
+        ))
+    {
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispose()
+    {
+        TextStyle.Dispose();
+    }
+
+    public string[] FontFamilies
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextStyle.FontFamilies;
+    }
+
+    public double Weight
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextStyle.Weight;
+    }
+
+    public bool IsItalic
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextStyle.IsItalic;
+    }
+}
+
+internal sealed class AlphaSkiaTextMetrics : IDisposable
+{
+    public AlphaSkia.AlphaSkiaTextMetrics TextMetrics
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public AlphaSkiaTextMetrics(AlphaSkia.AlphaSkiaTextMetrics textMetrics)
+    {
+        TextMetrics = textMetrics;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void Dispose()
+    {
+        TextMetrics.Dispose();
+    }
+
+    public double Width
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.Width;
+    }
+
+    public double ActualBoundingBoxLeft
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.ActualBoundingBoxLeft;
+    }
+
+    public double ActualBoundingBoxRight
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.ActualBoundingBoxRight;
+    }
+
+    public double FontBoundingBoxAscent
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.FontBoundingBoxAscent;
+    }
+
+    public double FontBoundingBoxDescent
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.FontBoundingBoxDescent;
+    }
+
+    public double ActualBoundingBoxAscent
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.ActualBoundingBoxAscent;
+    }
+
+    public double ActualBoundingBoxDescent
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.ActualBoundingBoxDescent;
+    }
+
+    public double EmHeightAscent
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.EmHeightAscent;
+    }
+
+    public double EmHeightDescent
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.EmHeightDescent;
+    }
+
+    public double HangingBaseline
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.HangingBaseline;
+    }
+
+    public double AlphabeticBaseline
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.AlphabeticBaseline;
+    }
+
+    public double IdeographicBaseline
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        get => TextMetrics.IdeographicBaseline;
     }
 }

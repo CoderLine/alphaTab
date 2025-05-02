@@ -1,6 +1,6 @@
 package alphaTab.platform.skia
 
-class AlphaSkiaTypeface private constructor(internal val typeface: alphaTab.alphaSkia.AlphaSkiaTypeface) :
+internal class AlphaSkiaTypeface private constructor(internal val typeface: alphaTab.alphaSkia.AlphaSkiaTypeface) :
     AutoCloseable {
     companion object {
         fun create(family: String, isBold: Boolean, isItalic: Boolean): AlphaSkiaTypeface? {
@@ -21,8 +21,8 @@ class AlphaSkiaTypeface private constructor(internal val typeface: alphaTab.alph
     val isItalic: Boolean
         get() = this.typeface.isItalic
 
-    val isBold: Boolean
-        get() = this.typeface.isBold
+    val weight: Double
+        get() = this.typeface.weight.toDouble()
 
     override fun close() {
         this.typeface.close()
