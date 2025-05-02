@@ -8,6 +8,7 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { expect } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -135,6 +136,34 @@ describe('Gp7ExporterTest', () => {
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+    });
+
+    it('alphatex-drumps-to-gp7', () => {
+        const tex = `\\track "Drums"
+        \\instrument percussion
+        \\clef neutral 
+        \\articulation Kick 36
+        \\articulation Unused 46
+        Kick.4 42.4 Kick.4 42.4
+        `;
+
+        const importer = new AlphaTexImporter();
+        importer.initFromString(tex, new Settings());
+        const expected = importer.readScore();
+        const exported = exportGp7(expected);
+
+        const actual = prepareImporterWithBytes(exported).readScore();
+
+        const expectedJson = JsonConverter.scoreToJsObject(expected);
+        const actualJson = JsonConverter.scoreToJsObject(actual);
+
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+
+        expect(actual.tracks[0].percussionArticulations).to.have.length(2);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0)
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(0)
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(1);
     });
 
     it('gp7-lyrics-null', async () => {
