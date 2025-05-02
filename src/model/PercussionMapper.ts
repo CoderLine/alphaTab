@@ -1266,7 +1266,7 @@ export class PercussionMapper {
             return trackArticulations[articulationIndex];
         }
 
-        return PercussionMapper.getArticulationByValue(articulationIndex);
+        return PercussionMapper.getArticulationByInputMidiNumber(articulationIndex);
     }
 
     public static getElementAndVariation(n: Note): number[] {
@@ -1279,7 +1279,7 @@ export class PercussionMapper {
         for (let element = 0; element < PercussionMapper.gp6ElementAndVariationToArticulation.length; element++) {
             const variations = PercussionMapper.gp6ElementAndVariationToArticulation[element];
             for (let variation = 0; variation < variations.length; variation++) {
-                const gp6Articulation = PercussionMapper.getArticulationByValue(variations[variation]);
+                const gp6Articulation = PercussionMapper.getArticulationByInputMidiNumber(variations[variation]);
                 if (gp6Articulation?.outputMidiNumber === articulation.outputMidiNumber) {
                     return [element, variation];
                 }
@@ -1289,9 +1289,9 @@ export class PercussionMapper {
         return [-1, -1];
     }
 
-    public static getArticulationByValue(midiNumber: number): InstrumentArticulation | null {
-        if (PercussionMapper.instrumentArticulations.has(midiNumber)) {
-            return PercussionMapper.instrumentArticulations.get(midiNumber)!;
+    public static getArticulationByInputMidiNumber(inputMidiNumber: number): InstrumentArticulation | null {
+        if (PercussionMapper.instrumentArticulations.has(inputMidiNumber)) {
+            return PercussionMapper.instrumentArticulations.get(inputMidiNumber)!;
         }
         return null;
     }

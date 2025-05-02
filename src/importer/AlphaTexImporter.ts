@@ -187,6 +187,8 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private _slurs: Map<string, Note> = new Map<string, Note>();
 
+    private _articulationValueToIndex = new Map<number, number>();
+
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
 
     public logErrors: boolean = false;
@@ -380,6 +382,7 @@ export class AlphaTexImporter extends ScoreImporter {
         const staff = this._currentTrack.staves[0];
         staff.displayTranspositionPitch = 0;
         staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+        this._articulationValueToIndex.clear();
 
         this.beginStaff(staff);
 
@@ -2579,7 +2582,22 @@ export class AlphaTexImporter extends ScoreImporter {
                 note.fret = fret;
             }
         } else if (this._currentStaff.isPercussion) {
-            note.percussionArticulation = fret;
+            const articulationValue = fret;
+            let articulationIndex: number = 0;
+            if (this._articulationValueToIndex.has(articulationValue)) {
+                articulationIndex = this._articulationValueToIndex.get(articulationValue)!;
+            } else {
+                articulationIndex = this._currentTrack.percussionArticulations.length;
+                const articulation = PercussionMapper.getArticulationByInputMidiNumber(articulationValue);
+                if (articulation === null) {
+                    this.errorMessage(`Unknown articulation value ${articulationValue}`);
+                }
+
+                this._currentTrack.percussionArticulations.push(articulation!);
+                this._articulationValueToIndex.set(articulationValue, articulationIndex);
+            }
+
+            note.percussionArticulation = articulationIndex;
         } else {
             note.octave = octave;
             note.tone = tone;
