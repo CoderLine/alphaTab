@@ -290,9 +290,9 @@ internal sealed class AlphaSkiaTypeface : IDisposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static AlphaSkiaTypeface? Create(string name, bool bold, bool italic)
+    public static AlphaSkiaTypeface? Create(string name, double weight, bool italic)
     {
-        var underlying = AlphaSkia.AlphaSkiaTypeface.Create(name, bold, italic);
+        var underlying = AlphaSkia.AlphaSkiaTypeface.Create(name, (ushort)weight, italic);
         return underlying == null
             ? null
             : new AlphaSkiaTypeface(underlying);
@@ -333,7 +333,7 @@ internal sealed class AlphaSkiaTextStyle : IDisposable
         get => TextStyle.FontFamilies;
     }
 
-    public ushort Weight
+    public double Weight
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextStyle.Weight;
@@ -366,73 +366,73 @@ internal sealed class AlphaSkiaTextMetrics : IDisposable
         TextMetrics.Dispose();
     }
 
-    public float Width
+    public double Width
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.Width;
     }
 
-    public float ActualBoundingBoxLeft
+    public double ActualBoundingBoxLeft
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.ActualBoundingBoxLeft;
     }
 
-    public float ActualBoundingBoxRight
+    public double ActualBoundingBoxRight
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.ActualBoundingBoxRight;
     }
 
-    public float FontBoundingBoxAscent
+    public double FontBoundingBoxAscent
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.FontBoundingBoxAscent;
     }
 
-    public float FontBoundingBoxDescent
+    public double FontBoundingBoxDescent
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.FontBoundingBoxDescent;
     }
 
-    public float ActualBoundingBoxAscent
+    public double ActualBoundingBoxAscent
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.ActualBoundingBoxAscent;
     }
 
-    public float ActualBoundingBoxDescent
+    public double ActualBoundingBoxDescent
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.ActualBoundingBoxDescent;
     }
 
-    public float EmHeightAscent
+    public double EmHeightAscent
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.EmHeightAscent;
     }
 
-    public float EmHeightDescent
+    public double EmHeightDescent
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.EmHeightDescent;
     }
 
-    public float HangingBaseline
+    public double HangingBaseline
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.HangingBaseline;
     }
 
-    public float AlphabeticBaseline
+    public double AlphabeticBaseline
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.AlphabeticBaseline;
     }
 
-    public float IdeographicBaseline
+    public double IdeographicBaseline
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextMetrics.IdeographicBaseline;
