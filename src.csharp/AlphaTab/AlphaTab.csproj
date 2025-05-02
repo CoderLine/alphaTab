@@ -25,7 +25,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="AlphaSkia" Version="3.0.135"/>
+        <PackageReference Include="AlphaSkia" Version="3.1.135"/>
         <PackageReference Include="Microsoft.CSharp" Version="4.7.0"/>
         <PackageReference Include="System.Drawing.Common" Version="9.0.4"/>
     </ItemGroup>
