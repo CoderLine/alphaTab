@@ -3618,6 +3618,29 @@ export default class CSharpAstTransformer {
 
             return callExpr;
         }
+
+        const argumentSymbol = this._context.typeChecker.getSymbolAtLocation(expression.argumentExpression);
+        const elementAccessMethod = argumentSymbol ? this._context.getMethodNameFromSymbol(argumentSymbol) : '';
+        if(elementAccessMethod) {
+
+            const memberAccess = {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                expression: {} as cs.Expression,
+                member: this._context.toMethodName(elementAccessMethod),
+                parent: parent,
+                tsNode: expression,
+                nullSafe: !!expression.questionDotToken
+            } as cs.MemberAccessExpression;
+            
+            memberAccess.expression = this.visitExpression(memberAccess, expression.expression)!;
+            if (!memberAccess.expression) {
+                return null;
+            }
+
+            return memberAccess;
+        }
+
+
         const elementAccess = {
             expression: {} as cs.Expression,
             argumentExpression: {} as cs.Expression,

@@ -600,6 +600,8 @@ export default class CSharpEmitterContext {
             case 'AlphaSkiaTextAlign':
             case 'AlphaSkiaTextBaseline':
             case 'AlphaSkiaTypeface':
+            case 'AlphaSkiaTextStyle':
+            case 'AlphaSkiaTextMetrics':
                 return `${this.alphaSkiaModule()}.`;
         }
 
