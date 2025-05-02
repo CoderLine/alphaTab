@@ -2594,7 +2594,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
 
                 this._currentTrack.percussionArticulations.push(articulation!);
-                this._articulationValueToIndex.set(articulationValue, articulationIndex)!;
+                this._articulationValueToIndex.set(articulationValue, articulationIndex);
             }
 
             note.percussionArticulation = articulationIndex;
