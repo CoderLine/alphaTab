@@ -66,7 +66,7 @@ export class TabSlurGlyph extends TabTieGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: BarRendererBase = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+            this.renderer.staff.staffId,
             this.startBeat!.voice.bar
         )!;
         const direction: BeamDirection = this.getBeamDirection(this.startBeat!, startNoteRenderer);

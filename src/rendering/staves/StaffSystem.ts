@@ -785,7 +785,7 @@ export class StaffSystem {
             return 0;
         }
         const bar: Bar = this.layout.renderer.tracks![0].staves[0].bars[index];
-        const renderer: BarRendererBase = this.layout.getRendererForBar(this._firstStaffInBrackets.staveId, bar)!;
+        const renderer: BarRendererBase = this.layout.getRendererForBar(this._firstStaffInBrackets.staffId, bar)!;
         return renderer.x;
     }
 }

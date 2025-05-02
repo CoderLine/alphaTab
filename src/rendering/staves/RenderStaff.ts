@@ -36,7 +36,7 @@ export class RenderStaff {
     public trackIndex: number = 0;
     public modelStaff: Staff;
 
-    public get staveId(): string {
+    public get staffId(): string {
         return this._factory.staffId;
     }
 
@@ -103,7 +103,7 @@ export class RenderStaff {
         renderer.index = this.barRenderers.length;
         renderer.reLayout();
         this.barRenderers.push(renderer);
-        this.system.layout.registerBarRenderer(this.staveId, renderer);
+        this.system.layout.registerBarRenderer(this.staffId, renderer);
     }
 
     public addBar(bar: Bar, layoutingInfo: BarLayoutingInfo, additionalMultiBarsRestBars: Bar[] | null): void {
@@ -127,14 +127,14 @@ export class RenderStaff {
 
         this.barRenderers.push(renderer);
         if (bar) {
-            this.system.layout.registerBarRenderer(this.staveId, renderer);
+            this.system.layout.registerBarRenderer(this.staffId, renderer);
         }
     }
 
     public revertLastBar(): BarRendererBase {
         const lastBar: BarRendererBase = this.barRenderers[this.barRenderers.length - 1];
         this.barRenderers.splice(this.barRenderers.length - 1, 1);
-        this.system.layout.unregisterBarRenderer(this.staveId, lastBar);
+        this.system.layout.unregisterBarRenderer(this.staffId, lastBar);
         for (const r of this.barRenderers) {
             r.applyLayoutingInfo();
         }

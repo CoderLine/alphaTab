@@ -92,14 +92,14 @@ export class BarRendererBase {
         if (!this.bar || !this.bar.nextBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff.staveId, this.bar.nextBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff.staffId, this.bar.nextBar);
     }
 
     public get previousRenderer(): BarRendererBase | null {
         if (!this.bar || !this.bar.previousBar) {
             return null;
         }
-        return this.scoreRenderer.layout!.getRendererForBar(this.staff.staveId, this.bar.previousBar);
+        return this.scoreRenderer.layout!.getRendererForBar(this.staff.staffId, this.bar.previousBar);
     }
 
     public scoreRenderer: ScoreRenderer;

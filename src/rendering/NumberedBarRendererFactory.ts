@@ -1,7 +1,6 @@
 import type { Bar } from '@src/model/Bar';
 import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
-import { SlashBarRenderer } from '@src/rendering/SlashBarRenderer';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import type { Track } from '@src/model/Track';
 import type { Staff } from '@src/model/Staff';
@@ -13,7 +12,7 @@ import { NumberedBarRenderer } from '@src/rendering/NumberedBarRenderer';
  */
 export class NumberedBarRendererFactory extends BarRendererFactory {
     public get staffId(): string {
-        return SlashBarRenderer.StaffId;
+        return NumberedBarRenderer.StaffId;
     }
 
     public override getStaffPaddingTop(staff: RenderStaff): number {
