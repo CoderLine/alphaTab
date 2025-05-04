@@ -237,7 +237,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
             }
 
-            this.consolidate();
+            ModelUtils.consolidate(this._score);
             this._score.finish(this.settings);
             this._score.rebuildRepeatGroups();
             for (const [track, lyrics] of this._lyrics) {
@@ -253,66 +253,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 throw new UnsupportedFormatError(e.message, e);
             }
             throw e;
-        }
-    }
-
-    /**
-     * Ensures all staffs of all tracks have the correct number of bars
-     * (the number of bars per staff and track could be inconsistent)
-     */
-    private consolidate(): void {
-        // empty score?
-        if (this._score.masterBars.length === 0) {
-            const master: MasterBar = new MasterBar();
-            this._score.addMasterBar(master);
-
-            const tempoAutomation: Automation = new Automation();
-            tempoAutomation.isLinear = false;
-            tempoAutomation.type = AutomationType.Tempo;
-            tempoAutomation.value = this._score.tempo;
-            master.tempoAutomations.push(tempoAutomation);
-
-            const bar: Bar = new Bar();
-            this._score.tracks[0].staves[0].addBar(bar);
-
-            const v = new Voice();
-            bar.addVoice(v);
-
-            const emptyBeat: Beat = new Beat();
-            emptyBeat.isEmpty = true;
-            v.addBeat(emptyBeat);
-            return;
-        }
-
-        for (const track of this._score.tracks) {
-            for (const staff of track.staves) {
-                // fill empty beats
-                for (const b of staff.bars) {
-                    for (const v of b.voices) {
-                        if (v.isEmpty && v.beats.length === 0) {
-                            const emptyBeat: Beat = new Beat();
-                            emptyBeat.isEmpty = true;
-                            v.addBeat(emptyBeat);
-                        }
-                    }
-                }
-
-                // fill missing bars
-                const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
-                while (staff.bars.length < this._score.masterBars.length) {
-                    const bar: Bar = new Bar();
-                    staff.addBar(bar);
-
-                    for (let i = 0; i < voiceCount; i++) {
-                        const v = new Voice();
-                        bar.addVoice(v);
-
-                        const emptyBeat: Beat = new Beat();
-                        emptyBeat.isEmpty = true;
-                        v.addBeat(emptyBeat);
-                    }
-                }
-            }
         }
     }
 
