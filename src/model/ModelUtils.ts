@@ -1,5 +1,5 @@
 import { GeneralMidi } from '@src/midi/GeneralMidi';
-import type { Beat } from '@src/model/Beat';
+import { Beat } from '@src/model/Beat';
 import type { Duration } from '@src/model/Duration';
 import { Fingers } from '@src/model/Fingers';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
@@ -8,6 +8,10 @@ import type { Settings } from '@src/Settings';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { MasterBar } from '@src/model/MasterBar';
 import type { Track } from '@src/model/Track';
+import { SynthConstants } from '@src/synth/SynthConstants';
+import { Bar } from '@src/model/Bar';
+import { Voice } from '@src/model/Voice';
+import { Automation, AutomationType } from '@src/model/Automation';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -529,5 +533,94 @@ export class ModelUtils {
         }
 
         return headerFooterStyle;
+    }
+
+    /**
+     * Performs some general consolidations of inconsistencies on the given score like
+     * missing bars, beats, duplicated midi channels etc
+     */
+    public static consolidate(score: Score) {
+        // empty score?
+        if (score.masterBars.length === 0) {
+            const master: MasterBar = new MasterBar();
+            score.addMasterBar(master);
+
+            const tempoAutomation = new Automation();
+            tempoAutomation.isLinear = false;
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = score.tempo;
+            master.tempoAutomations.push(tempoAutomation);
+
+            const bar: Bar = new Bar();
+            score.tracks[0].staves[0].addBar(bar);
+
+            const v = new Voice();
+            bar.addVoice(v);
+
+            const emptyBeat: Beat = new Beat();
+            emptyBeat.isEmpty = true;
+            v.addBeat(emptyBeat);
+            return;
+        }
+
+        const usedChannels = new Set<number>([SynthConstants.PercussionChannel]);
+        for (const track of score.tracks) {
+            // ensure percussion channel
+            if (track.staves.length === 1 && track.staves[0].isPercussion) {
+                track.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
+                track.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
+            } else {
+                // unique midi channels and generate secondary channels
+                if (track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
+                    while (usedChannels.has(track.playbackInfo.primaryChannel)) {
+                        track.playbackInfo.primaryChannel++;
+                    }
+                }
+                usedChannels.add(track.playbackInfo.primaryChannel);
+
+                if (track.playbackInfo.secondaryChannel !== SynthConstants.PercussionChannel) {
+                    while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
+                        track.playbackInfo.secondaryChannel++;
+                    }
+                }
+                usedChannels.add(track.playbackInfo.secondaryChannel);
+            }
+
+            for (const staff of track.staves) {
+                // fill empty beats
+                for (const b of staff.bars) {
+                    for (const v of b.voices) {
+                        if (v.isEmpty && v.beats.length === 0) {
+                            const emptyBeat: Beat = new Beat();
+                            emptyBeat.isEmpty = true;
+                            v.addBeat(emptyBeat);
+                        }
+                    }
+                }
+
+                // fill missing bars
+                const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+                while (staff.bars.length < score.masterBars.length) {
+                    const bar: Bar = new Bar();
+                    staff.addBar(bar);
+                    const previousBar = bar.previousBar;
+                    if (previousBar) {
+                        bar.clef = previousBar.clef;
+                        bar.clefOttava = previousBar.clefOttava;
+                        bar.keySignature = bar.previousBar!.keySignature;
+                        bar.keySignatureType = bar.previousBar!.keySignatureType;
+                    }
+
+                    for (let i = 0; i < voiceCount; i++) {
+                        const v = new Voice();
+                        bar.addVoice(v);
+
+                        const emptyBeat: Beat = new Beat();
+                        emptyBeat.isEmpty = true;
+                        v.addBeat(emptyBeat);
+                    }
+                }
+            }
+        }
     }
 }

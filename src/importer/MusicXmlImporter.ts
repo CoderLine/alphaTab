@@ -41,7 +41,6 @@ import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { SynthConstants } from '@src/synth/SynthConstants';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import type { XmlNode } from '@src/xml/XmlNode';
 import type { ZipEntry } from '@src/zip/ZipEntry';
@@ -198,68 +197,13 @@ export class MusicXmlImporter extends ScoreImporter {
         this._score.stylesheet.hideDynamics = true;
 
         this.parseDom(dom);
-        this.consolidate();
+        ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         this._score.rebuildRepeatGroups();
 
         return this._score;
     }
 
-    private consolidate() {
-        const usedChannels = new Set<number>([SynthConstants.PercussionChannel]);
-        for (const track of this._score.tracks) {
-            // unique midi channels and generate secondary channels
-            if (track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
-                while (usedChannels.has(track.playbackInfo.primaryChannel)) {
-                    track.playbackInfo.primaryChannel++;
-                }
-            }
-            usedChannels.add(track.playbackInfo.primaryChannel);
-
-            if (track.playbackInfo.secondaryChannel !== SynthConstants.PercussionChannel) {
-                while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
-                    track.playbackInfo.secondaryChannel++;
-                }
-            }
-            usedChannels.add(track.playbackInfo.secondaryChannel);
-
-            for (const staff of track.staves) {
-                // fill empty beats
-                for (const b of staff.bars) {
-                    for (const v of b.voices) {
-                        if (v.isEmpty && v.beats.length === 0) {
-                            const emptyBeat: Beat = new Beat();
-                            emptyBeat.isEmpty = true;
-                            v.addBeat(emptyBeat);
-                        }
-                    }
-                }
-
-                // fill missing bars
-                const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
-                while (staff.bars.length < this._score.masterBars.length) {
-                    const bar: Bar = new Bar();
-                    staff.addBar(bar);
-                    const previousBar = bar.previousBar;
-                    if (previousBar) {
-                        bar.clef = previousBar.clef;
-                        bar.clefOttava = previousBar.clefOttava;
-                        bar.keySignature = bar.previousBar!.keySignature;
-                        bar.keySignatureType = bar.previousBar!.keySignatureType;
-                    }
-
-                    for (let i = 0; i < voiceCount; i++) {
-                        const v = new Voice();
-                        bar.addVoice(v);
-
-                        const emptyBeat: Beat = new Beat();
-                        emptyBeat.isEmpty = true;
-                        v.addBeat(emptyBeat);
-                    }
-                }
-            }
-        }
-    }
 
     private extractMusicXml(): string {
         const zip = new ZipReader(this.data);

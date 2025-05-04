@@ -7,6 +7,7 @@ import { ScoreSubElement } from '@src/model/Score';
 import { TextAlign } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Settings } from '@src/Settings';
+import { SynthConstants } from '@src/synth/SynthConstants';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
@@ -350,5 +351,39 @@ describe('Gp8ImporterTest', () => {
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
             TextAlign.Right
         );
+    });
+
+    it('faulty', async () => {
+        // this is a GP8 file from unknown source.
+        // the score.gpif contents indicate that this file was NOT written by a real Guitar Pro 8 instance but
+        // by some 3rd party software. there are inconsistencies like:
+        // * line 752 and 764: Line Breaks in the list of NoteHeads
+        // * line 67: No line break on close tag, wrong indention
+        // * line 403: Additional empty line break
+        // * line 293: Missing line break
+        // * line 352,353: Missing Midi channels
+        // * Equal bars/voices/beats are not reused across the file
+
+        // Generally the file looks surprisingly complete for a "non real Guitar Pro" (RSE stuff) but it feels rather like
+        // a software which has read an original file, and then applied modifications to it before saving again.
+
+        // Maybe its the MacOS version which behaves differently than the Windows Version?
+        // Or more likely: a non-open source platform like Sound Slice?
+
+        const score = (await prepareImporterWithFile('guitarpro8/faulty.gp')).readScore();
+
+        const usedChannels = new Set<number>();
+        for (const t of score.tracks) {
+            expect(Number.isNaN(t.playbackInfo.primaryChannel)).to.be.false;
+            expect(Number.isNaN(t.playbackInfo.secondaryChannel)).to.be.false;
+
+            if (t.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
+                expect(usedChannels.has(t.playbackInfo.primaryChannel)).to.be.false;
+                expect(usedChannels.has(t.playbackInfo.secondaryChannel)).to.be.false;
+
+                usedChannels.add(t.playbackInfo.primaryChannel);
+                usedChannels.add(t.playbackInfo.secondaryChannel);
+            }
+        }
     });
 });

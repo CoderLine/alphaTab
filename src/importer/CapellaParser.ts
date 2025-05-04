@@ -137,31 +137,7 @@ export class CapellaParser {
     }
 
     private consolidate() {
-        // voice counts and contents might be inconsistent
-        // we need to ensure we have an equal amount of voices across all bars
-        // and voices must contain an empty beat at minimum
-        for (const track of this.score.tracks) {
-            const trackVoiceCount = this._voiceCounts.get(track.index)!;
-            for (const staff of track.staves) {
-                while (staff.bars.length < this.score.masterBars.length) {
-                    this.addNewBar(staff);
-                }
-
-                for (const bar of staff.bars) {
-                    while (bar.voices.length < trackVoiceCount) {
-                        bar.addVoice(new Voice());
-                    }
-
-                    for (const voice of bar.voices) {
-                        if (voice.beats.length === 0) {
-                            const emptyBeat = new Beat();
-                            emptyBeat.isEmpty = true;
-                            voice.addBeat(emptyBeat);
-                        }
-                    }
-                }
-            }
-        }
+        ModelUtils.consolidate(this.score);
 
         CapellaParser.applyEffectRange(this._slurs, (_, beat) => {
             beat.isLegatoOrigin = true;
