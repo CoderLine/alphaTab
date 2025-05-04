@@ -386,4 +386,13 @@ describe('Gp8ImporterTest', () => {
             }
         }
     });
+
+    it('audio-track', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/canon-audio-track.gp')).readScore();
+
+        // track data not relevant for snapshots
+        score.tracks = [];
+
+        expect(score).to.toMatchSnapshot();
+    });
 });

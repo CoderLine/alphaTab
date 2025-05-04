@@ -38,7 +38,9 @@ export class Gp7To8Importer extends ScoreImporter {
         let binaryStylesheetData: Uint8Array | null = null;
         let partConfigurationData: Uint8Array | null = null;
         let layoutConfigurationData: Uint8Array | null = null;
+        const entryLookup = new Map<string, ZipEntry>();
         for (const entry of entries) {
+            entryLookup.set(entry.fullName, entry);
             switch (entry.fileName) {
                 case 'score.gpif':
                     xml = IOHelper.toString(entry.data, this.settings.importer.encoding);
@@ -63,6 +65,12 @@ export class Gp7To8Importer extends ScoreImporter {
         // the score information as XML we need to parse.
         Logger.debug(this.name, 'Start Parsing score.gpif');
         const gpifParser: GpifParser = new GpifParser();
+        gpifParser.loadAsset = (fileName) => {
+            if(entryLookup.has(fileName)) {
+                return entryLookup.get(fileName)!.data;
+            };
+            return undefined;
+        };
         gpifParser.parseXml(xml, this.settings);
         Logger.debug(this.name, 'score.gpif parsed');
         const score: Score = gpifParser.score;
