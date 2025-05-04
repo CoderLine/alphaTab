@@ -7,6 +7,7 @@ import {
   PropSidebarItemCategory,
 } from "@docusaurus/plugin-content-docs";
 import { useDocById } from "@docusaurus/plugin-content-docs/client";
+import { MarkdownString } from "../MarkdownString";
 
 function buildPropertyUrl(property: Page) {
   let url = "";
@@ -31,7 +32,7 @@ const ReferenceRow: React.FC<ReferenceRowProps> = ({ property, showJson }) => {
           <CodeBadge name={mainName} type={javaScriptOnly ? 'js' : 'all' }  />
         </a>
       </td>
-      <td>{property.prop("description", "")}</td>
+      <td><MarkdownString content={property.prop("description", "")} /></td>
     </tr>
   );
 };
