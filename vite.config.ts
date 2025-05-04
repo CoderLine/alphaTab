@@ -298,7 +298,7 @@ export default defineConfig(({ command, mode }) => {
                 esm('alphaTab.webpack', 'src/alphaTab.webpack.ts', webpackOptions, false);
                 break;
             case 'umd':
-                umd('alphaTab', 'src/alphaTab.main.ts', {});
+                umd('alphaTab', 'src/alphaTab.main.ts', {}, false, true);
                 break;
             default:
             case 'esm':
