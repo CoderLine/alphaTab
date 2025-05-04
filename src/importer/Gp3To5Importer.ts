@@ -156,6 +156,7 @@ export class Gp3To5Importer extends ScoreImporter {
             this._score.masterBars[0].tempoAutomations.push(automation);
         }
 
+        ModelUtils.consolidate(this._score);
         this._score.finish(this.settings);
         if (this._lyrics && this._lyricsTrack >= 0) {
             this._score.tracks[this._lyricsTrack].applyLyrics(this._lyrics);
@@ -290,10 +291,11 @@ export class Gp3To5Importer extends ScoreImporter {
 
     public readPlaybackInfos(): void {
         this._playbackInfos = [];
+        let channel = 0;
         for (let i: number = 0; i < 64; i++) {
             const info: PlaybackInformation = new PlaybackInformation();
-            info.primaryChannel = i;
-            info.secondaryChannel = i;
+            info.primaryChannel = channel++;
+            info.secondaryChannel = channel++;
             info.program = IOHelper.readInt32LE(this.data);
             info.volume = this.data.readByte();
             info.balance = this.data.readByte();
