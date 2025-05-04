@@ -1,97 +1,77 @@
 ---
 title: changeTrackSolo
-description: Changes the given tracks to be played solo or not.
+description: "Changes the given tracks to be played solo or not."
 sidebar_custom_props:
-  jQueryName: alphaTab('soloTracks')
+  kind: method
   category: Methods - Player
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
+### Description
 Changes the given tracks to be played solo or not. If any track is set to solo, all other tracks are muted, unless they are also flagged as solo.
-This will result in a solo playback of the primary and secondary midi channel that the track uses for playback. 
+This will result in a solo playback of the primary and secondary midi channel that the track uses for playback.
 If the track shares the channels with another track, all related tracks will be played as they cannot be distinguished.
 
-## Signatures
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"changeTrackSolo"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"solo"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"ChangeTrackSolo"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"solo"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"changeTrackSolo"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.List"}</span><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"solo"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="js" name="function changeTrackSolo(tracks, solo)" />
-    <TypeRow type="jquery" name="alphaTab('soloTracks', tracks, solo)" />
-    <TypeRow type="net" name="void ChangeTrackSolo(Track[] tracks, bool solo)" />
-    <TypeRow type="android" name="fun changeTrackSolo(tracks: alphaTab.collections.List<alphaTab.model.Track>, solo: Boolean): Unit" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Tracks[]">
-        The array of tracks that should be played solo.
+    <ParameterRow platform="all" name="tracks">
+        The list of tracks to play solo or not.
     </ParameterRow>
-    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Tracks[]">
-        The array of tracks that should be played solo.
-    </ParameterRow>
-    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
-        The array of tracks that should be played solo.
-    </ParameterRow>
-    <ParameterRow platform="all" name="solo" type="bool">
-        A value indicating whether the track should be played solo or not.
+    <ParameterRow platform="all" name="solo">
+        If set to true, the tracks will be added to the solo list. If false, they are removed.
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Nothing
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.changeTrackSolo([api.score.tracks[0], api.score.tracks[1]], true);
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const at = $('#alphaTab');
-const tracks = at.alphaTab('tracks');
-at.alphaTab('soloTracks', [tracks[0], tracks[1]], true);
-```
-
-</TabItem>
-<TabItem value="cs">
-
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.ChangeTrackSolo(new Track[] { api.Score.Tracks[0], api.Score.Tracks[1] }, true);
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.changeTrackSolo(alphaTab.collections.List<alphaTab.model.Track>(api.score.tracks[0], api.score.tracks[1]), true);
 ```
-
 </TabItem>
 </Tabs>

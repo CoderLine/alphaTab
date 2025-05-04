@@ -1,104 +1,76 @@
 ---
 title: noteMouseUp
-description: This event is fired whenever the user releases the mouse after a mouse press on a note.
+description: "This event is fired whenever the user releases the mouse after a mouse press on a note."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
   since: 1.2.3
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.2.3" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-## Description
-This event is fired whenever the user releases the mouse after a mouse press on a note.
+### Description
+This event is fired whenever the user releases the mouse after a mouse press on a note. This event is fired whenever a the user presses the mouse button on a note.
 This event is fired regardless of whether the mouse was released on a note.
 The parameter is null if the mouse was released somewhere beside the note.
-It is only fired if [`includeNoteBounds`](/docs/reference/settings/core/includenotebounds) was set to true because
-only then this hit detection can be done. A move on a note is considered if the note head or the note number on tabs are clicked as documented in the [`boundsLookup`](/docs/reference/scorerenderer/boundslookup)
+It is only fired if <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/settings/core/includenotebounds"}>{"CoreSettings.includeNoteBounds"}</Link></code> was set to `true` because
+only then this hit detection can be done. A click on a note is considered if the note head or the note number on tabs are clicked as documented in the <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/boundslookup"}>{"boundsLookup"}</Link></code>.
 
-<EventDescription />
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"noteMouseUp"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/note"}>{"Note"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/note"}>{"Note"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"NoteMouseUp"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"noteMouseUp"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/note"}>{"Note"}</Link><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(note)" />    
-    <TypeRow type="net" name="Action<AlphaTab.Model.Note>" />    
-    <TypeRow type="android" name="(note: AlphaTab.Model.Note) -> Unit" />    
-</TypeTable>
-
-## Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="note" type="alphaTab.model.Note">
-        Note on which the mouse was released over after mouse down.
-        Might be null if no note could be found in near location.
-    </ParameterRow>
-    <ParameterRow platform="net" name="note" type="AlphaTab.Model.Note">
-        Note on which the mouse was released over after mouse down.
-        Might be null if no note could be found in near location.
-    </ParameterRow>
-    <ParameterRow platform="android" name="note" type="alphaTab.model.Note">
-        Note on which the mouse was released over after mouse down.
-        Might be null if no note could be found in near location.
-    </ParameterRow>
-</ParameterTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.noteMouseUp.on((note) => {
     api.playNote(note);
 });
 ```
-
 </TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.noteMouseUp', (e) => {
-    const note = e.detail;
-    api.playNote(note);
-}, false);
-```
-
-</TabItem>
-<TabItem value="cs">
-
+<TabItem value="csharp">
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.NoteMouseUp.On(note => 
+api.NoteMouseUp.On(note =>
 {
     api.PlayNote(note);
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.noteMouseUp.on { note ->
     api.playNote(note)
 }
 ```
-
 </TabItem>
 </Tabs>

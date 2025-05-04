@@ -1,75 +1,50 @@
 ---
 title: playbackRangeChanged
-description: This event is fired when the playback range changed.
+description: "This event is fired when the playback range changed."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
   since: 1.2.3
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.2.3" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+### Description
+This event is fired when the playback range changed.
 
-## Description
-This event is fired when the playback range changed. 
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"playbackRangeChanged"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/playbackrangechangedeventargs"}>{"PlaybackRangeChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/playbackrangechangedeventargs"}>{"PlaybackRangeChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"PlaybackRangeChanged"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"playbackRangeChanged"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/playbackrangechangedeventargs"}>{"PlaybackRangeChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<EventDescription />
-
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(e)" />    
-    <TypeRow type="net" name="Action<PlaybackRangeChangedEventArgs>" />    
-    <TypeRow type="android" name="(e: PlaybackRangeChangedEventArgs) : Unit" />    
-</TypeTable>
-
-## Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="args" type="alphaTab.synth.PlaybackRangeChangedEventArgs">
-        The information about the changed playback range. 
-    </ParameterRow>
-    <ParameterRow platform="net" name="args" type="AlphaTab.Synth.PlaybackRangeChangedEventArgs">
-        The information about the changed playback range.
-    </ParameterRow>
-    <ParameterRow platform="android" name="args" type="alphaTab.synth.PlaybackRangeChangedEventArgs">
-        The information about the changed playback range.
-    </ParameterRow>
-</ParameterTable>
-
-## PlaybackRangeChangedEventArgs Properties
-
-<ParameterTable>
-    <ParameterRow platform="js" name="playbackRange" type="alphaTab.synth.PlaybackRange">
-        The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
-    </ParameterRow>
-    <ParameterRow platform="net" name="PlaybackRange" type="AlphaTab.Synth.PlaybackRange">
-        The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
-    </ParameterRow>
-    <ParameterRow platform="android" name="playbackRange" type="alphaTab.synth.PlaybackRange">
-        The new playback range or null if no range is selected. (see [PlaybackRange](/docs/reference/api/playbackrange))
-    </ParameterRow>
-</ParameterTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.playbackRangeChanged.on((args) => {
@@ -80,55 +55,24 @@ api.playbackRangeChanged.on((args) => {
     }
 });
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').on('alphaTab.playbackRangeChanged', (e, args) => {
-    if (args.playbackRange) {
-        highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
-    } else {
-        clearHighlightInProgressBar();
-    }
-});
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.playbackRangeChanged', (e) => {
-    const args = e.detail;
-    if (args.playbackRange) {
-        highlightRangeInProgressBar(args.playbackRange.startTick, args.playbackRange.endTick);
-    } else {
-        clearHighlightInProgressBar();
-    }
-}, false);
-```
-
-</TabItem>
-<TabItem value="cs">
-
+<TabItem value="csharp">
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.PlaybackRangeChanged.On(args => 
+api.PlaybackRangeChanged.On(args =>
 {
-    if (args.PlaybackRange != null) 
+    if (args.PlaybackRange != null)
     {
         HighlightRangeInProgressBar(args.PlaybackRange.StartTick, args.PlaybackRange.EndTick);
     }
-    else 
+    else
     {
         ClearHighlightInProgressBar();
     }
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.playbackRangeChanged.on { args ->
@@ -140,6 +84,5 @@ api.playbackRangeChanged.on { args ->
     }
 }
 ```
-
 </TabItem>
 </Tabs>

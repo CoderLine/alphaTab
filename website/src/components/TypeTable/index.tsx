@@ -1,11 +1,11 @@
 import React from "react";
 import { CodeBadge, Platform } from "../CodeBadge";
 import styles from "./styles.module.scss";
-import { MDXProvider } from "@mdx-js/react";
+import { MarkdownString } from "../MarkdownString";
 
 function renderChild(child) {
   if (typeof child === "string") {
-    return <MDXProvider children={child} />;
+    return <MarkdownString content={child} />;
   } else {
     return child;
   }
@@ -15,14 +15,26 @@ export type TypeRowProps = {
   children: React.ReactNode;
   type: Platform;
   name: string;
+  link?: string;
 };
 
-export const TypeRow: React.FC<TypeRowProps> = ({ children, type, name }) => {
+export const TypeRow: React.FC<TypeRowProps> = ({
+  children,
+  type,
+  name,
+  link,
+}) => {
   if (children && type && name) {
     return (
       <tr>
         <td>
-          <CodeBadge type={type} name={name} />
+          {link ? (
+            <a href={link}>
+              <CodeBadge type={type} name={name} />
+            </a>
+          ) : (
+            <CodeBadge type={type} name={name} />
+          )}
         </td>
         <td>
           {Array.isArray(children)

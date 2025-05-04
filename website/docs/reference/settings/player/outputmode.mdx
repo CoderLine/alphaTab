@@ -1,41 +1,27 @@
 ---
 title: player.outputMode
-description: The mode used for playing audio samples
+description: "The mode used for playing audio samples"
 sidebar_custom_props:
   javaScriptOnly: true
   category: Player - JavaScript Specific
   since: 1.3.0
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="1.3.0" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
+### Description
+The mode used for playing audio samples Controls how alphaTab will play the audio samples in the browser.
 
-Controls how alphaTab will play the audio samples in the browser.
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"outputMode"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/playeroutputmode"}>{"PlayerOutputMode"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"PlayerOutputMode.WebAudioAudioWorklets"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-<PropertyDescription showJson={true} />
-
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="alphaTab.PlayerOutputMode">
-        `WebAudioAudioWorklets` - If [audio worklets](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Using_AudioWorklet) are available, they are used. If not fallback to the ScriptProcessorNode<br />
-        `WebAudioScriptProcessor` - Using the [ScriptProcessorNode](https://developer.mozilla.org/en-US/docs/Web/API/ScriptProcessorNode) for playback<br />
-    </TypeRow>
-    <TypeRow type="json-js-html" name="string">
-        `webaudioaudioworklets`<br />
-        `webaudioscriptprocessor`
-    </TypeRow>
-    <TypeRow type="json-js-html" name="int">
-        `0` - WebAudioAudioWorklets<br />
-        `1` - WebAudioScriptProcessor<br />
-    </TypeRow>
-</TypeTable>
-
-## Default Value
-
-`WebAudioAudioWorklets`

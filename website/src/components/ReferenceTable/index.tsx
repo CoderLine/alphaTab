@@ -7,6 +7,7 @@ import {
   PropSidebarItemCategory,
 } from "@docusaurus/plugin-content-docs";
 import { useDocById } from "@docusaurus/plugin-content-docs/client";
+import { MarkdownString } from "../MarkdownString";
 
 function buildPropertyUrl(property: Page) {
   let url = "";
@@ -21,45 +22,17 @@ function buildPropertyUrl(property: Page) {
 type ReferenceRowProps = { property: Page; showJson: boolean };
 
 const ReferenceRow: React.FC<ReferenceRowProps> = ({ property, showJson }) => {
-  const { jsNames, csNames, jQueryNames, domNames, androidNames } =
+  const { mainName, javaScriptOnly } =
     buildNames(property);
-  const jsonNames = showJson ? jsNames : [];
+    
   return (
     <tr>
       <td>
         <a href={buildPropertyUrl(property)}>
-          {jsNames.map((n) => (
-            <CodeBadge key={n} type="js" name={n} />
-          ))}
-
-          {jsonNames.length > 0 && <br />}
-          {jsonNames.map((n) => (
-            <CodeBadge key={n} type="json" name={n} />
-          ))}
-
-          {(jsonNames.length > 0 || jsonNames.length > 0) &&
-            jQueryNames.length > 0 && <br />}
-          {jQueryNames.map((n) => (
-            <CodeBadge key={n} type="jquery" name={n} />
-          ))}
-
-          {domNames.length > 0 && <br />}
-          {domNames.map((n) => (
-            <CodeBadge key={n} type="html" name={n} />
-          ))}
-
-          {csNames.length > 0 && <br />}
-          {csNames.map((n) => (
-            <CodeBadge key={n} type="net" name={n} />
-          ))}
-
-          {androidNames.length > 0 && <br />}
-          {androidNames.map((n) => (
-            <CodeBadge key={n} type="android" name={n} />
-          ))}
+          <CodeBadge name={mainName} type={javaScriptOnly ? 'js' : 'all' }  />
         </a>
       </td>
-      <td>{property.prop("description", "")}</td>
+      <td><MarkdownString content={property.prop("description", "")} /></td>
     </tr>
   );
 };
@@ -130,6 +103,10 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
   const existingKeys = new Map<string, Page[]>();
   const pages: { key: string; items: Page[] }[] = [];
   for (const page of allPages) {
+    if(page.type === "link"  && page.docId?.startsWith('_') === true) {
+      continue;
+    }
+
     const category = (page.customProps?.category as string) ?? "";
     let items = existingKeys.get(category);
     if (!items) {

@@ -1,116 +1,96 @@
 ---
 title: midiEventsPlayedFilter
-description: The midi events which will trigger the `midiEventsPlayed` event
+description: "The midi events which will trigger the `midiEventsPlayed` event"
 sidebar_custom_props:
+  kind: property
   category: Properties - Player
   since: 1.2.0
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.2.0" />
-
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-## Description
-Gets or sets the midi events which will trigger the `midiEventsPlayed` event. With this filter set you can enable 
-that alphaTab will signal any midi events as they are played by the synthesizer. This allows reacing on various low level
-audio playback elements like notes/rests played or metronome ticks. 
-
-Refer to the [related guide](/docs/guides/handling-midi-events) to learn more about this feature. 
-
 import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 <PropertyDescription />
 
+### Description
+The midi events which will trigger the `midiEventsPlayed` event Gets or sets the midi events which will trigger the `midiEventsPlayed` event. With this filter set you can enable
+that alphaTab will signal any midi events as they are played by the synthesizer. This allows reacing on various low level
+audio playback elements like notes/rests played or metronome ticks.
 
-## Types
+Refer to the [related guide](/docs/guides/handling-midi-events) to learn more about this feature.
 
-<TypeTable>
-    <TypeRow type="js" name="alphaTab.midi.MidiEventType[]" />
-    <TypeRow type="net" name="IList<AlphaTab.Midi.MidiEventType>" />
-    <TypeRow type="android" name="alphaTab.collections.List<alphaTab.midi.MidiEventType>" />
-</TypeTable>
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"midiEventsPlayedFilter"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midieventtype"}>{"MidiEventType"}</Link><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"[]"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midieventtype"}>{"MidiEventType"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"MidiEventsPlayedFilter"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"[]"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"midiEventsPlayedFilter"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.List"}</span><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/midi/midieventtype"}>{"MidiEventType"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"[]"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Default Value
-
-`[]`
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.midiEventsPlayedFilter = [alphaTab.midi.MidiEventType.AlphaTabMetronome];
 api.midiEventsPlayed.on(function(e) {
   for(const midi of e.events) {
     if(midi.isMetronome) {
-      console.log('Metronome tick ' + midi.metronomeNumerator); 
+      console.log('Metronome tick ' + midi.metronomeNumerator);
     }
   }
 });
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab')
-  .alphaTab('midiEventsPlayedFilter', [alphaTab.midi.MidiEventType.AlphaTabMetronome])
-  .on('alphaTab.midiEventsPlayed', (e, args) => {
-    for(const midi of args.events) {
-      if(midi.isMetronome) {
-        console.log('Metronome tick ' + midi.metronomeNumerator); 
-      }
-    }
-  });
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.MidiEventsPlayedFilter = new MidiEventType[] { AlphaTab.Midi.MidiEventType.AlphaTabMetronome };
-api.MidiEventsPlayed.On(e => 
+api.MidiEventsPlayed.On(e =>
 {
-  foreach(var midi of e.events) 
+  foreach(var midi of e.events)
   {
-    if(midi is AlphaTab.Midi.AlphaTabMetronomeEvent metronome) 
+    if(midi is AlphaTab.Midi.AlphaTabMetronomeEvent metronome)
     {
-      Console.WriteLine("Metronome tick " + metronome.MetronomeNumerator); 
+      Console.WriteLine("Metronome tick " + metronome.MetronomeNumerator);
     }
   }
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...);
 api.midiEventsPlayedFilter = alphaTab.collections.List<alphaTab.midi.MidiEventType>( alphaTab.midi.MidiEventType.AlphaTabMetronome )
 api.midiEventsPlayed.on { e ->
   for (midi in e.events) {
     if(midi instanceof alphaTab.midi.AlphaTabMetronomeEvent && midi.isMetronome) {
-      println("Metronome tick " + midi.tick); 
+      println("Metronome tick " + midi.tick);
     }
   }
 }
 ```
-
 </TabItem>
 </Tabs>

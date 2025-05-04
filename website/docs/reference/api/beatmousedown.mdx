@@ -1,112 +1,72 @@
 ---
 title: beatMouseDown
-description: This event is fired whenever a the user presses the mouse button on a beat.
+description: "This event is fired whenever a the user presses the mouse button on a beat."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
   since: 0.9.7
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.7" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-## Description
+### Description
 This event is fired whenever a the user presses the mouse button on a beat.
 
-<EventDescription />
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"beatMouseDown"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"BeatMouseDown"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"beatMouseDown"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/beat"}>{"Beat"}</Link><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(beat, originalEvent)" />    
-    <TypeRow type="net" name="Action<AlphaTab.Model.Beat>" />    
-    <TypeRow type="android" name="(beat: alphaTab.model.Beat) -> Unit" />    
-</TypeTable>
-
-## Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="beat" type="alphaTab.model.Beat">
-        The new beat that is now being played..
-    </ParameterRow>
-    <ParameterRow platform="js-jquery" name="originalEvent" type="MouseEvent">
-        The original mouse event that lead to trigger of the beat event. For the DOM event it is stored in the event.originalEvent.
-    </ParameterRow>
-    <ParameterRow platform="net" name="beat" type="AlphaTab.Model.Beat">
-        The new beat that is now being played.
-    </ParameterRow>
-    <ParameterRow platform="android" name="beat" type="alphaTab.model.Beat">
-        The new beat that is now being played.
-    </ParameterRow>
-</ParameterTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.beatMouseDown.on((beat) => {
     startSelectionOnBeat(beat);
 });
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').on('alphaTab.beatMouseDown', (e, beat) => {
-    originalEvent.preventDefault();
-    startSelectionOnBeat(beat);
-});
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.beatMouseDown', (e) => {
-    const beat = e.detail;
-    e.originalEvent.preventDefault();
-    startSelectionOnBeat(beat);
-}, false);
-```
-
-</TabItem>
-<TabItem value="cs">
-
+<TabItem value="csharp">
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.BeatMouseDown.On(beat => 
+api.BeatMouseDown.On(beat =>
 {
     StartSelectionOnBeat(args);
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.beatMouseDown.on { beat ->
     startSelectionOnBeat(args)
 }
 ```
-
 </TabItem>
 </Tabs>

@@ -1,93 +1,75 @@
 ---
 title: tex
-description: Tells alphaTab to render the given alphaTex.
+description: "Tells alphaTab to render the given alphaTex."
 sidebar_custom_props:
+  kind: method
   category: Methods - Core
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-
-## Description
+### Description
 Tells alphaTab to render the given alphaTex.
 
-## Signatures
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"number"}</span><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Tex"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><span style={{"color":"#36acaa"}}>{"double"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tex"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"String"}</span><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.DoubleList"}</span><span style={{"color":"#393A34"}}>{"?"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="js" name="function tex(tex)" />
-    <TypeRow type="js" name="function tex(tex, tracks)" />
-    <TypeRow type="jquery" name="alphaTab('tex', tex)" />
-    <TypeRow type="jquery" name="alphaTab('tex', tex, tracks)" />
-    <TypeRow type="net" name="void Tex(string tex)" />
-    <TypeRow type="net" name="void Tex(string tex, int[] tracks)" />
-    <TypeRow type="android" name="fun tex(tex: String, tracks: alphaTab.collections.DoubleList? = null): Unit" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="all" name="tex" type="string">
-        The alphaTex encoded string to load.
+    <ParameterRow platform="all" name="tex">
+        The alphaTex code to render.
     </ParameterRow>
-    <ParameterRow platform="all" name="tracks" type="int[]">
-        Which tracks to display.
-    </ParameterRow>
-    <ParameterRow platform="all" name="tracks" type="int">
-        Which track to display.
+    <ParameterRow platform="all" name="tracks">
+        If set, the given tracks will be rendered, otherwise the first track only will be rendered.
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Nothing
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.tex("\title 'Test' . 3.3.4");
+api.tex("\\title 'Test' . 3.3.4");
 ```
-
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-$('#alphaTab').alphaTab('tex', "\title 'Test' . 3.3.4");
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.Tex("\title 'Test' . 3.3.4");
+api.Tex("\\title 'Test' . 3.3.4");
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
-api.tex("\title 'Test' . 3.3.4");
+api.tex("\\title 'Test' . 3.3.4");
 ```
-
 </TabItem>
 </Tabs>

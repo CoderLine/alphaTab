@@ -1,35 +1,29 @@
 ---
 title: player.scrollElement
-description: The element to apply the scrolling on.
+description: "The element to apply the scrolling on."
 sidebar_custom_props:
   javaScriptOnly: true
   category: Player - JavaScript Specific
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-
-When the player is active, it by default automatically scrolls the browser window to the currently played bar. This setting 
+### Description
+The element to apply the scrolling on. When the player is active, it by default automatically scrolls the browser window to the currently played bar. This setting
 defines which elements should be scrolled to bring the played bar into the view port. By default scrolling happens on the `html,body`
-selector. 
+selector.
 
-<PropertyDescription showJson={true} />
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"scrollElement"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"HTMLElement"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"html,body"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-## Types
-
-<TypeTable>
-    <TypeRow name="string" type="json-js-html">
-        A selector for `document.querySelector`
-    </TypeRow>
-    <TypeRow name="DOM Element" type="js" />
-</TypeTable>
-
-## Default Value
-
-`html,body`

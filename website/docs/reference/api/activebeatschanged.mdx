@@ -1,122 +1,72 @@
 ---
 title: activeBeatsChanged
-description: This event is fired when the currently active beats across all tracks change.
+description: "This event is fired when the currently active beats across all tracks change."
 sidebar_custom_props:
+  kind: event
   category: Events - Player
   since: 1.2.3
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="1.2.3" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+### Description
+This event is fired when the currently active beats across all tracks change. Unlike the <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/playedbeatchanged"}>{"playedBeatChanged"}</Link></code> event this event contains the beats of all tracks and voices independent of them being rendered.
 
-## Description
-This event is fired when the currently active beats across all tracks change. Unlike the `playedBeatChanged` event
-this event contains the beats of all tracks and voices independent of them being rendered.
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"activeBeatsChanged"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/activebeatschangedeventargs"}>{"ActiveBeatsChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/activebeatschangedeventargs"}>{"ActiveBeatsChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"ActiveBeatsChanged"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"activeBeatsChanged"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/synth/activebeatschangedeventargs"}>{"ActiveBeatsChangedEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<EventDescription />
-
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(activeBeatsChangedEventArgs)" />    
-    <TypeRow type="net" name="Action<AlphaTab.Synth.ActiveBeatsChangedEventArgs>" />    
-    <TypeRow type="android" name="(args : AlphaTab.Synth.ActiveBeatsChangedEventArgs) -> Unit" />    
-</TypeTable>
-
-## Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="beat" type="alphaTab.synth.ActiveBeatsChangedEventArgs">
-        The event args containing the info about the active beats. 
-    </ParameterRow>    
-    <ParameterRow platform="net" name="beat" type="AlphaTab.Synth.ActiveBeatsChangedEventArgs">
-        The event args containing the info about the active beats.
-    </ParameterRow>
-    <ParameterRow platform="android" name="beat" type="alphaTab.synth.ActiveBeatsChangedEventArgs">
-        The event args containing the info about the active beats.
-    </ParameterRow>
-</ParameterTable>
-
-## ActiveBeatsChangedEventArgs Properties
-
-<ParameterTable>
-    <ParameterRow platform="js" name="activeBeats" type="alphaTab.model.Beat[]">
-        The currently active beats across all tracks and voices.
-    </ParameterRow>
-    <ParameterRow platform="net" name="ActiveBeats" type="IList<AlphaTab.Model.Beat>">
-        The currently active beats across all tracks and voices.
-    </ParameterRow>
-    <ParameterRow platform="android" name="activeBeats" type="alphaTab.collections.List<alphaTab.model.Beat>">
-        The currently active beats across all tracks and voices.
-    </ParameterRow>
-</ParameterTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.activeBeatsChanged.on(args => {
-    updateHighlights(args.activeBeats);
+   updateHighlights(args.activeBeats);
 });
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').on('alphaTab.activeBeatsChanged', (e, args) => {
-    updateHighlights(args.activeBeats);
-});
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.activeBeatsChanged', (e) => {
-    const args = e.detail;
-    updateHighlights(args.activeBeats);
-}, false);
-```
-
-</TabItem>
-<TabItem value="cs">
-
+<TabItem value="csharp">
 ```cs
 var api = new AlphaTabApi<MyControl>(...);
-api.ActiveBeatsChanged.On(args => 
+api.ActiveBeatsChanged.On(args =>
 {
     UpdateHighlights(args.ActiveBeats);
 });
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.activeBeatsChanged.on { args ->
     updateHighlights(args.activeBeats)
 }
 ```
-
 </TabItem>
 </Tabs>

@@ -1,48 +1,43 @@
 ---
 title: core.engine
-description: The engine which should be used to render the the tablature.
+description: "The engine which should be used to render the the tablature."
 sidebar_custom_props:
   jsOnParent: true
   category: Core
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-AlphaTab can use various render engines to draw the music notation. The available render engines is specific to the platform. Please refer to the table below to find out which engines are available on which platform.    
+### Description
+The engine which should be used to render the the tablature. AlphaTab can use various render engines to draw the music notation. The available render engines is specific to the platform. Please refer to the table below to find out which engines are available on which platform.
+- `default`- Platform specific default engine
+- `html5`- Uses HTML5 canvas elements to render the music notation (browser only)
+- `svg`- Outputs SVG strings (all platforms, default for web)
+- `skia` - Uses [Skia](https://skia.org/) for rendering (all non-browser platforms via [alphaSkia](https://github.com/CoderLine/alphaSkia), default for non-web)
+- `gdi` - Uses [GDI+](https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms) for rendering (only on .net)
+- `android` - Uses [android.graphics.Canvas](https://developer.android.com/reference/android/graphics/Canvas) for rendering (only on Android)
 
-<PropertyDescription showJson={true} />
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"engine"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"\"default\""}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Engine"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"\"default\""}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"engine"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"String"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"\"default\""}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="string">
-        `svg` - Outputs SVG strings. <br />
-        `html5` - Uses HTML5 canvas elements to render the music notation. 
-    </TypeRow>
-    <TypeRow type="net" name="string">
-        `skia` - Available on all .net platforms. Uses [Skia](https://skia.org/) for rendering<br />
-        `gdi` - Only available desktop .net. Uses [GDI+](https://docs.microsoft.com/en-us/dotnet/framework/winforms/advanced/graphics-and-drawing-in-windows-forms) for rendering <br /> 
-        `svg` - Available on all .net platforms. Outputs SVG strings. 
-    </TypeRow>
-    <TypeRow type="android" name="string">
-        `skia` - Uses [Skia](https://skia.org/) for rendering<br />
-        `android` - Uses [android.graphics.Canvas](https://developer.android.com/reference/android/graphics/Canvas) for rendering<br />
-        `svg` - Outputs SVG strings. 
-    </TypeRow>
-</TypeTable>
-
-## Default Value
-
-`default` which is mapped per platform: 
-
-<TypeTable>
-    <TypeRow type="js-html" name="svg" />
-    <TypeRow type="net" name="skia" />
-    <TypeRow type="android" name="skia" />
-</TypeTable>

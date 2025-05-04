@@ -12,10 +12,11 @@
     "serve": "docusaurus serve",
     "write-translations": "docusaurus write-translations",
     "write-heading-ids": "docusaurus write-heading-ids",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "generate-alphatabdoc": "tsx scripts/generate-alphatabdoc.mts"
   },
   "dependencies": {
-    "@coderline/alphatab": "^1.4.0-alpha.1326",
+    "@coderline/alphatab": "^1.5.0-alpha.1394",
     "@docusaurus/core": "^3.7.0",
     "@docusaurus/preset-classic": "^3.7.0",
     "@docusaurus/theme-mermaid": "^3.7.0",
@@ -40,8 +41,11 @@
     "babel-plugin-macros": "^3.1.0",
     "copy-webpack-plugin": "^12.0.2",
     "docusaurus-plugin-sass": "^0.2.6",
+    "prettier": "^3.5.3",
+    "remark-github-admonitions-to-directives": "^2.1.0",
     "resolve-url-loader": "^5.0.0",
     "sass": "^1.85.1",
+    "tsx": "^4.19.3",
     "typescript": "^5.7.3"
   },
   "browserslist": {

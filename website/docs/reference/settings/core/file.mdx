@@ -1,33 +1,30 @@
 ---
 title: core.file
-description: The full URL to the input file to be loaded.
+description: "The full URL to the input file to be loaded."
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
   category: Core - JavaScript Specific
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-
-AlphaTab can automatically load and render a file after initialization. This eliminates the need of manually calling
+### Description
+The full URL to the input file to be loaded. AlphaTab can automatically load and render a file after initialization. This eliminates the need of manually calling
 one of the load methods which are available. alphaTab will automatically initiate an `XMLHttpRequest` after initialization
 to load and display the provided url of this setting. Note that this setting is only interpreted once on initialization.
 
-<PropertyDescription showJson={true} />
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"file"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"null"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-## Types
-
-<TypeTable>
-    <TypeRow name="string" />
-</TypeTable>
-
-## Default Value
-
-`null`

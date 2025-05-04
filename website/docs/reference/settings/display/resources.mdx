@@ -1,226 +1,71 @@
 ---
 title: display.resources
-description: Allows adjusting of the used fonts and colors for rendering.
+description: "Allows adjusting of the used fonts and colors for rendering."
 sidebar_custom_props:
   domWildcard: true
   jsOnParent: true
   category: Display
   since: 0.9.6
 ---
-import { SinceBadge } from '@site/src/components/SinceBadge';
 
-<SinceBadge since="0.9.6" />
-
-import useBaseUrl from '@docusaurus/useBaseUrl';
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
 import { CodeBadge } from '@site/src/components/CodeBadge';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-export var Resources = {
-	colors: [
-		{
-			name: 'barNumberColor',
-			defaultValue: 'rgb(200, 0, 0)',
-			description: 'The color to use for displaying the bar numbers above the music sheet.',
-		},
-		{
-			name: 'barSeparatorColor',
-			defaultValue: 'rgb(34, 34, 17)',
-			description: 'The color to use for rendering bar separators, the accolade and repeat signs.',
-		},
-		{
-			name: 'mainGlyphColor',
-			defaultValue: 'rgb(0, 0, 0)',
-			description: 'The color to use for music notation elements of the primary voice.',
-		},
-		{
-			name: 'scoreInfoColor',
-			defaultValue: 'rgb(0, 0, 0)',
-			description: 'The color to use for displaying the song information above the music sheets.',
-		},
-		{
-			name: 'secondaryGlyphColor',
-			defaultValue: 'rgb(0,0,0,0.4)',
-			description: 'The color to use for music notation elements of the secondary voices.',
-		},
-		{
-			name: 'staffLineColor',
-			defaultValue: 'rgb(165, 165, 165)',
-			description: 'The color to use for rendering the lines of staves.',
-		},
-	],
-	fonts: [
-		{
-			name: 'barNumberFont',
-			defaultValue: '11px Arial, sans-serif',
-			description: 'The font to use for displaying the bar numbers above the music sheet.',
-		}, 
-		{
-			name: 'copyrightFont',
-			defaultValue: 'bold 12px Arial, sans-serif',
-			description: 'The font to use for displaying the songs copyright information in the header of the music sheet.,',
-		},
-		{
-			name: 'effectFont',
-			defaultValue: 'italic 12px Georgia, serif',
-			description: 'The font to use for displaying certain effect related elements in the music sheet.',
-		},
-		{
-			name: 'fingeringFont',
-			defaultValue: '14px Georgia, serif',
-			description: 'The font to use for displaying finger information in the music sheet.',
-		},
-		{
-			name: 'fretboardNumberFont',
-			defaultValue: '11px Arial, sans-serif',
-			description: 'The font to use for displaying the fretboard numbers in chord diagrams.',
-		},
-		{
-			name: 'graceFont',
-			defaultValue: '11px Arial, sans-serif',
-			description: 'The font to use for grace notation related texts in the music sheet.',
-		},
-		{
-			name: 'markerFont',
-			defaultValue: 'bold 14px Georgia, serif',
-			description: 'The font to use for section marker labels shown above the music sheet.',
-		},
-		{
-			name: 'subTitleFont',
-			defaultValue: '20px Georgia, serif',
-			description: 'The font to use for displaying the songs subtitle in the header of the music sheet.',
-		},
-		{
-			name: 'tablatureFont',
-			defaultValue: '13px Arial, sans-serif',
-			description: 'The font to use for displaying the guitar tablature numbers in the music sheet.',
-		},
-		{
-			name: 'titleFont',
-			defaultValue: '32px Georgia, serif',
-			description: 'The font to use for displaying the songs title in the header of the music sheet.',
-		},
-		{
-			name: 'wordsFont',
-			defaultValue: '15px Arial, sans-serif',
-			description: 'The font to use for displaying the lyrics information in the header of the music sheet.',
-		},
-		{
-			name: 'timerFont',
-			defaultValue: '12px Georgia, serif',
-			description: 'The font to use for displaying beat time information in the music sheet.',
-			since: "1.4.0"
-		},
-		{
-			name: 'directionsFont',
-			defaultValue: '14px Georgia, serif',
-			description: 'The font to use for displaying the directions texts.',
-			since: "1.4.0"
-		},
-		{
-			name: 'numberedNotationFont',
-			defaultValue: '16px Arial, sans-serif',
-			description: 'The font to use for displaying the numbered music notation in the music sheet.',
-			since: "1.4.0"
-		},
-		{
-			name: 'numberedNotationGraceFont',
-			defaultValue: '14px Arial, sans-serif',
-			description: 'The font to use for displaying the grace notes in numbered music notation in the music sheet.',
-			since: "1.4.0"
-		},
-		{
-			name: 'inlineFingeringFont',
-			defaultValue: '12px Georgia, serif',
-			description: 'The font to use for displaying finger information when inline into the music sheet.',
-			since: "1.4.0"
-		}
-	]
-};
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-export function toPascalCase(v) {
-    return v.substr(0, 1).toUpperCase() + v.substr(1);
-}
+<SettingsHeader />
 
-export function ResourceRow({resource, type}) {  
-    return (
-        <tr>
-            <td>
-                <CodeBadge type="js" name={resource.name} /><br />
-                <CodeBadge type="json" name={resource.name} /><br />
-                <CodeBadge type="html" name={resource.name.toLowerCase()} /><br />
-                <CodeBadge type="net" name={toPascalCase(resource.name)} />
-                <CodeBadge type="android" name={resource.name} />
-            </td>
-            <td>
-                <CodeBadge type="all" name={type} />
-            </td>
-            <td>{resource.defaultValue}</td>
-            <td>
-				{resource.since && <SinceBadge since={resource.since} inline="true" />}
-                {resource.description}
-            </td>
-        </tr>
-    );
-}
-
-export function ResourceTable() {
-    const colors = Resources.colors.map(c => <ResourceRow type="color" resource={c} />);
-    const fonts = Resources.fonts.map(f => <ResourceRow type="font" resource={f} />);
-    return (
-        <table className="table table-striped table-condensed type-table">
-            <thead>
-                <tr>
-                    <th>Resource</th>
-                    <th>Type</th>
-                    <th>Default</th>
-                    <th>Summary</th>
-                </tr>
-            </thead>    
-            <tbody> 
-                {colors}
-                {fonts}
-            </tbody>
-        </table>
-    );
-}
-
-## Description
-
-AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
-this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility. 
+### Description
+Allows adjusting of the used fonts and colors for rendering. AlphaTab allows configuring the colors and fonts used for rendering via the rendering resources settings. Please note that as of today
+this is the primary way of changing the way how alphaTab styles elements. CSS styling in the browser cannot be guaranteed to work due to its flexibility.
 
 
-Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage: 
+Due to space reasons in the following table the common prefix of the settings are removed. Please refer to these examples to eliminate confusion on the usage:
 
 | Platform   | Prefix                    | Example Usage                                                      |
 |------------|---------------------------|--------------------------------------------------------------------|
 | JavaScript | `display.resources.`      | `settings.display.resources.wordsFont = ...`                       |
 | JSON       | `display.resources.`      | `var settings = { display: { resources: { wordsFonts: '...'} } };` |
 | JSON       | `resources.`              | `var settings = { resources: { wordsFonts: '...'} };`              |
-| HTML       | `data-display-resources-` | `<div data-display-resources-wordsfont="...">`                     |
-| HTML       | `data-resources-`         | `<div data-resources-wordsfont="...">`                             |
 | .net       | `Display.Resources.`      | `settings.Display.Resources.WordsFonts = ...`                      |
 | Android    | `display.resources.`      | `settings.display.resources.wordsFonts = ...`                      |
-
-
-## Resources
-Following resources exist for adjusting the style. 
-
-<ResourceTable />
-
 ## Types
 
 ### Fonts
 
-For the JavaScript platform any font that might be installed on the client machines can be used. 
-Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded. 
+For the JavaScript platform any font that might be installed on the client machines can be used.
+Any additional fonts can be added via WebFonts. The rendering of the score will be delayed until it is detected that the font was loaded.
 Simply use any CSS font property compliant string as configuration. Relative font sizes with percentual values are not supported, remaining values will be considered if supported.
 
-<span class="badge badge--info badge--header">Since 1.2.3</span> Multiple fonts are also supported for the Web version. alphaTab will check if any of the fonts in the list is loaded instead of all. If none is available at the time alphaTab is initialized, it will try to initiate the load of the specified fonts individual through the Browser Font APIs.
+<SinceBadge inline={true} since={"1.2.3"} /> Multiple fonts are also supported for the Web version. alphaTab will check if any of the fonts in the list is loaded instead of all. If none is available at the time alphaTab is initialized, it will try to initiate the load of the specified fonts individual through the Browser Font APIs.
 
-For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts. 
+For the .net platform any installed font on the system can be used. Simply construct the `Font` object to configure your desired fonts.
 
 ### Colors
 
 For JavaScript you can use any CSS font property compliant string. (#RGB, #RGBA, #RRGGBB, #RRGGBBAA, rgb(r,g,b), rgba(r,g,b,a) )
 
-On .net simply construct the `Color` object to configure your desired color. 
+On .net simply construct the `Color` object to configure your desired color.
+
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"resources"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/renderingresources"}>{"RenderingResources"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/renderingresources"}>{"RenderingResources"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Resources"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"resources"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/renderingresources"}>{"RenderingResources"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"false"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
+
+
+import ManualDocs from './_resources.mdx';
+
+<ManualDocs />

@@ -1,82 +1,69 @@
 ---
 title: updateSettings
-description: Applies any changes that were done to the settings object and informs the Renderer about any new values to consider.
+description: "Applies any changes that were done to the settings object."
 sidebar_custom_props:
+  kind: method
   category: Methods - Core
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-
-## Description
-Applies any changes that were done to the settings object and informs the Renderer about any new values to consider.
+### Description
+Applies any changes that were done to the settings object. It also informs the <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/renderer"}>{"renderer"}</Link></code> about any new values to consider.
 By default alphaTab will not trigger any re-rendering or settings update just if the settings object itself was changed. This method must be called
-to trigger an update of the settings in all components. Then a re-rendering can be initiated using the `Render()` method.
+to trigger an update of the settings in all components. Then a re-rendering can be initiated using the <code style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/alphatabapibase/render"}>{"render"}</Link></code> method.
 
-## Signatures
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"updateSettings"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"UpdateSettings"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"updateSettings"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="js" name="function updateSettings()" />
-    <TypeRow type="jquery" name="alphaTab('updateSettings')" />
-    <TypeRow type="net" name="void UpdateSettings()" />
-    <TypeRow type="android" name="fun updateSettings(): Unit" />
-</TypeTable>
-
-### Parameters
-None
-
-### Returns
-Nothing
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.settings.display.scale = 2.0;
 api.updateSettings();
 api.render();
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const at = $('#alphaTab');
-at.alphaTab('settings').display.scale = 2.0;
-at.alphaTab('updateSettings');
-at.alphaTab('render');
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 
 api.Settings.Display.Scale = 2.0;
 api.UpdateSettings();
 api.Render()
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 
@@ -84,6 +71,5 @@ api.settings.display.scale = 2.0
 api.updateSettings()
 api.render()
 ```
-
 </TabItem>
 </Tabs>

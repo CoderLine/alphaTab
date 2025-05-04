@@ -229,3 +229,60 @@ To apply simile marks use the `\simile type` where type is:
 <AlphaTexSample player="true">{`
 3.3*4 | \\simile simple | 3.3*4 | 4.3*4 | \\simile firstofdouble | \\simile secondofdouble
 `}</AlphaTexSample>
+
+## Bar Lines
+
+For some special notation needs, the default bar line can be adjusted on every bar.
+The bar line styles are aligned with the ones from [MusicXML](https://www.w3.org/2021/06/musicxml40/musicxml-reference/data-types/bar-style/).
+
+* `\barlineLeft` adjusts the left bar line
+* `\barlineRight` adjusts the right bar line
+
+alphaTab attempts to reuse lines on overlapping styles across bars. 
+
+<AlphaTexSample tracks="all">{`
+\\instrument piano
+.
+\\track "Overlapping"
+    \\staff 
+        \\barlineleft dashed 
+        \\barlineright dotted 
+        | 
+        \\barlineleft heavyheavy
+        \\barlineright heavyheavy
+        
+    \\staff 
+        \\barlineleft lightlight 
+        \\barlineright lightheavy 
+        | 
+        \\barlineleft heavylight
+        \\barlineright dashed
+\\track "All Styles"
+    \\staff 
+        \\barlineright dashed |
+        \\barlineright dotted |
+        \\barlineright heavy |
+        \\barlineright heavyHeavy |
+        \\barlineright heavyLight |
+        \\barlineright lightHeavy |
+        \\barlineright lightlight |
+        \\barlineright none |
+        \\barlineright regular |
+        \\barlineright short |
+        \\barlineright tick |
+`}</AlphaTexSample>
+
+* `automatic` - Bar lines are determined automatically based on details like repeats and free time (default).
+* `dashed` 
+* `dotted` 
+* `heavy` 
+* `heavyheavy` 
+* `heavylight` 
+* `lightheavy` 
+* `lightlight`  
+* `none`
+* `regular`
+* `short` 
+* `tick` 
+
+

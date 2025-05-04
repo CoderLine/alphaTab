@@ -1,36 +1,40 @@
 ---
 title: display.padding
-description: Adjusts the padding between the music notation and the border
+description: "Adjusts the padding between the music notation and the border."
 sidebar_custom_props:
   jsOnParent: true
   category: Display
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
+### Description
+Adjusts the padding between the music notation and the border. Adjusts the padding between the music notation and the outer border of the container element.
+The array is either:
+* 2 elements: `[left-right, top-bottom]`
+* 4 elements: ``[left, top, right, bottom]``
 
-AlphaTab by default has a padding between the border of the control and the start of the content. 
-This setting controls this padding between border and content. 
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"padding"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"number"}</span><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"[35, 35]"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><span style={{"color":"#36acaa"}}>{"double"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Padding"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"set"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"[35, 35]"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"var"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"padding"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.DoubleList"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"[35, 35]"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<PropertyDescription showJson={true} />
-
-## Types
-
-<TypeTable>
-    <TypeRow name="double[]" type="all">
-        `[left, top, right, bottom]`
-    </TypeRow>
-    <TypeRow name="double[]" type="all">
-        `[left-right, top-bottom]`
-    </TypeRow>
-</TypeTable>
-
-## Default Value
-
-`[35, 35]` <SinceBadge since="1.4.0" inline="true" />

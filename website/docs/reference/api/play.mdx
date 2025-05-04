@@ -1,76 +1,68 @@
 ---
 title: play
-description: Starts the playback of the current song.
+description: "Starts the playback of the current song."
 sidebar_custom_props:
+  kind: method
   category: Methods - Player
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+### Description
+Starts the playback of the current song.
 
-## Description
-Starts the playback of the current song if possible.Reasons for not starting can be that the player is not ready yet or it is already playing.
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"play"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"boolean"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"bool"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Play"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"play"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Boolean"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Signatures
+### Returns 
+true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing. 
 
-<TypeTable>
-    <TypeRow type="js" name="function play()" />
-    <TypeRow type="jquery" name="alphaTab('play')" />
-    <TypeRow type="net" name="void Play()" />
-    <TypeRow type="android" name="fun play(): Unit" />
-</TypeTable>
-
-### Parameters
-None
-
-### Returns
-true if the playback was started, otherwise false. Reasons for not starting can be that the player is not ready or already playing.
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 api.play();
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').alphaTab('play');
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.Play();
 ```
-
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.play()
 ```
-
 </TabItem>
 </Tabs>

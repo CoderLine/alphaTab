@@ -1,51 +1,31 @@
 ---
 title: soundFontLoad
-description: This event is fired when the SoundFont is being loaded.
+description: "This event is fired when the SoundFont is being loaded."
 sidebar_custom_props:
+  kind: event
+  javaScriptOnly: true
   category: Events - Player
   since: 0.9.4
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import { EventDescription } from '@site/src/components/EventDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+### Description
+This event is fired when the SoundFont is being loaded. This event is fired when the SoundFont is being loaded and reports the progress accordingly.
 
-## Description
-This event is fired when the SoundFont is being loaded and reports the progress accordingly.     
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"soundFontLoad"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/ieventemitteroft"}>{"IEventEmitterOfT"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/progresseventargs"}>{"ProgressEventArgs"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-<EventDescription />
 
-## Types
-
-<TypeTable>
-    <TypeRow type="js" name="function(e)" />    
-</TypeTable>
-
-## Parameters
-
-<ParameterTable>
-    <ParameterRow platform="js" name="args" type="alphaTab.ProgressEventArgs">
-        The information about the load progress of the file.  
-    </ParameterRow>
-</ParameterTable>
-
-## Examples
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'HTML', value: 'html', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
+## Example - JavaScript
 
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
@@ -53,24 +33,3 @@ api.soundFontLoad.on((e) => {
     updateProgress(e.loaded, e.total);
 });
 ```
-
-</TabItem>
-<TabItem value="jq">
-
-```js
-$('#alphaTab').on('alphaTab.soundFontLoad', (e, args) {
-    updateProgress(args.loaded, args.total);
-});
-```
-
-</TabItem>
-<TabItem value="html">
-
-```js
-document.querySelector('#alphaTab').addEventListener('alphaTab.soundFontLoad', () => {
-    updateProgress(e.detail.loaded, e.detail.total);
-}, false);
-```
-
-</TabItem>
-</Tabs>

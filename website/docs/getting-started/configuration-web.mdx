@@ -109,28 +109,6 @@ api.scoreLoaded.on( (score) => {
 ```
 
 </TabItem>
-<TabItem value="html">
-
-DOM events are namespaced with a `alphaTab.` prefix and can be subscribed either via `addEventListener(eventName, handler)` or via jQuerys `.on(eventName, handler)`.
-To access potential parameters that are passed along the event, you will need to access the event details. 
-
-For raw DOM events, the info object will be contained in the [`detail`](https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/detail) property of the DOM event. 
-
-```js
-element.addEventListener('alphaTab.scoreLoaded', (e) => {
-    console.log('Score was loaded!', e.detail);
-});
-```
-
-For jQuery events the object related to the event will be the second parameter: 
-
-```js
-$(element).on('alphaTab.scoreLoaded', (e, score) => {
-    console.log('Score was loaded!', score);
-});
-```
-
-</TabItem>
 </Tabs>
 
 ## API

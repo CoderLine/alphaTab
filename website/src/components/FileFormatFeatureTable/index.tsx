@@ -1,5 +1,5 @@
 import React, { ReactElement, ReactNode } from "react";
-import { SinceBadge } from "../SinceBadge";
+import { TooltipSinceBadge } from "../SinceBadge";
 import Details from "@theme/Details";
 import { Tooltip } from "react-tooltip";
 import ReactDOMServer from "react-dom/server";
@@ -52,7 +52,7 @@ export const FileFormatFeatureCell: React.FC<FileFormatFeatureCellProps> = ({
     status.since || status.tooltip
       ? ReactDOMServer.renderToStaticMarkup(
           <>
-            <SinceBadge since={status.since} inline={true} /> {status.tooltip}
+            <TooltipSinceBadge since={status.since} inline={true} /> {status.tooltip}
           </>
         )
       : "";
@@ -130,18 +130,23 @@ function computeFeatureStatistics(node: React.ReactNode): {
 
 export type FileFormatFeatureGroupProps = {
   title: string;
+  tooltip: string;
   children: React.ReactNode;
 };
 export const FileFormatFeatureGroup: React.FC<FileFormatFeatureGroupProps> = ({
   title,
   children,
+  tooltip,
 }) => {
-  const tooltip = ReactDOMServer.renderToStaticMarkup(
+  const renderedTooltip = ReactDOMServer.renderToStaticMarkup(
+    <>
+    {tooltip}
     <FileFormatFeatureStatistics node={children} />
+    </>
   );
 
   const classNames = ["feature-status-has-tooltip", styles.noWrap];
-  if (tooltip) {
+  if (renderedTooltip) {
     classNames.push(styles.hasTooltip);
   }
 
@@ -149,7 +154,7 @@ export const FileFormatFeatureGroup: React.FC<FileFormatFeatureGroupProps> = ({
     <>
       <tr>
         <td>
-          <strong className={classNames.join(" ")} data-tooltip-html={tooltip}>
+          <strong className={classNames.join(" ")} data-tooltip-html={renderedTooltip}>
             {title}
           </strong>
         </td>

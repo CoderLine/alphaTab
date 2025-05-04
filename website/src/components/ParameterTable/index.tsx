@@ -1,11 +1,11 @@
 import React from "react";
 import { CodeBadge, Platform } from "../CodeBadge";
 import { SinceBadge } from "../SinceBadge";
-import { MDXProvider } from "@mdx-js/react";
+import { MarkdownString } from "../MarkdownString";
 
 function renderChild(child: React.ReactNode): React.ReactNode {
   if (typeof child === "string") {
-    return <MDXProvider children={child} />;
+    return <MarkdownString content={child} />;
   } else {
     return child;
   }
@@ -14,7 +14,6 @@ function renderChild(child: React.ReactNode): React.ReactNode {
 export type ParameterRowProps = {
   children: React.ReactNode;
   platform: Platform;
-  type: string;
   name: string;
   since?: string;
 };
@@ -22,7 +21,6 @@ export type ParameterRowProps = {
 export const ParameterRow: React.FC<ParameterRowProps> = ({
   children,
   platform,
-  type,
   name,
   since,
 }) => {
@@ -30,9 +28,6 @@ export const ParameterRow: React.FC<ParameterRowProps> = ({
     <tr>
       <td>
         <CodeBadge type={platform} name={name} />
-      </td>
-      <td>
-        <code>{type}</code>
       </td>
       <td>
         {Array.isArray(children)
@@ -53,8 +48,7 @@ export const ParameterTable: React.FC<ParameterTableProps> = ({ children }) => {
     <table className="table table-striped table-condensed type-table">
       <thead>
         <tr>
-          <th>Parameters</th>
-          <th>Type</th>
+          <th>Parameter</th>
           <th>Summary</th>
         </tr>
       </thead>

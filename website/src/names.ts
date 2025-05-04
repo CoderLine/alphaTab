@@ -64,11 +64,12 @@ export function tojQueryPropertyNames(jsNames: string[]) {
 
 export function buildNames(property: Page) {
   const javaScriptOnly = property.prop("javaScriptOnly", false);
-  const jQueryOnly = property.prop("jQueryOnly", false);
   const domWildcard = property.prop("domWildcard", false);
   const category = property.prop("category", "");
 
-  let jsNames = jQueryOnly ? [] : property.props("title");
+  let jsNames = property.props("title");
+
+  let mainName = jsNames[0];
 
   let csNames = property.props("csName");
   if (!javaScriptOnly && csNames.length === 0) {
@@ -117,6 +118,8 @@ export function buildNames(property: Page) {
   }
 
   return {
+    mainName,
+    javaScriptOnly,
     jsNames,
     csNames,
     jQueryNames,

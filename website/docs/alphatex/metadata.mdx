@@ -3,8 +3,9 @@ title: Metadata
 ---
 
 import { AlphaTexSample } from '@site/src/components/AlphaTexSample';
+import { SinceBadge } from '@site/src/components/SinceBadge';
 
-Metadata is specified using `\tagname value value` at the beginning of the score.
+Metadata is specified using `\tagname value` at the beginning of the score.
 It can be used to specify global information like title, tempo or track tuning.
 Metadata is optional, but if specified, it must be followed by a dot to indicate the end
 of the metadata.
@@ -38,6 +39,33 @@ Please refer to the [Tracks and Staves](/docs/alphatex/tracks-staves) or details
 `}</AlphaTexSample>
 
 Strings can contain escape sequences: `\n`, `\r`, `\t`, `\\`, `\"`, `\'`.
+
+<SinceBadge inline={true} since="1.5.0" /> its possible to also change the template and alignment of the song information 
+via `\tagname value template alignment`. 
+
+The `template` is a string which can have following placeholders which are then replaced with the respective info of the song:
+
+* `%TITLE%`
+* `%SUBTITLE%`
+* `%ARTIST%`
+* `%ALBUM%`
+* `%WORDS%`
+* `%WORDSMUSIC%`
+* `%MUSIC%`
+* `%TABBER%`
+* `%COPYRIGHT%`
+
+The `alignment` is one of the following values:
+
+* `left`
+* `center`
+* `right`
+
+<AlphaTexSample>{`
+\\title "Song Title" "Title: %TITLE%" left
+\\artist Artist "Written by %ARTIST%" right
+.
+`}</AlphaTexSample>
 
 ## Instrument
 As indicated above, the instrument can be changed via the `\instrument` metadata.

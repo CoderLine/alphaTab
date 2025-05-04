@@ -1,33 +1,32 @@
 ---
 title: core.scriptFile
-description: The full URL to the alphaTab JavaScript file.
+description: "The full URL to the alphaTab JavaScript file."
 sidebar_custom_props:
   javaScriptOnly: true
   jsOnParent: true
   category: Core - JavaScript Specific
   since: 0.9.6
 ---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
-<SinceBadge since="0.9.6" />
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
 
-import { PropertyDescription } from '@site/src/components/PropertyDescription';
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
+<SettingsHeader />
 
-## Description
-AlphaTab needs to know the full URL to the script file it is contained in to launch the web workers. AlphaTab will do its best to auto-detect
+### Description
+The full URL to the alphaTab JavaScript file. AlphaTab needs to know the full URL to the script file it is contained in to launch the web workers. AlphaTab will do its best to auto-detect
 this path but in case it fails, this setting can be used to explicitly define it. Altenatively also a global variable `ALPHATAB_ROOT` can
-be defined before initializing. Please be aware that bundling alphaTab together with other scripts might cause errors 
+be defined before initializing. Please be aware that bundling alphaTab together with other scripts might cause errors
 in case those scripts are not suitable for web workers. e.g. if there is a script bundled together with alphaTab that accesses the DOM,
-this will cause an error when alphaTab starts this script as worker. 
+this will cause an error when alphaTab starts this script as worker.
 
-<PropertyDescription showJson={true} />
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"scriptFile"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Absolute url to JavaScript file containing alphaTab. (auto detected)"}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
 
-## Types
-
-<TypeTable>
-    <TypeRow name="string" />
-</TypeTable>
-
-## Default Value
-Absolute url to JavaScript file containing alphaTab. (auto detected)

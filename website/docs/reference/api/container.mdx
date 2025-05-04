@@ -1,78 +1,68 @@
 ---
 title: container
-description: The UI container that holds the whole alphaTab control. 
+description: "The UI container that holds the whole alphaTab control."
 sidebar_custom_props:
+  kind: property
   category: Properties - Core
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
-
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-
-## Description
-Gets the UI container that represents the element on which alphaTab was initialized. Note that this is not the raw instance, but a UI framework specific wrapper for alphaTab.
-
 import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 <PropertyDescription />
 
+### Description
+The UI container that holds the whole alphaTab control. Gets the UI container that represents the element on which alphaTab was initialized. Note that this is not the raw instance, but a UI framework specific wrapper for alphaTab.
 
-## Types
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"readonly"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"container"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/platform/icontainer"}>{"IContainer"}</Link><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/platform/icontainer"}>{"IContainer"}</Link><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Container"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"{"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"get"}</span><span style={{"color":"#393A34"}}>{";"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"}"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"val"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"container"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/platform/icontainer"}>{"IContainer"}</Link></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-<TypeTable>
-    <TypeRow type="all" name="AlphaTab.UI.IContainer" />
-    <TypeRow type="net-wf" name="AlphaTab.Platform.CSharp.WinForms.ControlContainer" />
-    <TypeRow type="net-wpf" name="AlphaTab.Platform.CSharp.Wpf.FrameworkElementContainer" />
-    <TypeRow type="android" name="alphaTab.platform.android.AndroidRootViewContainer" />
-    <TypeRow type="js" name="alphaTab.platform.javascript.HtmlElementContainer" />
-</TypeTable>
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
 const container = api.container;
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const container = $('#alphaTab').alphaTab('container');
-```
-
-</TabItem>
-<TabItem value="cs">
-
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 var container = api.Container;
 ```
-
 </TabItem>
 <TabItem value="android">
-
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 val container = api.container;
 ```
-
 </TabItem>
 </Tabs>

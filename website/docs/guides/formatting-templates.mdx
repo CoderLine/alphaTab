@@ -1,0 +1,38 @@
+---
+title: Song Details Formatting
+since: 1.5.0
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.5.0"></SinceBadge>
+
+In the page payout, alphaTab shows the information of the song directly as part of the music sheet. 
+The display of this song information can be adjusted in 3 ways:
+
+* Colors can be adjusted via the `style` (see [Coloring Music Sheet](./coloring.mdx))
+* Alignment and the text template can be adjusted via `style`.
+* Fonts can be adjusted via [`settings.display.resources`](/docs/reference/settings/display/resources)
+
+The mechanisms are currently a bit scattered historically. With alphaTab 2.x we plan to consolidate these options.
+
+For some formats like Guitar Pro alphaTab will read the information contained in the file and adjust the alignments and templates.
+In any case, the song info can be adjusted by updating the settings and the data model after it has been loaded. 
+
+The examples here are written in TypeScript (for clarity on types), the same methods and properties are available on all flavors of alphaTab.
+When and what to set as styles depends on your needs. You might have an own custom style applied to all files, or you have the style stored beside
+your file and load it along the file itself.
+
+import {FormattingTemplateSample} from '@site/src/components/FormattingTemplateSample'
+
+<FormattingTemplateSample />
+
+The most important parts to know:
+
+* The [`style`](/docs/reference/types/model/score/style) on [`alphaTab.model.Score`](/docs/reference/types/model/score) is used to adjust the style of the visual elements. 
+* The [`headerAndFooter`](/docs/reference/types/model/scorestyle/headerandfooter) on [`alphaTab.model.ScoreStyle`](/docs/reference/types/model/scorestyle/) is used to adjust the text, visibility and alignment of the header and footer elements. 
+* The [`colors`](/docs/reference/types/model/elementstyle/colors) on `alphaTab.model.ScoreStyle` is used to adjust the color of the header and footer elements (and others).
+* The [`alphaTab.model.ScoreSubElement`](/docs/reference/types/model/scoresubelement) defines the possible list of elements to be styled (not all are song info related)
+

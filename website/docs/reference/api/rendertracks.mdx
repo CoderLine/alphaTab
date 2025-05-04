@@ -1,98 +1,78 @@
 ---
 title: renderTracks
-description: Initiates a rendering of the given tracks.
+description: "Renders the given list of tracks."
 sidebar_custom_props:
+  kind: method
   category: Methods - Core
-  since:  0.9.4
+  since: 0.9.4
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
 import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
 
 <SinceBadge since="0.9.4" />
 
-import {TypeTable, TypeRow} from '@site/src/components/TypeTable';
-import {ParameterTable, ParameterRow} from '@site/src/components/ParameterTable';
+### Description
+Renders the given list of tracks.
 
-## Description
-Initiates a rendering of the tracks. All tracks must be from the same score, otherwise an error is raised. 
+<Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
+<TabItem value="js">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"renderTracks"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{"[]"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"void"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="cs">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#00009f"}}>{"void"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"RenderTracks"}</span><span style={{"color":"#393A34"}}>{"("}</span><Link style={{"color":"#36acaa"}} to={"https://learn.microsoft.com/en-us/dotnet/api/system.collections.ilist"}>{"IList"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{")"}</span></code></pre></div></div>
+</TabItem>
+<TabItem value="kt">
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"fun"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"renderTracks"}</span><span style={{"color":"#393A34"}}>{"("}</span><span style={{"color":"#36acaa"}}>{"tracks"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"alphaTab.collections.List"}</span><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/model/track"}>{"Track"}</Link><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34"}}>{")"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Unit"}</span></code></pre></div></div>
+</TabItem>
+</Tabs>
 
-## Signatures
-
-<TypeTable>
-    <TypeRow type="js" name="function renderTracks(tracks)" />
-    <TypeRow type="jquery" name="alphaTab('renderTracks', tracks)" />
-    <TypeRow type="net" name="bool RenderTracks(Tracks[] track)" />
-    <TypeRow type="android" name="fun renderTracks(tracks: alphaTab.collections.List<alphaTab.model.Track>): Unit" />
-</TypeTable>
-
-### Parameters
 
 <ParameterTable>
-    <ParameterRow platform="js" name="tracks" type="alphaTab.model.Track[]">
-        The tracks that should be rendered.
-    </ParameterRow>
-    <ParameterRow platform="net" name="tracks" type="AlphaTab.Model.Track[]">
-        The tracks that should be rendered.
-    </ParameterRow>
-    <ParameterRow platform="android" name="tracks" type="alphaTab.collections.List<alphaTab.model.Track>">
-        The tracks that should be rendered.
+    <ParameterRow platform="all" name="tracks">
+        The tracks to render. They must all belong to the same score.
     </ParameterRow>
 </ParameterTable>
 
-### Returns
-Nothing
 
 ## Examples
 
 <Tabs
-  defaultValue="js"
-  values={[
-    { label: 'JavaScript', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'C#', value: 'cs', },
-    { label: 'Android', value: 'android', }
-  ]
-}>
-<TabItem value="js">
-
+    defaultValue="javascript"
+    values={[
+      { label: "JavaScript", value: "javascript"},
+      { label: "C#", value: "csharp"},
+      { label: "Android", value: "android"}
+    ]}
+>
+<TabItem value="javascript">
 ```js
 const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
-api.changeTrackMute([api.score.tracks[0], api.score.tracks[1]], true);
+api.renderTracks([api.score.tracks[0], api.score.tracks[1]]);
 ```
-
 </TabItem>
-<TabItem value="jq">
-
-```js
-const at = $('#alphaTab');
-const score = at.alphaTab('score');
-at.alphaTab('renderTracks', [
-    api.score.tracks[2],
-    api.score.tracks[3]
-]);
-```
-
-</TabItem>
-<TabItem value="cs">
-
-```csharp
+<TabItem value="csharp">
+```cs
 var api = new AlphaTabApi<MyControl>(...);
 api.RenderTracks(new []{
-    api.Score.Tracks[2], 
+    api.Score.Tracks[2],
     api.Score.Tracks[3]
 });
 ```
 </TabItem>
 <TabItem value="android">
-
 ```kotlin
 val api = AlphaTabApi<MyControl>(...)
 api.renderTracks(alphaTab.collections.List(
-    api.score.tracks[2], 
+    api.score.tracks[2],
     api.score.tracks[3]
 }
-
 ```
 </TabItem>
 </Tabs>
