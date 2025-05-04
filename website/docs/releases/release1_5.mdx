@@ -31,13 +31,209 @@ Supported for alphaTex and Guitar Pro.
     C4 D4 E4 F4 | r | r | C4 D4 E4 F4 | r | r | r | r |
 `}</AlphaTab>
 
+#### rendering: Coloring of individual notation elements
+https://github.com/CoderLine/alphaTab/pull/1936
+
+With this release we added a long requested feature to allow styling of individual notation elements.
+There is quite a list of individual items which might want to be colored and defining the colors accordingly
+can be tricky. If done wrong it can have a significant impact to rendering performance. 
+
+We think we solved this challenge and now you can color individual items of beats, bars etc. as you prefer. 
+
+This feature is useful when you want to color elements in lessons to give hints to the player what to pay attention to.
+
+[Learn more about this feature here](/docs/guides/coloring)
+
+import { ColoringExample } from '@site/src/components/ColoringExample';
+
+<ColoringExample />
+
+#### rendering: Score Info - Formatting templates 
+https://github.com/CoderLine/alphaTab/pull/2002
+
+Until this release the formatting of the score information like title and artist were hard-coded.
+Only the font size could be adjusted. 
+
+With alphaTab 1.5 you can now customize additional aspects like the displayed text and alignment of the items.
+Additionally we now display the contained copyright information of the file. For Guitar Pro we read the templates from the input files.
+
+[Learn more about this feature here](/docs/guides/formatting-templates)
+
+import { FormattingTemplateSample } from '@site/src/components/FormattingTemplateSample';
+
+<FormattingTemplateSample />
+
+#### rendering: Bar Line customizations
+https://github.com/CoderLine/alphaTab/pull/2031
+
+This feature was added as part of extending the MusicXML support but also has landed for alphaTex.
+It allows adjusting the bar lines for every individual bar. 
+
+<AlphaTab tex="true" tracks="all">{`
+\\instrument piano
+.
+\\track "Overlapping"
+    \\staff 
+        \\barlineleft dashed 
+        \\barlineright dotted 
+        | 
+        \\barlineleft heavyheavy
+        \\barlineright heavyheavy
+        
+    \\staff 
+        \\barlineleft lightlight 
+        \\barlineright lightheavy 
+        | 
+        \\barlineleft heavylight
+        \\barlineright dashed
+\\track "All Styles"
+    \\staff 
+        \\barlineright dashed |
+        \\barlineright dotted |
+        \\barlineright heavy |
+        \\barlineright heavyHeavy |
+        \\barlineright heavyLight |
+        \\barlineright lightHeavy |
+        \\barlineright lightlight |
+        \\barlineright none |
+        \\barlineright regular |
+        \\barlineright short |
+        \\barlineright tick |
+`}</AlphaTab>
+
+#### rendering: More Dynamic Values
+https://github.com/CoderLine/alphaTab/pull/2030
+
+This feature was added as part of extending the MusicXML support but also has landed for alphaTex.
+It extends the range of dynamic values to the full predefined range defined by [MusicXML](https://www.w3.org/2021/06/musicxml40/musicxml-reference/elements/dynamics/)
+
+<AlphaTab tex="true" tracks="all" player={true}>{`
+\\instrument piano
+.
+C4 {dy ffffff} C4 {dy mp}
+`}</AlphaTab>
+
+
+#### rendering: Different key signatures across staves
+https://github.com/CoderLine/alphaTab/pull/2034
+
+Up to this release alphaTab had the same restriction as Guitar Pro that key signatures had to be the same across all tracks and staves.
+In this release we allow now different key signatures on every staff and track. 
+
+<AlphaTab tex="true" tracks="all" player={true}>{`
+\\track T1
+  \\staff 
+    \\ks D
+    C4 D4 E4 F4
+  \\staff
+    \\clef F4
+    \\ks E
+    C3 D3 E3 F3
+\\track T2
+  \\staff 
+    \\ks C
+    C4 D4 E4 F4
+`}</AlphaTab>
+
+#### rendering: Use alphaSkia 3.x.135
+https://github.com/CoderLine/alphaTab/pull/2052
+
+We integrated alphaSkia 3.x.135 in alphaTab which brings a variety of improvements for C# and Kotlin rendering. 
+
+Highlights:
+
+* Underneath is upgrades Skia m120 to m135.
+* alphaSkia can now use font fallbacks on texts allowing to render special unicode fonts and emojis if fonts are registered and specified accordingly.
+* alphaSkia can now measure texts precisely (including the height) allowing more concise music sheets without overlaps on texts. 
+
+<img src="/img/release/v15/emojis.png" />
+
 ### Player
+
+### player: Allow Changing of output device
+https://github.com/CoderLine/alphaTab/pull/1924
+
+alphaTab exposes now an API to get a list of available output devices for playback and changing the used device. 
+If required by the platform the required permissions are requested.
+
+* On browsers it depends on a currently experimental API with only limited support. https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/setSinkId#browser_compatibility
+* On C# (Windows) it will load all system output devices via NAudio.
+* On Android it will request permissions and load all audio sinks. 
+
+New APIs:
+
+* [`enumerateOutputDevices`](/docs/reference/api/enumerateoutputdevices/)
+* [`setOutputDevice`](/docs/reference/api/enumerateoutputdevices/)
+* [`getOutputDevice`](/docs/reference/api/enumerateoutputdevices/)
 
 ### alphaTex Extensions
 
-### Guitar Pro Extensions
+### alphatex: Score Info - Formatting templates
+https://github.com/CoderLine/alphaTab/pull/2002
+
+Text templates and alignments for song info can be specified via alphaTex. 
+
+See [AlphaTex Metadata](/docs/alphatex/metadata).
+
+### alphatex: Bar Line customizations
+https://github.com/CoderLine/alphaTab/pull/2031
+
+The new barlines styles can also be activated via alphaTex.
+
+See [AlphaTex Bar Metadata](/docs/alphatex/bar-metadata#bar-lines).
+
+### alphatex: More Dynamic Values
+https://github.com/CoderLine/alphaTab/pull/2030
+
+The list of possible dynamic values (as defined by MusicXML) can also be specified in alphaTex.
+
+See [AlphaTex Beat Effects](/docs/alphatex/beat-effects#dynamics).
+
+### alphatex: Different key signatures across staves
+https://github.com/CoderLine/alphaTab/pull/2034
+
+The possiblity to define key signatures per staff / track is also available in alphaTex. 
+
+The `\ks` bar meta now only impacts the current bar not all.
 
 ### MusicXML Extensions
+
+### musicxml: Reimplemented Base Parser
+https://github.com/CoderLine/alphaTab/pull/1977
+
+This is one of the highlight features in this release. We reimplemented the whole base parser of MusicXML files ensuring
+we are following the specification accordingly. This rewrite brings improvements like:
+
+* We now support partwise and timewise files 
+* We respect aspects like `backup` and `forward` when writing multi staff and multi voice files.
+* We ensure `measure` tags result in the expected order across parts. 
+* We try to detect and fill the song information from a variety of tags (e.g. `credit` and `identification`)
+* We try to respect instrument details like midi programs, channels etc. closer.
+
+See [Music XML Compatibility](/docs/formats/musicxml) for more details on what we support.
+
+### musicxml: Read supported notation elements
+https://github.com/CoderLine/alphaTab/pull/1994
+
+On top of the new parser we aimed to increase the support of the music notation contained in MusicXML. 
+If alphaTab supports a certain music notation, we now fill it from MusicXML accordingly. 
+MusicXML supports a lot more than alphaTab does, so there is still a lot to do to have full support of the format. We hope to gradually extend alphaTab itself to support more music notation to eventually fill it from formats like MusicXML but also alphaTex.
+
+We still primarily focus on loading the **semantic** music notation information from MusicXML but have only sparse support for adjusting only visual or sound aspects. 
+e.g. we do not support yet aspects where elements are visually shifted in the layout or sizes are customized. 
+
+See [Music XML Compatibility](/docs/formats/musicxml) for more details on what we support.
+
+### musicxml: Percussion Support
+https://github.com/CoderLine/alphaTab/pull/2009
+
+Percussion in MusicXML needs special considerations in the data model and reading of the information. MusicXML uses the `unpitched` element in combination with `notehead` to define how 
+the notes are visually represented on the staff. Additionally the played midi key is separately defined (e.g. as `instrument`).
+
+We now use the information contained MusicXML files to show and play drums correctly. With this we added some general features to alphaTab which we plan to also bring for other formats:
+
+* Separation of displayed note from played note information.  
+* Customization of Note Heads
 
 ### Improvements & Bugfixes
 
@@ -51,3 +247,75 @@ With this fix the beat cursor should correctly move again in such scenarios.
 https://github.com/CoderLine/alphaTab/pull/1934
 
 When drawing scores at non 100%, the beat cursor was placed wrongly.
+
+#### tooling: Version and Environment Info
+https://github.com/CoderLine/alphaTab/pull/2015
+
+alphaTab has now a special API to print detailed information about the environment. With the new `alphaTab.Environment.printEnvironmentInfo()` all important details about the used version, browser, operating system etc. is printed to the console.
+And the info is printed always if the log level is increased to `debug`. 
+
+This should make it easier to provide the correct information about the platform when reporting bugs or asking questions.
+
+#### rendering: Wrong staff ID for numbered bar renderer
+https://github.com/CoderLine/alphaTab/pull/2057
+
+Internally the bar renderer for numbered notations was registered wrongly. In some scenarios this could lead to wrong placement of music notation (like ties).
+
+#### export: Wrong instrument articulations in Guitar Pro exported from alphaTex 
+https://github.com/CoderLine/alphaTab/pull/2058
+
+With the addition of percussion tabs in v1.4 we didn't consider correctly the export into Guitar Pro files. 
+We wrote wrong information about the instrument articulations defining details like the used note head, note placement and played midi key.
+
+This was fixed and exported files now show correct percussion tabs in Guitar Pro. 
+Unfortunately Guitar Pro is very sensitive to the used names for articulations and will not display the elements in the "Drumkit view".
+They already do not show all items of their own drumkit in the rendered staff. 
+
+### Infrastructure
+
+#### docs: Move reference documentation into code
+https://github.com/CoderLine/alphaTab/pull/1960
+
+We hope with this change keeping the reference docs up-to-date is a lot easier. Previously we were writing the docs for all APIs, settings and data model manually. 
+This had two problems:
+
+* The code documentation in the IDE was lacking information.
+* The website documentation was potentially out-of-date or incomplete. 
+
+With this item we moved all markdown docs into the code. At the same time we now generate the reference documentation from the compile output (TSDoc). 
+
+This has now following benefits and improvements to our docs:
+
+* All API properties and settings are guaranteed to be listed in the docs. 
+* We can now generate docs for all our classes, enums and interfaces we have, and we can cross reference to them in our docs. 
+
+Even if we have not advanced examples or full descriptions for the whole codebase, it helps checking what is be available. 
+We have plans to generally improve marking what docs are considered public (stable), low-level (stable but use at own risk), experimental (subject to change) or internal (not meant to be used by the public).
+
+#### tooling: Use Vite as bundler
+https://github.com/CoderLine/alphaTab/pull/1931
+
+We replaced Rollup with Vite as our bundler to build alphaTab. This brings us some benefits during development with the use of the Vite Dev Server allowing faster development (e.g. hot-reload and more incremental compilation).
+It makes our general builds a bit smaller due to some limitations in Vite but its worth the benefit when working on alphaTab itself. 
+
+#### tooling: Move from Prettier to Biome
+https://github.com/CoderLine/alphaTab/pull/2011
+
+We faced quite some issues with using Prettier as formatter for alphaTab due to its opinionated behaviors. These were not only problems on how things are formatted, but also on whether to format at all.
+The underlying `typescript-estree` project decided to add custom semantic checks on top of the TypeScript parser, and do not rely on what the TypeScript compiler offers.
+We have custom transformers and might write special code in TypeScript for the use in C# and Kotlin. While syntactically correct, we mute some parts via `@ts-ignore` or `@ts-expect-error` as we know it will be ultimately valid code in the output. 
+
+Unfortunately Prettier cannot format such semantically invalid (but syntactically valid) files because `typescript-estree` already throws an error while parsing the AST.  
+
+Hence we decided to move to Biome, as it:
+
+1. Offers a way to format files if they are considered invalid by their analyzer. 
+2. Offers also a linter in the same tooling and config (reducing problems with inconsistent checking across tools).
+
+This will become especially relevant when we'll move some runtime type implementations (e.g. Maps and Lists) into the TypeScript codebase instead of maintaining it per-language (C# / Kotlin).
+
+#### rendering: Change to OTF Fonts
+https://github.com/CoderLine/alphaTab/pull/2002
+
+Previously we were using TTF Fonts (like for Bravura or Noto) but it showed that it had some flaws in positioning. Wherever TTFs where used, we use now OTFs if they are available.
+This impacts mainly the .net and Android versions of alphaTab and our internal test setup.
