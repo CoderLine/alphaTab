@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { LineRangedGlyph } from '@src/rendering/glyphs/LineRangedGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 import { BarreShape } from '@src/model/BarreShape';
 
@@ -40,7 +40,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
                 break;
         }
 
-        barre += 'B ' + BeatBarreEffectInfo.toRoman(beat.barreFret);
+        barre += `B ${BeatBarreEffectInfo.toRoman(beat.barreFret)}`;
 
         return new LineRangedGlyph(barre, false);
     }
@@ -65,7 +65,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
         let str = '';
 
         if (num > 0) {
-            for (var [romanLetter, romanNumber] of BeatBarreEffectInfo.RomanLetters) {
+            for (const [romanLetter, romanNumber] of BeatBarreEffectInfo.RomanLetters) {
                 const q = Math.floor(num / romanNumber);
                 num -= q * romanNumber;
                 str += romanLetter.repeat(q);

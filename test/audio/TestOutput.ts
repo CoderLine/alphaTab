@@ -1,5 +1,5 @@
-import { ISynthOutput } from '@src/synth/ISynthOutput';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 
 export class TestOutput implements ISynthOutput {
     public samples: number[] = [];
@@ -58,4 +58,12 @@ export class TestOutput implements ISynthOutput {
      * Fired when the output needs more samples to be played.
      */
     readonly sampleRequest: IEventEmitter = new EventEmitter();
+
+    public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
+        return [] as ISynthOutputDevice[];
+    }
+    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
+    public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
+        return null;
+    }
 }

@@ -1,7 +1,7 @@
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Lyrics } from '@src/model/Lyrics';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
@@ -10,14 +10,14 @@ describe('LyricsTests', () => {
     async function loadLyricsTemplateFile(): Promise<Score> {
         const path: string = 'test-data/lyrics/template.gpx';
         const data = await TestPlatform.loadFile(path);
-        let buffer: ByteBuffer = ByteBuffer.fromBuffer(data);
-        let importer: GpxImporter = new GpxImporter();
+        const buffer: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const importer: GpxImporter = new GpxImporter();
         importer.init(buffer, new Settings());
         return importer.readScore();
     }
 
     function testLyrics(text: string, chunks: string[]): void {
-        let lyrics: Lyrics = new Lyrics();
+        const lyrics: Lyrics = new Lyrics();
         lyrics.text = text;
         lyrics.finish();
         expect(lyrics.chunks.join(',')).to.equal(chunks.join(','));

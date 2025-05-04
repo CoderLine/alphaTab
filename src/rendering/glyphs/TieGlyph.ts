@@ -1,9 +1,9 @@
-import { Beat } from '@src/model/Beat';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { Bounds } from '../utils/Bounds';
+import { Bounds } from '@src/rendering/utils/Bounds';
 
 export class TieGlyph extends Glyph {
     protected startBeat: Beat | null;
@@ -37,13 +37,13 @@ export class TieGlyph extends Glyph {
             return;
         }
 
-        let startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+        const startNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+            this.renderer.staff.staffId,
             this.startBeat!.voice.bar
         );
         this.startNoteRenderer = startNoteRenderer;
-        let endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-            this.renderer.staff.staveId,
+        const endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
+            this.renderer.staff.staffId,
             this.endBeat.voice.bar
         );
         this.endNoteRenderer = endNoteRenderer;
@@ -93,7 +93,8 @@ export class TieGlyph extends Glyph {
                 this._tieHeight = 0; // TODO: Bend slur height to be considered?
             } else {
                 this._tieHeight = this.getTieHeight(this._startX, this._startY, this._endX, this._endY);
-                this.height = TieGlyph.calculateActualTieHeight(
+
+                const tieBoundingBox = TieGlyph.calculateActualTieHeight(
                     1,
                     this._startX,
                     this._startY,
@@ -102,11 +103,19 @@ export class TieGlyph extends Glyph {
                     this.tieDirection === BeamDirection.Down,
                     this._tieHeight,
                     4
-                ).h;
-            }
+                );
 
-            if (this.tieDirection === BeamDirection.Up) {
-                this.y -= this.height;
+                this.height = tieBoundingBox.h;
+
+                if (this.tieDirection === BeamDirection.Up) {
+                    // the tie might go above `this.y` due to its shape
+                    // here we calculate how much this is so we can consider the
+                    // respective overflow
+                    const overlap = this.y - tieBoundingBox.y;
+                    if (overlap > 0) {
+                        this.y -= overlap;
+                    }
+                }
             }
         }
     }
@@ -258,7 +267,7 @@ export class TieGlyph extends Glyph {
         // normal vector
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;
-        let length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
         if (down) {
             normalVectorX *= -1;
         } else {
@@ -268,13 +277,13 @@ export class TieGlyph extends Glyph {
         normalVectorX /= length;
         normalVectorY /= length;
         // center of connection
-        let centerX: number = (x2 + x1) / 2;
-        let centerY: number = (y2 + y1) / 2;
+        const centerX: number = (x2 + x1) / 2;
+        const centerY: number = (y2 + y1) / 2;
         // control points
-        let cp1X: number = centerX + offset * normalVectorX;
-        let cp1Y: number = centerY + offset * normalVectorY;
-        let cp2X: number = centerX + (offset - size) * normalVectorX;
-        let cp2Y: number = centerY + (offset - size) * normalVectorY;
+        const cp1X: number = centerX + offset * normalVectorX;
+        const cp1Y: number = centerY + offset * normalVectorY;
+        const cp2X: number = centerX + (offset - size) * normalVectorX;
+        const cp2Y: number = centerY + (offset - size) * normalVectorY;
 
         return [x1, y1, cp1X, cp1Y, cp2X, cp2Y, x2, y2];
     }
@@ -329,7 +338,7 @@ export class TieGlyph extends Glyph {
     ): void {
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;
-        let length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
+        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
         if (down) {
             normalVectorX *= -1;
         } else {
@@ -340,22 +349,22 @@ export class TieGlyph extends Glyph {
         normalVectorY /= length;
         // center of connection
         // TODO: should be 1/3
-        let centerX: number = (x2 + x1) / 2;
-        let centerY: number = (y2 + y1) / 2;
+        const centerX: number = (x2 + x1) / 2;
+        const centerY: number = (y2 + y1) / 2;
         let offset: number = TieGlyph.BendSlurHeight * scale;
         if (x2 - x1 < 20) {
             offset /= 2;
         }
-        let cp1X: number = centerX + offset * normalVectorX;
-        let cp1Y: number = centerY + offset * normalVectorY;
+        const cp1X: number = centerX + offset * normalVectorX;
+        const cp1Y: number = centerY + offset * normalVectorY;
         canvas.beginPath();
         canvas.moveTo(x1, y1);
         canvas.lineTo(cp1X, cp1Y);
         canvas.lineTo(x2, y2);
         canvas.stroke();
         if (slurText) {
-            let w: number = canvas.measureText(slurText).width;
-            let textOffset: number = down ? 0 : -canvas.font.size;
+            const w: number = canvas.measureText(slurText).width;
+            const textOffset: number = down ? 0 : -canvas.font.size;
             canvas.fillText(slurText, cp1X - w / 2, cp1Y + textOffset);
         }
     }

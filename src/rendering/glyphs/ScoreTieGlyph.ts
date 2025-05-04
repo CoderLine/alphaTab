@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
@@ -17,7 +17,11 @@ export class ScoreTieGlyph extends TieGlyph {
     }
 
     protected override shouldDrawBendSlur() {
-        return this.renderer.settings.notation.extendBendArrowsOnTiedNotes && !!this.startNote.bendOrigin && this.startNote.isTieOrigin;
+        return (
+            this.renderer.settings.notation.extendBendArrowsOnTiedNotes &&
+            !!this.startNote.bendOrigin &&
+            this.startNote.isTieOrigin
+        );
     }
 
     public override doLayout(): void {

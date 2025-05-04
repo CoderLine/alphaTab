@@ -1,7 +1,7 @@
 /**@target web */
 import type * as webpackTypes from 'webpack';
 
-export { webpackTypes };
+export type { webpackTypes };
 
 export type webPackWithAlphaTab = {
     webpack: webpackTypes.Compiler['webpack'];
@@ -90,7 +90,7 @@ export function parseModuleUrl(parser: any, expr: Expression) {
     const [arg1, arg2] = newExpr.arguments;
     const callee = parser.evaluateExpression(newExpr.callee);
 
-    if (!callee.isIdentifier() || callee.identifier !== 'URL') {
+    if (!callee.isIdentifier() || !callee.identifier.includes('alphaTabUrl')) {
         return;
     }
 
@@ -106,9 +106,9 @@ export function getWorkerRuntime(
     cachedContextify: (s: string) => string,
     workerIndexMap: WeakMap<webpackTypes.ParserState, number>
 ): string {
-    let i = workerIndexMap.get(parser.state) || 0;
+    const i = workerIndexMap.get(parser.state) || 0;
     workerIndexMap.set(parser.state, i + 1);
-    let name = `${cachedContextify(parser.state.module.identifier())}|${i}`;
+    const name = `${cachedContextify(parser.state.module.identifier())}|${i}`;
     const hash = compilation.compiler.webpack.util.createHash(compilation.outputOptions.hashFunction!);
     hash.update(name);
     const digest = hash.digest(compilation.outputOptions.hashDigest) as string;

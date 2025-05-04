@@ -1,6 +1,8 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
+import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class RepeatCountGlyph extends Glyph {
     private _count: number = 0;
@@ -16,12 +18,18 @@ export class RepeatCountGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let res: RenderingResources = this.renderer.resources;
-        let oldAlign: TextAlign = canvas.textAlign;
+        using _ = ElementStyleHelper.bar(
+            canvas,
+            (this.renderer as LineBarRenderer).repeatsBarSubElement,
+            this.renderer.bar
+        );
+
+        const res: RenderingResources = this.renderer.resources;
+        const oldAlign: TextAlign = canvas.textAlign;
         canvas.font = res.barNumberFont;
         canvas.textAlign = TextAlign.Right;
-        let s: string = 'x' + this._count;
-        let w: number = canvas.measureText(s).width / 1.5;
+        const s: string = `x${this._count}`;
+        const w: number = canvas.measureText(s).width / 1.5;
         canvas.fillText(s, cx + this.x - w, cy + this.y);
         canvas.textAlign = oldAlign;
     }

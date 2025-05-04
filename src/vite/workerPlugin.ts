@@ -10,7 +10,6 @@
 // With https://github.com/vitejs/vite/pull/16422 integrated this custom code might not be needed anymore
 // Some adjustment for audio worklet in vite might be needed to treat them as type "module" workers
 
-
 // Original Sources Licensed under:
 
 // MIT License
@@ -34,7 +33,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from '@src/vite/AlphaTabVitePluginOptions';
 import {
     type ResolvedConfig,
     type Plugin,
@@ -47,9 +46,9 @@ import {
     AlphaTabWorkerTypes,
     WORKER_ASSET_ID,
     WORKER_FILE_ID
-} from './bridge';
-import {} from './bridge';
-import * as path from 'path';
+} from '@src/vite/bridge';
+import {} from '@src/vite/bridge';
+import * as path from 'node:path';
 import MagicString from 'magic-string';
 
 const workerFileRE = new RegExp(`(?:\\?|&)${WORKER_FILE_ID}&type=(\\w+)(?:&|$)`);
@@ -156,7 +155,6 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                     resolvedConfig.isWorker
                 );
 
-                let match: RegExpExecArray | null;
                 s = new MagicString(code);
                 workerAssetUrlRE.lastIndex = 0;
 
@@ -164,7 +162,8 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                 const workerMap = workerCache.get(resolvedConfig.mainConfig || resolvedConfig)!;
                 const { fileNameHash } = workerMap;
 
-                while ((match = workerAssetUrlRE.exec(code))) {
+                let match: RegExpExecArray | null = workerAssetUrlRE.exec(code);
+                while (match) {
                     const [full, hash] = match;
                     const filename = fileNameHash.get(hash)!;
                     const replacement = toOutputFilePathInJS(
@@ -180,6 +179,7 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                             ? JSON.stringify(encodeURIPath(replacement)).slice(1, -1)
                             : `"+${replacement.runtime}+"`;
                     s.update(match.index, match.index + full.length, replacementString);
+                    match = workerAssetUrlRE.exec(code);
                 }
             }
             return result();
@@ -190,7 +190,7 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                 return;
             }
             const workerMap = workerCache.get(resolvedConfig)!;
-            workerMap.assets.forEach(asset => {
+            for (const asset of workerMap.assets.values()) {
                 const duplicateAsset = bundle[asset.fileName];
                 if (duplicateAsset) {
                     const content = duplicateAsset.type === 'asset' ? duplicateAsset.source : duplicateAsset.code;
@@ -205,7 +205,7 @@ export function workerPlugin(options: AlphaTabVitePluginOptions): Plugin {
                     fileName: asset.fileName,
                     source: asset.source
                 });
-            });
+            }
             workerMap.assets.clear();
         }
     };

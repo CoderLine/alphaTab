@@ -5,9 +5,9 @@ export enum KeySignatureType {
     /**
      * Major
      */
-    Major,
+    Major = 0,
     /**
      * Minor
      */
-    Minor
+    Minor = 1
 }

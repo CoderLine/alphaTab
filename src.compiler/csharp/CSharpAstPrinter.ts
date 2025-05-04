@@ -1,13 +1,8 @@
 import * as cs from './CSharpAst';
 import * as ts from 'typescript';
-import CSharpEmitterContext from './CSharpEmitterContext';
 import AstPrinterBase from '../AstPrinterBase';
 
 export default class CSharpAstPrinter extends AstPrinterBase {
-    public constructor(sourceFile: cs.SourceFile, context: CSharpEmitterContext) {
-        super(sourceFile, context);
-    }
-
     private keywords: Set<string> = new Set<string>([
         'abstract',
         'as',
@@ -90,7 +85,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected override escapeIdentifier(identifier: string): string {
         if (this.keywords.has(identifier)) {
-            return '@' + identifier;
+            return `@${identifier}`;
         }
         return identifier;
     }
@@ -186,7 +181,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeLine();
         this.beginBlock();
 
-        d.members.forEach(m => this.writeMember(m));
+        for (const m of d.members) {
+            this.writeMember(m);
+        }
 
         this.endBlock();
     }
@@ -198,7 +195,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeLine();
         this.beginBlock();
 
-        d.members.forEach(m => this.writeEnumMember(m));
+        for (const m of d.members) {
+            this.writeEnumMember(m);
+        }
 
         this.endBlock();
     }
@@ -250,12 +249,12 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.beginBlock();
 
         let hasConstuctor = false;
-        d.members.forEach(m => {
+        for (const m of d.members) {
             this.writeMember(m);
             if (cs.isConstructorDeclaration(m) && !m.isStatic) {
                 hasConstuctor = true;
             }
-        });
+        }
 
         if (d.baseClass && !hasConstuctor) {
             let baseClass: cs.TypeReferenceType | undefined = d;
@@ -264,7 +263,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 if (typeof baseClass === 'string') {
                     constructorDeclaration = undefined;
                     break;
-                } else if (cs.isClassDeclaration(baseClass)) {
+                }
+
+                if (cs.isClassDeclaration(baseClass)) {
                     constructorDeclaration = baseClass.members.find(m =>
                         cs.isConstructorDeclaration(m)
                     ) as cs.ConstructorDeclaration;
@@ -359,6 +360,31 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeTypeParameterConstraints(d.typeParameters);
 
         this.writeBody(d.body);
+        this.writeLine();
+
+        if (this.isGetEnumerator(d)) {
+            this.write('System.Collections.Generic.IEnumerator<');
+            this.writeType((d.returnType as cs.TypeReference).typeArguments![0]);
+            this.write('> System.Collections.Generic.IEnumerable<');
+            this.writeType((d.returnType as cs.TypeReference).typeArguments![0]);
+            this.writeLine('>.GetEnumerator()');
+            this.beginBlock();
+            this.writeLine('return GetEnumerator();');
+            this.endBlock();
+            this.writeLine('System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() ');
+            this.beginBlock();
+            this.writeLine('return GetEnumerator();');
+            this.endBlock();
+        }
+    }
+
+    private isGetEnumerator(d: cs.MethodDeclaration) {
+        return (
+            d.name === 'GetEnumerator' &&
+            cs.isTypeReference(d.returnType) &&
+            d.returnType.typeArguments &&
+            d.returnType.typeArguments.length === 1
+        );
     }
 
     protected writeParameterDocumentation(d: cs.MethodDeclaration) {
@@ -504,7 +530,6 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                             this.write('struct');
                             break;
                         case cs.PrimitiveType.Object:
-                        case cs.PrimitiveType.Dynamic:
                         case cs.PrimitiveType.String:
                         case cs.PrimitiveType.Void:
                             this.write('class');
@@ -514,9 +539,6 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                     switch ((type as cs.PrimitiveTypeNode).type) {
                         case cs.PrimitiveType.Bool:
                             this.write('bool');
-                            break;
-                        case cs.PrimitiveType.Dynamic:
-                            this.write('dynamic');
                             break;
                         case cs.PrimitiveType.Double:
                             this.write('double');
@@ -568,22 +590,33 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 break;
             case cs.SyntaxKind.MapTypeNode:
                 const mapType = type as cs.MapTypeNode;
-                if (!mapType.valueIsValueType) {
-                    if (forNew) {
-                        this.write('AlphaTab.Collections.Map<');
-                    } else {
-                        this.write('AlphaTab.Collections.IMap<');
-                    }
+                if (!mapType.keyType && !mapType.valueType) {
+                    this.write('System.Collections.IDictionary');
                 } else {
-                    if (forNew) {
-                        this.write('AlphaTab.Collections.ValueTypeMap<');
+                    if (!mapType.valueIsValueType) {
+                        if (forNew) {
+                            this.write('AlphaTab.Collections.Map<');
+                        } else {
+                            this.write('AlphaTab.Collections.IMap<');
+                        }
                     } else {
-                        this.write('AlphaTab.Collections.IValueTypeMap<');
+                        if (forNew) {
+                            this.write('AlphaTab.Collections.ValueTypeMap<');
+                        } else {
+                            this.write('AlphaTab.Collections.IValueTypeMap<');
+                        }
                     }
+                    this.writeType(mapType.keyType!);
+                    this.write(', ');
+                    this.writeType(mapType.valueType!);
+                    this.write('>');
                 }
-                this.writeType(mapType.keyType);
-                this.write(', ');
-                this.writeType(mapType.valueType);
+
+                break;
+            case cs.SyntaxKind.ArrayTupleNode:
+                const arrayTupleType = type as cs.ArrayTupleNode;
+                this.write('AlphaTab.Core.ArrayTuple<');
+                this.writeCommaSeparated(arrayTupleType.types, p => this.writeType(p));
                 this.write('>');
                 break;
             case cs.SyntaxKind.FunctionTypeNode:
@@ -616,12 +649,19 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 let isAsyncVoid = false;
 
                 const targetType = (type as cs.TypeReference).reference;
+                let typeArguments = typeReference.typeArguments;
                 if (typeof targetType === 'string') {
-                    this.write(targetType);
+                    if (forNew && targetType === this._context.makeIterableType() && typeArguments) {
+                        this.writeType(typeArguments[0]);
+                        this.write('[]');
+                        typeArguments = undefined;
+                    } else {
+                        this.write(targetType);
+                    }
                 } else {
                     if (typeReference.isAsync) {
                         this.write('System.Threading.Tasks.Task');
-                        if (!cs.isPrimitiveTypeNode(targetType) || targetType.type != cs.PrimitiveType.Void) {
+                        if (!cs.isPrimitiveTypeNode(targetType) || targetType.type !== cs.PrimitiveType.Void) {
                             this.write('<');
                             this.writeType(targetType, forNew);
                         } else {
@@ -633,9 +673,9 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 }
 
                 if (!isAsyncVoid) {
-                    if (typeReference.typeArguments && typeReference.typeArguments.length > 0) {
+                    if (typeArguments && typeArguments.length > 0) {
                         this.write('<');
-                        this.writeCommaSeparated(typeReference.typeArguments, p => this.writeType(p));
+                        this.writeCommaSeparated(typeArguments, p => this.writeType(p));
                         this.write('>');
                     }
 
@@ -657,21 +697,24 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write(this._context.getFullName((type as cs.EnumMember).parent as cs.NamedTypeDeclaration));
                 break;
             default:
-                this.write('TODO: ' + cs.SyntaxKind[type.nodeType]);
+                this.write(`TODO: ${cs.SyntaxKind[type.nodeType]}`);
                 break;
         }
-        if ((type.isNullable) && !forNew && !forTypeConstraint) {
+        if (type.isNullable && !forNew && !forTypeConstraint) {
             this.write('?');
         }
     }
 
     protected writeTypeOfExpression(expr: cs.TypeOfExpression) {
         this.write('typeof');
+
+        this.write('(');
         if (expr.expression) {
-            this.write('(');
             this.writeExpression(expr.expression);
-            this.write(')');
+        } else if (expr.type) {
+            this.writeType(expr.type);
         }
+        this.write(')');
     }
 
     protected writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {
@@ -721,8 +764,8 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeStringTemplateExpression(expr: cs.StringTemplateExpression) {
         this.write('string.Format(System.Globalization.CultureInfo.InvariantCulture, @"');
-        let exprs: cs.Expression[] = [];
-        expr.chunks.forEach(c => {
+        const exprs: cs.Expression[] = [];
+        for (const c of expr.chunks) {
             if (cs.isStringLiteral(c)) {
                 const escapedText = c.text.replaceAll('"', '""').replaceAll('{', '{{').replaceAll('}', '}}');
                 this.write(escapedText);
@@ -730,12 +773,19 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                 this.write(`{${exprs.length}}`);
                 exprs.push(c as cs.Expression);
             }
-        });
+        }
         this.write('"');
-        exprs.forEach(expr => {
+        for (const expr of exprs) {
             this.write(', ');
-            this.writeExpression(expr);
-        });
+
+            if (cs.isStringLiteral(expr)) {
+                this.writeExpression(expr);
+            } else {
+                this.write('(');
+                this.writeExpression(expr);
+                this.write(').ToTemplate()');
+            }
+        }
         this.write(')');
     }
 
@@ -814,7 +864,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeNonNullExpression(expr: cs.NonNullExpression) {
         this.writeExpression(expr.expression);
-        if (!cs.isNonNullExpression(expr)) {
+        if (!cs.isNonNullExpression(expr.expression)) {
             this.write('!');
         }
     }
@@ -823,7 +873,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.write('catch (');
         this.writeType(c.variableDeclaration.type);
         this.write(' ');
-        this.write(c.variableDeclaration.name);
+        this.write(this.escapeIdentifier(c.variableDeclaration.name));
         this.writeLine(')');
         this.writeBlock(c.block);
     }
@@ -834,13 +884,13 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeLine(')');
         this.beginBlock();
 
-        s.caseClauses.forEach(c => {
+        for (const c of s.caseClauses) {
             if (cs.isDefaultClause(c)) {
                 this.writeDefaultClause(c);
             } else if (cs.isCaseClause(c)) {
                 this.writeCaseClause(c);
             }
-        });
+        }
 
         this.endBlock();
     }
@@ -850,14 +900,19 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeExpression(c.expression);
         this.writeLine(':');
         this._indent++;
-        c.statements.forEach(s => this.writeStatement(s));
+
+        for (const s of c.statements) {
+            this.writeStatement(s);
+        }
         this._indent--;
     }
 
     protected writeDefaultClause(c: cs.DefaultClause) {
         this.writeLine('default:');
         this._indent++;
-        c.statements.forEach(s => this.writeStatement(s));
+        for (const s of c.statements) {
+            this.writeStatement(s);
+        }
         this._indent--;
     }
 
@@ -944,11 +999,11 @@ export default class CSharpAstPrinter extends AstPrinterBase {
                     if (i > 0) {
                         this.write(', ');
                     }
-                    this.write(v);
+                    this.write(this.escapeIdentifier(v));
                 });
                 this.write(')');
             } else {
-                this.write(d.name);
+                this.write(this.escapeIdentifier(d.name));
             }
 
             if (d.initializer) {
@@ -960,11 +1015,30 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeBlock(b: cs.Block) {
         this.beginBlock();
-        b.statements.forEach(s => this.writeStatement(s));
+        for (const s of b.statements) {
+            this.writeStatement(s);
+        }
         this.endBlock();
     }
 
     protected writeUsing(using: cs.UsingDeclaration) {
         this.writeLine(`using ${using.namespaceOrTypeName};`);
+    }
+
+    protected writeLocalFunction(expr: cs.LocalFunctionDeclaration) {
+        this.writeType(expr.returnType);
+        this.write(` ${expr.name}`);
+        this.writeParameters(expr.parameters);
+        this.writeBlock(expr.body);
+    }
+
+    protected writeYieldExpression(expr: cs.YieldExpression) {
+        this.write('yield ');
+        if (expr.expression) {
+            this.write('return ');
+            this.writeExpression(expr.expression);
+        } else {
+            this.write('break');
+        }
     }
 }

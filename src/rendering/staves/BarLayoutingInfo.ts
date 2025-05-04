@@ -1,9 +1,9 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
 import { Spring } from '@src/rendering/staves/Spring';
 import { ModelUtils } from '@src/model/ModelUtils';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { GraceType } from '@src/model/GraceType';
 
 /**
@@ -16,11 +16,13 @@ export class BarLayoutingInfo {
     private static readonly MinDurationWidth: number = 7;
 
     private _timeSortedSprings: Spring[] = [];
-    private _xMin: number = 0;
     private _minTime: number = -1;
     private _onTimePositionsForce: number = 0;
     private _onTimePositions: Map<number, number> = new Map();
     private _incompleteGraceRodsWidth: number = 0;
+
+    // the smallest duration we have between two springs to ensure we have positive spring constants
+    private _minDuration: number = BarLayoutingInfo.MinDuration;
 
     /**
      * an internal version number that increments whenever a change was made.
@@ -43,14 +45,13 @@ export class BarLayoutingInfo {
             const groupId = beat.graceGroup!.id;
             const graceRod = this.allGraceRods.get(groupId)![beat.graceIndex];
             return graceRod.preBeatWidth;
-        } else {
-            const start: number = beat.absoluteDisplayStart;
-            if (!this.springs.has(start)) {
-                return 0;
-            }
-
-            return this.springs.get(start)!.preBeatWidth;
         }
+        const start: number = beat.absoluteDisplayStart;
+        if (!this.springs.has(start)) {
+            return 0;
+        }
+
+        return this.springs.get(start)!.preBeatWidth;
     }
 
     public getPostBeatSize(beat: Beat) {
@@ -58,14 +59,13 @@ export class BarLayoutingInfo {
             const groupId = beat.graceGroup!.id;
             const graceRod = this.allGraceRods.get(groupId)![beat.graceIndex];
             return graceRod.postSpringWidth;
-        } else {
-            const start: number = beat.absoluteDisplayStart;
-            if (!this.springs.has(start)) {
-                return 0;
-            }
-
-            return this.springs.get(start)!.postSpringWidth;
         }
+        const start: number = beat.absoluteDisplayStart;
+        if (!this.springs.has(start)) {
+            return 0;
+        }
+
+        return this.springs.get(start)!.postSpringWidth;
     }
 
     public incompleteGraceRods: Map<string, Spring[]> = new Map();
@@ -89,12 +89,16 @@ export class BarLayoutingInfo {
             // Gourlay defines that we need the smallest note duration that either starts **or continues** on the current spring.
             if (this._timeSortedSprings.length > 0) {
                 let smallestDuration: number = duration;
-                let previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
+                const previousSpring: Spring = this._timeSortedSprings[this._timeSortedSprings.length - 1];
                 for (const prevDuration of previousSpring.allDurations) {
-                    let end: number = previousSpring.timePosition + prevDuration;
+                    const end: number = previousSpring.timePosition + prevDuration;
                     if (end >= start && prevDuration < smallestDuration) {
                         smallestDuration = prevDuration;
                     }
+                }
+                //spring.smallestDuration = duration;
+                if (duration < this._minDuration) {
+                    this._minDuration = duration;
                 }
             }
             spring.longestDuration = duration;
@@ -102,7 +106,7 @@ export class BarLayoutingInfo {
             spring.graceBeatWidth = graceBeatWidth;
             spring.preBeatWidth = preBeatWidth;
             this.springs.set(start, spring);
-            let timeSorted: Spring[] = this._timeSortedSprings;
+            const timeSorted: Spring[] = this._timeSortedSprings;
             let insertPos: number = timeSorted.length - 1;
             while (insertPos > 0 && timeSorted[insertPos].timePosition > start) {
                 insertPos--;
@@ -134,7 +138,7 @@ export class BarLayoutingInfo {
     }
 
     public addBeatSpring(beat: Beat, preBeatSize: number, postBeatSize: number): void {
-        let start: number = beat.absoluteDisplayStart;
+        const start: number = beat.absoluteDisplayStart;
         if (beat.graceType !== GraceType.None) {
             // For grace beats we just remember the the sizes required for them
             // these sizes are then considered when the target beat is added.
@@ -149,7 +153,7 @@ export class BarLayoutingInfo {
                 this.incompleteGraceRods.set(groupId, new Array<Spring>(beat.graceGroup!.beats.length));
             }
 
-            let existingSpring = this.allGraceRods.get(groupId)![beat.graceIndex];
+            const existingSpring = this.allGraceRods.get(groupId)![beat.graceIndex];
             if (existingSpring) {
                 if (existingSpring.postSpringWidth < postBeatSize) {
                     existingSpring.postSpringWidth = postBeatSize;
@@ -203,27 +207,20 @@ export class BarLayoutingInfo {
     }
 
     private calculateSpringConstants(): void {
-        this._xMin = 0;
-        let springs: Map<number, Spring> = this.springs;
-        for (const spring of springs.values()) {
-            if (spring.springWidth < this._xMin) {
-                this._xMin = spring.springWidth;
-            }
-        }
         let totalSpringConstant: number = 0;
-        let sortedSprings: Spring[] = this._timeSortedSprings;
+        const sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {
             this.totalSpringConstant = -1;
             this.minStretchForce = -1;
             return;
         }
         for (let i: number = 0; i < sortedSprings.length; i++) {
-            let currentSpring: Spring = sortedSprings[i];
+            const currentSpring: Spring = sortedSprings[i];
             let duration: number = 0;
             if (i === sortedSprings.length - 1) {
                 duration = currentSpring.longestDuration;
             } else {
-                let nextSpring: Spring = sortedSprings[i + 1];
+                const nextSpring: Spring = sortedSprings[i + 1];
                 duration = Math.abs(nextSpring.timePosition - currentSpring.timePosition);
             }
             currentSpring.springConstant = this.calculateSpringConstant(currentSpring, duration);
@@ -238,13 +235,13 @@ export class BarLayoutingInfo {
         // reserves enough space
 
         for (let i: number = 0; i < sortedSprings.length; i++) {
-            let currentSpring = sortedSprings[i];
+            const currentSpring = sortedSprings[i];
             let requiredSpace = 0;
 
             if (i === sortedSprings.length - 1) {
                 requiredSpace = currentSpring.postSpringWidth;
             } else {
-                let nextSpring = sortedSprings[i + 1];
+                const nextSpring = sortedSprings[i + 1];
                 requiredSpace = currentSpring.postSpringWidth + nextSpring.preSpringWidth;
             }
 
@@ -254,7 +251,7 @@ export class BarLayoutingInfo {
                 requiredSpace += currentSpring.preSpringWidth;
             }
 
-            let requiredSpaceForce = requiredSpace * currentSpring.springConstant;
+            const requiredSpaceForce = requiredSpace * currentSpring.springConstant;
             this.updateMinStretchForce(requiredSpaceForce);
         }
     }
@@ -303,14 +300,18 @@ export class BarLayoutingInfo {
 
     private calculateSpringConstant(spring: Spring, duration: number): number {
         if (duration <= 0) {
-            duration = MidiUtils.toTicks(Duration.SixtyFourth);
+            duration = MidiUtils.toTicks(Duration.TwoHundredFiftySixth);
         }
         if (spring.smallestDuration === 0) {
             spring.smallestDuration = duration;
         }
-        let minDuration: number = spring.smallestDuration;
-        let phi: number = 1 + 0.85 * Math.log2(duration / BarLayoutingInfo.MinDuration);
-        return (minDuration / duration) * (1 / (phi * BarLayoutingInfo.MinDurationWidth));
+        const smallestDuration: number = spring.smallestDuration;
+
+        const minDuration = this._minDuration;
+        const minDurationWidth = BarLayoutingInfo.MinDurationWidth;
+
+        const phi: number = 1 + 0.85 * Math.log2(duration / minDuration);
+        return (smallestDuration / duration) * (1 / (phi * minDurationWidth));
     }
 
     public spaceToForce(space: number): number {
@@ -349,9 +350,9 @@ export class BarLayoutingInfo {
             return this._onTimePositions;
         }
         this._onTimePositionsForce = force;
-        let positions: Map<number, number> = new Map<number, number>();
+        const positions: Map<number, number> = new Map<number, number>();
         this._onTimePositions = positions;
-        let sortedSprings: Spring[] = this._timeSortedSprings;
+        const sortedSprings: Spring[] = this._timeSortedSprings;
         if (sortedSprings.length === 0) {
             return positions;
         }

@@ -1,18 +1,19 @@
-import { AlphaTabApiBase } from "@src/AlphaTabApiBase";
-import { EventEmitter, EventEmitterOfT, IEventEmitter, IEventEmitterOfT } from "@src/EventEmitter";
-import { Settings } from "@src/Settings";
-import { ScoreLoader } from "@src/importer";
-import { Score } from "@src/model";
-import { Cursors } from "@src/platform/Cursors";
-import { IContainer } from "@src/platform/IContainer";
-import { IMouseEventArgs } from "@src/platform/IMouseEventArgs";
-import { IUiFacade } from "@src/platform/IUiFacade";
-import { Bounds, IScoreRenderer, RenderFinishedEventArgs } from "@src/rendering";
-import { IAlphaSynth } from "@src/synth";
-import { TestPlatform } from "@test/TestPlatform";
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
+import { Settings } from '@src/Settings';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import { Score } from '@src/model/Score';
+import type { Cursors } from '@src/platform/Cursors';
+import type { IContainer } from '@src/platform/IContainer';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IUiFacade } from '@src/platform/IUiFacade';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import { Bounds } from '@src/rendering/utils/Bounds';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import { TestPlatform } from '@test/TestPlatform';
 
 class TestUiContainer implements IContainer {
-
     private _width: number = 0;
     private _height: number = 0;
 
@@ -28,7 +29,7 @@ class TestUiContainer implements IContainer {
     }
 
     public set width(value: number) {
-        if (value != this._width) {
+        if (value !== this._width) {
             this._width = value;
             (this.resize as EventEmitter).trigger();
         }
@@ -39,7 +40,7 @@ class TestUiContainer implements IContainer {
     }
 
     public set height(value: number) {
-        if (value != this._height) {
+        if (value !== this._height) {
             this._height = value;
             (this.resize as EventEmitter).trigger();
         }
@@ -58,29 +59,28 @@ class TestUiContainer implements IContainer {
     }
 
     public removeChild(child: TestUiContainer) {
-        this.childNodes = this.childNodes.filter(i => i != child);
+        this.childNodes = this.childNodes.filter(i => i !== child);
     }
 
     public appendChild(child: IContainer) {
         this.childNodes.push(child as TestUiContainer);
     }
 
-    public stopAnimation() {
-    }
+    public stopAnimation() {}
 
     protected lastBounds: Bounds = new Bounds();
 
     public setBounds(x: number, y: number, w: number, h: number): void {
-        if (isNaN(x)) {
+        if (Number.isNaN(x)) {
             x = this.lastBounds.x;
         }
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.lastBounds.y;
         }
-        if (isNaN(w)) {
+        if (Number.isNaN(w)) {
             w = this.lastBounds.w;
         }
-        if (isNaN(h)) {
+        if (Number.isNaN(h)) {
             h = this.lastBounds.h;
         }
         this.left = x;
@@ -90,7 +90,7 @@ class TestUiContainer implements IContainer {
     }
 
     public transitionToX(_duration: number, x: number): void {
-        this.setBounds(x, NaN, NaN, NaN);
+        this.setBounds(x, Number.NaN, Number.NaN, Number.NaN);
     }
 
     public clear(): void {
@@ -132,14 +132,18 @@ export class TestUiFacade implements IUiFacade<unknown> {
         api.settings = settings;
     }
 
-    public destroy(): void {
-    }
+    public destroy(): void {}
 
     public createCanvasElement(): IContainer {
         return new TestUiContainer();
     }
 
-    public triggerEvent(container: IContainer, eventName: string, details: unknown, originalEvent?: IMouseEventArgs): void {
+    public triggerEvent(
+        container: IContainer,
+        eventName: string,
+        details: unknown,
+        originalEvent?: IMouseEventArgs
+    ): void {
         // nothing to do
     }
 
@@ -156,7 +160,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
     }
 
     public beginAppendRenderResults(renderResult: RenderFinishedEventArgs | null): void {
-        const canvasElement: TestUiContainer = (this._api.canvasElement as TestUiContainer);
+        const canvasElement: TestUiContainer = this._api.canvasElement as TestUiContainer;
 
         // null result indicates that the rendering finished
         if (!renderResult) {
@@ -205,18 +209,15 @@ export class TestUiFacade implements IUiFacade<unknown> {
         return null;
     }
 
-    public destroyCursors(): void {
-    }
+    public destroyCursors(): void {}
 
     public beginInvoke(action: () => void): void {
         setImmediate(action);
     }
 
-    public removeHighlights(): void {
-    }
+    public removeHighlights(): void {}
 
-    public highlightElements(groupId: string, masterBarIndex: number): void {
-    }
+    public highlightElements(groupId: string, masterBarIndex: number): void {}
 
     public createSelectionElement(): IContainer | null {
         return null;
@@ -227,24 +228,23 @@ export class TestUiFacade implements IUiFacade<unknown> {
     }
 
     public getOffset(scrollContainer: IContainer | null, container: IContainer): Bounds {
-        let element = container as TestUiContainer;
+        const element = container as TestUiContainer;
 
         let top: number = element.top;
         let left: number = element.left;
         if (scrollContainer) {
-            let scrollElement = scrollContainer as TestUiContainer;
-            let scrollElementOffset = this.getOffset(null, scrollContainer);
+            const scrollElement = scrollContainer as TestUiContainer;
+            const scrollElementOffset = this.getOffset(null, scrollContainer);
             top = top + scrollElement.scrollTop - scrollElementOffset.y;
             left = left + scrollElement.scrollLeft - scrollElementOffset.x;
         }
 
-        let b = new Bounds();
+        const b = new Bounds();
         b.x = left;
         b.y = top;
         b.w = element.width;
         b.h = element.height;
         return b;
-
     }
 
     public scrollToY(scrollElement: IContainer, offset: number, speed: number): void {
@@ -261,7 +261,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
             return true;
         }
         if (data instanceof ArrayBuffer) {
-            let byteArray: Uint8Array = new Uint8Array(data as ArrayBuffer);
+            const byteArray: Uint8Array = new Uint8Array(data as ArrayBuffer);
             success(ScoreLoader.loadScoreFromBytes(byteArray, this._api.settings));
             return true;
         }
@@ -272,7 +272,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
         if (typeof data === 'string') {
             TestPlatform.loadFile(data)
                 .then(x => {
-                    success(ScoreLoader.loadScoreFromBytes(x))
+                    success(ScoreLoader.loadScoreFromBytes(x));
                 })
                 .catch(error);
             return true;

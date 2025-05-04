@@ -1,4 +1,4 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 
 /**
  * Represents a beat and when it is actually played according to the generated audio.
@@ -14,10 +14,7 @@ export class BeatTickLookupItem {
      */
     public readonly playbackStart: number;
 
-    public constructor(
-        beat: Beat,
-        playbackStart: number
-    ) {
+    public constructor(beat: Beat, playbackStart: number) {
         this.beat = beat;
         this.playbackStart = playbackStart;
     }
@@ -41,7 +38,7 @@ export class BeatTickLookup {
 
     /**
      * Gets or sets a list of all beats that should be highlighted when
-     * the beat of this lookup starts playing. This might not mean 
+     * the beat of this lookup starts playing. This might not mean
      * the beats start at this position.
      */
     public highlightedBeats: BeatTickLookupItem[] = [];
@@ -91,7 +88,7 @@ export class BeatTickLookup {
      */
     public getVisibleBeatAtStart(visibleTracks: Set<number>): Beat | null {
         for (const b of this.highlightedBeats) {
-            if (b.playbackStart == this.start && visibleTracks.has(b.beat.voice.bar.staff.track.index)) {
+            if (b.playbackStart === this.start && visibleTracks.has(b.beat.voice.bar.staff.track.index)) {
                 return b.beat;
             }
         }

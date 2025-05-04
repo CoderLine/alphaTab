@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using AlphaTab.Collections;
-using AlphaTab.Core.EcmaScript;
 using AlphaTab.Midi;
 using AlphaTab.Synth;
 
@@ -9,19 +8,20 @@ namespace AlphaTab.Platform.CSharp;
 
 internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
 {
-    private readonly ISynthOutput _output;
     private LogLevel _logLevel;
-    private double _bufferTimeInMilliseconds;
+    private readonly double _bufferTimeInMilliseconds;
 
-    protected AlphaSynth Player;
+    private AlphaSynth _player;
 
     protected AlphaSynthWorkerApiBase(ISynthOutput output, LogLevel logLevel, double bufferTimeInMilliseconds)
     {
-        _output = output;
+        Output = output;
         _logLevel = logLevel;
         _bufferTimeInMilliseconds = bufferTimeInMilliseconds;
-        Player = null!;
+        _player = null!;
     }
+
+    public ISynthOutput Output { get; }
 
     public abstract void Destroy();
     protected abstract void DispatchOnUiThread(Action action);
@@ -29,25 +29,25 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
 
     protected void Initialize()
     {
-        Player = new AlphaSynth(_output, _bufferTimeInMilliseconds);
-        Player.PositionChanged.On(OnPositionChanged);
-        Player.StateChanged.On(OnStateChanged);
-        Player.Finished.On(OnFinished);
-        Player.SoundFontLoaded.On(OnSoundFontLoaded);
-        Player.SoundFontLoadFailed.On(OnSoundFontLoadFailed);
-        Player.MidiLoaded.On(OnMidiLoaded);
-        Player.MidiLoadFailed.On(OnMidiLoadFailed);
-        Player.ReadyForPlayback.On(OnReadyForPlayback);
-        Player.MidiEventsPlayed.On(OnMidiEventsPlayed);
-        Player.PlaybackRangeChanged.On(OnPlaybackRangeChanged);
+        _player = new AlphaSynth(Output, _bufferTimeInMilliseconds);
+        _player.PositionChanged.On(OnPositionChanged);
+        _player.StateChanged.On(OnStateChanged);
+        _player.Finished.On(OnFinished);
+        _player.SoundFontLoaded.On(OnSoundFontLoaded);
+        _player.SoundFontLoadFailed.On(OnSoundFontLoadFailed);
+        _player.MidiLoaded.On(OnMidiLoaded);
+        _player.MidiLoadFailed.On(OnMidiLoadFailed);
+        _player.ReadyForPlayback.On(OnReadyForPlayback);
+        _player.MidiEventsPlayed.On(OnMidiEventsPlayed);
+        _player.PlaybackRangeChanged.On(OnPlaybackRangeChanged);
 
         DispatchOnUiThread(OnReady);
     }
 
-    public bool IsReady => Player.IsReady;
-    public bool IsReadyForPlayback => Player.IsReadyForPlayback;
+    public bool IsReady => _player.IsReady;
+    public bool IsReadyForPlayback => _player.IsReadyForPlayback;
 
-    public PlayerState State => Player == null ? PlayerState.Paused : Player.State;
+    public PlayerState State => _player == null ? PlayerState.Paused : _player.State;
 
     public LogLevel LogLevel
     {
@@ -55,62 +55,62 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
         set
         {
             _logLevel = value;
-            DispatchOnWorkerThread(() => { Player.LogLevel = value; });
+            DispatchOnWorkerThread(() => { _player.LogLevel = value; });
         }
     }
 
     public double MasterVolume
     {
-        get => Player.MasterVolume;
-        set => DispatchOnWorkerThread(() => { Player.MasterVolume = value; });
+        get => _player.MasterVolume;
+        set => DispatchOnWorkerThread(() => { _player.MasterVolume = value; });
     }
 
     public double CountInVolume
     {
-        get => Player.CountInVolume;
-        set => DispatchOnWorkerThread(() => { Player.CountInVolume = value; });
+        get => _player.CountInVolume;
+        set => DispatchOnWorkerThread(() => { _player.CountInVolume = value; });
     }
 
     public IList<MidiEventType> MidiEventsPlayedFilter
     {
-        get => Player.MidiEventsPlayedFilter;
-        set => DispatchOnWorkerThread(() => { Player.MidiEventsPlayedFilter = value; });
+        get => _player.MidiEventsPlayedFilter;
+        set => DispatchOnWorkerThread(() => { _player.MidiEventsPlayedFilter = value; });
     }
 
     public double MetronomeVolume
     {
-        get => Player.MetronomeVolume;
-        set => DispatchOnWorkerThread(() => { Player.MetronomeVolume = value; });
+        get => _player.MetronomeVolume;
+        set => DispatchOnWorkerThread(() => { _player.MetronomeVolume = value; });
     }
 
     public double PlaybackSpeed
     {
-        get => Player.PlaybackSpeed;
-        set => DispatchOnWorkerThread(() => { Player.PlaybackSpeed = value; });
+        get => _player.PlaybackSpeed;
+        set => DispatchOnWorkerThread(() => { _player.PlaybackSpeed = value; });
     }
 
     public double TickPosition
     {
-        get => Player.TickPosition;
-        set => DispatchOnWorkerThread(() => { Player.TickPosition = value; });
+        get => _player.TickPosition;
+        set => DispatchOnWorkerThread(() => { _player.TickPosition = value; });
     }
 
     public double TimePosition
     {
-        get => Player.TimePosition;
-        set => DispatchOnWorkerThread(() => { Player.TimePosition = value; });
+        get => _player.TimePosition;
+        set => DispatchOnWorkerThread(() => { _player.TimePosition = value; });
     }
 
     public PlaybackRange? PlaybackRange
     {
-        get => Player.PlaybackRange;
-        set => DispatchOnWorkerThread(() => { Player.PlaybackRange = value; });
+        get => _player.PlaybackRange;
+        set => DispatchOnWorkerThread(() => { _player.PlaybackRange = value; });
     }
 
     public bool IsLooping
     {
-        get => Player.IsLooping;
-        set => DispatchOnWorkerThread(() => { Player.IsLooping = value; });
+        get => _player.IsLooping;
+        set => DispatchOnWorkerThread(() => { _player.IsLooping = value; });
     }
 
     public bool Play()
@@ -120,73 +120,73 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
             return false;
         }
 
-        DispatchOnWorkerThread(() => { Player.Play(); });
+        DispatchOnWorkerThread(() => { _player.Play(); });
         return true;
     }
 
     public void Pause()
     {
-        DispatchOnWorkerThread(() => { Player.Pause(); });
+        DispatchOnWorkerThread(() => { _player.Pause(); });
     }
 
     public void PlayOneTimeMidiFile(MidiFile midiFile)
     {
-        DispatchOnWorkerThread(() => { Player.PlayOneTimeMidiFile(midiFile); });
+        DispatchOnWorkerThread(() => { _player.PlayOneTimeMidiFile(midiFile); });
     }
 
     public void PlayPause()
     {
-        DispatchOnWorkerThread(() => { Player.PlayPause(); });
+        DispatchOnWorkerThread(() => { _player.PlayPause(); });
     }
 
     public void Stop()
     {
-        DispatchOnWorkerThread(() => { Player.Stop(); });
+        DispatchOnWorkerThread(() => { _player.Stop(); });
     }
 
     public void ResetSoundFonts()
     {
-        DispatchOnWorkerThread(() => { Player.ResetSoundFonts(); });
+        DispatchOnWorkerThread(() => { _player.ResetSoundFonts(); });
     }
 
     public void LoadSoundFont(Uint8Array data, bool append)
     {
-        DispatchOnWorkerThread(() => { Player.LoadSoundFont(data, append); });
+        DispatchOnWorkerThread(() => { _player.LoadSoundFont(data, append); });
     }
 
     public void LoadMidiFile(MidiFile midi)
     {
-        DispatchOnWorkerThread(() => { Player.LoadMidiFile(midi); });
+        DispatchOnWorkerThread(() => { _player.LoadMidiFile(midi); });
     }
 
     public void ApplyTranspositionPitches(IValueTypeMap<double, double> transpositionPitches)
     {
-        DispatchOnWorkerThread(() => { Player.ApplyTranspositionPitches(transpositionPitches); });
+        DispatchOnWorkerThread(() => { _player.ApplyTranspositionPitches(transpositionPitches); });
     }
 
     public void SetChannelMute(double channel, bool mute)
     {
-        DispatchOnWorkerThread(() => { Player.SetChannelMute(channel, mute); });
+        DispatchOnWorkerThread(() => { _player.SetChannelMute(channel, mute); });
     }
 
     public void ResetChannelStates()
     {
-        DispatchOnWorkerThread(() => { Player.ResetChannelStates(); });
+        DispatchOnWorkerThread(() => { _player.ResetChannelStates(); });
     }
 
     public void SetChannelSolo(double channel, bool solo)
     {
-        DispatchOnWorkerThread(() => { Player.SetChannelSolo(channel, solo); });
+        DispatchOnWorkerThread(() => { _player.SetChannelSolo(channel, solo); });
     }
 
     public void SetChannelVolume(double channel, double volume)
     {
-        DispatchOnWorkerThread(() => { Player.SetChannelVolume(channel, volume); });
+        DispatchOnWorkerThread(() => { _player.SetChannelVolume(channel, volume); });
     }
 
     public void SetChannelTranspositionPitch(double channel, double semitones)
     {
-        DispatchOnWorkerThread(() => { Player.SetChannelTranspositionPitch(channel, semitones); });
+        DispatchOnWorkerThread(() => { _player.SetChannelTranspositionPitch(channel, semitones); });
     }
 
     public IEventEmitter Ready { get; } = new EventEmitter();

@@ -11,7 +11,7 @@ export class CoreSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => CoreSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: CoreSettings | null): Map<string, unknown> | null {
         if (!obj) {
@@ -55,7 +55,7 @@ export class CoreSettingsSerializer {
                 return true;
             /*@target web*/
             case "tracks":
-                obj.tracks = v! as number | number[] | "all" | null;
+                obj.tracks = v as number | number[] | "all" | null;
                 return true;
             case "enablelazyloading":
                 obj.enableLazyLoading = v! as boolean;

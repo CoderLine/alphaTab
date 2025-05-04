@@ -14,7 +14,7 @@ export class RenderStylesheetSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => RenderStylesheetSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: RenderStylesheet | null): Map<string, unknown> | null {
         if (!obj) {
@@ -46,6 +46,14 @@ export class RenderStylesheetSerializer {
         o.set("othersystemstracknamemode", obj.otherSystemsTrackNameMode as number);
         o.set("firstsystemtracknameorientation", obj.firstSystemTrackNameOrientation as number);
         o.set("othersystemstracknameorientation", obj.otherSystemsTrackNameOrientation as number);
+        o.set("multitrackmultibarrest", obj.multiTrackMultiBarRest);
+        if (obj.perTrackMultiBarRest !== null) {
+            const a: number[] = [];
+            o.set("pertrackmultibarrest", a);
+            for (const v of obj.perTrackMultiBarRest!) {
+                a.push(v);
+            }
+        }
         return o;
     }
     public static setProperty(obj: RenderStylesheet, property: string, v: unknown): boolean {
@@ -65,7 +73,7 @@ export class RenderStylesheetSerializer {
             case "pertrackdisplaytuning":
                 obj.perTrackDisplayTuning = new Map<number, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackDisplayTuning!.set(parseInt(k), v as boolean);
+                    obj.perTrackDisplayTuning!.set(Number.parseInt(k), v as boolean);
                 });
                 return true;
             case "globaldisplaychorddiagramsontop":
@@ -74,7 +82,7 @@ export class RenderStylesheetSerializer {
             case "pertrackchorddiagramsontop":
                 obj.perTrackChordDiagramsOnTop = new Map<number, boolean>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.perTrackChordDiagramsOnTop!.set(parseInt(k), v as boolean);
+                    obj.perTrackChordDiagramsOnTop!.set(Number.parseInt(k), v as boolean);
                 });
                 return true;
             case "singletracktracknamepolicy":
@@ -94,6 +102,12 @@ export class RenderStylesheetSerializer {
                 return true;
             case "othersystemstracknameorientation":
                 obj.otherSystemsTrackNameOrientation = JsonHelper.parseEnum<TrackNameOrientation>(v, TrackNameOrientation)!;
+                return true;
+            case "multitrackmultibarrest":
+                obj.multiTrackMultiBarRest = v! as boolean;
+                return true;
+            case "pertrackmultibarrest":
+                obj.perTrackMultiBarRest = new Set<number>(v as number[]);
                 return true;
         }
         return false;

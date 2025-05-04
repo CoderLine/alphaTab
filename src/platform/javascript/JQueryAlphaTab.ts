@@ -1,12 +1,12 @@
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
-import { PlayerState } from '@src/synth/PlayerState';
-import { Score } from '@src/model/Score';
-import { Track } from '@src/model/Track';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { PlayerState } from '@src/synth/PlayerState';
+import type { Score } from '@src/model/Score';
+import type { Track } from '@src/model/Track';
 import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { Settings } from '@src/Settings';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
-import { MidiEventType } from '@src/midi/MidiEvent';
+import type { MidiEventType } from '@src/midi/MidiEvent';
 
 /**
  * @target web
@@ -30,6 +30,7 @@ export declare class jQuery extends Array<HTMLElement> {
 
 /**
  * @target web
+ * @deprecated Migrate to {@link AlphaTabApi}.
  */
 export class JQueryAlphaTab {
     public exec(element: HTMLElement, method: string, args: any[]): unknown {
@@ -40,29 +41,29 @@ export class JQueryAlphaTab {
         if (method.charCodeAt(0) === 95 || method === 'exec') {
             return null;
         }
-        let jElement: jQuery = new jQuery(element);
-        let context: AlphaTabApi = jElement.data('alphaTab') as AlphaTabApi;
+        const jElement: jQuery = new jQuery(element);
+        const context: AlphaTabApi = jElement.data('alphaTab') as AlphaTabApi;
         if (method === 'destroy' && !context) {
             return null;
         }
         if (method !== 'init' && !context) {
             throw new Error('alphaTab not initialized');
         }
-        let apiMethod: Function = (this as any)[method];
+        // biome-ignore lint/complexity/noBannedTypes: Special use within jQuery plugin
+        const apiMethod: Function = (this as any)[method];
         if (apiMethod) {
-            let realArgs: string[] = ([jElement, context] as any[]).concat(args);
+            const realArgs: string[] = ([jElement, context] as any[]).concat(args);
             return apiMethod.apply(this, realArgs);
-        } else {
-            Logger.error('Api', "Method '" + method + "' does not exist on jQuery.alphaTab");
-            return null;
         }
+        Logger.error('Api', `Method '${method}' does not exist on jQuery.alphaTab`);
+        return null;
     }
 
     public init(element: jQuery, context: AlphaTabApi, options: any): void {
         if (!context) {
             context = new AlphaTabApi(element[0], options);
             element.data('alphaTab', context);
-            for (let listener of this._initListeners) {
+            for (const listener of this._initListeners) {
                 listener(element, context, options);
             }
         }
@@ -174,7 +175,11 @@ export class JQueryAlphaTab {
         return context.countInVolume;
     }
 
-    public midiEventsPlayedFilter(element: jQuery, context: AlphaTabApi, midiEventsPlayedFilter?: MidiEventType[]): MidiEventType[] {
+    public midiEventsPlayedFilter(
+        element: jQuery,
+        context: AlphaTabApi,
+        midiEventsPlayedFilter?: MidiEventType[]
+    ): MidiEventType[] {
         if (Array.isArray(midiEventsPlayedFilter)) {
             context.midiEventsPlayedFilter = midiEventsPlayedFilter;
         }

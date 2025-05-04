@@ -4,7 +4,7 @@ import { ImporterSettings } from '@src/ImporterSettings';
 import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
 import { PlayerSettings } from '@src/PlayerSettings';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
-import { SettingsJson } from './generated/SettingsJson';
+import type { SettingsJson } from '@src/generated/SettingsJson';
 
 /**
  * This public class contains instance specific settings for alphaTab
@@ -44,7 +44,7 @@ export class Settings {
      * Contains all player related settings
      * @json_partial_names
      */
-    public player: PlayerSettings = new PlayerSettings();
+    public readonly player: PlayerSettings = new PlayerSettings();
 
     public setSongBookModeSettings(): void {
         this.notation.notationMode = NotationMode.SongBook;
@@ -57,7 +57,7 @@ export class Settings {
     }
 
     public static get songBook(): Settings {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.setSongBookModeSettings();
         return settings;
     }

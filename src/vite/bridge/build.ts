@@ -2,21 +2,23 @@
 
 // index.ts for more details on contents and license of this file
 
-import { MinimalPluginContext, PluginContext, type InternalModuleFormat } from 'rollup';
-import { joinUrlSegments, partialEncodeURIPath } from './utils';
-import * as path from 'path';
-import { ResolvedConfig } from './config';
-import { BuildEnvironment, Plugin } from 'vite';
-import { RollupPluginHooks } from './typeUtils';
-import { ROLLUP_HOOKS } from './constants';
-import { getHookHandler } from './plugins';
+import type { MinimalPluginContext, PluginContext, InternalModuleFormat } from 'rollup';
+import { joinUrlSegments, partialEncodeURIPath } from '@src/vite/bridge/utils';
+import * as path from 'node:path';
+import type { ResolvedConfig } from '@src/vite/bridge/config';
+import type { BuildEnvironment, Plugin } from 'vite';
+import type { RollupPluginHooks } from '@src/vite/bridge/typeUtils';
+import { ROLLUP_HOOKS } from '@src/vite/bridge/constants';
+import { getHookHandler } from '@src/vite/bridge/plugins';
 
 const needsEscapeRegEx = /[\n\r'\\\u2028\u2029]/;
 const quoteNewlineRegEx = /([\n\r'\u2028\u2029])/g;
 const backSlashRegEx = /\\/g;
 
 function escapeId(id: string): string {
-    if (!needsEscapeRegEx.test(id)) return id;
+    if (!needsEscapeRegEx.test(id)) {
+        return id;
+    }
     return id.replace(backSlashRegEx, '\\\\').replace(quoteNewlineRegEx, '\\$1');
 }
 
@@ -35,7 +37,9 @@ const getFileUrlFromRelativePath = (path: string) => getFileUrlFromFullPath(`__d
 
 const relativeUrlMechanisms: Record<InternalModuleFormat, (relativePath: string) => string> = {
     amd: relativePath => {
-        if (relativePath[0] !== '.') relativePath = './' + relativePath;
+        if (relativePath[0] !== '.') {
+            relativePath = `./${relativePath}`;
+        }
         return getResolveUrl(`require.toUrl('${escapeId(relativePath)}'), document.baseURI`);
     },
     cjs: relativePath =>
@@ -78,7 +82,7 @@ export function toOutputFilePathInJS(
     toRelative: (filename: string, hostType: string) => string | { runtime: string }
 ): string | { runtime: string } {
     const { renderBuiltUrl } = config.experimental;
-    let relative = config.base === '' || config.base === './';
+    let relative = config.base === '' || config.base === '@src/vite/bridge/';
     if (renderBuiltUrl) {
         const result = renderBuiltUrl(filename, {
             hostId,
@@ -133,7 +137,9 @@ export function injectEnvironmentToHooks(environment: BuildEnvironment, plugin: 
 }
 
 function wrapEnvironmentResolveId(environment: BuildEnvironment, hook?: Plugin['resolveId']): Plugin['resolveId'] {
-    if (!hook) return;
+    if (!hook) {
+        return;
+    }
 
     const fn = getHookHandler(hook);
     const handler: Plugin['resolveId'] = function (id, importer, options) {
@@ -150,13 +156,14 @@ function wrapEnvironmentResolveId(environment: BuildEnvironment, hook?: Plugin['
             ...hook,
             handler
         } as Plugin['resolveId'];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load']): Plugin['load'] {
-    if (!hook) return;
+    if (!hook) {
+        return;
+    }
 
     const fn = getHookHandler(hook);
     const handler: Plugin['load'] = function (id, ...args) {
@@ -168,13 +175,14 @@ function wrapEnvironmentLoad(environment: BuildEnvironment, hook?: Plugin['load'
             ...hook,
             handler
         } as Plugin['load'];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function wrapEnvironmentTransform(environment: BuildEnvironment, hook?: Plugin['transform']): Plugin['transform'] {
-    if (!hook) return;
+    if (!hook) {
+        return;
+    }
 
     const fn = getHookHandler(hook);
     const handler: Plugin['transform'] = function (code, importer, ...args) {
@@ -191,19 +199,22 @@ function wrapEnvironmentTransform(environment: BuildEnvironment, hook?: Plugin['
             ...hook,
             handler
         } as Plugin['transform'];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function wrapEnvironmentHook<HookName extends keyof Plugin>(
     environment: BuildEnvironment,
     hook?: Plugin[HookName]
 ): Plugin[HookName] {
-    if (!hook) return;
+    if (!hook) {
+        return;
+    }
 
     const fn = getHookHandler(hook);
-    if (typeof fn !== 'function') return hook;
+    if (typeof fn !== 'function') {
+        return hook;
+    }
 
     const handler: Plugin[HookName] = function (this: PluginContext, ...args: any[]) {
         return fn.call(injectEnvironmentInContext(this, environment), ...args);
@@ -214,9 +225,8 @@ function wrapEnvironmentHook<HookName extends keyof Plugin>(
             ...hook,
             handler
         } as Plugin[HookName];
-    } else {
-        return handler;
     }
+    return handler;
 }
 
 function injectEnvironmentInContext<Context extends MinimalPluginContext>(

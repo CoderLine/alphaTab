@@ -14,13 +14,14 @@ export class PlayerSettingsSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => PlayerSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
     public static toJson(obj: PlayerSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
         const o = new Map<string, unknown>();
+        /*@target web*/
         o.set("soundfont", obj.soundFont);
         /*@target web*/
         o.set("outputmode", obj.outputMode as number);
@@ -45,6 +46,7 @@ export class PlayerSettingsSerializer {
     }
     public static setProperty(obj: PlayerSettings, property: string, v: unknown): boolean {
         switch (property) {
+            /*@target web*/
             case "soundfont":
                 obj.soundFont = v as string | null;
                 return true;
@@ -104,12 +106,10 @@ export class PlayerSettingsSerializer {
             VibratoPlaybackSettingsSerializer.fromJson(obj.vibrato, v as Map<string, unknown>);
             return true;
         }
-        else {
-            for (const c of ["vibrato"]) {
-                if (property.indexOf(c) === 0) {
-                    if (VibratoPlaybackSettingsSerializer.setProperty(obj.vibrato, property.substring(c.length), v)) {
-                        return true;
-                    }
+        for (const c of ["vibrato"]) {
+            if (property.indexOf(c) === 0) {
+                if (VibratoPlaybackSettingsSerializer.setProperty(obj.vibrato, property.substring(c.length), v)) {
+                    return true;
                 }
             }
         }
@@ -117,12 +117,10 @@ export class PlayerSettingsSerializer {
             SlidePlaybackSettingsSerializer.fromJson(obj.slide, v as Map<string, unknown>);
             return true;
         }
-        else {
-            for (const c of ["slide"]) {
-                if (property.indexOf(c) === 0) {
-                    if (SlidePlaybackSettingsSerializer.setProperty(obj.slide, property.substring(c.length), v)) {
-                        return true;
-                    }
+        for (const c of ["slide"]) {
+            if (property.indexOf(c) === 0) {
+                if (SlidePlaybackSettingsSerializer.setProperty(obj.slide, property.substring(c.length), v)) {
+                    return true;
                 }
             }
         }

@@ -1,23 +1,28 @@
 import { Environment } from '@src/Environment';
-import { Bar } from '@src/model/Bar';
+import type { Bar } from '@src/model/Bar';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
-import { Score } from '@src/model/Score';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
+import type { Staff } from '@src/model/Staff';
+import { type Track, TrackSubElement } from '@src/model/Track';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
+import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { ChordDiagramContainerGlyph } from '@src/rendering/glyphs/ChordDiagramContainerGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { RenderStaff } from '@src/rendering/staves/RenderStaff';
 import { StaffSystem } from '@src/rendering/staves/StaffSystem';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 import { Logger } from '@src/Logger';
-import { EventEmitterOfT } from '@src/EventEmitter';
-import { NotationSettings, NotationElement } from '@src/NotationSettings';
+import type { EventEmitterOfT } from '@src/EventEmitter';
+import { NotationElement } from '@src/NotationSettings';
 import { TuningContainerGlyph } from '@src/rendering/glyphs/TuningContainerGlyph';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
+import type { Settings } from '@src/Settings';
+import { Lazy } from '@src/util/Lazy';
 
 class LazyPartial {
     public args: RenderFinishedEventArgs;
@@ -35,17 +40,17 @@ export enum InternalSystemsLayoutMode {
     /**
      * Use the automatic alignment system provided by alphaTab (default)
      */
-    Automatic,
+    Automatic = 0,
 
     /**
      * Use the relative scaling information stored in the score model.
      */
-    FromModelWithScale,
+    FromModelWithScale = 1,
 
     /**
      * Use the absolute size information stored in the score model.
      */
-    FromModelWithWidths
+    FromModelWithWidths = 2
 }
 
 /**
@@ -54,23 +59,28 @@ export enum InternalSystemsLayoutMode {
 export abstract class ScoreLayout {
     private _barRendererLookup: Map<string, Map<number, BarRendererBase>> = new Map();
 
+    protected pagePadding: number[] | null = null;
+
     public abstract get name(): string;
 
     public renderer: ScoreRenderer;
     public width: number = 0;
     public height: number = 0;
 
+    public multiBarRestInfo: Map<number, number[]> | null = null;
+
     public get scaledWidth() {
-        return this.width / this.renderer.settings.display.scale;
+        return Math.round(this.width / this.renderer.settings.display.scale);
     }
 
-    protected scoreInfoGlyphs: Map<NotationElement, TextGlyph> = new Map();
+    protected headerGlyphs: Map<ScoreSubElement, TextGlyph> = new Map();
+    protected footerGlyphs: Map<ScoreSubElement, TextGlyph> = new Map();
     protected chordDiagrams: ChordDiagramContainerGlyph | null = null;
     protected tuningGlyph: TuningContainerGlyph | null = null;
 
     public systemsLayoutMode: InternalSystemsLayoutMode = InternalSystemsLayoutMode.Automatic;
 
-    protected constructor(renderer: ScoreRenderer) {
+    public constructor(renderer: ScoreRenderer) {
         this.renderer = renderer;
     }
 
@@ -86,20 +96,26 @@ export abstract class ScoreLayout {
     public layoutAndRender(): void {
         this._lazyPartials.clear();
 
-        let score: Score = this.renderer.score!;
-        let startIndex: number = this.renderer.settings.display.startBar;
-        startIndex--; // map to array index
+        const score: Score = this.renderer.score!;
 
-        startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
-        this.firstBarIndex = startIndex;
-        let endBarIndex: number = this.renderer.settings.display.barCount;
-        if (endBarIndex < 0) {
-            endBarIndex = score.masterBars.length;
+        this.firstBarIndex = ModelUtils.computeFirstDisplayedBarIndex(score, this.renderer.settings);
+        this.lastBarIndex = ModelUtils.computeLastDisplayedBarIndex(score, this.renderer.settings, this.firstBarIndex);
+        this.multiBarRestInfo = ModelUtils.buildMultiBarRestInfo(
+            this.renderer.tracks,
+            this.firstBarIndex,
+            this.lastBarIndex
+        );
+
+        this.pagePadding = this.renderer.settings.display.padding.map(p => p / this.renderer.settings.display.scale);
+        if (!this.pagePadding) {
+            this.pagePadding = [0, 0, 0, 0];
         }
-        endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+        if (this.pagePadding.length === 1) {
+            this.pagePadding = [this.pagePadding[0], this.pagePadding[0], this.pagePadding[0], this.pagePadding[0]];
+        } else if (this.pagePadding.length === 2) {
+            this.pagePadding = [this.pagePadding[0], this.pagePadding[1], this.pagePadding[0], this.pagePadding[1]];
+        }
 
-        endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
-        this.lastBarIndex = endBarIndex;
         this.createScoreInfoGlyphs();
         this.doLayoutAndRender();
     }
@@ -107,7 +123,7 @@ export abstract class ScoreLayout {
     private _lazyPartials: Map<string, LazyPartial> = new Map<string, LazyPartial>();
 
     protected registerPartial(args: RenderFinishedEventArgs, callback: (canvas: ICanvas) => void) {
-        if (args.height == 0) {
+        if (args.height === 0) {
             return;
         }
 
@@ -147,71 +163,119 @@ export abstract class ScoreLayout {
 
     protected abstract doLayoutAndRender(): void;
 
+    protected static HeaderElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
+        () =>
+            new Map<ScoreSubElement, NotationElement | undefined>([
+                [ScoreSubElement.Title, NotationElement.ScoreTitle],
+                [ScoreSubElement.SubTitle, NotationElement.ScoreSubTitle],
+                [ScoreSubElement.Artist, NotationElement.ScoreArtist],
+                [ScoreSubElement.Album, NotationElement.ScoreAlbum],
+                [ScoreSubElement.Words, NotationElement.ScoreWords],
+                [ScoreSubElement.Music, NotationElement.ScoreMusic],
+                [ScoreSubElement.WordsAndMusic, NotationElement.ScoreWordsAndMusic],
+                [ScoreSubElement.Transcriber, undefined]
+            ])
+    );
+    protected static FooterElements: Lazy<Map<ScoreSubElement, NotationElement | undefined>> = new Lazy(
+        () =>
+            new Map<ScoreSubElement, NotationElement | undefined>([
+                [ScoreSubElement.Copyright, NotationElement.ScoreCopyright],
+                [ScoreSubElement.CopyrightSecondLine, undefined]
+            ])
+    );
+
+    private createHeaderFooterGlyph(
+        settings: Settings,
+        score: Score,
+        element: ScoreSubElement,
+        notationElement: NotationElement | undefined
+    ): TextGlyph | undefined {
+        // special case 1: Words and Music combination
+        // special case 2: Copyright2 without Copyright 1 (Assuming order here)
+        switch (element) {
+            case ScoreSubElement.WordsAndMusic:
+                if (score.words !== score.music) {
+                    return undefined;
+                }
+                break;
+            case ScoreSubElement.Words:
+            case ScoreSubElement.Music:
+                if (score.words === score.music) {
+                    return undefined;
+                }
+                break;
+            case ScoreSubElement.CopyrightSecondLine:
+                if (!this.headerGlyphs.has(ScoreSubElement.Copyright)) {
+                    return undefined;
+                }
+                break;
+        }
+
+        const res = settings.display.resources;
+        const notation = settings.notation;
+
+        const hasStyle = score.style && score.style!.headerAndFooter.has(element);
+        const style = hasStyle
+            ? score.style!.headerAndFooter.get(element)!
+            : ScoreStyle.defaultHeaderAndFooter.get(element)!;
+
+        let isVisible = style.isVisible !== undefined ? style.isVisible! : true;
+        if (notationElement !== undefined) {
+            isVisible = notation.isNotationElementVisible(notationElement);
+        }
+
+        if (!isVisible) {
+            return undefined;
+        }
+
+        const text = style.buildText(score);
+        if (!text) {
+            return undefined;
+        }
+
+        return new TextGlyph(
+            0,
+            0,
+            text,
+            res.getFontForElement(element),
+            style.textAlign,
+            undefined,
+            ElementStyleHelper.scoreColor(res, element, score)
+        );
+    }
+
     private createScoreInfoGlyphs(): void {
         Logger.debug('ScoreLayout', 'Creating score info glyphs');
-        let notation: NotationSettings = this.renderer.settings.notation;
-        let score: Score = this.renderer.score!;
-        let res: RenderingResources = this.renderer.settings.display.resources;
-        this.scoreInfoGlyphs = new Map<NotationElement, TextGlyph>();
-        if (score.title && notation.isNotationElementVisible(NotationElement.ScoreTitle)) {
-            this.scoreInfoGlyphs.set(
-                NotationElement.ScoreTitle,
-                new TextGlyph(0, 0, score.title, res.titleFont, TextAlign.Center)
-            );
-        }
-        if (score.subTitle && notation.isNotationElementVisible(NotationElement.ScoreSubTitle)) {
-            this.scoreInfoGlyphs.set(
-                NotationElement.ScoreSubTitle,
-                new TextGlyph(0, 0, score.subTitle, res.subTitleFont, TextAlign.Center)
-            );
-        }
-        if (score.artist && notation.isNotationElementVisible(NotationElement.ScoreArtist)) {
-            this.scoreInfoGlyphs.set(
-                NotationElement.ScoreArtist,
-                new TextGlyph(0, 0, score.artist, res.subTitleFont, TextAlign.Center)
-            );
-        }
-        if (score.album && notation.isNotationElementVisible(NotationElement.ScoreAlbum)) {
-            this.scoreInfoGlyphs.set(
-                NotationElement.ScoreAlbum,
-                new TextGlyph(0, 0, score.album, res.subTitleFont, TextAlign.Center)
-            );
-        }
-        if (
-            score.music &&
-            score.music === score.words &&
-            notation.isNotationElementVisible(NotationElement.ScoreWordsAndMusic)
-        ) {
-            this.scoreInfoGlyphs.set(
-                NotationElement.ScoreWordsAndMusic,
-                new TextGlyph(0, 0, 'Music and Words by ' + score.words, res.wordsFont, TextAlign.Center)
-            );
-        } else {
-            if (score.music && notation.isNotationElementVisible(NotationElement.ScoreMusic)) {
-                this.scoreInfoGlyphs.set(
-                    NotationElement.ScoreMusic,
-                    new TextGlyph(0, 0, 'Music by ' + score.music, res.wordsFont, TextAlign.Right)
-                );
-            }
-            if (score.words && notation.isNotationElementVisible(NotationElement.ScoreWords)) {
-                this.scoreInfoGlyphs.set(
-                    NotationElement.ScoreWords,
-                    new TextGlyph(0, 0, 'Words by ' + score.words, res.wordsFont, TextAlign.Left)
-                );
-            }
-        }
-
+        const settings = this.renderer.settings;
+        const score: Score = this.renderer.score!;
+        this.headerGlyphs = new Map<ScoreSubElement, TextGlyph>();
+        this.footerGlyphs = new Map<ScoreSubElement, TextGlyph>();
         const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
 
-        for (const [_e, glyph] of this.scoreInfoGlyphs) {
-            glyph.renderer = fakeBarRenderer;
-            glyph.doLayout();
+        for (const [scoreElement, notationElement] of ScoreLayout.HeaderElements.value) {
+            const glyph = this.createHeaderFooterGlyph(settings, score, scoreElement, notationElement);
+            if (glyph) {
+                glyph.renderer = fakeBarRenderer;
+                glyph.doLayout();
+                this.headerGlyphs.set(scoreElement, glyph);
+            }
         }
 
+        for (const [scoreElement, notationElement] of ScoreLayout.FooterElements.value) {
+            const glyph = this.createHeaderFooterGlyph(settings, score, scoreElement, notationElement);
+            if (glyph) {
+                glyph.renderer = fakeBarRenderer;
+                glyph.doLayout();
+                this.footerGlyphs.set(scoreElement, glyph);
+            }
+        }
+
+        const notation = settings.notation;
+        const res = settings.display.resources;
         if (notation.isNotationElementVisible(NotationElement.GuitarTuning)) {
-            let tunings: Staff[] = [];
-            for (let track of this.renderer.tracks!) {
-                for (let staff of track.staves) {
+            const stavesWithTuning: Staff[] = [];
+            for (const track of this.renderer.tracks!) {
+                for (const staff of track.staves) {
                     let showTuning =
                         !staff.isPercussion && staff.isStringed && staff.tuning.length > 0 && staff.showTablature;
 
@@ -224,17 +288,28 @@ export abstract class ScoreLayout {
                     }
 
                     if (showTuning) {
-                        tunings.push(staff);
+                        stavesWithTuning.push(staff);
                         break;
                     }
                 }
             }
             // tuning info
-            if (tunings.length > 0 && score.stylesheet.globalDisplayTuning) {
+            if (stavesWithTuning.length > 0 && score.stylesheet.globalDisplayTuning) {
                 this.tuningGlyph = new TuningContainerGlyph(0, 0);
                 this.tuningGlyph.renderer = fakeBarRenderer;
-                for (const t of tunings) {
-                    this.tuningGlyph.addTuning(t.stringTuning, tunings.length > 1 ? t.track.name : '');
+                for (const staff of stavesWithTuning) {
+                    if (staff.stringTuning.tunings.length > 0) {
+                        const trackLabel = stavesWithTuning.length > 1 ? staff.track.name : '';
+                        const item: TuningGlyph = new TuningGlyph(0, 0, staff.stringTuning, trackLabel);
+                        item.colorOverride = ElementStyleHelper.trackColor(
+                            res,
+                            TrackSubElement.StringTuning,
+                            staff.track
+                        );
+                        item.renderer = fakeBarRenderer;
+                        item.doLayout();
+                        this.tuningGlyph.addGlyph(item);
+                    }
                 }
             }
         }
@@ -242,9 +317,9 @@ export abstract class ScoreLayout {
         if (notation.isNotationElementVisible(NotationElement.ChordDiagrams)) {
             this.chordDiagrams = new ChordDiagramContainerGlyph(0, 0);
             this.chordDiagrams.renderer = fakeBarRenderer;
-            let chordIds: Set<string> = new Set<string>();
+            const chordIds: Set<string> = new Set<string>();
 
-            for (let track of this.renderer.tracks!) {
+            for (const track of this.renderer.tracks!) {
                 const shouldShowDiagramsForTrack =
                     score.stylesheet.globalDisplayChordDiagramsOnTop &&
                     (score.stylesheet.perTrackChordDiagramsOnTop == null ||
@@ -255,7 +330,7 @@ export abstract class ScoreLayout {
                     continue;
                 }
 
-                for (let staff of track.staves) {
+                for (const staff of track.staves) {
                     const sc = staff.chords;
                     if (sc) {
                         for (const [, chord] of sc) {
@@ -277,15 +352,15 @@ export abstract class ScoreLayout {
     public lastBarIndex: number = 0;
 
     protected createEmptyStaffSystem(): StaffSystem {
-        let system: StaffSystem = new StaffSystem(this);
+        const system: StaffSystem = new StaffSystem(this);
         for (let trackIndex: number = 0; trackIndex < this.renderer.tracks!.length; trackIndex++) {
-            let track: Track = this.renderer.tracks![trackIndex];
+            const track: Track = this.renderer.tracks![trackIndex];
             for (let staffIndex: number = 0; staffIndex < track.staves.length; staffIndex++) {
-                let staff: Staff = track.staves[staffIndex];
-                let profile: BarRendererFactory[] = Environment.staveProfiles.get(
+                const staff: Staff = track.staves[staffIndex];
+                const profile: BarRendererFactory[] = Environment.staveProfiles.get(
                     this.renderer.settings.display.staveProfile
                 )!;
-                for (let factory of profile) {
+                for (const factory of profile) {
                     if (factory.canCreate(track, staff)) {
                         system.addStaff(track, new RenderStaff(trackIndex, staff, factory));
                     }
@@ -300,43 +375,119 @@ export abstract class ScoreLayout {
             this._barRendererLookup.set(key, new Map<number, BarRendererBase>());
         }
         this._barRendererLookup.get(key)!.set(renderer.bar.id, renderer);
+        if (renderer.additionalMultiRestBars) {
+            for (const b of renderer.additionalMultiRestBars) {
+                this._barRendererLookup.get(key)!.set(b.id, renderer);
+            }
+        }
     }
 
     public unregisterBarRenderer(key: string, renderer: BarRendererBase): void {
         if (this._barRendererLookup.has(key)) {
-            let lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
+            const lookup: Map<number, BarRendererBase> = this._barRendererLookup.get(key)!;
             lookup.delete(renderer.bar.id);
+            if (renderer.additionalMultiRestBars) {
+                for (const b of renderer.additionalMultiRestBars) {
+                    lookup.delete(b.id);
+                }
+            }
         }
     }
 
     public getRendererForBar(key: string, bar: Bar): BarRendererBase | null {
-        let barRendererId: number = bar.id;
+        const barRendererId: number = bar.id;
         if (this._barRendererLookup.has(key) && this._barRendererLookup.get(key)!.has(barRendererId)) {
             return this._barRendererLookup.get(key)!.get(barRendererId)!;
         }
         return null;
     }
 
+    protected layoutAndRenderBottomScoreInfo(y: number): number {
+        y = Math.round(y);
+        const e = new RenderFinishedEventArgs();
+        e.x = 0;
+        e.y = y;
+
+        let infoHeight = 0;
+
+        const res: RenderingResources = this.renderer.settings.display.resources;
+        const scoreInfoGlyphs: TextGlyph[] = [];
+
+        let width = 0;
+
+        for (const [scoreElement, _notationElement] of ScoreLayout.FooterElements.value) {
+            if (this.footerGlyphs.has(scoreElement)) {
+                const glyph: TextGlyph = this.footerGlyphs.get(scoreElement)!;
+                glyph.y = infoHeight;
+                this.alignScoreInfoGlyph(glyph);
+                infoHeight += glyph.font.size * 1.2;
+                scoreInfoGlyphs.push(glyph);
+                width = Math.max(width, Math.round(glyph.x + glyph.width));
+            }
+        }
+
+        infoHeight = Math.round(infoHeight);
+
+        if (scoreInfoGlyphs.length > 0) {
+            e.width = width;
+            e.height = infoHeight;
+            e.totalWidth = this.scaledWidth;
+            e.totalHeight = y + e.height;
+            this.registerPartial(e, (canvas: ICanvas) => {
+                canvas.color = res.scoreInfoColor;
+                canvas.textAlign = TextAlign.Left;
+                canvas.textBaseline = TextBaseline.Top;
+                for (const g of scoreInfoGlyphs) {
+                    g.paint(0, 0, canvas);
+                }
+            });
+        }
+
+        return y + infoHeight;
+    }
+
+    protected alignScoreInfoGlyph(glyph: TextGlyph) {
+        const isVertical = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
+        if (isVertical) {
+            switch (glyph.textAlign) {
+                case TextAlign.Left:
+                    glyph.x = this.pagePadding![0];
+                    break;
+                case TextAlign.Center:
+                    glyph.x = this.scaledWidth / 2;
+                    break;
+                case TextAlign.Right:
+                    glyph.x = this.scaledWidth - this.pagePadding![2];
+                    break;
+            }
+        } else {
+            glyph.x = this.firstBarX;
+            glyph.textAlign = TextAlign.Left;
+        }
+    }
+
     public layoutAndRenderAnnotation(y: number): number {
         // attention, you are not allowed to remove change this notice within any version of this library without permission!
-        let msg: string = 'rendered by alphaTab';
-        let resources: RenderingResources = this.renderer.settings.display.resources;
-        let size: number = 12;
-        let height: number = Math.floor(size);
-
-        const e = new RenderFinishedEventArgs();
+        const msg: string = 'rendered by alphaTab';
+        const resources: RenderingResources = this.renderer.settings.display.resources;
+        const size: number = 12;
         const font = Font.withFamilyList(resources.copyrightFont.families, size, FontStyle.Plain, FontWeight.Bold);
 
-        this.renderer.canvas!.font = font;
+        const fakeBarRenderer = new BarRendererBase(this.renderer, this.renderer.tracks![0].staves[0].bars[0]);
+        const glyph = new TextGlyph(0, 0, msg, font, TextAlign.Center, undefined, resources.mainGlyphColor);
+        glyph.renderer = fakeBarRenderer;
+        glyph.doLayout();
+        this.alignScoreInfoGlyph(glyph);
 
-        const centered = Environment.getLayoutEngineFactory(this.renderer.settings.display.layoutMode).vertical;
-        e.width = this.renderer.canvas!.measureText(msg).width / this.renderer.settings.display.scale;
-        e.height = height;
-        e.x = centered ? (this.scaledWidth - e.width) / 2 : this.firstBarX;
+        const e = new RenderFinishedEventArgs();
+
+        e.width = glyph.x + glyph.width;
+        e.x = 0;
+        e.height = size;
         e.y = y;
 
         e.totalWidth = this.scaledWidth;
-        e.totalHeight = y + height;
+        e.totalHeight = y + size;
         e.firstMasterBarIndex = -1;
         e.lastMasterBarIndex = -1;
 
@@ -345,9 +496,9 @@ export abstract class ScoreLayout {
             canvas.font = font;
             canvas.textAlign = TextAlign.Left;
             canvas.textBaseline = TextBaseline.Top;
-            canvas.fillText(msg, 0, 0);
+            glyph.paint(0, 0, canvas);
         });
 
-        return y + height;
+        return y + size;
     }
 }

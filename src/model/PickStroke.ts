@@ -5,13 +5,13 @@ export enum PickStroke {
     /**
      * No pickstroke used.
      */
-    None,
+    None = 0,
     /**
      * Pickstroke up.
      */
-    Up,
+    Up = 1,
     /**
      * Pickstroke down
      */
-    Down
+    Down = 2
 }

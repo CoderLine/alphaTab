@@ -1,8 +1,198 @@
-import { MasterBar } from '@src/model/MasterBar';
+import type { MasterBar } from '@src/model/MasterBar';
 import { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { RepeatGroup } from '@src/model/RepeatGroup';
-import { Track } from '@src/model/Track';
-import { Settings } from '@src/Settings';
+import type { Track } from '@src/model/Track';
+import type { Settings } from '@src/Settings';
+import { ElementStyle } from '@src/model/ElementStyle';
+import { Bar } from '@src/model/Bar';
+import { Beat } from '@src/model/Beat';
+import { Voice } from '@src/model/Voice';
+import { Note } from '@src/model/Note';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
+import type { NotationSettings } from '@src/NotationSettings';
+import { TextAlign } from '@src/platform/ICanvas';
+
+/**
+ * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
+ */
+export enum ScoreSubElement {
+    /**
+     * The title of the song
+     */
+    Title = 0,
+    /**
+     * The subtitle of the song
+     */
+    SubTitle = 1,
+    /**
+     * The artist of the song
+     */
+    Artist = 2,
+    /**
+     * The album of the song
+     */
+    Album = 3,
+    /**
+     * The word author of the song
+     */
+    Words = 4,
+    /**
+     * The Music author of the song
+     */
+    Music = 5,
+    /**
+     * The Words&Music author of the song
+     */
+    WordsAndMusic = 6,
+    /**
+     * The transcriber of the music sheet
+     */
+    Transcriber = 7,
+
+    /**
+     * The copyright holder of the song
+     */
+    Copyright = 8,
+
+    /**
+     * The second copyright line (typically something like 'All Rights Reserved')
+     */
+    CopyrightSecondLine = 9,
+
+    /**
+     * The chord diagram list shown on top of the score.
+     */
+    ChordDiagramList = 10
+}
+
+/**
+ * The additional style and display information for header and footer elements.
+ * @json
+ * @json_strict
+ */
+export class HeaderFooterStyle {
+    /**
+     * The template how the text should be formatted. Following placeholders exist and are filled from the song information:
+     * * `%TITLE%`
+     * * `%SUBTITLE%`
+     * * `%ARTIST%`
+     * * `%ALBUM%`
+     * * `%WORDS%`
+     * * `%WORDSMUSIC%`
+     * * `%MUSIC%`
+     * * `%TABBER%`
+     * * `%COPYRIGHT%`
+     */
+    public template: string;
+
+    /**
+     * Whether the element should be visible. Overriden by {@link NotationSettings.elements} if specified.
+     */
+    public isVisible?: boolean;
+
+    /**
+     * The alignment of the element on the page.
+     */
+    public textAlign: TextAlign;
+
+    public constructor(
+        template: string = '',
+        isVisible: boolean | undefined = undefined,
+        textAlign: TextAlign = TextAlign.Left
+    ) {
+        this.template = template;
+        this.isVisible = isVisible;
+        this.textAlign = textAlign;
+    }
+
+    public buildText(score: Score) {
+        let anyPlaceholderFilled = false;
+        let anyPlaceholder = false;
+        const replaced = this.template.replace(
+            HeaderFooterStyle.PlaceholderPattern,
+            (_match: string, variable: string) => {
+                anyPlaceholder = true;
+                let value = '';
+                switch (variable) {
+                    case 'TITLE':
+                        value = score.title;
+                        break;
+                    case 'SUBTITLE':
+                        value = score.subTitle;
+                        break;
+                    case 'ARTIST':
+                        value = score.artist;
+                        break;
+                    case 'ALBUM':
+                        value = score.album;
+                        break;
+                    case 'WORDS':
+                    case 'WORDSMUSIC':
+                        value = score.words;
+                        break;
+                    case 'MUSIC':
+                        value = score.music;
+                        break;
+                    case 'TABBER':
+                        value = score.tab;
+                        break;
+                    case 'COPYRIGHT':
+                        value = score.copyright;
+                        break;
+                    default:
+                        value = '';
+                        break;
+                }
+
+                if (value) {
+                    anyPlaceholderFilled = true;
+                }
+                return value;
+            }
+        );
+
+        if (anyPlaceholder && !anyPlaceholderFilled) {
+            return '';
+        }
+        return replaced;
+    }
+
+    private static readonly PlaceholderPattern = /%([^%]+)%/g;
+}
+
+/**
+ * Defines the custom styles for Scores.
+ * @json
+ * @json_strict
+ */
+export class ScoreStyle extends ElementStyle<ScoreSubElement> {
+    /**
+     * Changes additional style aspects fo the of the specified sub-element.
+     */
+    public headerAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<ScoreSubElement, HeaderFooterStyle>();
+
+    /**
+     * The default styles applied to headers and footers if not specified
+     */
+    public static readonly defaultHeaderAndFooter: Map<ScoreSubElement, HeaderFooterStyle> = new Map<
+        ScoreSubElement,
+        HeaderFooterStyle
+    >([
+        [ScoreSubElement.Title, new HeaderFooterStyle('%TITLE%', undefined, TextAlign.Center)],
+        [ScoreSubElement.SubTitle, new HeaderFooterStyle('%SUBTITLE%', undefined, TextAlign.Center)],
+        [ScoreSubElement.Artist, new HeaderFooterStyle('%ARTIST%', undefined, TextAlign.Center)],
+        [ScoreSubElement.Album, new HeaderFooterStyle('%ALBUM%', undefined, TextAlign.Center)],
+        [ScoreSubElement.Words, new HeaderFooterStyle('Words by %WORDS%', undefined, TextAlign.Left)],
+        [ScoreSubElement.Music, new HeaderFooterStyle('Music by %MUSIC%', undefined, TextAlign.Right)],
+        [ScoreSubElement.WordsAndMusic, new HeaderFooterStyle('Words & Music by %MUSIC%', undefined, TextAlign.Right)],
+        [ScoreSubElement.Transcriber, new HeaderFooterStyle('Tabbed by %TABBER%', false, TextAlign.Right)],
+        [ScoreSubElement.Copyright, new HeaderFooterStyle('%COPYRIGHT%', undefined, TextAlign.Center)],
+        [
+            ScoreSubElement.CopyrightSecondLine,
+            new HeaderFooterStyle('All Rights Reserved - International Copyright Secured', true, TextAlign.Center)
+        ]
+    ]);
+}
 
 /**
  * The score is the root node of the complete
@@ -15,6 +205,16 @@ export class Score {
     private _currentRepeatGroup: RepeatGroup | null = null;
     private _openedRepeatGroups: RepeatGroup[] = [];
     private _properlyOpenedRepeatGroups: number = 0;
+
+    /**
+     * Resets all internal ID generators.
+     */
+    public static resetIds() {
+        Bar.resetIds();
+        Beat.resetIds();
+        Voice.resetIds();
+        Note.resetIds();
+    }
 
     /**
      * The album of this song.
@@ -67,7 +267,7 @@ export class Score {
     public tab: string = '';
 
     /**
-     * Gets or sets the global tempo of the song in BPM. The tempo might change via {@link MasterBar.tempo}.
+     * Gets or sets the global tempo of the song in BPM. The tempo might change via {@link MasterBar.tempoAutomations}.
      */
     public tempo: number = 120;
 
@@ -100,11 +300,15 @@ export class Score {
      */
     public systemsLayout: number[] = [];
 
-
     /**
      * Gets or sets the rendering stylesheet for this song.
      */
     public stylesheet: RenderStylesheet = new RenderStylesheet();
+
+    /**
+     * The style customizations for this item.
+     */
+    public style?: ScoreStyle;
 
     public rebuildRepeatGroups(): void {
         this._currentRepeatGroup = null;
@@ -178,7 +382,7 @@ export class Score {
                         ? this._openedRepeatGroups[this._openedRepeatGroups.length - 1]
                         : null;
             }
-            // else: if only one group is opened, this group stays active for 
+            // else: if only one group is opened, this group stays active for
             // scenarios like open close bar close
         }
     }

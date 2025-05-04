@@ -1,13 +1,13 @@
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
-import { IWriteable } from '@src/io/IWriteable';
+import type { IWriteable } from '@src/io/IWriteable';
 
 export class IOHelper {
     public static readInt32BE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
-        let ch3: number = input.readByte();
-        let ch4: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
+        const ch3: number = input.readByte();
+        const ch4: number = input.readByte();
         return (ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4;
     }
 
@@ -26,10 +26,10 @@ export class IOHelper {
     }
 
     public static readInt32LE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
-        let ch3: number = input.readByte();
-        let ch4: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
+        const ch3: number = input.readByte();
+        const ch4: number = input.readByte();
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
     }
 
@@ -40,61 +40,61 @@ export class IOHelper {
     }
 
     public static readUInt32LE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
-        let ch3: number = input.readByte();
-        let ch4: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
+        const ch3: number = input.readByte();
+        const ch4: number = input.readByte();
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
     }
 
     public static decodeUInt32LE(data: Uint8Array, index: number): number {
-        let ch1: number = data[index];
-        let ch2: number = data[index + 1];
-        let ch3: number = data[index + 2];
-        let ch4: number = data[index + 3];
+        const ch1: number = data[index];
+        const ch2: number = data[index + 1];
+        const ch3: number = data[index + 2];
+        const ch4: number = data[index + 3];
         return (ch4 << 24) | (ch3 << 16) | (ch2 << 8) | ch1;
     }
 
     public static readUInt16LE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
         return TypeConversions.int32ToUint16((ch2 << 8) | ch1);
     }
 
     public static readInt16LE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
         return TypeConversions.int32ToInt16((ch2 << 8) | ch1);
     }
 
     public static readUInt32BE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
-        let ch3: number = input.readByte();
-        let ch4: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
+        const ch3: number = input.readByte();
+        const ch4: number = input.readByte();
         return TypeConversions.int32ToUint32((ch1 << 24) | (ch2 << 16) | (ch3 << 8) | ch4);
     }
 
     public static readUInt16BE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
         return TypeConversions.int32ToInt16((ch1 << 8) | ch2);
     }
 
     public static readInt16BE(input: IReadable): number {
-        let ch1: number = input.readByte();
-        let ch2: number = input.readByte();
+        const ch1: number = input.readByte();
+        const ch2: number = input.readByte();
         return TypeConversions.int32ToInt16((ch1 << 8) | ch2);
     }
 
     public static readByteArray(input: IReadable, length: number): Uint8Array {
-        let v: Uint8Array = new Uint8Array(length);
+        const v: Uint8Array = new Uint8Array(length);
         input.read(v, 0, length);
         return v;
     }
 
     public static read8BitChars(input: IReadable, length: number): string {
-        let b: Uint8Array = new Uint8Array(length);
+        const b: Uint8Array = new Uint8Array(length);
         input.read(b, 0, b.length);
         return IOHelper.toString(b, 'utf-8');
     }
@@ -113,13 +113,13 @@ export class IOHelper {
         let s: string = '';
         let z: number = -1;
         for (let i: number = 0; i < length; i++) {
-            let c: number = input.readByte();
+            const c: number = input.readByte();
             if (c === 0 && z === -1) {
                 z = i;
             }
             s += String.fromCharCode(c);
         }
-        let t: string = s;
+        const t: string = s;
         if (z >= 0) {
             return t.substr(0, z);
         }
@@ -127,7 +127,7 @@ export class IOHelper {
     }
 
     public static readSInt8(input: IReadable): number {
-        let v: number = input.readByte();
+        const v: number = input.readByte();
         return ((v & 255) >> 7) * -256 + (v & 255);
     }
 
@@ -144,14 +144,14 @@ export class IOHelper {
     }
 
     public static toString(data: Uint8Array, encoding: string): string {
-        let detectedEncoding: string | null = IOHelper.detectEncoding(data);
+        const detectedEncoding: string | null = IOHelper.detectEncoding(data);
         if (detectedEncoding) {
             encoding = detectedEncoding;
         }
         if (!encoding) {
             encoding = 'utf-8';
         }
-        let decoder: TextDecoder = new TextDecoder(encoding);
+        const decoder: TextDecoder = new TextDecoder(encoding);
         return decoder.decode(data.buffer as ArrayBuffer);
     }
 
@@ -172,7 +172,7 @@ export class IOHelper {
     }
 
     public static stringToBytes(str: string): Uint8Array {
-        let decoder: TextEncoder = new TextEncoder();
+        const decoder: TextEncoder = new TextEncoder();
         return decoder.encode(str);
     }
 

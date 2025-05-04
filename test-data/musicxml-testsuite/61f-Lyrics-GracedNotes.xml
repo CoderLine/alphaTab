@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Grace notes shall not mess up the 
-          lyrics, and they shall not be assigned a syllable.</miscellaneous-field>
+      <miscellaneous-field name="description">Grace notes shall not mess up the
+          lyrics, and they shall not be assigned to a
+          syllable.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -87,12 +88,8 @@
           <step>D</step>
           <octave>5</octave>
         </pitch>
-        <tie type="start"/>
         <voice>1</voice>
         <type>eighth</type>
-        <notations>
-          <tied type="start"/>
-        </notations>
       </note>
       <note>
         <pitch>
@@ -116,12 +113,8 @@
           <octave>5</octave>
         </pitch>
         <duration>2</duration>
-        <tie type="start"/>
         <voice>1</voice>
         <type>quarter</type>
-        <notations>
-          <tied type="start"/>
-        </notations>
         <lyric number="1">
           <syllabic>single</syllabic>
           <text>notes</text>
@@ -134,13 +127,9 @@
           <step>E</step>
           <octave>5</octave>
         </pitch>
-        <tie type="start"/>
         <voice>1</voice>
         <type>eighth</type>
         <beam number="1">begin</beam>
-        <notations>
-          <tied type="start"/>
-        </notations>
       </note>
       <note>
         <grace/>
@@ -158,12 +147,8 @@
           <octave>5</octave>
         </pitch>
         <duration>2</duration>
-        <tie type="stop"/>
         <voice>1</voice>
         <type>quarter</type>
-        <notations>
-          <tied type="stop"/>
-        </notations>
       </note>
       <note>
         <grace/>

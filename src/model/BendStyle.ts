@@ -5,13 +5,13 @@ export enum BendStyle {
     /**
      * The bends are as described by the bend points
      */
-    Default,
+    Default = 0,
     /**
      * The bends are gradual over the beat duration.
      */
-    Gradual,
+    Gradual = 1,
     /**
      * The bends are done fast before the next note.
      */
-    Fast,
+    Fast = 2
 }

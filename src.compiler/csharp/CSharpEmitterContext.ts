@@ -1,11 +1,10 @@
 import * as cs from './CSharpAst';
-import * as ts from 'typescript';
-import * as path from 'path';
+import ts from 'typescript';
+import path from 'node:path';
 
 type SymbolKey = string;
 
 export default class CSharpEmitterContext {
-    private _fileLookup: Map<ts.SourceFile, cs.SourceFile> = new Map();
     private _symbolLookup: Map<SymbolKey, cs.NamedElement & cs.Node> = new Map();
     private _exportedSymbols: Map<SymbolKey, boolean> = new Map();
     private _virtualSymbols: Map<SymbolKey, boolean> = new Map();
@@ -58,7 +57,13 @@ export default class CSharpEmitterContext {
         return (tsSymbol.flags & ts.SymbolFlags.Property) !== 0;
     }
 
-    public isTypeAssignable(targetType: ts.Type, actualType: ts.Type) {
+    public isTypeAssignable(targetType: ts.Type, contextualTypeNullable: ts.Type, actualType: ts.Type) {
+        if (
+            contextualTypeNullable.flags === ts.TypeFlags.Any ||
+            contextualTypeNullable.flags === ts.TypeFlags.Unknown
+        ) {
+            return true;
+        }
         if (targetType.flags === ts.TypeFlags.Any || targetType.flags === ts.TypeFlags.Unknown) {
             return true;
         }
@@ -75,6 +80,13 @@ export default class CSharpEmitterContext {
         this._unresolvedTypeNodes.push(unresolved);
     }
 
+    public removeUnresolvedTypeNode(unresolved: cs.UnresolvedTypeNode) {
+        if (this.processingSkippedElement) {
+            return;
+        }
+        this._unresolvedTypeNodes = this._unresolvedTypeNodes.filter(n => n !== unresolved);
+    }
+
     public getSymbolName(expr: cs.Node): string | undefined {
         const symbolKey = this.getSymbolKey(expr.tsSymbol);
         if (expr.tsSymbol) {
@@ -87,25 +99,54 @@ export default class CSharpEmitterContext {
                         return this.getFullName(csSymbol as cs.NamedTypeDeclaration, expr);
                 }
                 return csSymbol.name;
-            } else if (
+            }
+
+            if (
                 expr.tsSymbol.flags & ts.SymbolFlags.Class ||
                 expr.tsSymbol.flags & ts.SymbolFlags.Interface ||
                 expr.tsSymbol.flags & ts.SymbolFlags.ConstEnum ||
                 expr.tsSymbol.flags & ts.SymbolFlags.RegularEnum
             ) {
-                return this.buildCoreNamespace(expr.tsSymbol) + this.toCoreTypeName(expr.tsSymbol.name);
-            } else if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
-                if (this.isTestFunction(expr.tsSymbol)) {
-                    return this.toPascalCase('alphaTab.test') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
+                switch (expr.tsSymbol.name) {
+                    case 'Error':
+                        return this.makeExceptionType();
+                    case 'Iterable':
+                        return this.makeIterableType();
+                    case 'Iterator':
+                        return this.makeIteratorType();
+                    case 'Generator':
+                        return this.makeGeneratorType();
+                    case 'Disposable':
+                        return 'Disposable';
                 }
-                return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
-            } else if (
+
+                return this.buildCoreNamespace(expr.tsSymbol) + this.toCoreTypeName(expr.tsSymbol.name);
+            }
+
+            if (expr.tsSymbol.flags & ts.SymbolFlags.Function) {
+                if (this.isTestFunction(expr.tsSymbol)) {
+                    return `${this.toPascalCase('alphaTab.test')}.Globals.${this.toPascalCase(expr.tsSymbol.name)}`;
+                }
+
+                if (expr.tsSymbol.valueDeclaration && expr.tsNode) {
+                    const sourceFile = expr.tsSymbol.valueDeclaration.getSourceFile();
+                    if (sourceFile === expr.tsNode.getSourceFile()) {
+                        return expr.tsSymbol.name;
+                    }
+                }
+
+                return `${this.toPascalCase('alphaTab.core')}.Globals.${this.toPascalCase(expr.tsSymbol.name)}`;
+            }
+
+            if (
                 (expr.tsSymbol.flags & ts.SymbolFlags.FunctionScopedVariable && this.isGlobalVariable(expr.tsSymbol)) ||
                 (expr.tsSymbol.flags & ts.SymbolFlags.NamespaceModule && this.isKnownModule(expr.tsSymbol))
             ) {
-                return this.toPascalCase('alphaTab.core') + '.Globals.' + this.toPascalCase(expr.tsSymbol.name);
-            } else if (expr.tsSymbol) {
-                let externalModule = this.resolveExternalModuleOfType(expr.tsSymbol);
+                return `${this.toPascalCase('alphaTab.core')}.Globals.${this.toPascalCase(expr.tsSymbol.name)}`;
+            }
+
+            if (expr.tsSymbol) {
+                const externalModule = this.resolveExternalModuleOfType(expr.tsSymbol);
                 if (externalModule) {
                     return externalModule + this.toPascalCase(expr.tsSymbol.name);
                 }
@@ -148,9 +189,9 @@ export default class CSharpEmitterContext {
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
             case cs.SyntaxKind.EnumDeclaration:
-                return this.getFullName(type.parent as cs.NamedTypeDeclaration) + '.' + this.getClassName(type, expr);
+                return `${this.getFullName(type.parent as cs.NamedTypeDeclaration)}.${this.getClassName(type, expr)}`;
             case cs.SyntaxKind.NamespaceDeclaration:
-                return (type.parent as cs.NamespaceDeclaration).namespace + '.' + this.getClassName(type, expr);
+                return `${(type.parent as cs.NamespaceDeclaration).namespace}.${this.getClassName(type, expr)}`;
         }
         return '';
     }
@@ -160,7 +201,7 @@ export default class CSharpEmitterContext {
     }
 
     public resolveAllUnresolvedTypeNodes() {
-        for (let node of this._unresolvedTypeNodes) {
+        for (const node of this._unresolvedTypeNodes) {
             let resolved = this.resolveType(node);
             if (!resolved) {
                 resolved = this.resolveType(node);
@@ -219,7 +260,6 @@ export default class CSharpEmitterContext {
 
     public addSourceFile(csharpFile: cs.SourceFile) {
         this.csharpFiles.push(csharpFile);
-        this._fileLookup.set(csharpFile.tsNode as ts.SourceFile, csharpFile);
     }
 
     public resolveType(node: cs.UnresolvedTypeNode): cs.TypeNode | null {
@@ -237,7 +277,7 @@ export default class CSharpEmitterContext {
         }
 
         if (node.tsType) {
-            resolved = this.getTypeFromTsType(node, node.tsType, node.tsSymbol, node.typeArguments);
+            resolved = this.getTypeFromTsType(node, node.tsType, node.tsSymbol, node.typeArguments, node.tsNode);
         }
 
         if (resolved) {
@@ -285,24 +325,62 @@ export default class CSharpEmitterContext {
         node: cs.Node,
         tsType: ts.Type,
         tsSymbol?: ts.Symbol,
-        typeArguments?: cs.UnresolvedTypeNode[]
+        typeArguments?: cs.UnresolvedTypeNode[],
+        typeNode?: ts.Node
     ): cs.TypeNode | null {
         let csType: cs.TypeNode | null = this.resolveKnownTypeSymbol(node, tsType, typeArguments);
         if (csType) {
-            return csType;
+            return this.applyNullable(csType, typeNode);
+        }
+
+        if (typeNode && ts.isTypeOperatorNode(typeNode)) {
+            if (typeNode.operator === ts.SyntaxKind.KeyOfKeyword) {
+                return {
+                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                    type: cs.PrimitiveType.String,
+                    isNullable: false
+                } as cs.PrimitiveTypeNode;
+            }
+            return null;
         }
 
         csType = this.resolvePrimitiveType(node, tsType);
         if (csType) {
-            return csType;
+            return this.applyNullable(csType, typeNode);
         }
 
         csType = this.resolveUnionType(node, tsType, typeArguments);
         if (csType) {
-            return csType;
+            return this.applyNullable(csType, typeNode);
+        }
+
+        csType = this.resolveIntersectionType(node, tsType, typeArguments);
+        if (csType) {
+            return this.applyNullable(csType, typeNode);
         }
 
         csType = this.resolveUnknownTypeSymbol(node, tsType, tsSymbol, typeArguments);
+
+        return this.applyNullable(csType, typeNode);
+    }
+
+    private applyNullable(csType: cs.TypeNode | null, typeNode: ts.Node | undefined): cs.TypeNode | null {
+        if (!csType || !typeNode || ts.isTypeNode(typeNode)) {
+            return csType;
+        }
+
+        if (ts.isUnionTypeNode(typeNode)) {
+            for (const t of typeNode.types) {
+                if (
+                    t.kind === ts.SyntaxKind.NullKeyword ||
+                    (ts.isLiteralTypeNode(t) && t.literal.kind === ts.SyntaxKind.NullKeyword) ||
+                    t.kind === ts.SyntaxKind.UndefinedKeyword ||
+                    (ts.isLiteralTypeNode(t) && t.literal.kind === ts.SyntaxKind.UndefinedKeyword)
+                ) {
+                    csType.isNullable = true;
+                }
+            }
+        }
 
         return csType;
     }
@@ -320,9 +398,23 @@ export default class CSharpEmitterContext {
         if (!tsSymbol) {
             return null;
         }
+        if (tsType.isTypeParameter()) {
+            return {
+                nodeType: cs.SyntaxKind.TypeReference,
+                parent: node.parent,
+                tsNode: node.tsNode,
+                isAsync: false,
+                reference: tsType.symbol.name
+            } as cs.TypeReference;
+        }
 
         // some built in type handling
-        switch (tsSymbol.name) {
+        let symbolName = tsSymbol.name;
+        if (symbolName.endsWith('Constructor')) {
+            symbolName = symbolName.substring(0, symbolName.length - 'Constructor'.length);
+        }
+
+        switch (symbolName) {
             case 'Promise':
                 const promiseType = tsType as ts.TypeReference;
 
@@ -337,7 +429,7 @@ export default class CSharpEmitterContext {
                 if (
                     promiseReturnType != null &&
                     cs.isPrimitiveTypeNode(promiseReturnType) &&
-                    promiseReturnType.type == cs.PrimitiveType.Void
+                    promiseReturnType.type === cs.PrimitiveType.Void
                 ) {
                     promiseReturnType = null;
                 }
@@ -367,7 +459,78 @@ export default class CSharpEmitterContext {
                     mapValueType = this.getTypeFromTsType(node, mapType.typeArguments[1]);
                 }
 
-                return this.createMapType(tsSymbol, node, mapKeyType!, mapValueType!);
+                return this.createMapType(tsSymbol, node, mapKeyType, mapValueType);
+            case 'Iterable':
+                const iterableType = tsType as ts.TypeReference;
+
+                let iterableItemType: cs.TypeNode | null = null;
+
+                if (typeArguments) {
+                    iterableItemType = typeArguments[0];
+                } else if (iterableType.typeArguments) {
+                    iterableItemType = this.getTypeFromTsType(node, iterableType.typeArguments[0]);
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    reference: this.makeIterableType(),
+                    typeArguments: [iterableItemType]
+                } as cs.TypeReference;
+
+            case 'Generator':
+                const generatorType = tsType as ts.TypeReference;
+
+                let generatorItemType: cs.TypeNode | null = null;
+
+                if (typeArguments) {
+                    generatorItemType = typeArguments[0];
+                } else if (generatorType.typeArguments) {
+                    generatorItemType = this.getTypeFromTsType(node, generatorType.typeArguments[0]);
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    reference: this.makeGeneratorType(),
+                    typeArguments: [generatorItemType]
+                } as cs.TypeReference;
+
+            case 'Iterator':
+                const iteratorType = tsType as ts.TypeReference;
+
+                let iteratorItemType: cs.TypeNode | null = null;
+
+                if (typeArguments) {
+                    iteratorItemType = typeArguments[0];
+                } else if (iteratorType.typeArguments) {
+                    iteratorItemType = this.getTypeFromTsType(node, iteratorType.typeArguments[0]);
+                }
+
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    parent: node.parent,
+                    tsNode: node.tsNode,
+                    reference: this.makeIteratorType(),
+                    typeArguments: [iteratorItemType]
+                } as cs.TypeReference;
+
+            case 'Disposable':
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    isAsync: false,
+                    isNullable: false,
+                    reference: 'Disposable'
+                } as cs.TypeReference;
+            case 'Error':
+                return {
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    isAsync: false,
+                    isNullable: false,
+                    reference: this.makeExceptionType()
+                } as cs.TypeReference;
             case 'Array':
                 const arrayType = tsType as ts.TypeReference;
                 let arrayElementType: cs.TypeNode | null = null;
@@ -388,11 +551,9 @@ export default class CSharpEmitterContext {
 
                 return this.createArrayListType(tsSymbol, node, arrayElementType);
             case ts.InternalSymbolName.Type:
-                let csType: cs.TypeNode | null = null;
-
-                csType = this.resolveFunctionTypeFromTsType(node, tsType);
-
-                return csType;
+                return this.resolveFunctionTypeFromTsType(node, tsType);
+            case ts.InternalSymbolName.Function:
+                return this.resolveFunctionTypeFromTsType(node, tsType);
 
             default:
                 let externalModule = this.resolveExternalModuleOfType(tsSymbol);
@@ -401,7 +562,7 @@ export default class CSharpEmitterContext {
                 }
 
                 // remove ArrayBuffer type arguments
-                switch (tsSymbol.name) {
+                switch (symbolName) {
                     case 'Int8Array':
                     case 'Uint8Array':
                     case 'Int16Array':
@@ -412,6 +573,7 @@ export default class CSharpEmitterContext {
                     case 'Float64Array':
                     case 'DataView':
                         typeArguments = [];
+                        tsSymbol = undefined;
                         break;
                 }
 
@@ -419,7 +581,8 @@ export default class CSharpEmitterContext {
                     nodeType: cs.SyntaxKind.TypeReference,
                     parent: node.parent,
                     tsNode: node.tsNode,
-                    reference: externalModule + tsSymbol.name,
+                    tsSymbol: tsSymbol,
+                    reference: externalModule + symbolName,
                     typeArguments: typeArguments
                 } as cs.TypeReference;
         }
@@ -437,7 +600,9 @@ export default class CSharpEmitterContext {
             case 'AlphaSkiaTextAlign':
             case 'AlphaSkiaTextBaseline':
             case 'AlphaSkiaTypeface':
-                return this.alphaSkiaModule() + '.';
+            case 'AlphaSkiaTextStyle':
+            case 'AlphaSkiaTextMetrics':
+                return `${this.alphaSkiaModule()}.`;
         }
 
         return undefined;
@@ -459,8 +624,8 @@ export default class CSharpEmitterContext {
     protected createMapType(
         symbol: ts.Symbol,
         node: cs.Node,
-        mapKeyType: cs.TypeNode,
-        mapValueType: cs.TypeNode
+        mapKeyType: cs.TypeNode | null,
+        mapValueType: cs.TypeNode | null
     ): cs.TypeNode {
         return {
             nodeType: cs.SyntaxKind.MapTypeNode,
@@ -473,7 +638,7 @@ export default class CSharpEmitterContext {
         } as cs.MapTypeNode;
     }
 
-    protected isCsValueType(mapValueType: cs.TypeNode) {
+    protected isCsValueType(mapValueType: cs.TypeNode | null) {
         if (mapValueType) {
             switch (mapValueType.nodeType) {
                 case cs.SyntaxKind.PrimitiveTypeNode:
@@ -493,6 +658,8 @@ export default class CSharpEmitterContext {
                         }
                     }
                     break;
+                case cs.SyntaxKind.ArrayTupleNode:
+                    return true;
             }
         }
         return false;
@@ -506,59 +673,36 @@ export default class CSharpEmitterContext {
             return null;
         }
 
-        let functionTypeNode: ts.FunctionTypeNode | null = null;
-        for (const declaration of tsType.symbol.declarations) {
-            if (ts.isFunctionTypeNode(declaration)) {
-                functionTypeNode = declaration;
-                break;
-            }
-        }
-
-        if (!functionTypeNode) {
+        const signatures = tsType.getCallSignatures();
+        if (signatures.length === 0) {
             return null;
         }
 
-        const typeNodeToCsType = (typeNode: ts.TypeNode) => {
-            const nodeTsType = this.typeChecker.getTypeAtLocation(typeNode);
-            if (!nodeTsType) {
-                return null;
-            }
-
-            const nodeType = this.getTypeFromTsType(node, nodeTsType);
-            if (!nodeType) {
-                return null;
-            }
-
-            return nodeType;
-        };
-
-        const returnType = typeNodeToCsType(functionTypeNode.type);
+        const returnType = this.getTypeFromTsType(node, signatures[0].getReturnType());
         if (!returnType) {
-            this.addTsNodeDiagnostics(
-                functionTypeNode.type,
-                'Could not resolve return type',
-                ts.DiagnosticCategory.Error
-            );
+            this.addCsNodeDiagnostics(node, 'Could not resolve return type', ts.DiagnosticCategory.Error);
             return null;
         }
 
         const parameterTypes: cs.TypeNode[] = [];
-        for (const p of functionTypeNode.parameters) {
-            const symbol = this.typeChecker.getSymbolAtLocation(p.name);
-            if (!symbol) {
-                this.addTsNodeDiagnostics(p, 'Could not resolve symbol for parameter', ts.DiagnosticCategory.Error);
-                return null;
-            }
-
-            const pTsType = this.typeChecker.getTypeOfSymbolAtLocation(symbol, p);
+        for (const p of signatures[0].parameters) {
+            const pTsType = this.typeChecker.getTypeOfSymbol(p);
             if (!pTsType) {
-                this.addTsNodeDiagnostics(p, 'Could not resolve type for parameter', ts.DiagnosticCategory.Error);
+                this.addTsNodeDiagnostics(
+                    p.declarations![0],
+                    'Could not resolve type for parameter',
+                    ts.DiagnosticCategory.Error
+                );
                 return null;
             }
 
             const pType = this.getTypeFromTsType(node, pTsType);
             if (!pType) {
-                this.addTsNodeDiagnostics(p, 'Could not map type for parameter', ts.DiagnosticCategory.Error);
+                this.addTsNodeDiagnostics(
+                    p.declarations![0],
+                    'Could not map type for parameter',
+                    ts.DiagnosticCategory.Error
+                );
                 return null;
             }
 
@@ -566,18 +710,26 @@ export default class CSharpEmitterContext {
         }
 
         let typeParameters: cs.TypeNode[] | undefined = undefined;
-        if (functionTypeNode.typeParameters) {
+        if (signatures[0].typeParameters) {
             typeParameters = [];
-            for (const tp of functionTypeNode.typeParameters) {
-                const tpTsType = this.typeChecker.getTypeAtLocation(tp);
+            for (const tp of signatures[0].typeParameters) {
+                const tpTsType = this.typeChecker.getTypeOfSymbol(tp.symbol);
                 if (!tpTsType) {
-                    this.addTsNodeDiagnostics(tp, 'Could not resolve type parameter', ts.DiagnosticCategory.Error);
+                    this.addTsNodeDiagnostics(
+                        tp.symbol.declarations![0],
+                        'Could not resolve type parameter',
+                        ts.DiagnosticCategory.Error
+                    );
                     return null;
                 }
 
                 const tpType = this.getTypeFromTsType(node, tpTsType);
                 if (!tpType) {
-                    this.addTsNodeDiagnostics(tp, 'Could not map type parameter', ts.DiagnosticCategory.Error);
+                    this.addTsNodeDiagnostics(
+                        tp.symbol.declarations![0],
+                        'Could not map type parameter',
+                        ts.DiagnosticCategory.Error
+                    );
                     return null;
                 }
 
@@ -614,7 +766,7 @@ export default class CSharpEmitterContext {
         // external union type alias, refer by name
         if (!tsType.symbol && tsType.aliasSymbol) {
             let isNullable = false;
-            for (let t of tsType.types) {
+            for (const t of tsType.types) {
                 if ((t.flags & ts.TypeFlags.Null) !== 0) {
                     isNullable = true;
                 } else if ((t.flags & ts.TypeFlags.Undefined) !== 0) {
@@ -645,17 +797,25 @@ export default class CSharpEmitterContext {
             } else if (actualType == null) {
                 actualType = t;
             } else if (actualType != null && actualType.flags !== t.flags) {
-                let isEmitted = this.isNodeEmitted(parent);
+                const isEmitted = this.isNodeEmitted(parent);
                 if (isEmitted && t.symbol.name !== 'PromiseLike') {
                     this.addCsNodeDiagnostics(
                         parent,
-                        'Union type covering multiple types detected, fallback to dynamic',
+                        'Union type covering multiple types detected, fallback to object',
                         ts.DiagnosticCategory.Warning
                     );
                 }
                 fallbackToObject = true;
-            } else {
-                actualType = t;
+            } else if (actualType !== t) {
+                if (t.symbol?.name === 'PromiseLike') {
+                    this.addCsNodeDiagnostics(
+                        parent,
+                        'Union type with promise detected, ignoring',
+                        ts.DiagnosticCategory.Warning
+                    );
+                } else {
+                    actualType = t;
+                }
             }
         }
 
@@ -673,7 +833,7 @@ export default class CSharpEmitterContext {
         }
 
         let type: cs.TypeNode | null;
-        if (actualType == tsType) {
+        if (actualType === tsType) {
             type = {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: parent,
@@ -692,10 +852,90 @@ export default class CSharpEmitterContext {
         } as cs.TypeReference;
     }
 
+    private resolveIntersectionType(
+        parent: cs.Node,
+        tsType: ts.Type,
+        typeArguments?: cs.UnresolvedTypeNode[]
+    ): cs.TypeNode | null {
+        if (!tsType.isIntersection()) {
+            return null;
+        }
+
+        let isNonNullable = false;
+        let actualType: ts.Type | null = null;
+        let fallbackToObject = false;
+        for (let t of tsType.types) {
+            if (t.isLiteral()) {
+                t = this.typeChecker.getBaseTypeOfLiteralType(t);
+            }
+
+            // NonNullable (e.g. type Y = X & {})
+            if ((t.flags & ts.TypeFlags.Object) !== 0 && (t as ts.ObjectType).getProperties().length === 0) {
+                isNonNullable = true;
+            } else if (actualType == null) {
+                actualType = t;
+            } else if (actualType != null && actualType.flags !== t.flags) {
+                const isEmitted = this.isNodeEmitted(parent);
+                if (isEmitted && t.symbol.name !== 'PromiseLike') {
+                    this.addCsNodeDiagnostics(
+                        parent,
+                        'Intersection type covering multiple types detected, fallback to object',
+                        ts.DiagnosticCategory.Warning
+                    );
+                }
+                fallbackToObject = true;
+            } else if (actualType !== t) {
+                if (t.symbol?.name === 'PromiseLike') {
+                    this.addCsNodeDiagnostics(
+                        parent,
+                        'Intersection type with promise detected, ignoring',
+                        ts.DiagnosticCategory.Warning
+                    );
+                } else {
+                    actualType = t;
+                }
+            }
+        }
+
+        if (fallbackToObject) {
+            return {
+                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                parent: parent,
+                type: cs.PrimitiveType.Object,
+                isNullable: isNonNullable
+            } as cs.PrimitiveTypeNode;
+        }
+
+        if (!actualType) {
+            return null;
+        }
+
+        let type: cs.TypeNode | null;
+        if (actualType === tsType) {
+            type = {
+                nodeType: cs.SyntaxKind.TypeReference,
+                parent: parent,
+                reference: tsType.symbol.name,
+                isNullable: isNonNullable
+            } as cs.TypeReference;
+        } else {
+            type = this.getTypeFromTsType(parent, actualType, undefined, typeArguments);
+        }
+
+        return {
+            nodeType: cs.SyntaxKind.TypeReference,
+            parent: parent,
+            reference: type,
+            isNullable: isNonNullable
+        } as cs.TypeReference;
+    }
+
     private isNodeEmitted(node: cs.Node): boolean {
         if ('skipEmit' in node && (node.skipEmit as boolean)) {
             return false;
-        } else if (node.parent) {
+        }
+
+        if (node.parent) {
             return this.isNodeEmitted(node.parent);
         }
         return true;
@@ -734,7 +974,26 @@ export default class CSharpEmitterContext {
 
         // raw object without symbol -> dynamic
         if ((tsType.flags & ts.TypeFlags.Object) !== 0 && !tsType.symbol) {
-            return handleNullablePrimitive(cs.PrimitiveType.Dynamic);
+            if (this.typeChecker.isTupleType(tsType)) {
+                // Note: named tuples here if we start using it
+
+                // Array style tuples: [unknown,unknown]
+                return this.makeArrayTupleType(parent, this.typeChecker.getTypeArguments(tsType as ts.TypeReference));
+            }
+
+            this.addCsNodeDiagnostics(
+                parent,
+                `Could not translate type ${this.typeChecker.typeToString(tsType)}, fallback to object`,
+                ts.DiagnosticCategory.Warning
+            );
+            return handleNullablePrimitive(cs.PrimitiveType.Object);
+        }
+
+        // undefined -> nullable object
+        if ((tsType.flags & ts.TypeFlags.Undefined) === ts.TypeFlags.Undefined) {
+            const undefinedType = handleNullablePrimitive(cs.PrimitiveType.Object);
+            undefinedType.isNullable = true;
+            return undefinedType;
         }
 
         // any -> dynamic
@@ -784,16 +1043,26 @@ export default class CSharpEmitterContext {
             } as cs.PrimitiveTypeNode;
         }
 
-        // never -> dynamic
-        // (actually it would be void for usages on return values, but we rather have it as array element type on empty arrays)
+        // never -> void
         if ((tsType.flags & ts.TypeFlags.Never) !== 0) {
             return {
                 nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                type: cs.PrimitiveType.Dynamic
+                type: cs.PrimitiveType.Void
             } as cs.PrimitiveTypeNode;
         }
 
         return null;
+    }
+
+    public makeArrayTupleType(parent: cs.Node, typeArguments: readonly ts.Type[]): cs.ArrayTupleNode {
+        const ref = {
+            parent,
+            nodeType: cs.SyntaxKind.ArrayTupleNode
+        } as cs.ArrayTupleNode;
+
+        ref.types = typeArguments.map(x => this.getTypeFromTsType(ref, x)!);
+
+        return ref;
     }
 
     private resolveKnownTypeSymbol(
@@ -813,7 +1082,7 @@ export default class CSharpEmitterContext {
 
             if (typeArguments) {
                 reference.typeArguments = [];
-                typeArguments.forEach(a => {
+                for (const a of typeArguments) {
                     const parameterType = this.resolveType(a);
                     if (!parameterType) {
                         this.addTsNodeDiagnostics(
@@ -824,12 +1093,12 @@ export default class CSharpEmitterContext {
                     } else {
                         reference.typeArguments!.push(parameterType);
                     }
-                });
+                }
             } else {
                 const tsTypeArguments = (tsType as ts.TypeReference).typeArguments;
                 if (tsTypeArguments) {
                     reference.typeArguments = [];
-                    tsTypeArguments.forEach(a => {
+                    for (const a of tsTypeArguments) {
                         const parameterType = this.getTypeFromTsType(node, a);
                         if (!parameterType) {
                             this.addTsNodeDiagnostics(
@@ -840,12 +1109,14 @@ export default class CSharpEmitterContext {
                         } else {
                             reference.typeArguments!.push(parameterType);
                         }
-                    });
+                    }
                 }
             }
 
             return reference;
-        } else if (tsType.isTypeParameter()) {
+        }
+
+        if (tsType.isTypeParameter()) {
             return {
                 nodeType: cs.SyntaxKind.TypeReference,
                 parent: node.parent,
@@ -857,8 +1128,21 @@ export default class CSharpEmitterContext {
         return null;
     }
 
-    public makeExceptionType(): cs.TypeReferenceType {
-        return this.makeTypeName('system.Exception');
+    public makeExceptionType(): string {
+        // global alias
+        return this.makeTypeName('Error');
+    }
+
+    public makeIterableType(): string {
+        return this.makeTypeName('System.Collections.Generic.IEnumerable');
+    }
+
+    public makeIteratorType(): string {
+        return this.makeTypeName('System.Collections.Generic.IEnumerator');
+    }
+
+    public makeGeneratorType(): string {
+        return this.makeTypeName('System.Collections.Generic.IEnumerator');
     }
 
     public makeTypeName(tsName: string): string {
@@ -877,34 +1161,40 @@ export default class CSharpEmitterContext {
         return result;
     }
 
-    protected buildCoreNamespace(aliasSymbol: ts.Symbol) {
+    protected buildCoreNamespace(aliasSymbol?: ts.Symbol) {
         let suffix = '';
 
-        if (aliasSymbol.name === 'Map') {
-            return this.toPascalCase('alphaTab.collections') + suffix + '.';
-        }
+        if (aliasSymbol) {
+            if (aliasSymbol.name === 'Map') {
+                return `${this.toPascalCase('alphaTab.collections') + suffix}.`;
+            }
 
-        if (aliasSymbol.declarations) {
-            for (const decl of aliasSymbol.declarations) {
-                let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
-                if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
-                    fileName = fileName.substring(4, fileName.length - 5);
-                    if (fileName.length) {
-                        suffix = fileName.split('.').map(s => {
-                            if (s.match(/es[0-9]{4}/)) {
-                                return '.' + this.toPascalCase('ecmaScript');
-                            }
-                            if (s.match(/es[0-9]{1}/)) {
-                                return '.' + this.toPascalCase('ecmaScript');
-                            }
-                            return '.' + this.toPascalCase(s);
-                        })[0];
+            if (aliasSymbol.name === 'Error') {
+                return '';
+            }
+
+            if (aliasSymbol.declarations) {
+                for (const decl of aliasSymbol.declarations) {
+                    let fileName = path.basename(decl.getSourceFile().fileName).toLowerCase();
+                    if (fileName.startsWith('lib.') && fileName.endsWith('.d.ts')) {
+                        fileName = fileName.substring(4, fileName.length - 5);
+                        if (fileName.length) {
+                            suffix = fileName.split('.').map(s => {
+                                if (s.match(/es[0-9]{4}/)) {
+                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                }
+                                if (s.match(/es[0-9]{1}/)) {
+                                    return `.${this.toPascalCase('ecmaScript')}`;
+                                }
+                                return `.${this.toPascalCase(s)}`;
+                            })[0];
+                        }
                     }
                 }
             }
         }
 
-        return this.toPascalCase('alphaTab.core') + suffix + '.';
+        return `${this.toPascalCase('alphaTab.core') + suffix}.`;
     }
     protected toCoreTypeName(s: string) {
         if (s === 'Map') {
@@ -954,6 +1244,11 @@ export default class CSharpEmitterContext {
         }
     }
 
+    public resolveSymbol(symbol: ts.Symbol): (cs.NamedElement & cs.Node) | undefined {
+        const symbolKey = this.getSymbolKey(symbol);
+        return this._symbolLookup.get(symbolKey);
+    }
+
     public isConst(declaration: cs.FieldDeclaration) {
         const symbolKey = this.getSymbolKey(declaration.tsSymbol!);
         return this._symbolConst.has(symbolKey);
@@ -976,14 +1271,13 @@ export default class CSharpEmitterContext {
         const declaration = symbol.valueDeclaration
             ? symbol.valueDeclaration
             : symbol.declarations && symbol.declarations.length > 0
-            ? symbol.declarations[0]
-            : undefined;
+              ? symbol.declarations[0]
+              : undefined;
 
         if (declaration) {
-            return symbol.name + '_' + declaration.getSourceFile().fileName + '_' + declaration.pos;
-        } else {
-            return symbol.name;
+            return `${symbol.name}_${declaration.getSourceFile().fileName}_${declaration.pos}`;
         }
+        return symbol.name;
     }
 
     public getSymbolForDeclaration(node: ts.Node): ts.Symbol | undefined {
@@ -995,6 +1289,20 @@ export default class CSharpEmitterContext {
             }
         }
         return symbol;
+    }
+
+    public getMethodNameFromSymbol(symbol: ts.Symbol): string {
+        const parent = 'parent' in symbol ? (symbol.parent as ts.Symbol) : undefined;
+
+        if (symbol.name === 'dispose' && (!parent || parent.name === 'SymbolConstructor')) {
+            return symbol.name;
+        }
+
+        if (symbol.name === 'iterator' && (!parent || parent.name === 'SymbolConstructor')) {
+            return this.toMethodName('getEnumerator');
+        }
+
+        return '';
     }
 
     public isUnknownSmartCast(expression: ts.Expression) {
@@ -1018,7 +1326,9 @@ export default class CSharpEmitterContext {
             }
 
             return false;
-        } else if (type.symbol != null && type.symbol.name === 'Iterable') {
+        }
+
+        if (type.symbol != null && type.symbol.name === 'Iterable') {
             return true;
         }
 
@@ -1113,14 +1423,14 @@ export default class CSharpEmitterContext {
         }
 
         // declared type must be nullable
-        let declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
+        const declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
         if (!this.isNullableType(declaredType)) {
             return undefined;
         }
 
         // actual type at location must be non nullable
-        let declaredTypeNonNull = this.typeChecker.getNonNullableType(declaredType);
-        let contextualType = this.typeChecker.getTypeOfSymbolAtLocation(symbol, expression);
+        const declaredTypeNonNull = this.typeChecker.getNonNullableType(declaredType);
+        const contextualType = this.typeChecker.getTypeOfSymbolAtLocation(symbol, expression);
         if (!contextualType || this.isNullableType(contextualType)) {
             return undefined;
         }
@@ -1150,7 +1460,7 @@ export default class CSharpEmitterContext {
             return false;
         }
 
-        let contextualType = this.typeChecker.getContextualType(expression);
+        const contextualType = this.typeChecker.getTypeAtLocation(expression);
         if (!contextualType) {
             return false;
         }
@@ -1170,26 +1480,35 @@ export default class CSharpEmitterContext {
             symbol = this.typeChecker.getAliasedSymbol(symbol);
         }
 
-        if (
-            symbol.flags & ts.SymbolFlags.Interface ||
-            symbol.flags & ts.SymbolFlags.Class ||
-            symbol.flags & ts.SymbolFlags.BlockScopedVariable ||
-            symbol.flags & ts.SymbolFlags.FunctionScopedVariable
-        ) {
+        if (symbol.flags & ts.SymbolFlags.Interface || symbol.flags & ts.SymbolFlags.Class) {
             return false;
         }
 
-        let declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
+        const declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
         if (!this.isNullableType(declaredType)) {
             return false;
         }
 
-        return contextualType == this.typeChecker.getNonNullableType(declaredType);
+        return (
+            this.typeChecker.getNonNullableType(declaredType) === this.typeChecker.getNonNullableType(contextualType) &&
+            this.isNullableType(declaredType) &&
+            !this.isNullableType(contextualType)
+        );
     }
 
     public getSmartCastType(expression: ts.Expression): ts.Type | null {
         // if the parent is already casting, we have no "smart" cast.
         if (expression.parent.kind === ts.SyntaxKind.AsExpression) {
+            return null;
+        }
+
+        // no smartcast on assignments
+        if (
+            ts.isBinaryExpression(expression.parent) &&
+            (expression.parent.operatorToken.kind === ts.SyntaxKind.EqualsToken ||
+                expression.parent.operatorToken.kind === ts.SyntaxKind.QuestionQuestionEqualsToken) &&
+            expression.parent.left === expression
+        ) {
             return null;
         }
 
@@ -1210,7 +1529,7 @@ export default class CSharpEmitterContext {
         let symbol = this.typeChecker.getSymbolAtLocation(expression);
         if (!symbol) {
             // smartcast to unknown?
-            let contextualType = this.typeChecker.getContextualType(expression);
+            const contextualType = this.typeChecker.getContextualType(expression);
             if (
                 contextualType &&
                 ((contextualType.flags & ts.TypeFlags.Any) !== 0 || (contextualType.flags & ts.TypeFlags.Unknown) !== 0)
@@ -1243,7 +1562,7 @@ export default class CSharpEmitterContext {
 
         let declaredType = this.typeChecker.getTypeAtLocation(declarations[0]);
 
-        let contextualTypeNullable = contextualType;
+        const contextualTypeNullable = contextualType;
         contextualType = this.typeChecker.getNonNullableType(contextualType);
         declaredType = this.typeChecker.getNonNullableType(declaredType);
 
@@ -1290,12 +1609,13 @@ export default class CSharpEmitterContext {
         // enum literal to same enum type
         if (
             contextualType.flags & ts.TypeFlags.EnumLiteral &&
-            (declaredType.symbol as any)?.parent == contextualType.symbol
+            (declaredType.symbol as any)?.parent === contextualType.symbol
         ) {
             return null;
         }
 
-        return contextualType !== declaredType && !this.isTypeAssignable(contextualType, declaredType)
+        return contextualType !== declaredType &&
+            !this.isTypeAssignable(contextualType, contextualTypeNullable, declaredType)
             ? contextualTypeNullable
             : null;
     }
@@ -1349,28 +1669,18 @@ export default class CSharpEmitterContext {
         this._virtualSymbols.set(key, true);
     }
 
-    public markOverride(classElement: ts.ClassElement): boolean {
+    public markOverride(classElement: ts.ClassElement): (ts.ClassElement | ts.TypeElement)[] {
         let parent: ts.Node = classElement;
         while (parent.kind !== ts.SyntaxKind.ClassDeclaration) {
             if (parent.parent) {
                 parent = parent.parent;
             } else {
-                return false;
+                return [];
             }
         }
 
-        let classDecl = parent as ts.ClassDeclaration;
-        let classSymbol = this.typeChecker.getSymbolAtLocation(classDecl.name!);
-        if (!classSymbol) {
-            return false;
-        }
-
-        let classType = this.typeChecker.getDeclaredTypeOfSymbol(classSymbol);
-        if (!classType || !classType.isClass()) {
-            return false;
-        }
-
-        const overridden = this.getOverriddenMembers(classType, classElement);
+        const classDecl = parent as ts.ClassDeclaration;
+        const overridden = this.getOverriddenMembers(classDecl, classElement);
         if (overridden.length > 0) {
             const member =
                 this.typeChecker.getSymbolAtLocation(classElement) ??
@@ -1378,37 +1688,48 @@ export default class CSharpEmitterContext {
             this._virtualSymbols.set(this.getSymbolKey(member), true);
 
             for (const s of overridden) {
-                const symbolKey = this.getSymbolKey(s);
+                const overriddenMember =
+                    this.typeChecker.getSymbolAtLocation(s) ?? this.typeChecker.getSymbolAtLocation(s.name!);
+                const symbolKey = this.getSymbolKey(overriddenMember);
                 this._virtualSymbols.set(symbolKey, true);
             }
         }
 
-        return overridden.length > 0;
+        return overridden;
     }
 
-    protected getOverriddenMembers(classType: ts.InterfaceType, classElement: ts.ClassElement): ts.Symbol[] {
-        const symbols: ts.Symbol[] = [];
-        this.collectOverriddenMembersByName(symbols, classType, classElement.name!.getText(), false, false);
-        return symbols;
+    protected getOverriddenMembers(
+        classType: ts.ClassDeclaration | ts.InterfaceDeclaration,
+        classElement: ts.ClassElement
+    ): (ts.ClassElement | ts.TypeElement)[] {
+        const overriddenItems: (ts.ClassElement | ts.TypeElement)[] = [];
+        this.collectOverriddenMembersByName(overriddenItems, classType, classElement.name!.getText(), false, false);
+        return overriddenItems;
     }
 
     protected collectOverriddenMembersByName(
-        symbols: ts.Symbol[],
-        classType: ts.InterfaceType,
+        overriddenItems: (ts.ClassElement | ts.TypeElement)[],
+        classType: ts.ClassDeclaration | ts.InterfaceDeclaration,
         memberName: string,
         includeOwnMembers: boolean = false,
         allowInterfaces: boolean = false
     ) {
-        const member = classType.symbol?.members?.get(ts.escapeLeadingUnderscores(memberName));
+        const member = classType.members.find(m => m.name?.getText() === memberName);
         if (includeOwnMembers && member) {
-            symbols.push(member);
+            overriddenItems.push(member);
         }
 
-        const baseTypes = classType.getBaseTypes();
-        if (baseTypes) {
-            for (const baseType of baseTypes) {
-                if ((allowInterfaces && baseType.isClassOrInterface()) || baseType.isClass()) {
-                    this.collectOverriddenMembersByName(symbols, baseType, memberName, true, allowInterfaces);
+        if (classType.heritageClauses) {
+            for (const implementsClause of classType.heritageClauses) {
+                for (const typeSyntax of implementsClause.types) {
+                    const declarations = this.typeChecker.getTypeFromTypeNode(typeSyntax)?.symbol.declarations;
+                    if (declarations) {
+                        for (const decl of declarations) {
+                            if (ts.isClassDeclaration(decl) || (allowInterfaces && ts.isInterfaceDeclaration(decl))) {
+                                this.collectOverriddenMembersByName(overriddenItems, decl, memberName, true, true);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -1427,6 +1748,8 @@ export default class CSharpEmitterContext {
             tsType = this.typeChecker.getTypeAtLocation(expression);
         }
 
+        tsType = this.typeChecker.getNonNullableType(tsType);
+
         return this.isValueType(tsType);
     }
 
@@ -1439,9 +1762,36 @@ export default class CSharpEmitterContext {
             return true;
         }
 
+        return this.isEnum(tsType) || this.typeChecker.isTupleType(tsType);
+    }
+
+    public isEnum(tsType: ts.Type) {
         // enums
         if (tsType.symbol && tsType.symbol.flags & ts.SymbolFlags.Enum) {
             return true;
+        }
+        if (tsType.symbol && tsType.symbol.flags & ts.SymbolFlags.EnumMember) {
+            return true;
+        }
+        if (tsType.flags & ts.TypeFlags.EnumLiteral) {
+            return true;
+        }
+
+        // enums disguised as union
+        if (tsType.isUnion() && (tsType as ts.UnionType).types.length > 0) {
+            let isEnum = true;
+            for (const t of (tsType as ts.UnionType).types) {
+                if (
+                    !t.symbol ||
+                    (!(t.symbol.flags & ts.SymbolFlags.Enum) && !(t.symbol.flags & ts.SymbolFlags.EnumMember))
+                ) {
+                    isEnum = false;
+                    break;
+                }
+            }
+            if (isEnum) {
+                return true;
+            }
         }
 
         return false;
@@ -1515,11 +1865,11 @@ export default class CSharpEmitterContext {
         switch (node.nodeType) {
             case cs.SyntaxKind.ClassDeclaration:
                 const csClass = node as cs.ClassDeclaration;
-                csClass.members.forEach(m => {
+                for (const m of csClass.members) {
                     if (this.makeVirtual(m, visited)) {
                         hasVirtualMember = true;
                     }
-                });
+                }
 
                 let baseClass = csClass.baseClass;
                 while (baseClass != null) {
@@ -1585,14 +1935,16 @@ export default class CSharpEmitterContext {
                 }
 
                 if (csClass.interfaces) {
-                    csClass.interfaces.forEach(i => this.makePublic(i, visited));
+                    for (const i of csClass.interfaces) {
+                        this.makePublic(i, visited);
+                    }
                 }
 
-                csClass.members.forEach(m => {
-                    if (m.visibility == cs.Visibility.Public || m.visibility == cs.Visibility.Protected) {
+                for (const m of csClass.members) {
+                    if (m.visibility === cs.Visibility.Public || m.visibility === cs.Visibility.Protected) {
                         this.makePublic(m, visited);
                     }
-                });
+                }
                 break;
             case cs.SyntaxKind.EnumDeclaration:
                 const csEnum = node as cs.EnumDeclaration;
@@ -1603,22 +1955,28 @@ export default class CSharpEmitterContext {
                 csInterface.visibility = cs.Visibility.Public;
 
                 if (csInterface.interfaces) {
-                    csInterface.interfaces.forEach(i => this.makePublic(i, visited));
+                    for (const i of csInterface.interfaces) {
+                        this.makePublic(i, visited);
+                    }
                 }
 
-                csInterface.members.forEach(m => {
+                for (const m of csInterface.members) {
                     this.makePublic(m, visited);
-                });
+                }
 
                 break;
 
             case cs.SyntaxKind.ConstructorDeclaration:
                 const csConstructor = node as cs.ConstructorDeclaration;
-                csConstructor.parameters.forEach(p => this.makePublic(p, visited));
+                for (const p of csConstructor.parameters) {
+                    this.makePublic(p, visited);
+                }
                 break;
             case cs.SyntaxKind.MethodDeclaration:
                 const csMethod = node as cs.MethodDeclaration;
-                csMethod.parameters.forEach(p => this.makePublic(p, visited));
+                for (const p of csMethod.parameters) {
+                    this.makePublic(p, visited);
+                }
                 this.makePublic(csMethod.returnType, visited);
                 break;
             case cs.SyntaxKind.PropertyDeclaration:
@@ -1634,7 +1992,9 @@ export default class CSharpEmitterContext {
             case cs.SyntaxKind.TypeReference:
                 const csTypeRef = node as cs.TypeReference;
                 if (csTypeRef.typeArguments) {
-                    csTypeRef.typeArguments.forEach(r => this.makePublic(r, visited));
+                    for (const r of csTypeRef.typeArguments) {
+                        this.makePublic(r, visited);
+                    }
                 }
                 if (typeof csTypeRef.reference !== 'string') {
                     this.makePublic(csTypeRef.reference, visited);
@@ -1649,8 +2009,12 @@ export default class CSharpEmitterContext {
                 break;
             case cs.SyntaxKind.MapTypeNode:
                 const mapType = node as cs.MapTypeNode;
-                this.makePublic(mapType.keyType, visited);
-                this.makePublic(mapType.valueType, visited);
+                if (mapType.keyType) {
+                    this.makePublic(mapType.keyType, visited);
+                }
+                if (mapType.valueType) {
+                    this.makePublic(mapType.valueType, visited);
+                }
                 break;
         }
     }
@@ -1675,6 +2039,36 @@ export default class CSharpEmitterContext {
     }
 
     public getDefaultUsings(): string[] {
-        return [this.toPascalCase('system'), this.toPascalCase('alphaTab') + '.' + this.toPascalCase('core')];
+        return [this.toPascalCase('system'), `${this.toPascalCase('alphaTab')}.${this.toPascalCase('core')}`];
+    }
+
+    public buildMethodName(propertyName: ts.PropertyName) {
+        let methodName: string = '';
+        if (ts.isIdentifier(propertyName)) {
+            methodName = propertyName.text;
+        } else if (ts.isComputedPropertyName(propertyName)) {
+            if (ts.isPropertyAccessExpression(propertyName.expression)) {
+                const symbol = this.getSymbolForDeclaration(propertyName.expression);
+                if (symbol) {
+                    methodName = this.getMethodNameFromSymbol(symbol);
+                }
+            } else if (ts.isStringLiteral(propertyName)) {
+                methodName = (propertyName as ts.StringLiteral).text;
+            } else {
+                methodName = `<invalid method name ${propertyName.getText()}>`;
+                this.addTsNodeDiagnostics(propertyName, 'Unsupported method name syntax', ts.DiagnosticCategory.Error);
+            }
+        } else if (ts.isStringLiteral(propertyName)) {
+            methodName = propertyName.text;
+        } else if (ts.isPrivateIdentifier(propertyName)) {
+            methodName = propertyName.text.substring(1);
+        }
+
+        if (!methodName) {
+            methodName = `<invalid method name ${propertyName.getText()}>`;
+            this.addTsNodeDiagnostics(propertyName, 'Unsupported method name syntax', ts.DiagnosticCategory.Error);
+        }
+
+        return this.toMethodName(methodName);
     }
 }

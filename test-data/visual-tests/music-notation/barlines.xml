@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">Two properly nested part groups:
+          One group (with a bracket) goes from staff 2 to 4, and another group
+          (with a brace) goes from staff 3 to 4.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name></part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <!-- Check combinations of bars -->
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <barline location="left">
+        <bar-style>dashed</bar-style>
+      </barline>
+      <barline location="right">
+        <bar-style>dotted</bar-style>
+      </barline>
+    </measure>
+    <measure number="2">
+      <barline location="left">
+        <bar-style>dashed</bar-style>
+      </barline>
+      <barline location="right">
+        <bar-style>heavy-heavy</bar-style>
+      </barline>
+    </measure>
+    <measure number="3">
+      <barline location="left">
+        <bar-style>heavy-heavy</bar-style>
+      </barline>
+      <barline location="right">
+        <bar-style>heavy-heavy</bar-style>
+      </barline>
+    </measure>
+    <measure number="4">
+      <barline location="left">
+        <bar-style>dashed</bar-style>
+      </barline>
+      <barline location="right">
+        <bar-style>regular</bar-style>
+      </barline>
+    </measure>
+    <measure number="5">
+      <barline location="left">
+        <bar-style>dashed</bar-style>
+      </barline>
+      <barline location="right">
+        <bar-style>dashed</bar-style>
+      </barline>
+    </measure>
+    <measure number="6">
+      <barline location="left">
+        <bar-style>regular</bar-style>
+      </barline>
+    </measure>
+    <!-- All Styles -->
+    <measure number="7">
+      <barline location="right">
+        <bar-style>dashed</bar-style>
+      </barline>
+    </measure>
+    <measure number="8">
+      <barline location="right">
+        <bar-style>dotted</bar-style>
+      </barline>
+    </measure>
+    <measure number="9">
+      <barline location="right">
+        <bar-style>heavy</bar-style>
+      </barline>
+    </measure>
+    <measure number="10">
+      <barline location="right">
+        <bar-style>heavy-heavy</bar-style>
+      </barline>
+    </measure>
+    <measure number="11">
+      <barline location="right">
+        <bar-style>heavy-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="12">
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+    <measure number="13">
+      <barline location="right">
+        <bar-style>light-light</bar-style>
+      </barline>
+    </measure>
+    <measure number="14">
+      <barline location="right">
+        <bar-style>none</bar-style>
+      </barline>
+    </measure>
+    <measure number="15">
+      <barline location="right">
+        <bar-style>regular</bar-style>
+      </barline>
+    </measure>
+    <measure number="16">
+      <barline location="right">
+        <bar-style>short</bar-style>
+      </barline>
+    </measure>
+    <measure number="17">
+      <barline location="right">
+        <bar-style>tick</bar-style>
+      </barline>
+    </measure>
+    <measure number="18">
+      
+    </measure>
+  </part> 
+</score-partwise>

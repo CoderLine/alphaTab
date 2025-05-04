@@ -3,26 +3,26 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 import {
-    ControlChangeEvent,
-    MidiEvent,
+    type ControlChangeEvent,
+    type MidiEvent,
     MidiEventType,
-    NoteBendEvent,
-    NoteOffEvent,
-    NoteOnEvent,
-    PitchBendEvent,
-    ProgramChangeEvent,
-    TempoChangeEvent,
-    TimeSignatureEvent
+    type NoteBendEvent,
+    type NoteOffEvent,
+    type NoteOnEvent,
+    type PitchBendEvent,
+    type ProgramChangeEvent,
+    type TempoChangeEvent,
+    type TimeSignatureEvent
 } from '@src/midi/MidiEvent';
 import {
-    Hydra,
-    HydraIbag,
-    HydraIgen,
-    HydraInst,
-    HydraPbag,
+    type Hydra,
+    type HydraIbag,
+    type HydraIgen,
+    type HydraInst,
+    type HydraPbag,
     HydraPgen,
-    HydraPhdr,
-    HydraShdr
+    type HydraPhdr,
+    type HydraShdr
 } from '@src/synth/soundfont/Hydra';
 import { Channel } from '@src/synth/synthesis/Channel';
 import { Channels } from '@src/synth/synthesis/Channels';
@@ -30,7 +30,7 @@ import { LoopMode } from '@src/synth/synthesis/LoopMode';
 import { OutputMode } from '@src/synth/synthesis/OutputMode';
 import { Preset } from '@src/synth/synthesis/Preset';
 import { Region } from '@src/synth/synthesis/Region';
-import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
+import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { Voice } from '@src/synth/synthesis/Voice';
 import { VoiceEnvelopeSegment } from '@src/synth/synthesis/VoiceEnvelope';
 import { SynthHelper } from '@src/synth/SynthHelper';
@@ -81,8 +81,8 @@ export class TinySoundFont {
     }
 
     public channelSetMixVolume(channel: number, volume: number): void {
-        let c: Channel = this.channelInit(channel);
-        for (let v of this._voices) {
+        const c: Channel = this.channelInit(channel);
+        for (const v of this._voices) {
             if (v.playingChannel === channel && v.playingPreset !== -1) {
                 v.mixVolume = volume;
             }
@@ -184,7 +184,7 @@ export class TinySoundFont {
         // process in micro-buffers
         // process events for first microbuffer
         while (!this._midiEventQueue.isEmpty) {
-            let m: SynthEvent = this._midiEventQueue.dequeue();
+            const m: SynthEvent = this._midiEventQueue.dequeue();
             if (m.isMetronome && this.metronomeVolume > 0) {
                 this.channelNoteOff(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey);
                 this.channelNoteOn(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey, 95 / 127);
@@ -202,7 +202,7 @@ export class TinySoundFont {
                 // exception. metronome is implicitly added in solo
                 const isChannelMuted: boolean =
                     this._mutedChannels.has(channel) ||
-                    (anySolo && channel != SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
+                    (anySolo && channel !== SynthConstants.MetronomeChannel && !this._soloChannels.has(channel));
 
                 if (!buffer) {
                     voice.kill();
@@ -216,7 +216,7 @@ export class TinySoundFont {
     }
 
     private processMidiMessage(e: MidiEvent): void {
-        Logger.debug('Midi', 'Processing Midi message ' + MidiEventType[e.type] + '/' + e.tick);
+        Logger.debug('Midi', `Processing Midi message ${MidiEventType[e.type]}/${e.tick}`);
         const command: MidiEventType = e.type;
         switch (command) {
             case MidiEventType.TimeSignature:
@@ -279,7 +279,7 @@ export class TinySoundFont {
     }
 
     public set masterVolume(value: number) {
-        var gainDb = SynthHelper.gainToDecibels(value);
+        const gainDb = SynthHelper.gainToDecibels(value);
         const gainDBChange: number = gainDb - this.globalGainDb;
         if (gainDBChange === 0) {
             return;
@@ -355,7 +355,7 @@ export class TinySoundFont {
      * Stop all playing notes immediatly and reset all channel parameters
      */
     public reset(): void {
-        for (let v of this._voices) {
+        for (const v of this._voices) {
             if (
                 v.playingPreset !== -1 &&
                 (v.ampEnv.segment < VoiceEnvelopeSegment.Release || v.ampEnv.parameters!.release !== 0)
@@ -420,7 +420,7 @@ export class TinySoundFont {
                     }
                 }
             } else {
-                for (let v of this._voices) {
+                for (const v of this._voices) {
                     if (v.playingPreset === -1) {
                         voice = v;
                     }
@@ -488,7 +488,7 @@ export class TinySoundFont {
      * @returns returns false if preset does not exist, otherwise true
      */
     public bankNoteOn(bank: number, presetNumber: number, key: number, vel: number): boolean {
-        let presetIndex: number = this.getPresetIndex(bank, presetNumber);
+        const presetIndex: number = this.getPresetIndex(bank, presetNumber);
         if (presetIndex === -1) {
             return false;
         }
@@ -502,15 +502,17 @@ export class TinySoundFont {
     public noteOff(presetIndex: number, key: number): void {
         let matchFirst: Voice | null = null;
         let matchLast: Voice | null = null;
-        let matches: Voice[] = [];
-        for (let v of this._voices) {
+        const matches: Voice[] = [];
+        for (const v of this._voices) {
             if (
                 v.playingPreset !== presetIndex ||
                 v.playingKey !== key ||
                 v.ampEnv.segment >= VoiceEnvelopeSegment.Release
             ) {
                 continue;
-            } else if (!matchFirst || v.playIndex < matchFirst.playIndex) {
+            }
+
+            if (!matchFirst || v.playIndex < matchFirst.playIndex) {
                 matchFirst = v;
                 matchLast = v;
                 matches.push(v);
@@ -587,7 +589,7 @@ export class TinySoundFont {
         }
 
         for (let i: number = this._channels.channelList.length; i <= channel; i++) {
-            let c: Channel = new Channel();
+            const c: Channel = new Channel();
             c.presetIndex = 0;
             c.bank = 0;
             c.pitchWheel = 8192;
@@ -617,7 +619,7 @@ export class TinySoundFont {
 
         // search reverse (last import wins)
         for (let i: number = this.presets.length - 1; i >= 0; i--) {
-            let preset: Preset = this.presets[i];
+            const preset: Preset = this.presets[i];
             if (preset.presetNumber === presetNumber && preset.bank === bank) {
                 return i;
             }
@@ -703,7 +705,7 @@ export class TinySoundFont {
             }
         }
 
-        let c: Channel = this.channelInit(channel);
+        const c: Channel = this.channelInit(channel);
         c.perNotePitchWheel.delete(key);
 
         if (!matchFirst) {
@@ -733,7 +735,7 @@ export class TinySoundFont {
      * @param channel channel number
      */
     public channelNoteOffAll(channel: number): void {
-        let c: Channel = this.channelInit(channel);
+        const c: Channel = this.channelInit(channel);
         c.perNotePitchWheel.clear();
 
         for (const v of this._voices) {
@@ -752,10 +754,10 @@ export class TinySoundFont {
      * @param channel channel number
      */
     public channelSoundsOffAll(channel: number): void {
-        let c: Channel = this.channelInit(channel);
+        const c: Channel = this.channelInit(channel);
         c.perNotePitchWheel.clear();
 
-        for (let v of this._voices) {
+        for (const v of this._voices) {
             if (
                 v.playingPreset !== -1 &&
                 v.playingChannel === channel &&
@@ -835,7 +837,7 @@ export class TinySoundFont {
     public channelSetPan(channel: number, pan: number): void {
         for (const v of this._voices) {
             if (v.playingChannel === channel && v.playingPreset !== -1) {
-                let newPan: number = v.region!.pan + pan - 0.5;
+                const newPan: number = v.region!.pan + pan - 0.5;
                 if (newPan <= -0.5) {
                     v.panFactorLeft = 1;
                     v.panFactorRight = 0;
@@ -910,7 +912,7 @@ export class TinySoundFont {
 
     private channelApplyPitch(channel: number, c: Channel, key: number = -1): void {
         for (const v of this._voices) {
-            if (v.playingChannel === channel && v.playingPreset !== -1 && (key == -1 || v.playingKey === key)) {
+            if (v.playingChannel === channel && v.playingPreset !== -1 && (key === -1 || v.playingKey === key)) {
                 v.updatePitchRatio(c, this.outSampleRate);
             }
         }
@@ -950,7 +952,7 @@ export class TinySoundFont {
      * Apply a MIDI control change to the channel (not all controllers are supported!)
      */
     public channelMidiControl(channel: number, controller: ControllerType, controlValue: number): void {
-        let c: Channel = this.channelInit(channel);
+        const c: Channel = this.channelInit(channel);
         switch (controller) {
             case ControllerType.DataEntryFine:
                 c.midiData = TypeConversions.int32ToUint16((c.midiData & 0x3f80) | controlValue);
@@ -1161,7 +1163,7 @@ export class TinySoundFont {
                 let phivel: number = 127;
 
                 for (let pgenIndex: number = pbag.genNdx; pgenIndex < hydra.pbags[pbagIndex + 1].genNdx; pgenIndex++) {
-                    let pgen: HydraPgen = hydra.pgens[pgenIndex];
+                    const pgen: HydraPgen = hydra.pgens[pgenIndex];
 
                     if (pgen.genOper === HydraPgen.GenKeyRange) {
                         plokey = pgen.genAmount.lowByteAmount;
@@ -1183,13 +1185,13 @@ export class TinySoundFont {
                         continue;
                     }
 
-                    let pinst: HydraInst = hydra.insts[pgen.genAmount.wordAmount];
+                    const pinst: HydraInst = hydra.insts[pgen.genAmount.wordAmount];
                     for (
                         let ibagIndex: number = pinst.instBagNdx;
                         ibagIndex < hydra.insts[pgen.genAmount.wordAmount + 1].instBagNdx;
                         ibagIndex++
                     ) {
-                        let ibag: HydraIbag = hydra.ibags[ibagIndex];
+                        const ibag: HydraIbag = hydra.ibags[ibagIndex];
 
                         let ilokey: number = 0;
                         let ihikey: number = 127;
@@ -1201,7 +1203,7 @@ export class TinySoundFont {
                             igenIndex < hydra.ibags[ibagIndex + 1].instGenNdx;
                             igenIndex++
                         ) {
-                            let igen: HydraIgen = hydra.igens[igenIndex];
+                            const igen: HydraIgen = hydra.igens[igenIndex];
                             if (igen.genOper === HydraPgen.GenKeyRange) {
                                 ilokey = igen.genAmount.lowByteAmount;
                                 ihikey = igen.genAmount.highByteAmount;
@@ -1250,7 +1252,7 @@ export class TinySoundFont {
 
                     // Instrument.
                     if (pgen.genOper === HydraPgen.GenInstrument) {
-                        let whichInst: number = pgen.genAmount.wordAmount;
+                        const whichInst: number = pgen.genAmount.wordAmount;
                         if (whichInst >= hydra.insts.length) {
                             continue;
                         }
@@ -1259,14 +1261,14 @@ export class TinySoundFont {
                         instRegion.clear(false);
 
                         // Generators
-                        let inst: HydraInst = hydra.insts[whichInst];
+                        const inst: HydraInst = hydra.insts[whichInst];
                         for (
                             let ibagIndex: number = inst.instBagNdx;
                             ibagIndex < hydra.insts[whichInst + 1].instBagNdx;
                             ibagIndex++
                         ) {
-                            let ibag: HydraIbag = hydra.ibags[ibagIndex];
-                            let zoneRegion: Region = new Region(instRegion);
+                            const ibag: HydraIbag = hydra.ibags[ibagIndex];
+                            const zoneRegion: Region = new Region(instRegion);
                             let hadSampleId: boolean = false;
 
                             for (
@@ -1274,7 +1276,7 @@ export class TinySoundFont {
                                 igenIndex < hydra.ibags[ibagIndex + 1].instGenNdx;
                                 igenIndex++
                             ) {
-                                let igen: HydraIgen = hydra.igens[igenIndex];
+                                const igen: HydraIgen = hydra.igens[igenIndex];
 
                                 if (igen.genOper === HydraPgen.GenSampleId) {
                                     // preset region key and vel ranges are a filter for the zone regions
@@ -1368,7 +1370,7 @@ export class TinySoundFont {
                                         zoneRegion.initialFilterQ = 0;
                                     }
 
-                                    let shdr: HydraShdr = hydra.sHdrs[igen.genAmount.wordAmount];
+                                    const shdr: HydraShdr = hydra.sHdrs[igen.genAmount.wordAmount];
                                     zoneRegion.offset += shdr.start;
                                     zoneRegion.end += shdr.end;
                                     zoneRegion.loopStart += shdr.startLoop;
@@ -1384,7 +1386,7 @@ export class TinySoundFont {
                                     zoneRegion.tune += shdr.pitchCorrection;
                                     zoneRegion.sampleRate = shdr.sampleRate;
 
-                                    const isPercussion = phdr.bank == SynthConstants.PercussionBank;
+                                    const isPercussion = phdr.bank === SynthConstants.PercussionBank;
 
                                     const shouldLoadSamples =
                                         (isPercussion &&
@@ -1411,11 +1413,7 @@ export class TinySoundFont {
                                         const decompressVorbis = (shdr.sampleType & 0x10) !== 0;
                                         if (decompressVorbis) {
                                             // for SF3 the shdr contains the byte offsets within the overall buffer holding the OGG container
-                                            zoneRegion.samples = hydra.decodeSamples(
-                                                shdr.start,
-                                                shdr.end,
-                                                true
-                                            );
+                                            zoneRegion.samples = hydra.decodeSamples(shdr.start, shdr.end, true);
                                             // loop points are already relative within the individual samples.
                                         } else {
                                             zoneRegion.samples = hydra.decodeSamples(
@@ -1434,7 +1432,7 @@ export class TinySoundFont {
                                             // The DWORD dwEndloop contains the index, in sample data points, from the beginning of the sample data field to the first
                                             // data point following the loop of this sample. Note that this is the data point “equivalent to” the first loop data point, and that
                                             // to produce portable artifact free loops, the eight proximal data points surrounding both the Startloop and Endloop points
-                                            // should be identical. 
+                                            // should be identical.
 
                                             // reset offsets relative to sub-buffer
                                             if (zoneRegion.loopStart > 0) {
@@ -1542,7 +1540,7 @@ export class TinySoundFont {
         }
 
         for (const preset of presets) {
-            if (preset.bank == SynthConstants.PercussionBank) {
+            if (preset.bank === SynthConstants.PercussionBank) {
                 for (const region of preset.regions!) {
                     if (region.loKey >= key && region.hiKey <= key && region.samples.length > 0) {
                         return true;

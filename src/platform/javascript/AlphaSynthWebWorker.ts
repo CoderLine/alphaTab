@@ -1,13 +1,13 @@
 import { AlphaSynth } from '@src/synth/AlphaSynth';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { AlphaSynthWorkerSynthOutput } from '@src/platform/javascript/AlphaSynthWorkerSynthOutput';
-import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
+import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
-import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 
 /**
  * This class implements a HTML5 WebWorker based version of alphaSynth
@@ -40,23 +40,26 @@ export class AlphaSynthWebWorker {
     }
 
     public static init(): void {
-        let main: IWorkerScope = Environment.globalThis as IWorkerScope;
+        const main: IWorkerScope = Environment.globalThis as IWorkerScope;
         main.addEventListener('message', e => {
-            let data: any = e.data;
-            let cmd: string = data.cmd;
+            const data: any = e.data;
+            const cmd: string = data.cmd;
             switch (cmd) {
                 case 'alphaSynth.initialize':
                     AlphaSynthWorkerSynthOutput.preferredSampleRate = data.sampleRate;
                     Logger.logLevel = data.logLevel;
-                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(main, data.bufferTimeInMilliseconds);
+                    Environment.globalThis.alphaSynthWebWorker = new AlphaSynthWebWorker(
+                        main,
+                        data.bufferTimeInMilliseconds
+                    );
                     break;
             }
         });
     }
 
     public handleMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: string = data.cmd;
+        const data: any = e.data;
+        const cmd: string = data.cmd;
         switch (cmd) {
             case 'alphaSynth.setLogLevel':
                 Logger.logLevel = data.value;
@@ -178,7 +181,7 @@ export class AlphaSynthWebWorker {
     }
 
     private serializeException(e: any): unknown {
-        let error: any = JSON.parse(JSON.stringify(e));
+        const error: any = JSON.parse(JSON.stringify(e));
         if (e.message) {
             error.message = e.message;
         }

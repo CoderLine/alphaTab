@@ -3,7 +3,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using AlphaTab.Platform;
-using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.Wpf
 {

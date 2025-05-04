@@ -5,13 +5,13 @@ export enum VibratoType {
     /**
      * No vibrato.
      */
-    None,
+    None = 0,
     /**
      * A slight vibrato.
      */
-    Slight,
+    Slight = 1,
     /**
      * A wide vibrato.
      */
-    Wide
+    Wide = 2
 }

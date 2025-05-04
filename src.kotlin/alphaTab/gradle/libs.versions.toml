@@ -1,18 +1,18 @@
 [versions]
-agp = "8.8.1"
-kotlin = "2.1.10"
+agp = "8.9.1"
+kotlin = "2.1.20"
 
-kotlinx-coroutines = "1.10.1"
+kotlinx-coroutines = "1.10.2"
 dokka = "2.0.0"
 
 espressoCore = "3.6.1"
 appcompat = "1.7.0"
 
-coreKtx = "1.15.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
-alphaskia = "2.3.120"
-mavenPublish = "0.30.1-SNAPSHOT"
+alphaskia = "3.3.135"
+mavenPublish = "0.31.0"
 
 
 [libraries]

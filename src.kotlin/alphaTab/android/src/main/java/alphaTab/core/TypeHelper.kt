@@ -1,5 +1,7 @@
 package alphaTab.core
 
+import alphaTab.AlphaTabError
+import alphaTab.AlphaTabErrorType
 import alphaTab.core.ecmaScript.RegExp
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -7,11 +9,32 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.reflect.KClass
+
+typealias Disposable = AutoCloseable
 
 internal class TypeHelper {
     companion object {
         public fun createRegex(pattern: String, flags: String): RegExp {
             return RegExp(pattern, flags)
+        }
+
+        @ExperimentalContracts
+        @ExperimentalUnsignedTypes
+        public inline fun <reified T : Enum<T>> parseEnum(value: String, @Suppress("UNUSED_PARAMETER") type: KClass<T>): T {
+            return parseEnum(value, enumValues<T>())
+        }
+
+        @ExperimentalContracts
+        @ExperimentalUnsignedTypes
+        public fun <T : Enum<T>> parseEnum(value: String, values: Array<T>): T {
+            val valueLower = value.lowercase()
+            for (e in values) {
+                if (valueLower.equals(e.name, true)) {
+                    return e
+                }
+            }
+            throw AlphaTabError(AlphaTabErrorType.General, "Could not parse enum value '$value'")
         }
 
         @ExperimentalContracts
@@ -28,6 +51,11 @@ internal class TypeHelper {
         public fun isTruthy(s: Any?): Boolean {
             contract { returns(true) implies (s != null) }
             return s != null
+        }
+
+        @ExperimentalContracts
+        public fun isTruthy(s: Double): Boolean {
+            return !s.isNaN() && s != 0.0
         }
 
         @ExperimentalUnsignedTypes

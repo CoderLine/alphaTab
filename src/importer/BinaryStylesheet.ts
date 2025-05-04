@@ -1,23 +1,30 @@
-import { Score } from '@src/model/Score';
+import { type HeaderFooterStyle, type Score, ScoreSubElement } from '@src/model/Score';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
 import { GpBinaryHelpers } from '@src/importer/Gp3To5Importer';
 import { BendPoint } from '@src/model/BendPoint';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Color } from '@src/model/Color';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { IWriteable } from '@src/io/IWriteable';
+import {
+    type BracketExtendMode,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@src/model/RenderStylesheet';
+import type { IWriteable } from '@src/io/IWriteable';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { ModelUtils } from '@src/model/ModelUtils';
+import { TextAlign } from '@src/platform/ICanvas';
 
 enum DataType {
-    Boolean,
-    Integer,
-    Float,
-    String,
-    Point,
-    Size,
-    Rectangle,
-    Color
+    Boolean = 0,
+    Integer = 1,
+    Float = 2,
+    String = 3,
+    Point = 4,
+    Size = 5,
+    Rectangle = 6,
+    Color = 7
 }
 
 /**
@@ -72,41 +79,41 @@ export class BinaryStylesheet {
 
     private read(data: Uint8Array) {
         // BinaryStylesheet apears to be big-endien
-        let readable: ByteBuffer = ByteBuffer.fromBuffer(data);
-        let entryCount: number = IOHelper.readInt32BE(readable);
+        const readable: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const entryCount: number = IOHelper.readInt32BE(readable);
         for (let i: number = 0; i < entryCount; i++) {
-            let key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
-            let type: DataType = readable.readByte() as DataType;
+            const key: string = GpBinaryHelpers.gpReadString(readable, readable.readByte(), 'utf-8');
+            const type: DataType = readable.readByte() as DataType;
             this._types.set(key, type);
             switch (type) {
                 case DataType.Boolean:
-                    let flag: boolean = readable.readByte() === 1;
+                    const flag: boolean = readable.readByte() === 1;
                     this.addValue(key, flag);
                     break;
                 case DataType.Integer:
-                    let ivalue: number = IOHelper.readInt32BE(readable);
+                    const ivalue: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, ivalue);
                     break;
                 case DataType.Float:
-                    let fvalue: number = IOHelper.readFloat32BE(readable);
+                    const fvalue: number = IOHelper.readFloat32BE(readable);
                     this.addValue(key, fvalue);
                     break;
                 case DataType.String:
-                    let s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
+                    const s: string = GpBinaryHelpers.gpReadString(readable, IOHelper.readInt16BE(readable), 'utf-8');
                     this.addValue(key, s);
                     break;
                 case DataType.Point:
-                    let x: number = IOHelper.readInt32BE(readable);
-                    let y: number = IOHelper.readInt32BE(readable);
+                    const x: number = IOHelper.readInt32BE(readable);
+                    const y: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, new BendPoint(x, y));
                     break;
                 case DataType.Size:
-                    let width: number = IOHelper.readInt32BE(readable);
-                    let height: number = IOHelper.readInt32BE(readable);
+                    const width: number = IOHelper.readInt32BE(readable);
+                    const height: number = IOHelper.readInt32BE(readable);
                     this.addValue(key, new BendPoint(width, height));
                     break;
                 case DataType.Rectangle:
-                    let rect = new Bounds();
+                    const rect = new Bounds();
                     rect.x = IOHelper.readInt32BE(readable);
                     rect.y = IOHelper.readInt32BE(readable);
                     rect.w = IOHelper.readInt32BE(readable);
@@ -114,7 +121,7 @@ export class BinaryStylesheet {
                     this.addValue(key, rect);
                     break;
                 case DataType.Color:
-                    let color: Color = GpBinaryHelpers.gpReadColor(readable, true);
+                    const color: Color = GpBinaryHelpers.gpReadColor(readable, true);
                     this.addValue(key, color);
                     break;
             }
@@ -207,8 +214,142 @@ export class BinaryStylesheet {
                         score.stylesheet.otherSystemsTrackNameOrientation = TrackNameOrientation.Vertical;
                     }
                     break;
+                case 'Header/Title':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).template = value as string;
+                    break;
+                case 'Header/TitleAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).textAlign = this.toTextAlign(
+                        value as number
+                    );
+                    break;
+                case 'Header/drawTitle':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Title).isVisible = value as boolean;
+                    break;
+
+                case 'Header/Subtitle':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).template = value as string;
+                    break;
+                case 'Header/SubtitleAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).textAlign =
+                        this.toTextAlign(value as number);
+                    break;
+                case 'Header/drawSubtitle':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.SubTitle).isVisible =
+                        value as boolean;
+                    break;
+
+                case 'Header/Artist':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).template = value as string;
+                    break;
+                case 'Header/ArtistAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).textAlign = this.toTextAlign(
+                        value as number
+                    );
+                    break;
+                case 'Header/drawArtist':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Artist).isVisible = value as boolean;
+                    break;
+
+                case 'Header/Album':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).template = value as string;
+                    break;
+                case 'Header/AlbumAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).textAlign = this.toTextAlign(
+                        value as number
+                    );
+                    break;
+                case 'Header/drawAlbum':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Album).isVisible = value as boolean;
+                    break;
+
+                case 'Header/Words':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).template = value as string;
+                    break;
+                case 'Header/WordsAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).textAlign = this.toTextAlign(
+                        value as number
+                    );
+                    break;
+                case 'Header/drawWords':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Words).isVisible = value as boolean;
+                    break;
+
+                case 'Header/Music':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).template = value as string;
+                    break;
+                case 'Header/MusicAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).textAlign = this.toTextAlign(
+                        value as number
+                    );
+                    break;
+                case 'Header/drawMusic':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Music).isVisible = value as boolean;
+                    break;
+
+                case 'Header/WordsAndMusic':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).template =
+                        value as string;
+                    break;
+                case 'Header/WordsAndMusicAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).textAlign =
+                        this.toTextAlign(value as number);
+                    break;
+                case 'Header/drawWordsAndMusic':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.WordsAndMusic).isVisible =
+                        value as boolean;
+                    break;
+
+                case 'Header/Tabber':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).template =
+                        value as string;
+                    break;
+                case 'Header/TabberAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).textAlign =
+                        this.toTextAlign(value as number);
+                    break;
+                case 'Header/drawTabber':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Transcriber).isVisible =
+                        value as boolean;
+                    break;
+
+                case 'Footer/Copyright':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).template =
+                        value as string;
+                    break;
+                case 'Footer/CopyrightAlignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).textAlign =
+                        this.toTextAlign(value as number);
+                    break;
+                case 'Footer/drawCopyright':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.Copyright).isVisible =
+                        value as boolean;
+                    break;
+
+                case 'Footer/Copyright2':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).template =
+                        value as string;
+                    break;
+                case 'Footer/Copyright2Alignment':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).textAlign =
+                        this.toTextAlign(value as number);
+                    break;
+                case 'Footer/drawCopyright2':
+                    ModelUtils.getOrCreateHeaderFooterStyle(score, ScoreSubElement.CopyrightSecondLine).isVisible =
+                        value as boolean;
+                    break;
             }
         }
+    }
+    private toTextAlign(value: number): TextAlign {
+        switch (value) {
+            case 0:
+                return TextAlign.Left;
+            case 1:
+                return TextAlign.Center;
+            case 2:
+                return TextAlign.Right;
+        }
+        return TextAlign.Left;
     }
 
     public addValue(key: string, value: unknown, type?: DataType): void {
@@ -276,7 +417,7 @@ export class BinaryStylesheet {
                 return DataType.String;
             case 'number':
                 const withoutFraction: number = (value as number) | 0;
-                return (value as number) == withoutFraction ? DataType.Integer : DataType.Float;
+                return (value as number) === withoutFraction ? DataType.Integer : DataType.Float;
             case 'object':
                 if (value instanceof BendPoint) {
                     return DataType.Point;
@@ -373,8 +514,63 @@ export class BinaryStylesheet {
                 break;
         }
 
+        const scoreStyle = score.style;
+        if (scoreStyle) {
+            for (const [k, v] of scoreStyle.headerAndFooter) {
+                switch (k) {
+                    case ScoreSubElement.Title:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Title');
+                        break;
+                    case ScoreSubElement.SubTitle:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Subtitle');
+                        break;
+                    case ScoreSubElement.Artist:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Artist');
+                        break;
+                    case ScoreSubElement.Album:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Album');
+                        break;
+                    case ScoreSubElement.Words:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Words');
+                        break;
+                    case ScoreSubElement.Music:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Music');
+                        break;
+                    case ScoreSubElement.WordsAndMusic:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'WordsAndMusic');
+                        break;
+                    case ScoreSubElement.Transcriber:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Header/', 'Tabber');
+                        break;
+                    case ScoreSubElement.Copyright:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright');
+                        break;
+                    case ScoreSubElement.CopyrightSecondLine:
+                        BinaryStylesheet.addHeaderAndFooter(binaryStylesheet, v, 'Footer/', 'Copyright2');
+                        break;
+                }
+            }
+        }
+
         const writer = ByteBuffer.withCapacity(128);
         binaryStylesheet.writeTo(writer);
         return writer.toArray();
+    }
+
+    private static addHeaderAndFooter(
+        binaryStylesheet: BinaryStylesheet,
+        style: HeaderFooterStyle,
+        prefix: string,
+        name: string
+    ) {
+        if (style.template !== undefined) {
+            binaryStylesheet.addValue(`${prefix}${name}`, style.template!, DataType.String);
+        }
+
+        binaryStylesheet.addValue(`${prefix}${name}Alignment`, style.textAlign as number, DataType.Integer);
+
+        if (style.isVisible !== undefined) {
+            binaryStylesheet.addValue(`${prefix}draw${name}`, style.isVisible! as boolean, DataType.Boolean);
+        }
     }
 }

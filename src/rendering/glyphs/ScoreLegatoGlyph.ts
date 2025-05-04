@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { Beat } from '@src/model/Beat';
+import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
@@ -67,15 +67,14 @@ export class ScoreLegatoGlyph extends TieGlyph {
                         // stem lower end
                         return endNoteScoreRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.BottomWithStem);
                 }
-            } else {
-                switch (this.tieDirection) {
-                    case BeamDirection.Up:
-                        // stem upper end
-                        return endNoteScoreRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.BottomWithStem);
-                    default:
-                        // stem lower end
-                        return endNoteScoreRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.TopWithStem);
-                }
+            }
+            switch (this.tieDirection) {
+                case BeamDirection.Up:
+                    // stem upper end
+                    return endNoteScoreRenderer.getNoteY(this.endBeat!.maxNote!, NoteYPosition.BottomWithStem);
+                default:
+                    // stem lower end
+                    return endNoteScoreRenderer.getNoteY(this.endBeat!.minNote!, NoteYPosition.TopWithStem);
             }
         }
 
@@ -97,8 +96,9 @@ export class ScoreLegatoGlyph extends TieGlyph {
         const endBeamDirection = (this.endNoteRenderer as ScoreBarRenderer).getBeatDirection(this.endBeat!);
         return this.endNoteRenderer!.getBeatX(
             this.endBeat!,
-            this.endBeat!.duration > Duration.Whole &&
-            endBeamDirection === this.tieDirection ? BeatXPosition.Stem : BeatXPosition.MiddleNotes
+            this.endBeat!.duration > Duration.Whole && endBeamDirection === this.tieDirection
+                ? BeatXPosition.Stem
+                : BeatXPosition.MiddleNotes
         );
     }
 }

@@ -5,7 +5,11 @@ using System.Runtime.CompilerServices;
 
 namespace AlphaTab.Core.EcmaScript;
 
-public class Set<T> : IEnumerable<T>, ICollection
+public abstract class Set
+{
+}
+
+public class Set<T> : Set, IEnumerable<T>, ICollection
 {
     private readonly HashSet<T> _data;
 
@@ -16,9 +20,9 @@ public class Set<T> : IEnumerable<T>, ICollection
 
     public double Size => _data.Count;
 
-    public Set(IEnumerable<T> values)
+    public Set(IEnumerable<T>? values)
     {
-        _data = new HashSet<T>(values);
+        _data = values == null ? new HashSet<T>() : new HashSet<T>(values);
     }
 
     public void Clear()

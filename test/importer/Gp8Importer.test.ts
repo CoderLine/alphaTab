@@ -3,20 +3,23 @@ import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
+import { ScoreSubElement } from '@src/model/Score';
+import { TextAlign } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Settings } from '@src/Settings';
+import { SynthConstants } from '@src/synth/SynthConstants';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 describe('Gp8ImporterTest', () => {
     async function prepareImporterWithFile(name: string): Promise<Gp7To8Importer> {
-        const data = await TestPlatform.loadFile('test-data/' + name);
+        const data = await TestPlatform.loadFile(`test-data/${name}`);
         return prepareImporterWithBytes(data);
     }
 
     function prepareImporterWithBytes(buffer: Uint8Array) {
-        let readerBase: Gp7To8Importer = new Gp7To8Importer();
+        const readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }
@@ -271,5 +274,116 @@ describe('Gp8ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[8].voices[0].beats[0].showTimer).to.be.true;
         expect(score.tracks[0].staves[0].bars[8].voices[0].beats[0].timer).to.equal(0);
         expect(score.tracks[0].staves[0].bars[8].voices[0].beats[1].showTimer).to.be.false;
+    });
+
+    it('multibar-rest', async () => {
+        const enabled = (await prepareImporterWithFile('guitarpro8/multibar-rest.gp')).readScore();
+        const disabled = (await prepareImporterWithFile('guitarpro8/timer.gp')).readScore();
+
+        expect(disabled.stylesheet.multiTrackMultiBarRest).to.be.false;
+        expect(disabled.stylesheet.perTrackMultiBarRest).to.equal(null);
+        expect(enabled.stylesheet.multiTrackMultiBarRest).to.be.true;
+        expect(enabled.stylesheet.perTrackMultiBarRest).to.be.ok;
+        expect(enabled.stylesheet.perTrackMultiBarRest!.has(0)).to.be.false;
+        expect(enabled.stylesheet.perTrackMultiBarRest!.has(1)).to.be.true;
+        expect(enabled.stylesheet.perTrackMultiBarRest!.has(2)).to.be.true;
+    });
+
+    it('header-footer', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/header-footer.gp')).readScore();
+
+        expect(score.style).to.be.ok;
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).to.equal('Subtitle: %SUBTITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).to.equal('Album: %ALBUM%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).to.equal('Music: %MUSIC%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
+            'Words & Music: %MUSIC%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.template).to.equal(
+            'Transcriber: %TABBER%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Transcriber)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).to.equal(
+            'Copyright: %COPYRIGHT%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
+            TextAlign.Right
+        );
+    });
+
+    it('faulty', async () => {
+        // this is a GP8 file from unknown source.
+        // the score.gpif contents indicate that this file was NOT written by a real Guitar Pro 8 instance but
+        // by some 3rd party software. there are inconsistencies like:
+        // * line 752 and 764: Line Breaks in the list of NoteHeads
+        // * line 67: No line break on close tag, wrong indention
+        // * line 403: Additional empty line break
+        // * line 293: Missing line break
+        // * line 352,353: Missing Midi channels
+        // * Equal bars/voices/beats are not reused across the file
+
+        // Generally the file looks surprisingly complete for a "non real Guitar Pro" (RSE stuff) but it feels rather like
+        // a software which has read an original file, and then applied modifications to it before saving again.
+
+        // Maybe its the MacOS version which behaves differently than the Windows Version?
+        // Or more likely: a non-open source platform like Sound Slice?
+
+        const score = (await prepareImporterWithFile('guitarpro8/faulty.gp')).readScore();
+
+        const usedChannels = new Set<number>();
+        for (const t of score.tracks) {
+            expect(Number.isNaN(t.playbackInfo.primaryChannel)).to.be.false;
+            expect(Number.isNaN(t.playbackInfo.secondaryChannel)).to.be.false;
+
+            if (t.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
+                expect(usedChannels.has(t.playbackInfo.primaryChannel)).to.be.false;
+                expect(usedChannels.has(t.playbackInfo.secondaryChannel)).to.be.false;
+
+                usedChannels.add(t.playbackInfo.primaryChannel);
+                usedChannels.add(t.playbackInfo.secondaryChannel);
+            }
+        }
     });
 });

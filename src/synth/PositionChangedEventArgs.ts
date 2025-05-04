@@ -3,29 +3,30 @@
  */
 export class PositionChangedEventArgs {
     /**
-     * Gets a value indicating whether the position changed because of time seeking.
-     */
-    public isSeek: boolean;
-
-    /**
-     * Gets the current time in milliseconds.
+     * The current time position within the song in milliseconds.
      */
     public readonly currentTime: number;
 
     /**
-     * Gets the length of the played song in milliseconds.
+     * The total length of the song in milliseconds.
      */
     public readonly endTime: number;
 
     /**
-     * Gets the current time in midi ticks.
+     * The current time position within the song in midi ticks.
      */
     public readonly currentTick: number;
 
     /**
-     * Gets the length of the played song in midi ticks.
+     * The total length of the song in midi ticks.
      */
     public readonly endTick: number;
+
+    /**
+     * Whether the position changed because of time seeking.
+     * @since 1.2.0
+     */
+    public isSeek: boolean;
 
     /**
      * Initializes a new instance of the {@link PositionChangedEventArgs} class.
@@ -35,7 +36,7 @@ export class PositionChangedEventArgs {
      * @param endTick The end tick.
      * @param isSeek Whether the time was seeked.
      */
-    public constructor(currentTime: number, endTime: number, currentTick: number, endTick: number, isSeek:boolean) {
+    public constructor(currentTime: number, endTime: number, currentTick: number, endTick: number, isSeek: boolean) {
         this.currentTime = currentTime;
         this.endTime = endTime;
         this.currentTick = currentTick;

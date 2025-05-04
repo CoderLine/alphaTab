@@ -1,33 +1,47 @@
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as cs from '../csharp/CSharpAst';
-import * as path from 'path';
-import CSharpEmitterContext from '../csharp/CSharpEmitterContext';
+import path from 'node:path';
+import type CSharpEmitterContext from '../csharp/CSharpEmitterContext';
 import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
+import type KotlinEmitterContext from './KotlinEmitterContext';
 
 export default class KotlinAstTransformer extends CSharpAstTransformer {
-    public constructor(typeScript: ts.SourceFile, context: CSharpEmitterContext) {
+    protected override _context: KotlinEmitterContext;
+    public constructor(typeScript: ts.SourceFile, context: KotlinEmitterContext) {
         super(typeScript, context);
         this._testClassAttribute = '';
-        this._testMethodAttribute = 'Test';
+        this._testMethodAttribute = 'TestName';
+        this._snapshotFileAttribute = 'SnapshotFile';
+
+        this._context = context;
     }
 
     public override get extension(): string {
         return '.kt';
     }
 
-    public override get targetTag(): string {
-        return 'kotlin';
-    }
-
     private _paramReferences: Map<string, cs.Identifier[]>[] = [];
     private _paramsWithAssignment: Set<string>[] = [];
 
     private getMethodLocalParameterName(name: string) {
-        return 'param' + name;
+        return `param${name}`;
+    }
+
+    protected override visitMethodSignature(
+        parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
+        classElement: ts.MethodSignature
+    ) {
+        const csMethod = super.visitMethodSignature(parent, classElement);
+
+        if (ts.getJSDocTags(classElement).find(t => t.tagName.text === 'async')) {
+            csMethod.isAsync = true;
+        }
+
+        return csMethod;
     }
 
     protected override buildFileName(fileName: string, context: CSharpEmitterContext): string {
-        let parts = this.removeExtension(fileName).split(path.sep);
+        const parts = this.removeExtension(fileName).split(path.sep);
         if (parts.length > 0) {
             switch (parts[0]) {
                 case 'src':
@@ -68,9 +82,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     protected override visitPrefixUnaryExpression(parent: cs.Node, expression: ts.PrefixUnaryExpression) {
         const pre = super.visitPrefixUnaryExpression(parent, expression);
 
-        const preUnwrapped = pre && cs.isCastExpression(pre)
-            ? (pre.expression as cs.PrefixUnaryExpression)
-            : (pre as cs.PrefixUnaryExpression);
+        const preUnwrapped =
+            pre && cs.isCastExpression(pre)
+                ? (pre.expression as cs.PrefixUnaryExpression)
+                : (pre as cs.PrefixUnaryExpression);
 
         if (preUnwrapped) {
             switch (preUnwrapped.operator) {
@@ -144,10 +159,10 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     private injectParametersAsLocal(block: cs.Block) {
-        let localParams: cs.VariableStatement[] = [];
+        const localParams: cs.VariableStatement[] = [];
 
-        let currentAssignments = this._paramsWithAssignment[this._paramsWithAssignment.length - 1];
-        let currentScope = this._paramReferences[this._paramReferences.length - 1];
+        const currentAssignments = this._paramsWithAssignment[this._paramsWithAssignment.length - 1];
+        const currentScope = this._paramReferences[this._paramReferences.length - 1];
         for (const p of currentAssignments) {
             const renamedP = this.getMethodLocalParameterName(p);
 
@@ -171,7 +186,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 isConst: false
             } as cs.VariableDeclarationList;
 
-            let declaration = {
+            const declaration = {
                 nodeType: cs.SyntaxKind.VariableDeclaration,
                 parent: variableStatement.declarationList,
                 tsNode: block.tsNode,
@@ -229,43 +244,69 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         // and await expressions are normal method calls.
         // this is a problem when we want to use the raw Promise like  asyncFunction().then().catch()
         // The following code wraps the code to a "alphaTab.core.TypeHelper.suspendToDeferred({ asyncFunction() }).then().catch()
+
+        // similarly in reverse cases, when we have suspend function calling a method which returns a Deferred directly (e.g. on async interface methods)
+        // then we call .await()
         if (invocation && cs.isInvocationExpression(invocation)) {
             const returnType = this._context.typeChecker.getTypeAtLocation(expression);
             const method = this._context.typeChecker.getSymbolAtLocation(expression.expression);
 
-            if (returnType?.symbol?.name === "Promise" 
-                && (method as any)?.parent?.name !== 'Promise'
-                && !ts.isAwaitExpression(expression.parent)) {
-                const suspendToDeferred = {
-                    nodeType: cs.SyntaxKind.InvocationExpression,
-                } as cs.InvocationExpression;
+            if (returnType?.symbol?.name === 'Promise' && (method as any)?.parent?.name !== 'Promise') {
+                const isSuspend =
+                    method?.valueDeclaration &&
+                    ((method.valueDeclaration as ts.MethodDeclaration).modifiers?.some(
+                        m => m.kind === ts.SyntaxKind.AsyncKeyword
+                    ) ||
+                        ts.getJSDocTags(method.valueDeclaration!).find(t => t.tagName.text === 'async'));
 
-                suspendToDeferred.expression = this.makeMemberAccess(
-                    suspendToDeferred,
-                    this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                    this._context.toMethodName('suspendToDeferred')
-                );
+                if (!ts.isAwaitExpression(expression.parent) && isSuspend) {
+                    const suspendToDeferred = {
+                        nodeType: cs.SyntaxKind.InvocationExpression
+                    } as cs.InvocationExpression;
 
-                suspendToDeferred.arguments = [
-                    {
-                        nodeType: cs.SyntaxKind.LambdaExpression,
-                        parameters: [] as cs.ParameterDeclaration[],
-                        body: invocation,
-                        parent: suspendToDeferred,
-                        returnType: {
-                            nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                            type: cs.PrimitiveType.Void
-                        } as cs.PrimitiveTypeNode
-                    } as cs.LambdaExpression
-                ];
+                    suspendToDeferred.expression = this.makeMemberAccess(
+                        suspendToDeferred,
+                        this._context.makeTypeName('alphaTab.core.TypeHelper'),
+                        this._context.toMethodName('suspendToDeferred')
+                    );
 
-                return suspendToDeferred;
+                    suspendToDeferred.arguments = [
+                        {
+                            nodeType: cs.SyntaxKind.LambdaExpression,
+                            parameters: [] as cs.ParameterDeclaration[],
+                            body: invocation,
+                            parent: suspendToDeferred,
+                            returnType: {
+                                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                                type: cs.PrimitiveType.Void
+                            } as cs.PrimitiveTypeNode
+                        } as cs.LambdaExpression
+                    ];
+
+                    return suspendToDeferred;
+                }
+
+                if (ts.isAwaitExpression(expression.parent) && !isSuspend) {
+                    const deferredToSuspend = {
+                        nodeType: cs.SyntaxKind.InvocationExpression
+                    } as cs.InvocationExpression;
+
+                    deferredToSuspend.expression = {
+                        expression: invocation,
+                        member: 'await',
+                        parent: parent,
+                        nodeType: cs.SyntaxKind.MemberAccessExpression
+                    } as cs.MemberAccessExpression;
+
+                    deferredToSuspend.arguments = [];
+
+                    return deferredToSuspend;
+                }
             }
         }
 
         return invocation;
     }
-
 
     protected override visitConstructorDeclaration(
         parent: cs.ClassDeclaration,
@@ -310,7 +351,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return func;
     }
 
-    
     protected override visitTestClassMethod(parent: cs.ClassDeclaration, d: ts.FunctionDeclaration) {
         this._paramReferences.push(new Map<string, cs.Identifier[]>());
         this._paramsWithAssignment.push(new Set<string>());
@@ -326,7 +366,6 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
         return method;
     }
-
 
     protected override visitMethodDeclaration(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
@@ -347,11 +386,26 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         return method;
     }
 
-    protected override getSymbolName(
-        parentSymbol: ts.Symbol,
-        symbol: ts.Symbol,
-        expression: cs.Expression
-    ): string | null {
+    protected visitFunctionDeclaration(
+        parent: cs.Node,
+        expression: ts.FunctionDeclaration
+    ): cs.LocalFunctionDeclaration {
+        this._paramReferences.push(new Map<string, cs.Identifier[]>());
+        this._paramsWithAssignment.push(new Set<string>());
+
+        const fun = super.visitFunctionDeclaration(parent, expression);
+
+        if (fun.body) {
+            this.injectParametersAsLocal(fun.body);
+        }
+
+        this._paramReferences.pop();
+        this._paramsWithAssignment.pop();
+
+        return fun;
+    }
+
+    protected override getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol): string | null {
         switch (parentSymbol.name) {
             case 'String':
                 switch (symbol.name) {
@@ -417,14 +471,16 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 arguments: []
             } as cs.InvocationExpression;
 
-            let expr = this.visitExpression(call, expression.expression);
+            const expr = this.visitExpression(call, expression.expression);
             if (!expr) {
                 return null;
             }
             call.arguments.push(expr);
 
             return call;
-        } else if (this.isCastFromEnumToNumber(expression)) {
+        }
+
+        if (this.isCastFromEnumToNumber(expression)) {
             const methodAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 parent: parent,
@@ -433,7 +489,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
                 tsNode: expression
             } as cs.MemberAccessExpression;
 
-            let expr = this.visitExpression(methodAccess, expression.expression);
+            const expr = this.visitExpression(methodAccess, expression.expression);
             if (!expr) {
                 return null;
             }
@@ -447,88 +503,24 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             } as cs.InvocationExpression;
 
             return call;
-        } else {
-            return super.visitAsExpression(parent, expression);
         }
+        return super.visitAsExpression(parent, expression);
     }
 
     private isCastFromEnumToNumber(expression: ts.AsExpression) {
-        let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
-        let nonNullable = this._context.typeChecker.getNonNullableType(targetType);
+        const targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        const nonNullable = this._context.typeChecker.getNonNullableType(targetType);
         if (nonNullable.flags === ts.TypeFlags.Number) {
-            let sourceType = this._context.typeChecker.getNonNullableType(this._context.getType(expression.expression));
+            const sourceType = this._context.typeChecker.getNonNullableType(
+                this._context.getType(expression.expression)
+            );
             return sourceType.flags & ts.TypeFlags.Enum || sourceType.flags & ts.TypeFlags.EnumLiteral;
         }
         return false;
     }
     private isCastToEnum(expression: ts.AsExpression) {
-        let targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        const targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
-    }
-
-    protected override createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
-        const csExpr = {
-            parent: parent,
-            tsNode: expression,
-            nodeType: cs.SyntaxKind.InvocationExpression,
-            arguments: [],
-            expression: {} as cs.Expression
-        } as cs.InvocationExpression;
-
-        const type: cs.TypeReference = {
-            nodeType: cs.SyntaxKind.TypeReference,
-            parent: csExpr,
-            reference: '',
-            isAsync: false,
-            tsNode: expression
-        };
-
-        type.reference = 'MapEntry';
-        if (expression.elements.length === 2) {
-            const keyType = this._context.getType(expression.elements[0]);
-            let keyTypeContainerName = this.getContainerTypeName(keyType);
-
-            const valueType = this._context.getType(expression.elements[1]);
-            let valueTypeContainerName = this.getContainerTypeName(valueType);
-
-            if (!keyTypeContainerName) {
-                type.typeArguments = type.typeArguments ?? [];
-                type.typeArguments.push({
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    isAsync: false,
-                    parent: type,
-                    reference: this.createUnresolvedTypeNode(type, expression.elements[0], keyType)
-                } as cs.TypeReference);
-            }
-
-            if (!valueTypeContainerName) {
-                type.typeArguments = type.typeArguments ?? [];
-                type.typeArguments.push({
-                    nodeType: cs.SyntaxKind.TypeReference,
-                    isAsync: false,
-                    parent: type,
-                    reference: this.createUnresolvedTypeNode(type, expression.elements[1], valueType)
-                } as cs.TypeReference);
-            }
-
-            if (keyTypeContainerName || valueTypeContainerName) {
-                keyTypeContainerName = keyTypeContainerName || 'Object';
-                valueTypeContainerName = valueTypeContainerName || 'Object';
-                type.reference = keyTypeContainerName + valueTypeContainerName + type.reference;
-            }
-        }
-
-        type.reference = this._context.makeTypeName(`alphaTab.collections.${type.reference}`);
-        csExpr.expression = type;
-
-        expression.elements.forEach(e => {
-            const ex = this.visitExpression(csExpr, e);
-            if (ex) {
-                csExpr.arguments.push(ex);
-            }
-        });
-
-        return csExpr;
     }
 
     override visitTestClass(d: ts.CallExpression): void {
@@ -540,23 +532,24 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         super.visitTestClass(d);
     }
 
-    private getContainerTypeName(tsType: ts.Type): string | null {
-        if (this._context.isNullableType(tsType)) {
-            return null;
+    protected override convertPropertyToInvocation(parentSymbol: ts.Symbol, symbol: ts.Symbol): boolean {
+        switch (parentSymbol.name) {
+            // chai assertions
+            case 'Assertion':
+                return true;
         }
-        if (
-            (tsType.flags & ts.TypeFlags.Enum) !== 0 ||
-            (tsType.flags & ts.TypeFlags.EnumLike) !== 0 ||
-            (tsType.flags & ts.TypeFlags.EnumLiteral) !== 0
-        ) {
-            return null;
+        return false;
+    }
+
+    protected applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
+        super.applyMethodOverride(csMethod, classElement);
+        if (!csMethod.isOverride) {
+            if (
+                ts.isComputedPropertyName(classElement.name) &&
+                classElement.name.getText().includes('Symbol.dispose')
+            ) {
+                csMethod.isOverride = true;
+            }
         }
-        if ((tsType.flags & ts.TypeFlags.Number) !== 0 || (tsType.flags & ts.TypeFlags.NumberLiteral) !== 0) {
-            return 'Double';
-        }
-        if ((tsType.flags & ts.TypeFlags.Boolean) !== 0 || (tsType.flags & ts.TypeFlags.BooleanLiteral) !== 0) {
-            return 'Boolean';
-        }
-        return null;
     }
 }

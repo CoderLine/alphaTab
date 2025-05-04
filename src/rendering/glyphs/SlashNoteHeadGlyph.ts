@@ -1,60 +1,57 @@
 import { Duration } from '@src/model/Duration';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from './NoteHeadGlyph';
-import { Glyph } from './Glyph';
-import { BeamingHelper } from '../utils/BeamingHelper';
-import { EffectGlyph } from './EffectGlyph';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { NoteSubElement } from '@src/model/Note';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 
 export class SlashNoteHeadGlyph extends EffectGlyph {
-    public static readonly NoteHeadHeight: number = 17;
-
-    public static readonly QuarterNoteHeadWidth: number = 12;
-    public static readonly HalfNoteHeadWidth: number = 25;
-    public static readonly WholeNoteHeadWidth: number = 32;
-
     private _isGrace: boolean;
-    private _duration: Duration;
 
     public beatEffects: Map<string, Glyph> = new Map();
     public beamingHelper!: BeamingHelper;
+    public noteHeadElement: NoteSubElement = NoteSubElement.SlashNoteHead;
+    public effectElement: BeatSubElement = BeatSubElement.SlashEffects;
     private _symbol: MusicFontSymbol;
 
-    public constructor(x: number, y: number, duration: Duration, isGrace: boolean) {
+    public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
         super(x, y);
         this._isGrace = isGrace;
-        this._duration = duration;
-        this._symbol = SlashNoteHeadGlyph.getSymbol(duration)
+        this._symbol = SlashNoteHeadGlyph.getSymbol(duration);
+        this.beat = beat;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let offset: number = this._isGrace ? 1 : 0;
+        using _ =
+            this.beat!.notes.length === 0
+                ? undefined
+                : ElementStyleHelper.note(canvas, this.noteHeadElement, this.beat!.notes[0]);
+        const offset: number = this._isGrace ? 1 : 0;
         const glyphScale = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
         canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, glyphScale, this._symbol, false);
+
+        this.paintEffects(cx, cy, canvas);
+    }
+    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+        using _ = ElementStyleHelper.beat(canvas, this.effectElement, this.beat!);
         for (const g of this.beatEffects.values()) {
             g.paint(cx + this.x, cy + this.y, canvas);
         }
     }
 
     public override doLayout(): void {
-        const scale: number = (this._isGrace ? NoteHeadGlyph.GraceScale : 1);
-        switch (this._duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.DoubleWhole:
-            case Duration.Whole:
-                this.width = SlashNoteHeadGlyph.WholeNoteHeadWidth * scale;
-                break;
-            case Duration.Half:
-                this.width = SlashNoteHeadGlyph.HalfNoteHeadWidth * scale;
-                break;
-            default:
-                this.width = SlashNoteHeadGlyph.QuarterNoteHeadWidth * scale;
-                break;
-        }
-        this.height = SlashNoteHeadGlyph.NoteHeadHeight * scale;
+        const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
 
-        let effectSpacing: number = 7;
-        let effectY = SlashNoteHeadGlyph.NoteHeadHeight;
+        this.width = MusicFontSymbolSizes.Widths.get(this._symbol)! * scale;
+        this.height = MusicFontSymbolSizes.Heights.get(this._symbol)! * scale;
+
+        const effectSpacing: number = 7;
+        let effectY = MusicFontSymbolSizes.Heights.get(this._symbol)!;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;
@@ -79,13 +76,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
 
     public updateBeamingHelper(cx: number) {
         if (this.beamingHelper) {
-            this.beamingHelper.registerBeatLineX(
-                'slash',
-                this.beat!,
-                cx + this.x + this.width,
-                cx + this.x
-            );
+            this.beamingHelper.registerBeatLineX('slash', this.beat!, cx + this.x + this.width, cx + this.x);
         }
     }
-
 }

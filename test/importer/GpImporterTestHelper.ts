@@ -11,11 +11,11 @@ import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { PickStroke } from '@src/model/PickStroke';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 import { VibratoType } from '@src/model/VibratoType';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
@@ -26,13 +26,13 @@ export class GpImporterTestHelper {
         name: string,
         settings: Settings | null = null
     ): Promise<Gp3To5Importer> {
-        let path: string = 'test-data/';
+        const path: string = 'test-data/';
         const buffer = await TestPlatform.loadFile(path + name);
         return GpImporterTestHelper.prepareImporterWithBytes(buffer, settings);
     }
 
     public static prepareImporterWithBytes(buffer: Uint8Array, settings: Settings | null = null): Gp3To5Importer {
-        let readerBase: Gp3To5Importer = new Gp3To5Importer();
+        const readerBase: Gp3To5Importer = new Gp3To5Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), settings ?? new Settings());
         return readerBase;
     }
@@ -40,7 +40,7 @@ export class GpImporterTestHelper {
     public static checkNotes(score: Score): void {
         // Whole Notes
         let beat: number = 0;
-        let durationsInFile: Duration[] = [
+        const durationsInFile: Duration[] = [
             Duration.Whole,
             Duration.Half,
             Duration.Quarter,
@@ -49,7 +49,7 @@ export class GpImporterTestHelper {
             Duration.ThirtySecond,
             Duration.SixtyFourth
         ];
-        for (let duration of durationsInFile) {
+        for (const duration of durationsInFile) {
             expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].fret).to.equal(1);
             expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].notes[0].string).to.equal(1);
             expect(score.tracks[0].staves[0].bars[0].voices[0].beats[beat].duration).to.equal(duration);
@@ -382,77 +382,78 @@ export class GpImporterTestHelper {
     }
 
     public static checkKeySignatures(score: Score): void {
+        const bars = score.tracks[0].staves[0].bars;
         // major - flats
-        expect(score.masterBars[0].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[0].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[1].keySignature).to.equal(KeySignature.F);
-        expect(score.masterBars[1].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[2].keySignature).to.equal(KeySignature.Bb);
-        expect(score.masterBars[2].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[3].keySignature).to.equal(KeySignature.Eb);
-        expect(score.masterBars[3].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[4].keySignature).to.equal(KeySignature.Ab);
-        expect(score.masterBars[4].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[5].keySignature).to.equal(KeySignature.Db);
-        expect(score.masterBars[5].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[6].keySignature).to.equal(KeySignature.Gb);
-        expect(score.masterBars[6].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[7].keySignature).to.equal(KeySignature.Cb);
-        expect(score.masterBars[7].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[0].keySignature).to.equal(KeySignature.C);
+        expect(bars[0].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[1].keySignature).to.equal(KeySignature.F);
+        expect(bars[1].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[2].keySignature).to.equal(KeySignature.Bb);
+        expect(bars[2].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[3].keySignature).to.equal(KeySignature.Eb);
+        expect(bars[3].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[4].keySignature).to.equal(KeySignature.Ab);
+        expect(bars[4].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[5].keySignature).to.equal(KeySignature.Db);
+        expect(bars[5].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[6].keySignature).to.equal(KeySignature.Gb);
+        expect(bars[6].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[7].keySignature).to.equal(KeySignature.Cb);
+        expect(bars[7].keySignatureType).to.equal(KeySignatureType.Major);
 
         // major - sharps
-        expect(score.masterBars[8].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[8].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[9].keySignature).to.equal(KeySignature.G);
-        expect(score.masterBars[9].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[10].keySignature).to.equal(KeySignature.D);
-        expect(score.masterBars[10].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[11].keySignature).to.equal(KeySignature.A);
-        expect(score.masterBars[11].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[12].keySignature).to.equal(KeySignature.E);
-        expect(score.masterBars[12].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[13].keySignature).to.equal(KeySignature.B);
-        expect(score.masterBars[13].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[14].keySignature).to.equal(KeySignature.FSharp);
-        expect(score.masterBars[14].keySignatureType).to.equal(KeySignatureType.Major);
-        expect(score.masterBars[15].keySignature).to.equal(KeySignature.CSharp);
-        expect(score.masterBars[15].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[8].keySignature).to.equal(KeySignature.C);
+        expect(bars[8].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[9].keySignature).to.equal(KeySignature.G);
+        expect(bars[9].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[10].keySignature).to.equal(KeySignature.D);
+        expect(bars[10].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[11].keySignature).to.equal(KeySignature.A);
+        expect(bars[11].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[12].keySignature).to.equal(KeySignature.E);
+        expect(bars[12].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[13].keySignature).to.equal(KeySignature.B);
+        expect(bars[13].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[14].keySignature).to.equal(KeySignature.FSharp);
+        expect(bars[14].keySignatureType).to.equal(KeySignatureType.Major);
+        expect(bars[15].keySignature).to.equal(KeySignature.CSharp);
+        expect(bars[15].keySignatureType).to.equal(KeySignatureType.Major);
 
         // minor flats
-        expect(score.masterBars[16].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[16].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[17].keySignature).to.equal(KeySignature.F);
-        expect(score.masterBars[17].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[18].keySignature).to.equal(KeySignature.Bb);
-        expect(score.masterBars[18].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[19].keySignature).to.equal(KeySignature.Eb);
-        expect(score.masterBars[19].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[20].keySignature).to.equal(KeySignature.Ab);
-        expect(score.masterBars[20].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[21].keySignature).to.equal(KeySignature.Db);
-        expect(score.masterBars[21].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[22].keySignature).to.equal(KeySignature.Gb);
-        expect(score.masterBars[22].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[23].keySignature).to.equal(KeySignature.Cb);
-        expect(score.masterBars[23].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[16].keySignature).to.equal(KeySignature.C);
+        expect(bars[16].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[17].keySignature).to.equal(KeySignature.F);
+        expect(bars[17].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[18].keySignature).to.equal(KeySignature.Bb);
+        expect(bars[18].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[19].keySignature).to.equal(KeySignature.Eb);
+        expect(bars[19].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[20].keySignature).to.equal(KeySignature.Ab);
+        expect(bars[20].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[21].keySignature).to.equal(KeySignature.Db);
+        expect(bars[21].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[22].keySignature).to.equal(KeySignature.Gb);
+        expect(bars[22].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[23].keySignature).to.equal(KeySignature.Cb);
+        expect(bars[23].keySignatureType).to.equal(KeySignatureType.Minor);
 
         // minor sharps
-        expect(score.masterBars[24].keySignature).to.equal(KeySignature.C);
-        expect(score.masterBars[24].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[25].keySignature).to.equal(KeySignature.G);
-        expect(score.masterBars[25].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[26].keySignature).to.equal(KeySignature.D);
-        expect(score.masterBars[26].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[27].keySignature).to.equal(KeySignature.A);
-        expect(score.masterBars[27].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[28].keySignature).to.equal(KeySignature.E);
-        expect(score.masterBars[28].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[29].keySignature).to.equal(KeySignature.B);
-        expect(score.masterBars[29].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[30].keySignature).to.equal(KeySignature.FSharp);
-        expect(score.masterBars[30].keySignatureType).to.equal(KeySignatureType.Minor);
-        expect(score.masterBars[31].keySignature).to.equal(KeySignature.CSharp);
-        expect(score.masterBars[31].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[24].keySignature).to.equal(KeySignature.C);
+        expect(bars[24].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[25].keySignature).to.equal(KeySignature.G);
+        expect(bars[25].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[26].keySignature).to.equal(KeySignature.D);
+        expect(bars[26].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[27].keySignature).to.equal(KeySignature.A);
+        expect(bars[27].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[28].keySignature).to.equal(KeySignature.E);
+        expect(bars[28].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[29].keySignature).to.equal(KeySignature.B);
+        expect(bars[29].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[30].keySignature).to.equal(KeySignature.FSharp);
+        expect(bars[30].keySignatureType).to.equal(KeySignatureType.Minor);
+        expect(bars[31].keySignature).to.equal(KeySignature.CSharp);
+        expect(bars[31].keySignatureType).to.equal(KeySignatureType.Minor);
     }
 
     public static checkColors(score: Score): void {
@@ -478,8 +479,8 @@ export class GpImporterTestHelper {
     }
 
     public static checkChords(score: Score): void {
-        let track: Track = score.tracks[0];
-        let staff: Staff = track.staves[0];
+        const track: Track = score.tracks[0];
+        const staff: Staff = track.staves[0];
         expect(staff.chords!.size).to.equal(8);
 
         GpImporterTestHelper.checkChord(
@@ -552,7 +553,7 @@ export class GpImporterTestHelper {
     }
     public static checkSlash(score: Score): void {
         expect(score.tracks.length).to.equal(2);
-        
+
         expect(score.tracks[0].staves.length).to.equal(1);
         expect(score.tracks[0].staves[0].showSlash).to.equal(true);
         expect(score.tracks[0].staves[0].showTablature).to.equal(true);

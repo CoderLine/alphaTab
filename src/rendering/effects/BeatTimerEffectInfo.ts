@@ -1,11 +1,11 @@
 import { NotationElement } from '@src/NotationSettings';
-import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { Settings } from '@src/Settings';
-import { Beat } from '@src/model';
-import { BarRendererBase } from '../BarRendererBase';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
-import { BeatTimerGlyph } from '../glyphs/BeatTimerGlyph';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
+import type { Settings } from '@src/Settings';
+import type { Beat } from '@src/model/Beat';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { BeatTimerGlyph } from '@src/rendering/glyphs/BeatTimerGlyph';
 
 export class BeatTimerEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {

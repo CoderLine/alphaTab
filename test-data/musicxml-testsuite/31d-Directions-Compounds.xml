@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
+  <movement-title>MusicXML compound directions</movement-title>
+  <identification>
+    <miscellaneous>
+      <miscellaneous-field name="description">This tests various combinations of
+          &lt;direction&gt; children.  The lyrics for each note describe the
+          compound elements assigned to that note.
+
+          The first ‘molto f’ uses &lt;words&gt;molto &lt;words&gt;, i.e., it
+          omits the ‘xml:space’ attribute.   This makes the rendering of the
+          space between ‘molto’ and ‘f’ implementation-dependent (and might be
+          thus omitted).  The second ‘molto f’, together with ‘meno f’, uses
+          ‘xml:space="preserve"’.
+
+          For demonstration purposes, there is no space between words ‘bold’ and
+          ‘italic’.</miscellaneous-field>
+    </miscellaneous>
+  </identification>
+  <part-list>
+    <score-part id="P1">
+      <part-name print-object="no">MusicXML Part</part-name>
+    </score-part>
+  </part-list>
+  <!--=========================================================-->
+  <part id="P1">
+    <measure number="1">
+      <attributes>
+        <divisions>1</divisions>
+        <key>
+          <fifths>0</fifths>
+          <mode>major</mode>
+        </key>
+        <time symbol="common">
+          <beats>4</beats>
+          <beat-type>4</beat-type>
+        </time>
+        <clef>
+          <sign>G</sign>
+          <line>2</line>
+        </clef>
+      </attributes>
+      <direction>
+        <direction-type>
+          <words>Adagio</words>
+        </direction-type>
+        <direction-type>
+          <metronome>
+            <beat-unit>long</beat-unit>
+            <per-minute>100</per-minute>
+          </metronome>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>Adagio</text></lyric>
+        <lyric number="2"><text>long=100</text></lyric>
+      </note>
+      <direction placement="below">
+        <direction-type>
+          <words default-y="-80" font-family="Times New Roman" font-size="10.25"
+                 font-style="italic">molto </words>
+        </direction-type>
+        <direction-type>
+          <dynamics default-y="-80">
+            <f/>
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>molto↓</text></lyric>
+        <lyric number="2"><text>f</text></lyric>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="2">
+      <direction placement="below">
+        <direction-type>
+          <dynamics default-y="-80">
+            <p/>
+          </dynamics>
+        </direction-type>
+        <direction-type>
+          <words default-y="-80" font-family="Times New Roman" font-size="10.25"
+                 font-style="italic" xml:space="preserve"> subito</words>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>p↓</text></lyric>
+        <lyric number="2"><text>subito</text></lyric>
+      </note>
+      <direction placement="above">
+        <direction-type>
+          <words default-y="30" font-family="Times New Roman" font-size="10.25"
+                 font-style="italic" enclosure="rectangle"
+                 xml:space="preserve">molto </words>
+        </direction-type>
+        <direction-type>
+          <dynamics default-y="30">
+            <f/>
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>molto f↑</text></lyric>
+        <lyric number="2"><text>(rectangle)</text></lyric>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="3">
+      <direction placement="below">
+        <direction-type>
+          <dynamics><ppp/></dynamics>
+        </direction-type>
+        <direction-type>
+          <wedge type="crescendo"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><syllabic>begin</syllabic><text>ppp↓</text></lyric>
+        <lyric number="2"><syllabic>begin</syllabic><text>cresc.</text></lyric>
+      </note>
+      <direction placement="below">
+        <direction-type>
+          <wedge type="stop"/>
+        </direction-type>
+        <direction-type>
+          <dynamics><fff/></dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><syllabic>end</syllabic><text>to</text></lyric>
+        <lyric number="2"><syllabic>end</syllabic><text>fff↓</text></lyric>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="4">
+      <print new-system="yes"/>
+      <direction placement="above">
+        <direction-type>
+          <words font-style="italic">cresc.</words>
+        </direction-type>
+        <direction-type>
+          <dashes type="start" number="1"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><syllabic>begin</syllabic><text>cresc.↑</text></lyric>
+        <lyric number="2"><syllabic>begin</syllabic><text>dashes</text></lyric>
+      </note>
+      <direction placement="above">
+        <direction-type>
+          <dashes type="stop" number="1"/>
+        </direction-type>
+        <direction-type>
+          <words font-style="italic" xml:space="preserve">meno </words>
+        </direction-type>
+        <direction-type>
+          <dynamics>
+            <f/>
+          </dynamics>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><syllabic>end</syllabic><text>to</text></lyric>
+        <lyric number="2"><syllabic>end</syllabic><text>meno f↑</text></lyric>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="5">
+      <direction>
+        <direction-type>
+          <rehearsal>12</rehearsal>
+          <rehearsal font-style="italic">bis</rehearsal>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>reh. 12+bis</text></lyric>
+        <lyric number="2"><text>(square)</text></lyric>
+      </note>
+      <direction placement="below">
+        <direction-type>
+          <words font-weight="bold">bold</words>
+          <words font-weight="normal" font-style="italic">italic</words>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>bold+</text></lyric>
+        <lyric number="2"><text>italic</text></lyric>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="6">
+      <direction>
+        <direction-type>
+          <segno/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>segno</text></lyric>
+      </note>
+      <direction>
+        <direction-type>
+          <coda/>
+          <coda/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>2</duration>
+        <voice>1</voice>
+        <type>half</type>
+        <lyric number="1"><text>coda</text></lyric>
+        <lyric number="2"><text>×2</text></lyric>
+      </note>
+      <barline location="right">
+        <bar-style>light-heavy</bar-style>
+      </barline>
+    </measure>
+  </part>
+</score-partwise>

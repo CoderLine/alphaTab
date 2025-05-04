@@ -5,15 +5,15 @@ import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
-import { ScoreImporter } from '@src/importer/ScoreImporter';
+import type { ScoreImporter } from '@src/importer/ScoreImporter';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { AlphaSynthWebWorker } from '@src/platform/javascript/AlphaSynthWebWorker';
 import { AlphaTabWebWorker } from '@src/platform/javascript/AlphaTabWebWorker';
 import { Html5Canvas } from '@src/platform/javascript/Html5Canvas';
 import { JQueryAlphaTab } from '@src/platform/javascript/JQueryAlphaTab';
 import { CssFontSvgCanvas } from '@src/platform/svg/CssFontSvgCanvas';
-import { BarRendererFactory } from '@src/rendering/BarRendererFactory';
+import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRendererFactory } from '@src/rendering/EffectBarRendererFactory';
 import { AlternateEndingsEffectInfo } from '@src/rendering/effects/AlternateEndingsEffectInfo';
 import { CapoEffectInfo } from '@src/rendering/effects/CapoEffectInfo';
@@ -43,9 +43,9 @@ import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibrat
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
-import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
+import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { ScoreBarRendererFactory } from '@src/rendering/ScoreBarRendererFactory';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
@@ -55,27 +55,28 @@ import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverP
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { SkiaCanvas } from './platform/skia/SkiaCanvas';
-import { Font } from './model';
-import { Settings } from './Settings';
-import { AlphaTabError, AlphaTabErrorType } from './AlphaTabError';
-import { SlashBarRendererFactory } from './rendering/SlashBarRendererFactory';
-import { NumberedBarRendererFactory } from './rendering/NumberedBarRendererFactory';
-import { FreeTimeEffectInfo } from './rendering/effects/FreeTimeEffectInfo';
-import { ScoreBarRenderer } from './rendering/ScoreBarRenderer';
-import { TabBarRenderer } from './rendering/TabBarRenderer';
-import { SustainPedalEffectInfo } from './rendering/effects/SustainPedalEffectInfo';
-import { GolpeEffectInfo } from './rendering/effects/GolpeEffectInfo';
-import { GolpeType } from './model/GolpeType';
-import { WahPedalEffectInfo } from './rendering/effects/WahPedalEffectInfo';
-import { BeatBarreEffectInfo } from './rendering/effects/BeatBarreEffectInfo';
-import { NoteOrnamentEffectInfo } from './rendering/effects/NoteOrnamentEffectInfo';
-import { RasgueadoEffectInfo } from './rendering/effects/RasgueadoEffectInfo';
-import { DirectionsEffectInfo } from './rendering/effects/DirectionsEffectInfo';
-import { BeatTimerEffectInfo } from './rendering/effects/BeatTimerEffectInfo';
+import { SkiaCanvas } from '@src/platform/skia/SkiaCanvas';
+import type { Font } from '@src/model/Font';
+import type { Settings } from '@src/Settings';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { SlashBarRendererFactory } from '@src/rendering/SlashBarRendererFactory';
+import { NumberedBarRendererFactory } from '@src/rendering/NumberedBarRendererFactory';
+import { FreeTimeEffectInfo } from '@src/rendering/effects/FreeTimeEffectInfo';
+import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import { SustainPedalEffectInfo } from '@src/rendering/effects/SustainPedalEffectInfo';
+import { GolpeEffectInfo } from '@src/rendering/effects/GolpeEffectInfo';
+import { GolpeType } from '@src/model/GolpeType';
+import { WahPedalEffectInfo } from '@src/rendering/effects/WahPedalEffectInfo';
+import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
+import { NoteOrnamentEffectInfo } from '@src/rendering/effects/NoteOrnamentEffectInfo';
+import { RasgueadoEffectInfo } from '@src/rendering/effects/RasgueadoEffectInfo';
+import { DirectionsEffectInfo } from '@src/rendering/effects/DirectionsEffectInfo';
+import { BeatTimerEffectInfo } from '@src/rendering/effects/BeatTimerEffectInfo';
+import { VersionInfo } from '@src/generated/VersionInfo';
 
 /**
- * A factory for custom layout engines. 
+ * A factory for custom layout engines.
  */
 export class LayoutEngineFactory {
     /**
@@ -94,13 +95,13 @@ export class LayoutEngineFactory {
 }
 
 /**
- * A factory for custom render engines. 
- * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are 
+ * A factory for custom render engines.
+ * Note for Web: To use a custom engine in workers you have to ensure the engine and registration to the environment are
  * also done in the background worker files (e.g. when bundling)
  */
 export class RenderEngineFactory {
     /**
-     * Whether the layout supports background workers. 
+     * Whether the layout supports background workers.
      */
     public readonly supportsWorkers: boolean;
     public readonly createCanvas: () => ICanvas;
@@ -131,16 +132,19 @@ export class Environment {
 
     /**
      * The font size of the music font in pixel.
+     * @internal
      */
     public static readonly MusicFontSize = 34;
 
     /**
      * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays.
+     * @internal
      */
     public static HighDpiFactor = 1;
 
     /**
      * @target web
+     * @internal
      */
     public static createStyleElement(elementDocument: HTMLDocument, fontDirectory: string | null) {
         let styleElement: HTMLStyleElement = elementDocument.getElementById('alphaTabStyle') as HTMLStyleElement;
@@ -152,7 +156,7 @@ export class Environment {
 
             styleElement = elementDocument.createElement('style');
             styleElement.id = 'alphaTabStyle';
-            let css: string = `
+            const css: string = `
             @font-face {
                 font-display: block;
                 font-family: 'alphaTab';
@@ -201,6 +205,7 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static get globalThis(): any {
         if (Environment._globalThis === undefined) {
@@ -224,38 +229,39 @@ export class Environment {
             }
         }
 
-        return this._globalThis;
+        return Environment._globalThis;
     }
 
     /**
      * @target web
      */
-    public static webPlatform: WebPlatform = Environment.detectWebPlatform();
+    public static readonly webPlatform: WebPlatform = Environment.detectWebPlatform();
 
     /**
      * @target web
      */
-    public static isWebPackBundled: boolean = Environment.detectWebPack();
+    public static readonly isWebPackBundled: boolean = Environment.detectWebPack();
 
     /**
      * @target web
      */
-    public static isViteBundled: boolean = Environment.detectVite();
+    public static readonly isViteBundled: boolean = Environment.detectVite();
 
     /**
      * @target web
      */
-    public static scriptFile: string | null = Environment.detectScriptFile();
+    public static readonly scriptFile: string | null = Environment.detectScriptFile();
 
     /**
      * @target web
      */
-    public static fontDirectory: string | null = Environment.detectFontDirectory();
+    public static readonly fontDirectory: string | null = Environment.detectFontDirectory();
 
     /**
      * @target web
+     * @internal
      */
-    public static bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
+    public static readonly bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
 
     /**
      * @target web
@@ -332,6 +338,7 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static ensureFullUrl(relativeUrl: string | null): string {
         if (!relativeUrl) {
@@ -340,7 +347,7 @@ export class Environment {
 
         if (!relativeUrl.startsWith('http') && !relativeUrl.startsWith('https') && !relativeUrl.startsWith('file')) {
             let root: string = '';
-            let location: Location = Environment.globalThis['location'];
+            const location: Location = Environment.globalThis.location;
             root += location.protocol?.toString();
             root += '//'?.toString();
             if (location.hostname) {
@@ -353,7 +360,7 @@ export class Environment {
             // as it is not clearly defined how slashes are treated in the location object
             // better be safe than sorry here
             if (!relativeUrl.startsWith('/')) {
-                let directory: string = location.pathname.split('/').slice(0, -1).join('/');
+                const directory: string = location.pathname.split('/').slice(0, -1).join('/');
                 if (directory.length > 0) {
                     if (!directory.startsWith('/')) {
                         root += '/'?.toString();
@@ -386,14 +393,14 @@ export class Environment {
      */
     private static detectFontDirectory(): string | null {
         if (!Environment.isRunningInWorker && Environment.globalThis.ALPHATAB_FONT) {
-            return Environment.ensureFullUrl(Environment.globalThis['ALPHATAB_FONT']);
+            return Environment.ensureFullUrl(Environment.globalThis.ALPHATAB_FONT);
         }
 
         const scriptFile = Environment.scriptFile;
         if (scriptFile) {
-            let lastSlash: number = scriptFile.lastIndexOf(String.fromCharCode(47));
+            const lastSlash: number = scriptFile.lastIndexOf(String.fromCharCode(47));
             if (lastSlash >= 0) {
-                return scriptFile.substr(0, lastSlash) + '/font/';
+                return `${scriptFile.substr(0, lastSlash)}/font/`;
             }
         }
 
@@ -405,9 +412,10 @@ export class Environment {
      */
     private static registerJQueryPlugin(): void {
         if (!Environment.isRunningInWorker && Environment.globalThis && 'jQuery' in Environment.globalThis) {
-            let jquery: any = Environment.globalThis['jQuery'];
-            let api: JQueryAlphaTab = new JQueryAlphaTab();
+            const jquery: any = Environment.globalThis.jQuery;
+            const api: JQueryAlphaTab = new JQueryAlphaTab();
             jquery.fn.alphaTab = function (this: any, method: string) {
+                // biome-ignore lint/style/noArguments: Legacy jQuery plugin argument forwarding
                 const args = Array.prototype.slice.call(arguments, 1);
                 // if only a single element is affected, we use this
                 if (this.length === 1) {
@@ -425,9 +433,19 @@ export class Environment {
         }
     }
 
-    public static renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
-    public static layoutEngines: Map<LayoutMode, LayoutEngineFactory> = Environment.createDefaultLayoutEngines();
-    public static staveProfiles: Map<StaveProfile, BarRendererFactory[]> = Environment.createDefaultStaveProfiles();
+    public static readonly renderEngines: Map<string, RenderEngineFactory> = Environment.createDefaultRenderEngines();
+
+    /**
+     * @internal
+     */
+    public static readonly layoutEngines: Map<LayoutMode, LayoutEngineFactory> =
+        Environment.createDefaultLayoutEngines();
+
+    /**
+     * @internal
+     */
+    public static readonly staveProfiles: Map<StaveProfile, BarRendererFactory[]> =
+        Environment.createDefaultStaveProfiles();
 
     public static getRenderEngineFactory(engine: string): RenderEngineFactory {
         if (!engine || !Environment.renderEngines.has(engine)) {
@@ -436,6 +454,9 @@ export class Environment {
         return Environment.renderEngines.get(engine)!;
     }
 
+    /**
+     * @internal
+     */
     public static getLayoutEngineFactory(layoutMode: LayoutMode): LayoutEngineFactory {
         if (!layoutMode || !Environment.layoutEngines.has(layoutMode)) {
             return Environment.layoutEngines.get(LayoutMode.Page)!;
@@ -489,14 +510,12 @@ export class Environment {
     }
 
     /**
-     * Registers a new custom font for the usage in the alphaSkia rendering backend using
-     * provided font information.
+     * Registers a new custom font for the usage in the alphaSkia rendering backend.
      * @param fontData The raw binary data of the font.
-     * @param fontInfo If provided the font info provided overrules
      * @returns The font info under which the font was registered.
      */
-    public static registerAlphaSkiaCustomFont(fontData: Uint8Array, fontInfo?: Font | undefined): Font {
-        return SkiaCanvas.registerFont(fontData, fontInfo);
+    public static registerAlphaSkiaCustomFont(fontData: Uint8Array): Font {
+        return SkiaCanvas.registerFont(fontData);
     }
 
     /**
@@ -537,7 +556,7 @@ export class Environment {
                 new BeatBarreEffectInfo(),
                 new NoteOrnamentEffectInfo(),
                 new RasgueadoEffectInfo(),
-                new WahPedalEffectInfo(),
+                new WahPedalEffectInfo()
             ]),
             new EffectBarRendererFactory(
                 Environment.StaffIdBeforeScoreHideable,
@@ -735,16 +754,18 @@ export class Environment {
 
     /**
      * @target web
+     * @internal
      */
     public static get alphaTabWorker(): any {
-        return this.globalThis.Worker;
+        return Environment.globalThis.Worker;
     }
 
     /**
      * @target web
+     * @internal
      */
     public static get alphaTabUrl(): any {
-        return this.globalThis.URL;
+        return Environment.globalThis.URL;
     }
 
     /**
@@ -835,5 +856,37 @@ export class Environment {
         }
 
         return WebPlatform.Browser;
+    }
+
+    /**
+     * Prints the environment information for easier troubleshooting.
+     * @param force Whether to force printing.
+     */
+    public static printEnvironmentInfo(force: boolean = true) {
+        const printer: (message: string) => void = force
+            ? message => {
+                  Logger.log.debug('VersionInfo', message);
+              }
+            : message => {
+                  Logger.debug('VersionInfo', message);
+              };
+        VersionInfo.print(printer);
+        printer(`High DPI: ${Environment.HighDpiFactor}`);
+        Environment.printPlatformInfo(printer);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    private static printPlatformInfo(print: (message: string) => void) {
+        print(`Browser: ${navigator.userAgent}`);
+        print(`Platform: ${WebPlatform[Environment.webPlatform]}`);
+        print(`WebPack: ${Environment.isWebPackBundled}`);
+        print(`Vite: ${Environment.isViteBundled}`);
+        if (Environment.webPlatform !== WebPlatform.NodeJs) {
+            print(`Window Size: ${window.outerWidth}x${window.outerHeight}`);
+            print(`Screen Size: ${window.screen.width}x${window.screen.height}`);
+        }
     }
 }

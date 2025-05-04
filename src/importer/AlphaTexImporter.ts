@@ -3,7 +3,7 @@ import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BrushType } from '@src/model/BrushType';
@@ -20,22 +20,22 @@ import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
 import { Note } from '@src/model/Note';
 import { PickStroke } from '@src/model/PickStroke';
-import { Score } from '@src/model/Score';
+import { Score, ScoreSubElement } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
+import type { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
 import { Logger } from '@src/Logger';
-import { ModelUtils, TuningParseResult } from '@src/model/ModelUtils';
+import { ModelUtils, type TuningParseResult } from '@src/model/ModelUtils';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { IOHelper } from '@src/io/IOHelper';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { KeySignatureType } from '@src/model/KeySignatureType';
@@ -57,32 +57,33 @@ import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy
 import { Color } from '@src/model/Color';
 import { BendStyle } from '@src/model/BendStyle';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import { TextAlign } from '@src/platform/ICanvas';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
  */
 export enum AlphaTexSymbols {
-    No,
-    Eof,
-    Number,
-    DoubleDot,
-    Dot,
-    String,
-    Tuning,
-    LParensis,
-    RParensis,
-    LBrace,
-    RBrace,
-    Pipe,
-    MetaCommand,
-    Multiply,
-    LowerThan
+    No = 0,
+    Eof = 1,
+    Number = 2,
+    DoubleDot = 3,
+    Dot = 4,
+    String = 5,
+    Tuning = 6,
+    LParensis = 7,
+    RParensis = 8,
+    LBrace = 9,
+    RBrace = 10,
+    Pipe = 11,
+    MetaCommand = 12,
+    Multiply = 13,
+    LowerThan = 14
 }
 
 enum StaffMetaResult {
-    KnownStaffMeta,
-    UnknownStaffMeta,
-    EndOfMetaDetected
+    KnownStaffMeta = 0,
+    UnknownStaffMeta = 1,
+    EndOfMetaDetected = 2
 }
 
 export class AlphaTexError extends AlphaTabError {
@@ -143,8 +144,8 @@ export class AlphaTexError extends AlphaTabError {
 }
 
 enum AlphaTexAccidentalMode {
-    Auto,
-    Explicit
+    Auto = 0,
+    Explicit = 1
 }
 
 /**
@@ -186,13 +187,11 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private _slurs: Map<string, Note> = new Map<string, Note>();
 
+    private _articulationValueToIndex = new Map<number, number>();
+
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
 
     public logErrors: boolean = false;
-
-    public constructor() {
-        super();
-    }
 
     public get name(): string {
         return 'AlphaTex';
@@ -202,6 +201,8 @@ export class AlphaTexImporter extends ScoreImporter {
         this.data = ByteBuffer.empty();
         this._input = tex;
         this.settings = settings;
+        // when beginning reading a new score we reset the IDs.
+        Score.resetIds();
     }
 
     public readScore(): Score {
@@ -236,85 +237,22 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
             }
 
-            this.consolidate();
+            ModelUtils.consolidate(this._score);
             this._score.finish(this.settings);
             this._score.rebuildRepeatGroups();
             for (const [track, lyrics] of this._lyrics) {
                 this._score.tracks[track].applyLyrics(lyrics);
             }
             for (const [sustainPedal, beat] of this._sustainPedalToBeat) {
-                if (sustainPedal.ratioPosition === 0) {
-                    const duration = beat.voice.bar.masterBar.calculateDuration();
-                    sustainPedal.ratioPosition = beat.playbackStart / duration;
-                }
+                const duration = beat.voice.bar.masterBar.calculateDuration();
+                sustainPedal.ratioPosition = beat.playbackStart / duration;
             }
             return this._score;
         } catch (e) {
             if (e instanceof AlphaTexError) {
                 throw new UnsupportedFormatError(e.message, e);
-            } else {
-                throw e;
             }
-        }
-    }
-
-    /**
-     * Ensures all staffs of all tracks have the correct number of bars
-     * (the number of bars per staff and track could be inconsistent)
-     */
-    private consolidate(): void {
-        // empty score?
-        if (this._score.masterBars.length === 0) {
-            const master: MasterBar = new MasterBar();
-            this._score.addMasterBar(master);
-
-            const tempoAutomation: Automation = new Automation();
-            tempoAutomation.isLinear = false;
-            tempoAutomation.type = AutomationType.Tempo;
-            tempoAutomation.value = this._score.tempo;
-            master.tempoAutomations.push(tempoAutomation);
-
-            const bar: Bar = new Bar();
-            this._score.tracks[0].staves[0].addBar(bar);
-
-            const v = new Voice();
-            bar.addVoice(v);
-
-            const emptyBeat: Beat = new Beat();
-            emptyBeat.isEmpty = true;
-            v.addBeat(emptyBeat);
-            return;
-        }
-
-        for (let track of this._score.tracks) {
-            for (let staff of track.staves) {
-                // fill empty beats
-                for (const b of staff.bars) {
-                    for (const v of b.voices) {
-                        if (v.isEmpty && v.beats.length == 0) {
-                            const emptyBeat: Beat = new Beat();
-                            emptyBeat.isEmpty = true;
-                            v.addBeat(emptyBeat);
-                        }
-                    }
-                }
-
-                // fill missing bars
-                const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
-                while (staff.bars.length < this._score.masterBars.length) {
-                    const bar: Bar = new Bar();
-                    staff.addBar(bar);
-
-                    for (let i = 0; i < voiceCount; i++) {
-                        const v = new Voice();
-                        bar.addVoice(v);
-
-                        const emptyBeat: Beat = new Beat();
-                        emptyBeat.isEmpty = true;
-                        v.addBeat(emptyBeat);
-                    }
-                }
-            }
+            throw e;
         }
     }
 
@@ -336,7 +274,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else {
             receivedSymbol = expected;
         }
-        let e = AlphaTexError.symbolError(
+        const e = AlphaTexError.symbolError(
             this._lastValidSpot[0],
             this._lastValidSpot[1],
             this._lastValidSpot[2],
@@ -352,7 +290,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private errorMessage(message: string): void {
-        let e: AlphaTexError = AlphaTexError.errorMessage(
+        const e: AlphaTexError = AlphaTexError.errorMessage(
             message,
             this._lastValidSpot[0],
             this._lastValidSpot[1],
@@ -384,6 +322,7 @@ export class AlphaTexImporter extends ScoreImporter {
         const staff = this._currentTrack.staves[0];
         staff.displayTranspositionPitch = 0;
         staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
+        this._articulationValueToIndex.clear();
 
         this.beginStaff(staff);
 
@@ -640,7 +579,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this.saveValidSpot();
             } else if (this._ch === 0x22 /* " */ || this._ch === 0x27 /* ' */) {
-                let startChar: number = this._ch;
+                const startChar: number = this._ch;
                 this._ch = this.nextChar();
                 let s: string = '';
                 this._sy = AlphaTexSymbols.String;
@@ -650,13 +589,13 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._ch = this.nextChar();
                         if (this._ch === 0x5c /* \\ */) {
                             s += '\\';
-                        } else if (this._ch == startChar /* \<startchar> */) {
+                        } else if (this._ch === startChar /* \<startchar> */) {
                             s += String.fromCharCode(this._ch);
-                        } else if (this._ch == 0x52 /* \R */ || this._ch == 0x72 /* \r */) {
+                        } else if (this._ch === 0x52 /* \R */ || this._ch === 0x72 /* \r */) {
                             s += '\r';
-                        } else if (this._ch == 0x4e /* \N */ || this._ch == 0x6e /* \n */) {
+                        } else if (this._ch === 0x4e /* \N */ || this._ch === 0x6e /* \n */) {
                             s += '\n';
-                        } else if (this._ch == 0x54 /* \T */ || this._ch == 0x74 /* \t */) {
+                        } else if (this._ch === 0x54 /* \T */ || this._ch === 0x74 /* \t */) {
                             s += '\t';
                         } else {
                             this.errorMessage('Unsupported escape sequence');
@@ -693,7 +632,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._ch = this.nextChar();
                 this._sy = AlphaTexSymbols.MetaCommand;
                 // allow double backslash (easier to test when copying from escaped Strings)
-                if(this._ch === 0x5c /* \ */) {
+                if (this._ch === 0x5c /* \ */) {
                     this._ch = this.nextChar();
                 }
 
@@ -719,8 +658,8 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (this.isDigit(this._ch)) {
                 this.readNumberOrName();
             } else if (AlphaTexImporter.isNameLetter(this._ch)) {
-                let name: string = this.readName();
-                let tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
+                const name: string = this.readName();
+                const tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
                 if (tuning) {
                     this._sy = AlphaTexSymbols.Tuning;
                     this._syData = tuning;
@@ -750,7 +689,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
         if (isNumber) {
             this._sy = AlphaTexSymbols.Number;
-            this._syData = this._allowFloat ? parseFloat(str) : parseInt(str);
+            this._syData = this._allowFloat ? Number.parseFloat(str) : Number.parseInt(str);
         } else {
             this._sy = AlphaTexSymbols.String;
             this._syData = str;
@@ -821,7 +760,7 @@ export class AlphaTexImporter extends ScoreImporter {
         let anyOtherMeta = false;
         let continueReading: boolean = true;
         while (this._sy === AlphaTexSymbols.MetaCommand && continueReading) {
-            let metadataTag: string = (this._syData as string).toLowerCase();
+            const metadataTag: string = (this._syData as string).toLowerCase();
             switch (metadataTag) {
                 case 'title':
                 case 'subtitle':
@@ -839,28 +778,40 @@ export class AlphaTexImporter extends ScoreImporter {
                         // Need to use quotes in that case, or rewrite parsing logic.
                         this.error(metadataTag, AlphaTexSymbols.String, true);
                     }
-                    let metadataValue: string = this._syData as string;
+
+                    const metadataValue: string = this._syData as string;
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+
+                    let element: ScoreSubElement = ScoreSubElement.ChordDiagramList;
                     switch (metadataTag) {
                         case 'title':
                             this._score.title = metadataValue;
+                            element = ScoreSubElement.Title;
                             break;
                         case 'subtitle':
                             this._score.subTitle = metadataValue;
+                            element = ScoreSubElement.SubTitle;
                             break;
                         case 'artist':
                             this._score.artist = metadataValue;
+                            element = ScoreSubElement.Artist;
                             break;
                         case 'album':
                             this._score.album = metadataValue;
+                            element = ScoreSubElement.Album;
                             break;
                         case 'words':
                             this._score.words = metadataValue;
+                            element = ScoreSubElement.Words;
                             break;
                         case 'music':
                             this._score.music = metadataValue;
+                            element = ScoreSubElement.Music;
                             break;
                         case 'copyright':
                             this._score.copyright = metadataValue;
+                            element = ScoreSubElement.Copyright;
                             break;
                         case 'instructions':
                             this._score.instructions = metadataValue;
@@ -870,9 +821,31 @@ export class AlphaTexImporter extends ScoreImporter {
                             break;
                         case 'tab':
                             this._score.tab = metadataValue;
+                            element = ScoreSubElement.Transcriber;
                             break;
                     }
+
+                    if (element !== ScoreSubElement.ChordDiagramList) {
+                        this.headerFooterStyle(element);
+                    }
+
+                    break;
+                case 'copyright2':
                     this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error(metadataTag, AlphaTexSymbols.String, true);
+                    }
+
+                    this.headerFooterStyle(ScoreSubElement.CopyrightSecondLine);
+                    anyTopLevelMeta = true;
+                    break;
+                case 'wordsandmusic':
+                    this._sy = this.newSy();
+                    if (this._sy !== AlphaTexSymbols.String) {
+                        this.error(metadataTag, AlphaTexSymbols.String, true);
+                    }
+
+                    this.headerFooterStyle(ScoreSubElement.WordsAndMusic);
                     anyTopLevelMeta = true;
                     break;
                 case 'tempo':
@@ -930,6 +903,11 @@ export class AlphaTexImporter extends ScoreImporter {
                     break;
                 case 'usesystemsignseparator':
                     this._score.stylesheet.useSystemSignSeparator = true;
+                    this._sy = this.newSy();
+                    anyTopLevelMeta = true;
+                    break;
+                case 'multibarrest':
+                    this._score.stylesheet.multiTrackMultiBarRest = true;
                     this._sy = this.newSy();
                     anyTopLevelMeta = true;
                     break;
@@ -1028,6 +1006,37 @@ export class AlphaTexImporter extends ScoreImporter {
 
         return anyTopLevelMeta || anyOtherMeta;
     }
+    headerFooterStyle(element: ScoreSubElement) {
+        const style = ModelUtils.getOrCreateHeaderFooterStyle(this._score, element);
+        if (style.isVisible === undefined) {
+            style.isVisible = true;
+        }
+
+        if (this._sy === AlphaTexSymbols.String) {
+            const value = this._syData as string;
+            if (value) {
+                style.template = value;
+            } else {
+                style.isVisible = false;
+            }
+            this._sy = this.newSy();
+        }
+
+        if (this._sy === AlphaTexSymbols.String) {
+            switch ((this._syData as string).toLowerCase()) {
+                case 'left':
+                    style.textAlign = TextAlign.Left;
+                    break;
+                case 'center':
+                    style.textAlign = TextAlign.Center;
+                    break;
+                case 'right':
+                    style.textAlign = TextAlign.Right;
+                    break;
+            }
+            this._sy = this.newSy();
+        }
+    }
 
     private parseTrackNamePolicy(v: string): TrackNamePolicy {
         switch (v.toLowerCase()) {
@@ -1035,7 +1044,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return TrackNamePolicy.Hidden;
             case 'allsystems':
                 return TrackNamePolicy.AllSystems;
-            case 'firstsystem':
+            // case 'firstsystem':
             default:
                 return TrackNamePolicy.FirstSystem;
         }
@@ -1045,7 +1054,7 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (v.toLowerCase()) {
             case 'fullname':
                 return TrackNameMode.FullName;
-            case 'shortname':
+            // case 'shortname':
             default:
                 return TrackNameMode.ShortName;
         }
@@ -1055,7 +1064,7 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (v.toLowerCase()) {
             case 'horizontal':
                 return TrackNameOrientation.Horizontal;
-            case 'vertical':
+            //case 'vertical':
             default:
                 return TrackNameOrientation.Vertical;
         }
@@ -1074,12 +1083,12 @@ export class AlphaTexImporter extends ScoreImporter {
                 return StaffMetaResult.KnownStaffMeta;
             case 'tuning':
                 this._sy = this.newSy();
-                let strings: number = this._currentStaff.tuning.length;
+                const strings: number = this._currentStaff.tuning.length;
                 this._staffHasExplicitTuning = true;
                 this._staffTuningApplied = false;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
-                        let text: string = (this._syData as string).toLowerCase();
+                        const text: string = (this._syData as string).toLowerCase();
                         if (text === 'piano' || text === 'none' || text === 'voice') {
                             this.makeCurrentStaffPitched();
                         } else {
@@ -1088,9 +1097,9 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._sy = this.newSy();
                         break;
                     case AlphaTexSymbols.Tuning:
-                        let tuning: number[] = [];
+                        const tuning: number[] = [];
                         do {
-                            let t: TuningParseResult = this._syData as TuningParseResult;
+                            const t: TuningParseResult = this._syData as TuningParseResult;
                             tuning.push(t.realValue);
                             this._sy = this.newSy();
                         } while (this._sy === AlphaTexSymbols.Tuning);
@@ -1117,14 +1126,14 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
                 this._staffTuningApplied = false;
                 if (this._sy === AlphaTexSymbols.Number) {
-                    let instrument: number = this._syData as number;
+                    const instrument: number = this._syData as number;
                     if (instrument >= 0 && instrument <= 127) {
                         this._currentTrack.playbackInfo.program = this._syData as number;
                     } else {
                         this.error('instrument', AlphaTexSymbols.Number, false);
                     }
                 } else if (this._sy === AlphaTexSymbols.String) {
-                    let instrumentName: string = (this._syData as string).toLowerCase();
+                    const instrumentName: string = (this._syData as string).toLowerCase();
                     if (instrumentName === 'percussion') {
                         for (const staff of this._currentTrack.staves) {
                             this.applyPercussionStaff(staff);
@@ -1141,7 +1150,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return StaffMetaResult.KnownStaffMeta;
             case 'lyrics':
                 this._sy = this.newSy();
-                let lyrics: Lyrics = new Lyrics();
+                const lyrics: Lyrics = new Lyrics();
                 lyrics.startBar = 0;
                 lyrics.text = '';
                 if (this._sy === AlphaTexSymbols.Number) {
@@ -1158,7 +1167,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 return StaffMetaResult.KnownStaffMeta;
             case 'chord':
                 this._sy = this.newSy();
-                let chord: Chord = new Chord();
+                const chord: Chord = new Chord();
                 this.chordProperties(chord);
                 if (this._sy === AlphaTexSymbols.String) {
                     chord.name = this._syData as string;
@@ -1248,9 +1257,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
                 if (this.handleNewVoice()) {
                     return StaffMetaResult.EndOfMetaDetected;
-                } else {
-                    return StaffMetaResult.KnownStaffMeta;
                 }
+                return StaffMetaResult.KnownStaffMeta;
             default:
                 return StaffMetaResult.UnknownStaffMeta;
         }
@@ -1286,7 +1294,7 @@ export class AlphaTexImporter extends ScoreImporter {
      * Encodes a given string to a shorthand text form without spaces or special characters
      */
     private static toArticulationId(plain: string): string {
-        return plain.replace(new RegExp('[^a-zA-Z0-9]', 'g'), '').toLowerCase();
+        return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
     private applyPercussionStaff(staff: Staff) {
@@ -1377,7 +1385,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private bars(): boolean {
-        let anyData = this.bar();
+        const anyData = this.bar();
         while (this._sy !== AlphaTexSymbols.Eof) {
             // read pipe from last bar
             if (this._sy === AlphaTexSymbols.Pipe) {
@@ -1452,23 +1460,22 @@ export class AlphaTexImporter extends ScoreImporter {
     private handleNewVoice(): boolean {
         if (
             this._voiceIndex === 0 &&
-            (this._currentStaff.bars.length == 0 ||
+            (this._currentStaff.bars.length === 0 ||
                 (this._currentStaff.bars.length === 1 && this._currentStaff.bars[0].isEmpty))
         ) {
             // voice marker on the begining of the first voice without any bar yet?
             // -> ignore
             return false;
-        } else {
-            // create directly a new empty voice for all bars
-            for (const b of this._currentStaff.bars) {
-                const v = new Voice();
-                b.addVoice(v);
-            }
-            // start using the new voice (see newBar for details on matching)
-            this._voiceIndex++;
-            this._barIndex = 0;
-            return true;
         }
+        // create directly a new empty voice for all bars
+        for (const b of this._currentStaff.bars) {
+            const v = new Voice();
+            b.addVoice(v);
+        }
+        // start using the new voice (see newBar for details on matching)
+        this._voiceIndex++;
+        this._barIndex = 0;
+        return true;
     }
 
     private beginStaff(staff: Staff) {
@@ -1534,6 +1541,13 @@ export class AlphaTexImporter extends ScoreImporter {
                     this._sy = this.newSy();
                     this._currentTrack.playbackInfo.isSolo = true;
                     break;
+                case 'multibarrest':
+                    this._sy = this.newSy();
+                    if (!this._score.stylesheet.perTrackMultiBarRest) {
+                        this._score.stylesheet.perTrackMultiBarRest = new Set<number>();
+                    }
+                    this._score.stylesheet.perTrackMultiBarRest!.add(this._currentTrack.index);
+                    break;
                 default:
                     this.error('track-properties', AlphaTexSymbols.String, false);
                     break;
@@ -1598,13 +1612,11 @@ export class AlphaTexImporter extends ScoreImporter {
     private bar(): boolean {
         const anyStaffMeta = this.trackStaffMeta();
 
-        let bar: Bar = this.newBar(this._currentStaff);
+        const bar: Bar = this.newBar(this._currentStaff);
         if (this._currentStaff.bars.length > this._score.masterBars.length) {
-            let master: MasterBar = new MasterBar();
+            const master: MasterBar = new MasterBar();
             this._score.addMasterBar(master);
             if (master.index > 0) {
-                master.keySignature = master.previousMasterBar!.keySignature;
-                master.keySignatureType = master.previousMasterBar!.keySignatureType;
                 master.timeSignatureDenominator = master.previousMasterBar!.timeSignatureDenominator;
                 master.timeSignatureNumerator = master.previousMasterBar!.timeSignatureNumerator;
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
@@ -1618,7 +1630,7 @@ export class AlphaTexImporter extends ScoreImporter {
             // reset to defaults
             this._currentStaff.stringTuning.tunings = [];
 
-            if (program == 15) {
+            if (program === 15) {
                 // dulcimer E4 B3 G3 D3 A2 E2
                 this._currentStaff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
             } else if (program >= 24 && program <= 31) {
@@ -1628,39 +1640,39 @@ export class AlphaTexImporter extends ScoreImporter {
                 // bass G2 D2 A1 E1
                 this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
             } else if (
-                program == 40 ||
-                program == 44 ||
-                program == 45 ||
-                program == 48 ||
-                program == 49 ||
-                program == 50 ||
-                program == 51
+                program === 40 ||
+                program === 44 ||
+                program === 45 ||
+                program === 48 ||
+                program === 49 ||
+                program === 50 ||
+                program === 51
             ) {
                 // violin E3 A3 D3 G2
                 this._currentStaff.stringTuning.tunings = [52, 57, 50, 43];
-            } else if (program == 41) {
+            } else if (program === 41) {
                 // viola A3 D3 G2 C2
                 this._currentStaff.stringTuning.tunings = [57, 50, 43, 36];
-            } else if (program == 42) {
+            } else if (program === 42) {
                 // cello A2 D2 G1 C1
                 this._currentStaff.stringTuning.tunings = [45, 38, 31, 24];
-            } else if (program == 43) {
+            } else if (program === 43) {
                 // contrabass
                 // G2 D2 A1 E1
                 this._currentStaff.stringTuning.tunings = [43, 38, 33, 28];
-            } else if (program == 105) {
+            } else if (program === 105) {
                 // banjo
                 // D3 B2 G2 D2 G3
                 this._currentStaff.stringTuning.tunings = [50, 47, 43, 38, 55];
-            } else if (program == 106) {
+            } else if (program === 106) {
                 // shamisen
                 // A3 E3 A2
                 this._currentStaff.stringTuning.tunings = [57, 52, 45];
-            } else if (program == 107) {
+            } else if (program === 107) {
                 // koto
                 // E3 A2 D2 G1
                 this._currentStaff.stringTuning.tunings = [52, 45, 38, 31];
-            } else if (program == 110) {
+            } else if (program === 110) {
                 // Fiddle
                 // E4 A3 D3 G2
                 this._currentStaff.stringTuning.tunings = [64, 57, 50, 43];
@@ -1674,7 +1686,7 @@ export class AlphaTexImporter extends ScoreImporter {
             if (
                 (program >= 24 && program <= 31) || // Guitar
                 (program >= 32 && program <= 39) || // Bass
-                program == 43 // Contrabass
+                program === 43 // Contrabass
             ) {
                 // guitar E4 B3 G3 D3 A2 E2
                 this._currentStaff.displayTranspositionPitch = -12;
@@ -1684,7 +1696,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         let anyBeatData = false;
-        let voice: Voice = bar.voices[this._voiceIndex];
+        const voice: Voice = bar.voices[this._voiceIndex];
 
         // if we have a setup like \track \staff \track \staff (without any notes/beats defined)
         // we are at a track meta at this point and we don't read any beats
@@ -1702,7 +1714,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         if (voice.beats.length === 0) {
-            let emptyBeat: Beat = new Beat();
+            const emptyBeat: Beat = new Beat();
             emptyBeat.isEmpty = true;
             voice.addBeat(emptyBeat);
         }
@@ -1723,14 +1735,16 @@ export class AlphaTexImporter extends ScoreImporter {
         // need new bar
         const newBar: Bar = new Bar();
         staff.addBar(newBar);
-        if(newBar.previousBar) {
+        if (newBar.previousBar) {
             newBar.clef = newBar.previousBar.clef;
             newBar.clefOttava = newBar.previousBar.clefOttava;
+            newBar.keySignature = newBar.previousBar!.keySignature;
+            newBar.keySignatureType = newBar.previousBar!.keySignatureType;
         }
         this._barIndex++;
 
         for (let i = 0; i < voiceCount; i++) {
-            let voice: Voice = new Voice();
+            const voice: Voice = new Voice();
             newBar.addVoice(voice);
         }
 
@@ -1741,7 +1755,7 @@ export class AlphaTexImporter extends ScoreImporter {
         // duration specifier?
         this.beatDuration();
 
-        let beat: Beat = new Beat();
+        const beat: Beat = new Beat();
         voice.addBeat(beat);
 
         this._allowTuning = !this._currentStaff.isPercussion;
@@ -1822,7 +1836,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            let effect: string = (this._syData as string).toLowerCase();
+            const effect: string = (this._syData as string).toLowerCase();
             switch (effect) {
                 case 'tu':
                     this._sy = this.newSy();
@@ -1864,7 +1878,7 @@ export class AlphaTexImporter extends ScoreImporter {
      * @returns true if a effect could be applied, otherwise false
      */
     private applyBeatEffect(beat: Beat): boolean {
-        let syData: string = (this._syData as string).toLowerCase();
+        const syData: string = (this._syData as string).toLowerCase();
         if (syData === 'f') {
             beat.fade = FadeType.FadeIn;
         } else if (syData === 'fo') {
@@ -1919,7 +1933,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'tb' || syData === 'tbe') {
             this._sy = this.newSy();
 
-            let exact: boolean = syData === 'tbe';
+            const exact: boolean = syData === 'tbe';
 
             // Type
             if (this._sy === AlphaTexSymbols.String) {
@@ -1969,8 +1983,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 // set positions
                 if (!exact) {
-                    let count: number = beat.whammyBarPoints.length;
-                    let step: number = (60 / count) | 0;
+                    const count: number = beat.whammyBarPoints.length;
+                    const step: number = (60 / count) | 0;
                     let i: number = 0;
                     while (i < count) {
                         beat.whammyBarPoints[i].offset = Math.min(60, i * step);
@@ -2017,10 +2031,10 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'ch') {
             this._sy = this.newSy();
-            let chordName: string = this._syData as string;
-            let chordId: string = this.getChordId(this._currentStaff, chordName);
+            const chordName: string = this._syData as string;
+            const chordId: string = this.getChordId(this._currentStaff, chordName);
             if (!this._currentStaff.hasChord(chordId)) {
-                let chord: Chord = new Chord();
+                const chord: Chord = new Chord();
                 chord.showDiagram = false;
                 chord.name = chordName;
                 this._currentStaff.addChord(chordId, chord);
@@ -2040,30 +2054,35 @@ export class AlphaTexImporter extends ScoreImporter {
             return true;
         } else if (syData === 'dy') {
             this._sy = this.newSy();
-            switch ((this._syData as string).toLowerCase()) {
-                case 'ppp':
-                    beat.dynamics = DynamicValue.PPP;
-                    break;
-                case 'pp':
-                    beat.dynamics = DynamicValue.PP;
-                    break;
-                case 'p':
-                    beat.dynamics = DynamicValue.P;
-                    break;
-                case 'mp':
-                    beat.dynamics = DynamicValue.MP;
-                    break;
-                case 'mf':
-                    beat.dynamics = DynamicValue.MF;
-                    break;
-                case 'f':
-                    beat.dynamics = DynamicValue.F;
-                    break;
-                case 'ff':
-                    beat.dynamics = DynamicValue.FF;
-                    break;
-                case 'fff':
-                    beat.dynamics = DynamicValue.FFF;
+            const dynamicString = (this._syData as string).toUpperCase() as keyof typeof DynamicValue;
+            switch (dynamicString) {
+                case 'PPP':
+                case 'PP':
+                case 'P':
+                case 'MP':
+                case 'MF':
+                case 'F':
+                case 'FF':
+                case 'FFF':
+                case 'PPPP':
+                case 'PPPPP':
+                case 'PPPPPP':
+                case 'FFFF':
+                case 'FFFFF':
+                case 'FFFFFF':
+                case 'SF':
+                case 'SFP':
+                case 'SFPP':
+                case 'FP':
+                case 'RF':
+                case 'RFZ':
+                case 'SFZ':
+                case 'SFFZ':
+                case 'FZ':
+                case 'N':
+                case 'PF':
+                case 'SFZP':
+                    beat.dynamics = DynamicValue[dynamicString];
                     break;
             }
             this._currentDynamics = beat.dynamics;
@@ -2102,6 +2121,7 @@ export class AlphaTexImporter extends ScoreImporter {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Down;
             // exact ratio position will be applied after .finish() when times are known
+            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
             this._sustainPedalToBeat.set(sustainPedal, beat);
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
@@ -2110,6 +2130,7 @@ export class AlphaTexImporter extends ScoreImporter {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
             // exact ratio position will be applied after .finish() when times are known
+            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
             this._sustainPedalToBeat.set(sustainPedal, beat);
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
@@ -2118,7 +2139,6 @@ export class AlphaTexImporter extends ScoreImporter {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
             sustainPedal.ratioPosition = 1;
-            this._sustainPedalToBeat.set(sustainPedal, beat);
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
             return true;
@@ -2461,10 +2481,10 @@ export class AlphaTexImporter extends ScoreImporter {
                     this.makeCurrentStaffPitched();
                 }
 
-                let tuning: TuningParseResult = this._syData as TuningParseResult;
+                const tuning: TuningParseResult = this._syData as TuningParseResult;
                 octave = tuning.octave;
                 tone = tuning.tone.noteValue;
-                if (this._accidentalMode == AlphaTexAccidentalMode.Explicit) {
+                if (this._accidentalMode === AlphaTexAccidentalMode.Explicit) {
                     accidentalMode = tuning.tone.accidentalMode;
                 }
                 break;
@@ -2473,7 +2493,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy(); // Fret done
 
-        let isFretted: boolean =
+        const isFretted: boolean =
             octave === -1 && this._currentStaff.tuning.length > 0 && !this._currentStaff.isPercussion;
         let noteString: number = -1;
         if (isFretted) {
@@ -2493,7 +2513,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this._sy = this.newSy(); // string done
         }
         // read effects
-        let note: Note = new Note();
+        const note: Note = new Note();
         if (isFretted) {
             note.string = this._currentStaff.tuning.length - (noteString - 1);
             note.isDead = isDead;
@@ -2502,7 +2522,22 @@ export class AlphaTexImporter extends ScoreImporter {
                 note.fret = fret;
             }
         } else if (this._currentStaff.isPercussion) {
-            note.percussionArticulation = fret;
+            const articulationValue = fret;
+            let articulationIndex: number = 0;
+            if (this._articulationValueToIndex.has(articulationValue)) {
+                articulationIndex = this._articulationValueToIndex.get(articulationValue)!;
+            } else {
+                articulationIndex = this._currentTrack.percussionArticulations.length;
+                const articulation = PercussionMapper.getArticulationByInputMidiNumber(articulationValue);
+                if (articulation === null) {
+                    this.errorMessage(`Unknown articulation value ${articulationValue}`);
+                }
+
+                this._currentTrack.percussionArticulations.push(articulation!);
+                this._articulationValueToIndex.set(articulationValue, articulationIndex);
+            }
+
+            note.percussionArticulation = articulationIndex;
         } else {
             note.octave = octave;
             note.tone = tone;
@@ -2520,10 +2555,10 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._sy = this.newSy();
         while (this._sy === AlphaTexSymbols.String) {
-            let syData = (this._syData as string).toLowerCase();
+            const syData = (this._syData as string).toLowerCase();
             if (syData === 'b' || syData === 'be') {
                 this._sy = this.newSy();
-                let exact: boolean = syData === 'be';
+                const exact: boolean = syData === 'be';
 
                 // Type
                 if (this._sy === AlphaTexSymbols.String) {
@@ -2576,8 +2611,8 @@ export class AlphaTexImporter extends ScoreImporter {
                             return a.offset - b.offset;
                         });
                     } else {
-                        let count: number = points.length;
-                        let step: number = (60 / (count - 1)) | 0;
+                        const count: number = points.length;
+                        const step: number = (60 / (count - 1)) | 0;
                         let i: number = 0;
                         while (i < count) {
                             points[i].offset = Math.min(60, i * step);
@@ -2615,7 +2650,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('trill-effect', AlphaTexSymbols.Number, true);
                 }
-                let fret: number = this._syData as number;
+                const fret: number = this._syData as number;
                 this._sy = this.newSy();
                 let duration: Duration = Duration.Sixteenth;
                 if (this._sy === AlphaTexSymbols.Number) {
@@ -2867,11 +2902,11 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private barMeta(bar: Bar): boolean {
         let anyMeta = false;
-        let master: MasterBar = bar.masterBar;
+        const master: MasterBar = bar.masterBar;
         let endOfMeta = false;
         while (!endOfMeta && this._sy === AlphaTexSymbols.MetaCommand) {
             anyMeta = true;
-            let syData: string = (this._syData as string).toLowerCase();
+            const syData: string = (this._syData as string).toLowerCase();
             if (syData === 'ts') {
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.String) {
@@ -2895,7 +2930,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     master.timeSignatureDenominator = this._syData as number;
                     this._sy = this.newSy();
                 }
-            } else if (syData == 'ft') {
+            } else if (syData === 'ft') {
                 master.isFreeTime = true;
                 this._sy = this.newSy();
             } else if (syData === 'ro') {
@@ -2937,8 +2972,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.String) {
                     this.error('keysignature', AlphaTexSymbols.String, true);
                 }
-                master.keySignature = this.parseKeySignature(this._syData as string);
-                master.keySignatureType = this.parseKeySignatureType(this._syData as string);
+                bar.keySignature = this.parseKeySignature(this._syData as string);
+                bar.keySignatureType = this.parseKeySignatureType(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'clef') {
                 this._sy = this.newSy();
@@ -2950,7 +2985,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         bar.clef = this.parseClefFromInt(this._syData as number);
                         break;
                     case AlphaTexSymbols.Tuning:
-                        let parseResult: TuningParseResult = this._syData as TuningParseResult;
+                        const parseResult: TuningParseResult = this._syData as TuningParseResult;
                         bar.clef = this.parseClefFromInt(parseResult.realValue);
                         break;
                     default:
@@ -2974,7 +3009,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     text = this._syData as string;
                     this._sy = this.newSy();
                 }
-                let section: Section = new Section();
+                const section: Section = new Section();
                 section.marker = marker;
                 section.text = text;
                 master.section = section;
@@ -2999,6 +3034,23 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
             } else if (syData === 'db') {
                 master.isDoubleBar = true;
+                bar.barLineRight = BarLineStyle.LightLight;
+                this._sy = this.newSy();
+            } else if (syData === 'barlineleft') {
+                this._sy = this.newSy();
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('barlineleft', AlphaTexSymbols.String, true);
+                }
+
+                bar.barLineLeft = this.parseBarLineStyle(this._syData as string);
+                this._sy = this.newSy();
+            } else if (syData === 'barlineright') {
+                this._sy = this.newSy();
+                if (this._sy !== AlphaTexSymbols.String) {
+                    this.error('barlineright', AlphaTexSymbols.String, true);
+                }
+
+                bar.barLineRight = this.parseBarLineStyle(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'accidentals') {
                 this.handleAccidentalMode();
@@ -3058,13 +3110,20 @@ export class AlphaTexImporter extends ScoreImporter {
                             break;
                     }
                 } else {
-                    this.error('measure-effects', AlphaTexSymbols.String, false);
+                    switch (this.handleStaffMeta()) {
+                        case StaffMetaResult.EndOfMetaDetected:
+                            endOfMeta = true;
+                            break;
+                        default:
+                            this.error('measure-effects', AlphaTexSymbols.String, false);
+                            break;
+                    }
                 }
             }
         }
 
         if (master.index === 0 && master.tempoAutomations.length === 0) {
-            let tempoAutomation: Automation = new Automation();
+            const tempoAutomation: Automation = new Automation();
             tempoAutomation.isLinear = false;
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = this._score.tempo;
@@ -3072,6 +3131,37 @@ export class AlphaTexImporter extends ScoreImporter {
             master.tempoAutomations.push(tempoAutomation);
         }
         return anyMeta;
+    }
+
+    private parseBarLineStyle(v: string): BarLineStyle {
+        switch (v.toLowerCase()) {
+            case 'automatic':
+                return BarLineStyle.Automatic;
+            case 'dashed':
+                return BarLineStyle.Dashed;
+            case 'dotted':
+                return BarLineStyle.Dotted;
+            case 'heavy':
+                return BarLineStyle.Heavy;
+            case 'heavyheavy':
+                return BarLineStyle.HeavyHeavy;
+            case 'heavylight':
+                return BarLineStyle.HeavyLight;
+            case 'lightheavy':
+                return BarLineStyle.LightHeavy;
+            case 'lightlight':
+                return BarLineStyle.LightLight;
+            case 'none':
+                return BarLineStyle.None;
+            case 'regular':
+                return BarLineStyle.Regular;
+            case 'short':
+                return BarLineStyle.Short;
+            case 'tick':
+                return BarLineStyle.Tick;
+        }
+
+        return BarLineStyle.Automatic;
     }
 
     private parseSimileMarkFromString(str: string): SimileMark {
@@ -3187,7 +3277,7 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private applyAlternateEnding(master: MasterBar): void {
-        let num = this._syData as number;
+        const num = this._syData as number;
         if (num < 1) {
             // Repeat numberings start from 1
             this.error('alternateending', AlphaTexSymbols.Number, true);

@@ -1,11 +1,10 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import { Inflate } from '@src/zip/Inflate';
 import { ZipEntry } from '@src/zip/ZipEntry';
 
 export class ZipReader {
-
     private _readable: IReadable;
 
     public constructor(readable: IReadable) {
@@ -13,9 +12,9 @@ export class ZipReader {
     }
 
     public read(): ZipEntry[] {
-        let entries: ZipEntry[] = [];
+        const entries: ZipEntry[] = [];
         while (true) {
-            let e: ZipEntry | null = this.readEntry();
+            const e: ZipEntry | null = this.readEntry();
             if (!e) {
                 break;
             }
@@ -25,17 +24,17 @@ export class ZipReader {
     }
 
     private readEntry(): ZipEntry | null {
-        let readable: IReadable = this._readable;
-        let h: number = IOHelper.readInt32LE(readable);
+        const readable: IReadable = this._readable;
+        const h: number = IOHelper.readInt32LE(readable);
         if (h !== ZipEntry.LocalFileHeaderSignature) {
             return null;
         }
         // 4.3.7 local file header
         IOHelper.readUInt16LE(readable); // version
 
-        let flags: number = IOHelper.readUInt16LE(readable);
-        let compressionMethod: number = IOHelper.readUInt16LE(readable);
-        let compressed: boolean = compressionMethod !== 0;
+        const flags: number = IOHelper.readUInt16LE(readable);
+        const compressionMethod: number = IOHelper.readUInt16LE(readable);
+        const compressed: boolean = compressionMethod !== 0;
         if (compressed && compressionMethod !== ZipEntry.CompressionMethodDeflate) {
             return null;
         }
@@ -45,20 +44,20 @@ export class ZipReader {
         IOHelper.readInt32LE(readable); // crc-32
         IOHelper.readInt32LE(readable); // compressed size
 
-        let uncompressedSize: number = IOHelper.readInt32LE(readable);
-        let fileNameLength: number = IOHelper.readInt16LE(readable);
-        let extraFieldLength: number = IOHelper.readInt16LE(readable);
-        let fname: string = IOHelper.toString(IOHelper.readByteArray(readable, fileNameLength), 'utf-8');
+        const uncompressedSize: number = IOHelper.readInt32LE(readable);
+        const fileNameLength: number = IOHelper.readInt16LE(readable);
+        const extraFieldLength: number = IOHelper.readInt16LE(readable);
+        const fname: string = IOHelper.toString(IOHelper.readByteArray(readable, fileNameLength), 'utf-8');
         readable.skip(extraFieldLength);
 
         // 4.3.8 File Data
         let data: Uint8Array;
         if (compressed) {
-            let target: ByteBuffer = ByteBuffer.empty();
-            let z: Inflate = new Inflate(this._readable);
-            let buffer: Uint8Array = new Uint8Array(65536);
+            const target: ByteBuffer = ByteBuffer.empty();
+            const z: Inflate = new Inflate(this._readable);
+            const buffer: Uint8Array = new Uint8Array(65536);
             while (true) {
-                let bytes: number = z.readBytes(buffer, 0, buffer.length);
+                const bytes: number = z.readBytes(buffer, 0, buffer.length);
                 target.write(buffer, 0, bytes);
                 if (bytes < buffer.length) {
                     break;
@@ -72,7 +71,7 @@ export class ZipReader {
         // 4.3.9 Data Descriptor
         // 4.3.9.1
         if ((flags & 8) !== 0) {
-            let crc32: number = IOHelper.readInt32LE(this._readable);
+            const crc32: number = IOHelper.readInt32LE(this._readable);
             // 4.3.9.3
             if (crc32 === ZipEntry.OptionalDataDescriptorSignature) {
                 IOHelper.readInt32LE(this._readable); // real crc

@@ -1,6 +1,6 @@
 /**@target web */
 
-import { isWorkerRuntime, webPackWithAlphaTab, webpackTypes } from './Utils';
+import { isWorkerRuntime, type webPackWithAlphaTab, type webpackTypes } from '@src/webpack/Utils';
 
 export function injectWorkerRuntimeModule(webPackWithAlphaTab: webPackWithAlphaTab) {
     class AlphaTabWorkerRuntimeModule extends webPackWithAlphaTab.webpack.RuntimeModule {
@@ -30,7 +30,7 @@ export function injectWorkerRuntimeModule(webPackWithAlphaTab: webPackWithAlphaT
 
             return webPackWithAlphaTab.webpack.Template.asString([
                 `if ( ! ('AudioWorkletGlobalScope' in ${globalObject}) ) { return; }`,
-                `const installedChunks = {`,
+                'const installedChunks = {',
                 webPackWithAlphaTab.webpack.Template.indent(
                     Array.from(initialChunkIds, id => `${JSON.stringify(id)}: 1`).join(',\n')
                 ),
@@ -71,12 +71,12 @@ export function injectWorkerRuntimeModule(webPackWithAlphaTab: webPackWithAlphaT
                 compilation.addRuntimeModule(chunk, new AlphaTabWorkerRuntimeModule());
             });
 
-            compilation.hooks.additionalChunkRuntimeRequirements.tap(pluginName, (chunk, runtimeRequirements) =>{
-                if(isWorkerRuntime(chunk.runtime)) {
-                    runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories);
-                    runtimeRequirements.add(webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey);
-                }
-            });
+        compilation.hooks.additionalChunkRuntimeRequirements.tap(pluginName, (chunk, runtimeRequirements) => {
+            if (isWorkerRuntime(chunk.runtime)) {
+                runtimeRequirements.add(webPackWithAlphaTab.webpack.RuntimeGlobals.moduleFactories);
+                runtimeRequirements.add(webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey);
+            }
+        });
     };
     webPackWithAlphaTab.alphaTab.WebWorkerRuntimeModuleKey = AlphaTabWorkerRuntimeModule.Key;
 }

@@ -1,11 +1,8 @@
-import { Duration } from '@src/model/Duration';
-import { ScoreRestGlyph } from './ScoreRestGlyph';
+import { BeatSubElement } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 
 export class SlashRestGlyph extends ScoreRestGlyph {
-    public constructor(x: number, y: number, duration: Duration) {
-        super(x, y, duration);
-    }
-
     public override updateBeamingHelper(cx: number): void {
         if (this.beamingHelper) {
             this.beamingHelper.registerBeatLineX(
@@ -16,5 +13,8 @@ export class SlashRestGlyph extends ScoreRestGlyph {
             );
         }
     }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        super.internalPaint(cx, cy, canvas, BeatSubElement.SlashRests);
+    }
 }
- 

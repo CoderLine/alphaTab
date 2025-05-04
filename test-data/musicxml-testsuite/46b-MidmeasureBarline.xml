@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
-          "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="2.0">
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
     <identification>
       <miscellaneous>
-        <miscellaneous-field name="description">Barlines can appear at 
+        <miscellaneous-field name="description">Barlines can appear at
             mid-measure positions, without using an implicit measure!</miscellaneous-field>
       </miscellaneous>
     </identification>
@@ -13,9 +13,9 @@
             <part-name></part-name>
         </score-part>
     </part-list>
-    <!--=========================================================-->
+    <!--=======================================================-->
     <part id="P1">
-        <!--=======================================================-->
+        <!--===================================================-->
         <measure number="1">
             <attributes>
                 <divisions>1</divisions>
@@ -60,7 +60,7 @@
                 <type>quarter</type>
             </note>
         </measure>
-        <!--=======================================================-->
+        <!--===================================================-->
     </part>
-    <!--=========================================================-->
+    <!--=======================================================-->
 </score-partwise>

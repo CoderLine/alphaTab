@@ -27,7 +27,7 @@ public class List<T> : Iterable<T> {
         _data = items.toMutableList()
     }
 
-    private constructor(items: MutableList<T>) {
+    internal constructor(items: MutableList<T>) {
         _data = items
     }
 
@@ -63,6 +63,10 @@ public class List<T> : Iterable<T> {
         return _data.any(predicate)
     }
 
+    public fun includes(value: T): Boolean {
+        return _data.contains(value)
+    }
+
     public fun indexOf(value: T): Double {
         return _data.indexOf(value).toDouble()
     }
@@ -71,11 +75,11 @@ public class List<T> : Iterable<T> {
         return _data.removeLast()
     }
 
-    public fun unshift(item:T) {
+    public fun unshift(item: T) {
         _data.add(0, item)
     }
 
-    public fun sort(comparison: (a: T, b: T) -> Double) : List<T> {
+    public fun sort(comparison: (a: T, b: T) -> Double): List<T> {
         _data.sortWith { a, b -> comparison(a, b).toInt() }
         return this
     }
@@ -120,8 +124,7 @@ public class List<T> : Iterable<T> {
 
     public fun splice(start: Double, deleteCount: Double, vararg newElements: T) {
         var actualStart = start.toInt()
-        if (actualStart < 0)
-        {
+        if (actualStart < 0) {
             actualStart += _data.size
         }
 
@@ -132,4 +135,8 @@ public class List<T> : Iterable<T> {
     public fun join(separator: String): String {
         return _data.joinToString(separator)
     }
+}
+
+internal inline fun <reified T> List<T>.toArray(): Array<T>  {
+    return this._data.toTypedArray()
 }

@@ -1,10 +1,10 @@
 /**@target web */
 
-import type { Plugin } from './bridge';
-import type { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
-import { importMetaUrlPlugin } from './importMetaPlugin';
-import { copyAssetsPlugin } from './copyAssetsPlugin';
-import { workerPlugin } from './workerPlugin';
+import type { Plugin } from '@src/vite/bridge';
+import type { AlphaTabVitePluginOptions } from '@src/vite/AlphaTabVitePluginOptions';
+import { importMetaUrlPlugin } from '@src/vite/importMetaPlugin';
+import { copyAssetsPlugin } from '@src/vite/copyAssetsPlugin';
+import { workerPlugin } from '@src/vite/workerPlugin';
 
 export function alphaTab(options?: AlphaTabVitePluginOptions) {
     const plugins: Plugin[] = [];

@@ -1,12 +1,12 @@
-import { Beat } from '@src/model';
-import { NotationElement } from '@src/NotationSettings';
-import { BarRendererBase } from '../BarRendererBase';
-import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
-import { Settings } from '@src/Settings';
+import type { Beat } from '@src/model/Beat';
 import { NoteOrnament } from '@src/model/NoteOrnament';
-import { NoteOrnamentGlyph } from '../glyphs/NoteOrnamentGlyph';
+import { NotationElement } from '@src/NotationSettings';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { NoteOrnamentGlyph } from '@src/rendering/glyphs/NoteOrnamentGlyph';
+import type { Settings } from '@src/Settings';
 
 export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
@@ -30,7 +30,7 @@ export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new NoteOrnamentGlyph(beat.notes.find(n=>n.ornament != NoteOrnament.None)!.ornament);
+        return new NoteOrnamentGlyph(beat.notes.find(n => n.ornament !== NoteOrnament.None)!.ornament);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

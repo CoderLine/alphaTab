@@ -8,7 +8,7 @@
 
 // With https://github.com/vitejs/vite/pull/16422 integrated this custom code should not be needed anymore
 
-// Original Sources Licensed under: 
+// Original Sources Licensed under:
 
 // MIT License
 // Copyright (c) 2019-present, Yuxi (Evan) You and Vite contributors
@@ -31,8 +31,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-
-import { AlphaTabVitePluginOptions } from './AlphaTabVitePluginOptions';
+import type { AlphaTabVitePluginOptions } from '@src/vite/AlphaTabVitePluginOptions';
 import MagicString from 'magic-string';
 import {
     type ResolvedConfig,
@@ -46,12 +45,12 @@ import {
     workerFileToUrl,
     AlphaTabWorkerTypes,
     WORKER_FILE_ID
-} from './bridge';
-import path from 'path';
+} from '@src/vite/bridge';
+import path from 'node:path';
 
 const alphaTabWorkerPatterns = [
-    ['alphaTabWorker', 'new URL', 'import.meta.url'],
-    ['alphaTabWorklet.addModule', 'new URL', 'import.meta.url']
+    ['alphaTabWorker', 'new', 'alphaTabUrl', 'import.meta.url'],
+    ['alphaTabWorklet.addModule', 'new', 'alphaTabUrl', 'import.meta.url']
 ];
 
 function includesAlphaTabWorker(code: string): boolean {
@@ -141,13 +140,12 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
 
             let s: MagicString | undefined;
 
-            const alphaTabWorkerPattern = new RegExp(
-                '\\b(alphaTabWorker|alphaTabWorklet\\.addModule)\\s*\\(\\s*(new\\s+URL\\s*\\(\\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\\s*,\\s*import\\.meta\\.url\\s*\\))',
-                "dg"
-            );
-            
-            let match: RegExpExecArray | null;
-            while ((match = alphaTabWorkerPattern.exec(code))) {
+            const alphaTabWorkerPattern =
+                // @ts-expect-error For the Vite plugin we expect newer node than for alphaTab itself (-> migrate to monorepo)
+                /\b(alphaTabWorker|alphaTabWorklet\.addModule)\s*\(\s*(new\s+[^ (]+alphaTabUrl\s*\(\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
+
+            let match: RegExpExecArray | null = alphaTabWorkerPattern.exec(code);
+            while (match) {
                 const workerType = getWorkerType(code, match);
 
                 let typeActive = false;
@@ -162,6 +160,7 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
                 }
 
                 if (!typeActive) {
+                    match = alphaTabWorkerPattern.exec(code);
                     continue;
                 }
 
@@ -188,6 +187,8 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
                     // add `'' +` to skip vite:asset-import-meta-url plugin
                     `new URL('' + ${JSON.stringify(builtUrl)}, import.meta.url)`
                 );
+
+                match = alphaTabWorkerPattern.exec(code);
             }
 
             if (s) {

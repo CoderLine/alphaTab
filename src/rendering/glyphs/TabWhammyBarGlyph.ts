@@ -1,15 +1,16 @@
-import { Beat } from '@src/model/Beat';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode, NotationElement } from '@src/NotationSettings';
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TabBendGlyph } from '@src/rendering/glyphs/TabBendGlyph';
-import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { RenderingResources } from '@src/RenderingResources';
+import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
+import type { RenderingResources } from '@src/RenderingResources';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabWhammyBarGlyph extends Glyph {
     private static readonly TopOffsetSharedDataKey: string = 'tab.whammy.topoffset';
@@ -30,7 +31,7 @@ export class TabWhammyBarGlyph extends Glyph {
         if (beat.whammyBarType === WhammyType.Custom) {
             return beat.whammyBarPoints!;
         }
-        let renderingPoints: BendPoint[] = [];
+        const renderingPoints: BendPoint[] = [];
         // Guitar Pro Rendering Note:
         // Last point of bend is always at end of the beat even
         // though it might not be 100% correct from timing perspective.
@@ -80,9 +81,9 @@ export class TabWhammyBarGlyph extends Glyph {
         ) {
             topOffset += this.renderer.resources.tablatureFont.size * 2;
         }
-        let bottomOffset: number = minValue!.value < 0 ? Math.abs(this.getOffset(minValue!.value)) : 0;
+        const bottomOffset: number = minValue!.value < 0 ? Math.abs(this.getOffset(minValue!.value)) : 0;
         this.renderer.registerOverflowTop(topOffset + bottomOffset);
-        let currentOffset: number = this.renderer.staff.getSharedLayoutData<number>(
+        const currentOffset: number = this.renderer.staff.getSharedLayoutData<number>(
             TabWhammyBarGlyph.TopOffsetSharedDataKey,
             -1
         );
@@ -96,8 +97,7 @@ export class TabWhammyBarGlyph extends Glyph {
             return 0;
         }
         let offset: number =
-            TabWhammyBarGlyph.PerHalfSize +
-            Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize;
+            TabWhammyBarGlyph.PerHalfSize + Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize;
         if (value < 0) {
             offset = -offset;
         }
@@ -105,13 +105,15 @@ export class TabWhammyBarGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: BarRendererBase = this.renderer;
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, this._beat);
+
+        const startNoteRenderer: BarRendererBase = this.renderer;
         let endBeat: Beat | null = this._beat.nextBeat;
         let endNoteRenderer: TabBarRenderer | null = null;
         let endXPositionType: BeatXPosition = BeatXPosition.PreNotes;
         if (endBeat) {
             endNoteRenderer = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                this.renderer.staff.staveId,
+                this.renderer.staff.staffId,
                 endBeat.voice.bar
             ) as TabBarRenderer | null;
             if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
@@ -132,34 +134,26 @@ export class TabWhammyBarGlyph extends Glyph {
         let startX: number = 0;
         let endX: number = 0;
         if (this._isSimpleDip) {
-            startX =
-                cx +
-                startNoteRenderer.x +
-                startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) -
-                2;
-            endX =
-                cx +
-                startNoteRenderer.x +
-                startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) +
-                2;
+            startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) - 2;
+            endX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) + 2;
         } else {
             startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
             endX = !endNoteRenderer
                 ? cx + startNoteRenderer.x + startNoteRenderer.width - 2
                 : cx + endNoteRenderer.x + endNoteRenderer.getBeatX(endBeat!, endXPositionType);
         }
-        let old: TextAlign = canvas.textAlign;
+        const old: TextAlign = canvas.textAlign;
         canvas.textAlign = TextAlign.Center;
         if (this._renderPoints.length >= 2) {
-            let dx: number = (endX - startX) / BendPoint.MaxPosition;
+            const dx: number = (endX - startX) / BendPoint.MaxPosition;
             canvas.beginPath();
-            let zeroY: number =
+            const zeroY: number =
                 cy + this.renderer.staff.getSharedLayoutData<number>(TabWhammyBarGlyph.TopOffsetSharedDataKey, 0);
             let slurText: string = this._beat.whammyStyle === BendStyle.Gradual ? 'grad.' : '';
             for (let i: number = 0, j: number = this._renderPoints.length - 1; i < j; i++) {
-                let firstPt: BendPoint = this._renderPoints[i];
-                let secondPt: BendPoint = this._renderPoints[i + 1];
-                let nextPt: BendPoint | null = i < j - 2 ? this._renderPoints[i + 2] : null;
+                const firstPt: BendPoint = this._renderPoints[i];
+                const secondPt: BendPoint = this._renderPoints[i + 1];
+                const nextPt: BendPoint | null = i < j - 2 ? this._renderPoints[i + 2] : null;
                 let isFirst: boolean = i === 0;
                 // draw pre-bend if previous
                 if (i === 0 && firstPt.value !== 0 && !this._beat.isContinuedWhammy) {
@@ -185,18 +179,18 @@ export class TabWhammyBarGlyph extends Glyph {
         canvas: ICanvas,
         slurText?: string
     ): void {
-        let x1: number = cx + dx * firstPt.offset;
-        let x2: number = cx + dx * secondPt.offset;
-        let y1: number = cy - this.getOffset(firstPt.value);
-        let y2: number = cy - this.getOffset(secondPt.value);
+        const x1: number = cx + dx * firstPt.offset;
+        const x2: number = cx + dx * secondPt.offset;
+        const y1: number = cy - this.getOffset(firstPt.value);
+        const y2: number = cy - this.getOffset(secondPt.value);
         if (firstPt.offset === secondPt.offset) {
-            let dashSize: number = TabWhammyBarGlyph.DashSize;
-            let dashes: number = Math.abs(y2 - y1) / (dashSize * 2);
+            const dashSize: number = TabWhammyBarGlyph.DashSize;
+            const dashes: number = Math.abs(y2 - y1) / (dashSize * 2);
             if (dashes < 1) {
                 canvas.moveTo(x1, y1);
                 canvas.lineTo(x2, y2);
             } else {
-                let dashEndY: number = Math.max(y1, y2);
+                const dashEndY: number = Math.max(y1, y2);
                 let dashStartY: number = Math.min(y1, y2);
                 while (dashEndY > dashStartY) {
                     canvas.moveTo(x1, dashStartY);
@@ -206,14 +200,14 @@ export class TabWhammyBarGlyph extends Glyph {
             }
             canvas.stroke();
         } else if (firstPt.value === secondPt.value) {
-            let dashSize: number = TabWhammyBarGlyph.DashSize;
-            let dashes: number = Math.abs(x2 - x1) / (dashSize * 2);
+            const dashSize: number = TabWhammyBarGlyph.DashSize;
+            const dashes: number = Math.abs(x2 - x1) / (dashSize * 2);
             if (dashes < 1) {
                 canvas.moveTo(x1, y1);
                 canvas.lineTo(x2, y2);
             } else {
                 let dashEndX: number = Math.max(x1, x2);
-                let dashStartX: number = Math.min(x1, x2);
+                const dashStartX: number = Math.min(x1, x2);
                 while (dashEndX > dashStartX) {
                     canvas.moveTo(dashEndX, y1);
                     canvas.lineTo(dashEndX - dashSize, y1);
@@ -225,7 +219,7 @@ export class TabWhammyBarGlyph extends Glyph {
             canvas.moveTo(x1, y1);
             canvas.lineTo(x2, y2);
         }
-        let res: RenderingResources = this.renderer.resources;
+        const res: RenderingResources = this.renderer.resources;
         if (isFirst && !this._beat.isContinuedWhammy && !this._isSimpleDip) {
             let y: number = y1;
             y -= res.tablatureFont.size + 2;
@@ -239,7 +233,9 @@ export class TabWhammyBarGlyph extends Glyph {
         }
         let dV: number = Math.abs(secondPt.value);
         if (
-            (dV !== 0 || (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys) && !this._isSimpleDip)) &&
+            (dV !== 0 ||
+                (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys) &&
+                    !this._isSimpleDip)) &&
             firstPt.value !== secondPt.value
         ) {
             let s: string = '';
@@ -247,7 +243,7 @@ export class TabWhammyBarGlyph extends Glyph {
                 s += '-';
             }
             if (dV >= 4) {
-                let steps: number = (dV / 4) | 0;
+                const steps: number = (dV / 4) | 0;
                 s += steps;
                 // Quaters
                 dV -= steps * 4;
@@ -267,7 +263,7 @@ export class TabWhammyBarGlyph extends Glyph {
                     y -= 2;
                 }
             }
-            let x: number = x2;
+            const x: number = x2;
             canvas.fillText(s, x, y);
         }
     }

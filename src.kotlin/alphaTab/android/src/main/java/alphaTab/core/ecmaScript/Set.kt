@@ -1,42 +1,50 @@
 package alphaTab.core.ecmaScript
 
+import alphaTab.collections.ObjectBooleanMap
+
 public class Set<T> : Iterable<T> {
-    private val _set: HashSet<T>
+    private val _storage: ObjectBooleanMap<T>
 
     public constructor() {
-        _set = HashSet()
+        _storage = ObjectBooleanMap()
     }
 
     public val size : Double
-        get() = _set.size.toDouble()
+        get() = _storage.size.toDouble()
 
     public constructor(values: Iterable<T>?) {
-        _set = values?.toHashSet() ?: HashSet()
+        _storage = ObjectBooleanMap()
+        if(values != null){
+            for(v in values) {
+                add(v)
+            }
+        }
+
     }
 
     public fun add(item: T) {
-        _set.add(item)
+        _storage.set(item, true)
     }
 
     public fun has(item: T): Boolean {
-        return _set.contains(item)
+        return _storage.has(item)
     }
 
     public fun delete(item: T) {
-        _set.remove(item)
+        _storage.delete(item)
     }
 
     public fun forEach(action: (item: T) -> Unit) {
-        for (i in _set) {
+        for (i in _storage.keys()) {
             action(i)
         }
     }
 
     override fun iterator(): Iterator<T> {
-        return _set.iterator()
+        return _storage.keys().iterator()
     }
 
     fun clear() {
-        _set.clear()
+        _storage.clear()
     }
 }

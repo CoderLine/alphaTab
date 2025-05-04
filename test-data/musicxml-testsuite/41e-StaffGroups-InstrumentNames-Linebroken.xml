@@ -1,19 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Part names and abbreviations can 
-          contain line breaks.</miscellaneous-field>
+      <miscellaneous-field name="description">The &lt;part-name&gt; and
+          &lt;part-abbreviation&gt; fields don't have an ‘xml:space’ attribute,
+          making the interpretation of whitespace in the element content
+          implementation-dependent.
+
+          In this test, there is a line break after each word.  It is expected
+          that some implementations show actual line breaks in the output, while
+          others do not, replacing the line breaks with
+          spaces.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
     <score-part id="P1">
-      <part-name>Long&#xd;
-Staff&#xd;
+      <part-name>Long
+Staff
 Name</part-name>
-      <part-abbreviation>St.&#xd;
+      <part-abbreviation>St.
 Nm.</part-abbreviation>
     </score-part>
   </part-list>

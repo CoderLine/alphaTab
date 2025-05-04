@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Various clefs: G, C, F, percussion, 
-          TAB and none; some are also possible with octavation and  on other 
-          staff lines than their default (e.g. soprano/alto/tenor/bariton C 
-          clefs); Each measure shows a different clef (measure 17 has the "none" 
-          clef), only measure 18 has the same treble clef as measure 
-          1.</miscellaneous-field>
+      <miscellaneous-field name="description">Various clefs: G, C, F,
+          percussion, TAB, and ‘none’ (in measure 17).  Some clefs are also
+          shown with transposition and on other staff lines than their default.
+
+          Each measure shows a different clef; only measure 18 has the same
+          treble clef as the first measure.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN" "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="2.0">
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
+                                "http://www.musicxml.org/dtds/partwise.dtd">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">This piece has more part elements
-              than the part-list section gives. One can either convert all
-              the parts present, but not listed in the part-list, or simply 
-              not import / ignore them.</miscellaneous-field>
+      <miscellaneous-field name="description">This piece has two more
+          &lt;part&gt; elements than the &lt;part-list&gt; section contains.
+          One can either convert all the parts present but not listed in the
+          part list, or simply not import or ignore them.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

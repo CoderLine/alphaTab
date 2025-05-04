@@ -9,7 +9,7 @@ import alphaTab.model.MusicFontSymbol
 import alphaTab.platform.ICanvas
 import alphaTab.platform.TextAlign
 import alphaTab.platform.TextBaseline
-import alphaTab.platform.TextMetrics
+import alphaTab.platform.MeasuredText
 import android.content.Context
 import android.graphics.*
 import kotlin.contracts.ExperimentalContracts
@@ -28,7 +28,7 @@ val CustomTypeFaces = HashMap<String, Typeface>()
 internal class AndroidCanvas : ICanvas {
     companion object {
         public fun initialize(context: Context) {
-            MusicFont = Typeface.createFromAsset(context.assets, "Bravura.ttf")
+            MusicFont = Typeface.createFromAsset(context.assets, "Bravura.otf")
         }
 
         public fun registerCustomFont(name: String, face: Typeface) {
@@ -284,9 +284,9 @@ internal class AndroidCanvas : ICanvas {
     }
 
 
-    override fun measureText(text: String): TextMetrics {
+    override fun measureText(text: String): MeasuredText {
         if (text.isEmpty()) {
-            return TextMetrics(0.0, 0.0)
+            return MeasuredText(0.0, 0.0)
         }
         var width = 0.0
         var height = 0.0
@@ -297,7 +297,7 @@ internal class AndroidCanvas : ICanvas {
             width = bounds.width().toDouble()
             height = bounds.height().toDouble()
         })
-        return TextMetrics(width, height)
+        return MeasuredText(width, height)
     }
 
     override fun fillMusicFontSymbol(

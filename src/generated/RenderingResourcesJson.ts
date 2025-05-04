@@ -13,91 +13,135 @@ import { ColorJson } from "@src/model/Color";
  */
 export interface RenderingResourcesJson {
     /**
-     * Gets or sets the font to use for displaying the songs copyright information in the header of the music sheet.
+     * The font to use for displaying the songs copyright information in the header of the music sheet.
+     * @defaultValue `bold 12px Arial, sans-serif`
+     * @since 0.9.6
      */
     copyrightFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the songs title in the header of the music sheet.
+     * The font to use for displaying the songs title in the header of the music sheet.
+     * @defaultValue `32px Georgia, serif`
+     * @since 0.9.6
      */
     titleFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the songs subtitle in the header of the music sheet.
+     * The font to use for displaying the songs subtitle in the header of the music sheet.
+     * @defaultValue `20px Georgia, serif`
+     * @since 0.9.6
      */
     subTitleFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the lyrics information in the header of the music sheet.
+     * The font to use for displaying the lyrics information in the header of the music sheet.
+     * @defaultValue `15px Arial, sans-serif`
+     * @since 0.9.6
      */
     wordsFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying certain effect related elements in the music sheet.
+     * The font to use for displaying certain effect related elements in the music sheet.
+     * @defaultValue `italic 12px Georgia, serif`
+     * @since 0.9.6
      */
     effectFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying beat time information in the music sheet.
+     * The font to use for displaying beat time information in the music sheet.
+     * @defaultValue `12px Georgia, serif`
+     * @since 1.4.0
      */
     timerFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the directions texts.
+     * The font to use for displaying the directions texts.
+     * @defaultValue `14px Georgia, serif`
+     * @since 1.4.0
      */
     directionsFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the fretboard numbers in chord diagrams.
+     * The font to use for displaying the fretboard numbers in chord diagrams.
+     * @defaultValue `11px Arial, sans-serif`
+     * @since 0.9.6
      */
     fretboardNumberFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the numbered music notation in the music sheet.
+     * The font to use for displaying the numbered music notation in the music sheet.
+     * @defaultValue `14px Arial, sans-serif`
+     * @since 1.4.0
      */
     numberedNotationFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the grace notes in numbered music notation in the music sheet.
+     * The font to use for displaying the grace notes in numbered music notation in the music sheet.
+     * @defaultValue `16px Arial, sans-serif`
+     * @since 1.4.0
      */
     numberedNotationGraceFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying the guitar tablature numbers in the music sheet.
+     * The font to use for displaying the guitar tablature numbers in the music sheet.
+     * @defaultValue `13px Arial, sans-serif`
+     * @since 0.9.6
      */
     tablatureFont?: FontJson;
     /**
-     * Gets or sets the font to use for grace notation related texts in the music sheet.
+     * The font to use for grace notation related texts in the music sheet.
+     * @defaultValue `11px Arial, sans-serif`
+     * @since 0.9.6
      */
     graceFont?: FontJson;
     /**
-     * Gets or sets the color to use for rendering the lines of staves.
+     * The color to use for rendering the lines of staves.
+     * @defaultValue `rgb(165, 165, 165)`
+     * @since 0.9.6
      */
     staffLineColor?: ColorJson;
     /**
-     * Gets or sets the color to use for rendering bar separators, the accolade and repeat signs.
+     * The color to use for rendering bar separators, the accolade and repeat signs.
+     * @defaultValue `rgb(34, 34, 17)`
+     * @since 0.9.6
      */
     barSeparatorColor?: ColorJson;
     /**
-     * Gets or sets the font to use for displaying the bar numbers above the music sheet.
+     * The font to use for displaying the bar numbers above the music sheet.
+     * @defaultValue `11px Arial, sans-serif`
+     * @since 0.9.6
      */
     barNumberFont?: FontJson;
     /**
-     * Gets or sets the color to use for displaying the bar numbers above the music sheet.
+     * The color to use for displaying the bar numbers above the music sheet.
+     * @defaultValue `rgb(200, 0, 0)`
+     * @since 0.9.6
      */
     barNumberColor?: ColorJson;
     /**
-     * Gets or sets the font to use for displaying finger information above the music sheet.
+     * The font to use for displaying finger information in the music sheet.
+     * @defaultValue `14px Georgia, serif`
+     * @since 0.9.6
      */
     fingeringFont?: FontJson;
     /**
-     * Gets or sets the font to use for displaying finger information when inline into the music sheet.
+     * The font to use for displaying finger information when inline into the music sheet.
+     * @defaultValue `12px Georgia, serif`
+     * @since 1.4.0
      */
     inlineFingeringFont?: FontJson;
     /**
-     * Gets or sets the font to use for section marker labels shown above the music sheet.
+     * The font to use for section marker labels shown above the music sheet.
+     * @defaultValue `bold 14px Georgia, serif`
+     * @since 0.9.6
      */
     markerFont?: FontJson;
     /**
-     * Gets or sets the color to use for music notation elements of the primary voice.
+     * The color to use for music notation elements of the primary voice.
+     * @defaultValue `rgb(0, 0, 0)`
+     * @since 0.9.6
      */
     mainGlyphColor?: ColorJson;
     /**
-     * Gets or sets the color to use for music notation elements of the secondary voices.
+     * The color to use for music notation elements of the secondary voices.
+     * @defaultValue `rgb(0,0,0,0.4)`
+     * @since 0.9.6
      */
     secondaryGlyphColor?: ColorJson;
     /**
-     * Gets or sets the color to use for displaying the song information above the music sheet.
+     * The color to use for displaying the song information above the music sheets.
+     * @defaultValue `rgb(0, 0, 0)`
+     * @since 0.9.6
      */
     scoreInfoColor?: ColorJson;
 }

@@ -1,8 +1,8 @@
-import * as ts from 'typescript';
+import ts from 'typescript';
 import * as cs from './CSharpAst';
-import * as path from 'path';
-import CSharpEmitterContext from './CSharpEmitterContext';
-import exp from 'constants';
+import path from 'node:path';
+import fs from 'node:fs';
+import type CSharpEmitterContext from './CSharpEmitterContext';
 
 export default class CSharpAstTransformer {
     protected _typeScriptFile: ts.SourceFile;
@@ -11,8 +11,9 @@ export default class CSharpAstTransformer {
     protected _currentClassElement: ts.ClassElement | null = null;
     protected _declarationOrAssignmentTypeStack: ts.Type[] = [];
 
-    protected _testClassAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestClass';
-    protected _testMethodAttribute: string = 'microsoft.visualStudio.testTools.unitTesting.TestMethod';
+    protected _testClassAttribute: string = 'alphaTab.test.TestClass';
+    protected _testMethodAttribute: string = 'alphaTab.test.TestMethod';
+    protected _snapshotFileAttribute: string = 'alphaTab.test.SnapshotFile';
 
     public get extension(): string {
         return '.cs';
@@ -101,7 +102,7 @@ export default class CSharpAstTransformer {
                 break;
         }
 
-        this._typeScriptFile.statements.forEach(s => {
+        for (const s of this._typeScriptFile.statements) {
             if (ts.isExportDeclaration(s)) {
                 globalExports.push(s);
             } else if (ts.isClassDeclaration(s) || ts.isInterfaceDeclaration(s) || ts.isEnumDeclaration(s)) {
@@ -150,11 +151,11 @@ export default class CSharpAstTransformer {
             } else if (!ts.isImportDeclaration(s)) {
                 globalStatements.push(s);
             }
-        });
+        }
 
         // TODO: Introduce setting for main library name.
         if (path.basename(this._typeScriptFile.fileName).toLowerCase() === 'alphatab.core.ts') {
-            globalExports.forEach(x => {
+            for (const x of globalExports) {
                 if (!x.name && x.exportClause) {
                     if (ts.isNamespaceExport(x.exportClause)) {
                         if (!x.moduleSpecifier) {
@@ -179,7 +180,7 @@ export default class CSharpAstTransformer {
                             }
                         }
                     } else {
-                        x.exportClause.elements.forEach(e => {
+                        for (const e of x.exportClause.elements) {
                             const symbol = this._context.typeChecker.getTypeAtLocation(e.name)?.symbol;
                             if (symbol) {
                                 this._context.registerSymbolAsExported(symbol);
@@ -190,18 +191,18 @@ export default class CSharpAstTransformer {
                                     ts.DiagnosticCategory.Error
                                 );
                             }
-                        });
+                        }
                     }
                 } else {
                     this._context.addTsNodeDiagnostics(x, 'Unsupported export', ts.DiagnosticCategory.Error);
                 }
-            });
+            }
 
-            globalStatements.forEach(s => {
+            for (const s of globalStatements) {
                 if (ts.isVariableStatement(s) && s.modifiers?.find(m => m.kind === ts.SyntaxKind.ExportKeyword)) {
-                    s.declarationList.declarations.forEach(d => {
+                    for (const d of s.declarationList.declarations) {
                         if (d.initializer && ts.isObjectLiteralExpression(d.initializer)) {
-                            d.initializer.properties.forEach(p => {
+                            for (const p of d.initializer.properties) {
                                 if (ts.isShorthandPropertyAssignment(p)) {
                                     const symbol = this._context.typeChecker.getTypeAtLocation(p.name)?.symbol;
                                     if (symbol) {
@@ -220,44 +221,45 @@ export default class CSharpAstTransformer {
                                         ts.DiagnosticCategory.Message
                                     );
                                 }
-                            });
+                            }
                         } else {
                             this._context.addTsNodeDiagnostics(d, 'Unsupported export', ts.DiagnosticCategory.Message);
                         }
-                    });
+                    }
                 }
-            });
+            }
 
             // TODO: register global exports
         } else {
             // validate global statements
             if (!defaultExport || !ts.isClassDeclaration(defaultExport)) {
-                globalStatements.forEach(s => {
+                for (const s of globalStatements) {
                     this._context.addTsNodeDiagnostics(
                         s,
                         'Global statements in modules are only allowed if there is a default class export',
                         ts.DiagnosticCategory.Error
                     );
-                });
+                }
             }
 
-            additionalNestedExportDeclarations.forEach(s => {
+            for (const s of additionalNestedExportDeclarations) {
                 this._context.addTsNodeDiagnostics(
                     s,
                     'Global statements in modules are not yet supported',
                     ts.DiagnosticCategory.Error
                 );
-            });
-            additionalNestedNonExportsDeclarations.forEach(s => {
+            }
+
+            for (const s of additionalNestedNonExportsDeclarations) {
                 this._context.addTsNodeDiagnostics(
                     s,
                     'Global statements in modules are not yet supported',
                     ts.DiagnosticCategory.Error
                 );
-            });
+            }
 
             // TODO: make root namespace configurable from outside.
-            let folders = path
+            const folders = path
                 .dirname(
                     path.relative(
                         path.resolve(this._context.compilerOptions.baseUrl!),
@@ -270,7 +272,7 @@ export default class CSharpAstTransformer {
                 folders.shift();
             }
             this._csharpFile.namespace.namespace =
-                this._context.toPascalCase('alphaTab') + folders.map(f => '.' + this._context.toPascalCase(f)).join('');
+                this._context.toPascalCase('alphaTab') + folders.map(f => `.${this._context.toPascalCase(f)}`).join('');
 
             if (defaultExport) {
                 this.visit(
@@ -280,9 +282,15 @@ export default class CSharpAstTransformer {
                     globalStatements
                 );
             }
-            additionalExportDeclarations.forEach(d => this.visit(d));
-            additionalNonExportDeclarations.forEach(d => this.visit(d));
-            testClasses.forEach(d => this.visitTestClass(d));
+            for (const d of additionalExportDeclarations) {
+                this.visit(d);
+            }
+            for (const d of additionalNonExportDeclarations) {
+                this.visit(d);
+            }
+            for (const d of testClasses) {
+                this.visitTestClass(d);
+            }
 
             if (this._csharpFile.namespace.declarations.length > 0) {
                 this._context.addSourceFile(this._csharpFile);
@@ -368,7 +376,9 @@ export default class CSharpAstTransformer {
             csEnum.documentation = this.visitDocumentation(node.name);
         }
 
-        node.members.forEach(m => this.visitEnumMember(csEnum, m));
+        for (const m of node.members) {
+            this.visitEnumMember(csEnum, m);
+        }
 
         this._csharpFile.namespace.declarations.push(csEnum);
         this._context.registerSymbol(csEnum);
@@ -398,11 +408,13 @@ export default class CSharpAstTransformer {
     protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
         let extendsClauses: ts.ExpressionWithTypeArguments[] = [];
 
-        node.heritageClauses?.forEach(c => {
-            if (c.token === ts.SyntaxKind.ExtendsKeyword) {
-                extendsClauses = c.types.slice();
+        if (node.heritageClauses) {
+            for (const c of node.heritageClauses) {
+                if (c.token === ts.SyntaxKind.ExtendsKeyword) {
+                    extendsClauses = c.types.slice();
+                }
             }
-        });
+        }
 
         const csInterface: cs.InterfaceDeclaration = {
             visibility: cs.Visibility.Public,
@@ -441,7 +453,9 @@ export default class CSharpAstTransformer {
         }
 
         if (!csInterface.skipEmit) {
-            node.members.forEach(m => this.visitInterfaceElement(csInterface, m));
+            for (const m of node.members) {
+                this.visitInterfaceElement(csInterface, m);
+            }
         }
 
         this._csharpFile.namespace.declarations.push(csInterface);
@@ -460,7 +474,7 @@ export default class CSharpAstTransformer {
         };
 
         if (p.constraint) {
-            let constraintType = ts.isUnionTypeNode(p.constraint) ? p.constraint.types[0] : p.constraint;
+            const constraintType = ts.isUnionTypeNode(p.constraint) ? p.constraint.types[0] : p.constraint;
             csTypeParameter.constraint = this.createUnresolvedTypeNode(csTypeParameter, constraintType);
         }
 
@@ -535,7 +549,7 @@ export default class CSharpAstTransformer {
             ];
         }
 
-        ((d.arguments![1] as ts.ArrowFunction).body as ts.Block).statements.forEach(s => {
+        for (const s of ((d.arguments![1] as ts.ArrowFunction).body as ts.Block).statements) {
             if (ts.isExpressionStatement(s)) {
                 if (ts.isCallExpression(s.expression)) {
                     if (ts.isIdentifier(s.expression.expression) && s.expression.expression.text === 'it') {
@@ -543,14 +557,14 @@ export default class CSharpAstTransformer {
                     } else {
                         this._context.addTsNodeDiagnostics(
                             s,
-                            'Unsupported test method function call ' + s.expression.expression.getText(),
+                            `Unsupported test method function call ${s.expression.expression.getText()}`,
                             ts.DiagnosticCategory.Error
                         );
                     }
                 } else {
                     this._context.addTsNodeDiagnostics(
                         s,
-                        'Unsupported test class member ' + ts.SyntaxKind[s.expression.kind],
+                        `Unsupported test class member ${ts.SyntaxKind[s.expression.kind]}`,
                         ts.DiagnosticCategory.Error
                     );
                 }
@@ -561,11 +575,11 @@ export default class CSharpAstTransformer {
             } else {
                 this._context.addTsNodeDiagnostics(
                     s,
-                    'Unsupported test class member ' + ts.SyntaxKind[s.kind],
+                    `Unsupported test class member ${ts.SyntaxKind[s.kind]}`,
                     ts.DiagnosticCategory.Error
                 );
             }
-        });
+        }
 
         this._csharpFile.namespace.declarations.push(csClass);
     }
@@ -581,6 +595,7 @@ export default class CSharpAstTransformer {
             isOverride: false,
             isStatic: false,
             isVirtual: false,
+            isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
             name: this._context.toPascalCase((d.name as ts.Identifier).text),
             parameters: [],
@@ -595,7 +610,9 @@ export default class CSharpAstTransformer {
         const type = this._context.typeChecker.getTypeAtLocation(d.name!);
         csMethod.returnType.parent = csMethod;
 
-        d.parameters.forEach(p => csMethod.parameters.push(this.makeParameter(csMethod, p)));
+        for (const p of d.parameters) {
+            csMethod.parameters.push(this.makeParameter(csMethod, p));
+        }
         this._declarationOrAssignmentTypeStack.push(type);
         csMethod.body = this.visitBlock(csMethod, d.body as ts.Block);
         this._declarationOrAssignmentTypeStack.pop();
@@ -615,6 +632,7 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             isTestMethod: true,
+            isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
             name: this._context.toMethodName((d.arguments[0] as ts.StringLiteral).text),
             parameters: [],
@@ -630,7 +648,7 @@ export default class CSharpAstTransformer {
         };
 
         if (csMethod.name.match(/^[^a-zA-Z].*/)) {
-            csMethod.name = 'Test' + csMethod.name;
+            csMethod.name = `Test${csMethod.name}`;
         }
 
         csMethod.attributes = [
@@ -641,7 +659,14 @@ export default class CSharpAstTransformer {
                     parent: null,
                     nodeType: cs.SyntaxKind.TypeReference,
                     reference: this._context.makeTypeName(this._testMethodAttribute)
-                } as cs.TypeReference
+                } as cs.TypeReference,
+                arguments: [
+                    {
+                        parent: null,
+                        nodeType: cs.SyntaxKind.StringLiteral,
+                        text: (d.arguments[0] as ts.StringLiteral).text
+                    } as cs.StringLiteral
+                ]
             }
         ];
 
@@ -666,10 +691,37 @@ export default class CSharpAstTransformer {
         csMethod.body = this.visitBlock(csMethod, testFunction.body as ts.Block);
 
         parent.members.push(csMethod);
+
+        const sourcePath = d.getSourceFile().fileName;
+        const snapshotFilePath = path.resolve(
+            sourcePath,
+            '..',
+            '__snapshots__',
+            `${path.basename(sourcePath).toLowerCase()}.snap`
+        );
+        if (fs.existsSync(snapshotFilePath)) {
+            const relative = path.relative(path.resolve(this._context.compilerOptions.baseUrl!), snapshotFilePath);
+            csMethod.attributes.push({
+                parent: csMethod,
+                nodeType: cs.SyntaxKind.Attribute,
+                type: {
+                    parent: null,
+                    nodeType: cs.SyntaxKind.TypeReference,
+                    reference: this._context.makeTypeName(this._snapshotFileAttribute)
+                } as cs.TypeReference,
+                arguments: [
+                    {
+                        parent: null,
+                        nodeType: cs.SyntaxKind.StringLiteral,
+                        text: relative.replaceAll('\\', '/')
+                    } as cs.StringLiteral
+                ]
+            });
+        }
     }
 
     protected visitTestClassProperty(parent: cs.ClassDeclaration, s: ts.VariableStatement) {
-        s.declarationList.declarations.forEach(d => {
+        for (const d of s.declarationList.declarations) {
             const type = this._context.typeChecker.getTypeAtLocation(d.name);
             if (this._context.isFunctionType(type) && d.initializer && ts.isArrowFunction(d.initializer)) {
                 const csMethod: cs.MethodDeclaration = {
@@ -680,6 +732,7 @@ export default class CSharpAstTransformer {
                     isStatic: false,
                     isVirtual: false,
                     isTestMethod: false,
+                    isGeneratorFunction: false,
                     partial: !!ts.getJSDocTags(d).find(t => t.tagName.text === 'partial'),
                     name: this._context.toPascalCase(d.name.getText()),
                     returnType: {} as cs.TypeNode,
@@ -708,7 +761,9 @@ export default class CSharpAstTransformer {
 
                 csMethod.returnType.parent = csMethod;
 
-                d.initializer.parameters.forEach(p => csMethod.parameters.push(this.makeParameter(csMethod, p)));
+                for (const p of d.initializer.parameters) {
+                    csMethod.parameters.push(this.makeParameter(csMethod, p));
+                }
                 this._declarationOrAssignmentTypeStack.push(type);
                 csMethod.body = this.visitBlock(csMethod, d.initializer.body as ts.Block);
                 this._declarationOrAssignmentTypeStack.pop();
@@ -745,7 +800,7 @@ export default class CSharpAstTransformer {
                 parent.members.push(csProperty);
                 this._context.registerSymbol(csProperty);
             }
-        });
+        }
     }
 
     protected visitClassDeclaration(
@@ -757,14 +812,16 @@ export default class CSharpAstTransformer {
         let extendsClause: ts.ExpressionWithTypeArguments | null = null;
         let implementsClauses: ts.ExpressionWithTypeArguments[] = [];
 
-        node.heritageClauses?.forEach(c => {
-            if (c.token === ts.SyntaxKind.ExtendsKeyword) {
-                extendsClause = c.types[0];
+        if (node.heritageClauses) {
+            for (const c of node.heritageClauses) {
+                if (c.token === ts.SyntaxKind.ExtendsKeyword) {
+                    extendsClause = c.types[0];
+                }
+                if (c.token === ts.SyntaxKind.ImplementsKeyword) {
+                    implementsClauses = c.types.slice();
+                }
             }
-            if (c.token === ts.SyntaxKind.ImplementsKeyword) {
-                implementsClauses = c.types.slice();
-            }
-        });
+        }
 
         const csClass: cs.ClassDeclaration = {
             visibility: cs.Visibility.Public,
@@ -813,7 +870,9 @@ export default class CSharpAstTransformer {
         }
 
         if (!csClass.skipEmit) {
-            node.members.forEach(m => this.visitClassElement(csClass, m));
+            for (const m of node.members) {
+                this.visitClassElement(csClass, m);
+            }
 
             if (globalStatements && globalStatements.length > 0) {
                 const staticConstructor = {
@@ -831,12 +890,12 @@ export default class CSharpAstTransformer {
                     } as cs.Block
                 } as cs.ConstructorDeclaration;
 
-                globalStatements.forEach(s => {
+                for (const s of globalStatements) {
                     const st = this.visitStatement(staticConstructor.body!, s)!;
                     if (st) {
                         (staticConstructor.body as cs.Block).statements.push(st);
                     }
-                });
+                }
 
                 csClass.members.push(staticConstructor);
             }
@@ -847,7 +906,7 @@ export default class CSharpAstTransformer {
     }
 
     protected visitDocumentation(node: ts.Node): string | undefined {
-        let symbol = this._context.typeChecker.getSymbolAtLocation(node);
+        const symbol = this._context.typeChecker.getSymbolAtLocation(node);
         if (!symbol) {
             return undefined;
         }
@@ -898,7 +957,7 @@ export default class CSharpAstTransformer {
     }
 
     protected visitClassElement(parent: cs.ClassDeclaration, classElement: ts.ClassElement) {
-        let isSkipped = this.shouldSkip(classElement, false);
+        const isSkipped = this.shouldSkip(classElement, false);
         if (isSkipped) {
             this._context.processingSkippedElement = true;
         }
@@ -922,7 +981,7 @@ export default class CSharpAstTransformer {
         } else {
             this._context.addTsNodeDiagnostics(
                 classElement,
-                'Unsupported class element: ' + ts.SyntaxKind[classElement.kind],
+                `Unsupported class element: ${ts.SyntaxKind[classElement.kind]}`,
                 ts.DiagnosticCategory.Error
             );
         }
@@ -942,7 +1001,7 @@ export default class CSharpAstTransformer {
         } else {
             this._context.addTsNodeDiagnostics(
                 classElement,
-                'Unsupported interface element: ' + ts.SyntaxKind[classElement.kind],
+                `Unsupported interface element: ${ts.SyntaxKind[classElement.kind]}`,
                 ts.DiagnosticCategory.Error
             );
         }
@@ -973,13 +1032,13 @@ export default class CSharpAstTransformer {
 
         let isReadonly = false;
         if (classElement.modifiers) {
-            classElement.modifiers.forEach(m => {
+            for (const m of classElement.modifiers) {
                 switch (m.kind) {
                     case ts.SyntaxKind.ReadonlyKeyword:
                         isReadonly = true;
                         break;
                 }
-            });
+            }
         }
 
         csProperty.type.parent = csProperty;
@@ -1012,14 +1071,12 @@ export default class CSharpAstTransformer {
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
 
-            if (this._context.markOverride(classElement)) {
-                member.isOverride = true;
-            }
+            this.applyPropertyOverride(member, classElement);
         } else {
             const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
             const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
 
-            let newProperty: cs.PropertyDeclaration = {
+            const newProperty: cs.PropertyDeclaration = {
                 isAbstract: false,
                 isOverride: false,
                 isVirtual: false,
@@ -1034,12 +1091,10 @@ export default class CSharpAstTransformer {
                 tsSymbol: this._context.getSymbolForDeclaration(classElement)
             };
 
-            if (this._context.markOverride(classElement)) {
-                newProperty.isOverride = true;
-            }
+            this.applyPropertyOverride(newProperty, classElement);
 
             if (classElement.modifiers) {
-                classElement.modifiers.forEach(m => {
+                for (const m of classElement.modifiers) {
                     switch (m.kind) {
                         case ts.SyntaxKind.AbstractKeyword:
                             newProperty.isAbstract = true;
@@ -1053,7 +1108,7 @@ export default class CSharpAstTransformer {
                             newProperty.isOverride = false;
                             break;
                     }
-                });
+                }
             }
 
             newProperty.type.parent = newProperty;
@@ -1082,65 +1137,129 @@ export default class CSharpAstTransformer {
                 body: classElement.body ? this.visitBlock(member, classElement.body) : null
             } as cs.PropertyAccessorDeclaration;
 
-            if (this._context.markOverride(classElement)) {
-                member.isOverride = true;
-            }
+            this.applyPropertyOverride(member, classElement);
 
             return member.setAccessor;
-        } else {
-            const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
-            const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
+        }
+        const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
+        const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
 
-            let newProperty: cs.PropertyDeclaration = {
-                isAbstract: false,
-                isOverride: false,
-                isVirtual: false,
-                isStatic: false,
-                name: propertyName,
-                nodeType: cs.SyntaxKind.PropertyDeclaration,
-                parent: parent,
-                visibility: this.mapVisibility(classElement, cs.Visibility.Public),
-                type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
-                skipEmit: this.shouldSkip(classElement, false),
-                tsNode: classElement,
-                tsSymbol: this._context.getSymbolForDeclaration(classElement)
-            };
+        const newProperty: cs.PropertyDeclaration = {
+            isAbstract: false,
+            isOverride: false,
+            isVirtual: false,
+            isStatic: false,
+            name: propertyName,
+            nodeType: cs.SyntaxKind.PropertyDeclaration,
+            parent: parent,
+            visibility: this.mapVisibility(classElement, cs.Visibility.Public),
+            type: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
+            skipEmit: this.shouldSkip(classElement, false),
+            tsNode: classElement,
+            tsSymbol: this._context.getSymbolForDeclaration(classElement)
+        };
 
-            if (this._context.markOverride(classElement)) {
-                newProperty.isOverride = true;
+        this.applyPropertyOverride(newProperty, classElement);
+
+        if (classElement.modifiers) {
+            for (const m of classElement.modifiers) {
+                switch (m.kind) {
+                    case ts.SyntaxKind.AbstractKeyword:
+                        newProperty.isAbstract = true;
+                        parent.isAbstract = true;
+                        newProperty.isVirtual = false;
+                        newProperty.isOverride = false;
+                        break;
+                    case ts.SyntaxKind.StaticKeyword:
+                        newProperty.isStatic = true;
+                        newProperty.isVirtual = false;
+                        newProperty.isOverride = false;
+                        break;
+                }
             }
+        }
 
-            if (classElement.modifiers) {
-                classElement.modifiers.forEach(m => {
-                    switch (m.kind) {
-                        case ts.SyntaxKind.AbstractKeyword:
-                            newProperty.isAbstract = true;
-                            parent.isAbstract = true;
-                            newProperty.isVirtual = false;
-                            newProperty.isOverride = false;
-                            break;
-                        case ts.SyntaxKind.StaticKeyword:
-                            newProperty.isStatic = true;
-                            newProperty.isVirtual = false;
-                            newProperty.isOverride = false;
-                            break;
-                    }
-                });
+        newProperty.type.parent = newProperty;
+
+        newProperty.setAccessor = {
+            keyword: 'set',
+            parent: newProperty,
+            nodeType: cs.SyntaxKind.PropertyAccessorDeclaration,
+            tsNode: classElement,
+            body: classElement.body ? this.visitBlock(newProperty, classElement.body) : null
+        } as cs.PropertyAccessorDeclaration;
+
+        parent.members.push(newProperty);
+
+        return newProperty.setAccessor;
+    }
+
+    protected applyMethodOverride(csMethod: cs.MethodDeclaration, classElement: ts.MethodDeclaration) {
+        const overrides = this._context.markOverride(classElement);
+        if (overrides.length > 0) {
+            csMethod.isOverride = true;
+            for (const o of overrides) {
+                let type: ts.Type | undefined = undefined;
+                let typeNode: ts.TypeNode | undefined = undefined;
+                if (ts.isMethodDeclaration(classElement)) {
+                    const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
+                    type = signature ? this._context.typeChecker.getReturnTypeOfSignature(signature) : undefined;
+                }
+
+                if (!type) {
+                    return;
+                }
+
+                if (ts.isMethodDeclaration(o)) {
+                    typeNode = o.type;
+                } else if (ts.isMethodSignature(o)) {
+                    typeNode = o.type;
+                }
+
+                this._context.removeUnresolvedTypeNode(csMethod.returnType as cs.UnresolvedTypeNode);
+                csMethod.returnType = this.createUnresolvedTypeNode(csMethod, typeNode ?? o, type);
+
+                // NOTE: we could also ensure the correct parameter list here
+                return;
             }
+        }
+    }
 
-            newProperty.type.parent = newProperty;
+    private applyPropertyOverride(
+        csProperty: cs.PropertyDeclaration,
+        classElement: ts.PropertyDeclaration | ts.GetAccessorDeclaration | ts.SetAccessorDeclaration
+    ) {
+        const overrides = this._context.markOverride(classElement);
+        if (overrides.length > 0) {
+            csProperty.isOverride = true;
+            for (const o of overrides) {
+                let type: ts.Type | undefined = undefined;
+                let typeNode: ts.TypeNode | undefined = undefined;
 
-            newProperty.setAccessor = {
-                keyword: 'set',
-                parent: newProperty,
-                nodeType: cs.SyntaxKind.PropertyAccessorDeclaration,
-                tsNode: classElement,
-                body: classElement.body ? this.visitBlock(newProperty, classElement.body) : null
-            } as cs.PropertyAccessorDeclaration;
+                if (ts.isGetAccessorDeclaration(o)) {
+                    const signature = this._context.typeChecker.getSignatureFromDeclaration(o);
+                    type = signature ? this._context.typeChecker.getReturnTypeOfSignature(signature) : undefined;
+                    typeNode = o.type;
+                } else if (ts.isSetAccessorDeclaration(o)) {
+                    const signature = this._context.typeChecker.getSignatureFromDeclaration(o);
+                    type = signature ? this._context.typeChecker.getTypeOfSymbol(signature.parameters[0]) : undefined;
+                    typeNode = o.parameters[0].type;
+                } else if (ts.isPropertyDeclaration(o)) {
+                    type = this._context.typeChecker.getTypeAtLocation(o);
+                    typeNode = o.type;
+                } else if (ts.isPropertySignature(o)) {
+                    type = this._context.typeChecker.getTypeAtLocation(o);
+                    typeNode = o.type;
+                }
 
-            parent.members.push(newProperty);
+                if (!type) {
+                    return;
+                }
 
-            return newProperty.setAccessor;
+                this._context.removeUnresolvedTypeNode(csProperty.type as cs.UnresolvedTypeNode);
+                csProperty.type = this.createUnresolvedTypeNode(csProperty, typeNode ?? o, type);
+                return;
+            }
         }
     }
 
@@ -1169,13 +1288,11 @@ export default class CSharpAstTransformer {
             csProperty.documentation = this.visitDocumentation(classElement.name);
         }
 
-        if (this._context.markOverride(classElement)) {
-            csProperty.isOverride = true;
-        }
+        this.applyPropertyOverride(csProperty, classElement);
 
         let isReadonly = false;
         if (classElement.modifiers) {
-            classElement.modifiers.forEach(m => {
+            for (const m of classElement.modifiers) {
                 switch (m.kind) {
                     case ts.SyntaxKind.AbstractKeyword:
                         csProperty.isAbstract = true;
@@ -1194,7 +1311,7 @@ export default class CSharpAstTransformer {
                         isReadonly = true;
                         break;
                 }
-            });
+            }
         }
 
         csProperty.type.parent = csProperty;
@@ -1252,10 +1369,16 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             isTestMethod: false,
+            isGeneratorFunction: !!classElement.asteriskToken,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
-            name: this._context.toMethodName((classElement.name as ts.Identifier).text),
+            name: this._context.buildMethodName(classElement.name),
             parameters: [],
-            returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
+            returnType: this.createUnresolvedTypeNode(
+                null,
+                classElement.type ?? classElement,
+                returnType,
+                returnType?.getSymbol()
+            ),
             visibility: this.mapVisibility(classElement, cs.Visibility.Public),
             tsNode: classElement,
             tsSymbol: this._context.getSymbolForDeclaration(classElement),
@@ -1266,12 +1389,10 @@ export default class CSharpAstTransformer {
             csMethod.documentation = this.visitDocumentation(classElement.name);
         }
 
-        if (this._context.markOverride(classElement)) {
-            csMethod.isOverride = true;
-        }
+        this.applyMethodOverride(csMethod, classElement);
 
         if (classElement.modifiers) {
-            classElement.modifiers.forEach(m => {
+            for (const m of classElement.modifiers) {
                 switch (m.kind) {
                     case ts.SyntaxKind.AbstractKeyword:
                         csMethod.isAbstract = true;
@@ -1289,20 +1410,22 @@ export default class CSharpAstTransformer {
                         csMethod.isAsync = true;
                         break;
                 }
-            });
+            }
         }
 
         csMethod.returnType.parent = csMethod;
 
         if (classElement.typeParameters && classElement.typeParameters.length > 0) {
             csMethod.typeParameters = [];
-            classElement.typeParameters.forEach(p => {
+            for (const p of classElement.typeParameters) {
                 const csp = this.visitTypeParameterDeclaration(csMethod, p);
                 csMethod.typeParameters!.push(csp);
-            });
+            }
         }
 
-        classElement.parameters.forEach(p => this.visitMethodParameter(csMethod, p));
+        for (const p of classElement.parameters) {
+            this.visitMethodParameter(csMethod, p);
+        }
 
         if (classElement.body && !csMethod.skipEmit) {
             csMethod.body = this.visitBlock(csMethod, classElement.body);
@@ -1382,6 +1505,9 @@ export default class CSharpAstTransformer {
                 return this.visitThrowStatement(parent, s as ts.ThrowStatement);
             case ts.SyntaxKind.TryStatement:
                 return this.visitTryStatement(parent, s as ts.TryStatement);
+
+            case ts.SyntaxKind.FunctionDeclaration:
+                return this.visitFunctionDeclaration(parent, s as ts.FunctionDeclaration);
         }
         return {} as cs.ThrowStatement;
     }
@@ -1433,11 +1559,11 @@ export default class CSharpAstTransformer {
 
         variableStatement.declarationList = this.visitVariableDeclarationList(variableStatement, s.declarationList);
 
-        if ((s.declarationList.flags & ts.NodeFlags.Const) != 0) {
+        if ((s.declarationList.flags & ts.NodeFlags.Const) !== 0) {
             variableStatement.variableStatementKind = cs.VariableStatementKind.Const;
-        } else if ((s.declarationList.flags & ts.NodeFlags.Using) != 0) {
+        } else if ((s.declarationList.flags & ts.NodeFlags.Using) !== 0) {
             variableStatement.variableStatementKind = cs.VariableStatementKind.Using;
-        } else if ((s.declarationList.flags & ts.NodeFlags.AwaitUsing) != 0) {
+        } else if ((s.declarationList.flags & ts.NodeFlags.AwaitUsing) !== 0) {
             variableStatement.variableStatementKind = cs.VariableStatementKind.AwaitUsing;
         }
 
@@ -1450,12 +1576,12 @@ export default class CSharpAstTransformer {
             parent: parent,
             tsNode: s,
             declarations: [],
-            isConst: (s.flags & ts.NodeFlags.Const) != 0
+            isConst: (s.flags & ts.NodeFlags.Const) !== 0
         } as cs.VariableDeclarationList;
 
-        s.declarations.forEach(d =>
-            variableStatement.declarations.push(this.visitVariableDeclaration(variableStatement, d))
-        );
+        for (const d of s.declarations) {
+            variableStatement.declarations.push(this.visitVariableDeclaration(variableStatement, d));
+        }
 
         return variableStatement;
     }
@@ -1518,30 +1644,6 @@ export default class CSharpAstTransformer {
         expressionStatement.expression = this.visitExpression(expressionStatement, s.expression)!;
         if (!expressionStatement.expression) {
             return null;
-        }
-
-        // chai property statements like "expected(false).to.be.ok;"
-        if (
-            ts.isPropertyAccessExpression(s.expression) &&
-            ts.isPropertyAccessExpression(s.expression.expression) &&
-            ts.isPropertyAccessExpression(s.expression.expression.expression) &&
-            ts.isIdentifier(s.expression.expression.name) &&
-            s.expression.expression.name.text == 'be' &&
-            ts.isIdentifier(s.expression.expression.expression.name) &&
-            (s.expression.expression.expression.name.text == 'to' ||
-                s.expression.expression.expression.name.text == 'not')
-        ) {
-            const access = expressionStatement.expression;
-
-            expressionStatement.expression = {
-                nodeType: cs.SyntaxKind.InvocationExpression,
-                parent: expressionStatement,
-                arguments: [],
-                expression: access,
-                tsNode: s.expression,
-                skipEmit: access.skipEmit
-            } as cs.InvocationExpression;
-            access.parent = expressionStatement.expression;
         }
 
         return expressionStatement;
@@ -1772,7 +1874,7 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        s.caseBlock.clauses.forEach(c => {
+        for (const c of s.caseBlock.clauses) {
             if (ts.isDefaultClause(c)) {
                 switchStatement.caseClauses.push(this.visitDefaultClause(switchStatement, c));
             } else {
@@ -1781,7 +1883,7 @@ export default class CSharpAstTransformer {
                     switchStatement.caseClauses.push(cl);
                 }
             }
-        });
+        }
 
         return switchStatement;
     }
@@ -1794,12 +1896,12 @@ export default class CSharpAstTransformer {
             statements: []
         } as cs.DefaultClause;
 
-        s.statements.forEach(c => {
+        for (const c of s.statements) {
             const statement = this.visitStatement(defaultClause, c);
             if (statement) {
                 defaultClause.statements.push(statement);
             }
-        });
+        }
 
         return defaultClause;
     }
@@ -1821,12 +1923,12 @@ export default class CSharpAstTransformer {
         if (!caseClause.expression) {
             return null;
         }
-        s.statements.forEach(c => {
+        for (const c of s.statements) {
             const statement = this.visitStatement(caseClause, c);
             if (statement) {
                 caseClause.statements.push(statement);
             }
-        });
+        }
 
         return caseClause;
     }
@@ -1888,7 +1990,7 @@ export default class CSharpAstTransformer {
     protected visitMethodSignature(
         parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
         classElement: ts.MethodSignature
-    ) {
+    ): cs.MethodDeclaration {
         const signature = this._context.typeChecker.getSignatureFromDeclaration(classElement);
         const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
 
@@ -1900,8 +2002,9 @@ export default class CSharpAstTransformer {
             isStatic: false,
             isVirtual: false,
             isTestMethod: false,
+            isGeneratorFunction: false,
             partial: !!ts.getJSDocTags(classElement).find(t => t.tagName.text === 'partial'),
-            name: this._context.toMethodName((classElement.name as ts.Identifier).text),
+            name: this._context.buildMethodName(classElement.name),
             parameters: [],
             returnType: this.createUnresolvedTypeNode(null, classElement.type ?? classElement, returnType),
             visibility: cs.Visibility.None,
@@ -1917,7 +2020,7 @@ export default class CSharpAstTransformer {
 
         if (classElement.typeParameters && classElement.typeParameters.length > 0) {
             csMethod.typeParameters = [];
-            classElement.typeParameters.forEach(p => {
+            for (const p of classElement.typeParameters) {
                 const csp = {
                     parent: csMethod,
                     name: p.name.text,
@@ -1929,16 +2032,20 @@ export default class CSharpAstTransformer {
                 }
 
                 csMethod.typeParameters!.push(csp);
-            });
+            }
         }
 
-        classElement.parameters.forEach(p => this.visitMethodParameter(csMethod, p));
+        for (const p of classElement.parameters) {
+            this.visitMethodParameter(csMethod, p);
+        }
 
         if (!csMethod.skipEmit) {
             parent.members.push(csMethod);
         }
 
         this._context.registerSymbol(csMethod);
+
+        return csMethod;
     }
     protected mapVisibility(node: ts.Node, fallback: cs.Visibility): cs.Visibility {
         if (this._context.isInternal(node)) {
@@ -2003,7 +2110,9 @@ export default class CSharpAstTransformer {
             skipEmit: this.shouldSkip(classElement, false)
         };
 
-        classElement.parameters.forEach(p => this.visitMethodParameter(csConstructor, p));
+        for (const p of classElement.parameters) {
+            this.visitMethodParameter(csConstructor, p);
+        }
 
         if (classElement.body) {
             csConstructor.body = this.visitBlock(csConstructor, classElement.body);
@@ -2100,20 +2209,21 @@ export default class CSharpAstTransformer {
                 return this.visitStringLiteral(parent, expression as ts.Identifier);
             case ts.SyntaxKind.SpreadElement:
                 return this.visitSpreadElement(parent, expression as ts.SpreadElement);
-
-            case ts.SyntaxKind.SyntheticReferenceExpression:
-            case ts.SyntaxKind.CommaListExpression:
-            case ts.SyntaxKind.ClassExpression:
-            case ts.SyntaxKind.JSDocTypeExpression:
-            case ts.SyntaxKind.JsxExpression:
-            case ts.SyntaxKind.OmittedExpression:
-            case ts.SyntaxKind.PartiallyEmittedExpression:
-            case ts.SyntaxKind.ImportKeyword:
-            case ts.SyntaxKind.DeleteExpression:
-            case ts.SyntaxKind.VoidExpression:
             case ts.SyntaxKind.YieldExpression:
-            case ts.SyntaxKind.SyntheticExpression:
-            case ts.SyntaxKind.TaggedTemplateExpression:
+                return this.visitYieldExpression(parent, expression as ts.YieldExpression);
+
+            // case ts.SyntaxKind.SyntheticReferenceExpression:
+            // case ts.SyntaxKind.CommaListExpression:
+            // case ts.SyntaxKind.ClassExpression:
+            // case ts.SyntaxKind.JSDocTypeExpression:
+            // case ts.SyntaxKind.JsxExpression:
+            // case ts.SyntaxKind.OmittedExpression:
+            // case ts.SyntaxKind.PartiallyEmittedExpression:
+            // case ts.SyntaxKind.ImportKeyword:
+            // case ts.SyntaxKind.DeleteExpression:
+            // case ts.SyntaxKind.VoidExpression:
+            // case ts.SyntaxKind.SyntheticExpression:
+            // case ts.SyntaxKind.TaggedTemplateExpression:
             default:
                 this._context.addTsNodeDiagnostics(
                     expression,
@@ -2227,15 +2337,14 @@ export default class CSharpAstTransformer {
             } as cs.Identifier;
 
             return identifier;
-        } else {
-            const csExpr = {
-                parent: parent,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.ThisLiteral
-            } as cs.ThisLiteral;
-
-            return csExpr;
         }
+        const csExpr = {
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.ThisLiteral
+        } as cs.ThisLiteral;
+
+        return csExpr;
     }
 
     protected visitSuperLiteralExpression(parent: cs.Node, expression: ts.SuperExpression) {
@@ -2331,7 +2440,29 @@ export default class CSharpAstTransformer {
             }
 
             return csExpr;
-        } else if (expression.operatorToken.kind === ts.SyntaxKind.AsteriskAsteriskToken) {
+        }
+
+        if (expression.operatorToken.kind === ts.SyntaxKind.InstanceOfKeyword) {
+            const csExpr = {
+                parent: parent,
+                tsNode: expression,
+                nodeType: cs.SyntaxKind.IsExpression,
+                expression: null!,
+                type: null!
+            } as cs.IsExpression;
+
+            csExpr.expression = this.visitExpression(csExpr, expression.left)!;
+            csExpr.type = this.createUnresolvedTypeNode(
+                csExpr,
+                expression.right,
+                this._context.typeChecker.getTypeAtLocation(expression.right),
+                this._context.typeChecker.getSymbolAtLocation(expression.right)
+            );
+
+            return csExpr;
+        }
+
+        if (expression.operatorToken.kind === ts.SyntaxKind.AsteriskAsteriskToken) {
             this._context.addTsNodeDiagnostics(
                 expression,
                 'Exponentiation expresssions are not yet supported',
@@ -2342,7 +2473,9 @@ export default class CSharpAstTransformer {
                 parent: parent,
                 tsNode: expression
             } as cs.ToDoExpression;
-        } else if (
+        }
+
+        if (
             expression.operatorToken.kind === ts.SyntaxKind.BarEqualsToken ||
             expression.operatorToken.kind === ts.SyntaxKind.BarBarEqualsToken ||
             expression.operatorToken.kind === ts.SyntaxKind.CaretEqualsToken ||
@@ -2365,7 +2498,7 @@ export default class CSharpAstTransformer {
                 return null;
             }
 
-            const bitOp = (assignment.right = {
+            const bitOp = {
                 parent: assignment,
                 nodeType: cs.SyntaxKind.BinaryExpression,
                 tsNode: expression,
@@ -2382,7 +2515,9 @@ export default class CSharpAstTransformer {
                     tsNode: expression
                 } as cs.ParenthesizedExpression,
                 operator: ''
-            } as cs.BinaryExpression);
+            } as cs.BinaryExpression;
+
+            assignment.right = bitOp;
             bitOp.right.parent = bitOp;
 
             switch (expression.operatorToken.kind) {
@@ -2416,7 +2551,7 @@ export default class CSharpAstTransformer {
             const isRightEnum = rightType.flags & ts.TypeFlags.Enum || rightType.flags & ts.TypeFlags.EnumLiteral;
 
             if (!isLeftEnum || !isRightEnum) {
-                const toInt = ((bitOp.left as cs.ParenthesizedExpression).expression = {
+                const toInt = {
                     parent: bitOp,
                     nodeType: cs.SyntaxKind.CastExpression,
                     expression: {} as cs.Expression,
@@ -2427,7 +2562,8 @@ export default class CSharpAstTransformer {
                         tsNode: expression
                     } as cs.PrimitiveTypeNode,
                     tsNode: expression
-                } as cs.CastExpression);
+                } as cs.CastExpression;
+                (bitOp.left as cs.ParenthesizedExpression).expression = toInt;
                 toInt.expression = this.visitExpression(assignment, expression.left)!;
                 if (!toInt.expression) {
                     return null;
@@ -2463,100 +2599,115 @@ export default class CSharpAstTransformer {
 
             assignment.right = this.makeDouble(assignment.right);
             return assignment;
-        } else {
-            const binaryExpression = {
-                parent: parent,
-                nodeType: cs.SyntaxKind.BinaryExpression,
-                tsNode: expression,
-                left: {} as cs.Expression,
-                right: {} as cs.Expression,
-                operator: this.mapOperator(expression.operatorToken.kind)
-            } as cs.BinaryExpression;
+        }
+        const binaryExpression = {
+            parent: parent,
+            nodeType: cs.SyntaxKind.BinaryExpression,
+            tsNode: expression,
+            left: {} as cs.Expression,
+            right: {} as cs.Expression,
+            operator: this.mapOperator(expression.operatorToken.kind)
+        } as cs.BinaryExpression;
 
-            binaryExpression.left = this.visitExpression(binaryExpression, expression.left)!;
-            if (!binaryExpression.left) {
-                return null;
-            }
+        binaryExpression.left = this.visitExpression(binaryExpression, expression.left)!;
+        if (!binaryExpression.left) {
+            return null;
+        }
 
-            binaryExpression.right = this.visitExpression(binaryExpression, expression.right)!;
-            if (!binaryExpression.right) {
-                return null;
-            }
+        binaryExpression.right = this.visitExpression(binaryExpression, expression.right)!;
+        if (!binaryExpression.right) {
+            return null;
+        }
 
-            const leftType = this._context.typeChecker.getTypeAtLocation(expression.left);
-            const rightType = this._context.typeChecker.getTypeAtLocation(expression.right);
+        const leftType = this._context.typeChecker.getTypeAtLocation(expression.left);
+        const rightType = this._context.typeChecker.getTypeAtLocation(expression.right);
 
-            const isLeftEnum = leftType.flags & ts.TypeFlags.Enum || leftType.flags & ts.TypeFlags.EnumLiteral;
-            const isRightEnum = rightType.flags & ts.TypeFlags.Enum || rightType.flags & ts.TypeFlags.EnumLiteral;
+        const isLeftEnum = this._context.isEnum(leftType);
+        const isRightEnum = this._context.isEnum(rightType);
 
-            if (!isLeftEnum || !isRightEnum) {
-                switch (expression.operatorToken.kind) {
-                    case ts.SyntaxKind.PlusToken:
-                    case ts.SyntaxKind.PlusEqualsToken:
-                        // string and number concatenation
-                        if (
-                            leftType.flags & ts.TypeFlags.Number &&
-                            rightType.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)
-                        ) {
-                            binaryExpression.left = this.toInvariantString(binaryExpression.left);
-                        } else if (
-                            rightType.flags & ts.TypeFlags.Number &&
-                            leftType.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)
-                        ) {
-                            binaryExpression.right = this.toInvariantString(binaryExpression.right);
-                        }
-                        break;
-                    case ts.SyntaxKind.AmpersandToken:
-                    case ts.SyntaxKind.GreaterThanGreaterThanToken:
-                    case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
-                    case ts.SyntaxKind.LessThanLessThanToken:
-                    case ts.SyntaxKind.BarToken:
-                    case ts.SyntaxKind.CaretToken:
-                        if (!this.hasBinaryOperationMakeInt(binaryExpression.left)) {
-                            binaryExpression.left = this.makeInt(binaryExpression.left, true);
-                        }
-
-                        if (!this.hasBinaryOperationMakeInt(binaryExpression.right)) {
-                            let allowLongOnRight = false;
-                            switch (expression.operatorToken.kind) {
-                                case ts.SyntaxKind.AmpersandToken:
-                                case ts.SyntaxKind.BarToken:
-                                case ts.SyntaxKind.CaretToken:
-                                    allowLongOnRight = true;
-                                    break;
-                                default:
-                                    allowLongOnRight = false;
-                                    break;
-                            }
-
-                            binaryExpression.right = this.makeInt(binaryExpression.right, allowLongOnRight);
-                        }
-
-                        let nextParent = parent;
-                        while (cs.isParenthesizedExpression(nextParent)) {
-                            nextParent = nextParent.parent!;
-                        }
-
-                        if (
-                            nextParent.nodeType !== cs.SyntaxKind.BinaryExpression ||
-                            (nextParent as cs.BinaryExpression).operator === '='
-                        ) {
-                            return this.makeDouble(binaryExpression);
-                        }
-                        break;
-                    case ts.SyntaxKind.SlashToken:
-                        if (expression.left.kind === ts.SyntaxKind.NumericLiteral) {
+        if (!isLeftEnum || !isRightEnum) {
+            switch (expression.operatorToken.kind) {
+                case ts.SyntaxKind.PlusToken:
+                case ts.SyntaxKind.PlusEqualsToken:
+                    // string and number concatenation
+                    if (
+                        leftType.flags & ts.TypeFlags.Number &&
+                        rightType.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)
+                    ) {
+                        binaryExpression.left = this.toInvariantString(binaryExpression.left);
+                    } else if (
+                        rightType.flags & ts.TypeFlags.Number &&
+                        leftType.flags & (ts.TypeFlags.String | ts.TypeFlags.StringLiteral)
+                    ) {
+                        binaryExpression.right = this.toInvariantString(binaryExpression.right);
+                    } else {
+                        // number arithmetics
+                        if (isLeftEnum) {
                             binaryExpression.left = this.makeDouble(binaryExpression.left);
                         }
-                        if (expression.right.kind === ts.SyntaxKind.NumericLiteral) {
+                        if (isRightEnum) {
                             binaryExpression.right = this.makeDouble(binaryExpression.right);
                         }
-                        break;
-                }
-            }
+                    }
+                    break;
+                case ts.SyntaxKind.AmpersandToken:
+                case ts.SyntaxKind.GreaterThanGreaterThanToken:
+                case ts.SyntaxKind.GreaterThanGreaterThanGreaterThanToken:
+                case ts.SyntaxKind.LessThanLessThanToken:
+                case ts.SyntaxKind.BarToken:
+                case ts.SyntaxKind.CaretToken:
+                    if (!this.hasBinaryOperationMakeInt(binaryExpression.left)) {
+                        binaryExpression.left = this.makeInt(binaryExpression.left, true);
+                    }
 
-            return binaryExpression;
+                    if (!this.hasBinaryOperationMakeInt(binaryExpression.right)) {
+                        let allowLongOnRight = false;
+                        switch (expression.operatorToken.kind) {
+                            case ts.SyntaxKind.AmpersandToken:
+                            case ts.SyntaxKind.BarToken:
+                            case ts.SyntaxKind.CaretToken:
+                                allowLongOnRight = true;
+                                break;
+                            default:
+                                allowLongOnRight = false;
+                                break;
+                        }
+
+                        binaryExpression.right = this.makeInt(binaryExpression.right, allowLongOnRight);
+                    }
+
+                    let nextParent = parent;
+                    while (cs.isParenthesizedExpression(nextParent)) {
+                        nextParent = nextParent.parent!;
+                    }
+
+                    if (
+                        nextParent.nodeType !== cs.SyntaxKind.BinaryExpression ||
+                        (nextParent as cs.BinaryExpression).operator === '='
+                    ) {
+                        return this.makeDouble(binaryExpression);
+                    }
+                    break;
+                case ts.SyntaxKind.SlashToken:
+                case ts.SyntaxKind.AsteriskToken:
+                case ts.SyntaxKind.MinusToken:
+                    if (expression.left.kind === ts.SyntaxKind.NumericLiteral) {
+                        binaryExpression.left = this.makeDouble(binaryExpression.left);
+                    } else if (isLeftEnum) {
+                        binaryExpression.left = this.makeDouble(binaryExpression.left);
+                    }
+
+                    if (expression.right.kind === ts.SyntaxKind.NumericLiteral) {
+                        binaryExpression.right = this.makeDouble(binaryExpression.right);
+                    } else if (isRightEnum) {
+                        binaryExpression.right = this.makeDouble(binaryExpression.right);
+                    }
+
+                    break;
+            }
         }
+
+        return binaryExpression;
     }
 
     private hasBinaryOperationMakeInt(left: cs.Expression): boolean {
@@ -2739,13 +2890,14 @@ export default class CSharpAstTransformer {
             arguments: []
         } as cs.InvocationExpression;
 
-        const access = (call.expression = {
+        const access = {
             parent: call,
             tsNode: expression.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression,
             expression: {} as cs.Expression,
             member: this._context.toMethodName('isTruthy')
-        } as cs.MemberAccessExpression);
+        } as cs.MemberAccessExpression;
+        call.expression = access;
 
         access.expression = {
             parent: access,
@@ -2760,65 +2912,101 @@ export default class CSharpAstTransformer {
         return call;
     }
 
-    protected visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
-        if (cs.isExpressionStatement(parent)) {
-            this._context.addTsNodeDiagnostics(
-                expression,
-                'Local function declarations are not yet supported',
+    protected visitFunctionDeclaration(parent: cs.Node, expression: ts.FunctionDeclaration) {
+        const localFunction: cs.LocalFunctionDeclaration = {
+            name: (expression.name as ts.Identifier)?.text,
+            nodeType: cs.SyntaxKind.LocalFunction,
+            parent: parent,
+            tsNode: expression,
+            body: {} as cs.Block,
+            parameters: [],
+            returnType: {} as cs.TypeNode
+        };
+
+        for (const p of expression.parameters) {
+            localFunction.parameters.push(this.makeParameter(localFunction, p));
+        }
+
+        const signature = this._context.typeChecker.getSignatureFromDeclaration(expression);
+        if (!signature) {
+            this._context.addCsNodeDiagnostics(
+                localFunction,
+                'Could not get signature for function',
                 ts.DiagnosticCategory.Error
             );
-            return {
-                nodeType: cs.SyntaxKind.ToDoExpression,
-                parent: parent,
-                tsNode: expression
-            } as cs.ToDoExpression;
+            localFunction.returnType = {
+                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                parent: localFunction,
+                type: cs.PrimitiveType.Void
+            } as cs.PrimitiveTypeNode;
         } else {
-            if (expression.name) {
-                this._context.addTsNodeDiagnostics(
-                    expression,
-                    'Local functions with names have no matching kind in C#, name will be omitted',
-                    ts.DiagnosticCategory.Warning
-                );
-            }
-
-            const lambdaExpression = {
-                nodeType: cs.SyntaxKind.LambdaExpression,
-                parent: parent,
-                tsNode: expression,
-                body: {} as cs.Expression,
-                parameters: [],
-                returnType: {} as cs.TypeNode
-            } as cs.LambdaExpression;
-
-            const signature = this._context.typeChecker.getSignatureFromDeclaration(expression);
-            if (!signature) {
-                this._context.addCsNodeDiagnostics(
-                    lambdaExpression,
-                    'Could not get signature for function',
-                    ts.DiagnosticCategory.Error
-                );
-                lambdaExpression.returnType = {
-                    nodeType: cs.SyntaxKind.PrimitiveTypeNode,
-                    parent: lambdaExpression,
-                    type: cs.PrimitiveType.Void
-                } as cs.PrimitiveTypeNode;
-            } else {
-                const returnType = signature.getReturnType();
-                lambdaExpression.returnType = this.createUnresolvedTypeNode(
-                    lambdaExpression,
-                    expression.type ?? expression,
-                    returnType
-                );
-            }
-
-            expression.parameters.forEach(p => {
-                lambdaExpression.parameters.push(this.makeParameter(lambdaExpression, p));
-            });
-
-            lambdaExpression.body = this.visitBlock(lambdaExpression, expression.body);
-
-            return lambdaExpression;
+            const returnType = signature.getReturnType();
+            localFunction.returnType = this.createUnresolvedTypeNode(
+                localFunction,
+                expression.type ?? expression,
+                returnType
+            );
         }
+
+        if (expression.body) {
+            localFunction.body = this.visitBlock(localFunction, expression.body);
+        } else {
+            localFunction.body = {
+                nodeType: cs.SyntaxKind.Block,
+                statements: [],
+                parent: localFunction
+            };
+        }
+
+        return localFunction;
+    }
+
+    protected visitFunctionExpression(parent: cs.Node, expression: ts.FunctionExpression) {
+        if (expression.name) {
+            this._context.addTsNodeDiagnostics(
+                expression,
+                'Local functions with names have no matching kind in C#, name will be omitted',
+                ts.DiagnosticCategory.Warning
+            );
+        }
+
+        const lambdaExpression = {
+            nodeType: cs.SyntaxKind.LambdaExpression,
+            parent: parent,
+            tsNode: expression,
+            body: {} as cs.Expression,
+            parameters: [],
+            returnType: {} as cs.TypeNode
+        } as cs.LambdaExpression;
+
+        const signature = this._context.typeChecker.getSignatureFromDeclaration(expression);
+        if (!signature) {
+            this._context.addCsNodeDiagnostics(
+                lambdaExpression,
+                'Could not get signature for function',
+                ts.DiagnosticCategory.Error
+            );
+            lambdaExpression.returnType = {
+                nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                parent: lambdaExpression,
+                type: cs.PrimitiveType.Void
+            } as cs.PrimitiveTypeNode;
+        } else {
+            const returnType = signature.getReturnType();
+            lambdaExpression.returnType = this.createUnresolvedTypeNode(
+                lambdaExpression,
+                expression.type ?? expression,
+                returnType
+            );
+        }
+
+        for (const p of expression.parameters) {
+            lambdaExpression.parameters.push(this.makeParameter(lambdaExpression, p));
+        }
+
+        lambdaExpression.body = this.visitBlock(lambdaExpression, expression.body);
+
+        return lambdaExpression;
     }
 
     protected visitArrowExpression(parent: cs.Node, expression: ts.ArrowFunction) {
@@ -2831,9 +3019,9 @@ export default class CSharpAstTransformer {
             returnType: {} as cs.TypeNode
         } as cs.LambdaExpression;
 
-        expression.parameters.forEach(p => {
+        for (const p of expression.parameters) {
             lambdaExpression.parameters.push(this.makeParameter(lambdaExpression, p));
-        });
+        }
 
         const signature = this._context.typeChecker.getSignatureFromDeclaration(expression);
         if (!signature) {
@@ -2966,7 +3154,7 @@ export default class CSharpAstTransformer {
             } as cs.StringLiteral);
         }
 
-        expression.templateSpans.forEach(s => {
+        for (const s of expression.templateSpans) {
             const e = this.visitExpression(templateString, s.expression);
             if (e) {
                 templateString.chunks.push(e);
@@ -2977,7 +3165,7 @@ export default class CSharpAstTransformer {
                 tsNode: s,
                 text: s.literal.text
             } as cs.StringLiteral);
-        });
+        }
 
         return templateString;
     }
@@ -3017,148 +3205,88 @@ export default class CSharpAstTransformer {
     }
 
     protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
-        if (this.isMapEntry(expression)) {
-            return this.createMapEntry(parent, expression);
-        } else if (this.isMapInitializer(expression)) {
+        const type = this._context.typeChecker.getTypeAtLocation(expression);
+        if (this._context.typeChecker.isTupleType(type)) {
             const csExpr = {
                 parent: parent,
                 tsNode: expression,
-                nodeType: cs.SyntaxKind.InvocationExpression,
-                arguments: [],
-                expression: {} as cs.Expression
-            } as cs.InvocationExpression;
+                nodeType: cs.SyntaxKind.NewExpression,
+                type: null!,
+                arguments: []
+            } as cs.NewExpression;
 
-            csExpr.expression = this.makeMemberAccess(
-                csExpr,
-                this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toMethodName('mapInitializer')
+            csExpr.type = this._context.makeArrayTupleType(csExpr, []);
+
+            let tupleType = this._context.typeChecker.getContextualType(expression);
+            let typeArgs = tupleType
+                ? this._context.typeChecker.getTypeArguments(tupleType as ts.TypeReference)
+                : undefined;
+            if (!typeArgs || typeArgs.length !== expression.elements.length) {
+                tupleType = type;
+                typeArgs = this._context.typeChecker.getTypeArguments(tupleType as ts.TypeReference);
+            }
+
+            (csExpr.type as cs.ArrayTupleNode).types = typeArgs!.map((p, i) =>
+                this.createUnresolvedTypeNode(csExpr.type, expression.elements[i], p)
             );
 
-            expression.elements.forEach(e => {
+            for (const e of expression.elements) {
                 const ex = this.visitExpression(csExpr, e);
                 if (ex) {
-                    csExpr.arguments.push(ex);
+                    csExpr.arguments!.push(ex);
                 }
-            });
-
-            // steal generic from inner element
-            if (
-                csExpr.arguments.length > 0 &&
-                cs.isInvocationExpression(csExpr.arguments[0]) &&
-                cs.isTypeReference(csExpr.arguments[0].expression)
-            ) {
-                csExpr.typeArguments = [csExpr.arguments[0].expression];
             }
-
-            return csExpr;
-        } else if (this.isSetInitializer(expression)) {
-            const csExpr = {
-                parent: parent,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.InvocationExpression,
-                arguments: [],
-                expression: {} as cs.Expression
-            } as cs.InvocationExpression;
-
-            csExpr.expression = this.makeMemberAccess(
-                csExpr,
-                this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                this._context.toMethodName('setInitializer')
-            );
-
-            const setCreation = expression.parent as ts.NewExpression;
-            if (setCreation.typeArguments) {
-                csExpr.typeArguments = setCreation.typeArguments.map(t => this.createUnresolvedTypeNode(csExpr, t));
-            }
-
-            expression.elements.forEach(e => {
-                const ex = this.visitExpression(csExpr, e);
-                if (ex) {
-                    csExpr.arguments.push(ex);
-                }
-            });
-
-            return csExpr;
-        } else {
-            const csExpr = {
-                parent: parent,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.ArrayCreationExpression,
-                values: []
-            } as cs.ArrayCreationExpression;
-
-            const contextual = this._context.typeChecker.getContextualType(expression);
-            if (!contextual || !contextual.symbol || contextual.symbol.name !== 'Iterable') {
-                csExpr.type = this.createUnresolvedTypeNode(csExpr, expression, contextual);
-            }
-
-            expression.elements.forEach(e => {
-                const ex = this.visitExpression(csExpr, e);
-                if (ex) {
-                    csExpr.values!.push(ex);
-                }
-            });
 
             return csExpr;
         }
+        const csExpr = {
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.ArrayCreationExpression,
+            values: []
+        } as cs.ArrayCreationExpression;
+
+        const contextual = this._context.typeChecker.getContextualType(expression);
+        if (!contextual || !contextual.symbol || contextual.symbol.name !== 'Iterable') {
+            csExpr.type = this.createUnresolvedTypeNode(csExpr, expression, contextual);
+        }
+
+        for (const e of expression.elements) {
+            const ex = this.visitExpression(csExpr, e);
+            if (ex) {
+                csExpr.values!.push(ex);
+            }
+        }
+
+        return csExpr;
     }
     protected createMapEntry(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
         const csExpr = {
             parent: parent,
             tsNode: expression,
-            nodeType: cs.SyntaxKind.InvocationExpression,
-            arguments: [],
-            expression: {} as cs.Expression
-        } as cs.InvocationExpression;
+            nodeType: cs.SyntaxKind.NewExpression,
+            type: null!,
+            arguments: []
+        } as cs.NewExpression;
 
-        csExpr.expression = this.makeMemberAccess(
-            csExpr,
-            this._context.makeTypeName('alphaTab.core.TypeHelper'),
-            this._context.toMethodName('createMapEntry')
-        );
+        csExpr.type = {
+            nodeType: cs.SyntaxKind.ArrayTupleNode,
+            parent: csExpr,
+            types: [],
+            isNullable: false
+        } as cs.ArrayTupleNode;
 
-        expression.elements.forEach(e => {
+        for (const e of expression.elements) {
             const ex = this.visitExpression(csExpr, e);
             if (ex) {
+                (csExpr.type as cs.ArrayTupleNode).types.push(
+                    this.createUnresolvedTypeNode(csExpr.type, e, this._context.typeChecker.getTypeAtLocation(e))
+                );
                 csExpr.arguments.push(ex);
             }
-        });
+        }
 
         return csExpr;
-    }
-
-    protected isMapInitializer(expression: ts.ArrayLiteralExpression) {
-        const isCandidate = expression.parent.kind === ts.SyntaxKind.NewExpression;
-        if (!isCandidate) {
-            return false;
-        }
-
-        return this._context.typeChecker.getTypeAtLocation(expression.parent).symbol.name === 'Map';
-    }
-
-    protected isMapEntry(expression: ts.ArrayLiteralExpression) {
-        const isCandidate =
-            expression.elements.length === 2 &&
-            expression.parent.kind === ts.SyntaxKind.ArrayLiteralExpression &&
-            expression.parent.parent.kind === ts.SyntaxKind.NewExpression;
-        if (!isCandidate) {
-            return false;
-        }
-
-        switch (expression.parent.parent.parent.kind) {
-            case ts.SyntaxKind.PropertyDeclaration:
-                return this.getDeclarationOrAssignmentType()!.symbol.name === 'Map';
-            case ts.SyntaxKind.BinaryExpression:
-                if (
-                    (expression.parent.parent.parent as ts.BinaryExpression).operatorToken.kind ===
-                    ts.SyntaxKind.EqualsToken
-                ) {
-                    return this._context.getType(expression.parent.parent)?.symbol.name === 'Map';
-                }
-                break;
-        }
-
-        return false;
     }
 
     protected isSetInitializer(expression: ts.ArrayLiteralExpression) {
@@ -3192,9 +3320,11 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.MemberAccessExpression
         } as cs.MemberAccessExpression;
 
+        let convertToInvocation = false;
+
         if (memberAccess.tsSymbol) {
             if (this._context.isMethodSymbol(memberAccess.tsSymbol)) {
-                memberAccess.member = this._context.toMethodName(expression.name.text);
+                memberAccess.member = this._context.buildMethodName(expression.name);
             } else if (this._context.isPropertySymbol(memberAccess.tsSymbol)) {
                 memberAccess.member = this._context.toPropertyName(expression.name.text);
             }
@@ -3211,10 +3341,12 @@ export default class CSharpAstTransformer {
         if (memberAccess.tsSymbol) {
             const parentSymbol = (memberAccess.tsSymbol as any).parent as ts.Symbol;
             if (parentSymbol) {
-                const renamed = this.getSymbolName(parentSymbol!, memberAccess.tsSymbol!, memberAccess);
+                const renamed = this.getSymbolName(parentSymbol!, memberAccess.tsSymbol!);
                 if (renamed) {
                     memberAccess.member = renamed;
                 }
+
+                convertToInvocation = this.convertPropertyToInvocation(parentSymbol!, memberAccess.tsSymbol!);
             }
         }
 
@@ -3227,10 +3359,41 @@ export default class CSharpAstTransformer {
             return null;
         }
 
+        if (convertToInvocation && !ts.isCallExpression(expression.parent)) {
+            const invocation: cs.InvocationExpression = {
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                expression: memberAccess,
+                arguments: [],
+                tsNode: memberAccess.tsNode,
+                tsSymbol: memberAccess.tsSymbol,
+                parent: memberAccess.parent,
+                skipEmit: memberAccess.skipEmit
+            };
+
+            memberAccess.parent = invocation;
+
+            return this.wrapToSmartCast(parent, invocation, expression);
+        }
         return this.wrapToSmartCast(parent, memberAccess, expression);
     }
 
-    protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol, expression: cs.Expression): string | null {
+    protected convertPropertyToInvocation(parentSymbol: ts.Symbol, symbol: ts.Symbol): boolean {
+        switch (parentSymbol.name) {
+            case 'Error':
+                switch (symbol.name) {
+                    case 'stack':
+                    case 'cause':
+                        return true;
+                }
+                break;
+            // chai assertions
+            case 'Assertion':
+                return true;
+        }
+        return false;
+    }
+
+    protected getSymbolName(parentSymbol: ts.Symbol, symbol: ts.Symbol): string | null {
         switch (parentSymbol.name) {
             case 'Array':
                 switch (symbol.name) {
@@ -3272,7 +3435,7 @@ export default class CSharpAstTransformer {
             properties: []
         } as cs.AnonymousObjectCreationExpression;
 
-        expression.properties.forEach(p => {
+        for (const p of expression.properties) {
             if (ts.isPropertyAssignment(p)) {
                 const assignment = {
                     parent: objectLiteral,
@@ -3333,7 +3496,9 @@ export default class CSharpAstTransformer {
                     lambda.returnType = this.createUnresolvedTypeNode(lambda, p.type ?? p, returnType);
                 }
 
-                p.parameters.forEach(param => lambda.parameters.push(this.makeParameter(lambda, param)));
+                for (const param of p.parameters) {
+                    lambda.parameters.push(this.makeParameter(lambda, param));
+                }
                 lambda.body = this.visitBlock(parent, p.body!);
 
                 assignment.value = lambda;
@@ -3352,7 +3517,7 @@ export default class CSharpAstTransformer {
                     ts.DiagnosticCategory.Error
                 );
             }
-        });
+        }
 
         return objectLiteral;
     }
@@ -3365,13 +3530,14 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.InvocationExpression,
             tsNode: expr.tsNode
         } as cs.InvocationExpression;
-        const memberAccess = (callExpr.expression = {
+        const memberAccess = {
             expression: null!,
             member: this._context.toPascalCase('toInvariantString'),
             parent: callExpr,
             tsNode: expr.tsNode,
             nodeType: cs.SyntaxKind.MemberAccessExpression
-        } as cs.MemberAccessExpression);
+        } as cs.MemberAccessExpression;
+        callExpr.expression = memberAccess;
 
         const par = {
             parent: memberAccess,
@@ -3387,8 +3553,37 @@ export default class CSharpAstTransformer {
     }
 
     protected visitElementAccessExpression(parent: cs.Node, expression: ts.ElementAccessExpression) {
-        // Enum[value] => value.ToString()
-        if (this.isEnumToString(expression)) {
+        // Enum[enumValue] => value.toString()
+        // Enum[string] => TypeHelper.parseEnum<Type>(value, Type)
+        if (this.isEnumFromOrToString(expression)) {
+            const elementType = this._context.typeChecker.getTypeAtLocation(expression.argumentExpression);
+
+            if (this._context.isEnum(elementType)) {
+                const callExpr = {
+                    parent: parent,
+                    arguments: [],
+                    expression: {} as cs.Expression,
+                    nodeType: cs.SyntaxKind.InvocationExpression,
+                    tsNode: expression
+                } as cs.InvocationExpression;
+
+                const memberAccess = {
+                    expression: {} as cs.Expression,
+                    member: this._context.toPascalCase('toString'),
+                    parent: callExpr,
+                    tsNode: expression,
+                    nodeType: cs.SyntaxKind.MemberAccessExpression
+                } as cs.MemberAccessExpression;
+                callExpr.expression = memberAccess;
+
+                memberAccess.expression = this.visitExpression(memberAccess, expression.argumentExpression)!;
+                if (!memberAccess.expression) {
+                    return null;
+                }
+
+                return callExpr;
+            }
+
             const callExpr = {
                 parent: parent,
                 arguments: [],
@@ -3397,21 +3592,54 @@ export default class CSharpAstTransformer {
                 tsNode: expression
             } as cs.InvocationExpression;
 
-            const memberAccess = (callExpr.expression = {
-                expression: {} as cs.Expression,
-                member: this._context.toPascalCase('toString'),
-                parent: callExpr,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.MemberAccessExpression
-            } as cs.MemberAccessExpression);
+            callExpr.expression = this.makeMemberAccess(
+                callExpr,
+                this._context.makeTypeName('alphaTab.core.TypeHelper'),
+                this._context.toMethodName('parseEnum')
+            );
 
-            memberAccess.expression = this.visitExpression(memberAccess, expression.argumentExpression)!;
+            const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
+            callExpr.typeArguments = [
+                this.createUnresolvedTypeNode(callExpr, expression.argumentExpression, enumType, enumType.symbol)
+            ];
+
+            const typeOf: cs.TypeOfExpression = {
+                nodeType: cs.SyntaxKind.TypeOfExpression,
+                parent: callExpr
+            };
+            typeOf.type = this.createUnresolvedTypeNode(
+                typeOf,
+                expression.argumentExpression,
+                enumType,
+                enumType.symbol
+            );
+
+            callExpr.arguments = [this.visitExpression(callExpr, expression.argumentExpression)!, typeOf];
+
+            return callExpr;
+        }
+
+        const argumentSymbol = this._context.typeChecker.getSymbolAtLocation(expression.argumentExpression);
+        const elementAccessMethod = argumentSymbol ? this._context.getMethodNameFromSymbol(argumentSymbol) : '';
+        if(elementAccessMethod) {
+
+            const memberAccess = {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                expression: {} as cs.Expression,
+                member: this._context.toMethodName(elementAccessMethod),
+                parent: parent,
+                tsNode: expression,
+                nullSafe: !!expression.questionDotToken
+            } as cs.MemberAccessExpression;
+            
+            memberAccess.expression = this.visitExpression(memberAccess, expression.expression)!;
             if (!memberAccess.expression) {
                 return null;
             }
 
-            return callExpr;
+            return memberAccess;
         }
+
 
         const elementAccess = {
             expression: {} as cs.Expression,
@@ -3433,12 +3661,18 @@ export default class CSharpAstTransformer {
         }
 
         const symbol = this._context.typeChecker.getSymbolAtLocation(expression.expression);
-        let type = symbol ? this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression) : null;
+        let type = symbol
+            ? this._context.typeChecker.getTypeOfSymbolAtLocation(symbol!, expression.expression)
+            : this._context.typeChecker.getTypeAtLocation(expression.expression);
         if (type) {
             type = this._context.typeChecker.getNonNullableType(type);
         }
+        const isArrayTupleAccessor = type && this._context.typeChecker.isTupleType(type);
         const isArrayAccessor =
-            !symbol || (type && type.symbol && !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice')));
+            (!isArrayTupleAccessor && !symbol) ||
+            (type && type.symbol && !!type.symbol.members?.has(ts.escapeLeadingUnderscores('slice')));
+
+        const forceCast = false;
         if (isArrayAccessor) {
             const csArg = {
                 expression: {} as cs.Expression,
@@ -3459,15 +3693,38 @@ export default class CSharpAstTransformer {
             } as cs.ParenthesizedExpression;
             argumentExpression.parent = par;
             csArg.expression = par;
+        } else if (isArrayTupleAccessor) {
+            let index = expression.argumentExpression;
+            while (ts.isParenthesizedExpression(index)) {
+                index = index.expression;
+            }
+
+            // x[0] -> x.V1
+            if (ts.isNumericLiteral(index)) {
+                return {
+                    expression: elementAccess.expression,
+                    member: this._context.toPropertyName(`v${index.text}`),
+                    parent: parent,
+                    tsNode: expression,
+                    nodeType: cs.SyntaxKind.MemberAccessExpression,
+                    nullSafe: !!expression.questionDotToken
+                } as cs.MemberAccessExpression;
+            }
+            // x[expr] -> x[expr] as Type
+            this._context.addTsNodeDiagnostics(
+                expression,
+                'Dynamic expressions on tuple types are not supported',
+                ts.DiagnosticCategory.Error
+            );
         } else {
             elementAccess.argumentExpression = argumentExpression;
             argumentExpression.parent = elementAccess;
         }
 
-        return this.wrapToSmartCast(parent, elementAccess, expression);
+        return this.wrapToSmartCast(parent, elementAccess, expression, forceCast);
     }
 
-    protected isEnumToString(expression: ts.ElementAccessExpression): boolean {
+    protected isEnumFromOrToString(expression: ts.ElementAccessExpression): boolean {
         const enumType = this._context.typeChecker.getTypeAtLocation(expression.expression);
         return !!(enumType?.symbol && enumType.symbol.flags & ts.SymbolFlags.RegularEnum);
     }
@@ -3550,7 +3807,8 @@ export default class CSharpAstTransformer {
             expression: {} as cs.Expression,
             parent: parent,
             tsNode: expression,
-            nodeType: cs.SyntaxKind.InvocationExpression
+            nodeType: cs.SyntaxKind.InvocationExpression,
+            nullSafe: !!expression.questionDotToken
         } as cs.InvocationExpression;
 
         // chai
@@ -3559,7 +3817,7 @@ export default class CSharpAstTransformer {
                 parent: callExpression,
                 tsNode: expression.expression,
                 nodeType: cs.SyntaxKind.Identifier,
-                text: 'TestGlobals.' + this._context.toPascalCase('expect')
+                text: `TestGlobals.${this._context.toPascalCase('expect')}`
             } as cs.Identifier;
         } else {
             callExpression.expression = this.visitExpression(callExpression, expression.expression)!;
@@ -3576,18 +3834,18 @@ export default class CSharpAstTransformer {
             return null;
         }
 
-        expression.arguments.forEach(a => {
+        for (const a of expression.arguments) {
             const e = this.visitExpression(callExpression, a);
             if (e) {
                 callExpression.arguments.push(e);
             }
-        });
+        }
 
         if (expression.typeArguments) {
             callExpression.typeArguments = [];
-            expression.typeArguments.forEach(a =>
-                callExpression.typeArguments!.push(this.createUnresolvedTypeNode(callExpression, a))
-            );
+            for (const a of expression.typeArguments) {
+                callExpression.typeArguments!.push(this.createUnresolvedTypeNode(callExpression, a));
+            }
         }
 
         return this.makeTruthy(callExpression);
@@ -3606,7 +3864,7 @@ export default class CSharpAstTransformer {
             type = this._context.typeChecker.getTypeOfSymbolAtLocation(symbol, expression.expression) ?? null;
         }
 
-        if (type?.symbol?.name == 'PromiseConstructor') {
+        if (type?.symbol?.name === 'PromiseConstructor') {
             const invocation = {
                 parent: parent,
                 tsNode: expression,
@@ -3627,13 +3885,13 @@ export default class CSharpAstTransformer {
             }
 
             const isVoidPromise =
-                !expression.typeArguments || expression.typeArguments[0].kind == ts.SyntaxKind.VoidKeyword;
+                !expression.typeArguments || expression.typeArguments[0].kind === ts.SyntaxKind.VoidKeyword;
 
             if (!isVoidPromise) {
                 invocation.typeArguments = [];
-                expression.typeArguments!.forEach(a =>
-                    invocation.typeArguments!.push(this.createUnresolvedTypeNode(invocation, a))
-                );
+                for (const a of expression.typeArguments!) {
+                    invocation.typeArguments!.push(this.createUnresolvedTypeNode(invocation, a));
+                }
             } else if (e && cs.isLambdaExpression(e)) {
                 e.parameters[0].type = {
                     nodeType: cs.SyntaxKind.FunctionTypeNode,
@@ -3662,9 +3920,9 @@ export default class CSharpAstTransformer {
 
         if (expression.typeArguments) {
             csType.typeArguments = [];
-            expression.typeArguments.forEach(a =>
-                csType.typeArguments!.push(this.createUnresolvedTypeNode(newExpression, a))
-            );
+            for (const a of expression.typeArguments) {
+                csType.typeArguments!.push(this.createUnresolvedTypeNode(newExpression, a));
+            }
         } else {
             const typeAtLocation = this._context.typeChecker.getTypeAtLocation(expression) as ts.TypeReference;
             if (typeAtLocation.typeArguments && typeAtLocation.typeArguments.length > 0) {
@@ -3673,11 +3931,11 @@ export default class CSharpAstTransformer {
                 // we have some inferred type arguments here
                 if (actualTypeArguments && actualTypeArguments.length === typeAtLocation.typeArguments.length) {
                     csType.typeArguments = [];
-                    actualTypeArguments.forEach(a => {
+                    for (const a of actualTypeArguments) {
                         csType.typeArguments!.push(
                             this.createUnresolvedTypeNode(newExpression, expression.expression, a)
                         );
-                    });
+                    }
                 } else {
                     csType.typeArguments = [];
 
@@ -3692,12 +3950,12 @@ export default class CSharpAstTransformer {
         }
 
         if (expression.arguments) {
-            expression.arguments.forEach(a => {
+            for (const a of expression.arguments) {
                 const e = this.visitExpression(newExpression, a);
                 if (e) {
                     newExpression.arguments.push(e);
                 }
-            });
+            }
         }
 
         if (type && type.symbol && type.symbol.name === 'ArrayConstructor' && newExpression.arguments.length === 1) {
@@ -3746,21 +4004,40 @@ export default class CSharpAstTransformer {
             }
 
             return valueAccessExpression;
-        } else {
-            const nonNullExpression = {
-                expression: {} as cs.Expression,
-                parent: parent,
-                tsNode: expression,
-                nodeType: cs.SyntaxKind.NonNullExpression
-            } as cs.NonNullExpression;
-
-            nonNullExpression.expression = this.visitExpression(nonNullExpression, expression.expression)!;
-            if (!nonNullExpression.expression) {
-                return null;
-            }
-
-            return nonNullExpression;
         }
+        const nonNullExpression = {
+            expression: {} as cs.Expression,
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.NonNullExpression
+        } as cs.NonNullExpression;
+
+        nonNullExpression.expression = this.visitExpression(nonNullExpression, expression.expression)!;
+        if (!nonNullExpression.expression) {
+            return null;
+        }
+
+        return nonNullExpression;
+    }
+
+    protected visitYieldExpression(parent: cs.Node, expression: ts.YieldExpression) {
+        const yieldExpression = {
+            expression: {} as cs.Expression,
+            member: 'Value',
+            parent: parent,
+            tsNode: expression,
+            nodeType: cs.SyntaxKind.YieldExpression
+        } as cs.YieldExpression;
+
+        yieldExpression.expression = expression.expression
+            ? this.visitExpression(yieldExpression, expression.expression)
+            : null;
+
+        if (expression.expression && !yieldExpression.expression) {
+            return null;
+        }
+
+        return yieldExpression;
     }
 
     protected visitIdentifier(parent: cs.Node, expression: ts.Identifier) {
@@ -3768,8 +4045,8 @@ export default class CSharpAstTransformer {
             return {
                 parent: parent,
                 tsNode: expression,
-                nodeType: cs.SyntaxKind.NullLiteral
-            } as cs.NullLiteral;
+                nodeType: cs.SyntaxKind.DefaultExpression
+            } as cs.DefaultExpression;
         }
 
         const identifier = {
@@ -3809,7 +4086,12 @@ export default class CSharpAstTransformer {
         return expression.text;
     }
 
-    protected wrapToSmartCast(parent: cs.Node, node: cs.Node, expression: ts.Expression): cs.Expression {
+    protected wrapToSmartCast(
+        parent: cs.Node,
+        node: cs.Node,
+        expression: ts.Expression,
+        forceCast: boolean = false
+    ): cs.Expression {
         if (node.tsSymbol) {
             if (
                 (node.tsSymbol.flags & ts.SymbolFlags.Property) === ts.SymbolFlags.Property ||
@@ -3819,7 +4101,7 @@ export default class CSharpAstTransformer {
                     ts.SymbolFlags.FunctionScopedVariable ||
                 (node.tsSymbol.flags & ts.SymbolFlags.BlockScopedVariable) === ts.SymbolFlags.BlockScopedVariable
             ) {
-                let smartCastType = this._context.getSmartCastType(expression);
+                const smartCastType = this._context.getSmartCastType(expression);
                 if (smartCastType && !this._context.isIterable(smartCastType)) {
                     if (smartCastType.flags & ts.TypeFlags.Boolean) {
                         return this.makeTruthy(node, true);
@@ -3832,7 +4114,7 @@ export default class CSharpAstTransformer {
                         nodeType: cs.SyntaxKind.ParenthesizedExpression
                     } as cs.ParenthesizedExpression;
 
-                    const castExpression = (paren.expression = {
+                    const castExpression = {
                         type: this.createUnresolvedTypeNode(
                             null,
                             expression,
@@ -3843,12 +4125,13 @@ export default class CSharpAstTransformer {
                         parent: paren,
                         tsNode: expression,
                         nodeType: cs.SyntaxKind.CastExpression
-                    } as cs.CastExpression);
+                    } as cs.CastExpression;
+                    paren.expression = castExpression;
 
                     castExpression.type.parent = castExpression;
                     castExpression.expression.parent = castExpression;
 
-                    return paren;
+                    return this.makeTruthy(paren);
                 }
 
                 const isValueTypeNotNullSmartCast = this._context.isValueTypeNotNullSmartCast(expression);
@@ -3861,23 +4144,22 @@ export default class CSharpAstTransformer {
                             expression: node,
                             member: 'Value'
                         } as cs.MemberAccessExpression;
-                    } else {
-                        return {
-                            parent: parent,
-                            nodeType: cs.SyntaxKind.NonNullExpression,
-                            tsNode: expression,
-                            expression: node
-                        } as cs.NonNullExpression;
                     }
-                }
-
-                if (this._context.isNonNullSmartCast(expression)) {
-                    return {
+                    return this.makeTruthy({
                         parent: parent,
                         nodeType: cs.SyntaxKind.NonNullExpression,
                         tsNode: expression,
                         expression: node
-                    } as cs.NonNullExpression;
+                    } as cs.NonNullExpression);
+                }
+
+                if (this._context.isNonNullSmartCast(expression)) {
+                    return this.makeTruthy({
+                        parent: parent,
+                        nodeType: cs.SyntaxKind.NonNullExpression,
+                        tsNode: expression,
+                        expression: node
+                    } as cs.NonNullExpression);
                 }
             }
         }
@@ -3991,6 +4273,8 @@ export default class CSharpAstTransformer {
                 return '>>>=';
             case ts.SyntaxKind.GreaterThanGreaterThanEqualsToken:
                 return '>>=';
+            case ts.SyntaxKind.QuestionQuestionEqualsToken:
+                return '??=';
         }
         return '';
     }

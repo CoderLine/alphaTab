@@ -1,0 +1,65 @@
+{
+    "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+    "files": {
+        "include": ["src/**", "test/**", "src.compiler/**"],
+        "ignore": ["dist", ".rollup.cache", "node_modules", "test-data", "src/generated/**"]
+    },
+    "formatter": {
+        "enabled": true,
+        "formatWithErrors": true,
+        "ignore": [],
+        "attributePosition": "auto",
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120,
+        "lineEnding": "lf"
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "style": {
+                "noInferrableTypes": "off", // we want to be explicit (for transpiler)
+                "noNonNullAssertion": "off", // we use these assertions often.
+                "noParameterAssign": "off", // useful for default values
+                "useExponentiationOperator": "off", // not supported in C# and Kotlin, lets stay with Math.pow
+                "useBlockStatements": {
+                    "level": "error",
+                    "fix": "safe"
+                }
+            },
+            "suspicious": {
+                "noExplicitAny": "off" // used in areas where we work with dynamic JSON data
+            },
+            "correctness": {
+                "noUnusedImports": {
+                    "level": "error",
+                    "fix": "safe"
+                },
+                "noSwitchDeclarations": "off"
+            },
+            "complexity": {
+                "useOptionalChain": "off", // its currently a bit sensitive with Kotlin as they evaulate things differently
+                "noStaticOnlyClass": "off" // we are strictly OOP (for transpiler)
+            }
+        }
+    },
+    "organizeImports": {
+        "enabled": true
+    },
+    "javascript": {
+        "formatter": {
+            "arrowParentheses": "asNeeded",
+            "bracketSameLine": true,
+            "bracketSpacing": true,
+            "quoteProperties": "asNeeded",
+            "semicolons": "always",
+            "trailingCommas": "none",
+            "quoteStyle": "single"
+        }
+    },
+    "json": {
+        "formatter": {
+            "trailingCommas": "none"
+        }
+    }
+}

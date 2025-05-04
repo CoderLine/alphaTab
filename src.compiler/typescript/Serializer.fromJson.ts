@@ -1,28 +1,40 @@
 import * as ts from 'typescript';
 import { createNodeFromSource, setMethodBody } from '../BuilderHelpers';
-import { JsonSerializable } from './Serializer.common';
+import type { TypeSchema } from './TypeSchema';
 
-function generateFromJsonBody(serializable: JsonSerializable, importer: (name: string, module: string) => void) {
+function generateFromJsonBody(
+    input: ts.ClassDeclaration,
+    serializable: TypeSchema,
+    importer: (name: string, module: string) => void
+) {
     importer('JsonHelper', '@src/io/JsonHelper');
-    return ts.factory.createBlock([
-        createNodeFromSource<ts.IfStatement>(`if(!m) { 
+
+    const serializerName = `${input.name!.text}Serializer`;
+    return ts.factory.createBlock(
+        [
+            createNodeFromSource<ts.IfStatement>(
+                `if(!m) { 
             return; 
-        }`, ts.SyntaxKind.IfStatement),
-        serializable.isStrict
-            ? createNodeFromSource<ts.ExpressionStatement>(
-                `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));`,
-                ts.SyntaxKind.ExpressionStatement
-            )
-            : createNodeFromSource<ts.ExpressionStatement>(
-                `JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k.toLowerCase(), v));`,
-                ts.SyntaxKind.ExpressionStatement
-            )
-    ], true);
+        }`,
+                ts.SyntaxKind.IfStatement
+            ),
+            serializable.isStrict
+                ? createNodeFromSource<ts.ExpressionStatement>(
+                      `JsonHelper.forEach(m, (v, k) => ${serializerName}.setProperty(obj, k, v));`,
+                      ts.SyntaxKind.ExpressionStatement
+                  )
+                : createNodeFromSource<ts.ExpressionStatement>(
+                      `JsonHelper.forEach(m, (v, k) => ${serializerName}.setProperty(obj, k.toLowerCase(), v));`,
+                      ts.SyntaxKind.ExpressionStatement
+                  )
+        ],
+        true
+    );
 }
 
 export function createFromJsonMethod(
     input: ts.ClassDeclaration,
-    serializable: JsonSerializable,
+    serializable: TypeSchema,
     importer: (name: string, module: string) => void
 ) {
     const methodDecl = createNodeFromSource<ts.MethodDeclaration>(
@@ -32,5 +44,5 @@ export function createFromJsonMethod(
         }`,
         ts.SyntaxKind.MethodDeclaration
     );
-    return setMethodBody(methodDecl, generateFromJsonBody(serializable, importer));
+    return setMethodBody(methodDecl, generateFromJsonBody(input, serializable, importer));
 }

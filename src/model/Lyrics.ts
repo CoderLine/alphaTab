@@ -1,9 +1,9 @@
 enum LyricsState {
-    IgnoreSpaces,
-    Begin,
-    Text,
-    Comment,
-    Dash
+    IgnoreSpaces = 0,
+    Begin = 1,
+    Text = 2,
+    Comment = 3,
+    Dash = 4
 }
 
 /**
@@ -50,7 +50,7 @@ export class Lyrics {
         let start: number = 0;
 
         while (p < str.length) {
-            let c: number = str.charCodeAt(p);
+            const c: number = str.charCodeAt(p);
             switch (state) {
                 case LyricsState.IgnoreSpaces:
                     switch (c) {
@@ -96,7 +96,7 @@ export class Lyrics {
                         case Lyrics.CharCodeCR:
                         case Lyrics.CharCodeLF:
                         case Lyrics.CharCodeSpace:
-                            let txt: string = str.substr(start, p - start);
+                            const txt: string = str.substr(start, p - start);
                             this.addChunk(txt, skipEmptyEntries);
                             state = LyricsState.IgnoreSpaces;
                             next = LyricsState.Begin;
@@ -108,7 +108,7 @@ export class Lyrics {
                         case Lyrics.CharCodeDash:
                             break;
                         default:
-                            let txt: string = str.substr(start, p - start);
+                            const txt: string = str.substr(start, p - start);
                             this.addChunk(txt, skipEmptyEntries);
                             skipSpace = true;
                             state = LyricsState.IgnoreSpaces;
@@ -134,7 +134,7 @@ export class Lyrics {
     }
 
     private prepareChunk(txt: string): string {
-        let chunk = txt.split('+').join(' ');
+        const chunk = txt.split('+').join(' ');
 
         // trim off trailing _ like "You____" becomes "You"
         let endLength = chunk.length;

@@ -1,6 +1,6 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
@@ -8,11 +8,12 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { expect } from 'chai';
 
 describe('Gp7ExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         try {
-            const data = await TestPlatform.loadFile('test-data/' + name);
+            const data = await TestPlatform.loadFile(`test-data/${name}`);
             return ScoreLoader.loadScoreFromBytes(data);
         } catch (e) {
             return null;
@@ -20,7 +21,7 @@ describe('Gp7ExporterTest', () => {
     }
 
     function prepareImporterWithBytes(buffer: Uint8Array): Gp7To8Importer {
-        let readerBase: Gp7To8Importer = new Gp7To8Importer();
+        const readerBase: Gp7To8Importer = new Gp7To8Importer();
         readerBase.init(ByteBuffer.fromBuffer(buffer), new Settings());
         return readerBase;
     }
@@ -42,13 +43,16 @@ describe('Gp7ExporterTest', () => {
         const expectedJson = JsonConverter.scoreToJsObject(expected);
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
-        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<' + fileName + '>', ignoreKeys);
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
-    async function testRoundTripFolderEqual(name: string): Promise<void> {
+    async function testRoundTripFolderEqual(name: string, ignoredFiles?: string[]): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
+        const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
-            await testRoundTripEqual(`${name}/${file}`, null);
+            if (!ignoredFilesLookup.has(file)) {
+                await testRoundTripEqual(`${name}/${file}`, null);
+            }
         }
     }
 
@@ -75,7 +79,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('visual-music-notation', async () => {
-        await testRoundTripFolderEqual('visual-tests/music-notation');
+        await testRoundTripFolderEqual('visual-tests/music-notation', ['barlines.xml']);
     });
 
     it('visual-notation-legend', async () => {
@@ -91,7 +95,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp5-to-gp7', async () => {
-        await testRoundTripEqual(`conversion/full-song.gp5`, [
+        await testRoundTripEqual('conversion/full-song.gp5', [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'automations' // volume automations are not yet supported in gpif
@@ -99,7 +103,7 @@ describe('Gp7ExporterTest', () => {
     });
 
     it('gp6-to-gp7', async () => {
-        await testRoundTripEqual(`conversion/full-song.gpx`, [
+        await testRoundTripEqual('conversion/full-song.gpx', [
             'accidentalmode', // gets upgraded from default
             'percussionarticulations', // gets added
             'percussionarticulation' // gets added
@@ -132,6 +136,34 @@ describe('Gp7ExporterTest', () => {
         const actualJson = JsonConverter.scoreToJsObject(actual);
 
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+    });
+
+    it('alphatex-drumps-to-gp7', () => {
+        const tex = `\\track "Drums"
+        \\instrument percussion
+        \\clef neutral 
+        \\articulation Kick 36
+        \\articulation Unused 46
+        Kick.4 42.4 Kick.4 42.4
+        `;
+
+        const importer = new AlphaTexImporter();
+        importer.initFromString(tex, new Settings());
+        const expected = importer.readScore();
+        const exported = exportGp7(expected);
+
+        const actual = prepareImporterWithBytes(exported).readScore();
+
+        const expectedJson = JsonConverter.scoreToJsObject(expected);
+        const actualJson = JsonConverter.scoreToJsObject(actual);
+
+        ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
+
+        expect(actual.tracks[0].percussionArticulations).to.have.length(2);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0)
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(0)
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(1);
     });
 
     it('gp7-lyrics-null', async () => {

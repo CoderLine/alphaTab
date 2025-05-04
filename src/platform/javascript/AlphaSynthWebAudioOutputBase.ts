@@ -1,10 +1,28 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Environment } from '@src/Environment';
-import { EventEmitter, EventEmitterOfT, IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import { EventEmitter, EventEmitterOfT, type IEventEmitter, type IEventEmitterOfT } from '@src/EventEmitter';
 import { Logger } from '@src/Logger';
-import { ISynthOutput } from '@src/synth/ISynthOutput';
+import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
-declare var webkitAudioContext: any;
+declare const webkitAudioContext: any;
+
+/**
+ * @target web
+ */
+export class AlphaSynthWebAudioSynthOutputDevice implements ISynthOutputDevice {
+    public device: MediaDeviceInfo;
+
+    public constructor(device: MediaDeviceInfo) {
+        this.device = device;
+    }
+    public get deviceId(): string {
+        return this.device.deviceId;
+    }
+    public get label(): string {
+        return this.device.label;
+    }
+    public isDefault: boolean = false;
+}
 
 /**
  * @target web
@@ -51,11 +69,11 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     private patchIosSampleRate(): void {
-        let ua: string = navigator.userAgent;
+        const ua: string = navigator.userAgent;
         if (ua.indexOf('iPhone') !== -1 || ua.indexOf('iPad') !== -1) {
-            let context: AudioContext = this.createAudioContext();
-            let buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutputBase.PreferredSampleRate);
-            let dummy: AudioBufferSourceNode = context.createBufferSource();
+            const context: AudioContext = this.createAudioContext();
+            const buffer: AudioBuffer = context.createBuffer(1, 1, AlphaSynthWebAudioOutputBase.PreferredSampleRate);
+            const dummy: AudioBufferSourceNode = context.createBufferSource();
             dummy.buffer = buffer;
             dummy.connect(context.destination);
             dummy.start(0);
@@ -68,7 +86,8 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     private createAudioContext(): AudioContext {
         if ('AudioContext' in Environment.globalThis) {
             return new AudioContext();
-        } else if ('webkitAudioContext' in Environment.globalThis) {
+        }
+        if ('webkitAudioContext' in Environment.globalThis) {
             return new webkitAudioContext();
         }
         throw new AlphaTabError(AlphaTabErrorType.General, 'AudioContext not found');
@@ -77,7 +96,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     public open(bufferTimeInMilliseconds: number): void {
         this.patchIosSampleRate();
         this._context = this.createAudioContext();
-        let ctx: any = this._context;
+        const ctx: any = this._context;
         if (ctx.state === 'suspended') {
             this.registerResumeHandler();
         }
@@ -102,7 +121,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
     }
 
     public play(): void {
-        let ctx = this._context!;
+        const ctx = this._context!;
         this.activate();
         // create an empty buffer source (silence)
         this._buffer = ctx.createBuffer(2, AlphaSynthWebAudioOutputBase.BufferSize, ctx.sampleRate);
@@ -143,5 +162,119 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
 
     protected onReady() {
         (this.ready as EventEmitter).trigger();
+    }
+
+    private async checkSinkIdSupport() {
+        // https://caniuse.com/mdn-api_audiocontext_sinkid
+        const context = this._context ?? this.createAudioContext();
+        if (!('setSinkId' in context)) {
+            Logger.warning('WebAudio', 'Browser does not support changing the output device');
+            return false;
+        }
+        return true;
+    }
+
+    private _knownDevices: ISynthOutputDevice[] = [];
+
+    public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
+        try {
+            if (!(await this.checkSinkIdSupport())) {
+                return [];
+            }
+
+            // Request permissions
+            try {
+                await navigator.mediaDevices.getUserMedia({ audio: true });
+            } catch (e) {
+                // sometimes we get an error but can still enumerate, e.g. if microphone access is denied,
+                // we can still load the output devices in some cases.
+                Logger.warning('WebAudio', 'Output device permission rejected', e);
+            }
+
+            // load devices
+            const devices = await navigator.mediaDevices.enumerateDevices();
+
+            // default device candidates
+            let defaultDeviceGroupId = '';
+            let defaultDeviceId = '';
+
+            const realDevices = new Map<string, AlphaSynthWebAudioSynthOutputDevice>();
+            for (const device of devices) {
+                if (device.kind === 'audiooutput') {
+                    realDevices.set(device.groupId, new AlphaSynthWebAudioSynthOutputDevice(device));
+
+                    // chromium has the default device as deviceID: 'default'
+                    // the standard defines empty-string as default
+                    if (device.deviceId === 'default' || device.deviceId === '') {
+                        defaultDeviceGroupId = device.groupId;
+                        defaultDeviceId = device.deviceId;
+                    }
+                }
+            }
+
+            const final = Array.from(realDevices.values());
+
+            // flag default device
+            let defaultDevice = final.find(d => d.deviceId === defaultDeviceId);
+            if (!defaultDevice) {
+                defaultDevice = final.find(d => d.device.groupId === defaultDeviceGroupId);
+            }
+            if (!defaultDevice && final.length > 0) {
+                defaultDevice = final[0];
+            }
+
+            if (defaultDevice) {
+                defaultDevice.isDefault = true;
+            }
+
+            this._knownDevices = final;
+
+            return final;
+        } catch (e) {
+            Logger.error('WebAudio', 'Failed to enumerate output devices', e);
+            return [];
+        }
+    }
+
+    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {
+        if (!(await this.checkSinkIdSupport())) {
+            return;
+        }
+
+        // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/setSinkId
+        if (!device) {
+            await (this._context as any).setSinkId('');
+        } else {
+            await (this._context as any).setSinkId(device.deviceId);
+        }
+    }
+
+    public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
+        if (!(await this.checkSinkIdSupport())) {
+            return null;
+        }
+
+        // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/sinkId
+        const sinkId = (this._context as any).sinkId;
+
+        if (typeof sinkId !== 'string' || sinkId === '' || sinkId === 'default') {
+            return null;
+        }
+
+        // fast path -> cached devices list
+        let device = this._knownDevices.find(d => d.deviceId === sinkId);
+        if (device) {
+            return device;
+        }
+
+        // slow path -> enumerate devices
+        const allDevices = await this.enumerateOutputDevices();
+        device = allDevices.find(d => d.deviceId === sinkId);
+        if (device) {
+            return device;
+        }
+
+        Logger.warning('WebAudio', 'Could not find output device in device list', sinkId, allDevices);
+        return null;
     }
 }

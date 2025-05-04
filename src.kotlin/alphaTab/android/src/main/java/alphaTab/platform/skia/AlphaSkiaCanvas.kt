@@ -1,7 +1,7 @@
 package alphaTab.platform.skia
 
 @ExperimentalUnsignedTypes
-class AlphaSkiaCanvas : AutoCloseable {
+internal class AlphaSkiaCanvas : AutoCloseable {
     companion object {
         fun rgbaToColor(r: Double, g: Double, b: Double, a: Double): UInt {
             return alphaTab.alphaSkia.AlphaSkiaCanvas.rgbaToColor(
@@ -103,7 +103,7 @@ class AlphaSkiaCanvas : AutoCloseable {
 
     fun fillText(
         text: String,
-        typeFace: AlphaSkiaTypeface,
+        textStyle: AlphaSkiaTextStyle,
         fontSize: Double,
         x: Double,
         y: Double,
@@ -112,21 +112,27 @@ class AlphaSkiaCanvas : AutoCloseable {
     ) {
         this.canvas.fillText(
             text,
-            typeFace.typeface,
+            textStyle.textStyle,
             fontSize.toFloat(),
             x.toFloat(),
             y.toFloat(),
             textAlign.align,
-            textBaseline.align
+            textBaseline.baseline
         )
     }
 
     fun measureText(
         text: String,
-        typeFace: AlphaSkiaTypeface,
-        fontSize: Double
-    ): Double {
-        return this.canvas.measureText(text, typeFace.typeface, fontSize.toFloat()).toDouble()
+        textStyle: AlphaSkiaTextStyle,
+        fontSize: Double,
+        textAlign: AlphaSkiaTextAlign,
+        textBaseline: AlphaSkiaTextBaseline
+
+    ): AlphaSkiaTextMetrics {
+        return AlphaSkiaTextMetrics(this.canvas.measureText(text, textStyle.textStyle, fontSize.toFloat(),
+            textAlign.align,
+            textBaseline.baseline
+        ))
     }
 
     fun beginRotate(centerX: Double, centerY: Double, angle: Double) {

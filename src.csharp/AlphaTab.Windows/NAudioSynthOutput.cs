@@ -1,4 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Threading.Tasks;
+using AlphaTab.Core;
 using AlphaTab.Synth;
 using AlphaTab.Synth.Ds;
 using AlphaTab.Core.EcmaScript;
@@ -14,11 +19,13 @@ namespace AlphaTab
     {
         private const int BufferSize = 4096;
         private const int PreferredSampleRate = 44100;
+        private const int DirectSoundLatency = 40;
 
-        private DirectSoundOut _context;
+        private DirectSoundOut? _context;
         private CircularSampleBuffer _circularBuffer;
         private int _bufferCount;
         private int _requestedBufferCount;
+        private ISynthOutputDevice? _device;
 
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
@@ -29,7 +36,6 @@ namespace AlphaTab
         public NAudioSynthOutput()
             : base(PreferredSampleRate, (int)SynthConstants.AudioChannels)
         {
-            _context = null!;
             _circularBuffer = null!;
         }
 
@@ -42,8 +48,7 @@ namespace AlphaTab
         /// <inheritdoc />
         public void Open(double bufferTimeInMilliseconds)
         {
-            var latency = 40;
-            _context = new DirectSoundOut(latency);
+            _context = new DirectSoundOut(DirectSoundLatency);
             _context.Init(this);
 
             // NAudio introduces another level of buffering and latency
@@ -76,7 +81,7 @@ namespace AlphaTab
         /// </summary>
         public void Close()
         {
-            _context.Stop();
+            _context!.Stop();
             _circularBuffer.Clear();
             _context.Dispose();
         }
@@ -85,13 +90,13 @@ namespace AlphaTab
         public void Play()
         {
             RequestBuffers();
-            _context.Play();
+            _context!.Play();
         }
 
         /// <inheritdoc />
         public void Pause()
         {
-            _context.Pause();
+            _context!.Pause();
         }
 
         /// <inheritdoc />
@@ -156,5 +161,67 @@ namespace AlphaTab
 
         /// <inheritdoc />
         public IEventEmitter SampleRequest { get; } = new EventEmitter();
+
+        /// <inheritdoc />
+        public Task<IList<ISynthOutputDevice>> EnumerateOutputDevices()
+        {
+            var defaultPlayback = DirectSoundOut.DSDEVID_DefaultPlayback;
+            GetDeviceID(ref defaultPlayback, out Guid realDefault);
+
+            return Task.FromResult(
+                DirectSoundOut.Devices
+                    .Where(d => d.Guid != Guid.Empty)
+                    .Map(d => (ISynthOutputDevice)new NAudioOutputDevice(d,
+                        realDefault))
+            );
+        }
+
+        [DllImport("dsound.dll", CharSet = CharSet.Unicode,
+            CallingConvention = CallingConvention.StdCall, SetLastError = true,
+            PreserveSig = false)]
+        private static extern void GetDeviceID(ref Guid pGuidSrc, out Guid pGuidDest);
+
+
+        /// <inheritdoc />
+        public Task SetOutputDevice(ISynthOutputDevice? device)
+        {
+            if (_context != null)
+            {
+                _context.Stop();
+                _circularBuffer.Clear();
+                _context.Dispose();
+            }
+
+            _context = new DirectSoundOut(
+                device == null
+                    ? DirectSoundOut.DSDEVID_DefaultPlayback
+                    : ((NAudioOutputDevice)device).Device.Guid,
+                DirectSoundLatency);
+            _device = device;
+            _context.Init(this);
+
+            return Task.CompletedTask;
+        }
+
+        /// <inheritdoc />
+        public Task<ISynthOutputDevice?> GetOutputDevice()
+        {
+            return Task.FromResult(_device);
+        }
+    }
+
+    internal class NAudioOutputDevice : ISynthOutputDevice
+    {
+        public DirectSoundDeviceInfo Device { get; }
+
+        public NAudioOutputDevice(DirectSoundDeviceInfo device, Guid defaultDevice)
+        {
+            Device = device;
+            IsDefault = device.Guid == defaultDevice;
+        }
+
+        public string DeviceId => Device.Guid.ToString("N");
+        public string Label => Device.Description;
+        public bool IsDefault { get; }
     }
 }

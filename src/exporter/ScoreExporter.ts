@@ -1,7 +1,7 @@
 import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { IWriteable } from '@src/io/IWriteable';
-import { Score } from '@src/model/Score';
+import type { IWriteable } from '@src/io/IWriteable';
+import type { Score } from '@src/model/Score';
 
 /**
  * This is the base class for creating new song exporters which
@@ -20,7 +20,7 @@ export abstract class ScoreExporter {
     }
 
     /**
-     * Exports the given score to a binary buffer. 
+     * Exports the given score to a binary buffer.
      * @param score The score to serialize
      * @param settings  The settings to use during serialization
      * @returns A byte buffer with the serialized score.

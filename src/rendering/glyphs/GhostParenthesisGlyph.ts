@@ -1,10 +1,13 @@
-import { ICanvas } from '@src/platform/ICanvas';
+import type { Color } from '@src/model/Color';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
 export class GhostParenthesisGlyph extends Glyph {
     private static readonly Size: number = 6;
     private _isOpen: boolean;
+
+    public colorOverride?: Color;
 
     public constructor(isOpen: boolean) {
         super(0, 0);
@@ -17,6 +20,10 @@ export class GhostParenthesisGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const c = canvas.color;
+        if (this.colorOverride) {
+            canvas.color = this.colorOverride;
+        }
         if (this._isOpen) {
             TieGlyph.paintTie(
                 canvas,
@@ -30,17 +37,8 @@ export class GhostParenthesisGlyph extends Glyph {
                 3
             );
         } else {
-            TieGlyph.paintTie(
-                canvas,
-                1,
-                cx + this.x,
-                cy + this.y,
-                cx + this.x,
-                cy + this.y + this.height,
-                false,
-                6,
-                3
-            );
+            TieGlyph.paintTie(canvas, 1, cx + this.x, cy + this.y, cx + this.x, cy + this.y + this.height, false, 6, 3);
         }
+        canvas.color = c;
     }
 }

@@ -1,11 +1,11 @@
 import { CrescendoType } from '@src/model/CrescendoType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class CrescendoGlyph extends GroupedEffectGlyph {
-    private static readonly Padding: number = (NoteHeadGlyph.QuarterNoteHeadWidth / 2) | 0;
     private _crescendo: CrescendoType;
 
     public constructor(x: number, y: number, crescendo: CrescendoType) {
@@ -22,16 +22,17 @@ export class CrescendoGlyph extends GroupedEffectGlyph {
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        let startX: number = cx + this.x;
-        let height: number = this.height;
+        const startX: number = cx + this.x;
+        const height: number = this.height;
+        const padding = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteheadBlack)! / 2;
         canvas.beginPath();
         if (this._crescendo === CrescendoType.Crescendo) {
-            endX -= CrescendoGlyph.Padding;
+            endX -= padding;
             canvas.moveTo(endX, cy + this.y);
             canvas.lineTo(startX, cy + this.y + height / 2);
             canvas.lineTo(endX, cy + this.y + height);
         } else {
-            endX -= CrescendoGlyph.Padding;
+            endX -= padding;
             canvas.moveTo(startX, cy + this.y);
             canvas.lineTo(endX, cy + this.y + height / 2);
             canvas.lineTo(startX, cy + this.y + height);

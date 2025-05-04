@@ -9,9 +9,9 @@
                         <supports element='transpose' type='no'/>
                 </encoding>
                 <miscellaneous>
-                        <miscellaneous-field name="description">Dolet 3 for 
-                            Sibelius (5.1) did not print out any closing beam 
-                            tags, only starting and continuing beam tags. For 
+                        <miscellaneous-field name="description">Dolet 3 for
+                            Sibelius (5.1) did not print out any closing beam
+                            tags, only starting and continuing beam tags. For
                             such files, one either needs to ignore all beaming
                             information or close all beams </miscellaneous-field>
                 </miscellaneous>
@@ -21,7 +21,7 @@
                         <part-name></part-name>
                 </score-part>
         </part-list>
-<!--=========================================================-->
+<!--===========================================================-->
         <part id='P1'>
                 <measure number='1'>
                         <attributes>
@@ -116,7 +116,7 @@
                                 </notations>
                         </note>
                 </measure>
-<!--=========================================================-->
+<!--===========================================================-->
         </part>
-<!--=========================================================-->
+<!--===========================================================-->
 </score-partwise>

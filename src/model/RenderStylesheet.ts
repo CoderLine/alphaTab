@@ -1,5 +1,6 @@
 // @ts-ignore https://github.com/microsoft/TypeScript/issues/61183
-import type { Track } from './Track';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
+import type { Track } from '@src/model/Track';
 
 /**
  * Lists the different modes on how the brackets/braces are drawn and extended.
@@ -30,15 +31,15 @@ export enum TrackNamePolicy {
     /**
      * Track names are hidden everywhere.
      */
-    Hidden,
+    Hidden = 0,
     /**
      * Track names are displayed on the first system.
      */
-    FirstSystem,
+    FirstSystem = 1,
     /**
      * Track names are displayed on all systems.
      */
-    AllSystems
+    AllSystems = 2
 }
 
 /**
@@ -48,11 +49,11 @@ export enum TrackNameMode {
     /**
      * Full track names are displayed {@link Track.name}
      */
-    FullName,
+    FullName = 0,
     /**
      * Short Track names (abbreviations) are displayed {@link Track.shortName}
      */
-    ShortName
+    ShortName = 1
 }
 
 /**
@@ -62,11 +63,11 @@ export enum TrackNameOrientation {
     /**
      * Text is shown horizontally (left-to-right)
      */
-    Horizontal,
+    Horizontal = 0,
     /**
-     * Vertically rotated (bottom-to-top) 
+     * Vertically rotated (bottom-to-top)
      */
-    Vertical
+    Vertical = 1
 }
 
 /**
@@ -140,4 +141,14 @@ export class RenderStylesheet {
      * The orientation of the the track names on other systems
      */
     public otherSystemsTrackNameOrientation: TrackNameOrientation = TrackNameOrientation.Vertical;
+
+    /**
+     * If multi track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
+     */
+    public multiTrackMultiBarRest: boolean = false;
+
+    /**
+     * If single track: Whether to render multiple subsequent empty (or rest-only) bars together as multi-bar rest.
+     */
+    public perTrackMultiBarRest: Set<number> | null = null;
 }

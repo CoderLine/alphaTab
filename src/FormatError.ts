@@ -1,4 +1,4 @@
-import { AlphaTabError, AlphaTabErrorType} from "@src/AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * An invalid input format was detected (e.g. invalid setting values, file formats,...)

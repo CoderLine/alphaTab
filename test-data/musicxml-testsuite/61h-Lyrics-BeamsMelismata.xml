@@ -1,12 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Beaming or slurs can indicate 
-          melismata for lyrics. Also make sure that notes without an explicit
-          syllable are treated as if they were part of a melisma.</miscellaneous-field>
+      <miscellaneous-field name="description">Beaming or slurs can indicate
+          melismata for lyrics.  Also make sure that notes without an explicit
+          syllable are treated as if they were part of a
+          melisma.
+
+          In the second bar, ‘start’, ‘continue’, and ‘stop’ types are used for
+          &lt;extend&gt;, together with a red color for the extender
+          line.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -130,7 +135,7 @@
         <lyric number="1">
           <syllabic>end</syllabic>
           <text>ma</text>
-          <extend/>
+          <extend type="start" color="#FF0000"/>
         </lyric>
       </note>
       <note>
@@ -138,12 +143,18 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>eighth</type>
+        <lyric number="1">
+          <extend type="continue"/>
+        </lyric>
       </note>
       <note>
         <pitch><step>B</step><octave>4</octave></pitch>
         <duration>1</duration>
         <voice>1</voice>
         <type>eighth</type>
+        <lyric number="1">
+          <extend type="stop"/>
+        </lyric>
       </note>
       <note>
         <rest/>

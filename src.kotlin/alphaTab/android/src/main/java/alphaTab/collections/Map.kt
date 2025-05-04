@@ -1,5 +1,7 @@
 package alphaTab.collections
 
+import alphaTab.core.ArrayTuple
+
 public open class MapEntry<TKey, TValue> {
     private var _key: TKey
     public var key: TKey
@@ -51,7 +53,12 @@ public class MapEntryInternal<TKey, TValue> : MapEntry<TKey, TValue>(),
 public class Map<TKey, TValue>:
     MapBase<MapEntry<TKey, TValue>, MapEntryInternal<TKey, TValue>> {
     public constructor()
-    public constructor(iterable: Iterable<MapEntry<TKey, TValue>>) {
+    public constructor(iterable: Iterable<ArrayTuple<TKey, TValue>>) {
+        for (it in iterable) {
+            set(it.v0, it.v1)
+        }
+    }
+    public constructor(iterable: Map<TKey, TValue>) {
         for (it in iterable) {
             set(it.key, it.value)
         }
@@ -64,13 +71,13 @@ public class Map<TKey, TValue>:
     }
 
     @Suppress("UNCHECKED_CAST")
-    public fun get(key: TKey): TValue {
+    public fun get(key: TKey): TValue? {
         val i = findEntryInternal(key as Any?,
             { entry, k -> entry.key == (k as TKey) })
         if (i >= 0) {
             return entries[i].value
         }
-        throw KeyNotFoundException()
+        return null
     }
 
     public fun set(key: TKey, value: TValue) {

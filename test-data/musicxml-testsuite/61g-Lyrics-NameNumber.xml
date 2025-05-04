@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A lyrics syllable can have both 
-          a number and a name attribute. The question is: What should be used 
-          to put syllables of the same voice together. This example uses 
-          different number/name combinations to check how different 
-          applications handle this unspecified case (The advice on the 
-          MusicXML mailing list was "there is no correct way, each 
+      <miscellaneous-field name="description">A lyrics syllable can have both
+          a number and a name attribute. The question is: What should be used
+          to put syllables of the same voice together. This example uses
+          different number/name combinations to check how different
+          applications handle this unspecified case (The advice on the
+          MusicXML mailing list was "there is no correct way, each
           application can do what it thinks is best").</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -36,20 +36,20 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1" name="Verse">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>Verse1A</text>
         </lyric>
         <lyric number="1" name="Chorus">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>Chorus1A</text>
         </lyric>
         <lyric number="1" name="Chorus">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>AnotherChorus1A</text>
         </lyric>
         <lyric number="2" name="Chorus">
-          <syllabic>begin</syllabic>
-          <text>Chorus1A</text>
+          <syllabic>single</syllabic>
+          <text>Chorus2A</text>
         </lyric>
       </note>
       <note>
@@ -58,11 +58,11 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>1B</text>
         </lyric>
         <lyric number="2">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>2B</text>
         </lyric>
       </note>
@@ -72,11 +72,11 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1" name="Verse">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>Verse1C</text>
         </lyric>
         <lyric number="2" name="Chorus">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>Chorus2C</text>
         </lyric>
       </note>
@@ -86,7 +86,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1" name="Chorus">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>Chorus1D</text>
         </lyric>
       </note>
@@ -96,7 +96,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric name="Verse">
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>VerseE</text>
         </lyric>
       </note>
@@ -106,7 +106,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric>
-          <syllabic>begin</syllabic>
+          <syllabic>single</syllabic>
           <text>NoneF</text>
         </lyric>
       </note>

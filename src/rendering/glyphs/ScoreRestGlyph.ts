@@ -1,15 +1,16 @@
 import { Duration } from '@src/model/Duration';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { BeatSubElement } from '@src/model/Beat';
 
 export class ScoreRestGlyph extends MusicFontGlyph {
-    private _duration: Duration;
     public beamingHelper!: BeamingHelper;
 
     public constructor(x: number, y: number, duration: Duration) {
         super(x, y, 1, ScoreRestGlyph.getSymbol(duration));
-        this._duration = duration;
     }
 
     public static getSymbol(duration: Duration): MusicFontSymbol {
@@ -41,31 +42,6 @@ export class ScoreRestGlyph extends MusicFontGlyph {
         }
     }
 
-    public static getSize(duration: Duration): number {
-        switch (duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.DoubleWhole:
-            case Duration.Whole:
-            case Duration.Half:
-            case Duration.Quarter:
-            case Duration.Eighth:
-            case Duration.Sixteenth:
-                return 9;
-            case Duration.ThirtySecond:
-                return 12;
-            case Duration.SixtyFourth:
-                return 14;
-            case Duration.OneHundredTwentyEighth:
-            case Duration.TwoHundredFiftySixth:
-                return 20;
-        }
-        return 10;
-    }
-
-    public override doLayout(): void {
-        this.width = ScoreRestGlyph.getSize(this._duration);
-    }
-
     public updateBeamingHelper(cx: number): void {
         if (this.beamingHelper) {
             this.beamingHelper.registerBeatLineX(
@@ -75,5 +51,14 @@ export class ScoreRestGlyph extends MusicFontGlyph {
                 cx + this.x + this.width / 2
             );
         }
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.internalPaint(cx, cy, canvas, BeatSubElement.StandardNotationRests);
+    }
+
+    protected internalPaint(cx: number, cy: number, canvas: ICanvas, element: BeatSubElement): void {
+        using _ = ElementStyleHelper.beat(canvas, element, this.beat!);
+        super.paint(cx, cy, canvas);
     }
 }

@@ -8,7 +8,7 @@ export class TypeConversions {
 
     public static float64ToBytes(v: number): Uint8Array {
         TypeConversions._dataView.setFloat64(0, v, true);
-        return this._conversionByteArray;
+        return TypeConversions._conversionByteArray;
     }
 
     public static bytesToInt64LE(bytes: Uint8Array): number {

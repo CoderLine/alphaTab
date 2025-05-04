@@ -4,14 +4,14 @@ import { PartConfiguration } from '@src/importer/PartConfiguration';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 
 import { Logger } from '@src/Logger';
 
 import { ZipReader } from '@src/zip/ZipReader';
-import { ZipEntry } from '@src/zip/ZipEntry';
+import type { ZipEntry } from '@src/zip/ZipEntry';
 import { IOHelper } from '@src/io/IOHelper';
-import { LayoutConfiguration } from './LayoutConfiguration';
+import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 
 /**
  * This ScoreImporter can read Guitar Pro 7 and 8 (gp) files.
@@ -21,15 +21,11 @@ export class Gp7To8Importer extends ScoreImporter {
         return 'Guitar Pro 7-8';
     }
 
-    public constructor() {
-        super();
-    }
-
     public readScore(): Score {
         // at first we need to load the binary file system
         // from the GPX container
         Logger.debug(this.name, 'Loading ZIP entries');
-        let fileSystem: ZipReader = new ZipReader(this.data);
+        const fileSystem: ZipReader = new ZipReader(this.data);
         let entries: ZipEntry[];
         try {
             entries = fileSystem.read();
@@ -42,7 +38,7 @@ export class Gp7To8Importer extends ScoreImporter {
         let binaryStylesheetData: Uint8Array | null = null;
         let partConfigurationData: Uint8Array | null = null;
         let layoutConfigurationData: Uint8Array | null = null;
-        for (let entry of entries) {
+        for (const entry of entries) {
             switch (entry.fileName) {
                 case 'score.gpif':
                     xml = IOHelper.toString(entry.data, this.settings.importer.encoding);
@@ -66,14 +62,14 @@ export class Gp7To8Importer extends ScoreImporter {
         // the score.gpif file within this filesystem stores
         // the score information as XML we need to parse.
         Logger.debug(this.name, 'Start Parsing score.gpif');
-        let gpifParser: GpifParser = new GpifParser();
+        const gpifParser: GpifParser = new GpifParser();
         gpifParser.parseXml(xml, this.settings);
         Logger.debug(this.name, 'score.gpif parsed');
-        let score: Score = gpifParser.score;
+        const score: Score = gpifParser.score;
 
         if (binaryStylesheetData) {
             Logger.debug(this.name, 'Start Parsing BinaryStylesheet');
-            let stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
+            const stylesheet: BinaryStylesheet = new BinaryStylesheet(binaryStylesheetData);
             stylesheet.apply(score);
             Logger.debug(this.name, 'BinaryStylesheet parsed');
         }
@@ -87,7 +83,7 @@ export class Gp7To8Importer extends ScoreImporter {
         }
         if (layoutConfigurationData && partConfigurationParser != null) {
             Logger.debug(this.name, 'Start Parsing Layout Configuration');
-            let layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
+            const layoutConfigurationParser: LayoutConfiguration = new LayoutConfiguration(
                 partConfigurationParser,
                 layoutConfigurationData
             );

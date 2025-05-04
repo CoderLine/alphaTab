@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Accidentals can be cautionary
-          or editorial. Each measure has a normal accidental, an editorial,
-          a cautionary and an editioal and cautionary accidental.</miscellaneous-field>
+      <miscellaneous-field name="description">Accidentals have the attributes
+          ‘cautionary’, ‘editorial’, ‘parenthesized’, and ‘bracketed’. The first
+          two measures each have a cautionary accidental, an editorial, a
+          cautionary with parentheses off, and an editorial and cautionary
+          accidental. The next two measures each have a normal accidental, a
+          bracketed, a parenthesized, and a bracketed and parenthesized
+          accidental.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -41,7 +45,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>flat</accidental>
+        <accidental cautionary="yes">flat</accidental>
       </note>
       <note>
         <pitch>
@@ -63,7 +67,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes">flat</accidental>
+        <accidental cautionary="yes" parentheses="no">flat</accidental>
       </note>
       <note>
         <pitch>
@@ -88,7 +92,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>sharp</accidental>
+        <accidental cautionary="yes">sharp</accidental>
       </note>
       <note>
         <pitch>
@@ -110,7 +114,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes">sharp</accidental>
+        <accidental cautionary="yes" parentheses="no">sharp</accidental>
       </note>
       <note>
         <pitch>
@@ -135,7 +139,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>double-flat</accidental>
+        <accidental>flat-flat</accidental>
       </note>
       <note>
         <pitch>
@@ -146,7 +150,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental editorial="yes">double-flat</accidental>
+        <accidental bracket="yes">flat-flat</accidental>
       </note>
       <note>
         <pitch>
@@ -157,7 +161,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes">double-flat</accidental>
+        <accidental parentheses="yes">flat-flat</accidental>
       </note>
       <note>
         <pitch>
@@ -168,7 +172,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental editorial="yes" cautionary="yes">double-flat</accidental>
+        <accidental bracket="yes" parentheses="yes">flat-flat</accidental>
       </note>
     </measure>
     <!--=======================================================-->
@@ -193,7 +197,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental editorial="yes">double-sharp</accidental>
+        <accidental bracket="yes">double-sharp</accidental>
       </note>
       <note>
         <pitch>
@@ -204,7 +208,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental cautionary="yes">double-sharp</accidental>
+        <accidental parentheses="yes">double-sharp</accidental>
       </note>
       <note>
         <pitch>
@@ -215,7 +219,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental editorial="yes" cautionary="yes">double-sharp</accidental>
+        <accidental bracket="yes" parentheses="yes">double-sharp</accidental>
       </note>
     </measure>
   </part>

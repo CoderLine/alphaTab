@@ -1,4 +1,4 @@
-import { AlphaTabError, AlphaTabErrorType } from "@src/AlphaTabError";
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 
 /**
  * @partial
@@ -8,18 +8,18 @@ export class JsonHelper {
      * @target web
      * @partial
      */
-    public static parseEnum<T>(s: unknown, enumType: any): T | null {
+    public static parseEnum<T>(s: unknown, enumType: any): T | undefined {
         switch (typeof s) {
             case 'string':
-                const num = parseInt(s);
-                return isNaN(num)
-                    ? enumType[Object.keys(enumType).find(k => k.toLowerCase() === s.toLowerCase()) as any] as any
-                    : num as unknown as T;
+                const num = Number.parseInt(s);
+                return Number.isNaN(num)
+                    ? (enumType[Object.keys(enumType).find(k => k.toLowerCase() === s.toLowerCase()) as any] as any)
+                    : (num as unknown as T);
             case 'number':
                 return s as unknown as T;
             case 'undefined':
             case 'object':
-                return null;
+                return undefined;
         }
         throw new AlphaTabError(AlphaTabErrorType.Format, `Could not parse enum value '${s}'`);
     }
@@ -33,7 +33,7 @@ export class JsonHelper {
             (s as Map<string, unknown>).forEach(func);
         } else if (typeof s === 'object') {
             for (const k in s) {
-                func((s as any)[k], k)
+                func((s as any)[k], k);
             }
         }
         // skip
@@ -46,7 +46,9 @@ export class JsonHelper {
     public static getValue(s: unknown, key: string): unknown {
         if (s instanceof Map) {
             return (s as Map<string, unknown>).get(key);
-        } else if (typeof s === 'object') {
+        }
+
+        if (typeof s === 'object') {
             return (s as any)[key];
         }
         return null;

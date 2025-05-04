@@ -15,4 +15,14 @@ internal static class Array
     {
         return x.ToList();
     }
+
+    public static IList<T> From<T>(IEnumerator<T> x)
+    {
+        var list = new List<T>();
+        foreach (var i in x)
+        {
+            list.Add(i);
+        }
+        return list;
+    }
 }

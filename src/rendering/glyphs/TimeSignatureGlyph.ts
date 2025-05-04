@@ -2,13 +2,17 @@ import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
-import { GhostParenthesisGlyph } from './GhostParenthesisGlyph';
+import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@src/model/Bar';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export abstract class TimeSignatureGlyph extends GlyphGroup {
     private _numerator: number = 0;
     private _denominator: number = 0;
     private _isCommon: boolean;
     private _isFreeTime: boolean;
+    public barSubElement: BarSubElement = BarSubElement.StandardNotationTimeSignature;
 
     public constructor(
         x: number,
@@ -28,6 +32,10 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
     protected abstract get commonScale(): number;
     protected abstract get numberScale(): number;
 
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(canvas, this.barSubElement, this.renderer.bar);
+        super.paint(cx, cy, canvas);
+    }
 
     public override doLayout(): void {
         let x = 0;
@@ -43,18 +51,16 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         }
 
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
-            let common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
-            common.width = 14;
+            const common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
             this.addGlyph(common);
             super.doLayout();
         } else if (this._isCommon && this._numerator === 4 && this._denominator === 4) {
-            let common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
-            common.width = 14;
+            const common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
             this.addGlyph(common);
             super.doLayout();
         } else {
-            let numerator: NumberGlyph = new NumberGlyph(x, -numberHeight / 2, this._numerator, this.numberScale);
-            let denominator: NumberGlyph = new NumberGlyph(x, numberHeight / 2, this._denominator, this.numberScale);
+            const numerator: NumberGlyph = new NumberGlyph(x, -numberHeight / 2, this._numerator, this.numberScale);
+            const denominator: NumberGlyph = new NumberGlyph(x, numberHeight / 2, this._denominator, this.numberScale);
             this.addGlyph(numerator);
             this.addGlyph(denominator);
             super.doLayout();

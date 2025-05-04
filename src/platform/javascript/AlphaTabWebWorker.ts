@@ -1,9 +1,9 @@
 import { JsonConverter } from '@src/model/JsonConverter';
-import { Score } from '@src/model/Score';
-import { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
-import { FontSizeDefinition, FontSizes } from '@src/platform/svg/FontSizes';
+import type { Score } from '@src/model/Score';
+import type { IWorkerScope } from '@src/platform/javascript/IWorkerScope';
+import { type FontSizeDefinition, FontSizes } from '@src/platform/svg/FontSizes';
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
@@ -27,11 +27,11 @@ export class AlphaTabWebWorker {
     }
 
     private handleMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: any = data ? data.cmd : '';
+        const data: any = e.data;
+        const cmd: any = data ? data.cmd : '';
         switch (cmd) {
             case 'alphaTab.initialize':
-                let settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
+                const settings: Settings = JsonConverter.jsObjectToSettings(data.settings);
                 Logger.logLevel = settings.core.logLevel;
                 this._renderer = new ScoreRenderer(settings);
                 this._renderer.partialRenderFinished.on(result => {
@@ -80,7 +80,7 @@ export class AlphaTabWebWorker {
                 break;
             case 'alphaTab.renderScore':
                 this.updateFontSizes(data.fontSizes);
-                let score: any =
+                const score: any =
                     data.score == null ? null : JsonConverter.jsObjectToScore(data.score, this._renderer.settings);
                 this.renderMultiple(score, data.trackIndexes);
                 break;
@@ -103,7 +103,7 @@ export class AlphaTabWebWorker {
             if (!FontSizes.FontSizeLookupTables) {
                 FontSizes.FontSizeLookupTables = new Map<string, FontSizeDefinition>();
             }
-            for (let [k, v] of fontSizes) {
+            for (const [k, v] of fontSizes) {
                 FontSizes.FontSizeLookupTables.set(k, v);
             }
         }

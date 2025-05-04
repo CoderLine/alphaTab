@@ -1,9 +1,9 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle } from '@src/model/Font';
-import { ICanvas, TextAlign, TextBaseline, TextMetrics } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Settings } from '@src/Settings';
+import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Settings } from '@src/Settings';
 
 /**
  * A canvas implementation storing SVG data
@@ -59,8 +59,8 @@ export abstract class SvgCanvas implements ICanvas {
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
         this.buffer += `<rect x="${((x * this.scale) | 0) + blurOffset}" y="${((y * this.scale) | 0) + blurOffset}" width="${
-            (w * this.scale)
-        }" height="${(h * this.scale)}" stroke="${this.color.rgba}"`;
+            w * this.scale
+        }" height="${h * this.scale}" stroke="${this.color.rgba}"`;
         if (this.lineWidth !== 1) {
             this.buffer += ` stroke-width="${this.lineWidth * this.scale}"`;
         }
@@ -188,9 +188,9 @@ export abstract class SvgCanvas implements ICanvas {
     protected getSvgBaseLine(): string {
         switch (this.textBaseline) {
             case TextBaseline.Top:
-                return `dominant-baseline: hanging`;
+                return 'dominant-baseline: hanging';
             case TextBaseline.Bottom:
-                return `dominant-baseline: ideographic`;
+                return 'dominant-baseline: ideographic';
             // case TextBaseline.Middle:
             default:
                 // middle is set as default on the SVG tag via css
@@ -200,7 +200,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public measureText(text: string) {
         if (!text) {
-            return new TextMetrics(0, 0);
+            return new MeasuredText(0, 0);
         }
         return FontSizes.measureString(
             text,
@@ -233,14 +233,7 @@ export abstract class SvgCanvas implements ICanvas {
     }
 
     public beginRotate(centerX: number, centerY: number, angle: number): void {
-        this.buffer +=
-            '<g transform="translate(' +
-            centerX * this.scale +
-            ' ,' +
-            centerY * this.scale +
-            ') rotate( ' +
-            angle +
-            ')">';
+        this.buffer += `<g transform="translate(${centerX * this.scale} ,${centerY * this.scale}) rotate( ${angle})">`;
     }
 
     public endRotate(): void {

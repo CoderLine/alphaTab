@@ -1,5 +1,5 @@
-import { Note } from '@src/model';
 import { Beat } from '@src/model/Beat';
+import { Note } from '@src/model/Note';
 import { expect } from 'chai';
 
 describe('BeatTests', () => {

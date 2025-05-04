@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupGlyph';
+import type { Beat } from '@src/model/Beat';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { BendNoteHeadGroupGlyph } from '@src/rendering/glyphs/BendNoteHeadGroupGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
@@ -26,7 +26,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
     public override doLayout(): void {
         super.doLayout();
         this.width = 0;
-        for (let noteHeads of this.BendNoteHeads) {
+        for (const noteHeads of this.BendNoteHeads) {
             noteHeads.doLayout();
             this.width += noteHeads.width + 10;
         }

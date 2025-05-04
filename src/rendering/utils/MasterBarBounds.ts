@@ -1,8 +1,8 @@
-import { Beat } from '@src/model/Beat';
-import { BarBounds } from '@src/rendering/utils/BarBounds';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
+import type { Beat } from '@src/model/Beat';
+import type { BarBounds } from '@src/rendering/utils/BarBounds';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { StaffSystemBounds } from '@src/rendering/utils/StaffSystemBounds';
 
 /**
  * Represents the boundaries of a list of bars related to a single master bar.
@@ -68,9 +68,9 @@ export class MasterBarBounds {
      */
     public findBeatAtPos(x: number, y: number): Beat | null {
         let beat: BeatBounds | null = null;
-        let distance = 10000000;
-        for (let bar of this.bars) {
-            let b = bar.findBeatAtPos(x);
+        const distance = 10000000;
+        for (const bar of this.bars) {
+            const b = bar.findBeatAtPos(x);
             if (b && (!beat || beat.realBounds.x < b.realBounds.x)) {
                 const newDistance = Math.abs(b.realBounds.x - x);
                 if (!beat || newDistance < distance) {

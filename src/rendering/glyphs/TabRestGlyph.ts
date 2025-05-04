@@ -1,31 +1,31 @@
-import { Duration } from '@src/model/Duration';
-import { ICanvas } from '@src/platform/ICanvas';
+import { BeatSubElement } from '@src/model/Beat';
+import type { Duration } from '@src/model/Duration';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabRestGlyph extends MusicFontGlyph {
     private _isVisibleRest: boolean;
-    private _duration: Duration;
     public beamingHelper!: BeamingHelper;
 
     public constructor(x: number, y: number, isVisibleRest: boolean, duration: Duration) {
         super(x, y, 1, ScoreRestGlyph.getSymbol(duration));
         this._isVisibleRest = isVisibleRest;
-        this._duration = duration;
     }
 
     public override doLayout(): void {
-        if (this._isVisibleRest) {
-            this.width = ScoreRestGlyph.getSize(this._duration);
-        } else {
+        super.doLayout();
+        if (!this._isVisibleRest) {
             this.width = 10;
         }
     }
 
     public updateBeamingHelper(cx: number): void {
         if (this.beamingHelper && this.beamingHelper.isPositionFrom('tab', this.beat!)) {
-            this.beamingHelper.registerBeatLineX('tab',
+            this.beamingHelper.registerBeatLineX(
+                'tab',
                 this.beat!,
                 cx + this.x + this.width / 2,
                 cx + this.x + this.width / 2
@@ -35,6 +35,7 @@ export class TabRestGlyph extends MusicFontGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         if (this._isVisibleRest) {
+            using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabRests, this.beat!);
             super.paint(cx, cy, canvas);
         }
     }

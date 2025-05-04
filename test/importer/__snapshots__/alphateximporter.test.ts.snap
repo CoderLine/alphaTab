@@ -1,0 +1,140 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlphaTexImporterTest barlines 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 2,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 4,
+              "barlineright" => 4,
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 7,
+              "barlineright" => 6,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 5,
+              "barlineright" => 1,
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;

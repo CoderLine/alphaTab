@@ -1,8 +1,8 @@
 import { Direction } from '@src/model/Direction';
-import { EffectGlyph } from './EffectGlyph';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform';
-import { Glyph } from './Glyph';
-import { MusicFontSymbol } from '@src/model';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { Glyph } from '@src/rendering/glyphs/Glyph';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
 
 class TargetDirectionGlyph extends Glyph {
     private _symbols: MusicFontSymbol[];

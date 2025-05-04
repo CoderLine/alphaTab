@@ -1,17 +1,18 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { RenderingResources } from '@src/RenderingResources';
+import type { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { RenderingResources } from '@src/RenderingResources';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabNoteChordGlyph extends Glyph {
     private _notes: NoteNumberGlyph[] = [];
-    private _deadSlapped:DeadSlappedBeatGlyph|null = null;
+    private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _isGrace: boolean;
 
     public beat!: Beat;
@@ -34,7 +35,7 @@ export class TabNoteChordGlyph extends Glyph {
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         if (this.notesPerString.has(note.string)) {
-            let n = this.notesPerString.get(note.string)!;
+            const n = this.notesPerString.get(note.string)!;
 
             let pos = this.x + n.x;
             switch (requestedPosition) {
@@ -87,7 +88,7 @@ export class TabNoteChordGlyph extends Glyph {
         } else {
             let noteStringWidth: number = 0;
             for (let i: number = 0, j: number = this._notes.length; i < j; i++) {
-                let g: NoteNumberGlyph = this._notes[i];
+                const g: NoteNumberGlyph = this._notes[i];
                 g.renderer = this.renderer;
                 g.doLayout();
                 if (g.width > w) {
@@ -98,10 +99,10 @@ export class TabNoteChordGlyph extends Glyph {
                 }
             }
             this.noteStringWidth = noteStringWidth;
-            let tabHeight: number = this.renderer.resources.tablatureFont.size;
+            const tabHeight: number = this.renderer.resources.tablatureFont.size;
             let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
             // TODO: take care of actual glyph height
-            let effectSpacing: number = 7;
+            const effectSpacing: number = 7;
             for (const g of this.beatEffects.values()) {
                 g.y += effectY;
                 g.x += this.width / 2;
@@ -128,20 +129,22 @@ export class TabNoteChordGlyph extends Glyph {
 
         if (this.beat.deadSlapped) {
             this._deadSlapped?.paint(cx, cy, canvas);
-        } else{
-            let res: RenderingResources = this.renderer.resources;
-            let oldBaseLine: TextBaseline = canvas.textBaseline;
+        } else {
+            const res: RenderingResources = this.renderer.resources;
+            const oldBaseLine: TextBaseline = canvas.textBaseline;
             canvas.textBaseline = TextBaseline.Middle;
             canvas.font = this._isGrace ? res.graceFont : res.tablatureFont;
-    
-            let notes: NoteNumberGlyph[] = this._notes;
-            let w: number = this.width;
-            for (let g of notes) {
+
+            const notes: NoteNumberGlyph[] = this._notes;
+            const w: number = this.width;
+            for (const g of notes) {
                 g.renderer = this.renderer;
                 g.width = w;
                 g.paint(cx, cy, canvas);
             }
             canvas.textBaseline = oldBaseLine;
+
+            using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabEffects, this.beat);
             for (const g of this.beatEffects.values()) {
                 g.paint(cx, cy, canvas);
             }

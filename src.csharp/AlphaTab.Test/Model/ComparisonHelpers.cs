@@ -1,6 +1,4 @@
 ﻿using System.Collections.Generic;
-using AlphaTab.Collections;
-using AlphaTab.Test;
 
 namespace AlphaTab.Model;
 

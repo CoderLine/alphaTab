@@ -1,8 +1,9 @@
 import { VibratoType } from '@src/model/VibratoType';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _type: VibratoType;
@@ -22,26 +23,23 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        let symbolHeight: number = 0;
         switch (this._type) {
             case VibratoType.Slight:
                 this._symbol = MusicFontSymbol.WiggleTrill;
-                this._symbolSize = 9 * this._scale;
-                symbolHeight = 6 * this._scale;
                 break;
             case VibratoType.Wide:
                 this._symbol = MusicFontSymbol.WiggleVibratoMediumFast;
-                this._symbolSize = 10 * this._scale;
-                symbolHeight = 10 * this._scale;
                 break;
         }
-        this.height = symbolHeight;
+
+        this._symbolSize = MusicFontSymbolSizes.Widths.get(this._symbol)! * this._scale;
+        this.height = MusicFontSymbolSizes.Heights.get(this._symbol)! * this._scale;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        let startX: number = cx + this.x;
-        let width: number = endX - startX;
-        let step: number = this._symbolSize;
+        const startX: number = cx + this.x;
+        const width: number = endX - startX;
+        const step: number = this._symbolSize;
 
         let loops: number = width / step;
         if (!this._partialWaves) {

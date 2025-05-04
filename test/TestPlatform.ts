@@ -1,6 +1,6 @@
 import { IOHelper } from '@src/io/IOHelper';
-import * as fs from 'fs';
-import * as path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 /**
  * @partial
@@ -12,7 +12,7 @@ export class TestPlatform {
      */
     public static async saveFile(name: string, data: Uint8Array): Promise<void> {
         const directory = path.dirname(name);
-        await fs.promises.mkdir(directory, { recursive: true })
+        await fs.promises.mkdir(directory, { recursive: true });
         await fs.promises.writeFile(name, data);
     }
 
@@ -21,7 +21,7 @@ export class TestPlatform {
      * @partial
      */
     public static async deleteFile(name: string): Promise<void> {
-        await fs.promises.rm(name, { force: true })
+        await fs.promises.rm(name, { force: true });
     }
 
     /**
@@ -30,6 +30,14 @@ export class TestPlatform {
      */
     public static loadFile(path: string): Promise<Uint8Array> {
         return fs.promises.readFile(path);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static loadFileSync(path: string): Uint8Array {
+        return fs.readFileSync(path);
     }
 
     /**
@@ -45,20 +53,32 @@ export class TestPlatform {
         return IOHelper.toString(data, 'UTF-8');
     }
 
+    public static loadFileAsStringSync(path: string): string {
+        const data = TestPlatform.loadFileSync(path);
+        return IOHelper.toString(data, 'UTF-8');
+    }
+
     public static changeExtension(file: string, extension: string): string {
-        let lastDot: number = file.lastIndexOf('.');
+        const lastDot: number = file.lastIndexOf('.');
         if (lastDot === -1) {
             return file + extension;
-        } else {
-            return file.substr(0, lastDot) + extension;
         }
+        return file.substr(0, lastDot) + extension;
     }
-    
+
     /**
      * @target web
      * @partial
      */
     public static joinPath(...parts: string[]): string {
         return path.join(...parts);
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static enumValues<T>(enumType: any): T[] {
+        return Object.values(enumType).filter(k => typeof k === 'number') as T[];
     }
 }

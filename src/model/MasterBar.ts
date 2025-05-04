@@ -1,14 +1,16 @@
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { Automation } from '@src/model/Automation';
-import { Beat } from '@src/model/Beat';
-import { Fermata } from '@src/model/Fermata';
-import { KeySignature } from '@src/model/KeySignature';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { RepeatGroup } from '@src/model/RepeatGroup';
-import { Score } from '@src/model/Score';
-import { Section } from '@src/model/Section';
+import type { Automation } from '@src/model/Automation';
+import type { Beat } from '@src/model/Beat';
+import type { Fermata } from '@src/model/Fermata';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
+import type { Bar } from '@src/model/Bar';
+import type { KeySignature } from '@src/model/KeySignature';
+import type { KeySignatureType } from '@src/model/KeySignatureType';
+import type { RepeatGroup } from '@src/model/RepeatGroup';
+import type { Score } from '@src/model/Score';
+import type { Section } from '@src/model/Section';
 import { TripletFeel } from '@src/model/TripletFeel';
-import { Direction } from './Direction';
+import type { Direction } from '@src/model/Direction';
 
 /**
  * The MasterBar stores information about a bar which affects
@@ -43,17 +45,40 @@ export class MasterBar {
     public index: number = 0;
 
     /**
-     * Gets or sets the key signature used on all bars.
+     * The key signature used on all bars.
+     * @deprecated Use key signatures on bar level
      */
-    public keySignature: KeySignature = KeySignature.C;
+    public get keySignature(): KeySignature {
+        return this.score.tracks[0].staves[0].bars[this.index].keySignature;
+    }
 
     /**
-     * Gets or sets the type of key signature (major/minor)
+     * The key signature used on all bars.
+     * @deprecated Use key signatures on bar level
      */
-    public keySignatureType: KeySignatureType = KeySignatureType.Major;
+    public set keySignature(value: KeySignature) {
+        this.score.tracks[0].staves[0].bars[this.index].keySignature = value;
+    }
+
+    /**
+     * The type of key signature (major/minor)
+     * @deprecated Use key signatures on bar level
+     */
+    public get keySignatureType(): KeySignatureType {
+        return this.score.tracks[0].staves[0].bars[this.index].keySignatureType;
+    }
+
+    /**
+     * The type of key signature (major/minor)
+     * @deprecated Use key signatures on bar level
+     */
+    public set keySignatureType(value: KeySignatureType) {
+        this.score.tracks[0].staves[0].bars[this.index].keySignatureType = value;
+    }
 
     /**
      * Gets or sets whether a double bar is shown for this masterbar.
+     * @deprecated Use {@link Bar.barLineLeft} and {@link Bar.barLineRight}
      */
     public isDoubleBar: boolean = false;
 
@@ -168,9 +193,9 @@ export class MasterBar {
     public calculateDuration(respectAnacrusis: boolean = true): number {
         if (this.isAnacrusis && respectAnacrusis) {
             let duration: number = 0;
-            for (let track of this.score.tracks) {
-                for (let staff of track.staves) {
-                    let barDuration: number =
+            for (const track of this.score.tracks) {
+                for (const staff of track.staves) {
+                    const barDuration: number =
                         this.index < staff.bars.length ? staff.bars[this.index].calculateDuration() : 0;
                     if (barDuration > duration) {
                         duration = barDuration;
@@ -200,8 +225,8 @@ export class MasterBar {
      * Adds a direction to the masterbar.
      * @param direction The direction to add.
      */
-    public addDirection(direction:Direction):void {
-        if(this.directions == null){
+    public addDirection(direction: Direction): void {
+        if (this.directions == null) {
             this.directions = new Set<Direction>();
         }
         this.directions.add(direction);

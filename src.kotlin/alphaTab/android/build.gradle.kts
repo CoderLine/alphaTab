@@ -39,7 +39,7 @@ var libAuthorId = "danielku15"
 var libAuthorName = "Daniel Kuschny"
 var libOrgUrl = "https://github.com/coderline"
 var libCompany = "CoderLine"
-var libVersion = "1.4.4-SNAPSHOT"
+var libVersion = "1.5.0-SNAPSHOT"
 var libProjectUrl = "https://github.com/CoderLine/alphaTab"
 var libGitUrlHttp = "https://github.com/CoderLine/alphaTab.git"
 var libGitUrlGit = "scm:git:git://github.com/CoderLine/alphaTab.git"
@@ -116,7 +116,7 @@ android {
     androidResources {
         ignoreAssetsPattern = arrayOf(
             "eot",
-            "otf",
+            "ttf",
             "svg",
             "woff",
             "woff2",

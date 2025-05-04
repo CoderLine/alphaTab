@@ -1,8 +1,19 @@
 {
-    "mochaExplorer.files": "test/**/*.test.ts",
-    "mochaExplorer.nodeArgv": [
-        "--experimental-specifier-resolution=node",
-        "--import=tsx"
-    ],
-    "mochaExplorer.logpanel": true
+    "debug.javascript.terminalOptions": {
+        "resolveSourceMapLocations": [
+            "${workspaceFolder}/**",
+            "!**/node_modules/**",
+            "**/node_modules/.vite-temp/**"
+        ]
+    },
+    "typescript.preferences.importModuleSpecifier": "non-relative",
+    "[typescript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    },
+    "[javascript]": {
+        "editor.defaultFormatter": "biomejs.biome"
+    }
 }

@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">Various transposition. Each
-          part plays a c'', just displayed in different display pitches.
-          The second-to-last staff uses a transposition where the displayed c'
-          is an actual f''' concert pitch. The final staff is an untransposed
+          part plays a c’’, just displayed in different display pitches.
+          The second-to-last staff uses a transposition where the displayed c’
+          is an actual f’’’ concert pitch. The final staff is an untransposed
           instrument.</miscellaneous-field>
     </miscellaneous>
   </identification>
@@ -49,7 +49,7 @@
       <part-abbreviation>D Tpt.</part-abbreviation>
     </score-part>
     <score-part id="P10">
-      <part-name>displayed c'=fis'''</part-name>
+      <part-name>displayed c’=fis’’’</part-name>
     </score-part>
     <score-part id="P11">
       <part-name print-object="no">MusicXML Part</part-name>
@@ -169,10 +169,6 @@
     <measure number="1">
       <attributes>
         <divisions>1</divisions>
-        <key>
-          <fifths>2</fifths>
-          <mode>major</mode>
-        </key>
         <time symbol="common">
           <beats>4</beats>
           <beat-type>4</beat-type>
@@ -205,10 +201,6 @@
     <measure number="1">
       <attributes>
         <divisions>1</divisions>
-        <key>
-          <fifths>4</fifths>
-          <mode>major</mode>
-        </key>
         <time symbol="common">
           <beats>4</beats>
           <beat-type>4</beat-type>

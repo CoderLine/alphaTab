@@ -1,4 +1,24 @@
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+
+/**
+ * Represents a output device on which the synth can send the audio to.
+ */
+export interface ISynthOutputDevice {
+    /**
+     * The ID to uniquely identify the device.
+     */
+    readonly deviceId: string;
+
+    /**
+     * A string describing the device.
+     */
+    readonly label: string;
+
+    /**
+     * Gets a value indicating whether the device is the default output device.
+     */
+    readonly isDefault: boolean;
+}
 
 /**
  * This is the base interface for output devices which can
@@ -61,4 +81,26 @@ export interface ISynthOutput {
      * Fired when the output needs more samples to be played.
      */
     readonly sampleRequest: IEventEmitter;
+
+    /**
+     * Loads and lists the available output devices. Will request permissions if needed.
+     * @async
+     */
+    enumerateOutputDevices(): Promise<ISynthOutputDevice[]>;
+
+    /**
+     * Changes the output device which should be used for playing the audio.
+     * @async
+     * @param device The output device to use, or null to switch to the default device.
+     */
+    setOutputDevice(device: ISynthOutputDevice | null): Promise<void>;
+
+    /**
+     * The currently configured output device if changed via {@link setOutputDevice}.
+     * @async
+     * @returns The custom configured output device which was set via {@link setOutputDevice} or `null`
+     * if the default outputDevice is used.
+     * The output device might change dynamically if devices are connected/disconnected (e.g. bluetooth headset).
+     */
+    getOutputDevice(): Promise<ISynthOutputDevice | null>;
 }

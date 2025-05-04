@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 2.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="2.0">
+<score-partwise version="4.0">
   <movement-title>MusicXML directions (attached to staff)</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All &lt;direction&gt; elements 
-          defined in MusicXML. The lyrics for each note describes the direction
-          element assigned to that note.</miscellaneous-field>
+      <miscellaneous-field name="description">All &lt;direction&gt; elements
+          defined in MusicXML.  The lyrics for each note describes the direction
+          element assigned to that note.  Not marked with lyrics is a
+          &lt;scordatura&gt; element at the very
+          beginning.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -18,13 +20,33 @@
   <!--=========================================================-->
   <part id="P1">
     <!-- Direction type can contain the following child types:
-         rehearsal+ | segno+ | words+ |
-         coda+ | wedge | dynamics+ | dashes | bracket | pedal | 
-         metronome | octave-shift | harp-pedals | damp | 
-         damp-all | eyeglasses | scordatura | image |
-         accordion-registration | other-direction -->
-    <!-- Rehearsal marks -->
+         rehearsal+ | segno+ | (words | symbol)+ |
+         coda+ | wedge | dynamics+ | dashes | bracket | pedal |
+         metronome | octave-shift | harp-pedals | damp |
+         damp-all | eyeglasses | string-mute | scordatura | image |
+         principal-voice | percussion+ | accordion-registration |
+         staff-divide | other-direction -->
+
+    <!-- Scordatura and rehearsal marks -->
     <measure number="1">
+      <direction>
+        <direction-type>
+          <scordatura>
+            <accord string="3">
+              <tuning-step>C</tuning-step>
+              <tuning-octave>3</tuning-octave>
+            </accord>
+            <accord string="2">
+              <tuning-step>G</tuning-step>
+              <tuning-octave>5</tuning-octave>
+            </accord>
+            <accord string="1">
+              <tuning-step>E</tuning-step>
+              <tuning-octave>5</tuning-octave>
+            </accord>
+          </scordatura>
+        </direction-type>
+      </direction>
       <attributes>
         <divisions>1</divisions>
         <key>
@@ -50,7 +72,8 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>reh.A (def=sq.)</text></lyric>
+        <lyric number="1"><text>reh. A↓</text></lyric>
+        <lyric number="2"><text>(def=square)</text></lyric>
       </note>
       <direction placement="above">
         <direction-type>
@@ -62,11 +85,12 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>reh.B (none)</text></lyric>
+        <lyric number="1"><text>reh. B↑</text></lyric>
+        <lyric number="2"><text>(none)</text></lyric>
       </note>
       <direction>
         <direction-type>
-          <rehearsal enclosure="square">Test</rehearsal>
+          <rehearsal enclosure="rectangle">Test</rehearsal>
         </direction-type>
       </direction>
       <note>
@@ -74,7 +98,8 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>reh.Test (sq.)</text></lyric>
+        <lyric number="1"><text>reh. Test</text></lyric>
+        <lyric number="2"><text>(rect.)</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -86,10 +111,11 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>reh.Crc (crc.)</text></lyric>
+        <lyric number="1"><text>reh. Crc</text></lyric>
+        <lyric number="2"><text>(circle)</text></lyric>
       </note>
     </measure>
-    <!-- Segno, Coda, Words (extra unit test for formatting!),  Eyeglasses -->
+    <!-- Segno, coda, words (extra unit test for formatting!), symbol -->
     <measure number="2">
       <direction>
         <direction-type>
@@ -101,7 +127,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Segno</text></lyric>
+        <lyric number="1"><text>segno</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -113,11 +139,11 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Coda</text></lyric>
+        <lyric number="1"><text>coda</text></lyric>
       </note>
-      <direction>
+      <direction placement="above">
         <direction-type>
-          <words>words</words>
+          <words enclosure="oval">\"words"</words>
         </direction-type>
       </direction>
       <note>
@@ -125,11 +151,12 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Words</text></lyric>
+        <lyric number="1"><text>words↑</text></lyric>
+        <lyric number="2"><text>(oval)</text></lyric>
       </note>
       <direction>
         <direction-type>
-          <eyeglasses/>
+          <symbol>cClef</symbol>
         </direction-type>
       </direction>
       <note>
@@ -137,14 +164,16 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Eyegl.</text></lyric>
+        <lyric number="1"><text>symbol</text></lyric>
+        <lyric number="2"><text>("cClef")</text></lyric>
       </note>
     </measure>
     <!-- Dynamics: p | pp | ppp | pppp | ppppp | pppppp |
-        f | ff | fff | ffff | fffff | ffffff | mp | mf | sf |
-        sfp | sfpp | fp | rf | rfz | sfz | sffz | fz | 
-        other-dynamics -->
+                   f | ff | fff | ffff | fffff | ffffff |
+                   mp | mf | sf | sfp | sfpp | fp | rf |
+                   rfz | sfz | sffz | fz | other-dynamics -->
     <measure number="3">
+      <print new-system="yes"/>
       <direction>
         <direction-type>
           <dynamics><p/></dynamics>
@@ -195,7 +224,7 @@
       </note>
     </measure>
     <measure number="4">
-      <direction>
+      <direction placement="below">
         <direction-type>
           <dynamics><ppppp/></dynamics>
         </direction-type>
@@ -205,9 +234,9 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>ppppp</text></lyric>
+        <lyric number="1"><text>ppppp↓</text></lyric>
       </note>
-      <direction>
+      <direction placement="above">
         <direction-type>
           <dynamics><pppppp/></dynamics>
         </direction-type>
@@ -217,7 +246,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>pppppp</text></lyric>
+        <lyric number="1"><text>pppppp↑</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -269,7 +298,7 @@
         <type>quarter</type>
         <lyric number="1"><text>ffff</text></lyric>
       </note>
-      <direction>
+      <direction placement="below">
         <direction-type>
           <dynamics><fffff/></dynamics>
         </direction-type>
@@ -279,9 +308,9 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>fffff</text></lyric>
+        <lyric number="1"><text>fffff↓</text></lyric>
       </note>
-      <direction>
+      <direction placement="above">
         <direction-type>
           <dynamics><ffffff/></dynamics>
         </direction-type>
@@ -291,10 +320,11 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>ffffff</text></lyric>
+        <lyric number="1"><text>ffffff↑</text></lyric>
       </note>
     </measure>
     <measure number="6">
+      <print new-system="yes"/>
       <direction>
         <direction-type>
           <dynamics><mp/></dynamics>
@@ -433,7 +463,7 @@
       </note>
       <direction>
         <direction-type>
-          <dynamics><other-dynamics>abc-ffz</other-dynamics></dynamics>
+          <dynamics><other-dynamics>ffz</other-dynamics></dynamics>
         </direction-type>
       </direction>
       <note>
@@ -441,12 +471,14 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>abc-ffz (oth.)</text></lyric>
+        <lyric number="1"><text>other dyn.</text></lyric>
+        <lyric number="2"><text>('ffz')</text></lyric>
       </note>
     </measure>
     <!-- Spanners (there is another unit test for testing the various options):
          wedge, dashes, bracket, pedal, octave-shift -->
     <measure number="9">
+      <print new-system="yes"/>
       <direction>
         <direction-type>
           <wedge type="crescendo"/>
@@ -457,7 +489,8 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>begin</syllabic><text>hairpin</text></lyric>
+        <lyric number="1"><syllabic>begin</syllabic><text>hair</text></lyric>
+        <lyric number="2"><syllabic>begin</syllabic><text>(cre</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -469,9 +502,10 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>end</syllabic><text>cresc</text></lyric>
+        <lyric number="1"><syllabic>end</syllabic><text>pin</text></lyric>
+        <lyric number="2"><syllabic>end</syllabic><text>scendo)</text></lyric>
       </note>
-      <direction>
+      <direction placement="below">
         <direction-type>
           <dashes type="start"/>
         </direction-type>
@@ -493,13 +527,13 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>end</syllabic><text>es</text></lyric>
+        <lyric number="1"><syllabic>end</syllabic><text>es↓</text></lyric>
       </note>
     </measure>
     <measure number="10">
-      <direction>
+      <direction placement="below">
         <direction-type>
-          <bracket type="start" line-end="none"/>
+          <bracket type="start" line-end="up"/>
         </direction-type>
       </direction>
       <note>
@@ -509,9 +543,9 @@
         <type>quarter</type>
         <lyric number="1"><syllabic>begin</syllabic><text>bra</text></lyric>
       </note>
-      <direction>
+      <direction placement="below">
         <direction-type>
-          <bracket type="stop" line-end="none"/>
+          <bracket type="stop" line-end="up"/>
         </direction-type>
       </direction>
       <note>
@@ -519,7 +553,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>end</syllabic><text>cket</text></lyric>
+        <lyric number="1"><syllabic>end</syllabic><text>cket↓</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -532,6 +566,7 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1"><syllabic>begin</syllabic><text>oct.</text></lyric>
+        <lyric number="2"><text>(8</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -544,12 +579,13 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1"><syllabic>end</syllabic><text>shift</text></lyric>
+        <lyric number="2"><text>up)</text></lyric>
       </note>
     </measure>
     <measure number="11">
       <direction>
         <direction-type>
-          <pedal type="start"/>
+          <pedal line="yes" type="start"/>
         </direction-type>
       </direction>
       <note>
@@ -561,7 +597,7 @@
       </note>
       <direction>
         <direction-type>
-          <pedal type="change"/>
+          <pedal line="yes" type="change"/>
         </direction-type>
       </direction>
       <note>
@@ -579,7 +615,7 @@
       </note>
       <direction>
         <direction-type>
-          <pedal type="stop"/>
+          <pedal line="yes" type="stop"/>
         </direction-type>
       </direction>
       <note>
@@ -594,7 +630,10 @@
     <measure number="12">
       <direction>
         <direction-type>
-          <metronome><beat-unit>quarter</beat-unit><per-minute>60</per-minute></metronome>
+          <metronome>
+            <beat-unit>quarter</beat-unit>
+            <per-minute>60</per-minute>
+          </metronome>
         </direction-type>
       </direction>
       <note>
@@ -602,7 +641,8 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Metr.</text></lyric>
+        <lyric number="1"><text>metro-</text></lyric>
+        <lyric number="2"><text>nome</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -643,7 +683,8 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Harp ped.</text></lyric>
+        <lyric number="1"><text>harp</text></lyric>
+        <lyric number="2"><text>pedal</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -655,7 +696,7 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Damp</text></lyric>
+        <lyric number="1"><text>damp</text></lyric>
       </note>
       <direction>
         <direction-type>
@@ -667,26 +708,11 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Damp all</text></lyric>
+        <lyric number="1"><text>damp</text></lyric>
+        <lyric number="2"><text>all</text></lyric>
       </note>
     </measure>
     <measure number="13">
-      <direction>
-        <direction-type>
-          <scordatura>
-              <accord string="3"><tuning-step>C</tuning-step><tuning-octave>3</tuning-octave></accord>
-              <accord string="2"><tuning-step>G</tuning-step><tuning-octave>5</tuning-octave></accord>
-              <accord string="1"><tuning-step>E</tuning-step><tuning-octave>5</tuning-octave></accord>
-          </scordatura>
-        </direction-type>
-      </direction>
-      <note>
-        <pitch><step>C</step><octave>4</octave></pitch>
-        <duration>1</duration>
-        <voice>1</voice>
-        <type>quarter</type>
-        <lyric number="1"><text>Scord.</text></lyric>
-      </note>
       <direction>
         <direction-type>
           <accordion-registration>
@@ -701,85 +727,124 @@
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>Accordion reg.</text></lyric>
+        <lyric number="1"><text>accordion</text></lyric>
+        <lyric number="2"><text>register</text></lyric>
       </note>
+      <direction>
+        <direction-type>
+          <string-mute type="on"/>
+        </direction-type>
+      </direction>
       <note>
-        <rest/>
-        <duration>2</duration>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
         <voice>1</voice>
-        <type>half</type>
+        <type>quarter</type>
+        <lyric number="1"><text>string</text></lyric>
+        <lyric number="2"><text>mute on</text></lyric>
       </note>
-      <barline location="right">
-        <bar-style>light-light</bar-style>
-      </barline>
+      <direction>
+        <direction-type>
+          <string-mute type="off"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>string</text></lyric>
+        <lyric number="2"><text>mute off</text></lyric>
+      </note>
+      <direction>
+        <direction-type>
+          <eyeglasses/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>eye-</text></lyric>
+        <lyric number="2"><text>glasses</text></lyric>
+      </note>
     </measure>
     <!-- Other issues: Multiple direction-type elements: "subito p", ppp<fff -->
     <measure number="14">
-      <direction placement="below">
+      <direction>
         <direction-type>
-          <words default-y="-80" font-family="Times New Roman" font-size="10.25" font-style="italic">subito</words>
+          <percussion>
+            <timpani/>
+          </percussion>
         </direction-type>
-        <direction-type>
-          <words default-y="-80" font-family="Times New Roman" font-size="10.25"> </words>
-        </direction-type>
-        <direction-type>
-          <dynamics default-y="-80">
-            <p/>
-          </dynamics>
-        </direction-type>
-        <offset>2</offset>
       </direction>
       <note>
         <pitch><step>C</step><octave>4</octave></pitch>
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>subp</text></lyric>
+        <lyric number="1"><text>perc.</text></lyric>
+        <lyric number="2"><text>(timpani)</text></lyric>
       </note>
-      <direction placement="below">
+      <direction>
         <direction-type>
-          <dynamics><ppp/></dynamics>
+          <staff-divide type="up-down"/>
         </direction-type>
-        <direction-type>
-          <wedge type="crescendo"/>
-        </direction-type>
-        <offset>2</offset>
       </direction>
       <note>
         <pitch><step>C</step><octave>4</octave></pitch>
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>begin</syllabic><text>ppp cresc</text></lyric>
+        <lyric number="1"><text>staff-</text></lyric>
+        <lyric number="2"><text>divide</text></lyric>
       </note>
-      <direction placement="below">
+      <direction placement="above">
         <direction-type>
-          <wedge type="stop"/>
+          <principal-voice symbol="Hauptstimme" type="start"/>
         </direction-type>
-        <direction-type>
-          <dynamics><fff/></dynamics>
-        </direction-type>
-        <offset>2</offset>
       </direction>
       <note>
         <pitch><step>C</step><octave>4</octave></pitch>
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><syllabic>end</syllabic><text>to fff</text></lyric>
+        <lyric number="1"><syllabic>begin</syllabic><text>principal</text></lyric>
+        <lyric number="2"><syllabic>begin</syllabic><text>(Haupt</text></lyric>
       </note>
+      <direction placement="above">
+        <direction-type>
+          <principal-voice symbol="plain" type="stop"/>
+        </direction-type>
+      </direction>
       <note>
-        <rest/>
+        <pitch><step>C</step><octave>4</octave></pitch>
         <duration>1</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <lyric number="1"><text>subp</text></lyric>
+        <lyric number="1"><syllabic>end</syllabic><text>voice</text></lyric>
+        <lyric number="2"><syllabic>end</syllabic><text>stimme)</text></lyric>
+      </note>
+    </measure>
+    <measure number="15">
+      <print new-system="yes"/>
+      <direction placement="below">
+        <direction-type>
+          <image source="nestedboxes.png" type="image/png"
+                 height="100" width="200" default-y="-200"/>
+        </direction-type>
+      </direction>
+      <note>
+        <pitch><step>C</step><octave>4</octave></pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+        <lyric number="1"><text>image</text></lyric>
       </note>
       <barline location="right">
         <bar-style>light-heavy</bar-style>
       </barline>
     </measure>
-    <!--=======================================================-->
   </part>
-  <!--=========================================================-->
 </score-partwise>

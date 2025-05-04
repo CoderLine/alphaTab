@@ -1,12 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A multi-voice / multi-staff part 
-          with a clef change in the middle of a measure and a &lt;backward&gt; 
-          for voice 2 jumping back beyond that clef change.</miscellaneous-field>
+      <miscellaneous-field name="description">A part with three voices; two on
+          the upper staff and one on the lower staff.  There are two clef
+          changes in the upper staff, one in the middle of measure one and one
+          at the end.  The third voice has a length of only three eights,
+          starting at the fourth eighth of the first bar.
+
+          No voice contains &lt;stem&gt; elements.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -116,6 +120,49 @@
         <notations>
           <slur number="1" type="stop"/>
         </notations>
+      </note>
+      <backup>
+        <duration>504</duration>
+      </backup>
+      <note>
+        <rest/>
+        <duration>336</duration>
+        <voice>2</voice>
+        <type>quarter</type>
+        <staff>1</staff>
+      </note>
+      <note>
+        <pitch>
+          <step>B</step>
+          <octave>3</octave>
+        </pitch>
+        <duration>168</duration>
+        <voice>2</voice>
+        <type>eighth</type>
+        <staff>1</staff>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>D</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>168</duration>
+        <voice>2</voice>
+        <type>eighth</type>
+        <staff>1</staff>
+      </note>
+      <note>
+        <chord/>
+        <pitch>
+          <step>F</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>168</duration>
+        <voice>2</voice>
+        <type>eighth</type>
+        <accidental>natural</accidental>
+        <staff>1</staff>
       </note>
       <backup>
         <duration>1008</duration>
@@ -304,7 +351,7 @@
       </note>
       <note>
         <pitch>
-          <step>F</step>
+          <step>E</step>
           <octave>4</octave>
         </pitch>
         <duration>336</duration>
@@ -391,7 +438,5 @@
         </notations>
       </note>
     </measure>
-    <!--=======================================================-->
   </part>
-  <!--=========================================================-->
 </score-partwise>

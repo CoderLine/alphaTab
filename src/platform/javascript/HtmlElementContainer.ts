@@ -1,6 +1,6 @@
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import { IContainer } from '@src/platform/IContainer';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { IContainer } from '@src/platform/IContainer';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Lazy } from '@src/util/Lazy';
@@ -13,7 +13,7 @@ export class HtmlElementContainer implements IContainer {
         () =>
             new ResizeObserver((entries: ResizeObserverEntry[]) => {
                 for (const e of entries) {
-                    let evt = new CustomEvent('resize', {
+                    const evt = new CustomEvent('resize', {
                         detail: e
                     });
                     e.target.dispatchEvent(evt);
@@ -28,7 +28,7 @@ export class HtmlElementContainer implements IContainer {
     }
 
     public set width(value: number) {
-        this.element.style.width = value + 'px';
+        this.element.style.width = `${value}px`;
     }
 
     public get scrollLeft(): number {
@@ -53,7 +53,7 @@ export class HtmlElementContainer implements IContainer {
 
     public set height(value: number) {
         if (value >= 0) {
-            this.element.style.height = value + 'px';
+            this.element.style.height = `${value}px`;
         } else {
             this.element.style.height = '100%';
         }
@@ -138,22 +138,22 @@ export class HtmlElementContainer implements IContainer {
 
     public transitionToX(duration: number, x: number): void {
         this.element.style.transition = `transform ${duration}ms linear`;
-        this.setBounds(x, NaN, NaN, NaN);
+        this.setBounds(x, Number.NaN, Number.NaN, Number.NaN);
     }
 
     protected lastBounds: Bounds = new Bounds();
 
     public setBounds(x: number, y: number, w: number, h: number) {
-        if (isNaN(x)) {
+        if (Number.isNaN(x)) {
             x = this.lastBounds.x;
         }
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.lastBounds.y;
         }
-        if (isNaN(w)) {
+        if (Number.isNaN(w)) {
             w = this.lastBounds.w;
         }
-        if (isNaN(h)) {
+        if (Number.isNaN(h)) {
             h = this.lastBounds.h;
         }
         this.element.style.transform = `translate(${x}px, ${y}px) scale(${w}, ${h})`;

@@ -6,11 +6,11 @@
 import { RiffChunk } from '@src/synth/soundfont/RiffChunk';
 
 import { IOHelper } from '@src/io/IOHelper';
-import { IReadable } from '@src/io/IReadable';
+import type { IReadable } from '@src/io/IReadable';
 import { TypeConversions } from '@src/io/TypeConversions';
 
 import { FormatError } from '@src/FormatError';
-import { VorbisFile } from '../vorbis/VorbisFile';
+import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 
 export class Hydra {
@@ -70,7 +70,7 @@ export class Hydra {
         }
 
         while (RiffChunk.load(chunkHead, chunkFastList, readable)) {
-            let chunk: RiffChunk = new RiffChunk();
+            const chunk: RiffChunk = new RiffChunk();
             if (chunkFastList.id === 'pdta') {
                 while (RiffChunk.load(chunkFastList, chunk, readable)) {
                     switch (chunk.id) {

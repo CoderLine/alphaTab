@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <movement-title>Different Key signatures</movement-title>
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Various key signature: from 11
-            flats to 11 sharps (each one first one measure in major, then one
-            measure in minor)</miscellaneous-field>
+      <miscellaneous-field name="description">Various key signatures: from 11
+          flats to 11 sharps.  Each signature is shown twice, with one measure
+          in major and the other measure in minor.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

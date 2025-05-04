@@ -43,16 +43,27 @@ body:
     description: Providing a minimal reproducible example can help a lot.
   validations:
     required: false
-- type: dropdown
-  id: version
+- type: textarea
+  id: environment
   attributes:
-    label: Found in Version
-    description: Which version of alphaTab are you using?
-    options:
-    - 1.4 (alpha)
-    - 1.3    
-    - 1.2
-    - Other
+    label: Version and Environment
+    description: |
+      Please provide detailed information about your environment, like alphaTab version used, browser, device, .net runtime, Android version,..
+      Since 1.5.0: You can call `alphaTab.Environment.printEnvironmentInfo()` and copy the printed info. Or enable [debug logs](https://www.alphatab.net/docs/reference/settings/core/loglevel) and they are always printed.
+      Just grab them from the console/debugger/output/logcat output.      
+    placeholder: |
+      [AlphaTab][VersionInfo] alphaTab 1.5.0
+      [AlphaTab][VersionInfo] commit: 43c51b693438c54c0023ba729d7a7aa351e0f1fd
+      [AlphaTab][VersionInfo] build date: 2025-04-13T12:44:25.644Z
+      [AlphaTab][VersionInfo] High DPI: 1
+      [AlphaTab][VersionInfo] Browser: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36
+      [AlphaTab][VersionInfo] Platform: BrowserModule
+      [AlphaTab][VersionInfo] WebPack: false
+      [AlphaTab][VersionInfo] Vite: false
+      [AlphaTab][VersionInfo] Window Size: 1529x1152
+      [AlphaTab][VersionInfo] Screen Size: 3840x1200
+      
+    render: bash
   validations:
     required: true
 - type: dropdown
@@ -72,21 +83,7 @@ body:
     - Other
   validations:
     required: true
-- type: textarea
-  id: environment
-  attributes:
-    label: Environment
-    description: |
-      examples:
-        - **OS**: Windows 10 Pro
-        - **Browser**: Chrome 92.0.4515.159
-    value: |
-      - **OS**:
-      - **Browser**:
-      - **.net Version**:
-    render: markdown
-  validations:
-    required: true
+
 - type: textarea
   id: further
   attributes:

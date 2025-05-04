@@ -29,12 +29,12 @@ export enum ControllerType {
     /**
      * Pan MSB
      */
-    PanCoarse = 0x0A,
+    PanCoarse = 0x0a,
 
     /**
      * Expression Controller MSB
      */
-    ExpressionControllerCoarse = 0x0B,
+    ExpressionControllerCoarse = 0x0b,
 
     //EffectControl1Coarse = 0x0C,
     //EffectControl2Coarse = 0x0D,
@@ -65,12 +65,12 @@ export enum ControllerType {
     /**
      * Pan LSB
      */
-    PanFine = 0x2A,
+    PanFine = 0x2a,
 
     /**
      * Expression controller LSB
      */
-    ExpressionControllerFine = 0x2B,
+    ExpressionControllerFine = 0x2b,
 
     //EffectControl1Fine = 0x2C,
     //EffectControl2Fine = 0x2D,
@@ -139,7 +139,7 @@ export enum ControllerType {
     /**
      * All notes of.
      */
-    AllNotesOff = 0x7B
+    AllNotesOff = 0x7b
 
     //OmniModeOff = 0x7C,
     //OmniModeOn = 0x7D,

@@ -1,14 +1,15 @@
 /**@target web */
 import { AlphaTabWebPackPlugin } from '../../src/alphaTab.webpack';
 import webpack from 'webpack';
-import path from 'path';
-import fs from 'fs';
+import path from 'node:path';
+import fs from 'node:fs';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import { expect } from 'chai';
 
 describe('WebPack', () => {
     it('bundle-correctly', async () => {
         const bundlerProject = './test-data/bundler/webpack';
+        // biome-ignore lint/suspicious/noAsyncPromiseExecutor: resolve/reject called accordingly
         await new Promise(async (resolve, reject) => {
             const cwd = process.cwd();
             process.chdir(bundlerProject);
@@ -45,6 +46,10 @@ describe('WebPack', () => {
                         }
                     },
                     (err, stats) => {
+                        if (stats) {
+                            console.log(stats.toString());
+                        }
+
                         process.chdir(cwd);
                         if (err) {
                             reject(err);
@@ -87,7 +92,9 @@ describe('WebPack', () => {
 
                 if (file.name.startsWith('app-')) {
                     // ensure new worker has worker import
-                    expect(text).to.include('new Environment.alphaTabWorker(new URL(/* worker import */');
+                    expect(text).to.include(
+                        'new Environment.alphaTabWorker(new Environment.alphaTabUrl(/* worker import */'
+                    );
                     // ensure worklet bootstrapper exists
                     expect(text).to.include('/* worklet bootstrap */ async function(__webpack_worklet__) {');
                     // without custom bundling the app will bundle alphatab directly

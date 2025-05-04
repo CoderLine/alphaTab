@@ -22,12 +22,12 @@
  */
 
 export enum XmlNodeType {
-    None,
-    Element,
-    Text,
-    CDATA,
-    Document,
-    DocumentType,
+    None = 0,
+    Element = 1,
+    Text = 2,
+    CDATA = 3,
+    Document = 4,
+    DocumentType = 5
 }
 
 export class XmlNode {
@@ -39,6 +39,14 @@ export class XmlNode {
     public firstChild: XmlNode | null = null;
     public firstElement: XmlNode | null = null;
 
+    public *childElements() {
+        for (const c of this.childNodes) {
+            if (c.nodeType === XmlNodeType.Element) {
+                yield c;
+            }
+        }
+    }
+
     public addChild(node: XmlNode): void {
         this.childNodes.push(node);
         this.firstChild = node;
@@ -47,21 +55,21 @@ export class XmlNode {
         }
     }
 
-    public getAttribute(name: string): string {
+    public getAttribute(name: string, defaultValue: string = ''): string {
         if (this.attributes.has(name)) {
             return this.attributes.get(name)!;
         }
-        return '';
+        return defaultValue;
     }
 
     public getElementsByTagName(name: string, recursive: boolean = false): XmlNode[] {
-        let tags: XmlNode[] = [];
+        const tags: XmlNode[] = [];
         this.searchElementsByTagName(this.childNodes, tags, name, recursive);
         return tags;
     }
 
     private searchElementsByTagName(all: XmlNode[], result: XmlNode[], name: string, recursive: boolean = false): void {
-        for (let c of all) {
+        for (const c of all) {
             if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
                 result.push(c);
             }
@@ -72,7 +80,7 @@ export class XmlNode {
     }
 
     public findChildElement(name: string): XmlNode | null {
-        for (let c of this.childNodes) {
+        for (const c of this.childNodes) {
             if (c && c.nodeType === XmlNodeType.Element && c.localName === name) {
                 return c;
             }
@@ -90,19 +98,18 @@ export class XmlNode {
 
     public get innerText(): string {
         if (this.nodeType === XmlNodeType.Element || this.nodeType === XmlNodeType.Document) {
-            if(this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
+            if (this.firstElement && this.firstElement.nodeType === XmlNodeType.CDATA) {
                 return this.firstElement.innerText;
             }
             let txt: string = '';
-            for (let c of this.childNodes) {
+            for (const c of this.childNodes) {
                 txt += c.innerText?.toString();
             }
-            let s: string = txt;
+            const s: string = txt;
             return s.trim();
         }
         return this.value ?? '';
     }
-
 
     public set innerText(value: string) {
         const textNode = new XmlNode();
@@ -111,7 +118,7 @@ export class XmlNode {
         this.childNodes = [textNode];
     }
 
-    public setCData(s:string) {
+    public setCData(s: string) {
         const textNode = new XmlNode();
         textNode.nodeType = XmlNodeType.CDATA;
         textNode.value = s;

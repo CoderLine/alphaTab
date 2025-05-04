@@ -15,7 +15,7 @@ describe('LayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'layout/page-layout.gp',
-                [new VisualTestRun(-1, 'layout/page-layout-justify-last-row.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/layout/page-layout-justify-last-row.png')],
                 settings
             )
         );
@@ -32,14 +32,14 @@ describe('LayoutTests', () => {
     });
 
     it('page-layout-5barsperrow', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
         settings.display.barsPerRow = 5;
         await VisualTestHelper.runVisualTest('layout/page-layout-5barsperrow.gp', settings);
     });
 
     it('page-layout-bar5to8', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Page;
         settings.display.startBar = 5;
         settings.display.barCount = 4;
@@ -47,13 +47,13 @@ describe('LayoutTests', () => {
     });
 
     it('horizontal-layout', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         await VisualTestHelper.runVisualTest('layout/horizontal-layout.gp', settings);
     });
 
     it('horizontal-layout-bar5to8', async () => {
-        let settings: Settings = new Settings();
+        const settings: Settings = new Settings();
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.startBar = 5;
         settings.display.barCount = 4;
@@ -134,8 +134,29 @@ describe('LayoutTests', () => {
             \\scale 0.5 c4 | \\scale 2 c4 | \\scale 0.5 c4 |
             c4 | c4  
         `,
-            'layout/system-layout-tex.png',
+            'test-data/visual-tests/layout/system-layout-tex.png',
             settings
         );
+    });
+
+    it('multibar-rests-single-track', async () => {
+        await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
+            o.tracks = [0];
+            o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-single-track.png';
+        });
+    });
+
+    it('multibar-rests-multi-track', async () => {
+        await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
+            o.tracks = [0, 1];
+            o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-multi-track.png';
+        });
+    });
+
+    it('multibar-rests-all-tracks', async () => {
+        await VisualTestHelper.runVisualTest('layout/multibar-rest.gp', undefined, o => {
+            o.tracks = [0, 1, 2];
+            o.runs[0].referenceFileName = 'test-data/visual-tests/layout/multibar-rest-all-tracks.png';
+        });
     });
 });

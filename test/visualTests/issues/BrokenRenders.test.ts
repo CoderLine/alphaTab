@@ -1,10 +1,11 @@
 import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper } from '../VisualTestHelper';
-import { ScoreLoader } from '@src/importer';
 import { Settings } from '@src/Settings';
-import { RenderFinishedEventArgs, ScoreRenderer } from '@src/rendering';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { expect } from 'chai';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 
 describe('BrokenRendersTests', () => {
     it('let-ring-empty-voice', async () => {
@@ -16,7 +17,7 @@ describe('BrokenRendersTests', () => {
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = false;
 
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/layout/page-layout.gp`);
+        const inputFileData = await TestPlatform.loadFile('test-data/visual-tests/layout/page-layout.gp');
         const score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
         const api = new ScoreRenderer(settings);

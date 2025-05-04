@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">The number of staff lines can be
-      modified by using the staff-lines child of the staff-details attribute.
-      This can happen globally (the first staff has one line globally) or
-      during the part at the beginning of a measure and even inside a measure
-      (the second part has 5 lines initially, 4 at the beginning of the
-      second measure, and 3 starting in the middle of the third
-      measure).</miscellaneous-field>
+      <miscellaneous-field name="description">Testing staff line configurations
+          and pitched notes.  The number of staff lines can be modified by using
+          the ‘staff-lines’ child of the ‘staff-details’ attribute.  This can
+          happen globally (the first staff has one line globally) or during the
+          part at the beginning of a measure and even inside a measure (the
+          second part has 5 lines initially, 4 at the beginning of the second
+          measure, and 3 starting in the middle of the third measure).  The
+          fourth measure in the lower staff has five lines again but uses
+          ‘print-object="no"’ in the ‘line-detail’ element to suppress the
+          second and fourth staff line.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -41,8 +44,8 @@
       </attributes>
       <note>
         <pitch>
-          <step>D</step>
-          <octave>5</octave>
+          <step>G</step>
+          <octave>4</octave>
         </pitch>
         <duration>4</duration>
         <voice>1</voice>
@@ -53,8 +56,8 @@
     <measure number="2">
       <note>
         <pitch>
-          <step>D</step>
-          <octave>5</octave>
+          <step>G</step>
+          <octave>4</octave>
         </pitch>
         <duration>4</duration>
         <voice>1</voice>
@@ -65,8 +68,20 @@
     <measure number="3">
       <note>
         <pitch>
-          <step>D</step>
-          <octave>5</octave>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="4">
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
         </pitch>
         <duration>4</duration>
         <voice>1</voice>
@@ -136,7 +151,7 @@
       </note>
       <attributes>
         <staff-details>
-          <staff-lines>2</staff-lines>
+          <staff-lines>3</staff-lines>
         </staff-details>
       </attributes>
       <note>
@@ -147,6 +162,25 @@
         <duration>2</duration>
         <voice>1</voice>
         <type>half</type>
+      </note>
+    </measure>
+    <!--=======================================================-->
+    <measure number="4">
+      <attributes>
+        <staff-details>
+          <staff-lines>5</staff-lines>
+          <line-detail line="2" print-object="no"/>
+          <line-detail line="4" print-object="no"/>
+        </staff-details>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>4</duration>
+        <voice>1</voice>
+        <type>whole</type>
       </note>
     </measure>
   </part>

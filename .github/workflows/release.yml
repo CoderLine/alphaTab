@@ -15,7 +15,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 'lts/*'
-      - run: npm install
+      - run: npm ci
       - run: node ./scripts/update-version.js ${{github.run_number}}
       - run: npm run build
       - run: npm pack
@@ -43,7 +43,7 @@ jobs:
           dotnet-version: '8'
         env:
           NUGET_AUTH_TOKEN: ${{secrets.NUGET_API_KEY}}
-      - run: npm install
+      - run: npm ci
       - run: node ./scripts/update-csharp-version.js ${{github.run_number}}
       - run: npm run build-csharp
       - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
@@ -71,7 +71,7 @@ jobs:
           java-version: "19"
           distribution: "temurin"
 
-      - run: npm install
+      - run: npm ci
       - run: node ./scripts/update-kotlin-version.js
       - run: npm run build-kotlin
       - run: ./gradlew publishToMavenCentral

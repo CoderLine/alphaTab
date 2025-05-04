@@ -1,12 +1,12 @@
-import { ByteBuffer } from "@src/io/ByteBuffer";
-import { IOHelper } from "@src/io/IOHelper";
-import { Score } from "@src/model/Score";
-import { PartConfiguration } from "./PartConfiguration";
+import { ByteBuffer } from '@src/io/ByteBuffer';
+import { IOHelper } from '@src/io/IOHelper';
+import type { Score } from '@src/model/Score';
+import type { PartConfiguration } from '@src/importer/PartConfiguration';
 
 // PartConfiguration File Format Notes.
 // Based off Guitar Pro 8
 // The LayoutConfiguration is aligned with the data in the PartConfiguration.
-// We haven't fully deciphered how they handle everything but its enough for our needs. 
+// We haven't fully deciphered how they handle everything but its enough for our needs.
 
 // File:
 //    int32 (big endian) | Zoom Level encoded
@@ -36,12 +36,11 @@ import { PartConfiguration } from "./PartConfiguration";
 //    1 byte (bool)      | MultiVoice Cursor (CTRL+M)
 //    ScoreView[]        | Data for all score views (number is aligned with PartConfiguration)
 
-// ScoreView: 
+// ScoreView:
 //    TrackViewGroup[]   | The individual track view groups (number is aligned with PartConfiguration)
 
 // TrackViewGroup:
 //    1 byte (bool)      | isVisible (true -> 0xFF, false -> 0x00)
-
 
 class LayoutConfigurationScoreView {
     public trackViewGroups: LayoutConfigurationTrackViewGroup[] = [];
@@ -61,44 +60,39 @@ enum GuitarProView {
 }
 
 export class LayoutConfiguration {
-    public zoomLevel:number = 4;
-    public view:GuitarProView = GuitarProView.PageVertical;
-    public muiltiVoiceCursor:boolean = false;
+    public zoomLevel: number = 4;
+    public view: GuitarProView = GuitarProView.PageVertical;
+    public muiltiVoiceCursor: boolean = false;
     public scoreViews: LayoutConfigurationScoreView[] = [];
 
-    public constructor(
-        partConfiguration:PartConfiguration,
-        layoutConfigurationData: Uint8Array) {
+    public constructor(partConfiguration: PartConfiguration, layoutConfigurationData: Uint8Array) {
         const readable: ByteBuffer = ByteBuffer.fromBuffer(layoutConfigurationData);
 
         this.zoomLevel = IOHelper.readInt32BE(readable);
         this.view = readable.readByte() as GuitarProView;
-        this.muiltiVoiceCursor = readable.readByte() != 0
+        this.muiltiVoiceCursor = readable.readByte() !== 0;
 
         const scoreViewCount: number = partConfiguration.scoreViews.length;
 
         for (let i: number = 0; i < scoreViewCount; i++) {
-            
             const scoreView = new LayoutConfigurationScoreView();
             this.scoreViews.push(scoreView);
 
             const partScoreView = partConfiguration.scoreViews[i];
 
             for (let j: number = 0; j < partScoreView.trackViewGroups.length; j++) {
-                
                 const trackViewGroup = new LayoutConfigurationTrackViewGroup();
-                trackViewGroup.isVisible = readable.readByte() != 0;
+                trackViewGroup.isVisible = readable.readByte() !== 0;
 
                 scoreView.trackViewGroups.push(trackViewGroup);
             }
         }
-
     }
 
     public apply(score: Score): void {
-        if(this.scoreViews.length > 0) {
+        if (this.scoreViews.length > 0) {
             let trackIndex = 0;
-            for (let trackConfig of this.scoreViews[0].trackViewGroups) {
+            for (const trackConfig of this.scoreViews[0].trackViewGroups) {
                 if (trackIndex < score.tracks.length) {
                     const track = score.tracks[trackIndex];
                     track.isVisibleOnMultiTrack = trackConfig.isVisible;
@@ -108,23 +102,23 @@ export class LayoutConfiguration {
         }
     }
 
-    public static writeForScore(score: Score,): Uint8Array {
+    public static writeForScore(score: Score): Uint8Array {
         const writer = ByteBuffer.withCapacity(128);
 
         IOHelper.writeInt32BE(writer, 4); // 100% Zoom
-        writer.writeByte(0x00) // Page - Vertical
+        writer.writeByte(0x00); // Page - Vertical
 
         const isMultiVoice = score.tracks.length > 0 && score.tracks[0].staves[0].bars[0].isMultiVoice;
-        writer.writeByte(isMultiVoice ? 0xFF : 0x00);
+        writer.writeByte(isMultiVoice ? 0xff : 0x00);
 
         // ScoreView[0] => Multi Track Score View
         for (const track of score.tracks) {
-            writer.writeByte(track.isVisibleOnMultiTrack ? 0xFF : 0x00);
+            writer.writeByte(track.isVisibleOnMultiTrack ? 0xff : 0x00);
         }
 
         // Single Track Views for each track
         for (const _track of score.tracks) {
-            writer.writeByte(0xFF);
+            writer.writeByte(0xff);
         }
 
         return writer.toArray();

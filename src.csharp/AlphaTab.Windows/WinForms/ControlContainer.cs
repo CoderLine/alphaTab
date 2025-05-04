@@ -1,7 +1,6 @@
 ﻿using System.Drawing;
 using System.Windows.Forms;
 using AlphaTab.Platform;
-using AlphaTab.Rendering.Utils;
 
 namespace AlphaTab.WinForms
 {

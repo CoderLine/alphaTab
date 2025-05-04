@@ -1,7 +1,12 @@
 import emit from './KotlinEmitter';
-import transpiler from '../TranspilerBase'
+import transpiler from '../TranspilerBase';
 
-transpiler([{
-    name: 'Kotlin',
-    emit: emit
-}], true);
+transpiler(
+    [
+        {
+            name: 'Kotlin',
+            emit: emit
+        }
+    ],
+    true
+);

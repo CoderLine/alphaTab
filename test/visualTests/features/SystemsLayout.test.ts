@@ -1,7 +1,7 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { LayoutMode } from '@src/LayoutMode';
 import { Settings } from '@src/Settings';
-import { ScoreLoader } from '@src/importer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { TestPlatform } from '@test/TestPlatform';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 
@@ -13,7 +13,7 @@ describe('SystemsLayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'systems-layout/bars-adjusted.gp',
-                [new VisualTestRun(-1, 'systems-layout/bars-adjusted-automatic.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/bars-adjusted-automatic.png')],
                 settings
             )
         );
@@ -26,7 +26,7 @@ describe('SystemsLayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'systems-layout/bars-adjusted.gp',
-                [new VisualTestRun(-1, 'systems-layout/bars-adjusted-model.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/bars-adjusted-model.png')],
                 settings
             )
         );
@@ -39,7 +39,7 @@ describe('SystemsLayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'systems-layout/multi-track-different.gp',
-                [new VisualTestRun(-1, 'systems-layout/multi-track-single-track.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/multi-track-single-track.png')],
                 settings
             )
         );
@@ -51,7 +51,7 @@ describe('SystemsLayoutTests', () => {
 
         const options = await VisualTestOptions.file(
             'systems-layout/multi-track-different.gp',
-            [new VisualTestRun(-1, 'systems-layout/multi-track-two-tracks.png')],
+            [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/multi-track-two-tracks.png')],
             settings
         );
         options.tracks = [0, 1];
@@ -65,7 +65,7 @@ describe('SystemsLayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             await VisualTestOptions.file(
                 'systems-layout/resized.gp',
-                [new VisualTestRun(-1, 'systems-layout/resized.png')],
+                [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/resized.png')],
                 settings
             )
         );
@@ -77,7 +77,7 @@ describe('SystemsLayoutTests', () => {
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
 
         const score = ScoreLoader.loadScoreFromBytes(
-            await TestPlatform.loadFile(`test-data/visual-tests/systems-layout/multi-track-different.gp`)
+            await TestPlatform.loadFile('test-data/visual-tests/systems-layout/multi-track-different.gp')
         );
 
         for (const bars of score.tracks[0].staves[0].bars) {
@@ -87,7 +87,12 @@ describe('SystemsLayoutTests', () => {
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
                 score,
-                [new VisualTestRun(-1, 'systems-layout/horizontal-fixed-sizes-single-track.png')],
+                [
+                    new VisualTestRun(
+                        -1,
+                        'test-data/visual-tests/systems-layout/horizontal-fixed-sizes-single-track.png'
+                    )
+                ],
                 settings
             )
         );
@@ -98,7 +103,7 @@ describe('SystemsLayoutTests', () => {
         settings.display.layoutMode = LayoutMode.Horizontal;
         settings.display.systemsLayoutMode = SystemsLayoutMode.UseModelLayout;
         const score = ScoreLoader.loadScoreFromBytes(
-            await TestPlatform.loadFile(`test-data/visual-tests/systems-layout/multi-track-different.gp`)
+            await TestPlatform.loadFile('test-data/visual-tests/systems-layout/multi-track-different.gp')
         );
 
         for (const masterBar of score.masterBars) {
@@ -107,7 +112,7 @@ describe('SystemsLayoutTests', () => {
 
         const o = new VisualTestOptions(
             score,
-            [new VisualTestRun(-1, 'systems-layout/horizontal-fixed-sizes-two-tracks.png')],
+            [new VisualTestRun(-1, 'test-data/visual-tests/systems-layout/horizontal-fixed-sizes-two-tracks.png')],
             settings
         );
         o.tracks = [0, 1];

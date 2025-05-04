@@ -8,8 +8,8 @@ export class IntersectionObserverPolyfill {
 
     public constructor(callback: IntersectionObserverCallback) {
         let timer: any = null;
-        const oldCheck = this._check.bind(this);
-        this._check = () => {
+        const oldCheck = this.check.bind(this);
+        this.check = () => {
             if (!timer) {
                 timer = setTimeout(() => {
                     oldCheck();
@@ -20,8 +20,8 @@ export class IntersectionObserverPolyfill {
 
         this._callback = callback;
 
-        window.addEventListener('resize', this._check, true);
-        document.addEventListener('scroll', this._check, true);
+        window.addEventListener('resize', this.check, true);
+        document.addEventListener('scroll', this.check, true);
     }
 
     public observe(target: HTMLElement) {
@@ -29,25 +29,24 @@ export class IntersectionObserverPolyfill {
             return;
         }
         this._elements.push(target);
-        this._check();
+        this.check();
     }
 
     public unobserve(target: HTMLElement) {
         this._elements = this._elements.filter(item => {
-            return item != target;
+            return item !== target;
         });
-    };
+    }
 
-    private _check() {
+    private check() {
         const entries: IntersectionObserverEntry[] = [];
-        this._elements.forEach(element => {
+        for (const element of this._elements) {
             const rect = element.getBoundingClientRect();
-            const isVisible = (
+            const isVisible =
                 rect.top + rect.height >= 0 &&
                 rect.top <= window.innerHeight &&
                 rect.left + rect.width >= 0 &&
-                rect.left <= window.innerWidth
-            );
+                rect.left <= window.innerWidth;
 
             if (isVisible) {
                 entries.push({
@@ -55,7 +54,7 @@ export class IntersectionObserverPolyfill {
                     isIntersecting: true
                 } as any);
             }
-        });
+        }
 
         if (entries.length) {
             this._callback(entries, this as any);

@@ -1,14 +1,17 @@
-import { Note } from '@src/model';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
-import { ScoreBarRenderer } from '../ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { FingeringMode } from '@src/NotationSettings';
-import { TextGlyph } from './TextGlyph';
-import { TextAlign, TextBaseline } from '@src/platform';
+import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { type Note, NoteSubElement } from '@src/model/Note';
+import { TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import type { Color } from '@src/model/Color';
 
 export class FingeringInfo {
     public line: number = 0;
     public text: string;
+    public color: Color | undefined;
 
     public constructor(line: number, text: string) {
         this.line = line;
@@ -47,11 +50,12 @@ export class FingeringGroupGlyph extends GlyphGroup {
     }
 
     private addFinger(note: Note, text: string) {
-        let sr = this.renderer as ScoreBarRenderer;
-        let line: number = sr.getNoteLine(note);
+        const sr = this.renderer as ScoreBarRenderer;
+        const line: number = sr.getNoteLine(note);
 
         if (!this._infos.has(line)) {
             const info = new FingeringInfo(line, text);
+            info.color = ElementStyleHelper.noteColor(sr.resources, NoteSubElement.StandardNotationEffects, note);
             this._infos.set(line, info);
         } else {
             const info = this._infos.get(line)!;
@@ -60,7 +64,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
     }
 
     public override doLayout(): void {
-        let sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
         for (const [_, info] of this._infos) {
             const g = new TextGlyph(
@@ -71,6 +75,7 @@ export class FingeringGroupGlyph extends GlyphGroup {
                 TextAlign.Left,
                 TextBaseline.Middle
             );
+            g.colorOverride = info.color;
             g.renderer = sr;
             g.y = sr.getScoreY(info.line);
             g.doLayout();

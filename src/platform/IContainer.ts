@@ -1,5 +1,5 @@
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 
 /**
  * This interface represents a container control in the UI layer.

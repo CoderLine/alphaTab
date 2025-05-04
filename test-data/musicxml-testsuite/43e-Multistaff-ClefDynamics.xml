@@ -1,12 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A piano staff with dynamics and 
-          clef changes, where each element (ffff, wedge and clef changes) 
-          applies only to one voice or one staff, respectively.</miscellaneous-field>
+      <miscellaneous-field name="description">A piano staff with dynamics and
+          clef changes, where each element (‘ffff’, a wedge, and clef changes)
+          applies only to one voice or one staff, respectively.
+
+          The key change is given only once, not specifying a particular staff;
+          it should thus appear on both staves.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

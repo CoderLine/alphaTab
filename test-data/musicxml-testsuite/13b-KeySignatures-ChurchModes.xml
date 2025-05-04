@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">All different modes: major, 
-        minor, ionian, dorian, phrygian, lydian, mixolydian, aeolian, and 
-        locrian; All modes are given with 2 sharps.</miscellaneous-field>
+      <miscellaneous-field name="description">All different modes: ‘major’,
+          ‘minor’, ‘ionian’, ‘dorian’, ‘phrygian’, ‘lydian’, ‘mixolydian’,
+          ‘aeolian’, ‘locrian’, and ‘none’.  All modes are given with two
+          sharps.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -173,6 +174,22 @@
         <voice>1</voice>
         <type>quarter</type>
         <lyric number="1"><text>locrian</text></lyric>
+      </note>
+      <attributes>
+        <key>
+          <fifths>2</fifths>
+          <mode>none</mode>
+        </key>
+      </attributes>
+      <note>
+        <pitch>
+          <step>G</step>
+          <octave>4</octave>
+        </pitch>
+        <duration>1</duration>
+        <voice>1</voice>
+        <type>quarter</type>
+        <lyric number="1"><text>none</text></lyric>
       </note>
     </measure>
   </part>

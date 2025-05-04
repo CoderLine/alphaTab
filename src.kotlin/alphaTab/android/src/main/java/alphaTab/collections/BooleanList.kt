@@ -38,10 +38,12 @@ internal class BooleanList : IBooleanIterable {
         _data.fill(b)
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     public inline fun spread(): BooleanArray {
         return _data;
     }
 
+    @Suppress("NOTHING_TO_INLINE")
     public inline fun indexOf(v: Boolean): Double {
         return _data.indexOf(v).toDouble()
     }

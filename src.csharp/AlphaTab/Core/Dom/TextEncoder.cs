@@ -1,5 +1,4 @@
 ﻿using System.Text;
-using AlphaTab.Core.EcmaScript;
 
 namespace AlphaTab.Core.Dom;
 

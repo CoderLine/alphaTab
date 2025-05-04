@@ -1,4 +1,4 @@
-import * as alphaTab from '../dist/alphaTab.mjs';
+import * as alphaTab from '../src/alphaTab.main';
 
 const toDomElement = (function () {
     const parser = document.createElement('div');
@@ -12,9 +12,10 @@ const params = new URL(window.location.href).searchParams;
 
 const defaultSettings = {
     core: {
-        logLevel: params.get('loglevel') ?? 'info'
+        logLevel: params.get('loglevel') ?? 'info',
+        file: '/test-data/audio/full-song.gp5',
+        fontDirectory: '/font/bravura/'
     },
-    file: '/test-data/audio/full-song.gp5',
     player: {
         enablePlayer: true,
         scrollOffsetX: -10,
@@ -23,22 +24,22 @@ const defaultSettings = {
 };
 
 function applyFonts(settings) {
-    settings.display.resources.copyrightFont.families = ["Noto Sans"];
-    settings.display.resources.titleFont.families = ["Noto Serif"];
-    settings.display.resources.subTitleFont.families = ["Noto Serif"];
-    settings.display.resources.wordsFont.families = ["Noto Serif"];
-    settings.display.resources.effectFont.families = ["Noto Serif"];
-    settings.display.resources.timerFont.families = ["Noto Serif"];
-    settings.display.resources.fretboardNumberFont.families = ["Noto Sans"];
-    settings.display.resources.tablatureFont.families = ["Noto Sans"];
-    settings.display.resources.graceFont.families = ["Noto Sans"];
-    settings.display.resources.barNumberFont.families = ["Noto Sans"];
-    settings.display.resources.fingeringFont.families = ["Noto Serif"];
-    settings.display.resources.inlineFingeringFont.families = ["Noto Serif"];
-    settings.display.resources.markerFont.families = ["Noto Serif"];
-    settings.display.resources.directionsFont.families = ["Noto Serif"];
-    settings.display.resources.numberedNotationFont.families = ["Noto Sans"];
-    settings.display.resources.numberedNotationGraceFont.families = ["Noto Sans"];
+    settings.display.resources.copyrightFont.families = ['Noto Sans'];
+    settings.display.resources.titleFont.families = ['Noto Serif'];
+    settings.display.resources.subTitleFont.families = ['Noto Serif'];
+    settings.display.resources.wordsFont.families = ['Noto Serif'];
+    settings.display.resources.effectFont.families = ['Noto Serif'];
+    settings.display.resources.timerFont.families = ['Noto Serif'];
+    settings.display.resources.fretboardNumberFont.families = ['Noto Sans'];
+    settings.display.resources.tablatureFont.families = ['Noto Sans'];
+    settings.display.resources.graceFont.families = ['Noto Sans'];
+    settings.display.resources.barNumberFont.families = ['Noto Sans'];
+    settings.display.resources.fingeringFont.families = ['Noto Serif'];
+    settings.display.resources.inlineFingeringFont.families = ['Noto Serif'];
+    settings.display.resources.markerFont.families = ['Noto Serif'];
+    settings.display.resources.directionsFont.families = ['Noto Serif'];
+    settings.display.resources.numberedNotationFont.families = ['Noto Sans'];
+    settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans'];
 }
 
 function createTrackItem(track, trackSelection) {
@@ -261,6 +262,31 @@ export function setupControl(selector, customSettings) {
             at.countInVolume = 0;
         }
     };
+
+    function createOutputDeviceItem(device) {
+        const item = document.createElement('a');
+        item.classList.add('dropdown-item');
+        item.href = '#';
+        item.onclick = async () => {
+            await at.setOutputDevice(device);
+        };
+        item.innerText = device.label + (device.isDefault ? ' (default)' : '');
+        return item;
+    }
+
+    control.querySelector('.at-output-device').addEventListener('show.bs.dropdown', async () => {
+        const devices = await at.enumerateOutputDevices();
+        if (devices.length === 0) {
+            return;
+        }
+
+        const list = control.querySelector('.at-output-device .dropdown-menu');
+        list.innerHTML = '';
+        for (const d of devices) {
+            const item = createOutputDeviceItem(d);
+            list.appendChild(item);
+        }
+    });
 
     control.querySelectorAll('.at-speed-options a').forEach(function (a) {
         a.onclick = function (e) {

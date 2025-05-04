@@ -1,5 +1,5 @@
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform';
-import { EffectGlyph } from './EffectGlyph';
+import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class BeatTimerGlyph extends EffectGlyph {
     private static readonly PaddingX = 2;
@@ -33,7 +33,12 @@ export class BeatTimerGlyph extends EffectGlyph {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const halfWidth = (this._textWidth / 2) | 0;
-        canvas.strokeRect(cx + this.x - halfWidth, cy + this.y + BeatTimerGlyph.MarginY, this._textWidth, this._textHeight);
+        canvas.strokeRect(
+            cx + this.x - halfWidth,
+            cy + this.y + BeatTimerGlyph.MarginY,
+            this._textWidth,
+            this._textHeight
+        );
         const f = canvas.font;
         const b = canvas.textBaseline;
         const a = canvas.textAlign;

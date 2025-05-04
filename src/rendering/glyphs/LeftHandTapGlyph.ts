@@ -1,6 +1,6 @@
-import { ICanvas, TextAlign } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { RenderingResources } from '@src/RenderingResources';
+import type { RenderingResources } from '@src/RenderingResources';
 
 export class LeftHandTapGlyph extends EffectGlyph {
     private static readonly Padding = 4;
@@ -16,12 +16,16 @@ export class LeftHandTapGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let res: RenderingResources = this.renderer.resources;
+        const res: RenderingResources = this.renderer.resources;
         canvas.font = res.effectFont;
-        let old: TextAlign = canvas.textAlign;
+        const old: TextAlign = canvas.textAlign;
         canvas.textAlign = TextAlign.Center;
         canvas.fillText('T', cx + this.x, cy + this.y + canvas.font.size / 2);
         canvas.textAlign = old;
-        canvas.strokeCircle(cx + this.x, cy + this.y + canvas.font.size / 2 + (LeftHandTapGlyph.Padding - 1), canvas.font.size / 1.6);
+        canvas.strokeCircle(
+            cx + this.x,
+            cy + this.y + canvas.font.size / 2 + (LeftHandTapGlyph.Padding - 1),
+            canvas.font.size / 1.6
+        );
     }
 }

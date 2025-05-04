@@ -1,20 +1,21 @@
-import { Beat } from '@src/model/Beat';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { Duration } from '@src/model/Duration';
-import { Note } from '@src/model/Note';
-import { ICanvas } from '@src/platform/ICanvas';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { Note } from '@src/model/Note';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGlyphBase';
-import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
+import type { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
 import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteBounds } from '@src/rendering/utils/NoteBounds';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { DeadSlappedBeatGlyph } from './DeadSlappedBeatGlyph';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
@@ -27,17 +28,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public beat!: Beat;
     public beamingHelper!: BeamingHelper;
 
-    public constructor() {
-        super();
-    }
-
     public get direction(): BeamDirection {
         return this.beamingHelper.direction;
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
-            let n = this._noteGlyphLookup.get(note.id)!;
+            const n = this._noteGlyphLookup.get(note.id)!;
 
             let pos = this.x + n.x + this._noteHeadPadding;
             switch (requestedPosition) {
@@ -101,7 +98,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public override doLayout(): void {
         super.doLayout();
-        let scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const scoreRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
         if (this.beat.deadSlapped) {
             this._deadSlapped = new DeadSlappedBeatGlyph();
@@ -110,7 +107,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             this.width = this._deadSlapped.width;
         }
 
-        let direction: BeamDirection = this.direction;
+        const direction: BeamDirection = this.direction;
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
         let belowEffectSpacing = 1;
@@ -126,17 +123,17 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             if (this.direction === BeamDirection.Up) {
                 belowEffectSpacingShiftBefore = false;
                 aboveEffectSpacingShiftBefore = true;
-                belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.line + 2);
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.steps + 2);
                 aboveBeatEffectsY =
-                    scoreRenderer.getScoreY(this.minNote!.line) - scoreRenderer.getStemSize(this.beamingHelper, true);
+                    scoreRenderer.getScoreY(this.minNote!.steps) - scoreRenderer.getStemSize(this.beamingHelper, true);
             } else {
                 belowEffectSpacingShiftBefore = true;
                 aboveEffectSpacingShiftBefore = false;
-                belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.line - 1);
+                belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.steps - 1);
                 belowEffectSpacing *= -1;
                 aboveEffectSpacing *= -1;
                 aboveBeatEffectsY =
-                    scoreRenderer.getScoreY(this.maxNote!.line) + scoreRenderer.getStemSize(this.beamingHelper, true);
+                    scoreRenderer.getScoreY(this.maxNote!.steps) + scoreRenderer.getStemSize(this.beamingHelper, true);
             }
         }
 
@@ -192,9 +189,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
         if (this.beat.isTremolo && !this.beat.deadSlapped) {
             let offset: number = 0;
-            let baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
-            let tremoloX: number = direction === BeamDirection.Up ? this.displacedX : 0;
-            let speed: Duration = this.beat.tremoloSpeed!;
+            const baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
+            let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
+            const speed: Duration = this.beat.tremoloSpeed!;
             switch (speed) {
                 case Duration.ThirtySecond:
                     offset = direction === BeamDirection.Up ? -15 : 15;
@@ -221,10 +218,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
-        for (let note of this._notes) {
+        for (const note of this._notes) {
             if (this._noteGlyphLookup.has(note.id)) {
-                let glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
-                let noteBounds: NoteBounds = new NoteBounds();
+                const glyph: EffectGlyph = this._noteGlyphLookup.get(note.id)!;
+                const noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;
                 noteBounds.noteHeadBounds = new Bounds();
                 noteBounds.noteHeadBounds.x = cx + this.x + this._noteHeadPadding + glyph.x;
@@ -237,13 +234,19 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        this.paintEffects(cx, cy, canvas);
+
+        super.paint(cx, cy, canvas);
+    }
+
+    private paintEffects(cx: number, cy: number, canvas: ICanvas) {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, this.beat);
         for (const g of this.aboveBeatEffects.values()) {
             g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
         for (const g of this.belowBeatEffects.values()) {
             g.paint(cx + this.x + 2, cy + this.y, canvas);
         }
-        super.paint(cx, cy, canvas);
         if (this._tremoloPicking) {
             this._tremoloPicking.paint(cx, cy, canvas);
         }

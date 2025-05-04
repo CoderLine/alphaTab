@@ -1,13 +1,14 @@
-import { MidiFile } from '@src/midi/MidiFile';
-import { PlaybackRange } from '@src/synth/PlaybackRange';
-import { PlayerState } from '@src/synth/PlayerState';
-import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
-import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
-import { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
-import { LogLevel } from '@src/LogLevel';
-import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
-import { MidiEventType } from '@src/midi/MidiEvent';
+import type { MidiFile } from '@src/midi/MidiFile';
+import type { PlaybackRange } from '@src/synth/PlaybackRange';
+import type { PlayerState } from '@src/synth/PlayerState';
+import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { IEventEmitter, IEventEmitterOfT } from '@src/EventEmitter';
+import type { LogLevel } from '@src/LogLevel';
+import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
+import type { MidiEventType } from '@src/midi/MidiEvent';
+import type { ISynthOutput } from '@src/synth/ISynthOutput';
 
 /**
  * The public API interface for interacting with the synthesizer.
@@ -71,6 +72,7 @@ export interface IAlphaSynth {
 
     /**
      * Gets or sets volume of the metronome during count-in. (range: 0.0-3.0, default 0.0 - no count in)
+     * @since 1.1.0
      */
     countInVolume: number;
 
@@ -80,7 +82,13 @@ export interface IAlphaSynth {
     midiEventsPlayedFilter: MidiEventType[];
 
     /**
+     * Gets the output used by alphaSynth.
+     */
+    readonly output: ISynthOutput;
+
+    /**
      * Destroys the synthesizer and all related components
+     * @since 0.9.6
      */
     destroy(): void;
 
@@ -106,7 +114,7 @@ export interface IAlphaSynth {
     stop(): void;
 
     /**
-     * Stops any ongoing playback and plays the given midi file instead. 
+     * Stops any ongoing playback and plays the given midi file instead.
      * @param midi The midi file to play
      */
     playOneTimeMidiFile(midi: MidiFile): void;
@@ -136,7 +144,7 @@ export interface IAlphaSynth {
     applyTranspositionPitches(transpositionPitches: Map<number, number>): void;
 
     /**
-     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the 
+     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the
      * ones applied already via {@link applyTranspositionPitches}.
      * @param channel The channel number
      * @param semitones The number of semitones to apply as pitch offset.
@@ -181,46 +189,55 @@ export interface IAlphaSynth {
 
     /**
      * This event is fired when the playback of the whole song finished.
+     * @eventProperty
      */
     readonly finished: IEventEmitter;
 
     /**
      * This event is fired when the SoundFont needed for playback was loaded.
+     * @eventProperty
      */
     readonly soundFontLoaded: IEventEmitter;
 
     /**
      * This event is fired when the loading of the SoundFont failed.
+     * @eventProperty
      */
     readonly soundFontLoadFailed: IEventEmitterOfT<Error>;
 
     /**
      * This event is fired when the Midi file needed for playback was loaded.
+     * @eventProperty
      */
     readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
 
     /**
      * This event is fired when the loading of the Midi file failed.
+     * @eventProperty
      */
-    readonly midiLoadFailed: IEventEmitterOfT<Error>
+    readonly midiLoadFailed: IEventEmitterOfT<Error>;
 
     /**
      * This event is fired when the playback state changed.
+     * @eventProperty
      */
     readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs>;
 
     /**
      * This event is fired when the current playback position of/ the song changed.
+     * @eventProperty
      */
     readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
 
     /**
      * The event is fired when certain midi events were sent to the audio output device for playback.
+     * @eventProperty
      */
     readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs>;
 
     /**
      * The event is fired when the playback range within the player was updated.
+     * @eventProperty
      */
     readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
 }

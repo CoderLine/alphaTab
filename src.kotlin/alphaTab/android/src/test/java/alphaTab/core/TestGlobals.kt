@@ -1,8 +1,16 @@
 package alphaTab.core
 
+import alphaTab.SnapshotFileRepository
+import alphaTab.TestPlatformPartials
+import alphaTab.collections.ObjectDoubleMap
 import org.junit.Assert
-import kotlin.math.exp
+import java.lang.reflect.Method
+import java.nio.file.Paths
+import kotlin.contracts.ExperimentalContracts
 import kotlin.reflect.KClass
+
+annotation class TestName(val name: String)
+annotation class SnapshotFile(val path: String)
 
 typealias Test = org.junit.Test
 
@@ -42,8 +50,7 @@ class NotExpector<T>(private val actual: T) {
 class Expector<T>(private val actual: T) {
     val to
         get() = this
-    val not
-        get() = NotExpector(actual)
+    fun not() = NotExpector(actual)
 
     val be
         get() = this
@@ -74,11 +81,21 @@ class Expector<T>(private val actual: T) {
         Assert.assertEquals(message, expectedTyped, actualToCheck as Any?)
     }
 
+
+    fun lessThan(expected: Double) {
+        if (actual is Number) {
+            Assert.assertTrue("Expected $actual to be less than $expected", actual.toDouble() < expected)
+        } else {
+            Assert.fail("lessThan can only be used with numeric operands");
+        }
+    }
+
+
     fun greaterThan(expected: Double) {
         if (actual is Number) {
             Assert.assertTrue("Expected $actual to be greater than $expected", actual.toDouble() > expected)
         } else {
-            Assert.fail("toBeCloseTo can only be used with numeric operands");
+            Assert.fail("greaterThan can only be used with numeric operands");
         }
     }
     fun closeTo(expected: Double, delta: Double, message: String? = null) {
@@ -160,10 +177,72 @@ class Expector<T>(private val actual: T) {
             Assert.fail("ToThrowError can only be used with an exception");
         }
     }
+
+    private fun findTestMethod(): Method {
+        val walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE)
+        var testMethod:Method? = null
+        walker.forEach { frame ->
+            if(testMethod == null) {
+                val method = frame.declaringClass.getDeclaredMethod(
+                    frame.methodName,
+                    *frame.methodType.parameterArray()
+                )
+
+                if(method.getAnnotation(Test::class.java) != null) {
+                    testMethod = method
+                }
+            }
+        }
+
+        if (testMethod == null) {
+            Assert.fail("No information about current test available, cannot find test snapshot");
+        }
+
+        return testMethod!!
+    }
+
+    @ExperimentalUnsignedTypes
+    @ExperimentalContracts
+    fun toMatchSnapshot() {
+        val testMethodInfo = findTestMethod()
+        val file = testMethodInfo.getAnnotation(SnapshotFile::class.java)?.path
+        if (file.isNullOrEmpty()) {
+            Assert.fail("Missing SnapshotFile annotation with path to .snap file")
+        }
+
+        val absoluteSnapFilePath = Paths.get(
+            TestPlatformPartials.projectRoot,
+            file
+        ).toAbsolutePath();
+        if (!absoluteSnapFilePath.toFile().exists()) {
+            Assert.fail("Could not find snapshot file at $absoluteSnapFilePath")
+        }
+
+        val snapshotFile = SnapshotFileRepository.loadSnapshortFile(absoluteSnapFilePath.toString())
+
+        val testSuiteName = testMethodInfo.declaringClass.simpleName
+        val testName = testMethodInfo.getAnnotation(TestName::class.java)!!.name
+
+        val fullTestName = "$testSuiteName $testName "
+
+        val counter = (TestGlobals.snapshotAssertionCounters.get(fullTestName) ?: 0.0) + 1
+        TestGlobals.snapshotAssertionCounters.set(fullTestName, counter)
+
+        val snapshotName = "$fullTestName${counter.toInt()}"
+
+        val error = snapshotFile.match(snapshotName, actual)
+        if (!error.isNullOrEmpty()) {
+            Assert.fail(error)
+        }
+    }
 }
 
 class TestGlobals {
+    @ExperimentalUnsignedTypes
+    @ExperimentalContracts
     companion object {
+        val snapshotAssertionCounters: ObjectDoubleMap<String> = ObjectDoubleMap()
+
         fun <T> expect(actual: T): Expector<T> {
             return Expector(actual);
         }
@@ -175,5 +254,7 @@ class TestGlobals {
         fun fail(message: Any?) {
             Assert.fail(message.toString())
         }
+
+
     }
 }

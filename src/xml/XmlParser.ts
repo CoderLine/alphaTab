@@ -25,25 +25,25 @@ import { XmlError } from '@src/xml/XmlError';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
 enum XmlState {
-    IgnoreSpaces,
-    Begin,
-    BeginNode,
-    TagName,
-    Body,
-    AttribName,
-    Equals,
-    AttvalBegin,
-    AttribVal,
-    Childs,
-    Close,
-    WaitEnd,
-    WaitEndRet,
-    Pcdata,
-    Header,
-    Comment,
-    Doctype,
-    Cdata,
-    Escape
+    IgnoreSpaces = 0,
+    Begin = 1,
+    BeginNode = 2,
+    TagName = 3,
+    Body = 4,
+    AttribName = 5,
+    Equals = 6,
+    AttvalBegin = 7,
+    AttribVal = 8,
+    Childs = 9,
+    Close = 10,
+    WaitEnd = 11,
+    WaitEndRet = 12,
+    Pcdata = 13,
+    Header = 14,
+    Comment = 15,
+    Doctype = 16,
+    Cdata = 17,
+    Escape = 18
 }
 
 export class XmlParser {
@@ -132,7 +132,7 @@ export class XmlParser {
                 case XmlState.Pcdata:
                     if (c === XmlParser.CharCodeLowerThan) {
                         buf += str.substr(start, p - start);
-                        let child: XmlNode = new XmlNode();
+                        const child: XmlNode = new XmlNode();
                         child.nodeType = XmlNodeType.Text;
                         child.value = buf;
                         buf = '';
@@ -154,7 +154,7 @@ export class XmlParser {
                         str.charCodeAt(p + 2) === XmlParser.CharCodeGreaterThan
                     ) {
                         // ]]>
-                        let child: XmlNode = new XmlNode();
+                        const child: XmlNode = new XmlNode();
                         child.nodeType = XmlNodeType.CDATA;
                         child.value = str.substr(start, p - start);
                         parent.addChild(child);
@@ -249,7 +249,7 @@ export class XmlParser {
                         if (start === p) {
                             throw new XmlError('Expected attribute name', str, p);
                         }
-                        let tmp: string = str.substr(start, p - start);
+                        const tmp: string = str.substr(start, p - start);
                         aname = tmp;
                         if (xml!.attributes.has(aname)) {
                             throw new XmlError(`Duplicate attribute [${aname}]`, str, p);
@@ -294,7 +294,7 @@ export class XmlParser {
                         default:
                             if (c === attrValQuote) {
                                 buf += str.substr(start, p - start);
-                                let value: string = buf;
+                                const value: string = buf;
                                 buf = '';
                                 xml!.attributes.set(aname!, value);
                                 state = XmlState.IgnoreSpaces;
@@ -333,9 +333,9 @@ export class XmlParser {
                         if (start === p) {
                             throw new XmlError('Expected node name', str, p);
                         }
-                        let v: string = str.substr(start, p - start);
+                        const v: string = str.substr(start, p - start);
                         if (v !== parent.localName) {
-                            throw new XmlError('Expected </' + parent.localName + '>', str, p);
+                            throw new XmlError(`Expected </${parent.localName}>`, str, p);
                         }
                         state = XmlState.IgnoreSpaces;
                         next = XmlState.WaitEndRet;
@@ -361,7 +361,7 @@ export class XmlParser {
                         nbrackets--;
                     } else if (c === XmlParser.CharCodeGreaterThan && nbrackets === 0) {
                         // >
-                        let node: XmlNode = new XmlNode();
+                        const node: XmlNode = new XmlNode();
                         node.nodeType = XmlNodeType.DocumentType;
                         node.value = str.substr(start, p - start);
                         parent.addChild(node);
@@ -378,17 +378,17 @@ export class XmlParser {
 
                 case XmlState.Escape:
                     if (c === XmlParser.CharCodeSemi) {
-                        let s: string = str.substr(start, p - start);
+                        const s: string = str.substr(start, p - start);
                         if (s.charCodeAt(0) === XmlParser.CharCodeSharp) {
-                            let code: number =
+                            const code: number =
                                 s.charCodeAt(1) === XmlParser.CharCodeLowerX
-                                    ? parseInt('0' + s.substr(1, s.length - 1))
-                                    : parseInt(s.substr(1, s.length - 1));
+                                    ? Number.parseInt(`0${s.substr(1, s.length - 1)}`)
+                                    : Number.parseInt(s.substr(1, s.length - 1));
                             buf += String.fromCharCode(code);
                         } else if (XmlParser.Escapes.has(s)) {
                             buf += XmlParser.Escapes.get(s);
                         } else {
-                            buf += ('&' + s + ';')?.toString();
+                            buf += `&${s};`?.toString();
                         }
                         start = p + 1;
                         state = escapeNext;
@@ -413,7 +413,7 @@ export class XmlParser {
         if (state === XmlState.Pcdata) {
             if (p !== start) {
                 buf += str.substr(start, p - start);
-                let node: XmlNode = new XmlNode();
+                const node: XmlNode = new XmlNode();
                 node.nodeType = XmlNodeType.Text;
                 node.value = buf;
                 parent.addChild(node);
@@ -423,7 +423,7 @@ export class XmlParser {
         if (state === XmlState.Escape && escapeNext === XmlState.Pcdata) {
             buf += '&';
             buf += str.substr(start, p - start);
-            let node: XmlNode = new XmlNode();
+            const node: XmlNode = new XmlNode();
             node.nodeType = XmlNodeType.Text;
             node.value = buf;
             parent.addChild(node);

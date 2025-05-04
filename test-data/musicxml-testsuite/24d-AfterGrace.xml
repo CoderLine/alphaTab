@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">Some grace notes and after-graces
-            (indicated by steal-time-previous and steal-time-following).</miscellaneous-field>
+          indicated by ‘steal-time-previous’ (for the first grace note) and
+          ‘steal-time-following’ (for the second one).  The remaining grace
+          notes have no such attribute.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -15,7 +17,7 @@
   </part-list>
   <!--=========================================================-->
   <part id="P1">
-    <measure number="25">
+    <measure number="1">
       <attributes>
         <divisions>32</divisions>
         <key>
@@ -42,7 +44,7 @@
         <staff>1</staff>
       </note>
       <note>
-        <grace steal-time-previous="20"/>
+        <grace slash="no" steal-time-previous="20"/>
         <pitch>
           <step>G</step>
           <octave>5</octave>
@@ -52,7 +54,7 @@
         <staff>1</staff>
       </note>
       <note>
-        <grace steal-time-following="20"/>
+        <grace slash="no" steal-time-following="20"/>
         <pitch>
           <step>A</step>
           <octave>5</octave>
@@ -62,7 +64,7 @@
         <staff>1</staff>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>A</step>
           <octave>5</octave>
@@ -82,7 +84,7 @@
         <staff>1</staff>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>G</step>
           <octave>5</octave>
@@ -94,7 +96,7 @@
         <beam number="2">begin</beam>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>A</step>
           <octave>5</octave>

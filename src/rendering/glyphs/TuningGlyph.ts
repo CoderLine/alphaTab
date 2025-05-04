@@ -1,13 +1,17 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Tuning } from '@src/model/Tuning';
-import { ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import type { Color } from '@src/model/Color';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
     private _trackLabel: string;
+
+    public colorOverride?: Color;
 
     public constructor(x: number, y: number, tuning: Tuning, trackLabel: string) {
         super(x, y);
@@ -29,13 +33,14 @@ export class TuningGlyph extends GlyphGroup {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         canvas.textBaseline = TextBaseline.Middle;
+        const c = canvas.color;
+        if (this.colorOverride) {
+            canvas.color = this.colorOverride!;
+        }
         super.paint(cx, cy, canvas);
+        canvas.color = c;
     }
 
-    /**
-     * The height of the GuitarString# glyphs at scale 1
-     */
-    public static readonly CircleNumberHeight: number = 20;
     public static readonly CircleNumberScale: number = 0.7;
 
     private createGlyphs(tuning: Tuning): void {
@@ -43,13 +48,16 @@ export class TuningGlyph extends GlyphGroup {
         this.height = 0;
 
         const rowHeight = 15;
+        const textPadding = 1;
 
         // Track name
         if (this._trackLabel.length > 0) {
+            this.height += textPadding;
+
             const trackName = new TextGlyph(0, this.height, this._trackLabel, res.effectFont, TextAlign.Left);
             trackName.renderer = this.renderer;
             trackName.doLayout();
-            this.height += trackName.height;
+            this.height += trackName.height + textPadding;
             trackName.y += trackName.height / 2;
             this.addGlyph(trackName);
         }
@@ -73,17 +81,17 @@ export class TuningGlyph extends GlyphGroup {
         if (!tuning.isStandard) {
             this.height += rowHeight;
             const circleScale = TuningGlyph.CircleNumberScale;
-            const circleHeight = TuningGlyph.CircleNumberHeight * circleScale;
+            const circleHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
             // Strings
-            let stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
+            const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
             let currentY: number = this.height;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
                 this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 2.5, circleScale, symbol));
 
-                const str: string = '= ' + Tuning.getTextForTuning(tuning.tunings[i], false);
+                const str: string = `= ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
                 this.addGlyph(
                     new TextGlyph(currentX + circleHeight + 1, currentY, str, res.effectFont, TextAlign.Left)
                 );

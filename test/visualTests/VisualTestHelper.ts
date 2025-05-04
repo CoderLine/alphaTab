@@ -1,9 +1,9 @@
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { Environment } from '@src/Environment';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PixelMatch, PixelMatchOptions } from '@test/visualTests/PixelMatch';
@@ -71,9 +71,10 @@ export class VisualTestHelper {
         settings?: Settings,
         configure?: (o: VisualTestOptions) => void
     ): Promise<void> {
-        const inputFileData = await TestPlatform.loadFile(`test-data/visual-tests/${inputFile}`);
+        inputFile = `test-data/visual-tests/${inputFile}`;
+        const inputFileData = await TestPlatform.loadFile(inputFile);
         const referenceFileName = TestPlatform.changeExtension(inputFile, '.png');
-        let score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
+        const score: Score = ScoreLoader.loadScoreFromBytes(inputFileData, settings);
 
         const o = new VisualTestOptions(score, [new VisualTestRun(-1, referenceFileName)], settings);
         if (configure) {
@@ -96,24 +97,24 @@ export class VisualTestHelper {
         await VisualTestHelper.prepareAlphaSkia();
         VisualTestHelper.prepareSettingsForTest(settings!);
 
-        let referenceFileData: Uint8Array[] = [];
+        const referenceFileData: Uint8Array[] = [];
         for (const run of runs) {
             try {
-                referenceFileData.push(await TestPlatform.loadFile(`test-data/visual-tests/${run.referenceFileName}`));
+                referenceFileData.push(await TestPlatform.loadFile(run.referenceFileName));
             } catch (e) {
                 referenceFileData.push(new Uint8Array(0));
             }
         }
 
-        let results: RenderFinishedEventArgs[][] = [];
-        let totalWidths: number[] = [];
-        let totalHeights: number[] = [];
+        const results: RenderFinishedEventArgs[][] = [];
+        const totalWidths: number[] = [];
+        const totalHeights: number[] = [];
         const uiFacade = new TestUiFacade();
         uiFacade.rootContainer.width = runs[runIndex++].width;
 
         const api = new AlphaTabApiBase<unknown>(uiFacade, settings);
 
-        let render = new Promise<void>((resolve, reject) => {
+        const render = new Promise<void>((resolve, reject) => {
             api.renderStarted.on(_ => {
                 results.push([]);
                 totalWidths.push(0);
@@ -184,7 +185,8 @@ export class VisualTestHelper {
 
             if (errors.length === 1) {
                 throw errors[0];
-            } else if (errors.length > 0) {
+            }
+            if (errors.length > 0) {
                 const errorMessages = errors.map(e => e.message ?? 'Unknown error').join('\n');
                 throw new Error(errorMessages);
             }
@@ -200,18 +202,20 @@ export class VisualTestHelper {
             return;
         }
 
-        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.ttf')).buffer as ArrayBuffer;
+        const bravura: ArrayBuffer = (await TestPlatform.loadFile('font/bravura/Bravura.otf')).buffer as ArrayBuffer;
         VisualTestHelper.enableAlphaSkia(bravura);
 
         const fonts = [
-            'font/noto-sans/NotoSans-Regular.ttf',
-            'font/noto-sans/NotoSans-Italic.ttf',
-            'font/noto-sans/NotoSans-Bold.ttf',
-            'font/noto-sans/NotoSans-BoldItalic.ttf',
-            'font/noto-serif/NotoSerif-Regular.ttf',
-            'font/noto-serif/NotoSerif-Italic.ttf',
-            'font/noto-serif/NotoSerif-Bold.ttf',
-            'font/noto-serif/NotoSerif-BoldItalic.ttf'
+            'font/noto-sans/NotoSans-Regular.otf',
+            'font/noto-sans/NotoSans-Italic.otf',
+            'font/noto-sans/NotoSans-Bold.otf',
+            'font/noto-sans/NotoSans-BoldItalic.otf',
+            'font/noto-serif/NotoSerif-Regular.otf',
+            'font/noto-serif/NotoSerif-Italic.otf',
+            'font/noto-serif/NotoSerif-Bold.otf',
+            'font/noto-serif/NotoSerif-BoldItalic.otf',
+            'font/noto-music/NotoMusic-Regular.otf',
+            'font/noto-color-emoji/NotoColorEmoji_WindowsCompatible.ttf',
         ];
 
         for (const font of fonts) {
@@ -237,22 +241,22 @@ export class VisualTestHelper {
         Environment.HighDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;
 
-        settings.display.resources.copyrightFont.families = ['Noto Sans'];
-        settings.display.resources.titleFont.families = ['Noto Serif'];
-        settings.display.resources.subTitleFont.families = ['Noto Serif'];
-        settings.display.resources.wordsFont.families = ['Noto Serif'];
-        settings.display.resources.effectFont.families = ['Noto Serif'];
-        settings.display.resources.timerFont.families = ['Noto Serif'];
-        settings.display.resources.fretboardNumberFont.families = ['Noto Sans'];
-        settings.display.resources.tablatureFont.families = ['Noto Sans'];
-        settings.display.resources.graceFont.families = ['Noto Sans'];
-        settings.display.resources.barNumberFont.families = ['Noto Sans'];
-        settings.display.resources.fingeringFont.families = ['Noto Serif'];
-        settings.display.resources.inlineFingeringFont.families = ['Noto Serif'];
-        settings.display.resources.markerFont.families = ['Noto Serif'];
-        settings.display.resources.directionsFont.families = ['Noto Serif'];
-        settings.display.resources.numberedNotationFont.families = ['Noto Sans'];
-        settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans'];
+        settings.display.resources.copyrightFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.titleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.subTitleFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.wordsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.effectFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.timerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.fretboardNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.tablatureFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.graceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.barNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.fingeringFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.inlineFingeringFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.markerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.directionsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.numberedNotationFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
+        settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
     }
 
     public static async compareVisualResult(
@@ -343,7 +347,7 @@ export class VisualTestHelper {
                 pixelMatchOptions.diffMask = true;
                 pixelMatchOptions.alpha = 1;
 
-                let match = PixelMatch.match(
+                const match = PixelMatch.match(
                     new Uint8Array(expectedImageData),
                     new Uint8Array(actualImageData),
                     new Uint8Array(diffImageData),
@@ -353,15 +357,15 @@ export class VisualTestHelper {
                 );
 
                 // only pixels that are not transparent are relevant for the diff-ratio
-                let totalPixels = match.totalPixels - match.transparentPixels;
-                let percentDifference = (match.differentPixels / totalPixels) * 100;
+                const totalPixels = match.totalPixels - match.transparentPixels;
+                const percentDifference = (match.differentPixels / totalPixels) * 100;
 
                 pass = percentDifference <= tolerancePercent;
                 // result.pass = match.differentPixels === 0;
                 errorMessage = '';
 
                 if (!pass) {
-                    let percentDifferenceText = percentDifference.toFixed(2);
+                    const percentDifferenceText = percentDifference.toFixed(2);
                     errorMessage = `Difference between original and new image is too big: ${match.differentPixels}/${totalPixels} (${percentDifferenceText}%)`;
 
                     using diffPng = AlphaSkiaImage.fromPixels(actual.width, actual.height, diffImageData)!;
@@ -379,15 +383,14 @@ export class VisualTestHelper {
             }
         } else {
             pass = false;
-            errorMessage = 'Missing reference image file' + expectedFileName;
+            errorMessage = `Missing reference image file${expectedFileName}`;
             await VisualTestHelper.saveFiles(expectedFileName, oldActual, undefined);
         }
 
         if (!pass) {
             throw new Error(errorMessage);
-        } else {
-            await VisualTestHelper.deleteFiles(expectedFileName);
         }
+        await VisualTestHelper.deleteFiles(expectedFileName);
     }
 
     static async saveFiles(
@@ -395,7 +398,6 @@ export class VisualTestHelper {
         actual: AlphaSkiaImage,
         diff: AlphaSkiaImage | undefined
     ): Promise<void> {
-        expectedFilePath = TestPlatform.joinPath('test-data', 'visual-tests', expectedFilePath);
         if (diff) {
             const diffData = diff.toPng()!;
 
@@ -409,8 +411,6 @@ export class VisualTestHelper {
     }
 
     static async deleteFiles(expectedFilePath: string): Promise<void> {
-        expectedFilePath = TestPlatform.joinPath('test-data', 'visual-tests', expectedFilePath);
-
         const diffFileName = TestPlatform.changeExtension(expectedFilePath, '.diff.png');
         await TestPlatform.deleteFile(diffFileName);
 

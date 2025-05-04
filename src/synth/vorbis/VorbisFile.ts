@@ -1,24 +1,22 @@
-import { IReadable } from '@src/io/IReadable';
-import { OggReader } from './OggReader';
-import { VorbisStream } from './VorbisStream';
-import { VorbisStreamReader } from './VorbisStreamReader';
+import type { IReadable } from '@src/io/IReadable';
+import { OggReader } from '@src/synth/vorbis/OggReader';
+import type { VorbisStream } from '@src/synth/vorbis/VorbisStream';
+import { VorbisStreamReader } from '@src/synth/vorbis/VorbisStreamReader';
 
 export class VorbisFile {
     public streams: VorbisStream[] = [];
 
     public constructor(readable: IReadable) {
-        var oggContainer = new OggReader(readable);
-        var packets = oggContainer.read();
+        const oggContainer = new OggReader(readable);
+        const packets = oggContainer.read();
 
-        var decoder = new VorbisStreamReader(packets);
-        while(true){
-            let stream = decoder.read();
-            if(stream == null){
+        const decoder = new VorbisStreamReader(packets);
+        while (true) {
+            const stream = decoder.read();
+            if (stream == null) {
                 break;
             }
-            else{
-                this.streams.push(stream);
-            }
+            this.streams.push(stream);
         }
     }
 }

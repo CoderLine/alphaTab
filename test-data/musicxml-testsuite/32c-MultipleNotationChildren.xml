@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">
           It should not make any difference whether two articulations are given
-          inside two different notation elements, inside two different articulations 
+          inside two different notation elements, inside two different articulations
           children of the same notation element or inside the same articulations
           element. Thus, all three notes should have a staccato and an accent.
       </miscellaneous-field>
@@ -42,7 +42,6 @@
         <duration>4</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>sharp</accidental>
         <notations>
           <articulations>
             <staccato placement="above"/>
@@ -62,7 +61,6 @@
         <duration>4</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>sharp</accidental>
         <notations>
           <articulations>
             <staccato placement="above"/>
@@ -80,7 +78,6 @@
         <duration>4</duration>
         <voice>1</voice>
         <type>quarter</type>
-        <accidental>sharp</accidental>
         <notations>
           <articulations>
             <staccato placement="above"/>

@@ -1,5 +1,5 @@
 import { ControllerType } from '@src/midi/ControllerType';
-import { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
+import type { IMidiFileHandler } from '@src/midi/IMidiFileHandler';
 
 import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
 import { MasterBarTickLookup, MasterBarTickLookupTempoChange } from '@src/midi/MasterBarTickLookup';
@@ -7,27 +7,27 @@ import { MidiTickLookup } from '@src/midi/MidiTickLookup';
 
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
-import { Automation, AutomationType } from '@src/model/Automation';
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
+import { type Automation, AutomationType } from '@src/model/Automation';
+import type { Bar } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
 import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
-import { MasterBar } from '@src/model/MasterBar';
-import { Note } from '@src/model/Note';
-import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import type { MasterBar } from '@src/model/MasterBar';
+import type { Note } from '@src/model/Note';
+import type { PlaybackInformation } from '@src/model/PlaybackInformation';
+import type { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { VibratoType } from '@src/model/VibratoType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 import { WhammyType } from '@src/model/WhammyType';
 import { NotationMode } from '@src/NotationSettings';
 import { Settings } from '@src/Settings';
@@ -35,7 +35,7 @@ import { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { DynamicValue } from '@src/model';
+import { DynamicValue } from '@src/model/DynamicValue';
 import { FadeType } from '@src/model/FadeType';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
@@ -193,8 +193,8 @@ export class MidiFileGenerator {
                 : -track.staves[0].transpositionPitch;
         this.transpositionPitches.set(channel, transpositionPitch);
 
-        let volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);
-        let balance: number = MidiFileGenerator.toChannelShort(playbackInfo.balance);
+        const volume: number = MidiFileGenerator.toChannelShort(playbackInfo.volume);
+        const balance: number = MidiFileGenerator.toChannelShort(playbackInfo.balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.VolumeCoarse, volume);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.PanCoarse, balance);
         this._handler.addControlChange(track.index, 0, channel, ControllerType.ExpressionControllerCoarse, 127);
@@ -267,7 +267,7 @@ export class MidiFileGenerator {
     }
 
     private generateBar(bar: Bar, barStartTick: number, tempoOnBarStart: number): void {
-        let playbackBar: Bar = this.getPlaybackBar(bar);
+        const playbackBar: Bar = this.getPlaybackBar(bar);
 
         const barStartTime = this._currentTime;
         for (const v of playbackBar.voices) {
@@ -315,11 +315,7 @@ export class MidiFileGenerator {
 
         // in case of simile marks where we repeat we register the empty beat for the whole bar
         if (playbackBar.id !== bar.id) {
-            this.tickLookup.addBeat(
-                bar.voices[0].beats[0],
-                0,
-                tickDuration
-            );
+            this.tickLookup.addBeat(bar.voices[0].beats[0], 0, tickDuration);
             //this.tickLookup.addBeat(beat, 0, audioDuration);
         }
     }
@@ -411,8 +407,8 @@ export class MidiFileGenerator {
         } else if (beat.deadSlapped) {
             this.generateDeadSlap(beat, barStartTick + beatStart);
         } else {
-            let brushInfo = this.getBrushInfo(beat);
-            let rasgueadoInfo = this.getRasgueadoInfo(beat, audioDuration);
+            const brushInfo = this.getBrushInfo(beat);
+            const rasgueadoInfo = this.getRasgueadoInfo(beat, audioDuration);
             for (const n of beat.notes) {
                 this.generateNote(
                     n,
@@ -547,7 +543,7 @@ export class MidiFileGenerator {
                     beatStart,
                     deadSlapDuration,
                     t,
-                    MidiUtils.dynamicToVelocity(DynamicValue.F as number),
+                    MidiUtils.dynamicToVelocity(DynamicValue.F),
                     staff.track.playbackInfo.primaryChannel
                 );
             }
@@ -615,7 +611,7 @@ export class MidiFileGenerator {
         const channel: number = this.determineChannel(track, note);
         let initialBend: number = 0;
 
-        let noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
+        const noteSoundDuration: number = Math.max(noteDuration.untilTieOrSlideEnd, noteDuration.letRingEnd);
 
         if (note.hasBend) {
             initialBend = MidiFileGenerator.getPitchWheel(note.bendPoints![0].value);
@@ -695,18 +691,8 @@ export class MidiFileGenerator {
      */
     // prettier-ignore
     private static readonly OrnamentKeysUp = [
-        /* C -> D */ 2,
-        /* C# -> D# */ 2,
-        /* D -> E */ 2,
-        /* D# -> E */ 1,
-        /* E -> F */ 1, 
-        /* F -> G */ 2,
-        /* F# -> G# */ 2,
-        /* G -> A */ 2,
-        /* G# -> A# */ 2,
-        /* A -> B */ 2,
-        /* A# -> B */ 1,
-        /* B -> C */ 1
+        /* C -> D */ 2, /* C# -> D# */ 2, /* D -> E */ 2, /* D# -> E */ 1, /* E -> F */ 1, /* F -> G */ 2,
+        /* F# -> G# */ 2, /* G -> A */ 2, /* G# -> A# */ 2, /* A -> B */ 2, /* A# -> B */ 1, /* B -> C */ 1
     ];
 
     /**
@@ -717,18 +703,8 @@ export class MidiFileGenerator {
      */
     // prettier-ignore
     private static readonly OrnamentKeysDown = [
-        /* C -> B */ -1,
-        /* C# -> C */ -1,
-        /* D -> C# */ -1,
-        /* D# -> D */ -1,
-        /* E -> D# */ -1, 
-        /* F -> E */ -1,
-        /* F# -> F */ -1,
-        /* G -> F# */ -1,
-        /* G# -> G */ -1,
-        /* A -> G# */ -1,
-        /* A# -> A */ -1,
-        /* B -> A# */ -1
+        /* C -> B */ -1, /* C# -> C */ -1, /* D -> C# */ -1, /* D# -> D */ -1, /* E -> D# */ -1, /* F -> E */ -1,
+        /* F# -> F */ -1, /* G -> F# */ -1, /* G# -> G */ -1, /* A -> G# */ -1, /* A# -> A */ -1, /* B -> A# */ -1
     ];
 
     private generateOrnament(
@@ -912,7 +888,7 @@ export class MidiFileGenerator {
             let letRingEnd: number = 0;
             const maxDuration: number = note.beat.voice.bar.masterBar.calculateDuration();
             while (lastLetRingBeat.nextBeat) {
-                let next: Beat = lastLetRingBeat.nextBeat;
+                const next: Beat = lastLetRingBeat.nextBeat;
                 if (next.isRest) {
                     break;
                 }
@@ -947,26 +923,26 @@ export class MidiFileGenerator {
     }
 
     private static getNoteVelocity(note: Note): number {
-        let dynamicValue: number = note.dynamics as number;
+        let adjustment: number = 0;
         // more silent on hammer destination
         if (!note.beat.voice.bar.staff.isPercussion && note.hammerPullOrigin) {
-            dynamicValue--;
+            adjustment--;
         }
         // more silent on ghost notes
         if (note.isGhost) {
-            dynamicValue--;
+            adjustment--;
         }
         // louder on accent
         switch (note.accentuated) {
             case AccentuationType.Normal:
-                dynamicValue++;
+                adjustment++;
                 break;
             case AccentuationType.Heavy:
-                dynamicValue += 2;
+                adjustment += 2;
                 break;
         }
 
-        return MidiUtils.dynamicToVelocity(dynamicValue);
+        return MidiUtils.dynamicToVelocity(note.dynamics, adjustment);
     }
 
     private generateFade(beat: Beat, beatStart: number, beatDuration: number): void {
@@ -1063,8 +1039,8 @@ export class MidiFileGenerator {
             note.vibrato !== VibratoType.None
                 ? note.vibrato
                 : note.isTieDestination
-                ? note.tieOrigin!.vibrato
-                : VibratoType.Slight; /* should never happen unless called wrongly */
+                  ? note.tieOrigin!.vibrato
+                  : VibratoType.Slight; /* should never happen unless called wrongly */
         switch (vibratoType) {
             case VibratoType.Slight:
                 phaseLength = this._settings.player.vibrato.noteSlightLength;
@@ -1113,7 +1089,7 @@ export class MidiFileGenerator {
             let phase: number = 0;
             const phaseDuration: number = noteStart + phaseLength < noteEnd ? phaseLength : noteEnd - noteStart;
             while (phase < phaseDuration) {
-                let bend: number = bendBase + bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
+                const bend: number = bendBase + bendAmplitude * Math.sin((phase * Math.PI) / phaseHalf);
                 addBend((noteStart + phase) | 0, MidiFileGenerator.getPitchWheel(bend));
                 phase += resolution;
             }
@@ -1161,10 +1137,10 @@ export class MidiFileGenerator {
         channel: number,
         tempoOnBeatStart: number
     ) {
-        let duration: number =
+        const duration: number =
             note.slideOutType === SlideOutType.Legato ? noteDuration.noteOnly : noteDuration.untilTieOrSlideEnd;
-        let playedBendPoints: BendPoint[] = [];
-        let track: Track = note.beat.voice.bar.staff.track;
+        const playedBendPoints: BendPoint[] = [];
+        const track: Track = note.beat.voice.bar.staff.track;
 
         const simpleSlidePitchOffset = this._settings.player.slide.simpleSlidePitchOffset;
         const simpleSlideDurationOffset = Math.floor(
@@ -1227,8 +1203,8 @@ export class MidiFileGenerator {
         channel: number,
         tempoOnBeatStart: number
     ): void {
-        let bendPoints: BendPoint[] = note.bendPoints!;
-        let track: Track = note.beat.voice.bar.staff.track;
+        const bendPoints: BendPoint[] = note.bendPoints!;
+        const track: Track = note.beat.voice.bar.staff.track;
 
         const addBend: (tick: number, value: number) => void = (tick, value) => {
             this._handler.addNoteBend(track.index, tick, channel, noteKey, value);
@@ -1243,7 +1219,7 @@ export class MidiFileGenerator {
             while (
                 endNote.isTieOrigin &&
                 !endNote.tieDestination!.hasBend &&
-                endNote.tieDestination!.vibrato == VibratoType.None
+                endNote.tieDestination!.vibrato === VibratoType.None
             ) {
                 endNote = endNote.tieDestination!;
             }
@@ -1646,7 +1622,7 @@ export class MidiFileGenerator {
         let trillLength: number = MidiUtils.toTicks(note.trillSpeed);
         let realKey: boolean = true;
         let tick: number = noteStart;
-        let end: number = noteStart + noteDuration.untilTieOrSlideEnd;
+        const end: number = noteStart + noteDuration.untilTieOrSlideEnd;
         while (tick + 10 < end) {
             // only the rest on last trill play
             if (tick + trillLength >= end) {
@@ -1947,7 +1923,7 @@ export class MidiFileGenerator {
             let brushMove: number = 0;
             const brushIncrement: number = (brushDuration / (stringCount - 1)) | 0;
             for (let i: number = 0; i < beat.voice.bar.staff.tuning.length; i++) {
-                let index: number = down ? i : brushInfo.length - 1 - i;
+                const index: number = down ? i : brushInfo.length - 1 - i;
                 if ((stringUsed & (0x01 << index)) !== 0) {
                     brushInfo[index] = brushMove;
                     brushMove += brushIncrement;
@@ -1975,7 +1951,7 @@ export class MidiFileGenerator {
                 );
                 break;
             case AutomationType.Balance:
-                let balance: number = MidiFileGenerator.toChannelShort(automation.value);
+                const balance: number = MidiFileGenerator.toChannelShort(automation.value);
                 this._handler.addControlChange(
                     beat.voice.bar.staff.track.index,
                     beat.playbackStart + startMove,
@@ -1992,7 +1968,7 @@ export class MidiFileGenerator {
                 );
                 break;
             case AutomationType.Volume:
-                let volume: number = MidiFileGenerator.toChannelShort(automation.value);
+                const volume: number = MidiFileGenerator.toChannelShort(automation.value);
                 this._handler.addControlChange(
                     beat.voice.bar.staff.track.index,
                     beat.playbackStart + startMove,
@@ -2058,7 +2034,7 @@ export class MidiFileGenerator {
         this._handler.addTimeSignature(0, masterBar.timeSignatureNumerator, masterBar.timeSignatureDenominator);
         this._handler.addTempo(0, tempo);
 
-        let volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
+        const volumeCoarse: number = MidiFileGenerator.toChannelShort(volume);
         this._handler.addControlChange(
             0,
             0,

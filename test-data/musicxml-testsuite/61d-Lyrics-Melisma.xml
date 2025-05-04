@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">How to treat lyrics and slurred 
-          notes. Normally, a slurred group of notes is assigned only one lyrics 
+      <miscellaneous-field name="description">How to treat lyrics and slurred
+          notes. Normally, a slurred group of notes is assigned only one lyrics
           syllable.</miscellaneous-field>
     </miscellaneous>
   </identification>

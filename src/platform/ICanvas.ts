@@ -1,7 +1,7 @@
-import { Color } from '@src/model/Color';
-import { Font } from '@src/model/Font';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { Settings } from '@src/Settings';
+import type { Color } from '@src/model/Color';
+import type { Font } from '@src/model/Font';
+import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { Settings } from '@src/Settings';
 
 /**
  * This public enum lists all different text alignments
@@ -10,13 +10,13 @@ export enum TextAlign {
     /**
      * Text is left aligned.
      */
-    Left,
+    Left = 0,
     /**
      * Text is centered.
-     */ Center,
+     */ Center = 1,
     /**
      * Text is right aligned.
-     */ Right
+     */ Right = 2
 }
 
 /**
@@ -26,21 +26,21 @@ export enum TextBaseline {
     /**
      * Text is aligned on top.
      */
-    Top,
+    Top = 0,
     /**
      * Text is aligned middle
      */
-    Middle,
+    Middle = 1,
     /**
      * Text is aligend on the bottom.
      */
-    Bottom
+    Bottom = 2
 }
 
 /**
- * The TextMetrics class represents the dimensions of a piece of text in the canvas;
+ * The MeasuredText class represents the dimensions of a piece of text in the canvas;
  */
-export class TextMetrics {
+export class MeasuredText {
     /**
      * Returns the width of a segment of inline text in CSS pixels.
      */
@@ -86,9 +86,15 @@ export interface ICanvas {
 
     fillText(text: string, x: number, y: number): void;
 
-    measureText(text: string): TextMetrics;
+    measureText(text: string): MeasuredText;
 
-    fillMusicFontSymbol(x: number, y: number, relativeScale: number, symbol: MusicFontSymbol, centerAtPosition?: boolean): void;
+    fillMusicFontSymbol(
+        x: number,
+        y: number,
+        relativeScale: number,
+        symbol: MusicFontSymbol,
+        centerAtPosition?: boolean
+    ): void;
 
     fillMusicFontSymbols(
         x: number,

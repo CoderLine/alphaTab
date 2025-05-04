@@ -1,8 +1,8 @@
 import * as cs from './csharp/CSharpAst';
-import * as ts from 'typescript';
-import * as path from 'path';
-import * as fs from 'fs';
-import CSharpEmitterContext from './csharp/CSharpEmitterContext';
+import ts from 'typescript';
+import path from 'node:path';
+import fs from 'node:fs';
+import type CSharpEmitterContext from './csharp/CSharpEmitterContext';
 
 export default abstract class AstPrinterBase {
     protected _sourceFile: cs.SourceFile;
@@ -96,7 +96,9 @@ export default abstract class AstPrinterBase {
 
     protected writeAttributes(d: cs.AttributedElement) {
         if (d.attributes) {
-            d.attributes.forEach(a => this.writeAttribute(a));
+            for (const a of d.attributes) {
+                this.writeAttribute(a);
+            }
         }
     }
 
@@ -181,14 +183,15 @@ export default abstract class AstPrinterBase {
     protected abstract writeNewExpression(expr: cs.NewExpression);
     protected abstract writeCastExpression(expr: cs.CastExpression);
     protected abstract writeNonNullExpression(expr: cs.NonNullExpression);
+    protected abstract writeYieldExpression(expr: cs.YieldExpression);
 
     protected writeToDoExpression(expr: cs.ToDoExpression) {
         this.write('/* TODO */');
     }
 
     protected writeIdentifier(expr: cs.Identifier | string) {
-        let name;
-        if (typeof expr !== "string") {
+        let name: string;
+        if (typeof expr !== 'string') {
             name = this._context.getSymbolName(expr) ?? expr.text;
         } else {
             name = expr;
@@ -196,7 +199,7 @@ export default abstract class AstPrinterBase {
         this.write(this.escapeIdentifier(name));
     }
 
-    protected abstract escapeIdentifier(identifier:string) : string;
+    protected abstract escapeIdentifier(identifier: string): string;
 
     protected writeNullSafeExpression(expr: cs.NullSafeExpression) {
         this.writeExpression(expr.expression);
@@ -210,14 +213,24 @@ export default abstract class AstPrinterBase {
             this.writeCommaSeparated(expr.typeArguments, t => this.writeType(t));
             this.write('>');
         }
+
+        if (expr.nullSafe) {
+            this.write('?.');
+            this.write(this._context.toMethodName('invoke'));
+        }
+
         this.write('(');
         if (expr.arguments.length > 5) {
             this.writeLine();
             this._indent++;
-            this.writeCommaSeparated(expr.arguments, a => {
-                this.writeExpression(a);
-                this.writeLine();
-            }, true);
+            this.writeCommaSeparated(
+                expr.arguments,
+                a => {
+                    this.writeExpression(a);
+                    this.writeLine();
+                },
+                true
+            );
             this._indent--;
             this.writeLine();
         } else {
@@ -265,7 +278,7 @@ export default abstract class AstPrinterBase {
     protected writeTypeParameterConstraints(typeParameters: cs.TypeParameterDeclaration[] | undefined) {
         if (typeParameters) {
             this._indent++;
-            typeParameters.forEach(p => {
+            for (const p of typeParameters) {
                 if (p.constraint) {
                     this.writeLine();
                     this.write('where ');
@@ -273,7 +286,7 @@ export default abstract class AstPrinterBase {
                     this.write(' : ');
                     this.writeType(p.constraint, false, false, true);
                 }
-            });
+            }
             this._indent--;
         }
     }
@@ -384,6 +397,9 @@ export default abstract class AstPrinterBase {
             case cs.SyntaxKind.TypeOfExpression:
                 this.writeTypeOfExpression(expr as cs.TypeOfExpression);
                 break;
+            case cs.SyntaxKind.YieldExpression:
+                this.writeYieldExpression(expr as cs.YieldExpression);
+                break;
             case cs.SyntaxKind.TypeReference:
                 this.writeType(expr as cs.TypeReference);
                 break;
@@ -439,6 +455,9 @@ export default abstract class AstPrinterBase {
             case cs.SyntaxKind.TryStatement:
                 this.writeTryStatement(s as cs.TryStatement);
                 break;
+            case cs.SyntaxKind.LocalFunction:
+                this.writeLocalFunction(s as cs.LocalFunctionDeclaration);
+                break;
         }
     }
 
@@ -446,7 +465,9 @@ export default abstract class AstPrinterBase {
         this.writeLine('try');
         this.writeBlock(s.tryBlock);
         if (s.catchClauses) {
-            s.catchClauses.forEach(c => this.writeCatchClause(c));
+            for (const c of s.catchClauses) {
+                this.writeCatchClause(c);
+            }
         }
         if (s.finallyBlock) {
             this.writeLine('finally');
@@ -586,7 +607,9 @@ export default abstract class AstPrinterBase {
         this.write('new');
         this.beginBlock();
 
-        expr.properties.forEach(p => this.writeAnonymousObjectProperty(p));
+        for (const p of expr.properties) {
+            this.writeAnonymousObjectProperty(p);
+        }
 
         this.endBlock();
     }
@@ -597,4 +620,6 @@ export default abstract class AstPrinterBase {
         this.writeExpression(expr.value);
         this.writeLine(',');
     }
+
+    protected abstract writeLocalFunction(expr: cs.LocalFunctionDeclaration);
 }

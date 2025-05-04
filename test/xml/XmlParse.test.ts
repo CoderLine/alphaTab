@@ -5,8 +5,8 @@ import { expect } from 'chai';
 
 describe('XmlParseTest', () => {
     it('parseSimple', () => {
-        let s: string = '<root></root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root></root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -14,8 +14,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseShorthand', () => {
-        let s: string = '<root />';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root />';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -23,8 +23,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseSingleAttribute', () => {
-        let s: string = '<root att="v"></root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root att="v"></root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -33,8 +33,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseMultipleAttributes', () => {
-        let s: string = '<root att="v" att2="v2"></root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root att="v" att2="v2"></root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -44,8 +44,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseSimpleText', () => {
-        let s: string = '<root>Text</root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root>Text</root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -55,8 +55,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseChild', () => {
-        let s: string = '<root><cc></cc></root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root><cc></cc></root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -66,8 +66,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseMultiChild', () => {
-        let s: string = '<root><cc></cc><cc></cc></root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<root><cc></cc><cc></cc></root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -79,8 +79,9 @@ describe('XmlParseTest', () => {
     });
 
     it('parseComments', () => {
-        let s: string = '<!-- some comment --><test><cc c="d"><!-- some comment --></cc><!-- some comment --><cc>value<!-- some comment --></cc></test><!-- ending -->';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string =
+            '<!-- some comment --><test><cc c="d"><!-- some comment --></cc><!-- some comment --><cc>value<!-- some comment --></cc></test><!-- ending -->';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('test');
@@ -96,8 +97,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseDoctype', () => {
-        let s: string = '<!DOCTYPE html><test><cc></cc><cc></cc></test>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<!DOCTYPE html><test><cc></cc><cc></cc></test>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('test');
@@ -109,8 +110,8 @@ describe('XmlParseTest', () => {
     });
 
     it('parseXmlHeadTest', () => {
-        let s: string = '<?xml version="1.0" encoding="utf-8"`?><root></root>';
-        let xml: XmlDocument = new XmlDocument();
+        const s: string = '<?xml version="1.0" encoding="utf-8"`?><root></root>';
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
         expect(xml.firstElement!.localName).to.equal('root');
@@ -118,7 +119,7 @@ describe('XmlParseTest', () => {
 
     it('parseFull', async () => {
         const s = await TestPlatform.loadFileAsString('test-data/xml/GPIF.xml');
-        let xml: XmlDocument = new XmlDocument();
+        const xml: XmlDocument = new XmlDocument();
         xml.parse(s);
         expect(xml.firstElement).to.be.ok;
     });

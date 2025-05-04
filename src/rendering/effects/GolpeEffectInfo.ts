@@ -1,12 +1,12 @@
 import { NotationElement } from '@src/NotationSettings';
-import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { Settings } from '@src/Settings';
-import { Beat } from '@src/model';
-import { GolpeType } from '@src/model/GolpeType';
-import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import { BarRendererBase } from '../BarRendererBase';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
-import { GuitarGolpeGlyph } from '../glyphs/GuitarGolpeGlyph';
+import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
+import type { Settings } from '@src/Settings';
+import type { Beat } from '@src/model/Beat';
+import type { GolpeType } from '@src/model/GolpeType';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 
 export class GolpeEffectInfo extends EffectBarRendererInfo {
     private _type: GolpeType;
@@ -36,7 +36,7 @@ export class GolpeEffectInfo extends EffectBarRendererInfo {
 
     public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
         const shouldCreate = this._shouldCreate;
-        return beat.golpe == this._type && (!shouldCreate || shouldCreate(settings, beat));
+        return beat.golpe === this._type && (!shouldCreate || shouldCreate(settings, beat));
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {

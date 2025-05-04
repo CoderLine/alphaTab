@@ -1,22 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.1 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise version="1.1">
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
       <miscellaneous-field name="description">An instrument change from one
           transposition (Clarinet in Eb) to another transposing instrument
-          (Clarinet in Bb). The displayed instrument name should also be updated.
+          (Clarinet in Bb). The displayed instrument name should also be
+          updated.
 
           The whole piece is in Bb major (sounding), so first the key signature
           should be one flat, after the change it should have no accidentals.
-      </miscellaneous-field>
+
+          Both the instrument name and instrument name abbreviation use the
+          &lt;accidental-text&gt; element to display a proper ‘flat’
+          glyph.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
     <score-part id="P1">
-      <part-name>Clarinet in Eb</part-name>
-      <part-abbreviation>Eb Cl.</part-abbreviation>
+      <part-name></part-name>
+      <part-name-display>
+        <display-text>Clarinet in E</display-text>
+        <accidental-text>flat</accidental-text>
+      </part-name-display>
+      <part-abbreviation-display>
+        <display-text>Cl. (E</display-text>
+        <accidental-text>flat</accidental-text>
+        <display-text>)</display-text>
+      </part-abbreviation-display>
     </score-part>
   </part-list>
   <!--=========================================================-->
@@ -63,8 +75,15 @@
         </transpose>
       </attributes>
       <print>
-        <part-name-display><display-text>Clarinet in Bb</display-text></part-name-display>
-        <part-abbreviation-display><display-text>Bb Cl.</display-text></part-abbreviation-display>
+        <part-name-display>
+          <display-text>Clarinet in B</display-text>
+          <accidental-text>flat</accidental-text>
+        </part-name-display>
+        <part-abbreviation-display>
+          <display-text>Cl. (B</display-text>
+          <accidental-text>flat</accidental-text>
+          <display-text>)</display-text>
+      </part-abbreviation-display>
       </print>
       <note>
         <pitch>
@@ -77,7 +96,7 @@
       </note>
     </measure>
     <measure number="3">
-      <print new-system="yes" />
+      <print new-system="yes"/>
       <note>
         <pitch>
           <step>C</step>

@@ -1,7 +1,7 @@
 import { FontStyle, FontWeight } from '@src/model/Font';
 import { Environment } from '@src/Environment';
-import { TextMetrics } from '../ICanvas';
-import { WebPlatform } from '../javascript/WebPlatform';
+import { MeasuredText } from '@src/platform/ICanvas';
+import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 /**
  * Describes the sizes of a font for measuring purposes.
@@ -41,21 +41,21 @@ export class FontSizes {
             return;
         }
 
-        if (!Environment.isRunningInWorker && Environment.webPlatform != WebPlatform.NodeJs) {
-            let canvas: HTMLCanvasElement = document.createElement('canvas');
-            let measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
+        if (!Environment.isRunningInWorker && Environment.webPlatform !== WebPlatform.NodeJs) {
+            const canvas: HTMLCanvasElement = document.createElement('canvas');
+            const measureContext: CanvasRenderingContext2D = canvas.getContext('2d')!;
             const measureSize = 11;
             measureContext.font = `${measureSize}px ${family}`;
             const widths: number[] = [];
             let fullTxt = '';
             for (let i: number = FontSizes.ControlChars; i < 255; i++) {
-                let s: string = String.fromCharCode(i);
+                const s: string = String.fromCharCode(i);
                 fullTxt += s;
                 const metrics = measureContext.measureText(s);
                 widths.push(metrics.width);
             }
 
-            const heightMetrics = measureContext.measureText(fullTxt + 'ÄÖÜÁÈ');
+            const heightMetrics = measureContext.measureText(`${fullTxt}ÄÖÜÁÈ`);
 
             const top = 0 - Math.abs(heightMetrics.fontBoundingBoxAscent);
             const bottom = 0 + Math.abs(heightMetrics.fontBoundingBoxDescent);
@@ -75,9 +75,9 @@ export class FontSizes {
         size: number,
         style: FontStyle,
         weight: FontWeight
-    ): TextMetrics {
+    ): MeasuredText {
         let data: FontSizeDefinition;
-        let dataSize: number = 11;
+        const dataSize: number = 11;
         let family = families[0]; // default to first font
 
         // find a font which is maybe registered already
@@ -102,16 +102,16 @@ export class FontSizes {
 
         let stringSize: number = 0;
         for (let i: number = 0; i < s.length; i++) {
-            let code: number = Math.min(data.characterWidths.length - 1, s.charCodeAt(i) - FontSizes.ControlChars);
+            const code: number = Math.min(data.characterWidths.length - 1, s.charCodeAt(i) - FontSizes.ControlChars);
             if (code >= 0) {
                 stringSize += (data.characterWidths[code] * size) / dataSize;
             }
         }
 
         // add a small increase of size for spacing/kerning etc.
-        // we really need to improve the width calculation, maybe by using offscreencanvas? 
-        factor *= 1.07; 
+        // we really need to improve the width calculation, maybe by using offscreencanvas?
+        factor *= 1.07;
 
-        return new TextMetrics(stringSize * factor, size * data.fontSizeToHeight);
+        return new MeasuredText(stringSize * factor, size * data.fontSizeToHeight);
     }
 }

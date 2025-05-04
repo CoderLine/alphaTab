@@ -1,7 +1,7 @@
 import { FadeType } from '@src/model/FadeType';
-import { MusicFontGlyph } from './MusicFontGlyph';
-import { MusicFontSymbol } from '@src/model';
-import { ICanvas } from '@src/platform';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class FadeGlyph extends MusicFontGlyph {
     public constructor(type: FadeType) {
@@ -20,15 +20,7 @@ export class FadeGlyph extends MusicFontGlyph {
         return MusicFontSymbol.None;
     }
 
-    public override doLayout(): void {
-        this.width = 13;
-        if (this.symbol == MusicFontSymbol.GuitarVolumeSwell) {
-            this.width *= 2;
-        }
-        this.height = 13;
-    }
-
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height, canvas)
+        super.paint(cx, cy + this.height, canvas);
     }
 }

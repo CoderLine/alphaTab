@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">Some notes with simple lyrics: 
-            Syllables, notes without a syllable, syllable 
-            spanners.</miscellaneous-field>
+      <miscellaneous-field name="description">Some notes with simple lyrics:
+          Syllables, notes without a syllable, syllable
+          spanners.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>

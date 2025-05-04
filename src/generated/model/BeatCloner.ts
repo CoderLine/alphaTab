@@ -4,9 +4,9 @@
 // the code is regenerated.
 // </auto-generated>
 import { Beat } from "@src/model/Beat";
-import { NoteCloner } from "./NoteCloner";
-import { AutomationCloner } from "./AutomationCloner";
-import { BendPointCloner } from "./BendPointCloner";
+import { NoteCloner } from "@src/generated/model/NoteCloner";
+import { AutomationCloner } from "@src/generated/model/AutomationCloner";
+import { BendPointCloner } from "@src/generated/model/BendPointCloner";
 export class BeatCloner {
     public static clone(original: Beat): Beat {
         const clone = new Beat();
@@ -57,6 +57,7 @@ export class BeatCloner {
         clone.playbackStart = original.playbackStart;
         clone.displayDuration = original.displayDuration;
         clone.playbackDuration = original.playbackDuration;
+        clone.overrideDisplayDuration = original.overrideDisplayDuration;
         clone.golpe = original.golpe;
         clone.dynamics = original.dynamics;
         clone.invertBeamDirection = original.invertBeamDirection;

@@ -1,11 +1,11 @@
 import { NotationElement } from '@src/NotationSettings';
-import { EffectBarGlyphSizing } from '../EffectBarGlyphSizing';
-import { Settings } from '@src/Settings';
-import { Beat } from '@src/model';
-import { BarRendererBase } from '../BarRendererBase';
-import { EffectGlyph } from '../glyphs/EffectGlyph';
-import { EffectBarRendererInfo } from '../EffectBarRendererInfo';
-import { SustainPedalGlyph } from '../glyphs/SustainPedalGlyph';
+import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
+import type { Settings } from '@src/Settings';
+import type { Beat } from '@src/model/Beat';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
+import { SustainPedalGlyph } from '@src/rendering/glyphs/SustainPedalGlyph';
 
 export class SustainPedalEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {

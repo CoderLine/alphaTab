@@ -5,41 +5,41 @@ export enum BendType {
     /**
      * No bend at all
      */
-    None,
+    None = 0,
     /**
      * Individual points define the bends in a flexible manner.
      * This system was mainly used in Guitar Pro 3-5
      */
-    Custom,
+    Custom = 1,
     /**
      * Simple Bend from an unbended string to a higher note.
      */
-    Bend,
+    Bend = 2,
     /**
      * Release of a bend that was started on an earlier note.
      */
-    Release,
+    Release = 3,
     /**
      * A bend that starts from an unbended string,
      * and also releases the bend after some time.
      */
-    BendRelease,
+    BendRelease = 4,
     /**
      * Holds a bend that was started on an earlier note
      */
-    Hold,
+    Hold = 5,
     /**
      * A bend that is already started before the note is played then it is held until the end.
      */
-    Prebend,
+    Prebend = 6,
     /**
      * A bend that is already started before the note is played and
      * bends even further, then it is held until the end.
      */
-    PrebendBend,
+    PrebendBend = 7,
     /**
      * A bend that is already started before the note is played and
      * then releases the bend to a lower note where it is held until the end.
      */
-    PrebendRelease
+    PrebendRelease = 8
 }

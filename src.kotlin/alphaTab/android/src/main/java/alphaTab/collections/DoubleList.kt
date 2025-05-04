@@ -30,6 +30,15 @@ public class DoubleList : IDoubleIterable {
         _size = elements.size
     }
 
+    internal constructor(elements: IDoubleIterable) {
+        _items = DoubleArray(0)
+        _size = 0
+        for(d in elements) {
+            push(d)
+        }
+    }
+
+
     private constructor(elements: DoubleArray, size: Int) {
         _items = elements
         _size = size
@@ -150,7 +159,7 @@ public class DoubleList : IDoubleIterable {
         }
     }
 
-    
+
     internal fun reduce(operation: (acc: Double, v: Double) -> Double, initial:Double): Double {
         var accumulator = initial
         for (element in _items) accumulator = operation(accumulator, element)

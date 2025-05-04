@@ -5,37 +5,37 @@ export enum AccidentalType {
     /**
      * No accidental
      */
-    None,
+    None = 0,
     /**
      * Naturalize
      */
-    Natural,
+    Natural = 1,
     /**
      * Sharp
      */
-    Sharp,
+    Sharp = 2,
     /**
      * Flat
      */
-    Flat,
+    Flat = 3,
     /**
      * Natural for smear bends
      */
-    NaturalQuarterNoteUp,
+    NaturalQuarterNoteUp = 4,
     /**
      * Sharp for smear bends
      */
-    SharpQuarterNoteUp,
+    SharpQuarterNoteUp = 5,
     /**
      * Flat for smear bends
      */
-    FlatQuarterNoteUp,
+    FlatQuarterNoteUp = 6,
     /**
      * Double Sharp, indicated by an 'x'
      */
-    DoubleSharp,
+    DoubleSharp = 7,
     /**
      * Double Flat, indicated by 'bb'
      */
-    DoubleFlat
+    DoubleFlat = 8
 }

@@ -15,7 +15,7 @@ export class StaffSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => StaffSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Staff | null): Map<string, unknown> | null {
         if (!obj) {
@@ -69,6 +69,9 @@ export class StaffSerializer {
             case "displaytranspositionpitch":
                 obj.displayTranspositionPitch = v! as number;
                 return true;
+            case "stringtuning":
+                TuningSerializer.fromJson(obj.stringTuning, v);
+                return true;
             case "showslash":
                 obj.showSlash = v! as boolean;
                 return true;
@@ -87,10 +90,6 @@ export class StaffSerializer {
             case "standardnotationlinecount":
                 obj.standardNotationLineCount = v! as number;
                 return true;
-        }
-        if (["stringtuning"].indexOf(property) >= 0) {
-            TuningSerializer.fromJson(obj.stringTuning, v as Map<string, unknown>);
-            return true;
         }
         return false;
     }

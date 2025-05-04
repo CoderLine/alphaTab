@@ -31,12 +31,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-export { type Plugin } from 'vite';
-export { fileToUrl } from './asset';
-export { createToImportMetaURLBasedRelativeRuntime, toOutputFilePathInJS } from './build';
-export { type ResolvedConfig } from './config';
-export { ENV_PUBLIC_PATH } from './constants';
-export { evalValue, cleanUrl, injectQuery, encodeURIPath } from './utils';
-export { tryFsResolve } from './resolve';
-export { tryOptimizedDepResolve } from './optimizer';
-export { AlphaTabWorkerTypes, WORKER_ASSET_ID, WORKER_FILE_ID, workerFileToUrl, workerCache, isSameContent } from './worker';
+export type { Plugin } from 'vite';
+export { fileToUrl } from '@src/vite/bridge/asset';
+export { createToImportMetaURLBasedRelativeRuntime, toOutputFilePathInJS } from '@src/vite/bridge/build';
+export type { ResolvedConfig } from '@src/vite/bridge/config';
+export { ENV_PUBLIC_PATH } from '@src/vite/bridge/constants';
+export { evalValue, cleanUrl, injectQuery, encodeURIPath } from '@src/vite/bridge/utils';
+export { tryFsResolve } from '@src/vite/bridge/resolve';
+export { tryOptimizedDepResolve } from '@src/vite/bridge/optimizer';
+export {
+    AlphaTabWorkerTypes,
+    WORKER_ASSET_ID,
+    WORKER_FILE_ID,
+    workerFileToUrl,
+    workerCache,
+    isSameContent
+} from '@src/vite/bridge/worker';

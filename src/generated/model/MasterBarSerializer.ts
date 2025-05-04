@@ -8,8 +8,6 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { SectionSerializer } from "@src/generated/model/SectionSerializer";
 import { AutomationSerializer } from "@src/generated/model/AutomationSerializer";
 import { FermataSerializer } from "@src/generated/model/FermataSerializer";
-import { KeySignature } from "@src/model/KeySignature";
-import { KeySignatureType } from "@src/model/KeySignatureType";
 import { TripletFeel } from "@src/model/TripletFeel";
 import { Section } from "@src/model/Section";
 import { Automation } from "@src/model/Automation";
@@ -20,7 +18,7 @@ export class MasterBarSerializer {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => MasterBarSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: MasterBar | null): Map<string, unknown> | null {
         if (!obj) {
@@ -28,8 +26,6 @@ export class MasterBarSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("alternateendings", obj.alternateEndings);
-        o.set("keysignature", obj.keySignature as number);
-        o.set("keysignaturetype", obj.keySignatureType as number);
         o.set("isdoublebar", obj.isDoubleBar);
         o.set("isrepeatstart", obj.isRepeatStart);
         o.set("repeatcount", obj.repeatCount);
@@ -38,7 +34,9 @@ export class MasterBarSerializer {
         o.set("timesignaturecommon", obj.timeSignatureCommon);
         o.set("isfreetime", obj.isFreeTime);
         o.set("tripletfeel", obj.tripletFeel as number);
-        o.set("section", SectionSerializer.toJson(obj.section));
+        if (obj.section) {
+            o.set("section", SectionSerializer.toJson(obj.section));
+        }
         o.set("tempoautomations", obj.tempoAutomations.map(i => AutomationSerializer.toJson(i)));
         if (obj.fermata !== null) {
             const m = new Map<string, unknown>();
@@ -65,12 +63,6 @@ export class MasterBarSerializer {
             case "alternateendings":
                 obj.alternateEndings = v! as number;
                 return true;
-            case "keysignature":
-                obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;
-                return true;
-            case "keysignaturetype":
-                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
-                return true;
             case "isdoublebar":
                 obj.isDoubleBar = v! as boolean;
                 return true;
@@ -95,6 +87,15 @@ export class MasterBarSerializer {
             case "tripletfeel":
                 obj.tripletFeel = JsonHelper.parseEnum<TripletFeel>(v, TripletFeel)!;
                 return true;
+            case "section":
+                if (v) {
+                    obj.section = new Section();
+                    SectionSerializer.fromJson(obj.section, v);
+                }
+                else {
+                    obj.section = null;
+                }
+                return true;
             case "tempoautomations":
                 obj.tempoAutomations = [];
                 for (const o of (v as (Map<string, unknown> | null)[])) {
@@ -108,7 +109,7 @@ export class MasterBarSerializer {
                 JsonHelper.forEach(v, (v, k) => {
                     const i = new Fermata();
                     FermataSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.addFermata(parseInt(k), i);
+                    obj.addFermata(Number.parseInt(k), i);
                 });
                 return true;
             case "start":
@@ -128,16 +129,6 @@ export class MasterBarSerializer {
                     obj.addDirection(JsonHelper.parseEnum<Direction>(i, Direction)!);
                 }
                 return true;
-        }
-        if (["section"].indexOf(property) >= 0) {
-            if (v) {
-                obj.section = new Section();
-                SectionSerializer.fromJson(obj.section, v as Map<string, unknown>);
-            }
-            else {
-                obj.section = null;
-            }
-            return true;
         }
         return false;
     }

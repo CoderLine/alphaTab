@@ -1,7 +1,7 @@
-import { Bar } from '@src/model/Bar';
-import { BeatBounds } from '@src/rendering/utils/BeatBounds';
-import { Bounds } from '@src/rendering/utils/Bounds';
-import { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
+import type { Bar } from '@src/model/Bar';
+import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
+import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { MasterBarBounds } from '@src/rendering/utils/MasterBarBounds';
 
 /**
  * Represents the boundaries of a single bar.
@@ -49,7 +49,7 @@ export class BarBounds {
      */
     public findBeatAtPos(x: number): BeatBounds | null {
         let beat: BeatBounds | null = null;
-        for (let t of this.beats) {
+        for (const t of this.beats) {
             if (!beat || t.realBounds.x < x) {
                 beat = t;
             } else if (t.realBounds.x > x) {
@@ -67,7 +67,7 @@ export class BarBounds {
         this.visualBounds.scaleWith(scale);
 
         this.beats.sort((a, b) => a.realBounds.x - b.realBounds.x);
-        for(const b of this.beats){
+        for (const b of this.beats) {
             b.finish(scale);
         }
     }

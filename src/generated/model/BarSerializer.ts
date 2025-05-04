@@ -7,17 +7,22 @@ import { Bar } from "@src/model/Bar";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { VoiceSerializer } from "@src/generated/model/VoiceSerializer";
 import { SustainPedalMarkerSerializer } from "@src/generated/model/SustainPedalMarkerSerializer";
+import { BarStyleSerializer } from "@src/generated/model/BarStyleSerializer";
 import { Clef } from "@src/model/Clef";
 import { Ottavia } from "@src/model/Ottavia";
 import { Voice } from "@src/model/Voice";
 import { SimileMark } from "@src/model/SimileMark";
 import { SustainPedalMarker } from "@src/model/Bar";
+import { BarLineStyle } from "@src/model/Bar";
+import { KeySignature } from "@src/model/KeySignature";
+import { KeySignatureType } from "@src/model/KeySignatureType";
+import { BarStyle } from "@src/model/Bar";
 export class BarSerializer {
     public static fromJson(obj: Bar, m: unknown): void {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => BarSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Bar | null): Map<string, unknown> | null {
         if (!obj) {
@@ -32,6 +37,13 @@ export class BarSerializer {
         o.set("displayscale", obj.displayScale);
         o.set("displaywidth", obj.displayWidth);
         o.set("sustainpedals", obj.sustainPedals.map(i => SustainPedalMarkerSerializer.toJson(i)));
+        o.set("barlineleft", obj.barLineLeft as number);
+        o.set("barlineright", obj.barLineRight as number);
+        o.set("keysignature", obj.keySignature as number);
+        o.set("keysignaturetype", obj.keySignatureType as number);
+        if (obj.style) {
+            o.set("style", BarStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Bar, property: string, v: unknown): boolean {
@@ -68,6 +80,27 @@ export class BarSerializer {
                     const i = new SustainPedalMarker();
                     SustainPedalMarkerSerializer.fromJson(i, o);
                     obj.sustainPedals.push(i);
+                }
+                return true;
+            case "barlineleft":
+                obj.barLineLeft = JsonHelper.parseEnum<BarLineStyle>(v, BarLineStyle)!;
+                return true;
+            case "barlineright":
+                obj.barLineRight = JsonHelper.parseEnum<BarLineStyle>(v, BarLineStyle)!;
+                return true;
+            case "keysignature":
+                obj.keySignature = JsonHelper.parseEnum<KeySignature>(v, KeySignature)!;
+                return true;
+            case "keysignaturetype":
+                obj.keySignatureType = JsonHelper.parseEnum<KeySignatureType>(v, KeySignatureType)!;
+                return true;
+            case "style":
+                if (v) {
+                    obj.style = new BarStyle();
+                    BarStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
                 }
                 return true;
         }

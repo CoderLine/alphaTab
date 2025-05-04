@@ -3,9 +3,9 @@
 // TypeScript port for alphaTab: (C) 2020 by Daniel Kuschny
 // Licensed under: MPL-2.0
 
-import { Channel } from '@src/synth/synthesis/Channel';
-import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
-import { Voice } from '@src/synth/synthesis/Voice';
+import type { Channel } from '@src/synth/synthesis/Channel';
+import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
+import type { Voice } from '@src/synth/synthesis/Voice';
 
 export class Channels {
     public activeChannel: number = 0;
@@ -19,7 +19,7 @@ export class Channels {
         voice.noteGainDb += c.gainDb;
 
         voice.updatePitchRatio(c, tinySoundFont.outSampleRate);
-        
+
         if (newpan <= -0.5) {
             voice.panFactorLeft = 1.0;
             voice.panFactorRight = 0.0;

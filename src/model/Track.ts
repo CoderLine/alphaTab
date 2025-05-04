@@ -1,15 +1,49 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { Color } from '@src/model/Color';
-import { Lyrics } from '@src/model/Lyrics';
+import type { Lyrics } from '@src/model/Lyrics';
 import { PlaybackInformation } from '@src/model/PlaybackInformation';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
-import { Settings } from '@src/Settings';
-import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import type { Settings } from '@src/Settings';
+import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { ElementStyle } from '@src/model/ElementStyle';
+
+/**
+ * Lists all graphical sub elements within a {@link Track} which can be styled via {@link Track.style}
+ */
+export enum TrackSubElement {
+    /**
+     * The track names shown before the staves.
+     */
+    TrackName = 0,
+
+    /**
+     * The braces and brackets grouping the staves.
+     * If a bracket spans multiple tracks, the color of the first track counts.
+     */
+    BracesAndBrackets = 1,
+
+    /**
+     * The system separator.
+     */
+    SystemSeparator = 2,
+
+    /**
+     * The tuning of the strings.
+     */
+    StringTuning = 3
+}
+
+/**
+ * Defines the custom styles for tracks.
+ * @json
+ * @json_strict
+ */
+export class TrackStyle extends ElementStyle<TrackSubElement> {}
 
 /**
  * This public class describes a single track or instrument of score.
- * It is bascially a list of staffs containing individual music notation kinds.
+ * It is primarily a list of staves containing individual music notation kinds.
  * @json
  * @json_strict
  */
@@ -28,7 +62,7 @@ export class Track {
     public score!: Score;
 
     /**
-     * Gets or sets the list of staffs that are defined for this track.
+     * Gets or sets the list of staves that are defined for this track.
      * @json_add addStaff
      */
     public staves: Staff[] = [];
@@ -54,7 +88,7 @@ export class Track {
      * In formats like Guitar Pro this flag indicates whether on the default "multi-track" layout
      * tracks should be visible or not.
      */
-    public isVisibleOnMultiTrack:boolean = true;
+    public isVisibleOnMultiTrack: boolean = true;
 
     /**
      * Gets or sets the short name of this track.
@@ -74,10 +108,33 @@ export class Track {
     public systemsLayout: number[] = [];
 
     /**
+     * Defines on which bars specifically a line break is forced.
+     * @json_add addLineBreaks
+     */
+    public lineBreaks?: Set<number>;
+
+    /**
+     * Adds a new line break.
+     * @param index  The index of the bar before which a line break should happen.
+     */
+    public addLineBreaks(index: number) {
+        if (!this.lineBreaks) {
+            this.lineBreaks = new Set<number>();
+        }
+
+        this.lineBreaks!.add(index);
+    }
+
+    /**
      * Gets or sets a mapping on which staff lines particular percussion instruments
      * should be shown.
      */
     public percussionArticulations: InstrumentArticulation[] = [];
+
+    /**
+     * The style customizations for this item.
+     */
+    public style?: TrackStyle;
 
     public ensureStaveCount(staveCount: number): void {
         while (this.staves.length < staveCount) {
@@ -104,12 +161,12 @@ export class Track {
     }
 
     public applyLyrics(lyrics: Lyrics[]): void {
-        for (let lyric of lyrics) {
+        for (const lyric of lyrics) {
             lyric.finish();
         }
-        let staff: Staff = this.staves[0];
+        const staff: Staff = this.staves[0];
         for (let li: number = 0; li < lyrics.length; li++) {
-            let lyric: Lyrics = lyrics[li];
+            const lyric: Lyrics = lyrics[li];
             if (lyric.startBar >= 0 && lyric.startBar < staff.bars.length) {
                 let beat: Beat | null = staff.bars[lyric.startBar].voices[0].beats[0];
                 for (let ci: number = 0; ci < lyric.chunks.length && beat; ci++) {
@@ -122,7 +179,7 @@ export class Track {
                         // initialize lyrics list for beat if required
                         if (!beat.lyrics) {
                             beat.lyrics = new Array<string>(lyrics.length);
-                            beat.lyrics.fill("");
+                            beat.lyrics.fill('');
                         }
                         // assign chunk
                         beat.lyrics[li] = lyric.chunks[ci];

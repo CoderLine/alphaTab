@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 1.0 Partwise//EN"
+<!DOCTYPE score-partwise PUBLIC "-//Recordare//DTD MusicXML 4.0 Partwise//EN"
                                 "http://www.musicxml.org/dtds/partwise.dtd">
-<score-partwise>
+<score-partwise version="4.0">
   <identification>
     <miscellaneous>
-      <miscellaneous-field name="description">A grace note on a different 
-          staff than the actual note.</miscellaneous-field>
+      <miscellaneous-field name="description">Grace notes on a different
+          staff than the actual notes.</miscellaneous-field>
     </miscellaneous>
   </identification>
   <part-list>
@@ -15,7 +15,7 @@
   </part-list>
   <!--=========================================================-->
   <part id="P1">
-    <measure number="25">
+    <measure number="1">
       <attributes>
         <divisions>32</divisions>
         <key>
@@ -26,11 +26,22 @@
           <beats>4</beats>
           <beat-type>4</beat-type>
         </time>
+        <staves>2</staves>
         <clef>
           <sign>G</sign>
           <line>2</line>
         </clef>
       </attributes>
+      <note>
+        <grace slash="no"/>
+        <pitch>
+          <step>G</step>
+          <octave>5</octave>
+        </pitch>
+        <voice>1</voice>
+        <type>16th</type>
+        <staff>2</staff>
+      </note>
       <note>
         <pitch>
           <step>E</step>
@@ -42,7 +53,7 @@
         <staff>1</staff>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>G</step>
           <octave>5</octave>
@@ -54,7 +65,7 @@
         <beam number="2">begin</beam>
       </note>
       <note>
-        <grace/>
+        <grace slash="no"/>
         <pitch>
           <step>A</step>
           <octave>5</octave>
@@ -74,6 +85,15 @@
         <voice>1</voice>
         <type>half</type>
         <staff>1</staff>
+      </note>
+      <backup>
+        <duration>128</duration>
+      </backup>
+      <note>
+        <rest measure="yes"/>
+        <duration>128</duration>
+        <voice>2</voice>
+        <staff>2</staff>
       </note>
     </measure>
   </part>

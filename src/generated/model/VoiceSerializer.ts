@@ -6,13 +6,15 @@
 import { Voice } from "@src/model/Voice";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BeatSerializer } from "@src/generated/model/BeatSerializer";
+import { VoiceStyleSerializer } from "@src/generated/model/VoiceStyleSerializer";
 import { Beat } from "@src/model/Beat";
+import { VoiceStyle } from "@src/model/Voice";
 export class VoiceSerializer {
     public static fromJson(obj: Voice, m: unknown): void {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => VoiceSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Voice | null): Map<string, unknown> | null {
         if (!obj) {
@@ -21,7 +23,9 @@ export class VoiceSerializer {
         const o = new Map<string, unknown>();
         o.set("id", obj.id);
         o.set("beats", obj.beats.map(i => BeatSerializer.toJson(i)));
-        o.set("isempty", obj.isEmpty);
+        if (obj.style) {
+            o.set("style", VoiceStyleSerializer.toJson(obj.style));
+        }
         return o;
     }
     public static setProperty(obj: Voice, property: string, v: unknown): boolean {
@@ -37,8 +41,14 @@ export class VoiceSerializer {
                     obj.addBeat(i);
                 }
                 return true;
-            case "isempty":
-                obj.isEmpty = v! as boolean;
+            case "style":
+                if (v) {
+                    obj.style = new VoiceStyle();
+                    VoiceStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
+                }
                 return true;
         }
         return false;

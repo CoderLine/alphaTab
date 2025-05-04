@@ -1,20 +1,22 @@
-import { Bar } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
-import { Voice } from '@src/model/Voice';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
-import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
+import { type Bar, BarSubElement } from '@src/model/Bar';
+import { type Beat, BeatSubElement } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
+import type { Voice } from '@src/model/Voice';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { LineBarRenderer } from './LineBarRenderer';
-import { SlashNoteHeadGlyph } from './glyphs/SlashNoteHeadGlyph';
-import { SlashBeatContainerGlyph } from './SlashBeatContainerGlyph';
-import { BeatGlyphBase } from './glyphs/BeatGlyphBase';
-import { SlashBeatGlyph } from './glyphs/SlashBeatGlyph';
-import { BeatOnNoteGlyphBase } from './glyphs/BeatOnNoteGlyphBase';
-import { SpacingGlyph } from './glyphs/SpacingGlyph';
-import { ScoreTimeSignatureGlyph } from './glyphs/ScoreTimeSignatureGlyph';
+import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { LineBarRenderer } from '@src/rendering//LineBarRenderer';
+import { SlashBeatContainerGlyph } from '@src/rendering/SlashBeatContainerGlyph';
+import { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
+import { SlashBeatGlyph } from '@src/rendering/glyphs/SlashBeatGlyph';
+import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
+import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
+import { ScoreTimeSignatureGlyph } from '@src/rendering/glyphs/ScoreTimeSignatureGlyph';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using Slash Rhythm notation
@@ -30,6 +32,22 @@ export class SlashBarRenderer extends LineBarRenderer {
         // ignore numbered notation here
         this._isOnlySlash = !bar.staff.showTablature && !bar.staff.showStandardNotation;
         this.helpers.preferredBeamDirection = BeamDirection.Up;
+    }
+
+    public override get repeatsBarSubElement(): BarSubElement {
+        return BarSubElement.SlashRepeats;
+    }
+
+    public override get barNumberBarSubElement(): BarSubElement {
+        return BarSubElement.SlashBarNumber;
+    }
+
+    public override get barLineBarSubElement(): BarSubElement {
+        return BarSubElement.SlashBarLines;
+    }
+
+    public override get staffLineBarSubElement(): BarSubElement {
+        return BarSubElement.SlashStaffLine;
     }
 
     public override get lineSpacing(): number {
@@ -50,16 +68,16 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         super.paint(cx, cy, canvas);
-        this.paintBeams(cx, cy, canvas);
-        this.paintTuplets(cx, cy, canvas);
+        this.paintBeams(cx, cy, canvas, BeatSubElement.SlashFlags, BeatSubElement.SlashBeams);
+        this.paintTuplets(cx, cy, canvas, BeatSubElement.SlashTuplet);
     }
 
     public override doLayout(): void {
         super.doLayout();
         let hasTuplets: boolean = false;
-        for (let voice of this.bar.voices) {
+        for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
-                let c = this.getVoiceContainer(voice)!;
+                const c = this.getVoiceContainer(voice)!;
                 if (c.tupletGroups.length > 0) {
                     hasTuplets = true;
                     break;
@@ -76,11 +94,13 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -89,7 +109,7 @@ export class SlashBarRenderer extends LineBarRenderer {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let y = super.getNoteY(note, requestedPosition);
-        if (isNaN(y)) {
+        if (Number.isNaN(y)) {
             y = this.getLineY(0);
         }
         return y;
@@ -100,7 +120,8 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        return this.getLineY(0) - (SlashNoteHeadGlyph.NoteHeadHeight / 2);
+        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -127,37 +148,38 @@ export class SlashBarRenderer extends LineBarRenderer {
         this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
 
         const masterBar = this.bar.masterBar;
-        this.addPreBeatGlyph(
-            new ScoreTimeSignatureGlyph(
-                0,
-                this.getLineY(0),
-                masterBar.timeSignatureNumerator,
-                masterBar.timeSignatureDenominator,
-                masterBar.timeSignatureCommon,
-                masterBar.isFreeTime &&
-                    (masterBar.previousMasterBar == null ||
-                        masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
-            )
+        const g = new ScoreTimeSignatureGlyph(
+            0,
+            this.getLineY(0),
+            masterBar.timeSignatureNumerator,
+            masterBar.timeSignatureDenominator,
+            masterBar.timeSignatureCommon,
+            masterBar.isFreeTime &&
+                (masterBar.previousMasterBar == null ||
+                    masterBar.isFreeTime !== masterBar.previousMasterBar!.isFreeTime)
         );
+        g.barSubElement = BarSubElement.SlashTimeSignature;
+        this.addPreBeatGlyph(g);
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
         for (const b of v.beats) {
-            let container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
+            const container: SlashBeatContainerGlyph = new SlashBeatContainerGlyph(b, this.getVoiceContainer(v)!);
             container.preNotes = new BeatGlyphBase();
-            container.onNotes = v.index == 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
+            container.onNotes = v.index === 0 ? new SlashBeatGlyph() : new BeatOnNoteGlyphBase();
             this.addBeatGlyph(container);
         }
     }
 
     protected override paintBeamingStem(
-        _beat: Beat,
+        beat: Beat,
         _cy: number,
         x: number,
         topY: number,
         bottomY: number,
         canvas: ICanvas
     ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
         canvas.lineWidth = BarRendererBase.StemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);

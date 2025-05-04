@@ -1,11 +1,11 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { TextAlign } from '@src/platform/ICanvas';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { NotationElement } from '@src/NotationSettings';
 
 export class CapoEffectInfo extends EffectBarRendererInfo {
@@ -33,7 +33,7 @@ export class CapoEffectInfo extends EffectBarRendererInfo {
         return new TextGlyph(
             0,
             0,
-            'Capo. fret ' + beat.voice.bar.staff.capo,
+            `Capo. fret ${beat.voice.bar.staff.capo}`,
             renderer.resources.effectFont,
             TextAlign.Left
         );

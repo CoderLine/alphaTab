@@ -2,17 +2,17 @@
  * This file contains an emitter which generates classes to clone
  * any data models following certain rules.
  */
-import * as path from 'path';
-import * as ts from 'typescript';
+import path from 'node:path';
+import ts from 'typescript';
 import createEmitter from './EmitterBase';
-import { getTypeWithNullableInfo, unwrapArrayItemType } from '../BuilderHelpers';
+import { getTypeWithNullableInfo } from './TypeSchema';
 
 function removeExtension(fileName: string) {
     return fileName.substring(0, fileName.lastIndexOf('.'));
 }
 
 function toImportPath(fileName: string) {
-    return '@' + removeExtension(fileName).split('\\').join('/');
+    return `@${removeExtension(fileName).split('\\').join('/')}`;
 }
 
 function isClonable(type: ts.Type): boolean {
@@ -52,10 +52,10 @@ function isCloneMember(propertyDeclaration: ts.PropertyDeclaration) {
 
 function generateClonePropertyStatements(
     prop: ts.PropertyDeclaration,
-    typeChecker: ts.TypeChecker,
+    program: ts.Program,
     importer: (name: string, module: string) => void
 ): ts.Statement[] {
-    const propertyType = getTypeWithNullableInfo(typeChecker, prop.type!, true);
+    const propertyType = getTypeWithNullableInfo(program, prop.type!, true, !!prop.questionToken, undefined);
 
     const statements: ts.Statement[] = [];
 
@@ -72,15 +72,15 @@ function generateClonePropertyStatements(
         ];
     }
 
-    const arrayItemType = unwrapArrayItemType(propertyType.type!, typeChecker);
+    const arrayItemType = propertyType.arrayItemType;
     if (arrayItemType) {
-        if (isClonable(arrayItemType)) {
+        if (arrayItemType.isCloneable) {
             const collectionAddMethod = ts
                 .getJSDocTags(prop)
                 .filter(t => t.tagName.text === 'clone_add')
                 .map(t => t.comment ?? '')[0] as string;
 
-            importer(arrayItemType.symbol!.name + 'Cloner', './' + arrayItemType.symbol!.name + 'Cloner');
+            importer(`${arrayItemType.typeAsString}Cloner`, `@src/generated/model/${arrayItemType.typeAsString}Cloner`);
             const loopItems = [
                 ...assign(ts.factory.createArrayLiteralExpression(undefined)),
 
@@ -93,54 +93,61 @@ function generateClonePropertyStatements(
                     ts.factory.createNonNullExpression(
                         ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('original'), propertyName)
                     ),
-                    ts.factory.createBlock([
-                        ts.factory.createExpressionStatement(
-                            collectionAddMethod
-                                ? // clone.addProp(ItemTypeCloner.clone(i))
-                                  ts.factory.createCallExpression(
-                                      ts.factory.createPropertyAccessExpression(
-                                          ts.factory.createIdentifier('clone'),
-                                          collectionAddMethod
-                                      ),
-                                      undefined,
-                                      [
-                                          ts.factory.createCallExpression(
-                                              ts.factory.createPropertyAccessExpression(
-                                                  ts.factory.createIdentifier(arrayItemType.symbol!.name + 'Cloner'),
-                                                  'clone'
-                                              ),
-                                              undefined,
-                                              [ts.factory.createIdentifier('i')]
-                                          )
-                                      ]
-                                  )
-                                : // clone.prop.push(ItemTypeCloner.clone(i))
-                                  ts.factory.createCallExpression(
-                                      ts.factory.createPropertyAccessExpression(
+                    ts.factory.createBlock(
+                        [
+                            ts.factory.createExpressionStatement(
+                                collectionAddMethod
+                                    ? // clone.addProp(ItemTypeCloner.clone(i))
+                                      ts.factory.createCallExpression(
                                           ts.factory.createPropertyAccessExpression(
                                               ts.factory.createIdentifier('clone'),
-                                              propertyName
+                                              collectionAddMethod
                                           ),
-                                          'push'
-                                      ),
-                                      undefined,
-                                      [
-                                          ts.factory.createCallExpression(
+                                          undefined,
+                                          [
+                                              ts.factory.createCallExpression(
+                                                  ts.factory.createPropertyAccessExpression(
+                                                      ts.factory.createIdentifier(
+                                                          `${arrayItemType.typeAsString}Cloner`
+                                                      ),
+                                                      'clone'
+                                                  ),
+                                                  undefined,
+                                                  [ts.factory.createIdentifier('i')]
+                                              )
+                                          ]
+                                      )
+                                    : // clone.prop.push(ItemTypeCloner.clone(i))
+                                      ts.factory.createCallExpression(
+                                          ts.factory.createPropertyAccessExpression(
                                               ts.factory.createPropertyAccessExpression(
-                                                  ts.factory.createIdentifier(arrayItemType.symbol!.name + 'Cloner'),
-                                                  'clone'
+                                                  ts.factory.createIdentifier('clone'),
+                                                  propertyName
                                               ),
-                                              undefined,
-                                              [ts.factory.createIdentifier('i')]
-                                          )
-                                      ]
-                                  )
-                        )
-                    ], true)
+                                              'push'
+                                          ),
+                                          undefined,
+                                          [
+                                              ts.factory.createCallExpression(
+                                                  ts.factory.createPropertyAccessExpression(
+                                                      ts.factory.createIdentifier(
+                                                          `${arrayItemType.typeAsString}Cloner`
+                                                      ),
+                                                      'clone'
+                                                  ),
+                                                  undefined,
+                                                  [ts.factory.createIdentifier('i')]
+                                              )
+                                          ]
+                                      )
+                            )
+                        ],
+                        true
+                    )
                 )
             ];
 
-            if (propertyType.isNullable) {
+            if (propertyType.isNullable || propertyType.isOptional) {
                 // if(original.prop) {
                 //   clone.prop = [];
                 //   for(const i of original.prop) { clone.addProp(ItemTypeCloner.clone(i)); }
@@ -174,7 +181,10 @@ function generateClonePropertyStatements(
                 []
             );
 
-            if (propertyType.isNullable) {
+            const nullOrUndefined = propertyType.isNullable
+                ? ts.factory.createNull()
+                : ts.factory.createIdentifier('undefined');
+            if (propertyType.isNullable || propertyType.isOptional) {
                 statements.push(
                     ...assign(
                         ts.factory.createConditionalExpression(
@@ -185,7 +195,7 @@ function generateClonePropertyStatements(
                             ts.factory.createToken(ts.SyntaxKind.QuestionToken),
                             sliceCall,
                             ts.factory.createToken(ts.SyntaxKind.ColonToken),
-                            ts.factory.createNull()
+                            nullOrUndefined
                         )
                     )
                 );
@@ -195,10 +205,14 @@ function generateClonePropertyStatements(
             }
         }
     } else {
-        if (isClonable(propertyType.type!)) {
-            importer(propertyType.type.symbol!.name + 'Cloner', './' + propertyType.type.symbol!.name + 'Cloner');
+        if (propertyType.isCloneable) {
+            importer(`${propertyType.typeAsString}Cloner`, `@src/generated/model/${propertyType.typeAsString}Cloner`);
 
             // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : null
+            // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : undefined
+            const nullOrUndefined = propertyType.isNullable
+                ? ts.factory.createNull()
+                : ts.factory.createIdentifier('undefined');
             statements.push(
                 ...assign(
                     ts.factory.createConditionalExpression(
@@ -209,7 +223,7 @@ function generateClonePropertyStatements(
                         ts.factory.createToken(ts.SyntaxKind.QuestionToken),
                         ts.factory.createCallExpression(
                             ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier(propertyType.type.symbol!.name + 'Cloner'),
+                                ts.factory.createIdentifier(`${propertyType.typeAsString}Cloner`),
                                 'clone'
                             ),
                             undefined,
@@ -221,7 +235,7 @@ function generateClonePropertyStatements(
                             ]
                         ),
                         ts.factory.createToken(ts.SyntaxKind.ColonToken),
-                        ts.factory.createNull()
+                        nullOrUndefined
                     )
                 )
             );
@@ -243,13 +257,12 @@ function generateCloneBody(
     input: ts.ClassDeclaration,
     importer: (name: string, module: string) => void
 ): ts.Block {
-    const typeChecker = program.getTypeChecker();
     const propertiesToSerialize = input.members
         .filter(m => ts.isPropertyDeclaration(m) && isCloneMember(m))
         .map(m => m as ts.PropertyDeclaration);
 
     const bodyStatements = propertiesToSerialize.reduce((stmts, prop) => {
-        stmts.push(...generateClonePropertyStatements(prop, typeChecker, importer));
+        stmts.push(...generateClonePropertyStatements(prop, program, importer));
         return stmts;
     }, new Array<ts.Statement>());
 
@@ -273,7 +286,9 @@ function generateCloneBody(
             ...bodyStatements,
             // return json;
             ts.factory.createReturnStatement(ts.factory.createIdentifier('clone'))
-        ], true);
+        ],
+        true
+    );
 }
 
 function createCloneMethod(
@@ -333,7 +348,7 @@ export default createEmitter('cloneable', (program, input) => {
     statements.push(
         ts.factory.createClassDeclaration(
             [ts.factory.createModifier(ts.SyntaxKind.ExportKeyword)],
-            input.name!.text + 'Cloner',
+            `${input.name!.text}Cloner`,
             undefined,
             undefined,
             [createCloneMethod(program, input, importer)]
@@ -348,7 +363,11 @@ export default createEmitter('cloneable', (program, input) => {
                     false,
                     undefined,
                     ts.factory.createNamedImports([
-                        ts.factory.createImportSpecifier(false, undefined, ts.factory.createIdentifier(input.name!.text))
+                        ts.factory.createImportSpecifier(
+                            false,
+                            undefined,
+                            ts.factory.createIdentifier(input.name!.text)
+                        )
                     ])
                 ),
                 ts.factory.createStringLiteral(toImportPath(sourceFileName))

@@ -1,4 +1,4 @@
 export enum BeamDirection {
-    Up,
-    Down
+    Up = 0,
+    Down = 1
 }

@@ -1,9 +1,10 @@
 import { Settings } from '@src/Settings';
-import { Ottavia } from '@src/model';
-import { Beat, BeatBeamingMode } from '@src/model/Beat';
+import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
-import { Score } from '@src/model/Score';
+import { Ottavia } from '@src/model/Ottavia';
+import { type Score, ScoreSubElement } from '@src/model/Score';
 import { WahPedal } from '@src/model/WahPedal';
+import { TextAlign } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { expect } from 'chai';
@@ -11,7 +12,7 @@ import { expect } from 'chai';
 describe('Gp5ImporterTest', () => {
     it('score-info', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/score-info.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         expect(score.title).to.equal('Title');
         expect(score.subTitle).to.equal('Subtitle');
         expect(score.artist).to.equal('Artist');
@@ -30,109 +31,109 @@ describe('Gp5ImporterTest', () => {
 
     it('notes', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/notes.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkNotes(score);
     });
 
     it('time-signatures', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/time-signatures.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTimeSignatures(score);
     });
 
     it('dead', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/dead.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkDead(score);
     });
 
     it('grace', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/grace.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkGrace(score);
     });
 
     it('accentuations', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/accentuations.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkAccentuations(score, true);
     });
 
     it('harmonics', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/harmonics.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkHarmonics(score);
     });
 
     it('hammer', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/hammer.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkHammer(score);
     });
 
     it('bend', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bends.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkBend(score);
     });
 
     it('tremolo', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/tremolo.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTremolo(score);
     });
 
     it('slides', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/slides.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkSlides(score);
     });
 
     it('vibrato', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/vibrato.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkVibrato(score, true);
     });
 
     it('trills', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/trills.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTrills(score);
     });
 
     it('other-effects', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/other-effects.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkOtherEffects(score, false);
     });
 
     it('fingering', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/fingering.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkFingering(score);
     });
 
     it('stroke', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/strokes.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkStroke(score);
     });
 
     it('tuplets', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/tuplets.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkTuplets(score);
     });
 
     it('ranges', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/ranges.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkRanges(score);
     });
 
     it('effects', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/effects.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkEffects(score);
     });
 
@@ -144,25 +145,25 @@ describe('Gp5ImporterTest', () => {
 
     it('strings', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/strings.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkStrings(score);
     });
 
     it('key-signatures', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/key-signatures.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkKeySignatures(score);
     });
 
     it('chords', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/chords.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkChords(score);
     });
 
     it('colors', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/colors.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         GpImporterTestHelper.checkColors(score);
     });
 
@@ -179,7 +180,7 @@ describe('Gp5ImporterTest', () => {
 
     it('canon', async () => {
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/canon.gp5');
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
         expect(score.title).to.equal('Canon Rock');
         expect(score.subTitle).to.equal('');
         expect(score.artist).to.equal('JerryC');
@@ -206,7 +207,7 @@ describe('Gp5ImporterTest', () => {
         const settings = new Settings();
         settings.importer.beatTextAsLyrics = true;
         const reader = await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/beat-text-lyrics.gp5', settings);
-        let score: Score = reader.readScore();
+        const score: Score = reader.readScore();
 
         const expectedChunks: string[] = [
             '',
@@ -444,7 +445,9 @@ describe('Gp5ImporterTest', () => {
         // invert to down
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].invertBeamDirection).to.be.false;
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Down);
+        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].preferredBeamDirection).to.equal(
+            BeamDirection.Down
+        );
 
         // invert to up
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(BeatBeamingMode.Auto);
@@ -452,7 +455,6 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].preferredBeamDirection).to.equal(BeamDirection.Up);
     });
 
-    
     it('ottavia', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/ottavia.gp5')).readScore();
 
@@ -462,7 +464,7 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].ottava).to.equal(Ottavia._15mb);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].ottava).to.equal(Ottavia.Regular);
     });
-    
+
     it('wah-wah', async () => {
         const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/wah-wah.gp5')).readScore();
 
@@ -472,5 +474,64 @@ describe('Gp5ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].wahPedal).to.equal(WahPedal.Open);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].wahPedal).to.equal(WahPedal.Closed);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[1].wahPedal).to.equal(WahPedal.None);
+    });
+
+    it('header-footer', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/header-footer.gp5')).readScore();
+
+        expect(score.style).to.be.ok;
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Title)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.template).to.equal('Title: %TITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Title)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.SubTitle)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.template).to.equal('Subtitle: %SUBTITLE%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.SubTitle)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Artist)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.template).to.equal('Artist: %ARTIST%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Artist)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Album)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.template).to.equal('Album: %ALBUM%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Album)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Words)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.template).to.equal('Words: %WORDS%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Words)!.textAlign).to.equal(TextAlign.Left);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Music)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.template).to.equal('Music: %MUSIC%');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Music)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.WordsAndMusic)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.template).to.equal(
+            'Words & Music: %WORDSMUSIC%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.isVisible).to.be.false;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.WordsAndMusic)!.textAlign).to.equal(TextAlign.Right);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Transcriber)).to.be.false;
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.Copyright)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.template).to.equal(
+            'Copyright: %COPYRIGHT%'
+        );
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.Copyright)!.textAlign).to.equal(TextAlign.Center);
+
+        expect(score.style!.headerAndFooter.has(ScoreSubElement.CopyrightSecondLine)).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.template).to.equal('Copyright2');
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.isVisible).to.be.true;
+        expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
+            TextAlign.Center
+        );
     });
 });

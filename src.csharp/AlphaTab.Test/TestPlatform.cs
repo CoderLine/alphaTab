@@ -8,7 +8,7 @@ namespace AlphaTab;
 
 static partial class TestPlatform
 {
-    private static readonly Lazy<string> RepositoryRoot = new(() =>
+    public static readonly Lazy<string> RepositoryRoot = new(() =>
     {
         var currentDir = new DirectoryInfo(System.Environment.CurrentDirectory);
         while (currentDir != null)
@@ -21,14 +21,25 @@ static partial class TestPlatform
             currentDir = currentDir.Parent;
         }
 
-        throw new IOException($"Could not find repository root via working dir {System.Environment.CurrentDirectory}");
+        throw new IOException(
+            $"Could not find repository root via working dir {System.Environment.CurrentDirectory}");
     });
 
     public static async Task<Uint8Array> LoadFile(string path)
     {
-        await using var fs = new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
+        await using var fs =
+            new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
         await using var ms = new MemoryStream();
         await fs.CopyToAsync(ms);
+        return new Uint8Array(ms.ToArray());
+    }
+
+    public static Uint8Array LoadFileSync(string path)
+    {
+        using var fs =
+            new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
+        using var ms = new MemoryStream();
+        fs.CopyTo(ms);
         return new Uint8Array(ms.ToArray());
     }
 
@@ -42,7 +53,8 @@ static partial class TestPlatform
 
     public static Task<IList<string>> ListDirectory(string path)
     {
-        return Task.FromResult((IList<string>) Directory.EnumerateFiles(Path.Combine(RepositoryRoot.Value, path))
+        return Task.FromResult((IList<string>)Directory
+            .EnumerateFiles(Path.Combine(RepositoryRoot.Value, path))
             .Select(Path.GetFileName)
             .ToList());
     }
@@ -58,6 +70,12 @@ static partial class TestPlatform
         {
             File.Delete(path);
         }
+
         return Task.CompletedTask;
+    }
+
+    public static T[] EnumValues<T>(Type type) where T : struct, Enum
+    {
+        return Enum.GetValues<T>();
     }
 }

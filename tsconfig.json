@@ -1,16 +1,38 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "outDir": "dist/lib.test",
-    "declarationDir": "dist/types.test",
-  },
-  "include": [
-    "src",
-    "test",
-    "rollup.config.ts",
-    "rollup.config.cjs.ts",
-    "rollup.config.esm.ts",
-    "rollup.plugin.server.ts",
-    "rollup.plugin.resolve.ts",
-  ]
+    "compilerOptions": {
+        "moduleResolution": "Bundler",
+        "target": "ES2020",
+        "module": "ES2020",
+        "lib": ["ES2015", "ES2016", "ES2017", "ES2021", "es2022.regexp", "es2022.error", "dom"],
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+
+        "strict": true,
+        "allowSyntheticDefaultImports": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "emitDecoratorMetadata": false,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noImplicitOverride": true,
+        "baseUrl": ".",
+        "paths": {
+            "@src/*": ["src/*"],
+            "@test/*": ["test/*"]
+        },
+        "typeRoots": ["./types/", "./node_modules/@types"]
+    },
+    "include": [
+        "src",
+        "test",
+        "rollup.config.ts",
+        "rollup.config.cjs.ts",
+        "rollup.config.esm.ts",
+        "rollup.plugin.server.ts",
+        "rollup.plugin.resolve.ts"
+    ],
+    "exclude": ["**/node_modules"]
 }

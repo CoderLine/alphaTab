@@ -1,7 +1,8 @@
+import { Color } from '@src/model/Color';
 import { VisualTestHelper, VisualTestOptions } from '../VisualTestHelper';
 import { AlphaSkiaCanvas } from '@coderline/alphaskia';
-import { Color } from '@src/model';
-import { Bounds, BoundsLookup } from '@src/rendering';
+import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
+import { Bounds } from '@src/rendering/utils/Bounds';
 
 describe('BoundsLookupRenderingTests', () => {
     async function runTest(referenceFileName: string, color: Color, collectBounds: (bounds: BoundsLookup) => Bounds[]) {
@@ -16,7 +17,7 @@ describe('BoundsLookupRenderingTests', () => {
         \\track "Guitar 2"
         3.3 
         `,
-            referenceFileName
+            `test-data/visual-tests/${referenceFileName}`
         );
         o.tracks = [0, 1];
         o.prepareFullImage = (_run, api, img) => {

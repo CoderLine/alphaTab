@@ -1,14 +1,11 @@
-import { ICanvas } from '@src/platform';
-import { EffectGlyph } from './EffectGlyph';
-import { SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
-import { MusicFontSymbol } from '@src/model';
+import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
 
 export class SustainPedalGlyph extends EffectGlyph {
-    private static readonly TextHeight = 19;
-    private static readonly TextWidth = 35;
     private static readonly TextLinePadding = 3;
-
-    private static readonly StarSize = 16;
     private static readonly StarLinePadding = 3;
 
     public constructor() {
@@ -17,7 +14,7 @@ export class SustainPedalGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = SustainPedalGlyph.TextHeight;
+        this.height = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.KeyboardPedalPed)!;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -26,7 +23,10 @@ export class SustainPedalGlyph extends EffectGlyph {
         const y = cy + this.y;
         const h = this.height;
 
-        let markers = renderer.bar.sustainPedals;
+        const markers = renderer.bar.sustainPedals;
+
+        const textWidth = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.KeyboardPedalPed)!;
+        const starSize = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.KeyboardPedalUp)!;
 
         let markerIndex = 0;
         while (markerIndex < markers.length) {
@@ -38,10 +38,10 @@ export class SustainPedalGlyph extends EffectGlyph {
                 let linePadding = 0;
                 if (marker.pedalType === SustainPedalMarkerType.Down) {
                     canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalPed, true);
-                    linePadding = SustainPedalGlyph.TextWidth / 2 + SustainPedalGlyph.TextLinePadding;
+                    linePadding = textWidth / 2 + SustainPedalGlyph.TextLinePadding;
                 } else if (marker.pedalType === SustainPedalMarkerType.Up) {
                     canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
-                    linePadding = SustainPedalGlyph.StarSize / 2 + SustainPedalGlyph.StarLinePadding;
+                    linePadding = starSize / 2 + SustainPedalGlyph.StarLinePadding;
                 }
 
                 // line to next marker or end-of-bar
@@ -51,13 +51,13 @@ export class SustainPedalGlyph extends EffectGlyph {
 
                         switch (marker.nextPedalMarker.pedalType) {
                             case SustainPedalMarkerType.Down:
-                                nextX -= SustainPedalGlyph.TextWidth / 2;
+                                nextX -= textWidth / 2;
                                 break;
                             case SustainPedalMarkerType.Hold:
                                 // no offset on hold
                                 break;
                             case SustainPedalMarkerType.Up:
-                                nextX -= SustainPedalGlyph.StarSize / 2;
+                                nextX -= starSize / 2;
                                 break;
                         }
 

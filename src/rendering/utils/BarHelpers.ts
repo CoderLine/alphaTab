@@ -1,10 +1,10 @@
-import { Beat } from '@src/model/Beat';
+import type { Beat } from '@src/model/Beat';
 import { GraceType } from '@src/model/GraceType';
-import { Voice } from '@src/model/Voice';
+import type { Voice } from '@src/model/Voice';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { BarCollisionHelper } from '@src/rendering/utils/BarCollisionHelper';
-import { BeamDirection } from './BeamDirection';
+import type { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class BarHelpers {
     private _renderer: BarRendererBase;
@@ -19,17 +19,17 @@ export class BarHelpers {
     }
 
     public initialize() {
-        var barRenderer = this._renderer;
-        var bar = this._renderer.bar;
+        const barRenderer = this._renderer;
+        const bar = this._renderer.bar;
 
         let currentBeamHelper: BeamingHelper | null = null;
         let currentGraceBeamHelper: BeamingHelper | null = null;
         for (let i: number = 0, j: number = bar.voices.length; i < j; i++) {
-            let v: Voice = bar.voices[i];
+            const v: Voice = bar.voices[i];
             this.beamHelpers.push([]);
             this.beamHelperLookup.push(new Map<number, BeamingHelper>());
             for (let k: number = 0, l: number = v.beats.length; k < l; k++) {
-                let b: Beat = v.beats[k];
+                const b: Beat = v.beats[k];
                 let helperForBeat: BeamingHelper | null;
                 if (b.graceType !== GraceType.None) {
                     helperForBeat = currentGraceBeamHelper;

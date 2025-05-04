@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 
 namespace AlphaTab.Core.EcmaScript;
@@ -58,6 +59,13 @@ internal class RegExp
         return _global
             ? _regex.Replace(input, replacement)
             : _regex.Replace(input, replacement, 1);
+    }
+
+    public string Replace(string input, Func<string, string, string> replacer)
+    {
+        return _global
+            ? _regex.Replace(input, match => replacer(match.Value, match.Groups[1].Value))
+            : _regex.Replace(input, match => replacer(match.Value, match.Groups[1].Value), 1);
     }
 
     public string[] Split(string value)

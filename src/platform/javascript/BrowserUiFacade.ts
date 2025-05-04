@@ -1,45 +1,45 @@
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { Environment } from '@src/Environment';
-import { EventEmitter, IEventEmitter } from '@src/EventEmitter';
+import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Font } from '@src/model/Font';
+import type { Font } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { NotationMode } from '@src/NotationSettings';
-import { IContainer } from '@src/platform/IContainer';
+import type { IContainer } from '@src/platform/IContainer';
 import { HtmlElementContainer } from '@src/platform/javascript/HtmlElementContainer';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { Settings } from '@src/Settings';
 import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
-import { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
-import { IUiFacade } from '@src/platform/IUiFacade';
+import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
+import type { IUiFacade } from '@src/platform/IUiFacade';
 import { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 import { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
-import { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
+import type { AlphaTabApi } from '@src/platform/javascript/AlphaTabApi';
 import { AlphaTabWorkerScoreRenderer } from '@src/platform/javascript/AlphaTabWorkerScoreRenderer';
-import { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
+import type { BrowserMouseEventArgs } from '@src/platform/javascript/BrowserMouseEventArgs';
 import { Cursors } from '@src/platform/Cursors';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { ScalableHtmlElementContainer } from './ScalableHtmlElementContainer';
+import { ScalableHtmlElementContainer } from '@src/platform/javascript/ScalableHtmlElementContainer';
 import { PlayerOutputMode } from '@src/PlayerSettings';
-import { SettingsJson } from '@src/generated/SettingsJson';
+import type { SettingsJson } from '@src/generated/SettingsJson';
 
 /**
  * @target web
  */
 enum ResultState {
-    LayoutDone,
-    RenderRequested,
-    RenderDone,
-    Detached
+    LayoutDone = 0,
+    RenderRequested = 1,
+    RenderDone = 2,
+    Detached = 3
 }
 
 /**
@@ -97,7 +97,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             return false;
         }
 
-        Logger.debug('Font', 'All fonts loaded: ' + this._fontCheckers.size);
+        Logger.debug('Font', `All fonts loaded: ${this._fontCheckers.size}`);
         return true;
     }
 
@@ -176,7 +176,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             settings = JsonConverter.jsObjectToSettings(raw);
         }
 
-        let dataAttributes: Map<string, unknown> = this.getDataAttributes();
+        const dataAttributes: Map<string, unknown> = this.getDataAttributes();
         SettingsSerializer.fromJson(settings, dataAttributes);
         if (settings.notation.notationMode === NotationMode.SongBook) {
             settings.setSongBookModeSettings();
@@ -186,7 +186,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         this._initialTrackIndexes = this.parseTracks(settings.core.tracks);
         this._contents = '';
-        let element: HtmlElementContainer = api.container as HtmlElementContainer;
+        const element: HtmlElementContainer = api.container as HtmlElementContainer;
         if (settings.core.tex) {
             this._contents = element.element.innerHTML;
             element.element.innerHTML = '';
@@ -211,7 +211,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
     private registerFontChecker(font: Font): void {
         if (!this._fontCheckers.has(font.families.join(', '))) {
-            let checker: FontLoadingChecker = new FontLoadingChecker(font.families);
+            const checker: FontLoadingChecker = new FontLoadingChecker(font.families);
             this._fontCheckers.set(font.families.join(', '), checker);
             checker.fontLoaded.on(this.onFontLoaded.bind(this));
             checker.checkForFontAvailability();
@@ -223,7 +223,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public createCanvasElement(): IContainer {
-        let canvasElement: HTMLElement = document.createElement('div');
+        const canvasElement: HTMLElement = document.createElement('div');
         canvasElement.className = 'at-surface';
         canvasElement.style.fontSize = '0';
         canvasElement.style.overflow = 'hidden';
@@ -238,10 +238,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         details: unknown = null,
         originalEvent?: IMouseEventArgs
     ): void {
-        let element: HTMLElement = (container as HtmlElementContainer).element;
-        name = 'alphaTab.' + name;
-        let e: any = document.createEvent('CustomEvent');
-        let originalMouseEvent: MouseEvent | null = originalEvent
+        const element: HTMLElement = (container as HtmlElementContainer).element;
+        name = `alphaTab.${name}`;
+        const e: any = document.createEvent('CustomEvent');
+        const originalMouseEvent: MouseEvent | null = originalEvent
             ? (originalEvent as BrowserMouseEventArgs).mouseEvent
             : null;
         e.initCustomEvent(name, false, false, details);
@@ -250,8 +250,8 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
         element.dispatchEvent(e);
         if (window && 'jQuery' in window) {
-            let jquery: any = (window as any)['jQuery'];
-            let args: unknown[] = [];
+            const jquery: any = (window as any).jQuery;
+            const args: unknown[] = [];
             args.push(details);
             if (originalMouseEvent) {
                 args.push(originalMouseEvent);
@@ -266,7 +266,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             return true;
         }
         if (data instanceof ArrayBuffer) {
-            let byteArray: Uint8Array = new Uint8Array(data);
+            const byteArray: Uint8Array = new Uint8Array(data);
             success(ScoreLoader.loadScoreFromBytes(byteArray, this._api.settings));
             return true;
         }
@@ -339,7 +339,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private createStyleElement(settings: Settings): void {
-        let elementDocument: HTMLDocument = (this._api.container as HtmlElementContainer).element.ownerDocument!;
+        const elementDocument: HTMLDocument = (this._api.container as HtmlElementContainer).element.ownerDocument!;
         Environment.createStyleElement(elementDocument, settings.core.fontDirectory);
     }
 
@@ -347,7 +347,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         if (!tracksData) {
             return [];
         }
-        let tracks: number[] = [];
+        const tracks: number[] = [];
         // decode string
         if (typeof tracksData === 'string') {
             try {
@@ -363,17 +363,17 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         if (typeof tracksData === 'number') {
             tracks.push(tracksData);
         } else if ('length' in (tracksData as any)) {
-            let length: number = (tracksData as any).length;
-            let array: unknown[] = tracksData as unknown[];
+            const length: number = (tracksData as any).length;
+            const array: unknown[] = tracksData as unknown[];
             for (let i: number = 0; i < length; i++) {
-                let item: unknown = array[i];
+                const item: unknown = array[i];
                 let value: number = 0;
                 if (typeof item === 'number') {
                     value = item;
                 } else if ('index' in (item as any)) {
                     value = (item as any).index;
                 } else {
-                    value = parseInt((item as any).toString());
+                    value = Number.parseInt((item as any).toString());
                 }
                 if (value >= 0 || value === -1) {
                     tracks.push(value);
@@ -386,13 +386,13 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private getDataAttributes(): Map<string, unknown> {
-        let dataAttributes: Map<string, unknown> = new Map<string, unknown>();
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
+        const dataAttributes: Map<string, unknown> = new Map<string, unknown>();
+        const element: HTMLElement = (this._api.container as HtmlElementContainer).element;
         if (element.dataset) {
-            for (let key of Object.keys(element.dataset)) {
+            for (const key of Object.keys(element.dataset)) {
                 let value: unknown = (element.dataset as any)[key];
                 try {
-                    let stringValue: string = value as string;
+                    const stringValue: string = value as string;
                     value = JSON.parse(stringValue);
                 } catch (e) {
                     if (value === '') {
@@ -403,10 +403,10 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             }
         } else {
             for (let i: number = 0; i < element.attributes.length; i++) {
-                let attr: Attr = element.attributes.item(i)!;
-                let nodeName: string = attr.nodeName;
+                const attr: Attr = element.attributes.item(i)!;
+                const nodeName: string = attr.nodeName;
                 if (nodeName.startsWith('data-')) {
-                    let keyParts: string[] = nodeName.substr(5).split('-');
+                    const keyParts: string[] = nodeName.substr(5).split('-');
                     let key: string = keyParts[0];
                     for (let j: number = 1; j < keyParts.length; j++) {
                         key += keyParts[j].substr(0, 1).toUpperCase() + keyParts[j].substr(1);
@@ -465,15 +465,15 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             }
             placeholder.style.zIndex = '1';
             placeholder.style.position = 'absolute';
-            placeholder.style.left = renderResult.x + 'px';
-            placeholder.style.top = renderResult.y + 'px';
-            placeholder.style.width = renderResult.width + 'px';
-            placeholder.style.height = renderResult.height + 'px';
+            placeholder.style.left = `${renderResult.x}px`;
+            placeholder.style.top = `${renderResult.y}px`;
+            placeholder.style.width = `${renderResult.width}px`;
+            placeholder.style.height = `${renderResult.height}px`;
             placeholder.style.display = 'inline-block';
             placeholder.layoutResultId = renderResult.id;
             placeholder.resultState = ResultState.LayoutDone;
-            delete placeholder.renderedResultId;
-            delete placeholder.renderedResult;
+            placeholder.renderedResultId = undefined;
+            placeholder.renderedResult = undefined;
 
             this._resultIdToElementLookup.set(renderResult.id, placeholder);
 
@@ -501,10 +501,9 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
      */
     public createWorkerPlayer(): IAlphaSynth | null {
         let player: AlphaSynthWebWorkerApi | null = null;
-        let supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
+        const supportsScriptProcessor: boolean = 'ScriptProcessorNode' in window;
 
-        let supportsAudioWorklets: boolean =
-            window.isSecureContext && 'AudioWorkletNode' in window;
+        const supportsAudioWorklets: boolean = window.isSecureContext && 'AudioWorkletNode' in window;
 
         if (supportsAudioWorklets && this._api.settings.player.outputMode === PlayerOutputMode.WebAudioAudioWorklets) {
             Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with worklets for playback');
@@ -513,11 +512,11 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 this._api.settings
             );
         } else if (supportsScriptProcessor) {
-            Logger.debug('Player', 'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback');
-            player = new AlphaSynthWebWorkerApi(
-                new AlphaSynthScriptProcessorOutput(),
-                this._api.settings
+            Logger.debug(
+                'Player',
+                'Will use webworkers for synthesizing and web audio api with ScriptProcessor for playback'
             );
+            player = new AlphaSynthWebWorkerApi(new AlphaSynthScriptProcessorOutput(), this._api.settings);
         }
 
         if (!player) {
@@ -542,7 +541,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     public highlightElements(groupId: string, masterBarIndex: number): void {
         const element = this._barToElementLookup.get(masterBarIndex);
         if (element) {
-            let elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
+            const elementsToHighlight: HTMLCollection = element.getElementsByClassName(groupId);
             for (let i: number = 0; i < elementsToHighlight.length; i++) {
                 elementsToHighlight.item(i)!.classList.add('at-highlight');
                 this._highlightedElements.push(elementsToHighlight.item(i) as HTMLElement);
@@ -562,24 +561,24 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public destroyCursors(): void {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let cursorWrapper: HTMLElement = element.querySelector('.at-cursors') as HTMLElement;
+        const element: HTMLElement = (this._api.container as HtmlElementContainer).element;
+        const cursorWrapper: HTMLElement = element.querySelector('.at-cursors') as HTMLElement;
         element.removeChild(cursorWrapper);
     }
 
     public createCursors(): Cursors | null {
-        let element: HTMLElement = (this._api.container as HtmlElementContainer).element;
-        let cursorWrapper: HTMLElement = document.createElement('div');
+        const element: HTMLElement = (this._api.container as HtmlElementContainer).element;
+        const cursorWrapper: HTMLElement = document.createElement('div');
         cursorWrapper.classList.add('at-cursors');
-        let selectionWrapper: HTMLElement = document.createElement('div');
+        const selectionWrapper: HTMLElement = document.createElement('div');
         selectionWrapper.classList.add('at-selection');
 
         const barCursorContainer = this.createScalingElement();
         const beatCursorContainer = this.createScalingElement();
 
-        let barCursor: HTMLElement = barCursorContainer.element;
+        const barCursor: HTMLElement = barCursorContainer.element;
         barCursor.classList.add('at-cursor-bar');
-        let beatCursor: HTMLElement = beatCursorContainer.element;
+        const beatCursor: HTMLElement = beatCursorContainer.element;
         beatCursor.classList.add('at-cursor-beat');
         // required css styles
         element.style.position = 'relative';
@@ -623,21 +622,21 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     public getOffset(scrollContainer: IContainer | null, container: IContainer): Bounds {
-        let element: HTMLElement = (container as HtmlElementContainer).element;
-        let bounds: DOMRect = element.getBoundingClientRect();
+        const element: HTMLElement = (container as HtmlElementContainer).element;
+        const bounds: DOMRect = element.getBoundingClientRect();
         let top: number = bounds.top + element.ownerDocument!.defaultView!.pageYOffset;
         let left: number = bounds.left + element.ownerDocument!.defaultView!.pageXOffset;
         if (scrollContainer) {
-            let scrollElement: HTMLElement = (scrollContainer as HtmlElementContainer).element;
-            let nodeName: string = scrollElement.nodeName.toLowerCase();
+            const scrollElement: HTMLElement = (scrollContainer as HtmlElementContainer).element;
+            const nodeName: string = scrollElement.nodeName.toLowerCase();
             if (nodeName !== 'html' && nodeName !== 'body') {
-                let scrollElementOffset: Bounds = this.getOffset(null, scrollContainer);
+                const scrollElementOffset: Bounds = this.getOffset(null, scrollContainer);
                 top = top + scrollElement.scrollTop - scrollElementOffset.y;
                 left = left + scrollElement.scrollLeft - scrollElementOffset.x;
             }
         }
 
-        let b = new Bounds();
+        const b = new Bounds();
         b.x = left;
         b.y = top;
         b.w = bounds.width;
@@ -656,7 +655,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             typeof this._api.settings.player.scrollElement === 'string'
                 ? (document.querySelector(this._api.settings.player.scrollElement) as HTMLElement)
                 : (this._api.settings.player.scrollElement as HTMLElement);
-        let nodeName: string = scrollElement.nodeName.toLowerCase();
+        const nodeName: string = scrollElement.nodeName.toLowerCase();
         if (nodeName === 'html' || nodeName === 'body') {
             // https://github.com/CoderLine/alphaTab/issues/205
             // https://github.com/CoderLine/alphaTab/issues/354
@@ -713,16 +712,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 behavior: 'smooth'
             });
         } else {
-            let startY: number = element.scrollTop;
-            let diff: number = scrollTargetY - startY;
+            const startY: number = element.scrollTop;
+            const diff: number = scrollTargetY - startY;
 
             let start: number = 0;
-            let step = (x: number) => {
+            const step = (x: number) => {
                 if (start === 0) {
                     start = x;
                 }
-                let time: number = x - start;
-                let percent: number = Math.min(time / speed, 1);
+                const time: number = x - start;
+                const percent: number = Math.min(time / speed, 1);
                 element.scrollTop = (startY + diff * percent) | 0;
                 if (time < speed) {
                     window.requestAnimationFrame(step);
@@ -739,15 +738,15 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 behavior: 'smooth'
             });
         } else {
-            let startX: number = element.scrollLeft;
-            let diff: number = scrollTargetX - startX;
+            const startX: number = element.scrollLeft;
+            const diff: number = scrollTargetX - startX;
             let start: number = 0;
-            let step = (t: number) => {
+            const step = (t: number) => {
                 if (start === 0) {
                     start = t;
                 }
-                let time: number = t - start;
-                let percent: number = Math.min(time / speed, 1);
+                const time: number = t - start;
+                const percent: number = Math.min(time / speed, 1);
                 element.scrollLeft = (startX + diff * percent) | 0;
                 if (time < speed) {
                     window.requestAnimationFrame(step);

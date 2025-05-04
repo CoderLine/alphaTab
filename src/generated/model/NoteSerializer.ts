@@ -6,6 +6,7 @@
 import { Note } from "@src/model/Note";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { BendPointSerializer } from "@src/generated/model/BendPointSerializer";
+import { NoteStyleSerializer } from "@src/generated/model/NoteStyleSerializer";
 import { AccentuationType } from "@src/model/AccentuationType";
 import { BendType } from "@src/model/BendType";
 import { BendStyle } from "@src/model/BendStyle";
@@ -19,12 +20,13 @@ import { Duration } from "@src/model/Duration";
 import { NoteAccidentalMode } from "@src/model/NoteAccidentalMode";
 import { DynamicValue } from "@src/model/DynamicValue";
 import { NoteOrnament } from "@src/model/NoteOrnament";
+import { NoteStyle } from "@src/model/Note";
 export class NoteSerializer {
     public static fromJson(obj: Note, m: unknown): void {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => this.setProperty(obj, k, v));
+        JsonHelper.forEach(m, (v, k) => NoteSerializer.setProperty(obj, k, v));
     }
     public static toJson(obj: Note | null): Map<string, unknown> | null {
         if (!obj) {
@@ -68,6 +70,9 @@ export class NoteSerializer {
         o.set("accidentalmode", obj.accidentalMode as number);
         o.set("dynamics", obj.dynamics as number);
         o.set("ornament", obj.ornament as number);
+        if (obj.style) {
+            o.set("style", NoteStyleSerializer.toJson(obj.style));
+        }
         obj.toJson(o);
         return o;
     }
@@ -184,6 +189,15 @@ export class NoteSerializer {
                 return true;
             case "ornament":
                 obj.ornament = JsonHelper.parseEnum<NoteOrnament>(v, NoteOrnament)!;
+                return true;
+            case "style":
+                if (v) {
+                    obj.style = new NoteStyle();
+                    NoteStyleSerializer.fromJson(obj.style, v);
+                }
+                else {
+                    obj.style = undefined;
+                }
                 return true;
         }
         return obj.setProperty(property, v);

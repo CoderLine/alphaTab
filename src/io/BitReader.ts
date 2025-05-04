@@ -1,5 +1,5 @@
 import { ByteBuffer } from '@src/io/ByteBuffer';
-import { EndOfReaderError, IReadable } from '@src/io/IReadable';
+import { EndOfReaderError, type IReadable } from '@src/io/IReadable';
 
 /**
  * This utility public class allows bitwise reading of a stream
@@ -62,7 +62,7 @@ export class BitReader {
     }
 
     public readAll(): Uint8Array {
-        let all: ByteBuffer = ByteBuffer.empty();
+        const all: ByteBuffer = ByteBuffer.empty();
         try {
             while (true) {
                 all.writeByte(this.readByte() & 0xff);

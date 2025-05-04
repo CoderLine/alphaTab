@@ -46,8 +46,12 @@ internal class AndroidAudioWorker(
         _writeThread = Thread {
             this@AndroidAudioWorker.writeSamples()
         }
-        _writeThread!!.name = "alphaTab Audio Worker";
+        _writeThread!!.name = "alphaTab Audio Worker"
         _writeThread!!.start()
+    }
+
+    fun setOutputDevice(device: AudioDeviceInfo?) {
+        _track.preferredDevice = device
     }
 
     private fun writeSamples() {
@@ -82,7 +86,7 @@ internal class AndroidAudioWorker(
             _track.play()
             _stopped = false
 
-            _updateSchedule = _updateTimer.scheduleAtFixedRate(
+            _updateSchedule = _updateTimer.scheduleWithFixedDelay(
                 {
                     this@AndroidAudioWorker.onUpdatePlayedSamples()
                 }, 0L, 50L, TimeUnit.MILLISECONDS
@@ -103,7 +107,7 @@ internal class AndroidAudioWorker(
 
     private var _previousPosition: Int = -1
     private val _timestamp = AudioTimestamp()
-    private val _lastTimestampUpdate: Long = -1L;
+    private val _lastTimestampUpdate: Long = -1L
 
     private fun onUpdatePlayedSamples() {
         val sinceUpdateInMillis = (System.nanoTime() - _lastTimestampUpdate) / 10e6

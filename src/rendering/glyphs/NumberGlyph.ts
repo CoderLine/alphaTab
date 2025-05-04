@@ -1,40 +1,67 @@
-import { DigitGlyph } from '@src/rendering/glyphs/DigitGlyph';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
+import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import type { ICanvas } from '@src/platform/ICanvas';
 
-export class NumberGlyph extends GlyphGroup {
-    public static readonly numberHeight:number = 18;
-    
-    private _number: number = 0;
+export class NumberGlyph extends Glyph {
+    public static readonly numberHeight: number = 18;
+
     private _scale: number = 0;
+
+    private _symbols: MusicFontSymbol[] = [];
 
     public constructor(x: number, y: number, num: number, scale: number = 1.0) {
         super(x, y);
-        this._number = num;
+        this._symbols = NumberGlyph.getSymbols(num);
         this._scale = scale;
     }
 
-    public override doLayout(): void {
-        let i: number = this._number;
-        while (i > 0) {
-            let num: number = i % 10;
-            let gl: DigitGlyph = new DigitGlyph(0, 0, num, this._scale);
-            this.addGlyph(gl);
-            i = (i / 10) | 0;
+    public static getSymbols(number: number): MusicFontSymbol[] {
+        const symbols: MusicFontSymbol[] = [];
+        while (number > 0) {
+            const digit: number = number % 10;
+            symbols.unshift(NumberGlyph.getSymbol(digit));
+            number = (number / 10) | 0;
         }
+        return symbols;
+    }
 
-        if (this.glyphs) {
-            this.glyphs.reverse();
-            let cx: number = 0;
-            for (let j: number = 0, k: number = this.glyphs.length; j < k; j++) {
-                let g: Glyph = this.glyphs[j];
-                g.x = cx;
-                g.y = 0;
-                g.renderer = this.renderer;
-                g.doLayout();
-                cx += g.width;
-            }
-            this.width = cx;
+    public static getSymbol(digit: number): MusicFontSymbol {
+        switch (digit) {
+            case 0:
+                return MusicFontSymbol.TimeSig0;
+            case 1:
+                return MusicFontSymbol.TimeSig1;
+            case 2:
+                return MusicFontSymbol.TimeSig2;
+            case 3:
+                return MusicFontSymbol.TimeSig3;
+            case 4:
+                return MusicFontSymbol.TimeSig4;
+            case 5:
+                return MusicFontSymbol.TimeSig5;
+            case 6:
+                return MusicFontSymbol.TimeSig6;
+            case 7:
+                return MusicFontSymbol.TimeSig7;
+            case 8:
+                return MusicFontSymbol.TimeSig8;
+            case 9:
+                return MusicFontSymbol.TimeSig9;
+            default:
+                return MusicFontSymbol.None;
         }
+    }
+
+    public override doLayout(): void {
+        let w = 0;
+        for (const d of this._symbols) {
+            w += MusicFontSymbolSizes.Widths.get(d)!;
+        }
+        this.width = w;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y, this._scale, this._symbols);
     }
 }

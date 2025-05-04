@@ -1,12 +1,17 @@
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { Beat } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
+import type { Duration } from '@src/model/Duration';
 import { Fingers } from '@src/model/Fingers';
-import { Score } from '@src/model/Score';
+import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
 import { FingeringMode } from '@src/NotationSettings';
-import { Settings } from '@src/Settings';
-import { NoteAccidentalMode } from './NoteAccidentalMode';
-import { MasterBar } from './MasterBar';
+import type { Settings } from '@src/Settings';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { MasterBar } from '@src/model/MasterBar';
+import type { Track } from '@src/model/Track';
+import { SynthConstants } from '@src/synth/SynthConstants';
+import { Bar } from '@src/model/Bar';
+import { Voice } from '@src/model/Voice';
+import { Automation, AutomationType } from '@src/model/Automation';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -32,8 +37,8 @@ export class TuningParseResultTone {
  */
 export class ModelUtils {
     public static getIndex(duration: Duration): number {
-        let index: number = 0;
-        let value: number = duration;
+        const index: number = 0;
+        const value: number = duration;
         if (value < 0) {
             return index;
         }
@@ -55,12 +60,12 @@ export class ModelUtils {
     public static applyPitchOffsets(settings: Settings, score: Score): void {
         for (let i: number = 0; i < score.tracks.length; i++) {
             if (i < settings.notation.displayTranspositionPitches.length) {
-                for (let staff of score.tracks[i].staves) {
+                for (const staff of score.tracks[i].staves) {
                     staff.displayTranspositionPitch = -settings.notation.displayTranspositionPitches[i];
                 }
             }
             if (i < settings.notation.transpositionPitches.length) {
-                for (let staff of score.tracks[i].staves) {
+                for (const staff of score.tracks[i].staves) {
                     staff.transpositionPitch = -settings.notation.transpositionPitches[i];
                 }
             }
@@ -146,7 +151,7 @@ export class ModelUtils {
         let note: string = '';
         let octave: string = '';
         for (let i: number = 0; i < name.length; i++) {
-            let c: number = name.charCodeAt(i);
+            const c: number = name.charCodeAt(i);
             if (c >= 0x30 && c <= 0x39 /* 0-9 */) {
                 // number without note?
                 if (!note) {
@@ -162,9 +167,9 @@ export class ModelUtils {
         if (!octave || !note) {
             return null;
         }
-        let result: TuningParseResult = new TuningParseResult();
+        const result: TuningParseResult = new TuningParseResult();
 
-        result.octave = parseInt(octave) + 1;
+        result.octave = Number.parseInt(octave) + 1;
         result.note = note.toLowerCase();
         result.tone = ModelUtils.getToneForText(result.note);
 
@@ -179,7 +184,7 @@ export class ModelUtils {
     }
 
     public static getTuningForText(str: string): number {
-        let result: TuningParseResult | null = ModelUtils.parseTuning(str);
+        const result: TuningParseResult | null = ModelUtils.parseTuning(str);
         if (!result) {
             return -1;
         }
@@ -281,36 +286,26 @@ export class ModelUtils {
     }
 
     public static newGuid(): string {
-        return (
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
-            '-' +
-            Math.floor((1 + Math.random()) * 0x10000)
-                .toString(16)
-                .substring(1) +
+        return `${
             Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
                 .substring(1) +
             Math.floor((1 + Math.random()) * 0x10000)
                 .toString(16)
                 .substring(1)
-        );
+        }-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}-${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}${Math.floor((1 + Math.random()) * 0x10000)
+            .toString(16)
+            .substring(1)}`;
     }
 
     public static isAlmostEqualTo(a: number, b: number): boolean {
@@ -319,13 +314,13 @@ export class ModelUtils {
 
     public static toHexString(n: number, digits: number = 0): string {
         let s: string = '';
-        let hexChars: string = '0123456789ABCDEF';
+        const hexChars: string = '0123456789ABCDEF';
         do {
             s = String.fromCharCode(hexChars.charCodeAt(n & 15)) + s;
             n = n >> 4;
         } while (n > 0);
         while (s.length < digits) {
-            s = '0' + s;
+            s = `0${s}`;
         }
         return s;
     }
@@ -383,5 +378,249 @@ export class ModelUtils {
             return max;
         }
         return value;
+    }
+
+    public static buildMultiBarRestInfo(
+        tracks: Track[] | null,
+        startIndex: number,
+        endIndexInclusive: number
+    ): Map<number, number[]> | null {
+        if (!tracks) {
+            return null;
+        }
+        const stylesheet = tracks[0].score.stylesheet;
+        const shouldDrawMultiBarRests: boolean =
+            tracks.length > 1
+                ? stylesheet.multiTrackMultiBarRest
+                : stylesheet.perTrackMultiBarRest?.has(tracks[0].index) === true;
+        if (!shouldDrawMultiBarRests) {
+            return null;
+        }
+
+        const lookup = new Map<number, number[]>();
+
+        const score = tracks[0].score;
+
+        let currentIndex = startIndex;
+        while (currentIndex <= endIndexInclusive) {
+            const currentGroupStartIndex = currentIndex;
+            let currentGroup: number[] | null = null;
+
+            while (currentIndex <= endIndexInclusive) {
+                const masterBar = score.masterBars[currentIndex];
+
+                // check if masterbar breaks multibar rests, it must be fully empty with no annotations
+                if (
+                    masterBar.alternateEndings ||
+                    (masterBar.isRepeatStart && masterBar.index !== currentGroupStartIndex) ||
+                    masterBar.isFreeTime ||
+                    masterBar.isAnacrusis ||
+                    masterBar.section !== null ||
+                    (masterBar.index !== currentGroupStartIndex && masterBar.tempoAutomations.length > 0) ||
+                    (masterBar.fermata !== null && masterBar.fermata.size > 0) ||
+                    (masterBar.directions !== null && masterBar.directions.size > 0)
+                ) {
+                    break;
+                }
+
+                // check if masterbar breaks multibar rests because of change to previous
+                if (
+                    currentGroupStartIndex > startIndex &&
+                    masterBar.previousMasterBar &&
+                    (masterBar.timeSignatureCommon !== masterBar.previousMasterBar!.timeSignatureCommon ||
+                        masterBar.timeSignatureNumerator !== masterBar.previousMasterBar!.timeSignatureNumerator ||
+                        masterBar.timeSignatureDenominator !== masterBar.previousMasterBar!.timeSignatureDenominator ||
+                        masterBar.tripletFeel !== masterBar.previousMasterBar!.tripletFeel)
+                ) {
+                    break;
+                }
+
+                // masterbar is good, now check bars across staves
+                let areAllBarsSuitable = true;
+                for (const t of tracks) {
+                    for (const s of t.staves) {
+                        const bar = s.bars[masterBar.index];
+
+                        if (!bar.isRestOnly) {
+                            areAllBarsSuitable = false;
+                            break;
+                        }
+
+                        if (
+                            bar.index > 0 &&
+                            (bar.keySignature !== bar.previousBar!.keySignature ||
+                                bar.keySignatureType !== bar.previousBar!.keySignatureType)
+                        ) {
+                            areAllBarsSuitable = false;
+                            break;
+                        }
+                    }
+
+                    if (!areAllBarsSuitable) {
+                        break;
+                    }
+                }
+
+                if (!areAllBarsSuitable) {
+                    break;
+                }
+
+                // skip initial bar as it is not "additional" but we are checking it
+                currentIndex++;
+                if (masterBar.index > currentGroupStartIndex) {
+                    if (currentGroup === null) {
+                        currentGroup = [masterBar.index];
+                    } else {
+                        currentGroup.push(masterBar.index);
+                    }
+                }
+
+                // special scenario -> repeat ends are included but then we stop
+                if (masterBar.isRepeatEnd) {
+                    break;
+                }
+            }
+
+            if (currentGroup) {
+                lookup.set(currentGroupStartIndex, currentGroup);
+            } else {
+                currentIndex++;
+            }
+        }
+
+        return lookup;
+    }
+
+    public static computeFirstDisplayedBarIndex(score: Score, settings: Settings) {
+        let startIndex: number = settings.display.startBar;
+        startIndex--; // map to array index
+
+        startIndex = Math.min(score.masterBars.length - 1, Math.max(0, startIndex));
+        return startIndex;
+    }
+
+    public static computeLastDisplayedBarIndex(score: Score, settings: Settings, startIndex: number) {
+        let endBarIndex: number = settings.display.barCount;
+        if (endBarIndex < 0) {
+            endBarIndex = score.masterBars.length;
+        }
+        endBarIndex = startIndex + endBarIndex - 1; // map count to array index
+
+        endBarIndex = Math.min(score.masterBars.length - 1, Math.max(0, endBarIndex));
+        return endBarIndex;
+    }
+
+    public static getOrCreateHeaderFooterStyle(score: Score, element: ScoreSubElement) {
+        let style = score.style;
+        if (!score.style) {
+            style = new ScoreStyle();
+            score.style = style;
+        }
+
+        let headerFooterStyle: HeaderFooterStyle;
+        if (style!.headerAndFooter.has(element)) {
+            headerFooterStyle = style!.headerAndFooter.get(element)!;
+        } else {
+            headerFooterStyle = new HeaderFooterStyle();
+
+            if (ScoreStyle.defaultHeaderAndFooter.has(element)) {
+                const defaults = ScoreStyle.defaultHeaderAndFooter.get(element)!;
+                headerFooterStyle.template = defaults.template;
+                headerFooterStyle.textAlign = defaults.textAlign;
+            }
+
+            style!.headerAndFooter.set(element, headerFooterStyle);
+        }
+
+        return headerFooterStyle;
+    }
+
+    /**
+     * Performs some general consolidations of inconsistencies on the given score like
+     * missing bars, beats, duplicated midi channels etc
+     */
+    public static consolidate(score: Score) {
+        // empty score?
+        if (score.masterBars.length === 0) {
+            const master: MasterBar = new MasterBar();
+            score.addMasterBar(master);
+
+            const tempoAutomation = new Automation();
+            tempoAutomation.isLinear = false;
+            tempoAutomation.type = AutomationType.Tempo;
+            tempoAutomation.value = score.tempo;
+            master.tempoAutomations.push(tempoAutomation);
+
+            const bar: Bar = new Bar();
+            score.tracks[0].staves[0].addBar(bar);
+
+            const v = new Voice();
+            bar.addVoice(v);
+
+            const emptyBeat: Beat = new Beat();
+            emptyBeat.isEmpty = true;
+            v.addBeat(emptyBeat);
+            return;
+        }
+
+        const usedChannels = new Set<number>([SynthConstants.PercussionChannel]);
+        for (const track of score.tracks) {
+            // ensure percussion channel
+            if (track.staves.length === 1 && track.staves[0].isPercussion) {
+                track.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
+                track.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
+            } else {
+                // unique midi channels and generate secondary channels
+                if (track.playbackInfo.primaryChannel !== SynthConstants.PercussionChannel) {
+                    while (usedChannels.has(track.playbackInfo.primaryChannel)) {
+                        track.playbackInfo.primaryChannel++;
+                    }
+                }
+                usedChannels.add(track.playbackInfo.primaryChannel);
+
+                if (track.playbackInfo.secondaryChannel !== SynthConstants.PercussionChannel) {
+                    while (usedChannels.has(track.playbackInfo.secondaryChannel)) {
+                        track.playbackInfo.secondaryChannel++;
+                    }
+                }
+                usedChannels.add(track.playbackInfo.secondaryChannel);
+            }
+
+            for (const staff of track.staves) {
+                // fill empty beats
+                for (const b of staff.bars) {
+                    for (const v of b.voices) {
+                        if (v.isEmpty && v.beats.length === 0) {
+                            const emptyBeat: Beat = new Beat();
+                            emptyBeat.isEmpty = true;
+                            v.addBeat(emptyBeat);
+                        }
+                    }
+                }
+
+                // fill missing bars
+                const voiceCount = staff.bars.length === 0 ? 1 : staff.bars[0].voices.length;
+                while (staff.bars.length < score.masterBars.length) {
+                    const bar: Bar = new Bar();
+                    staff.addBar(bar);
+                    const previousBar = bar.previousBar;
+                    if (previousBar) {
+                        bar.clef = previousBar.clef;
+                        bar.clefOttava = previousBar.clefOttava;
+                        bar.keySignature = bar.previousBar!.keySignature;
+                        bar.keySignatureType = bar.previousBar!.keySignatureType;
+                    }
+
+                    for (let i = 0; i < voiceCount; i++) {
+                        const v = new Voice();
+                        bar.addVoice(v);
+
+                        const emptyBeat: Beat = new Beat();
+                        emptyBeat.isEmpty = true;
+                        v.addBeat(emptyBeat);
+                    }
+                }
+            }
+        }
     }
 }

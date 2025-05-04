@@ -1,9 +1,11 @@
 import { Clef } from '@src/model/Clef';
 import { Ottavia } from '@src/model/Ottavia';
-import { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { BarSubElement } from '@src/model/Bar';
 
 export class ClefGlyph extends MusicFontGlyph {
     private _clef: Clef;
@@ -13,20 +15,6 @@ export class ClefGlyph extends MusicFontGlyph {
         super(x, y, 1, ClefGlyph.getSymbol(clef));
         this._clef = clef;
         this._clefOttava = clefOttava;
-    }
-
-    public override doLayout(): void {
-        switch (this._clef) {
-            case Clef.Neutral:
-                this.width = 15;
-                break;
-            case Clef.C3:
-            case Clef.C4:
-            case Clef.F4:
-            case Clef.G2:
-                this.width = 28;
-                break;
-        }
     }
 
     private static getSymbol(clef: Clef): MusicFontSymbol {
@@ -47,6 +35,8 @@ export class ClefGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationClef, this.renderer.bar);
+
         super.paint(cx, cy, canvas);
         let numberGlyph: Glyph;
         let top: boolean = false;
@@ -96,7 +86,7 @@ export class ClefGlyph extends MusicFontGlyph {
         }
         numberGlyph.renderer = this.renderer;
         numberGlyph.doLayout();
-        let x: number = this.width / 2;
+        const x: number = this.width / 2;
         numberGlyph.paint(cx + this.x + x + offsetX, cy + this.y + offsetY, canvas);
     }
 }

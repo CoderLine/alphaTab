@@ -1,5 +1,5 @@
 import { FermataType } from '@src/model/Fermata';
-import { ICanvas } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
@@ -19,11 +19,6 @@ export class FermataGlyph extends MusicFontGlyph {
             default:
                 return MusicFontSymbol.None;
         }
-    }
-
-    public override doLayout(): void {
-        this.width = 23;
-        this.height = 12;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

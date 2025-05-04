@@ -1,14 +1,14 @@
 import { LayoutMode } from '@src/LayoutMode';
 import { Environment } from '@src/Environment';
-import { EventEmitter, IEventEmitter, IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
-import { Score } from '@src/model/Score';
-import { Track } from '@src/model/Track';
-import { ICanvas } from '@src/platform/ICanvas';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
+import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import type { Score } from '@src/model/Score';
+import type { Track } from '@src/model/Track';
+import type { ICanvas } from '@src/platform/ICanvas';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 
 /**
@@ -79,7 +79,7 @@ export class ScoreRenderer implements IScoreRenderer {
                     tracks = score.tracks.slice(0);
                 } else {
                     tracks = [];
-                    for (let track of trackIndexes) {
+                    for (const track of trackIndexes) {
                         if (track >= 0 && track < score.tracks.length) {
                             tracks.push(score.tracks[track]);
                         }
@@ -119,10 +119,10 @@ export class ScoreRenderer implements IScoreRenderer {
         try {
             const layout = this.layout;
             if (layout) {
-                Logger.debug('Rendering', 'Request render of lazy partial ' + resultId);
+                Logger.debug('Rendering', `Request render of lazy partial ${resultId}`);
                 layout.renderLazyPartial(resultId);
             } else {
-                Logger.warning('Rendering', 'Request render of lazy partial ' + resultId + ' ignored, no layout exists');
+                Logger.warning('Rendering', `Request render of lazy partial ${resultId} ignored, no layout exists`);
             }
         } catch (e) {
             (this.error as EventEmitterOfT<Error>).trigger(e as Error);
@@ -147,10 +147,10 @@ export class ScoreRenderer implements IScoreRenderer {
             (this.postRenderFinished as EventEmitter).trigger();
             Logger.debug('Rendering', 'Clearing finished');
         } else {
-            Logger.debug('Rendering', 'Rendering ' + this.tracks.length + ' tracks');
+            Logger.debug('Rendering', `Rendering ${this.tracks.length} tracks`);
             for (let i: number = 0; i < this.tracks.length; i++) {
-                let track: Track = this.tracks[i];
-                Logger.debug('Rendering', 'Track ' + i + ': ' + track.name);
+                const track: Track = this.tracks[i];
+                Logger.debug('Rendering', `Track ${i}: ${track.name}`);
             }
             (this.preRender as EventEmitterOfT<boolean>).trigger(false);
             this.recreateLayout();
@@ -180,7 +180,7 @@ export class ScoreRenderer implements IScoreRenderer {
     private layoutAndRender(): void {
         Logger.debug(
             'Rendering',
-            'Rendering at scale ' + this.settings.display.scale + ' with layout ' + this.layout!.name,
+            `Rendering at scale ${this.settings.display.scale} with layout ${this.layout!.name}`,
             null
         );
         this.layout!.layoutAndRender();

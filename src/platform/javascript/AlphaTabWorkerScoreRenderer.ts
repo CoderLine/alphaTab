@@ -1,12 +1,12 @@
-import { AlphaTabApiBase } from '@src/AlphaTabApiBase';
-import { EventEmitter, IEventEmitterOfT, IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
+import type { AlphaTabApiBase } from '@src/AlphaTabApiBase';
+import { EventEmitter, type IEventEmitterOfT, type IEventEmitter, EventEmitterOfT } from '@src/EventEmitter';
 import { JsonConverter } from '@src/model/JsonConverter';
-import { Score } from '@src/model/Score';
+import type { Score } from '@src/model/Score';
 import { FontSizes } from '@src/platform/svg/FontSizes';
-import { IScoreRenderer } from '@src/rendering/IScoreRenderer';
-import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
+import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
+import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
-import { Settings } from '@src/Settings';
+import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
 import { Environment } from '@src/Environment';
 
@@ -73,7 +73,6 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-
     public get width(): number {
         return this._width;
     }
@@ -87,8 +86,8 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private handleWorkerMessage(e: MessageEvent): void {
-        let data: any = e.data;
-        let cmd: string = data.cmd;
+        const data: any = e.data;
+        const cmd: string = data.cmd;
         switch (cmd) {
             case 'alphaTab.preRender':
                 (this.preRender as EventEmitterOfT<boolean>).trigger(data.resize);
@@ -114,7 +113,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public renderScore(score: Score | null, trackIndexes: number[] | null): void {
-        let jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
+        const jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,
@@ -124,8 +123,10 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
-    public partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
-    public partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
+    public partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
     public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
     public postRenderFinished: IEventEmitter = new EventEmitter();
     public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();

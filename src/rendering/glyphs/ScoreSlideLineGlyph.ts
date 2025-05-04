@@ -1,16 +1,16 @@
-import { Beat } from '@src/model/Beat';
-import { Note } from '@src/model/Note';
+import type { Beat } from '@src/model/Beat';
+import type { Note } from '@src/model/Note';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import { VibratoType } from '@src/model/VibratoType';
-import { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { type BarRendererBase, NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
-import { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
+import type { ScoreBeatPreNotesGlyph } from '@src/rendering/glyphs/ScoreBeatPreNotesGlyph';
+import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 
 export class ScoreSlideLineGlyph extends Glyph {
     private _outType: SlideOutType;
@@ -36,10 +36,10 @@ export class ScoreSlideLineGlyph extends Glyph {
     }
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let sizeX: number = 12;
+        const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sizeX: number = 12;
         let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2;
-        let endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+        const endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
         let startX = endX - sizeX;
         let startY: number = cy + startNoteRenderer.y;
 
@@ -54,14 +54,14 @@ export class ScoreSlideLineGlyph extends Glyph {
                 return;
         }
 
-        let accidentalsWidth: number = this.getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
+        const accidentalsWidth: number = this.getAccidentalsWidth(startNoteRenderer, this._startNote.beat);
         startX -= accidentalsWidth;
         endX -= accidentalsWidth;
         this.paintSlideLine(canvas, false, startX, endX, startY, endY);
     }
 
     private getAccidentalsWidth(renderer: ScoreBarRenderer, beat: Beat): number {
-        let preNotes: ScoreBeatPreNotesGlyph = renderer.getPreNotesGlyphForBeat(beat) as ScoreBeatPreNotesGlyph;
+        const preNotes: ScoreBeatPreNotesGlyph = renderer.getPreNotesGlyphForBeat(beat) as ScoreBeatPreNotesGlyph;
         if (preNotes && preNotes.accidentals) {
             return preNotes.accidentals.width;
         }
@@ -69,10 +69,10 @@ export class ScoreSlideLineGlyph extends Glyph {
     }
 
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
-        let startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        let sizeX: number = 12;
-        let offsetX: number = 2;
-        let offsetY: number = 2;
+        const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
+        const sizeX: number = 12;
+        const offsetX: number = 2;
+        const offsetY: number = 2;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -84,14 +84,15 @@ export class ScoreSlideLineGlyph extends Glyph {
                 startX =
                     cx +
                     startNoteRenderer.x +
-                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) + 
+                    startNoteRenderer.getBeatX(this._startNote.beat, BeatXPosition.PostNotes) +
                     offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 if (this._startNote.slideTarget) {
-                    let endNoteRenderer: BarRendererBase | null = this.renderer.scoreRenderer.layout!.getRendererForBar(
-                        this.renderer.staff.staveId,
-                        this._startNote.slideTarget.beat.voice.bar
-                    );
+                    const endNoteRenderer: BarRendererBase | null =
+                        this.renderer.scoreRenderer.layout!.getRendererForBar(
+                            this.renderer.staff.staffId,
+                            this._startNote.slideTarget.beat.voice.bar
+                        );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                         endX = cx + startNoteRenderer.x + startNoteRenderer.width;
                         endY = startY;
@@ -101,10 +102,13 @@ export class ScoreSlideLineGlyph extends Glyph {
                             endNoteRenderer.x +
                             endNoteRenderer.getBeatX(this._startNote.slideTarget.beat, BeatXPosition.PreNotes) -
                             offsetX;
-                        endY = cy + endNoteRenderer.y + endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
+                        endY =
+                            cy +
+                            endNoteRenderer.y +
+                            endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
                     }
 
-                    if(this._startNote.slideTarget.realValue > this._startNote.realValue) {
+                    if (this._startNote.slideTarget.realValue > this._startNote.realValue) {
                         startY += offsetY;
                         endY -= offsetY;
                     } else {
@@ -117,19 +121,31 @@ export class ScoreSlideLineGlyph extends Glyph {
                 }
                 break;
             case SlideOutType.OutUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endX = startX + sizeX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 break;
             case SlideOutType.OutDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endX = startX + sizeX;
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 break;
             case SlideOutType.PickSlideUp:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX * 2;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX * 2;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
@@ -145,7 +161,11 @@ export class ScoreSlideLineGlyph extends Glyph {
                 waves = true;
                 break;
             case SlideOutType.PickSlideDown:
-                startX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) + offsetX * 2;
+                startX =
+                    cx +
+                    startNoteRenderer.x +
+                    startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
+                    offsetX * 2;
                 startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
                 endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
                 endX = cx + startNoteRenderer.x + startNoteRenderer.width;
@@ -175,19 +195,19 @@ export class ScoreSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            let glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 
             startY -= glyph.height / 2;
             endY -= glyph.height / 2;
 
-            let b: number = endX - startX;
-            let a: number = endY - startY;
-            let c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
+            const b: number = endX - startX;
+            const a: number = endY - startY;
+            const c: number = Math.sqrt(Math.pow(a, 2) + Math.pow(b, 2));
             glyph.width = b;
 
-            let angle: number = Math.asin(a / c) * (180 / Math.PI);
+            const angle: number = Math.asin(a / c) * (180 / Math.PI);
             canvas.beginRotate(startX, startY, angle);
             glyph.paint(0, 0, canvas);
             canvas.endRotate();
