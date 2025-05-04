@@ -43,3 +43,6 @@ Integrated Libraries:
     Copyright: Copyright (c) 2002-2020 Xiph.org Foundation
     URL: https://github.com/xiph/vorbis
     Purpose: NVorbis adopted some code from libvorbis.
+
+@preserve
+@license

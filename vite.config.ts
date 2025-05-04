@@ -104,6 +104,13 @@ export default defineConfig(({ command, mode }) => {
         const commonOutput: Partial<OutputOptions> = {
             globals: {
                 jQuery: 'jQuery'
+            },
+            // ugly workaround for https://github.com/rollup/rollup/issues/5946
+            intro(chunk) {
+                if(chunk.isEntry) {
+                    return "if(typeof Symbol.dispose==='undefined'){Symbol.dispose = Symbol('Symbol.dispose')}"
+                }
+                return '';
             }
         };
 
@@ -112,8 +119,9 @@ export default defineConfig(({ command, mode }) => {
             plugins: [
                 license({
                     banner: {
+                        commentStyle: 'ignored',
                         content: {
-                            file: 'LICENSE.header'
+                            file: 'LICENSE.header',
                         },
                         data() {
                             let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
@@ -297,7 +305,7 @@ export default defineConfig(({ command, mode }) => {
                 esm('alphaTab.webpack', 'src/alphaTab.webpack.ts', webpackOptions, false);
                 break;
             case 'umd':
-                umd('alphaTab', 'src/alphaTab.main.ts', {});
+                umd('alphaTab', 'src/alphaTab.main.ts', {}, false, true);
                 break;
             default:
             case 'esm':
