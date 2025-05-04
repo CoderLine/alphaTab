@@ -11,6 +11,7 @@ import { Note } from '@src/model/Note';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { NotationSettings } from '@src/NotationSettings';
 import { TextAlign } from '@src/platform/ICanvas';
+import type { BackingTrack } from '@src/model/BackingTrack';
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
@@ -304,6 +305,11 @@ export class Score {
      * Gets or sets the rendering stylesheet for this song.
      */
     public stylesheet: RenderStylesheet = new RenderStylesheet();
+
+    /**
+     * Information about the backing track that can be used instead of the synthesized audio.
+     */
+    public backingTrack: BackingTrack | undefined;
 
     /**
      * The style customizations for this item.

@@ -38,6 +38,9 @@ export class MasterBarSerializer {
             o.set("section", SectionSerializer.toJson(obj.section));
         }
         o.set("tempoautomations", obj.tempoAutomations.map(i => AutomationSerializer.toJson(i)));
+        if (obj.syncPoints !== undefined) {
+            o.set("syncpoints", obj.syncPoints?.map(i => AutomationSerializer.toJson(i)));
+        }
         if (obj.fermata !== null) {
             const m = new Map<string, unknown>();
             o.set("fermata", m);
@@ -102,6 +105,16 @@ export class MasterBarSerializer {
                     const i = new Automation();
                     AutomationSerializer.fromJson(i, o);
                     obj.tempoAutomations.push(i);
+                }
+                return true;
+            case "syncpoints":
+                if (v) {
+                    obj.syncPoints = [];
+                    for (const o of (v as (Map<string, unknown> | null)[])) {
+                        const i = new Automation();
+                        AutomationSerializer.fromJson(i, o);
+                        obj.addSyncPoint(i);
+                    }
                 }
                 return true;
             case "fermata":

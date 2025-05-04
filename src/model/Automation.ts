@@ -17,7 +17,40 @@ export enum AutomationType {
     /**
      * Balance change.
      */
-    Balance = 3
+    Balance = 3,
+    /**
+     * A sync point for synchronizing the internal time axis with an external audio track.
+     */
+    SyncPoint = 4
+}
+
+/**
+ * Represents the data of a sync point for synchronizing the internal time axis with
+ * an external audio file.
+ * @cloneable
+ * @json
+ * @json_strict
+ */
+export class SyncPointData {
+    /**
+     * Indicates for which repeat occurence this sync point is valid (e.g. 0 on the first time played, 1 on the second time played)
+     */
+    public barOccurence: number = 0;
+    /**
+     * The original tempo at the start of this bar when played (aka. the tempo when played precisely via synthesizer).
+     */
+    public originalTempo: number = 0;
+    /**
+     * The modified tempo at which the cursor should move (aka. the tempo played within the external audio track).
+     * This information is used together with the {@link originalTempo} to calculate how much faster/slower the
+     * cursor playback is performed to align with the audio track.
+     */
+    public modifiedTempo: number = 0;
+    /**
+     * The audio frame offset marking the position within the audio track (e.g. on a 44100hz stereo audio file, 88200 marks the position 00:02 sec in the audio file).
+     * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
+     */
+    public frameOffset: number = 0;
 }
 
 /**
@@ -41,6 +74,11 @@ export class Automation {
      * Gets or sets the target value of the automation.
      */
     public value: number = 0;
+
+    /**
+     * The sync point data in case of {@link AutomationType.SyncPoint}
+     */
+    public syncPointValue: SyncPointData | undefined;
 
     /**
      * Gets or sets the relative position of of the automation.

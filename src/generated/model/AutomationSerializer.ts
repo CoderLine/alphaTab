@@ -5,7 +5,9 @@
 // </auto-generated>
 import { Automation } from "@src/model/Automation";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { SyncPointDataSerializer } from "@src/generated/model/SyncPointDataSerializer";
 import { AutomationType } from "@src/model/Automation";
+import { SyncPointData } from "@src/model/Automation";
 export class AutomationSerializer {
     public static fromJson(obj: Automation, m: unknown): void {
         if (!m) {
@@ -21,6 +23,9 @@ export class AutomationSerializer {
         o.set("islinear", obj.isLinear);
         o.set("type", obj.type as number);
         o.set("value", obj.value);
+        if (obj.syncPointValue) {
+            o.set("syncpointvalue", SyncPointDataSerializer.toJson(obj.syncPointValue));
+        }
         o.set("ratioposition", obj.ratioPosition);
         o.set("text", obj.text);
         return o;
@@ -35,6 +40,15 @@ export class AutomationSerializer {
                 return true;
             case "value":
                 obj.value = v! as number;
+                return true;
+            case "syncpointvalue":
+                if (v) {
+                    obj.syncPointValue = new SyncPointData();
+                    SyncPointDataSerializer.fromJson(obj.syncPointValue, v);
+                }
+                else {
+                    obj.syncPointValue = undefined;
+                }
                 return true;
             case "ratioposition":
                 obj.ratioPosition = v! as number;
