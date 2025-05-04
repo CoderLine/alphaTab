@@ -112,8 +112,9 @@ export default defineConfig(({ command, mode }) => {
             plugins: [
                 license({
                     banner: {
+                        commentStyle: 'ignored',
                         content: {
-                            file: 'LICENSE.header'
+                            file: 'LICENSE.header',
                         },
                         data() {
                             let buildNumber = process.env.GITHUB_RUN_NUMBER || 0;
