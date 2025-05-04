@@ -104,6 +104,13 @@ export default defineConfig(({ command, mode }) => {
         const commonOutput: Partial<OutputOptions> = {
             globals: {
                 jQuery: 'jQuery'
+            },
+            // ugly workaround for https://github.com/rollup/rollup/issues/5946
+            intro(chunk) {
+                if(chunk.isEntry) {
+                    return "if(typeof Symbol.dispose==='undefined'){Symbol.dispose = Symbol('Symbol.dispose')}"
+                }
+                return '';
             }
         };
 
