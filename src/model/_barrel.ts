@@ -1,7 +1,7 @@
 export { AccentuationType } from '@src/model/AccentuationType';
 export { AccidentalType } from '@src/model/AccidentalType';
 export { AutomationType, Automation } from '@src/model/Automation';
-export { Bar, SustainPedalMarkerType, SustainPedalMarker, BarSubElement, BarStyle } from '@src/model/Bar';
+export { Bar, SustainPedalMarkerType, SustainPedalMarker, BarSubElement, BarStyle, BarLineStyle } from '@src/model/Bar';
 export { BarreShape } from '@src/model/BarreShape';
 export { Beat, BeatBeamingMode, BeatSubElement, BeatStyle } from '@src/model/Beat';
 export { BendPoint } from '@src/model/BendPoint';
@@ -45,7 +45,7 @@ export {
     TrackNameOrientation
 } from '@src/model/RenderStylesheet';
 export { RepeatGroup } from '@src/model/RepeatGroup';
-export { Score, ScoreSubElement, ScoreStyle } from '@src/model/Score';
+export { Score, ScoreSubElement, ScoreStyle, HeaderFooterStyle } from '@src/model/Score';
 export { Section } from '@src/model/Section';
 export { SimileMark } from '@src/model/SimileMark';
 export { SlideInType } from '@src/model/SlideInType';

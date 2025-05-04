@@ -56,7 +56,7 @@ export class DynamicsGlyph extends MusicFontGlyph {
             case DynamicValue.RFZ:
                 return MusicFontSymbol.DynamicRinforzando2;
             case DynamicValue.SFZ:
-                return MusicFontSymbol.DynamicSforzando1;
+                return MusicFontSymbol.DynamicSforzato;
             case DynamicValue.SFFZ:
                 return MusicFontSymbol.DynamicSforzatoFF;
             case DynamicValue.FZ:
