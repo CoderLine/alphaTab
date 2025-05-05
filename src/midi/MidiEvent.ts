@@ -411,7 +411,20 @@ export class TempoChangeEvent extends MidiEvent {
     /**
      * The tempo in microseconds per quarter note (aka USQ). A time format typically for midi.
      */
-    public microSecondsPerQuarterNote: number;
+    public get microSecondsPerQuarterNote(): number {
+        return 60000000 / this.beatsPerMinute;
+    }
+/**
+     * The tempo in microseconds per quarter note (aka USQ). A time format typically for midi.
+     */
+    public set microSecondsPerQuarterNote(value : number) {
+        this.beatsPerMinute = 60000000 / value;
+    }
+
+    /**
+     * The tempo in beats per minute
+     */
+    public beatsPerMinute: number = 0;
 
     public constructor(tick: number, microSecondsPerQuarterNote: number) {
         super(0, tick, MidiEventType.TempoChange);

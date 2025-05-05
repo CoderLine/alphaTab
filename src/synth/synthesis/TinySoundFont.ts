@@ -242,7 +242,7 @@ export class TinySoundFont {
                 break;
             case MidiEventType.TempoChange:
                 const tempoChange = e as TempoChangeEvent;
-                this.currentTempo = 60000000 / tempoChange.microSecondsPerQuarterNote;
+                this.currentTempo = tempoChange.beatsPerMinute;
                 break;
             case MidiEventType.PitchBend:
                 const pitchBend = e as PitchBendEvent;

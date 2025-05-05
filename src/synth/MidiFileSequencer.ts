@@ -232,7 +232,7 @@ export class MidiFileSequencer {
 
             if (mEvent.type === MidiEventType.TempoChange) {
                 const meta: TempoChangeEvent = mEvent as TempoChangeEvent;
-                bpm = 60000000 / meta.microSecondsPerQuarterNote;
+                bpm = meta.beatsPerMinute;
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
                 metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division));
             } else if (mEvent.type === MidiEventType.TimeSignature) {
