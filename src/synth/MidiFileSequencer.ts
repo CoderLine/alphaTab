@@ -46,7 +46,7 @@ class MidiSequencerState {
  * synthesize position. The sequencer does not consider the playback speed.
  */
 export class MidiFileSequencer {
-    private _synthesizer: TinySoundFont;
+    private _synthesizer: IAudioSampleSynthesizer;
     private _currentState: MidiSequencerState;
     private _mainState: MidiSequencerState;
     private _oneTimeState: MidiSequencerState | null = null;
@@ -64,7 +64,7 @@ export class MidiFileSequencer {
         return this._currentState === this._countInState;
     }
 
-    public constructor(synthesizer: TinySoundFont) {
+    public constructor(synthesizer: IAudioSampleSynthesizer) {
         this._synthesizer = synthesizer;
         this._mainState = new MidiSequencerState();
         this._currentState = this._mainState;
