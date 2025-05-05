@@ -1,5 +1,5 @@
 import type { MidiFile } from '@src/midi/MidiFile';
-import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { BackingTrackSyncPoint, IAlphaSynth } from '@src/synth/IAlphaSynth';
 import type { ISynthOutput } from '@src/synth/ISynthOutput';
 import { MidiFileSequencer } from '@src/synth/MidiFileSequencer';
 import type { PlaybackRange } from '@src/synth/PlaybackRange';
@@ -19,6 +19,7 @@ import { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs'
 import type { MidiEvent, MidiEventType } from '@src/midi/MidiEvent';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { ModelUtils } from '@src/model/ModelUtils';
+import type { Score } from '@src/model/Score';
 import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
 
 /**
@@ -575,6 +576,10 @@ export class AlphaSynthBase implements IAlphaSynth {
      */
     public hasSamplesForPercussion(key: number): boolean {
         return this.synthesizer.hasSamplesForPercussion(key);
+    }
+
+    public loadBackingTrack(_score: Score, _syncPoints:BackingTrackSyncPoint[]): void {
+        // ignore
     }
 }
 

@@ -96,6 +96,7 @@ import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { CoreSettings } from '@src/CoreSettings';
+import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
 
 class SelectionInfo {
     public beat: Beat;
@@ -1430,15 +1431,62 @@ export class AlphaTabApiBase<TSettings> {
         this.destroyCursors();
     }
 
-    private setupPlayer(): void {
+    private setupPlayer(): boolean {
+        let mode = this.settings.player.playerMode;
+        if (mode === PlayerMode.EnabledAutomatic) {
+            const score = this.score;
+            if (!score) {
+                return false;
+            }
+
+            if (score?.backingTrack?.rawAudioFile) {
+                mode = PlayerMode.EnabledBackingTrack;
+            } else {
+                mode = PlayerMode.EnabledSynthesizer;
+            }
+        }
+
+        if (mode !== this._playerMode) {
+            this.destroyPlayer();
+        }
         this.updateCursors();
-        if (this.player) {
-            return;
+
+        switch (mode) {
+            case PlayerMode.Disabled:
+                this._playerMode = PlayerMode.Disabled;
+                this.destroyPlayer();
+                return false;
+
+            case PlayerMode.EnabledSynthesizer:
+                if (this.player) {
+                    return true;
+                }
+
+                // new player needed
+                this.player = this.uiFacade.createWorkerPlayer();
+                break;
+
+            case PlayerMode.EnabledBackingTrack:
+                if (this.player) {
+                    return true;
+                }
+
+                // new player needed
+                this.player = this.uiFacade.createBackingTrackPlayer();
+                break;
+            case PlayerMode.EnabledExternalMedia:
+                if (this.player) {
+                    return true;
+                }
+
+                this.player = new ExternalMediaPlayer(this.settings.player.bufferTimeInMilliseconds);
+                break;
         }
-        this.player = this.uiFacade.createWorkerPlayer();
+
         if (!this.player) {
-            return;
+            return false;
         }
+
         this.player.ready.on(() => {
             this.loadMidiForScore();
         });
@@ -1466,6 +1514,8 @@ export class AlphaTabApiBase<TSettings> {
         this.player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
         this.player.finished.on(this.onPlayerFinished.bind(this));
         this.setupPlayerEvents();
+
+        return false;
     }
 
     private loadMidiForScore(): void {
@@ -1494,6 +1544,7 @@ export class AlphaTabApiBase<TSettings> {
         const player = this.player;
         if (player) {
             player.loadMidiFile(midiFile);
+            player.loadBackingTrack(score, generator.syncPoints);
             player.applyTranspositionPitches(generator.transpositionPitches);
         }
     }
@@ -2938,6 +2989,9 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.scoreLoaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'scoreLoaded', score);
+        if (this.setupPlayer()) {
+            this.loadMidiForScore();
+        }
     }
 
     /**

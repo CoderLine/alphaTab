@@ -307,6 +307,10 @@ export class TestUiFacade implements IUiFacade<unknown> {
         return false;
     }
 
+    public createBackingTrackPlayer(): IAlphaSynth | null {
+        return null;
+    }
+
     public readonly canRenderChanged: IEventEmitter = new EventEmitter();
     public readonly rootContainerBecameVisible: IEventEmitter = new EventEmitter();
 }

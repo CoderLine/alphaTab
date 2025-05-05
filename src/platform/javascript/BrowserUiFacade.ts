@@ -31,6 +31,8 @@ import { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynt
 import { ScalableHtmlElementContainer } from '@src/platform/javascript/ScalableHtmlElementContainer';
 import { PlayerOutputMode } from '@src/PlayerSettings';
 import type { SettingsJson } from '@src/generated/SettingsJson';
+import { AudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';
+import { BackingTrackPlayer } from '@src/synth/BackingTrackPlayer';
 
 /**
  * @target web
@@ -754,5 +756,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             };
             window.requestAnimationFrame(step);
         }
+    }
+
+    public createBackingTrackPlayer(): IAlphaSynth | null {
+        return new BackingTrackPlayer(
+            new AudioElementBackingTrackSynthOutput(),
+            this._api.settings.player.bufferTimeInMilliseconds
+        );
     }
 }
