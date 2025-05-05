@@ -67,7 +67,7 @@ import type { Track } from '@src/model/Track';
 import type { IContainer } from '@src/platform/IContainer';
 import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import type { IUiFacade } from '@src/platform/IUiFacade';
-import { ScrollMode } from '@src/PlayerSettings';
+import { PlayerMode, ScrollMode } from '@src/PlayerSettings';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 
 import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
@@ -272,6 +272,11 @@ export class AlphaTabApiBase<TSettings> {
         uiFacade.initialize(this, settings);
         Logger.logLevel = this.settings.core.logLevel;
 
+        // backwards compatibility: remove in 2.0
+        if (this.settings.player.playerMode === PlayerMode.Disabled && this.settings.player.enablePlayer) {
+            this.settings.player.playerMode = PlayerMode.EnabledAutomatic;
+        }
+
         Environment.printEnvironmentInfo(false);
 
         this.canvasElement = uiFacade.createCanvasElement();
@@ -320,7 +325,7 @@ export class AlphaTabApiBase<TSettings> {
             this.appendRenderResult(null); // marks last element
         });
         this.renderer.error.on(this.onError.bind(this));
-        if (this.settings.player.enablePlayer) {
+        if (this.settings.player.playerMode !== PlayerMode.Disabled) {
             this.setupPlayer();
         }
         this.setupClickHandling();
@@ -414,12 +419,9 @@ export class AlphaTabApiBase<TSettings> {
         }
         this.renderer.updateSettings(this.settings);
         // enable/disable player if needed
-        if (this.settings.player.enablePlayer) {
-            this.setupPlayer();
-            if (score) {
-                this.player?.applyTranspositionPitches(
-                    MidiFileGenerator.buildTranspositionPitches(score, this.settings)
-                );
+        if (this.settings.player.playerMode !== PlayerMode.Disabled) {
+            if (this.setupPlayer() && score) {
+                this.loadMidiForScore();
             }
         } else {
             this.destroyPlayer();
@@ -919,9 +921,9 @@ export class AlphaTabApiBase<TSettings> {
         return this.renderer.boundsLookup;
     }
 
-    /**
-     * Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
-     */
+    // the previously configured player mode to detect changes
+    private _playerMode: PlayerMode = PlayerMode.Disabled;
+
     /**
      * The alphaSynth player used for playback.
      * @remarks
@@ -2576,7 +2578,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (
-            this.settings.player.enablePlayer &&
+            this.settings.player.playerMode !== PlayerMode.Disabled &&
             this.settings.player.enableCursor &&
             this.settings.player.enableUserInteraction
         ) {
@@ -2628,7 +2630,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (
-            this.settings.player.enablePlayer &&
+            this.settings.player.playerMode !== PlayerMode.Disabled &&
             this.settings.player.enableCursor &&
             this.settings.player.enableUserInteraction
         ) {
@@ -2775,7 +2777,7 @@ export class AlphaTabApiBase<TSettings> {
         this.renderer.postRenderFinished.on(() => {
             if (
                 !this._selectionStart ||
-                !this.settings.player.enablePlayer ||
+                this.settings.player.playerMode === PlayerMode.Disabled ||
                 !this.settings.player.enableCursor ||
                 !this.settings.player.enableUserInteraction
             ) {

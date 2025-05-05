@@ -237,10 +237,9 @@ export class JsonConverter {
                     JsonHelper.getValue(midiEvent, 'program') as number
                 );
             case MidiEventType.TempoChange:
-                return new TempoChangeEvent(
-                    tick,
-                    JsonHelper.getValue(midiEvent, 'microSecondsPerQuarterNote') as number
-                );
+                const tempo = new TempoChangeEvent(tick, 0);
+                tempo.beatsPerMinute = JsonHelper.getValue(midiEvent, 'beatsPerMinute') as number;
+                return tempo;
             case MidiEventType.PitchBend:
                 return new PitchBendEvent(
                     track,
@@ -337,7 +336,7 @@ export class JsonConverter {
                 o.set('program', (midiEvent as ProgramChangeEvent).program);
                 break;
             case MidiEventType.TempoChange:
-                o.set('microSecondsPerQuarterNote', (midiEvent as TempoChangeEvent).microSecondsPerQuarterNote);
+                o.set('beatsPerMinute', (midiEvent as TempoChangeEvent).beatsPerMinute);
                 break;
             case MidiEventType.PitchBend:
                 o.set('channel', (midiEvent as PitchBendEvent).channel);

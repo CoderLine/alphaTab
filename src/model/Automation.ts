@@ -37,20 +37,16 @@ export class SyncPointData {
      */
     public barOccurence: number = 0;
     /**
-     * The original tempo at the start of this bar when played (aka. the tempo when played precisely via synthesizer).
-     */
-    public originalTempo: number = 0;
-    /**
      * The modified tempo at which the cursor should move (aka. the tempo played within the external audio track).
      * This information is used together with the {@link originalTempo} to calculate how much faster/slower the
      * cursor playback is performed to align with the audio track.
      */
     public modifiedTempo: number = 0;
     /**
-     * The audio frame offset marking the position within the audio track (e.g. on a 44100hz stereo audio file, 88200 marks the position 00:02 sec in the audio file).
+     * The uadio offset marking the position within the audio track in milliseconds.
      * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
      */
-    public frameOffset: number = 0;
+    public millisecondOffset: number = 0;
 }
 
 /**

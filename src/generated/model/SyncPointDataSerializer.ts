@@ -18,9 +18,8 @@ export class SyncPointDataSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("baroccurence", obj.barOccurence);
-        o.set("originaltempo", obj.originalTempo);
         o.set("modifiedtempo", obj.modifiedTempo);
-        o.set("frameoffset", obj.frameOffset);
+        o.set("millisecondoffset", obj.millisecondOffset);
         return o;
     }
     public static setProperty(obj: SyncPointData, property: string, v: unknown): boolean {
@@ -28,14 +27,11 @@ export class SyncPointDataSerializer {
             case "baroccurence":
                 obj.barOccurence = v! as number;
                 return true;
-            case "originaltempo":
-                obj.originalTempo = v! as number;
-                return true;
             case "modifiedtempo":
                 obj.modifiedTempo = v! as number;
                 return true;
-            case "frameoffset":
-                obj.frameOffset = v! as number;
+            case "millisecondoffset":
+                obj.millisecondOffset = v! as number;
                 return true;
         }
         return false;

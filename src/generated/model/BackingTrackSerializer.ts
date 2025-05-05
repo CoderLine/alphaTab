@@ -17,13 +17,13 @@ export class BackingTrackSerializer {
             return null;
         }
         const o = new Map<string, unknown>();
-        o.set("framepadding", obj.framePadding);
+        o.set("padding", obj.padding);
         return o;
     }
     public static setProperty(obj: BackingTrack, property: string, v: unknown): boolean {
         switch (property) {
-            case "framepadding":
-                obj.framePadding = v! as number;
+            case "padding":
+                obj.padding = v! as number;
                 return true;
         }
         return false;

@@ -31,7 +31,7 @@ class AlphaTabView : RelativeLayout {
 
     private var _settings: Settings = Settings().apply {
         this.player.enableCursor = true
-        this.player.enablePlayer = true
+        this.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic
         this.player.enableUserInteraction = true
     }
 

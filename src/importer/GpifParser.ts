@@ -96,6 +96,12 @@ export class GpifParser {
      */
     private static readonly BendPointValueFactor: number = 1 / 25.0;
 
+    // test have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
+    // they are NOT using the sample rate of the input file. 
+    // Downsampling a 44100hz ogg to 8000hz and using it in as audio track resulted in the same frame offset when placing sync points.
+    private static readonly SampleRate = 44100;
+
+
     public score!: Score;
     private _backingTrackAssetId: string | undefined;
 
@@ -371,7 +377,7 @@ export class GpifParser {
                     assetId = c.innerText;
                     break;
                 case 'FramePadding':
-                    backingTrack.framePadding = GpifParser.parseIntSafe(c.innerText, 0);
+                    backingTrack.padding = GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate * 1000;
                     break;
             }
         }
@@ -468,11 +474,9 @@ export class GpifParser {
                                 case 'ModifiedTempo':
                                     syncPointValue.modifiedTempo = GpifParser.parseFloatSafe(vc.innerText, 0);
                                     break;
-                                case 'OriginalTempo':
-                                    syncPointValue.originalTempo = GpifParser.parseFloatSafe(vc.innerText, 0);
-                                    break;
                                 case 'FrameOffset':
-                                    syncPointValue.frameOffset = GpifParser.parseFloatSafe(vc.innerText, 0);
+                                    const frameOffset = GpifParser.parseFloatSafe(vc.innerText, 0);
+                                    syncPointValue.millisecondOffset = (frameOffset / GpifParser.SampleRate) * 1000;
                                     break;
                             }
                         }

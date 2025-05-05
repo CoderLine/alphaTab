@@ -8,9 +8,8 @@ export class SyncPointDataCloner {
     public static clone(original: SyncPointData): SyncPointData {
         const clone = new SyncPointData();
         clone.barOccurence = original.barOccurence;
-        clone.originalTempo = original.originalTempo;
         clone.modifiedTempo = original.modifiedTempo;
-        clone.frameOffset = original.frameOffset;
+        clone.millisecondOffset = original.millisecondOffset;
         return clone;
     }
 }

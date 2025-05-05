@@ -9,7 +9,8 @@ export {
     ScrollMode,
     SlidePlaybackSettings,
     VibratoPlaybackSettings,
-    PlayerOutputMode
+    PlayerOutputMode,
+    PlayerMode
 } from '@src/PlayerSettings';
 export { ProgressEventArgs } from '@src/ProgressEventArgs';
 export { RenderingResources } from '@src/RenderingResources';

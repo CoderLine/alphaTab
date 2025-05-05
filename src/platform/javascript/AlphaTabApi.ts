@@ -12,6 +12,7 @@ import type { Settings } from '@src/Settings';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import type { SettingsJson } from '@src/generated/SettingsJson';
+import { PlayerMode } from '@src/PlayerSettings';
 
 /**
  * @target web
@@ -137,7 +138,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         settings.core.file = null;
         settings.core.tracks = null;
         settings.player.enableCursor = false;
-        settings.player.enablePlayer = false;
+        settings.player.playerMode = PlayerMode.Disabled;
         settings.player.enableElementHighlighting = false;
         settings.player.enableUserInteraction = false;
         settings.player.soundFont = null;
