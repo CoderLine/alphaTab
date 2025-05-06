@@ -20,10 +20,14 @@ jobs:
     - run: npm install @coderline/alphatab@alpha
     - run: npm run generate-alphatabdoc
     - run: npm run build
-    - run: cp web.config ./build
     - name: Package Zip
       run: zip -qq -r ../website.zip .
       working-directory: ./build
+    - run: ls -l website.zip
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: website
+        path: website.zip
     - name: Push Zip To Server
       run: |
         curl --request POST \
@@ -31,4 +35,4 @@ jobs:
         --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
         --header 'branch: next' \
         -F 'website=@./website.zip' \
-        --fail
+        --fail-with-body
