@@ -34,6 +34,6 @@ jobs:
         curl --request POST \
         --url https://docs-deploy.alphaTab.net/ \
         --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
-        --header 'branch: website' \
+        --header 'branch: main' \
         -F 'website=@./website.zip' \
         --fail-with-body
