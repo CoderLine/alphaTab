@@ -23,7 +23,7 @@ jobs:
     - run: npm run build
     - run: cp web.config ./build
     - name: Package Zip
-      run: zip -qq -r ../website.zip ./build
+      run: zip -qq -r ../website.zip .
       working-directory: ./build
     - name: Push Zip To Server
       run: |
