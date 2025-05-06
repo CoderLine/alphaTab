@@ -165,15 +165,20 @@ namespace AlphaTab
         /// <inheritdoc />
         public Task<IList<ISynthOutputDevice>> EnumerateOutputDevices()
         {
+            return Task.FromResult(EnumerateDirectSoundOutputDevices());
+        }
+
+        internal static IList<ISynthOutputDevice> EnumerateDirectSoundOutputDevices()
+        {
             var defaultPlayback = DirectSoundOut.DSDEVID_DefaultPlayback;
             GetDeviceID(ref defaultPlayback, out Guid realDefault);
 
-            return Task.FromResult(
+            return
                 DirectSoundOut.Devices
                     .Where(d => d.Guid != Guid.Empty)
                     .Map(d => (ISynthOutputDevice)new NAudioOutputDevice(d,
                         realDefault))
-            );
+            ;
         }
 
         [DllImport("dsound.dll", CharSet = CharSet.Unicode,

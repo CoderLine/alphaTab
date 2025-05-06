@@ -7,6 +7,7 @@ import alphaTab.core.ecmaScript.Error
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.midi.MidiEventType
 import alphaTab.midi.MidiFile
+import alphaTab.model.Score
 import alphaTab.synth.*
 import android.util.Log
 import java.util.concurrent.BlockingQueue
@@ -252,6 +253,10 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
 
     override fun setChannelTranspositionPitch(channel: Double, semitones: Double) {
         _workerQueue.add { _player?.setChannelTranspositionPitch(channel, semitones) }
+    }
+
+    override fun loadBackingTrack(score: Score, syncPoints: List<BackingTrackSyncPoint>) {
+        _workerQueue.add { _player?.loadBackingTrack(score, syncPoints) }
     }
 
     override val ready: IEventEmitter = EventEmitter()

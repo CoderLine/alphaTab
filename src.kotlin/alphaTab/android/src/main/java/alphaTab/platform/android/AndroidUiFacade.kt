@@ -15,6 +15,7 @@ import alphaTab.platform.skia.AlphaSkiaImage
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
+import alphaTab.synth.BackingTrackPlayer
 import alphaTab.synth.IAlphaSynth
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
@@ -56,7 +57,8 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _renderSurface = renderSurface
         _renderWrapper = renderWrapper
 
-        rootContainer = AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
+        rootContainer =
+            AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
         _handler = Handler(outerScroll.context.mainLooper)
 
         rootContainerBecameVisible = object : IEventEmitter,
@@ -226,8 +228,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _handler.post {
             // convert AlphaSkia image to Android Bitmap
             val renderResult = renderResults.renderResult
-            if (renderResult is AlphaSkiaImage)
-            {
+            if (renderResult is AlphaSkiaImage) {
                 renderResults.renderResult = convertAlphaSkiaImageToAndroidBitmap(renderResult)
             }
 
@@ -237,7 +238,8 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     private fun convertAlphaSkiaImageToAndroidBitmap(renderResult: AlphaSkiaImage): Bitmap {
         renderResult.use {
-            val bitmap = Bitmap.createBitmap(renderResult.width.toInt(), renderResult.height.toInt(),
+            val bitmap = Bitmap.createBitmap(
+                renderResult.width.toInt(), renderResult.height.toInt(),
                 Bitmap.Config.ARGB_8888
             )
             val pixels = renderResult.readPixels()!!
@@ -386,6 +388,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 success(data as Score)
                 return true
             }
+
             (data is ByteArray) -> {
                 success(
                     ScoreLoader.loadScoreFromBytes(
@@ -395,6 +398,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
+
             (data is UByteArray) -> {
                 success(
                     ScoreLoader.loadScoreFromBytes(
@@ -404,6 +408,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
+
             (data is InputStream) -> {
                 val bos = ByteArrayOutputStream()
                 (data as InputStream).copyTo(bos)
@@ -415,6 +420,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
+
             else -> {
                 return false
             }
@@ -429,19 +435,29 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 player.loadSoundFont(Uint8Array((data as ByteArray).asUByteArray()), append)
                 return true
             }
+
             (data is UByteArray) -> {
                 player.loadSoundFont(Uint8Array((data as UByteArray)), append)
                 return true
             }
+
             (data is InputStream) -> {
                 val bos = ByteArrayOutputStream()
                 (data as InputStream).copyTo(bos)
                 player.loadSoundFont(Uint8Array(bos.toByteArray().asUByteArray()), append)
                 return true
             }
+
             else -> {
                 return false
             }
         }
+    }
+
+    override fun createBackingTrackPlayer(): IAlphaSynth {
+        return BackingTrackPlayer(
+            AndroidBackingTrackSynthOutput(_renderWrapper.context, this::beginInvoke),
+            this.api.settings.player.bufferTimeInMilliseconds
+        )
     }
 }

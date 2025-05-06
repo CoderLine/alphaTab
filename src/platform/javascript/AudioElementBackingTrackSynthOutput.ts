@@ -5,6 +5,9 @@ import { WebAudioHelper } from '@src/platform/javascript/AlphaSynthWebAudioOutpu
 import type { IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
+/**
+ * @target web
+ */
 export class AudioElementBackingTrackSynthOutput implements IBackingTrackSynthOutput {
     // fake rate
     public readonly sampleRate: number = 44100;

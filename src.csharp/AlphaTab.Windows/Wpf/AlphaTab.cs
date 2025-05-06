@@ -176,7 +176,7 @@ namespace AlphaTab.Wpf
 
             SnapsToDevicePixels = true;
             Settings = new Settings();
-            Settings.Player.PlayerMode = AlphaTab.PlayerMode.EnabledAutomatic;
+            Settings.Player.PlayerMode = PlayerMode.EnabledAutomatic;
             Settings.Player.EnableCursor = true;
         }
 

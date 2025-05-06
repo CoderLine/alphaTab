@@ -103,10 +103,15 @@ export class AlphaSynthBase implements IAlphaSynth {
 
     public set playbackSpeed(value: number) {
         value = ModelUtils.clamp(value, SynthConstants.MinPlaybackSpeed, SynthConstants.MaxPlaybackSpeed);
+        this.updatePlaybackSpeed(value);
+    }
+
+    protected updatePlaybackSpeed(value: number) {
         const oldSpeed: number = this.sequencer.playbackSpeed;
         this.sequencer.playbackSpeed = value;
         this.timePosition = this.timePosition * (oldSpeed / value);
     }
+
 
     public get tickPosition(): number {
         return this._tickPosition;

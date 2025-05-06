@@ -56,6 +56,8 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
         return player;
     }
 
+    public abstract IAlphaSynth? CreateBackingTrackPlayer();
+
     protected abstract ISynthOutput CreateSynthOutput();
 
     public abstract IContainer RootContainer { get; }

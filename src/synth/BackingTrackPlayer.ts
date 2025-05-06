@@ -129,8 +129,8 @@ export class BackingTrackPlayer extends AlphaSynthBase {
         });
     }
 
-    public override set playbackSpeed(value: number) {
-        super.playbackSpeed = value;
+    protected override updatePlaybackSpeed(value: number): void {
+        super.updatePlaybackSpeed(value);
         this._backingTrackOutput.playbackRate = value;
     }
 
