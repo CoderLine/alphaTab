@@ -1,3 +1,5 @@
+'use client';
+
 import * as alphaTab from "@coderline/alphatab";
 import React, { useEffect, useRef, useState } from "react";
 import { PlayerControlsGroup } from "./player-controls-group";
