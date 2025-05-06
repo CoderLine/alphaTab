@@ -28,7 +28,7 @@ jobs:
     - name: Push Zip To Server
       run: |
         curl --request POST \
-        --url https://docs.alphaTab.net/deploy-zip.php \
+        --url https://docs-deploy.alphaTab.net/ \
         --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
         --header 'branch: website' \
         -F 'website=@./website.zip' \
