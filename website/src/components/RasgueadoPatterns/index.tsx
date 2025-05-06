@@ -1,3 +1,4 @@
+'use client';
 import * as alphaTab from "@coderline/alphatab";
 import { useEffect, useRef } from "react";
 import styles from "./styles.module.scss";

@@ -15,7 +15,6 @@ jobs:
     - run: npm install @coderline/alphatab@alpha
     - run: npm run generate-alphatabdoc
     - run: npm run build
-    - run: cp web.config ./build
     - uses: actions/upload-artifact@v4
       with: 
         name: website

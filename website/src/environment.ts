@@ -5,6 +5,15 @@ export default {
     settings.core.fontDirectory = "/font/";
     settings.player.soundFont = "/soundfont/sonivox.sf3";
 
+    if (typeof window !== 'undefined') {
+      const params = new URL(window.location.href).searchParams;
+      settings.fillFromJson({
+        core: {
+          logLevel: (params.get('loglevel') ?? 'info') as keyof typeof alphaTab.LogLevel
+        }
+      })
+    }
+
     settings.display.resources.copyrightFont.families = ["Noto Sans"];
     settings.display.resources.titleFont.families = ["Noto Serif"];
     settings.display.resources.subTitleFont.families = ["Noto Serif"];

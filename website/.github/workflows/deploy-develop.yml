@@ -13,7 +13,6 @@ jobs:
       
     steps:
     - uses: actions/checkout@v4
-    - uses: montudor/action-zip@v1
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
@@ -21,14 +20,19 @@ jobs:
     - run: npm install @coderline/alphatab@alpha
     - run: npm run generate-alphatabdoc
     - run: npm run build
-    - run: cp web.config ./build
     - name: Package Zip
-      run: zip -qq -r ./website.zip ./build
+      run: zip -qq -r ../website.zip .
+      working-directory: ./build
+    - run: ls -l website.zip
+    - uses: actions/upload-artifact@v4
+      with: 
+        name: website
+        path: website.zip
     - name: Push Zip To Server
       run: |
         curl --request POST \
-        --url https://docs.alphaTab.net/deploy-zip.php \
+        --url https://docs-deploy.alphaTab.net/ \
         --header 'authorization: Bearer ${{ secrets.DEPLOY_TOKEN }}' \
-        --header 'branch: next' \
+        --header 'branch: develop' \
         -F 'website=@./website.zip' \
-        --fail
+        --fail-with-body
