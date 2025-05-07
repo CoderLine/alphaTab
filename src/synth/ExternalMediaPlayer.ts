@@ -44,7 +44,7 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
 
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
         const empty:ISynthOutputDevice[] = [];
-        return empty;;
+        return empty;
     }
     public async setOutputDevice(_device: ISynthOutputDevice | null): Promise<void> {}
 
