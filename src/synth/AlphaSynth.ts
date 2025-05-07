@@ -459,36 +459,49 @@ export class AlphaSynthBase implements IAlphaSynth {
             endTick = this.sequencer.currentEndTick;
         }
 
-        if (this._tickPosition >= endTick && this._notPlayedSamples <= 0) {
-            this._notPlayedSamples = 0;
-            if (this.sequencer.isPlayingCountIn) {
-                Logger.debug('AlphaSynth', 'Finished playback (count-in)');
-                this.sequencer.resetCountIn();
-                this.timePosition = this.sequencer.currentTime;
-                this.playInternal();
-                this.output.resetSamples();
-            } else if (this.sequencer.isPlayingOneTimeMidi) {
-                Logger.debug('AlphaSynth', 'Finished playback (one time)');
-                this.output.resetSamples();
-                this.state = PlayerState.Paused;
-                this.stopOneTimeMidi();
-            } else if (this.isLooping) {
-                Logger.debug('AlphaSynth', 'Finished playback (main looping)');
-                (this.finished as EventEmitter).trigger();
-                this.tickPosition = startTick;
-                this._synthStopping = false;
-            } else if (this.synthesizer.activeVoiceCount > 0) {
-                // smooth stop
+        if (this._tickPosition >= endTick) {
+            // fully done with playback of remaining samples? 
+            if(this._notPlayedSamples <= 0) {
+                this._notPlayedSamples = 0;
+                if (this.sequencer.isPlayingCountIn) {
+                    Logger.debug('AlphaSynth', 'Finished playback (count-in)');
+                    this.sequencer.resetCountIn();
+                    this.timePosition = this.sequencer.currentTime;
+                    this.playInternal();
+                    this.output.resetSamples();
+                } else if (this.sequencer.isPlayingOneTimeMidi) {
+                    Logger.debug('AlphaSynth', 'Finished playback (one time)');
+                    this.output.resetSamples();
+                    this.state = PlayerState.Paused;
+                    this.stopOneTimeMidi();
+                } else if (this.isLooping) {
+                    Logger.debug('AlphaSynth', 'Finished playback (main looping)');
+                    (this.finished as EventEmitter).trigger();
+                    this.tickPosition = startTick;
+                    this._synthStopping = false;
+                } else if (this.synthesizer.activeVoiceCount > 0) {
+                    // smooth stop
+                    if (!this._synthStopping) {
+                        Logger.debug('AlphaSynth', 'Signaling synth to stop all voices (all samples played)');
+                        this.synthesizer.noteOffAll(true);
+                        this._synthStopping = true;
+                    }
+                } else {
+                    this._synthStopping = false;
+                    Logger.debug('AlphaSynth', 'Finished playback (main)');
+                    (this.finished as EventEmitter).trigger();
+                    this.stop();
+                }
+            } else {
+                // the output still has to play some samples, signal the synth to stop
+                // to eventually bring the voices down to 0 and stop playing
                 if (!this._synthStopping) {
+                    Logger.debug('AlphaSynth', 'Signaling synth to stop all voices (not all samples played)');
                     this.synthesizer.noteOffAll(true);
                     this._synthStopping = true;
                 }
-            } else {
-                this._synthStopping = false;
-                Logger.debug('AlphaSynth', 'Finished playback (main)');
-                (this.finished as EventEmitter).trigger();
-                this.stop();
             }
+          
         }
     }
 
