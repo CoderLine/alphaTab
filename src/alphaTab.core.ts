@@ -1,3 +1,5 @@
+import '@src/alphaTab.polyfills';
+
 export { CoreSettings } from '@src/CoreSettings';
 export { DisplaySettings, SystemsLayoutMode } from '@src/DisplaySettings';
 export { LayoutMode } from '@src/LayoutMode';
