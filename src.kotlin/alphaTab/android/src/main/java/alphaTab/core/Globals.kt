@@ -84,7 +84,7 @@ internal fun Double.toInvariantString(base: Double): String {
 
 var invariantDoubleFormat = DecimalFormat().apply {
     this.minimumFractionDigits = 0
-    this.maximumFractionDigits = 12
+    this.maximumFractionDigits = 13
     this.decimalFormatSymbols.decimalSeparator = '.'
     this.isGroupingUsed = false
 }
@@ -101,7 +101,7 @@ internal fun Double.toInvariantString(): String {
 }
 
 internal inline fun IAlphaTabEnum.toInvariantString(): String {
-    return this.toString()
+    return this.value.toString()
 }
 
 internal inline fun Double.toFixed(decimals: Double): String {
