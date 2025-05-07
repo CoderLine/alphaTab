@@ -1,7 +1,7 @@
 import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverPolyfill';
 import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 
-/* @target web */
+/*@target web*/
 (() => {
     if (typeof Symbol.dispose === 'undefined') {
         type Writeable<T> = { -readonly [K in keyof T]: T[K] };

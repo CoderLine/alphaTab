@@ -234,28 +234,34 @@ export default class CSharpAstTransformer {
             // validate global statements
             if (!defaultExport || !ts.isClassDeclaration(defaultExport)) {
                 for (const s of globalStatements) {
+                    if (!this.shouldSkip(s, true)) {
+                        this._context.addTsNodeDiagnostics(
+                            s,
+                            'Global statements in modules are only allowed if there is a default class export',
+                            ts.DiagnosticCategory.Error
+                        );
+                    }
+                }
+            }
+
+            for (const s of additionalNestedExportDeclarations) {
+                if (!this.shouldSkip(s, true)) {
                     this._context.addTsNodeDiagnostics(
                         s,
-                        'Global statements in modules are only allowed if there is a default class export',
+                        'Global statements in modules are not yet supported',
                         ts.DiagnosticCategory.Error
                     );
                 }
             }
 
-            for (const s of additionalNestedExportDeclarations) {
-                this._context.addTsNodeDiagnostics(
-                    s,
-                    'Global statements in modules are not yet supported',
-                    ts.DiagnosticCategory.Error
-                );
-            }
-
             for (const s of additionalNestedNonExportsDeclarations) {
-                this._context.addTsNodeDiagnostics(
-                    s,
-                    'Global statements in modules are not yet supported',
-                    ts.DiagnosticCategory.Error
-                );
+                if (!this.shouldSkip(s, true)) {
+                    this._context.addTsNodeDiagnostics(
+                        s,
+                        'Global statements in modules are not yet supported',
+                        ts.DiagnosticCategory.Error
+                    );
+                }
             }
 
             // TODO: make root namespace configurable from outside.
@@ -3621,8 +3627,7 @@ export default class CSharpAstTransformer {
 
         const argumentSymbol = this._context.typeChecker.getSymbolAtLocation(expression.argumentExpression);
         const elementAccessMethod = argumentSymbol ? this._context.getMethodNameFromSymbol(argumentSymbol) : '';
-        if(elementAccessMethod) {
-
+        if (elementAccessMethod) {
             const memberAccess = {
                 nodeType: cs.SyntaxKind.MemberAccessExpression,
                 expression: {} as cs.Expression,
@@ -3631,7 +3636,7 @@ export default class CSharpAstTransformer {
                 tsNode: expression,
                 nullSafe: !!expression.questionDotToken
             } as cs.MemberAccessExpression;
-            
+
             memberAccess.expression = this.visitExpression(memberAccess, expression.expression)!;
             if (!memberAccess.expression) {
                 return null;
@@ -3639,7 +3644,6 @@ export default class CSharpAstTransformer {
 
             return memberAccess;
         }
-
 
         const elementAccess = {
             expression: {} as cs.Expression,
