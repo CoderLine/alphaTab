@@ -224,14 +224,13 @@ export function setupControl(selector, customSettings) {
 
     const settings = new alphaTab.Settings();
     applyFonts(settings);
+    settings.fillFromJson(defaultSettings);
     settings.fillFromJson({
-        ...defaultSettings,
         player: {
-            ...defaultSettings.player,
             scrollElement: viewPort
         },
-        ...customSettings
     });
+    settings.fillFromJson(customSettings);
 
     const at = new alphaTab.AlphaTabApi(el, settings);
     at.error.on(function (e) {

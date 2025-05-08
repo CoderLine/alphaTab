@@ -3,40 +3,112 @@ import type { BackingTrack } from '@src/model/BackingTrack';
 import { type IBackingTrackSynthOutput, BackingTrackPlayer } from '@src/synth/BackingTrackPlayer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
+export interface IExternalMediaHandler {
+    /**
+     * The total duration of the backing track in milliseconds.
+     */
+    readonly backingTrackDuration: number;
+    /**
+     * The playback rate at which the output should playback.
+     */
+    playbackRate: number;
+    /**
+     * The volume at which the output should play (0-1)
+     */
+    masterVolume: number;
+    /**
+     * Instructs the output to seek to the given time position.
+     * @param time The absolute time in milliseconds.
+     */
+    seekTo(time: number): void;
+
+    play(): void;
+    pause(): void;
+}
+
 class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
     // fake rate
     public readonly sampleRate: number = 44100;
 
-    public backingTrackDuration: number = 0;
-    public playbackRate: number = 1;
-    public masterVolume: number = 1;
+    private _padding: number = 0;
+    private _seekPosition: number = 0;
 
-    public seekTo(time: number): void {}
+    private _handler?: IExternalMediaHandler;
 
-    public loadBackingTrack(backingTrack: BackingTrack) {}
+    public get handler(): IExternalMediaHandler | undefined {
+        return this._handler;
+    }
+
+    public set handler(value: IExternalMediaHandler | undefined) {
+        if (value) {
+            if (this._seekPosition !== 0) {
+                value.seekTo(this._seekPosition);
+                this._seekPosition = 0;
+            }
+        }
+
+        this._handler = value;
+    }
+
+    public get backingTrackDuration() {
+        return this.handler?.backingTrackDuration ?? 0;
+    }
+
+    public get playbackRate(): number {
+        return this.handler?.playbackRate ?? 1;
+    }
+
+    public set playbackRate(value: number) {
+        const handler = this.handler;
+        if (handler) {
+            handler.playbackRate = value;
+        }
+    }
+
+    public get masterVolume(): number {
+        return this.handler?.masterVolume ?? 1;
+    }
+
+    public set masterVolume(value: number) {
+        const handler = this.handler;
+        if (handler) {
+            handler.masterVolume = value;
+        }
+    }
+
+    public seekTo(time: number): void {
+        const handler = this.handler;
+        if (handler) {
+            handler.seekTo(time - this._padding);
+        } else {
+            this._seekPosition = time - this._padding;
+        }
+    }
+
+    public loadBackingTrack(backingTrack: BackingTrack) {
+        this._padding = backingTrack.padding;
+    }
 
     public open(_bufferTimeInMilliseconds: number): void {
         (this.ready as EventEmitter).trigger();
     }
 
     public updatePosition(currentTime: number) {
-        (this.timeUpdate as EventEmitterOfT<number>).trigger(currentTime);
+        (this.timeUpdate as EventEmitterOfT<number>).trigger(currentTime + this._padding);
     }
 
-    public play(): void {}
+    public play(): void {
+        this.handler?.play();
+    }
     public destroy(): void {}
 
-    public pause(): void {}
+    public pause(): void {
+        this.handler?.pause();
+    }
 
-    public addSamples(_samples: Float32Array): void {
-        // nobody will call this
-    }
-    public resetSamples(): void {
-        // nobody will call this
-    }
-    public activate(): void {
-        // nobody will call this
-    }
+    public addSamples(_samples: Float32Array): void {}
+    public resetSamples(): void {}
+    public activate(): void {}
 
     public readonly ready: IEventEmitter = new EventEmitter();
     public readonly samplesPlayed: IEventEmitterOfT<number> = new EventEmitterOfT<number>();
@@ -44,7 +116,7 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
     public readonly sampleRequest: IEventEmitter = new EventEmitter();
 
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
-        const empty:ISynthOutputDevice[] = [];
+        const empty: ISynthOutputDevice[] = [];
         return empty;
     }
     public async setOutputDevice(_device: ISynthOutputDevice | null): Promise<void> {}
@@ -55,6 +127,14 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
 }
 
 export class ExternalMediaPlayer extends BackingTrackPlayer {
+    public get handler(): IExternalMediaHandler | undefined {
+        return (this.output as ExternalMediaSynthOutput).handler;
+    }
+
+    public set handler(value: IExternalMediaHandler | undefined) {
+        (this.output as ExternalMediaSynthOutput).handler = value;
+    }
+
     constructor(bufferTimeInMilliseconds: number) {
         super(new ExternalMediaSynthOutput(), bufferTimeInMilliseconds);
     }
