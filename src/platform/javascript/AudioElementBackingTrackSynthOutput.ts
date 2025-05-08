@@ -6,42 +6,64 @@ import type { IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
 /**
+ * A {@link IBackingTrackSynthOutput} which uses a HTMLAudioElement as playback mechanism.
+ * Allows the access to the element for further custom usage.
  * @target web
  */
-export class AudioElementBackingTrackSynthOutput implements IBackingTrackSynthOutput {
+export interface IAudioElementBackingTrackSynthOutput extends IBackingTrackSynthOutput {
+    /**
+     * The audio element used for playing the backing track.
+     * @remarks
+     * Direct interaction with the element might not result in correct alphaTab behavior.
+     */
+    readonly audioElement: HTMLAudioElement;
+}
+
+/**
+ * @target web
+ */
+export class AudioElementBackingTrackSynthOutput implements IAudioElementBackingTrackSynthOutput {
     // fake rate
     public readonly sampleRate: number = 44100;
 
-    private _audioElement?: HTMLAudioElement;
+    public audioElement!: HTMLAudioElement;
     private _padding: number = 0;
     private _updateInterval: number = 0;
 
     public get backingTrackDuration(): number {
-        const duration = this._audioElement?.duration ?? 0;
+        const duration = this.audioElement.duration ?? 0;
         return Number.isFinite(duration) ? duration * 1000 : 0;
     }
 
     public get playbackRate(): number {
-        return this._audioElement!.playbackRate;
+        return this.audioElement.playbackRate;
     }
 
     public set playbackRate(value: number) {
-        this._audioElement!.playbackRate = value;
+        this.audioElement.playbackRate = value;
+    }
+
+    public get masterVolume(): number {
+        return this.audioElement.volume;
+    }
+
+    public set masterVolume(value: number) {
+        this.audioElement.volume = value;
     }
 
     public seekTo(time: number): void {
-        this._audioElement!.currentTime = (time / 1000) - this._padding;
+        this.audioElement.currentTime = time / 1000 - this._padding;
     }
 
     public loadBackingTrack(backingTrack: BackingTrack) {
-        if (this._audioElement?.src) {
-            URL.revokeObjectURL(this._audioElement!.src);
+        if (this.audioElement?.src) {
+            URL.revokeObjectURL(this.audioElement.src);
         }
 
         this._padding = backingTrack.padding / 1000;
 
         const blob = new Blob([backingTrack.rawAudioFile!]);
-        this._audioElement!.src = URL.createObjectURL(blob);
+        this.audioElement.src = URL.createObjectURL(blob);
     }
 
     public open(_bufferTimeInMilliseconds: number): void {
@@ -51,30 +73,30 @@ export class AudioElementBackingTrackSynthOutput implements IBackingTrackSynthOu
         audioElement.addEventListener('timeupdate', () => {
             this.updatePosition();
         });
-        this._audioElement = audioElement;
+        this.audioElement = audioElement;
         (this.ready as EventEmitter).trigger();
     }
 
     private updatePosition() {
-        const timePos = (this._audioElement!.currentTime + this._padding) * 1000;
+        const timePos = (this.audioElement.currentTime + this._padding) * 1000;
         (this.timeUpdate as EventEmitterOfT<number>).trigger(timePos);
     }
 
     public play(): void {
-        this._audioElement!.play();
+        this.audioElement.play();
         this._updateInterval = window.setInterval(() => {
             this.updatePosition();
         }, 50);
     }
     public destroy(): void {
-        const audioElement = this._audioElement;
+        const audioElement = this.audioElement;
         if (audioElement) {
             document.body.removeChild(audioElement);
         }
     }
 
     public pause(): void {
-        this._audioElement!.pause();
+        this.audioElement.pause();
         window.clearInterval(this._updateInterval);
     }
 
@@ -103,9 +125,9 @@ export class AudioElementBackingTrackSynthOutput implements IBackingTrackSynthOu
 
         // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/setSinkId
         if (!device) {
-            await this._audioElement!.setSinkId('');
+            await this.audioElement.setSinkId('');
         } else {
-            await this._audioElement!.setSinkId(device.deviceId);
+            await this.audioElement.setSinkId(device.deviceId);
         }
     }
 
@@ -115,7 +137,7 @@ export class AudioElementBackingTrackSynthOutput implements IBackingTrackSynthOu
         }
 
         // https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/sinkId
-        const sinkId = this._audioElement!.sinkId;
+        const sinkId = this.audioElement.sinkId;
 
         if (typeof sinkId !== 'string' || sinkId === '' || sinkId === 'default') {
             return null;

@@ -9,6 +9,7 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
 
     public backingTrackDuration: number = 0;
     public playbackRate: number = 1;
+    public masterVolume: number = 1;
 
     public seekTo(time: number): void {}
 

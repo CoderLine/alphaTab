@@ -67,6 +67,10 @@ export class AlphaSynthBase implements IAlphaSynth {
 
     public set masterVolume(value: number) {
         value = Math.max(value, SynthConstants.MinVolume);
+        this.updateMasterVolume(value);
+    }
+
+    protected updateMasterVolume(value: number) {
         this.synthesizer.masterVolume = value;
     }
 

@@ -120,6 +120,15 @@ export class AlphaTabApiBase<TSettings> {
     private _isDestroyed: boolean = false;
     private _score: Score | null = null;
     private _tracks: Track[] = [];
+    private _actualPlayerMode:PlayerMode = PlayerMode.Disabled;
+
+    /**
+     * The actual player mode which is currently active (e.g. allows determining whether a backing track or the synthesizer is active).
+     */
+    public get actualPlayerMode(): PlayerMode {
+        return this._actualPlayerMode;
+    }
+
     /**
      * Gets the UI facade to use for interacting with the user interface.
      */
@@ -1451,6 +1460,7 @@ export class AlphaTabApiBase<TSettings> {
         }
         this.updateCursors();
 
+        this._actualPlayerMode = mode;
         switch (mode) {
             case PlayerMode.Disabled:
                 this._playerMode = PlayerMode.Disabled;

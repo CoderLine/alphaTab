@@ -11,11 +11,36 @@ import type { ISynthOutput } from '@src/synth/ISynthOutput';
 import type { Hydra } from '@src/synth/soundfont/Hydra';
 import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 
+/**
+ * A synth output for playing backing tracks.
+ */
 export interface IBackingTrackSynthOutput extends ISynthOutput {
+    /**
+     * An event fired when the playback time changes. The time is in absolute milliseconds.
+     */
     readonly timeUpdate: IEventEmitterOfT<number>;
+    /**
+     * The total duration of the backing track in milliseconds.
+     */
     readonly backingTrackDuration: number;
+    /**
+     * The playback rate at which the output should playback.
+     */
     playbackRate: number;
+    /**
+     * The volume at which the output should play (0-1)
+     */
+    masterVolume: number;
+    /**
+     * Instructs the output to seek to the given time position.
+     * @param time The absolute time in milliseconds.
+     */
     seekTo(time: number): void;
+
+    /**
+     * Instructs the output to load the given backing track.
+     * @param backingTrack The backing track to load.
+     */
     loadBackingTrack(backingTrack: BackingTrack): void;
 }
 
@@ -29,6 +54,7 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
     public timeSignatureNumerator: number = 4;
     public timeSignatureDenominator: number = 4;
     public activeVoiceCount: number = 0;
+    public output!: IBackingTrackSynthOutput;
 
     public noteOffAll(_immediate: boolean): void {
         // not supported, ignore
@@ -113,6 +139,7 @@ export class BackingTrackPlayer extends AlphaSynthBase {
     private _backingTrackOutput: IBackingTrackSynthOutput;
     constructor(backingTrackOutput: IBackingTrackSynthOutput, bufferTimeInMilliseconds: number) {
         super(backingTrackOutput, new BackingTrackAudioSynthesizer(), bufferTimeInMilliseconds);
+        (this.synthesizer as BackingTrackAudioSynthesizer).output = backingTrackOutput;
         this._backingTrackOutput = backingTrackOutput;
 
         backingTrackOutput.timeUpdate.on(timePosition => {
@@ -127,6 +154,11 @@ export class BackingTrackPlayer extends AlphaSynthBase {
             this.updateTimePosition(alphaTabTimePosition, false);
             this.checkForFinish();
         });
+    }
+
+    protected override updateMasterVolume(value: number): void {
+        super.updateMasterVolume(value);
+        this._backingTrackOutput.masterVolume = value;
     }
 
     protected override updatePlaybackSpeed(value: number): void {
