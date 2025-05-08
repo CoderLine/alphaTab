@@ -25,6 +25,12 @@ namespace AlphaTab
         private Task? _timeUpdateTask;
         private CancellationTokenSource? _timeUpdateTaskCancellation;
 
+        public double MasterVolume
+        {
+            get => _context!.Volume;
+            set => _context!.Volume = (float)value;
+        }
+
         public NAudioBackingTrackOutput(Action<Action> invokeUi)
         {
             _invokeUi = invokeUi;

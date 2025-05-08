@@ -32,11 +32,21 @@ class AndroidBackingTrackSynthOutput(
         private const val PREFERRED_SAMPLE_RATE = 44100
     }
 
+    private var _masterVolume = 1.0
+
     private var _player: MediaPlayer = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
         MediaPlayer(context)
     } else {
         MediaPlayer()
     }
+
+    override var masterVolume: Double
+        get() = _masterVolume
+        set(value) {
+            _masterVolume = value
+            _player.setVolume(value.toFloat(), value.toFloat())
+        }
+
     private var _padding: Int = 0
     private var _device: ISynthOutputDevice? = null
     private val _updateTimer: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
