@@ -39,6 +39,7 @@ import { DynamicValue } from '@src/model/DynamicValue';
 import { FadeType } from '@src/model/FadeType';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
+import { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -84,6 +85,11 @@ export class MidiFileGenerator {
     public applyTranspositionPitches: boolean = true;
 
     /**
+     * The computed sync points for synchronizing the midi file with an external backing track.
+     */
+    public syncPoints: BackingTrackSyncPoint[] = [];
+
+    /**
      * Gets the transposition pitches for the individual midi channels.
      */
     public readonly transpositionPitches: Map<number, number> = new Map<number, number>();
@@ -121,6 +127,7 @@ export class MidiFileGenerator {
         let currentTempo = this._score.tempo;
 
         // store the previous played bar for repeats
+        const barOccurence = new Map<number, number>();
         while (!controller.finished) {
             const index: number = controller.index;
             const bar: MasterBar = this._score.masterBars[index];
@@ -128,7 +135,11 @@ export class MidiFileGenerator {
             controller.processCurrent();
 
             if (controller.shouldPlay) {
-                this.generateMasterBar(bar, previousMasterBar, currentTick, currentTempo);
+                let occurence = barOccurence.has(index) ? barOccurence.get(index)! : -1;
+                occurence++;
+                barOccurence.set(index, occurence);
+
+                this.generateMasterBar(bar, previousMasterBar, currentTick, currentTempo, occurence);
 
                 if (bar.tempoAutomations.length > 0) {
                     currentTempo = bar.tempoAutomations[0].value;
@@ -224,7 +235,8 @@ export class MidiFileGenerator {
         masterBar: MasterBar,
         previousMasterBar: MasterBar | null,
         currentTick: number,
-        currentTempo: number
+        currentTempo: number,
+        barOccurence: number
     ): void {
         // time signature
         if (
@@ -258,6 +270,16 @@ export class MidiFileGenerator {
             masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, masterBar.score.tempo));
         } else {
             masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, currentTempo));
+        }
+
+        const syncPoints = masterBar.syncPoints;
+        if (syncPoints) {
+            for (const syncPoint of syncPoints) {
+                if(syncPoint.syncPointValue!.barOccurence === barOccurence) {
+                    const tick = currentTick + masterBarDuration * syncPoint.ratioPosition;
+                    this.syncPoints.push(new BackingTrackSyncPoint(tick, syncPoint.syncPointValue!));
+                }
+            }
         }
 
         masterBarLookup.masterBar = masterBar;

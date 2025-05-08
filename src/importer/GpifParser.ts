@@ -1,6 +1,6 @@
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
-import { Automation, AutomationType } from '@src/model/Automation';
+import { Automation, AutomationType, SyncPointData } from '@src/model/Automation';
 import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
@@ -54,6 +54,7 @@ import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { BackingTrack } from '@src/model/BackingTrack';
 
 /**
  * This structure represents a duration within a gpif
@@ -95,7 +96,14 @@ export class GpifParser {
      */
     private static readonly BendPointValueFactor: number = 1 / 25.0;
 
+    // test have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
+    // they are NOT using the sample rate of the input file. 
+    // Downsampling a 44100hz ogg to 8000hz and using it in as audio track resulted in the same frame offset when placing sync points.
+    private static readonly SampleRate = 44100;
+
+
     public score!: Score;
+    private _backingTrackAssetId: string | undefined;
 
     private _masterTrackAutomations!: Map<number, Automation[]>;
     private _automationsPerTrackIdAndBarIndex!: Map<string, Map<number, Automation[]>>;
@@ -125,6 +133,8 @@ export class GpifParser {
         number,
         [KeySignature, KeySignatureType]
     >();
+
+    public loadAsset?: (fileName: string) => Uint8Array | undefined;
 
     public parseXml(xml: string, settings: Settings): void {
         this._masterTrackAutomations = new Map<number, Automation[]>();
@@ -187,6 +197,9 @@ export class GpifParser {
                     case 'MasterTrack':
                         this.parseMasterTrackNode(n);
                         break;
+                    case 'BackingTrack':
+                        this.parseBackingTrackNode(n);
+                        break;
                     case 'Tracks':
                         this.parseTracksNode(n);
                         break;
@@ -208,10 +221,45 @@ export class GpifParser {
                     case 'Rhythms':
                         this.parseRhythms(n);
                         break;
+                    case 'Assets':
+                        this.parseAssets(n);
+                        break;
                 }
             }
         } else {
             throw new UnsupportedFormatError('Root node of XML was not GPIF');
+        }
+    }
+
+    private parseAssets(element: XmlNode) {
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'Asset':
+                    if (c.getAttribute('id') === this._backingTrackAssetId) {
+                        this.parseBackingTrackAsset(c);
+                    }
+                    break;
+            }
+        }
+    }
+    private parseBackingTrackAsset(element: XmlNode) {
+        let embeddedFilePath = '';
+        for (const c of element.childElements()) {
+            switch (c.localName) {
+                case 'EmbeddedFilePath':
+                    embeddedFilePath = c.innerText;
+                    break;
+            }
+        }
+
+        const loadAsset = this.loadAsset;
+        if (loadAsset) {
+            const assetData = loadAsset(embeddedFilePath);
+            if (assetData) {
+                this.score.backingTrack!.rawAudioFile = assetData;
+            } else {
+                this.score.backingTrack = undefined;
+            }
         }
     }
 
@@ -303,7 +351,43 @@ export class GpifParser {
             return [];
         }
 
-        return text.split(separator).map(t => t.trim()).filter(t => t.length > 0);
+        return text
+            .split(separator)
+            .map(t => t.trim())
+            .filter(t => t.length > 0);
+    }
+
+    //
+    // <BackingTrack>...</BackingTrack>
+    //
+    private parseBackingTrackNode(node: XmlNode): void {
+        const backingTrack = new BackingTrack();
+        let enabled = false;
+        let source = '';
+        let assetId = '';
+        for (const c of node.childElements()) {
+            switch (c.localName) {
+                case 'Enabled':
+                    enabled = c.innerText === 'true';
+                    break;
+                case 'Source':
+                    source = c.innerText;
+                    break;
+                case 'AssetId':
+                    assetId = c.innerText;
+                    break;
+                case 'FramePadding':
+                    backingTrack.padding = GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate * 1000;
+                    break;
+            }
+        }
+
+        // only local (contained backing tracks are supported)
+        // remote / youtube links seem to come in future releases according to the gpif tags.
+        if (enabled && source === 'Local') {
+            this.score.backingTrack = backingTrack;
+            this._backingTrackAssetId = assetId; // when the Asset tag is parsed this ID is used to load the raw data
+        }
     }
 
     //
@@ -354,6 +438,8 @@ export class GpifParser {
         let textValue: string | null = null;
         let reference: number = 0;
         let text: string | null = null;
+        let syncPointValue: SyncPointData | undefined = undefined;
+
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Type':
@@ -371,6 +457,29 @@ export class GpifParser {
                 case 'Value':
                     if (c.firstElement && c.firstElement.nodeType === XmlNodeType.CDATA) {
                         textValue = c.innerText;
+                    } else if (
+                        c.firstElement &&
+                        c.firstElement.nodeType === XmlNodeType.Element &&
+                        type === 'SyncPoint'
+                    ) {
+                        syncPointValue = new SyncPointData();
+                        for (const vc of c.childElements()) {
+                            switch (vc.localName) {
+                                case 'BarIndex':
+                                    barIndex = GpifParser.parseIntSafe(vc.innerText, 0);
+                                    break;
+                                case 'BarOccurrence':
+                                    syncPointValue.barOccurence = GpifParser.parseIntSafe(vc.innerText, 0);
+                                    break;
+                                case 'ModifiedTempo':
+                                    syncPointValue.modifiedTempo = GpifParser.parseFloatSafe(vc.innerText, 0);
+                                    break;
+                                case 'FrameOffset':
+                                    const frameOffset = GpifParser.parseFloatSafe(vc.innerText, 0);
+                                    syncPointValue.millisecondOffset = (frameOffset / GpifParser.SampleRate) * 1000;
+                                    break;
+                            }
+                        }
                     } else {
                         const parts: string[] = GpifParser.splitSafe(c.innerText);
                         // Issue 391: Some GPX files might have
@@ -396,6 +505,13 @@ export class GpifParser {
         switch (type) {
             case 'Tempo':
                 automation = Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference);
+                break;
+            case 'SyncPoint':
+                automation = new Automation();
+                automation.type = AutomationType.SyncPoint;
+                automation.isLinear = isLinear;
+                automation.ratioPosition = ratioPosition;
+                automation.syncPointValue = syncPointValue;
                 break;
             case 'Sound':
                 if (textValue && sounds && sounds.has(textValue)) {
@@ -2619,14 +2735,19 @@ export class GpifParser {
             const masterBar: MasterBar = this.score.masterBars[barNumber];
             for (let i: number = 0, j: number = automations.length; i < j; i++) {
                 const automation: Automation = automations[i];
-                if (automation.type === AutomationType.Tempo) {
-                    if (barNumber === 0) {
-                        this.score.tempo = automation.value | 0;
-                        if (automation.text) {
-                            this.score.tempoLabel = automation.text;
+                switch (automation.type) {
+                    case AutomationType.Tempo:
+                        if (barNumber === 0) {
+                            this.score.tempo = automation.value | 0;
+                            if (automation.text) {
+                                this.score.tempoLabel = automation.text;
+                            }
                         }
-                    }
-                    masterBar.tempoAutomations.push(automation);
+                        masterBar.tempoAutomations.push(automation);
+                        break;
+                    case AutomationType.SyncPoint:
+                        masterBar.addSyncPoint(automation);
+                        break;
                 }
             }
         }

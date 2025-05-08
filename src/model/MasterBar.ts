@@ -150,6 +150,13 @@ export class MasterBar {
     public tempoAutomations: Automation[] = [];
 
     /**
+     * The sync points for this master bar to synchronize the alphaTab time axis with the
+     * external backing track audio.
+     * @json_add addSyncPoint
+     */
+    public syncPoints: Automation[] | undefined;
+
+    /**
      * Gets or sets the reference to the score this song belongs to.
      * @json_ignore
      */
@@ -246,5 +253,16 @@ export class MasterBar {
             return fermataMap.get(beat.playbackStart)!;
         }
         return null;
+    }
+
+    /**
+     * Adds the given sync point to the list of sync points for this bar.
+     * @param syncPoint  The sync point to add.
+     */
+    public addSyncPoint(syncPoint: Automation) {
+        if (!this.syncPoints) {
+            this.syncPoints = [];
+        }
+        this.syncPoints!.push(syncPoint);
     }
 }

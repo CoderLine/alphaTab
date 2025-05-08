@@ -67,7 +67,7 @@ import type { Track } from '@src/model/Track';
 import type { IContainer } from '@src/platform/IContainer';
 import type { IMouseEventArgs } from '@src/platform/IMouseEventArgs';
 import type { IUiFacade } from '@src/platform/IUiFacade';
-import { ScrollMode } from '@src/PlayerSettings';
+import { PlayerMode, ScrollMode } from '@src/PlayerSettings';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 
 import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
@@ -96,6 +96,7 @@ import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { CoreSettings } from '@src/CoreSettings';
+import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
 
 class SelectionInfo {
     public beat: Beat;
@@ -119,6 +120,15 @@ export class AlphaTabApiBase<TSettings> {
     private _isDestroyed: boolean = false;
     private _score: Score | null = null;
     private _tracks: Track[] = [];
+    private _actualPlayerMode:PlayerMode = PlayerMode.Disabled;
+
+    /**
+     * The actual player mode which is currently active (e.g. allows determining whether a backing track or the synthesizer is active).
+     */
+    public get actualPlayerMode(): PlayerMode {
+        return this._actualPlayerMode;
+    }
+
     /**
      * Gets the UI facade to use for interacting with the user interface.
      */
@@ -272,6 +282,11 @@ export class AlphaTabApiBase<TSettings> {
         uiFacade.initialize(this, settings);
         Logger.logLevel = this.settings.core.logLevel;
 
+        // backwards compatibility: remove in 2.0
+        if (this.settings.player.playerMode === PlayerMode.Disabled && this.settings.player.enablePlayer) {
+            this.settings.player.playerMode = PlayerMode.EnabledAutomatic;
+        }
+
         Environment.printEnvironmentInfo(false);
 
         this.canvasElement = uiFacade.createCanvasElement();
@@ -320,7 +335,7 @@ export class AlphaTabApiBase<TSettings> {
             this.appendRenderResult(null); // marks last element
         });
         this.renderer.error.on(this.onError.bind(this));
-        if (this.settings.player.enablePlayer) {
+        if (this.settings.player.playerMode !== PlayerMode.Disabled) {
             this.setupPlayer();
         }
         this.setupClickHandling();
@@ -414,12 +429,9 @@ export class AlphaTabApiBase<TSettings> {
         }
         this.renderer.updateSettings(this.settings);
         // enable/disable player if needed
-        if (this.settings.player.enablePlayer) {
-            this.setupPlayer();
-            if (score) {
-                this.player?.applyTranspositionPitches(
-                    MidiFileGenerator.buildTranspositionPitches(score, this.settings)
-                );
+        if (this.settings.player.playerMode !== PlayerMode.Disabled) {
+            if (this.setupPlayer() && score) {
+                this.loadMidiForScore();
             }
         } else {
             this.destroyPlayer();
@@ -919,9 +931,9 @@ export class AlphaTabApiBase<TSettings> {
         return this.renderer.boundsLookup;
     }
 
-    /**
-     * Gets the alphaSynth player used for playback. This is the low-level API to the Midi synthesizer used for playback.
-     */
+    // the previously configured player mode to detect changes
+    private _playerMode: PlayerMode = PlayerMode.Disabled;
+
     /**
      * The alphaSynth player used for playback.
      * @remarks
@@ -1428,15 +1440,63 @@ export class AlphaTabApiBase<TSettings> {
         this.destroyCursors();
     }
 
-    private setupPlayer(): void {
+    private setupPlayer(): boolean {
+        let mode = this.settings.player.playerMode;
+        if (mode === PlayerMode.EnabledAutomatic) {
+            const score = this.score;
+            if (!score) {
+                return false;
+            }
+
+            if (score?.backingTrack?.rawAudioFile) {
+                mode = PlayerMode.EnabledBackingTrack;
+            } else {
+                mode = PlayerMode.EnabledSynthesizer;
+            }
+        }
+
+        if (mode !== this._playerMode) {
+            this.destroyPlayer();
+        }
         this.updateCursors();
-        if (this.player) {
-            return;
+
+        this._actualPlayerMode = mode;
+        switch (mode) {
+            case PlayerMode.Disabled:
+                this._playerMode = PlayerMode.Disabled;
+                this.destroyPlayer();
+                return false;
+
+            case PlayerMode.EnabledSynthesizer:
+                if (this.player) {
+                    return true;
+                }
+
+                // new player needed
+                this.player = this.uiFacade.createWorkerPlayer();
+                break;
+
+            case PlayerMode.EnabledBackingTrack:
+                if (this.player) {
+                    return true;
+                }
+
+                // new player needed
+                this.player = this.uiFacade.createBackingTrackPlayer();
+                break;
+            case PlayerMode.EnabledExternalMedia:
+                if (this.player) {
+                    return true;
+                }
+
+                this.player = new ExternalMediaPlayer(this.settings.player.bufferTimeInMilliseconds);
+                break;
         }
-        this.player = this.uiFacade.createWorkerPlayer();
+
         if (!this.player) {
-            return;
+            return false;
         }
+
         this.player.ready.on(() => {
             this.loadMidiForScore();
         });
@@ -1464,6 +1524,8 @@ export class AlphaTabApiBase<TSettings> {
         this.player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
         this.player.finished.on(this.onPlayerFinished.bind(this));
         this.setupPlayerEvents();
+
+        return false;
     }
 
     private loadMidiForScore(): void {
@@ -1492,6 +1554,7 @@ export class AlphaTabApiBase<TSettings> {
         const player = this.player;
         if (player) {
             player.loadMidiFile(midiFile);
+            player.loadBackingTrack(score, generator.syncPoints);
             player.applyTranspositionPitches(generator.transpositionPitches);
         }
     }
@@ -1944,7 +2007,7 @@ export class AlphaTabApiBase<TSettings> {
                 this._selectionWrapper = cursors.selectionWrapper;
             }
             if (this._currentBeat !== null) {
-                this.cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, true);
+                this.cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
             }
         } else if (!this.settings.player.enableCursor && this._cursorWrapper) {
             this.destroyCursors();
@@ -1959,13 +2022,14 @@ export class AlphaTabApiBase<TSettings> {
         // we need to update our position caches if we render a tablature
         this.renderer.postRenderFinished.on(() => {
             this._currentBeat = null;
-            this.cursorUpdateTick(this._previousTick, false, this._previousTick > 10);
+            this.cursorUpdateTick(this._previousTick, false, 1, this._previousTick > 10);
         });
         if (this.player) {
             this.player.positionChanged.on(e => {
                 this._previousTick = e.currentTick;
                 this.uiFacade.beginInvoke(() => {
-                    this.cursorUpdateTick(e.currentTick, false, false, e.isSeek);
+                    const cursorSpeed = e.modifiedTempo / e.originalTempo;
+                    this.cursorUpdateTick(e.currentTick, false, cursorSpeed, false, e.isSeek);
                 });
             });
             this.player.stateChanged.on(e => {
@@ -1990,9 +2054,12 @@ export class AlphaTabApiBase<TSettings> {
     private cursorUpdateTick(
         tick: number,
         stop: boolean,
+        cursorSpeed: number,
         shouldScroll: boolean = false,
         forceUpdate: boolean = false
     ): void {
+        this._previousTick = tick;
+
         const cache: MidiTickLookup | null = this._tickCache;
         if (cache) {
             const tracks = this._trackIndexLookup;
@@ -2003,6 +2070,7 @@ export class AlphaTabApiBase<TSettings> {
                         beat,
                         stop,
                         shouldScroll,
+                        cursorSpeed,
                         forceUpdate || this.playerState === PlayerState.Paused
                     );
                 }
@@ -2017,6 +2085,7 @@ export class AlphaTabApiBase<TSettings> {
         lookupResult: MidiTickLookupFindBeatResult,
         stop: boolean,
         shouldScroll: boolean,
+        cursorSpeed: number,
         forceUpdate: boolean = false
     ): void {
         const beat: Beat = lookupResult.beat;
@@ -2064,7 +2133,8 @@ export class AlphaTabApiBase<TSettings> {
                 cache!,
                 beatBoundings!,
                 shouldScroll,
-                lookupResult.cursorMode
+                lookupResult.cursorMode,
+                cursorSpeed
             );
         });
     }
@@ -2153,7 +2223,8 @@ export class AlphaTabApiBase<TSettings> {
         cache: BoundsLookup,
         beatBoundings: BeatBounds,
         shouldScroll: boolean,
-        cursorMode: MidiTickLookupFindBeatResultCursorMode
+        cursorMode: MidiTickLookupFindBeatResultCursorMode,
+        cursorSpeed: number
     ) {
         const barCursor = this._barCursor;
         const beatCursor = this._beatCursor;
@@ -2167,12 +2238,33 @@ export class AlphaTabApiBase<TSettings> {
             barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
 
-        if (beatCursor) {
-            // move beat to start position immediately
-            if (this.settings.player.enableAnimatedBeatCursor) {
-                beatCursor.stopAnimation();
+        let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
+        // get position of next beat on same system
+        if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
+            // if we are moving within the same bar or to the next bar
+            // transition to the next beat, otherwise transition to the end of the bar.
+            const nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
+            if (
+                nextBeatBoundings &&
+                nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
+            ) {
+                nextBeatX = nextBeatBoundings.onNotesX;
             }
-            beatCursor.setBounds(beatBoundings.onNotesX, barBounds.y, 1, barBounds.h);
+        }
+
+        let startBeatX = beatBoundings.onNotesX;
+        if (beatCursor) {
+            // relative positioning of the cursor
+            if (this.settings.player.enableAnimatedBeatCursor) {
+                const animationWidth = nextBeatX - beatBoundings.onNotesX;
+                const relativePosition = this._previousTick - this._currentBeat!.start;
+                const ratioPosition = relativePosition / this._currentBeat!.tickDuration;
+                startBeatX = beatBoundings.onNotesX + animationWidth * ratioPosition;
+                duration -= duration * ratioPosition;
+                beatCursor.transitionToX(0, startBeatX);
+            }
+
+            beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
         }
 
         // if playing, animate the cursor to the next beat
@@ -2196,25 +2288,11 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (this.settings.player.enableAnimatedBeatCursor && beatCursor) {
-            let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
-            // get position of next beat on same system
-            if (nextBeat && cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext) {
-                // if we are moving within the same bar or to the next bar
-                // transition to the next beat, otherwise transition to the end of the bar.
-                const nextBeatBoundings: BeatBounds | null = cache.findBeat(nextBeat);
-                if (
-                    nextBeatBoundings &&
-                    nextBeatBoundings.barBounds.masterBarBounds.staffSystemBounds === barBoundings.staffSystemBounds
-                ) {
-                    nextBeatX = nextBeatBoundings.onNotesX;
-                }
-            }
-
             if (isPlayingUpdate) {
                 // we need to put the transition to an own animation frame
                 // otherwise the stop animation above is not applied.
                 this.uiFacade.beginInvoke(() => {
-                    beatCursor!.transitionToX(duration / this.playbackSpeed, nextBeatX);
+                    beatCursor!.transitionToX(duration / cursorSpeed, nextBeatX);
                 });
             }
         }
@@ -2576,7 +2654,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (
-            this.settings.player.enablePlayer &&
+            this.settings.player.playerMode !== PlayerMode.Disabled &&
             this.settings.player.enableCursor &&
             this.settings.player.enableUserInteraction
         ) {
@@ -2628,7 +2706,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (
-            this.settings.player.enablePlayer &&
+            this.settings.player.playerMode !== PlayerMode.Disabled &&
             this.settings.player.enableCursor &&
             this.settings.player.enableUserInteraction
         ) {
@@ -2654,7 +2732,7 @@ export class AlphaTabApiBase<TSettings> {
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
                 if (this._playerState === PlayerState.Paused) {
-                    this.cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false);
+                    this.cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false, 1);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
                 // set playback range
@@ -2775,7 +2853,7 @@ export class AlphaTabApiBase<TSettings> {
         this.renderer.postRenderFinished.on(() => {
             if (
                 !this._selectionStart ||
-                !this.settings.player.enablePlayer ||
+                this.settings.player.playerMode === PlayerMode.Disabled ||
                 !this.settings.player.enableCursor ||
                 !this.settings.player.enableUserInteraction
             ) {
@@ -2921,6 +2999,9 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.scoreLoaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'scoreLoaded', score);
+        if (this.setupPlayer()) {
+            this.loadMidiForScore();
+        }
     }
 
     /**

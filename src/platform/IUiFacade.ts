@@ -88,10 +88,16 @@ export interface IUiFacade<TSettings> {
     createWorkerRenderer(): IScoreRenderer;
 
     /**
-     * Tells the UI layer to create a player worker.
+     * Tells the UI layer to create a player worker for the synthesizer.
      * @returns
      */
     createWorkerPlayer(): IAlphaSynth | null;
+
+    /**
+     * Tells the UI layer to create a player which can play backing tracks.
+     * @returns
+     */
+    createBackingTrackPlayer(): IAlphaSynth | null;
 
     /**
      * Creates the cursor objects that are used to highlight the currently played beats and bars.

@@ -8,9 +8,11 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { MasterBarSerializer } from "@src/generated/model/MasterBarSerializer";
 import { TrackSerializer } from "@src/generated/model/TrackSerializer";
 import { RenderStylesheetSerializer } from "@src/generated/model/RenderStylesheetSerializer";
+import { BackingTrackSerializer } from "@src/generated/model/BackingTrackSerializer";
 import { ScoreStyleSerializer } from "@src/generated/model/ScoreStyleSerializer";
 import { MasterBar } from "@src/model/MasterBar";
 import { Track } from "@src/model/Track";
+import { BackingTrack } from "@src/model/BackingTrack";
 import { ScoreStyle } from "@src/model/Score";
 export class ScoreSerializer {
     public static fromJson(obj: Score, m: unknown): void {
@@ -41,6 +43,9 @@ export class ScoreSerializer {
         o.set("defaultsystemslayout", obj.defaultSystemsLayout);
         o.set("systemslayout", obj.systemsLayout);
         o.set("stylesheet", RenderStylesheetSerializer.toJson(obj.stylesheet));
+        if (obj.backingTrack) {
+            o.set("backingtrack", BackingTrackSerializer.toJson(obj.backingTrack));
+        }
         if (obj.style) {
             o.set("style", ScoreStyleSerializer.toJson(obj.style));
         }
@@ -108,6 +113,15 @@ export class ScoreSerializer {
                 return true;
             case "stylesheet":
                 RenderStylesheetSerializer.fromJson(obj.stylesheet, v);
+                return true;
+            case "backingtrack":
+                if (v) {
+                    obj.backingTrack = new BackingTrack();
+                    BackingTrackSerializer.fromJson(obj.backingTrack, v);
+                }
+                else {
+                    obj.backingTrack = undefined;
+                }
                 return true;
             case "style":
                 if (v) {

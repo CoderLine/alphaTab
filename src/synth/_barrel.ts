@@ -2,6 +2,7 @@ export { AlphaSynth } from '@src/synth/AlphaSynth';
 export { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 export { PlaybackRange } from '@src/synth/PlaybackRange';
 export type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
+export type { IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
 export type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 export { PlayerState } from '@src/synth/PlayerState';
 export { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
@@ -13,3 +14,4 @@ export { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWo
 export { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 export { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 export { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
+export type { IAudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';

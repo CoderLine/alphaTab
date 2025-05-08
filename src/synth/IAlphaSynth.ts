@@ -9,6 +9,21 @@ import type { LogLevel } from '@src/LogLevel';
 import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import type { MidiEventType } from '@src/midi/MidiEvent';
 import type { ISynthOutput } from '@src/synth/ISynthOutput';
+import type { Score } from '@src/model/Score';
+import type { SyncPointData } from '@src/model/Automation';
+
+/**
+ * Rerpresents a point to sync the alphaTab time axis with an external backing track.
+ */
+export class BackingTrackSyncPoint {
+    public tick: number = 0;
+    public data: SyncPointData;
+
+    constructor(tick: number, data: SyncPointData) {
+        this.tick = tick;
+        this.data = data;
+    }
+}
 
 /**
  * The public API interface for interacting with the synthesizer.
@@ -136,6 +151,12 @@ export interface IAlphaSynth {
      * @param midi
      */
     loadMidiFile(midi: MidiFile): void;
+
+    /**
+     * Loads the synchronization information from the given score (used for backing tracks and external media).
+     * @param score
+     */
+    loadBackingTrack(score: Score, syncPoints: BackingTrackSyncPoint[]): void;
 
     /**
      * Applies the given transposition pitches to be used during playback.

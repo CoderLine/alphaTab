@@ -17,7 +17,7 @@ const defaultSettings = {
         fontDirectory: '/font/bravura/'
     },
     player: {
-        enablePlayer: true,
+        playerMode: alphaTab.PlayerMode.EnabledAutomatic,
         scrollOffsetX: -10,
         soundFont: '/font/sonivox/sonivox.sf2'
     }
@@ -94,6 +94,125 @@ function createTrackItem(track, trackSelection) {
 
     trackItem.track = track;
     return trackItem;
+}
+
+let backingTrackScore = null;
+let backingTrackAudioElement = null;
+let waveForm = null;
+let waveFormCursor = null;
+window.onload = ()=>{
+    waveForm = document.querySelector('.at-waveform');
+    waveFormCursor = waveForm.querySelector('.at-waveform-cursor');
+    waveForm.onclick = (e)=>{
+        const percent = e.offsetX / waveForm.offsetWidth;
+        if(backingTrackAudioElement) {
+            backingTrackAudioElement.currentTime = backingTrackAudioElement.duration * percent;
+        }
+    };
+}
+
+function updateWaveFormCursor(){
+    if(waveFormCursor) {
+        waveFormCursor.style.left = ((backingTrackAudioElement.currentTime / backingTrackAudioElement.duration) * 100) + '%';
+    }
+};
+
+function hideBackingTrack(at) {
+    if(backingTrackAudioElement) {
+        backingTrackAudioElement.removeEventListener('timeupdate', updateWaveFormCursor);
+        backingTrackAudioElement.removeEventListener('durationchange', updateWaveFormCursor);
+        backingTrackAudioElement.removeEventListener('seeked', updateWaveFormCursor);
+    }
+    const waveForm = document.querySelector('.at-waveform');
+    waveForm.classList.add('d-none');
+}
+
+
+async function showBackingTrack(at) {
+
+    const audioElement = at.player.output.audioElement;
+    if(audioElement !== backingTrackAudioElement) {
+        backingTrackAudioElement = audioElement;
+        audioElement.addEventListener('timeupdate', updateWaveFormCursor);
+        audioElement.addEventListener('durationchange', updateWaveFormCursor);
+        audioElement.addEventListener('seeked', updateWaveFormCursor);
+        updateWaveFormCursor();
+    }
+
+    const score = at.score;
+    if(score === backingTrackScore) {
+        return;
+    }
+    backingTrackScore = at.score;
+
+    const audioContext = new AudioContext();
+    const rawData = await audioContext.decodeAudioData(
+        structuredClone(at.score.backingTrack.rawAudioFile.buffer)
+    );
+
+    const topChannel = rawData.getChannelData(0);
+    const bottomChannel = rawData.numberOfChannels > 1 ? rawData.getChannelData(1) : topChannel;
+    const length = topChannel.length
+
+    waveForm.classList.remove('d-none');
+
+    const canvas = document.querySelector('.at-waveform canvas') ?? document.createElement('canvas');
+    const width = waveForm.offsetWidth;
+    const height = 80;
+    canvas.width = width;
+    canvas.height = height;
+    waveForm.appendChild(canvas);
+
+    const ctx = canvas.getContext('2d');
+
+    const pixelRatio = window.devicePixelRatio;
+    const halfHeight = height / 2;
+
+    const barWidth = 2 * pixelRatio;
+    const barGap = 1 * pixelRatio;
+    const barIndexScale = width / (barWidth + barGap) / length
+
+    ctx.beginPath();
+
+    let prevX = 0
+    let maxTop = 0
+    let maxBottom = 0
+    for (let i = 0; i <= length; i++) {
+        const x = Math.round(i * barIndexScale)
+
+        if (x > prevX) {
+            const topBarHeight = Math.round(maxTop * halfHeight)
+            const bottomBarHeight = Math.round(maxBottom * halfHeight)
+            const barHeight = topBarHeight + bottomBarHeight || 1
+
+            ctx.roundRect(prevX * (barWidth + barGap), halfHeight - topBarHeight, barWidth, barHeight, 2)
+
+            prevX = x
+            maxTop = 0
+            maxBottom = 0
+        }
+
+        const magnitudeTop = Math.abs(topChannel[i] || 0)
+        const magnitudeBottom = Math.abs(bottomChannel[i] || 0)
+        if (magnitudeTop > maxTop) maxTop = magnitudeTop
+        if (magnitudeBottom > maxBottom) maxBottom = magnitudeBottom
+    }
+
+    ctx.fillStyle = '#436d9d'  
+    ctx.fill()
+}
+
+function updateBackingTrack(at) {
+    switch(at.actualPlayerMode) {
+        case alphaTab.PlayerMode.Disabled:
+        case alphaTab.PlayerMode.EnabledSynthesizer:
+        case alphaTab.PlayerMode.EnabledExternalMedia:
+            hideBackingTrack(at);
+            break;
+        case alphaTab.PlayerMode.EnabledBackingTrack:
+            showBackingTrack(at);
+            break;
+    }
 }
 
 export function setupControl(selector, customSettings) {
@@ -184,10 +303,24 @@ export function setupControl(selector, customSettings) {
             trackItems.push(trackItem);
             trackList.appendChild(trackItem);
         });
+
+        updateBackingTrack(at);
     });
 
     const timePositionLabel = control.querySelector('.at-time-position');
     const timeSliderValue = control.querySelector('.at-time-slider-value');
+
+    const timeSlider = control.querySelector('.at-time-slider');
+    let songTimeInfo = null;
+    timeSlider.onclick = (e)=>{
+        const percent = e.offsetX / timeSlider.offsetWidth;
+        if(songTimeInfo) {
+            at.timePosition = Math.floor(songTimeInfo.endTime * percent); 
+        }
+    };
+    at.midiLoaded.on(e => { songTimeInfo = e; });
+
+    
 
     function formatDuration(milliseconds) {
         let seconds = milliseconds / 1000;
@@ -214,6 +347,8 @@ export function setupControl(selector, customSettings) {
         control.querySelectorAll('.at-player .disabled').forEach(function (c) {
             c.classList.remove('disabled');
         });
+
+        updateBackingTrack(at);
     });
 
     at.playerStateChanged.on(function (args) {

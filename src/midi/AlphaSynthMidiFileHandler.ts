@@ -104,8 +104,9 @@ export class AlphaSynthMidiFileHandler implements IMidiFileHandler {
 
     public addTempo(tick: number, tempo: number): void {
         // bpm -> microsecond per quarter note
-        const tempoInUsq: number = (60000000 / tempo) | 0;
-        this._midiFile.addEvent(new TempoChangeEvent(tick, tempoInUsq));
+        const tempoEvent = new TempoChangeEvent(tick, 0);
+        tempoEvent.beatsPerMinute = tempo;
+        this._midiFile.addEvent(tempoEvent);
     }
 
     public addBend(track: number, tick: number, channel: number, value: number): void {

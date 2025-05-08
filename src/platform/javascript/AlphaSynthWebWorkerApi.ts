@@ -18,6 +18,7 @@ import { Environment } from '@src/Environment';
 import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import type { Settings } from '@src/Settings';
 import { ModelUtils } from '@src/model/ModelUtils';
+import type { Score } from '@src/model/Score';
 
 /**
  * a WebWorker based alphaSynth which uses the given player as output.
@@ -382,7 +383,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                         data.endTime,
                         data.currentTick,
                         data.endTick,
-                        data.isSeek
+                        data.isSeek,
+                        data.originalTempo,
+                        data.modifiedTempo
                     )
                 );
                 break;
@@ -420,7 +423,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                         data.endTime,
                         data.currentTick,
                         data.endTick,
-                        data.isSeek
+                        data.isSeek,
+                        data.originalTempo,
+                        data.modifiedTempo
                     )
                 );
                 break;
@@ -491,5 +496,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private onOutputReady(): void {
         this._outputIsReady = true;
         this.checkReady();
+    }
+
+    public loadBackingTrack(_score: Score): void {
+        // ignore
     }
 }

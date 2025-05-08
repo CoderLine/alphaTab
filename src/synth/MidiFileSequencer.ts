@@ -8,10 +8,12 @@ import {
 import type { MidiFile } from '@src/midi/MidiFile';
 import type { PlaybackRange } from '@src/synth/PlaybackRange';
 import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
-import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { MidiUtils } from '@src/midi/MidiUtils';
+import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
+import { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
+import type { SyncPointData } from '@src/model/Automation';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
@@ -25,8 +27,18 @@ export class MidiFileSequencerTempoChange {
     }
 }
 
+class BackingTrackSyncPointWithTime extends BackingTrackSyncPoint {
+    public time: number;
+    constructor(tick: number, data: SyncPointData, time: number) {
+        super(tick, data);
+        this.time = time;
+    }
+}
+
 class MidiSequencerState {
     public tempoChanges: MidiFileSequencerTempoChange[] = [];
+    public tempoChangeIndex: number = 0;
+    public syncPoints: BackingTrackSyncPointWithTime[] = [];
     public firstProgramEventPerChannel: Map<number, SynthEvent> = new Map();
     public firstTimeSignatureNumerator: number = 0;
     public firstTimeSignatureDenominator: number = 0;
@@ -34,11 +46,15 @@ class MidiSequencerState {
     public division: number = MidiUtils.QuarterTime;
     public eventIndex: number = 0;
     public currentTime: number = 0;
+    public currentTick: number = 0;
+    public syncPointIndex: number = 0;
     public playbackRange: PlaybackRange | null = null;
     public playbackRangeStartTime: number = 0;
     public playbackRangeEndTime: number = 0;
     public endTick: number = 0;
     public endTime: number = 0;
+    public currentTempo: number = 0;
+    public modifiedTempo: number = 0;
 }
 
 /**
@@ -46,7 +62,7 @@ class MidiSequencerState {
  * synthesize position. The sequencer does not consider the playback speed.
  */
 export class MidiFileSequencer {
-    private _synthesizer: TinySoundFont;
+    private _synthesizer: IAudioSampleSynthesizer;
     private _currentState: MidiSequencerState;
     private _mainState: MidiSequencerState;
     private _oneTimeState: MidiSequencerState | null = null;
@@ -64,7 +80,7 @@ export class MidiFileSequencer {
         return this._currentState === this._countInState;
     }
 
-    public constructor(synthesizer: TinySoundFont) {
+    public constructor(synthesizer: IAudioSampleSynthesizer) {
         this._synthesizer = synthesizer;
         this._mainState = new MidiSequencerState();
         this._currentState = this._mainState;
@@ -107,6 +123,14 @@ export class MidiFileSequencer {
         return this._currentState.endTime / this.playbackSpeed;
     }
 
+    public get currentTempo(): number {
+        return this._currentState.currentTempo;
+    }
+
+    public get modifiedTempo(): number {
+        return this._currentState.modifiedTempo * this.playbackSpeed;
+    }
+
     /**
      * Gets or sets the playback speed.
      */
@@ -131,6 +155,8 @@ export class MidiFileSequencer {
             // we have to restart the midi to make sure we get the right state: instruments, volume, pan, etc
             this._mainState.currentTime = 0;
             this._mainState.eventIndex = 0;
+            this._mainState.syncPointIndex = 0;
+            this._mainState.tempoChangeIndex = 0;
             if (this.isPlayingMain) {
                 const metronomeVolume: number = this._synthesizer.metronomeVolume;
                 this._synthesizer.noteOffAll(true);
@@ -232,7 +258,7 @@ export class MidiFileSequencer {
 
             if (mEvent.type === MidiEventType.TempoChange) {
                 const meta: TempoChangeEvent = mEvent as TempoChangeEvent;
-                bpm = 60000000 / meta.microSecondsPerQuarterNote;
+                bpm = meta.beatsPerMinute;
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
                 metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division));
             } else if (mEvent.type === MidiEventType.TimeSignature) {
@@ -264,6 +290,9 @@ export class MidiFileSequencer {
             }
         }
 
+        state.currentTempo = state.tempoChanges.length > 0 ? state.tempoChanges[0].bpm : bpm;
+        state.modifiedTempo = state.currentTempo;
+
         state.synthData.sort((a, b) => {
             if (a.time > b.time) {
                 return 1;
@@ -281,6 +310,47 @@ export class MidiFileSequencer {
 
     public fillMidiEventQueue(): boolean {
         return this.fillMidiEventQueueLimited(-1);
+    }
+
+    public fillMidiEventQueueToEndTime(endTime: number) {
+        while (this._mainState.currentTime < endTime) {
+            if (this.fillMidiEventQueueLimited(endTime - this._mainState.currentTime)) {
+                this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
+            }
+        }
+
+        let anyEventsDispatched: boolean = false;
+        this._currentState.currentTime = endTime;
+        while (
+            this._currentState.eventIndex < this._currentState.synthData.length &&
+            this._currentState.synthData[this._currentState.eventIndex].time < this._currentState.currentTime
+        ) {
+            const synthEvent = this._currentState.synthData[this._currentState.eventIndex];
+            this._synthesizer.dispatchEvent(synthEvent);
+
+            while (
+                this._currentState.syncPointIndex < this._currentState.syncPoints.length &&
+                this._currentState.syncPoints[this._currentState.syncPointIndex].tick < synthEvent.event.tick
+            ) {
+                this._currentState.modifiedTempo =
+                    this._currentState.syncPoints[this._currentState.syncPointIndex].data.modifiedTempo;
+                this._currentState.syncPointIndex++;
+            }
+
+            while (
+                this._currentState.tempoChangeIndex < this._currentState.tempoChanges.length &&
+                this._currentState.tempoChanges[this._currentState.tempoChangeIndex].time <= synthEvent.time
+            ) {
+                this._currentState.currentTempo =
+                    this._currentState.tempoChanges[this._currentState.tempoChangeIndex].bpm;
+                this._currentState.tempoChangeIndex++;
+            }
+
+            this._currentState.eventIndex++;
+            anyEventsDispatched = true;
+        }
+
+        return anyEventsDispatched;
     }
 
     private fillMidiEventQueueLimited(maxMilliseconds: number): boolean {
@@ -318,8 +388,108 @@ export class MidiFileSequencer {
         return this.timePositionToTickPositionWithSpeed(this._mainState, timePosition, this.playbackSpeed);
     }
 
+    public mainUpdateSyncPoints(syncPoints: BackingTrackSyncPoint[]) {
+        const state = this._mainState;
+        syncPoints.sort((a, b) => a.tick - b.tick); // just in case
+        state.syncPoints = new Array<BackingTrackSyncPointWithTime>(syncPoints.length);
+
+        if (syncPoints.length >= 0) {
+            let bpm: number = 120;
+            let absTick: number = 0;
+            let absTime: number = 0.0;
+            let previousTick: number = 0;
+
+            let tempoChangeIndex = 0;
+
+            for (let i = 0; i < syncPoints.length; i++) {
+                const p = syncPoints[i];
+                const deltaTick: number = p.tick - previousTick;
+                absTick += deltaTick;
+                absTime += deltaTick * (60000.0 / (bpm * state.division));
+                state.syncPoints[i] = new BackingTrackSyncPointWithTime(p.tick, p.data, absTime);
+                previousTick = p.tick;
+
+                while (
+                    tempoChangeIndex < state.tempoChanges.length &&
+                    state.tempoChanges[tempoChangeIndex].ticks <= absTick
+                ) {
+                    bpm = state.tempoChanges[tempoChangeIndex].bpm;
+                    tempoChangeIndex++;
+                }
+            }
+        }
+
+        state.syncPointIndex = 0;
+    }
+
     public currentTimePositionToTickPosition(timePosition: number): number {
         return this.timePositionToTickPositionWithSpeed(this._currentState, timePosition, this.playbackSpeed);
+    }
+
+    public mainTimePositionFromBackingTrack(timePosition: number, backingTrackLength: number): number {
+        const mainState = this._mainState;
+        const syncPoints = mainState.syncPoints;
+
+        if (timePosition < 0 || syncPoints.length === 0) {
+            return timePosition;
+        }
+
+        let syncPointIndex = timePosition >= syncPoints[mainState.syncPointIndex].data.millisecondOffset ? mainState.syncPointIndex : 0;
+        while (
+            syncPointIndex + 1 < syncPoints.length &&
+            syncPoints[syncPointIndex + 1].data.millisecondOffset <= timePosition
+        ) {
+            syncPointIndex++;
+        }
+
+        const currentSyncPoint = syncPoints[syncPointIndex];
+        const timeDiff = timePosition - currentSyncPoint.data.millisecondOffset;
+
+        let alphaTabTimeDiff: number;
+        if (syncPointIndex + 1 < syncPoints.length) {
+            const nextSyncPoint = syncPoints[syncPointIndex + 1];
+            const relativeTimeDiff =
+                timeDiff / (nextSyncPoint.data.millisecondOffset - currentSyncPoint.data.millisecondOffset);
+
+            alphaTabTimeDiff = (nextSyncPoint.time - currentSyncPoint.time) * relativeTimeDiff;
+        } else {
+            const relativeTimeDiff = timeDiff / (backingTrackLength - currentSyncPoint.data.millisecondOffset);
+            alphaTabTimeDiff = (mainState.endTime - currentSyncPoint.time) * relativeTimeDiff;
+        }
+
+        return (currentSyncPoint.time + alphaTabTimeDiff) / this.playbackSpeed;
+    }
+
+    public mainTimePositionToBackingTrack(timePosition: number, backingTrackLength: number): number {
+        const mainState = this._mainState;
+        const syncPoints = mainState.syncPoints;
+        if (timePosition < 0 || syncPoints.length === 0) {
+            return timePosition;
+        }
+
+        timePosition *= this.playbackSpeed;
+
+        let syncPointIndex = timePosition >= syncPoints[mainState.syncPointIndex].time ? mainState.syncPointIndex : 0;
+        while (syncPointIndex + 1 < syncPoints.length && syncPoints[syncPointIndex + 1].time <= timePosition) {
+            syncPointIndex++;
+        }
+
+        const currentSyncPoint = syncPoints[syncPointIndex];
+        const alphaTabTimeDiff = timePosition - currentSyncPoint.time;
+
+        let backingTrackPos: number;
+        if (syncPointIndex + 1 < syncPoints.length) {
+            const nextSyncPoint = syncPoints[syncPointIndex + 1];
+            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (nextSyncPoint.time - currentSyncPoint.time);
+            const backingTrackDiff = nextSyncPoint.data.millisecondOffset - currentSyncPoint.data.millisecondOffset;
+            backingTrackPos = currentSyncPoint.data.millisecondOffset + backingTrackDiff * relativeAlphaTabTimeDiff;
+        } else {
+            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (mainState.endTime - currentSyncPoint.time);
+            const frameDiff = backingTrackLength - currentSyncPoint.data.millisecondOffset;
+            backingTrackPos = currentSyncPoint.data.millisecondOffset + frameDiff * relativeAlphaTabTimeDiff;
+        }
+
+        return backingTrackPos;
     }
 
     private tickPositionToTimePositionWithSpeed(
@@ -465,6 +635,8 @@ export class MidiFileSequencer {
         });
         state.endTime = metronomeTime;
         state.endTick = metronomeTick;
+        state.currentTempo = bpm;
+        state.modifiedTempo = bpm;
         this._countInState = state;
     }
 }

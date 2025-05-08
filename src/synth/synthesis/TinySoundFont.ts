@@ -39,6 +39,7 @@ import { SynthConstants } from '@src/synth/SynthConstants';
 import { Queue } from '@src/synth/ds/Queue';
 import { ControllerType } from '@src/midi/ControllerType';
 import { Logger } from '@src/Logger';
+import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
 
 /**
  * This is a tiny soundfont based synthesizer.
@@ -47,7 +48,7 @@ import { Logger } from '@src/Logger';
  *   - Better low-pass filter without lowering performance too much
  *   - Support for modulators
  */
-export class TinySoundFont {
+export class TinySoundFont implements IAudioSampleSynthesizer {
     private _midiEventQueue: Queue<SynthEvent> = new Queue<SynthEvent>();
     private _mutedChannels: Map<number, boolean> = new Map<number, boolean>();
     private _soloChannels: Map<number, boolean> = new Map<number, boolean>();
@@ -242,7 +243,7 @@ export class TinySoundFont {
                 break;
             case MidiEventType.TempoChange:
                 const tempoChange = e as TempoChangeEvent;
-                this.currentTempo = 60000000 / tempoChange.microSecondsPerQuarterNote;
+                this.currentTempo = tempoChange.beatsPerMinute;
                 break;
             case MidiEventType.PitchBend:
                 const pitchBend = e as PitchBendEvent;

@@ -149,7 +149,9 @@ export class AlphaSynthWebWorker {
             endTime: e.endTime,
             currentTick: e.currentTick,
             endTick: e.endTick,
-            isSeek: e.isSeek
+            isSeek: e.isSeek,
+            originalTempo: e.originalTempo,
+            modifiedTempo: e.modifiedTempo
         });
     }
 
@@ -201,7 +203,9 @@ export class AlphaSynthWebWorker {
             endTime: e.endTime,
             currentTick: e.currentTick,
             endTick: e.endTick,
-            isSeek: e.isSeek
+            isSeek: e.isSeek,
+            originalTempo: e.originalTempo,
+            modifiedTempo: e.modifiedTempo
         });
     }
 

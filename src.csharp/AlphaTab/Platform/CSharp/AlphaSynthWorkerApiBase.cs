@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using AlphaTab.Collections;
 using AlphaTab.Midi;
+using AlphaTab.Model;
 using AlphaTab.Synth;
 
 namespace AlphaTab.Platform.CSharp;
@@ -189,11 +190,16 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
         DispatchOnWorkerThread(() => { _player.SetChannelTranspositionPitch(channel, semitones); });
     }
 
+    public void LoadBackingTrack(Score score, IList<BackingTrackSyncPoint> syncPoints)
+    {
+        DispatchOnWorkerThread(() => { _player.LoadBackingTrack(score, syncPoints); });
+    }
+
     public IEventEmitter Ready { get; } = new EventEmitter();
     public IEventEmitter ReadyForPlayback { get; } = new EventEmitter();
     public IEventEmitter Finished { get; } = new EventEmitter();
     public IEventEmitter SoundFontLoaded { get; } = new EventEmitter();
-    public IEventEmitterOfT<Error> SoundFontLoadFailed { get; } =new EventEmitterOfT<Error>();
+    public IEventEmitterOfT<Error> SoundFontLoadFailed { get; } = new EventEmitterOfT<Error>();
     public IEventEmitterOfT<MidiFile> MidiLoad { get; } = new EventEmitterOfT<MidiFile>();
     public IEventEmitterOfT<PositionChangedEventArgs> MidiLoaded { get; } = new EventEmitterOfT<PositionChangedEventArgs>();
     public IEventEmitterOfT<Error> MidiLoadFailed { get; } = new EventEmitterOfT<Error>();

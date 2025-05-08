@@ -8,6 +8,7 @@ import { JsonHelper } from "@src/io/JsonHelper";
 import { VibratoPlaybackSettingsSerializer } from "@src/generated/VibratoPlaybackSettingsSerializer";
 import { SlidePlaybackSettingsSerializer } from "@src/generated/SlidePlaybackSettingsSerializer";
 import { PlayerOutputMode } from "@src/PlayerSettings";
+import { PlayerMode } from "@src/PlayerSettings";
 import { ScrollMode } from "@src/PlayerSettings";
 export class PlayerSettingsSerializer {
     public static fromJson(obj: PlayerSettings, m: unknown): void {
@@ -26,6 +27,7 @@ export class PlayerSettingsSerializer {
         /*@target web*/
         o.set("outputmode", obj.outputMode as number);
         o.set("enableplayer", obj.enablePlayer);
+        o.set("playermode", obj.playerMode as number);
         o.set("enablecursor", obj.enableCursor);
         o.set("enableanimatedbeatcursor", obj.enableAnimatedBeatCursor);
         o.set("enableelementhighlighting", obj.enableElementHighlighting);
@@ -60,6 +62,9 @@ export class PlayerSettingsSerializer {
                 return true;
             case "enableplayer":
                 obj.enablePlayer = v! as boolean;
+                return true;
+            case "playermode":
+                obj.playerMode = JsonHelper.parseEnum<PlayerMode>(v, PlayerMode)!;
                 return true;
             case "enablecursor":
                 obj.enableCursor = v! as boolean;
