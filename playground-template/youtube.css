@@ -1,0 +1,10 @@
+
+.at-wrap {
+    height: calc(90vh - 360px);
+    margin: 0;
+}
+.youtube-wrap {
+    height: 360px;
+    display: flex;
+    justify-content: center;
+}

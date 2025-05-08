@@ -931,9 +931,6 @@ export class AlphaTabApiBase<TSettings> {
         return this.renderer.boundsLookup;
     }
 
-    // the previously configured player mode to detect changes
-    private _playerMode: PlayerMode = PlayerMode.Disabled;
-
     /**
      * The alphaSynth player used for playback.
      * @remarks
@@ -1455,7 +1452,7 @@ export class AlphaTabApiBase<TSettings> {
             }
         }
 
-        if (mode !== this._playerMode) {
+        if (mode !== this._actualPlayerMode) {
             this.destroyPlayer();
         }
         this.updateCursors();
@@ -1463,7 +1460,6 @@ export class AlphaTabApiBase<TSettings> {
         this._actualPlayerMode = mode;
         switch (mode) {
             case PlayerMode.Disabled:
-                this._playerMode = PlayerMode.Disabled;
                 this.destroyPlayer();
                 return false;
 
