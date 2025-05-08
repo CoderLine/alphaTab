@@ -310,6 +310,18 @@ export function setupControl(selector, customSettings) {
     const timePositionLabel = control.querySelector('.at-time-position');
     const timeSliderValue = control.querySelector('.at-time-slider-value');
 
+    const timeSlider = control.querySelector('.at-time-slider');
+    let songTimeInfo = null;
+    timeSlider.onclick = (e)=>{
+        const percent = e.offsetX / timeSlider.offsetWidth;
+        if(songTimeInfo) {
+            at.timePosition = Math.floor(songTimeInfo.endTime * percent); 
+        }
+    };
+    at.midiLoaded.on(e => { songTimeInfo = e; });
+
+    
+
     function formatDuration(milliseconds) {
         let seconds = milliseconds / 1000;
         const minutes = (seconds / 60) | 0;

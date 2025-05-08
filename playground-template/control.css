@@ -338,8 +338,14 @@ input[type='range']::-moz-range-thumb {
     background: #d9d9d9;
 }
 
+.at-time-slider:hover {
+    transition: all 0.1s ease;
+    height: 15px;
+    cursor: pointer;
+}
+
 .at-time-slider-value {
-    height: 4px;
+    height: 100%;
     background: #4972a1;
     width: 0;
 }
@@ -461,7 +467,8 @@ input[type='range']::-moz-range-thumb {
 .at-waveform {
     position: relative;
     background: #f7f7f7;
-    border-top: 1px solid rgba(0, 0, 0, 0.12)
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+    cursor: pointer;
 }
 
 .at-waveform > canvas {
