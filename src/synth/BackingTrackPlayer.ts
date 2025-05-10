@@ -98,7 +98,7 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
     public fakeSynthesize(): SynthEvent[] {
         const processedEvents: SynthEvent[] = [];
         while (!this._midiEventQueue.isEmpty) {
-            const m: SynthEvent = this._midiEventQueue.dequeue();
+            const m: SynthEvent = this._midiEventQueue.dequeue()!;
             if (m.isMetronome && this.metronomeVolume > 0) {
                 // ignore metronome
             } else if (m.event) {

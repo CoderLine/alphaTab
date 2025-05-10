@@ -1,38 +1,58 @@
-export class Queue<T> {
-    private _items: T[] = [];
-    private _position: number = 0;
+class QueueItem<T> {
+    public value: T;
+    public next?: QueueItem<T>;
 
-    public isEmpty: boolean = true;
+    public constructor(value: T) {
+        this.value = value;
+    }
+}
+
+export class Queue<T> {
+    private _head?: QueueItem<T>;
+    private _tail?: QueueItem<T>;
+
+    public get isEmpty() {
+        return this._head === undefined;
+    }
 
     public clear() {
-        this._items = [];
-        this._position = 0;
-        this.isEmpty = true;
+        this._head = undefined;
+        this._tail = undefined;
     }
 
     public enqueue(item: T) {
-        this.isEmpty = false;
-        this._items.push(item);
-    }
-
-    public peek(): T {
-        return this._items[this._position];
-    }
-
-    public dequeue(): T {
-        const item = this._items[this._position];
-        this._position++;
-        if (this._position >= this._items.length / 2) {
-            this._items = this._items.slice(this._position);
-            this._position = 0;
+        const queueItem = new QueueItem<T>(item);
+        if (this._tail) {
+            // not empty -> add after tail
+            this._tail!.next = queueItem;
+            this._tail = queueItem;
+        } else {
+            // empty -> new item takes head and tail
+            this._head = queueItem;
+            this._tail = queueItem;
         }
-        this.isEmpty = this._items.length === 0;
-        return item;
     }
 
-    public toArray(): T[] {
-        const items = this._items.slice(this._position);
-        items.reverse();
-        return items;
+    public peek(): T | undefined {
+        const head = this._head;
+        if (!head) {
+            return undefined;
+        }
+        return head.value;
+    }
+
+    public dequeue(): T | undefined {
+        const head = this._head;
+        if (!head) {
+            return undefined;
+        }
+
+        const newHead:QueueItem<T>|undefined = head.next;
+        this._head = newHead;
+        // last item removed?
+        if (!newHead) {
+            this._tail = undefined;
+        }
+        return head.value;
     }
 }

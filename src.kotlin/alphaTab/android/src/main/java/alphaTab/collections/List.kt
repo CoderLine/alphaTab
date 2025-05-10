@@ -1,22 +1,32 @@
 package alphaTab.collections
 
+internal class ArrayListWithRemoveRange<T> : ArrayList<T> {
+
+    constructor() : super()
+    constructor(c: Collection<T>) : super(c)
+
+    public override fun removeRange(startIndex:Int, endIndex:Int) {
+        super.removeRange(startIndex, endIndex);
+    }
+}
+
 public class List<T> : Iterable<T> {
-    internal val _data: MutableList<T>
+    internal val _data: ArrayListWithRemoveRange<T>
 
     val length: Double
         get() = _data.size.toDouble()
 
     public constructor() {
-        _data = ArrayList()
+        _data = ArrayListWithRemoveRange()
     }
 
     public constructor(vararg items: T) {
-        _data = items.toMutableList()
+        _data = items.toCollection(ArrayListWithRemoveRange())
     }
 
     @Suppress("UNCHECKED_CAST")
     public constructor(size: Int) {
-        _data = ArrayList()
+        _data = ArrayListWithRemoveRange()
         var remaining = size
         while (remaining-- > 0) {
             _data.add(null as T)
@@ -24,10 +34,10 @@ public class List<T> : Iterable<T> {
     }
 
     public constructor(items: Iterable<T>) {
-        _data = items.toMutableList()
+        _data = items.toCollection(ArrayListWithRemoveRange())
     }
 
-    internal constructor(items: MutableList<T>) {
+    internal constructor(items: ArrayListWithRemoveRange<T>) {
         _data = items
     }
 
@@ -72,7 +82,7 @@ public class List<T> : Iterable<T> {
     }
 
     public fun pop(): T {
-        return _data.removeLast()
+        return _data.removeAt(_data.lastIndex)
     }
 
     public fun unshift(item: T) {
@@ -111,11 +121,11 @@ public class List<T> : Iterable<T> {
     }
 
     public fun slice(): List<T> {
-        return List(ArrayList(_data))
+        return List(ArrayListWithRemoveRange(_data))
     }
 
     public fun slice(start: Double): List<T> {
-        return List(_data.subList(start.toInt(), _data.size))
+        return List(ArrayListWithRemoveRange(_data.subList(start.toInt(), _data.size)))
     }
 
     public fun shift(): T {
@@ -128,7 +138,7 @@ public class List<T> : Iterable<T> {
             actualStart += _data.size
         }
 
-        _data.subList(start.toInt(), (start + deleteCount).toInt()).clear()
+        _data.removeRange(start.toInt(), (start + deleteCount).toInt())
         _data.addAll(start.toInt(), newElements.toList())
     }
 
