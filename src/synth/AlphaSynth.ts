@@ -557,14 +557,15 @@ export class AlphaSynthBase implements IAlphaSynth {
         if (isSeek) {
             this._playedEventsQueue.clear();
         } else {
-            const playedEvents = new Queue<MidiEvent>();
-            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek().time < currentTime) {
-                const synthEvent = this._playedEventsQueue.dequeue();
-                playedEvents.enqueue(synthEvent.event);
+            const playedEvents: MidiEvent[] = [];
+            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek()!.time < currentTime) {
+                const synthEvent = this._playedEventsQueue.dequeue()!;
+                playedEvents.push(synthEvent.event);
             }
-            if (!playedEvents.isEmpty) {
+            if (playedEvents.length > 0) {
+                playedEvents.reverse();
                 (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
-                    new MidiEventsPlayedEventArgs(playedEvents.toArray())
+                    new MidiEventsPlayedEventArgs(playedEvents)
                 );
             }
         }

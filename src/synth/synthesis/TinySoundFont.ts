@@ -185,7 +185,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
         // process in micro-buffers
         // process events for first microbuffer
         while (!this._midiEventQueue.isEmpty) {
-            const m: SynthEvent = this._midiEventQueue.dequeue();
+            const m: SynthEvent = this._midiEventQueue.dequeue()!;
             if (m.isMetronome && this.metronomeVolume > 0) {
                 this.channelNoteOff(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey);
                 this.channelNoteOn(SynthConstants.MetronomeChannel, SynthConstants.MetronomeKey, 95 / 127);
