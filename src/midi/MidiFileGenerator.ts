@@ -7,7 +7,7 @@ import { MidiTickLookup } from '@src/midi/MidiTickLookup';
 
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
-import { type Automation, AutomationType } from '@src/model/Automation';
+import { type Automation, AutomationType, SyncPointData } from '@src/model/Automation';
 import type { Bar } from '@src/model/Bar';
 import type { Beat } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
@@ -162,6 +162,30 @@ export class MidiFileGenerator {
             previousMasterBar = bar;
         }
 
+        // here we interpolate the sync point which marks the end of the sync.
+        // Sync points define new tempos at certain positions.
+        // looking from the last sync point to the end we do not assume the end where the audio ends,
+        // but where it ends according to the BPM and the remaining ticks.
+        if (this.syncPoints.length > 0) {
+            const lastSyncPoint = this.syncPoints[this.syncPoints.length - 1];
+            const endTick = controller.currentTick;
+            const remainingTicks = endTick - lastSyncPoint.tick;
+            if (remainingTicks > 0) {
+                const syncPointData = new SyncPointData();
+
+                // last occurence of the last bar
+                syncPointData.barOccurence = barOccurence.get(this._score.masterBars.length - 1)!;
+                // same tempo as last point
+                syncPointData.modifiedTempo = lastSyncPoint.data.modifiedTempo;
+                // interpolated end from last syncPoint
+                syncPointData.millisecondOffset =
+                    lastSyncPoint.data.millisecondOffset +
+                    MidiUtils.ticksToMillis(remainingTicks, syncPointData.modifiedTempo);
+
+                this.syncPoints.push(new BackingTrackSyncPoint(endTick, syncPointData));
+            }
+        }
+
         for (const track of this._score.tracks) {
             this._handler.finishTrack(track.index, controller.currentTick);
         }
@@ -275,7 +299,7 @@ export class MidiFileGenerator {
         const syncPoints = masterBar.syncPoints;
         if (syncPoints) {
             for (const syncPoint of syncPoints) {
-                if(syncPoint.syncPointValue!.barOccurence === barOccurence) {
+                if (syncPoint.syncPointValue!.barOccurence === barOccurence) {
                     const tick = currentTick + masterBarDuration * syncPoint.ratioPosition;
                     this.syncPoints.push(new BackingTrackSyncPoint(tick, syncPoint.syncPointValue!));
                 }
