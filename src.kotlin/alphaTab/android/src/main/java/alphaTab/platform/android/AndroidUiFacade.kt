@@ -63,13 +63,14 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
         rootContainerBecameVisible = object : IEventEmitter,
             ViewTreeObserver.OnGlobalLayoutListener, View.OnLayoutChangeListener {
-            override fun on(value: () -> Unit) {
+            override fun on(value: () -> Unit): () -> Unit {
                 if (rootContainer.isVisible) {
                     value()
                 } else {
                     outerScroll.viewTreeObserver.addOnGlobalLayoutListener(this)
                     outerScroll.addOnLayoutChangeListener(this)
                 }
+                return fun() { off(value) }
             }
 
             override fun off(value: () -> Unit) {

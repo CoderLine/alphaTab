@@ -70,13 +70,13 @@ export class HtmlElementContainer implements IContainer {
 
         this.mouseDown = {
             on: (value: any) => {
-                this.element.addEventListener(
-                    'mousedown',
-                    e => {
-                        value(new BrowserMouseEventArgs(e));
-                    },
-                    true
-                );
+                const nativeListener: (e: MouseEvent) => void = e => {
+                    value(new BrowserMouseEventArgs(e));
+                };
+                this.element.addEventListener('mousedown', nativeListener, true);
+                return () => {
+                    this.element.removeEventListener('mousedown', nativeListener, true);
+                };
             },
             off: (value: any) => {
                 // not supported due to wrapping
@@ -85,13 +85,15 @@ export class HtmlElementContainer implements IContainer {
 
         this.mouseUp = {
             on: (value: any) => {
-                this.element.addEventListener(
-                    'mouseup',
-                    e => {
-                        value(new BrowserMouseEventArgs(e));
-                    },
-                    true
-                );
+                const nativeListener: (e: MouseEvent) => void = e => {
+                    value(new BrowserMouseEventArgs(e));
+                };
+
+                this.element.addEventListener('mouseup', nativeListener, true);
+
+                return () => {
+                    this.element.removeEventListener('mouseup', nativeListener, true);
+                };
             },
             off: (value: any) => {
                 // not supported due to wrapping
@@ -100,26 +102,30 @@ export class HtmlElementContainer implements IContainer {
 
         this.mouseMove = {
             on: (value: any) => {
-                this.element.addEventListener(
-                    'mousemove',
-                    e => {
-                        value(new BrowserMouseEventArgs(e));
-                    },
-                    true
-                );
+                const nativeListener: (e: MouseEvent) => void = e => {
+                    value(new BrowserMouseEventArgs(e));
+                };
+                this.element.addEventListener('mousemove', nativeListener, true);
+
+                return () => {
+                    this.element.removeEventListener('mousemove', nativeListener, true);
+                };
             },
             off: (_: any) => {
                 // not supported due to wrapping
             }
         };
 
+        const container = this;
         this.resize = {
-            on: (value: any) => {
-                if (this._resizeListeners === 0) {
-                    HtmlElementContainer.resizeObserver.value.observe(this.element);
+            on: function (value: any) {
+                if (container._resizeListeners === 0) {
+                    HtmlElementContainer.resizeObserver.value.observe(container.element);
                 }
-                this.element.addEventListener('resize', value, true);
-                this._resizeListeners++;
+                container.element.addEventListener('resize', value, true);
+                container._resizeListeners++;
+
+                return () => this.off(value);
             },
             off: (value: any) => {
                 this.element.removeEventListener('resize', value, true);

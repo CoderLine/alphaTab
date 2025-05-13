@@ -4,7 +4,7 @@ namespace AlphaTab;
 
 partial interface IEventEmitterOfT<T>
 {
-    void On(System.Action value);
+    System.Action On(System.Action value);
     void Off(System.Action value);
 }
 	
@@ -14,7 +14,7 @@ partial class EventEmitterOfT<T>
         new System.Collections.Generic.Dictionary<System.Action, System.Action<T>>();
        
     [Obsolete("Use event registration overload with parameter.", false)]
-    public void On(System.Action value) 
+    public System.Action On(System.Action value) 
     {
         var wrapper = new Action<T>(_=> 
         {
@@ -22,6 +22,7 @@ partial class EventEmitterOfT<T>
         });
         _wrappers[value] = wrapper;
         On(wrapper);
+        return () => Off(value);
     }
 
     [Obsolete("Use event unregistration with parameter.", false)]
