@@ -116,7 +116,6 @@ export class AlphaSynthBase implements IAlphaSynth {
         this.timePosition = this.timePosition * (oldSpeed / value);
     }
 
-
     public get tickPosition(): number {
         return this._tickPosition;
     }
@@ -464,8 +463,8 @@ export class AlphaSynthBase implements IAlphaSynth {
         }
 
         if (this._tickPosition >= endTick) {
-            // fully done with playback of remaining samples? 
-            if(this._notPlayedSamples <= 0) {
+            // fully done with playback of remaining samples?
+            if (this._notPlayedSamples <= 0) {
                 this._notPlayedSamples = 0;
                 if (this.sequencer.isPlayingCountIn) {
                     Logger.debug('AlphaSynth', 'Finished playback (count-in)');
@@ -505,7 +504,6 @@ export class AlphaSynthBase implements IAlphaSynth {
                     this._synthStopping = true;
                 }
             }
-          
         }
     }
 
@@ -601,7 +599,7 @@ export class AlphaSynthBase implements IAlphaSynth {
         return this.synthesizer.hasSamplesForPercussion(key);
     }
 
-    public loadBackingTrack(_score: Score, _syncPoints:BackingTrackSyncPoint[]): void {
+    public loadBackingTrack(_score: Score, _syncPoints: BackingTrackSyncPoint[]): void {
         // ignore
     }
 }

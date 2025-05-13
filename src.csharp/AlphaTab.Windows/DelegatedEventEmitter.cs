@@ -13,9 +13,10 @@ namespace AlphaTab
             _off = off;
         }
 
-        public void On(Action value)
+        public System.Action On(Action value)
         {
             _on(value);
+            return () => _off(value);
         }
 
         public void Off(Action value)
@@ -35,9 +36,10 @@ namespace AlphaTab
             _off = off;
         }
 
-        public void On(Action value)
+        public System.Action On(Action value)
         {
 			// not used internally
+            return () => {};
         }
 
         public void Off(Action value)
@@ -45,9 +47,10 @@ namespace AlphaTab
             // not used internally
         }
 		
-        public void On(Action<T> value)
+        public System.Action On(Action<T> value)
         {
             _on(value);
+            return () => _off(value);
         }
 
         public void Off(Action<T> value)

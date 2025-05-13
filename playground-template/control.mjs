@@ -129,6 +129,10 @@ function hideBackingTrack(at) {
 
 
 async function showBackingTrack(at) {
+    if(!at.score.backingTrack) {
+        hideBackingTrack();
+        return;
+    }
 
     const audioElement = at.player.output.audioElement;
     if(audioElement !== backingTrackAudioElement) {

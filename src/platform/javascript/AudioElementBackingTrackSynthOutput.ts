@@ -63,7 +63,11 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
         this._padding = backingTrack.padding / 1000;
 
         const blob = new Blob([backingTrack.rawAudioFile!]);
+        // https://html.spec.whatwg.org/multipage/media.html#loading-the-media-resource
+        // Step 8. resets the playbackRate, we need to remember and restore it. 
+        const playbackRate = this.audioElement.playbackRate;
         this.audioElement.src = URL.createObjectURL(blob);
+        this.audioElement.playbackRate = playbackRate;
     }
 
     public open(_bufferTimeInMilliseconds: number): void {
