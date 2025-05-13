@@ -97,6 +97,7 @@ import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { CoreSettings } from '@src/CoreSettings';
 import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
+import { AlphaSynthWrapper } from '@src/synth/AlphaSynthWrapper';
 
 class SelectionInfo {
     public beat: Beat;
@@ -120,7 +121,8 @@ export class AlphaTabApiBase<TSettings> {
     private _isDestroyed: boolean = false;
     private _score: Score | null = null;
     private _tracks: Track[] = [];
-    private _actualPlayerMode:PlayerMode = PlayerMode.Disabled;
+    private _actualPlayerMode: PlayerMode = PlayerMode.Disabled;
+    private _player!: AlphaSynthWrapper;
 
     /**
      * The actual player mode which is currently active (e.g. allows determining whether a backing track or the synthesizer is active).
@@ -335,14 +337,46 @@ export class AlphaTabApiBase<TSettings> {
             this.appendRenderResult(null); // marks last element
         });
         this.renderer.error.on(this.onError.bind(this));
+        this.setupPlayerWrapper();
         if (this.settings.player.playerMode !== PlayerMode.Disabled) {
-            this.setupPlayer();
+            this.setupOrDestroyPlayer();
         }
         this.setupClickHandling();
         // delay rendering to allow ui to hook up with events first.
         this.uiFacade.beginInvoke(() => {
             this.uiFacade.initialRender();
         });
+    }
+
+    private setupPlayerWrapper() {
+        const player = new AlphaSynthWrapper();
+        this._player = player;
+        player.ready.on(() => {
+            this.loadMidiForScore();
+        });
+        player.readyForPlayback.on(() => {
+            this.onPlayerReady();
+            if (this.tracks) {
+                for (const track of this.tracks) {
+                    const volume: number = track.playbackInfo.volume / 16;
+                    player.setChannelVolume(track.playbackInfo.primaryChannel, volume);
+                    player.setChannelVolume(track.playbackInfo.secondaryChannel, volume);
+                }
+            }
+        });
+        player.soundFontLoaded.on(this.onSoundFontLoaded.bind(this));
+        player.soundFontLoadFailed.on(e => {
+            this.onError(e);
+        });
+        player.midiLoaded.on(this.onMidiLoaded.bind(this));
+        player.midiLoadFailed.on(e => {
+            this.onError(e);
+        });
+        player.stateChanged.on(this.onPlayerStateChanged.bind(this));
+        player.positionChanged.on(this.onPlayerPositionChanged.bind(this));
+        player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
+        player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
+        player.finished.on(this.onPlayerFinished.bind(this));
     }
 
     /**
@@ -377,9 +411,7 @@ export class AlphaTabApiBase<TSettings> {
      */
     public destroy(): void {
         this._isDestroyed = true;
-        if (this.player) {
-            this.player.destroy();
-        }
+        this._player.destroy();
         this.uiFacade.destroy();
         this.renderer.destroy();
     }
@@ -428,13 +460,8 @@ export class AlphaTabApiBase<TSettings> {
             ModelUtils.applyPitchOffsets(this.settings, score);
         }
         this.renderer.updateSettings(this.settings);
-        // enable/disable player if needed
-        if (this.settings.player.playerMode !== PlayerMode.Disabled) {
-            if (this.setupPlayer() && score) {
-                this.loadMidiForScore();
-            }
-        } else {
-            this.destroyPlayer();
+        if (this.setupOrDestroyPlayer()) {
+            this.loadMidiForScore();
         }
 
         this.onSettingsUpdated();
@@ -760,9 +787,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public loadSoundFont(data: unknown, append: boolean = false): boolean {
-        if (!this.player) {
-            return false;
-        }
         return this.uiFacade.loadSoundFont(data, append);
     }
 
@@ -809,10 +833,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public resetSoundFonts(): void {
-        if (!this.player) {
-            return;
-        }
-        this.player.resetSoundFonts();
+        this._player.resetSoundFonts();
     }
 
     /**
@@ -959,7 +980,9 @@ export class AlphaTabApiBase<TSettings> {
      * setupPlayerEvents(api.player)
      * ```
      */
-    public player: IAlphaSynth | null = null;
+    public get player(): IAlphaSynth | null {
+        return this._player.instance ? this._player : null;
+    }
 
     /**
      * Whether the player is ready for starting the playback.
@@ -990,10 +1013,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get isReadyForPlayback(): boolean {
-        if (!this.player) {
-            return false;
-        }
-        return this.player.isReadyForPlayback;
+        return this._player.isReadyForPlayback;
     }
 
     /**
@@ -1024,10 +1044,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get playerState(): PlayerState {
-        if (!this.player) {
-            return PlayerState.Paused;
-        }
-        return this.player.state;
+        return this._player.state;
     }
 
     /**
@@ -1058,16 +1075,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get masterVolume(): number {
-        if (!this.player) {
-            return 0;
-        }
-        return this.player.masterVolume;
+        return this._player.masterVolume;
     }
 
     public set masterVolume(value: number) {
-        if (this.player) {
-            this.player.masterVolume = value;
-        }
+        this._player.masterVolume = value;
     }
 
     /**
@@ -1099,16 +1111,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get metronomeVolume(): number {
-        if (!this.player) {
-            return 0;
-        }
-        return this.player.metronomeVolume;
+        return this._player.metronomeVolume;
     }
 
     public set metronomeVolume(value: number) {
-        if (this.player) {
-            this.player.metronomeVolume = value;
-        }
+        this._player.metronomeVolume = value;
     }
 
     /**
@@ -1140,16 +1147,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get countInVolume(): number {
-        if (!this.player) {
-            return 0;
-        }
-        return this.player.countInVolume;
+        return this._player.countInVolume;
     }
 
     public set countInVolume(value: number) {
-        if (this.player) {
-            this.player.countInVolume = value;
-        }
+        this._player.countInVolume = value;
     }
 
     /**
@@ -1209,16 +1211,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get midiEventsPlayedFilter(): MidiEventType[] {
-        if (!this.player) {
-            return [];
-        }
-        return this.player.midiEventsPlayedFilter;
+        return this._player.midiEventsPlayedFilter;
     }
 
     public set midiEventsPlayedFilter(value: MidiEventType[]) {
-        if (this.player) {
-            this.player.midiEventsPlayedFilter = value;
-        }
+        this._player.midiEventsPlayedFilter = value;
     }
 
     /**
@@ -1247,16 +1244,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get tickPosition(): number {
-        if (!this.player) {
-            return 0;
-        }
-        return this.player.tickPosition;
+        return this._player.tickPosition;
     }
 
     public set tickPosition(value: number) {
-        if (this.player) {
-            this.player.tickPosition = value;
-        }
+        this._player.tickPosition = value;
     }
 
     /**
@@ -1285,16 +1277,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get timePosition(): number {
-        if (!this.player) {
-            return 0;
-        }
-        return this.player.timePosition;
+        return this._player.timePosition;
     }
 
     public set timePosition(value: number) {
-        if (this.player) {
-            this.player.timePosition = value;
-        }
+        this._player.timePosition = value;
     }
 
     /**
@@ -1329,18 +1316,13 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get playbackRange(): PlaybackRange | null {
-        if (!this.player) {
-            return null;
-        }
-        return this.player.playbackRange;
+        return this._player.playbackRange;
     }
 
     public set playbackRange(value: PlaybackRange | null) {
-        if (this.player) {
-            this.player.playbackRange = value;
-            if (this.settings.player.enableCursor) {
-                this.updateSelectionCursor(value);
-            }
+        this._player.playbackRange = value;
+        if (this.settings.player.enableCursor) {
+            this.updateSelectionCursor(value);
         }
     }
 
@@ -1373,16 +1355,11 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get playbackSpeed(): number {
-        if (!this.player) {
-            return 0;
-        }
-        return this.player.playbackSpeed;
+        return this._player.playbackSpeed;
     }
 
     public set playbackSpeed(value: number) {
-        if (this.player) {
-            this.player.playbackSpeed = value;
-        }
+        this._player.playbackSpeed = value;
     }
 
     /**
@@ -1414,30 +1391,20 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public get isLooping(): boolean {
-        if (!this.player) {
-            return false;
-        }
-        return this.player.isLooping;
+        return this._player.isLooping;
     }
 
     public set isLooping(value: boolean) {
-        if (this.player) {
-            this.player.isLooping = value;
-        }
+        this._player.isLooping = value;
     }
 
     private destroyPlayer(): void {
-        if (!this.player) {
-            return;
-        }
-        this.player.destroy();
-        this.player = null;
+        this._player.destroy();
         this._previousTick = 0;
-        this._playerState = PlayerState.Paused;
         this.destroyCursors();
     }
 
-    private setupPlayer(): boolean {
+    private setupOrDestroyPlayer(): boolean {
         let mode = this.settings.player.playerMode;
         if (mode === PlayerMode.EnabledAutomatic) {
             const score = this.score;
@@ -1452,74 +1419,36 @@ export class AlphaTabApiBase<TSettings> {
             }
         }
 
+        let newPlayer: IAlphaSynth | null = null;
         if (mode !== this._actualPlayerMode) {
             this.destroyPlayer();
+
+            switch (mode) {
+                case PlayerMode.Disabled:
+                    newPlayer = null;
+                    break;
+                case PlayerMode.EnabledSynthesizer:
+                    newPlayer = this.uiFacade.createWorkerPlayer();
+                    break;
+                case PlayerMode.EnabledBackingTrack:
+                    newPlayer = this.uiFacade.createBackingTrackPlayer();
+                    break;
+                case PlayerMode.EnabledExternalMedia:
+                    newPlayer = new ExternalMediaPlayer(this.settings.player.bufferTimeInMilliseconds);
+                    break;
+            }
+        } else {
+            // no change in player mode, just update song info if needed
+            return true;
         }
+
         this.updateCursors();
-
         this._actualPlayerMode = mode;
-        switch (mode) {
-            case PlayerMode.Disabled:
-                this.destroyPlayer();
-                return false;
-
-            case PlayerMode.EnabledSynthesizer:
-                if (this.player) {
-                    return true;
-                }
-
-                // new player needed
-                this.player = this.uiFacade.createWorkerPlayer();
-                break;
-
-            case PlayerMode.EnabledBackingTrack:
-                if (this.player) {
-                    return true;
-                }
-
-                // new player needed
-                this.player = this.uiFacade.createBackingTrackPlayer();
-                break;
-            case PlayerMode.EnabledExternalMedia:
-                if (this.player) {
-                    return true;
-                }
-
-                this.player = new ExternalMediaPlayer(this.settings.player.bufferTimeInMilliseconds);
-                break;
-        }
-
-        if (!this.player) {
+        if (!newPlayer) {
             return false;
         }
 
-        this.player.ready.on(() => {
-            this.loadMidiForScore();
-        });
-        this.player.readyForPlayback.on(() => {
-            this.onPlayerReady();
-            if (this.tracks) {
-                for (const track of this.tracks) {
-                    const volume: number = track.playbackInfo.volume / 16;
-                    this.player!.setChannelVolume(track.playbackInfo.primaryChannel, volume);
-                    this.player!.setChannelVolume(track.playbackInfo.secondaryChannel, volume);
-                }
-            }
-        });
-        this.player.soundFontLoaded.on(this.onSoundFontLoaded.bind(this));
-        this.player.soundFontLoadFailed.on(e => {
-            this.onError(e);
-        });
-        this.player.midiLoaded.on(this.onMidiLoaded.bind(this));
-        this.player.midiLoadFailed.on(e => {
-            this.onError(e);
-        });
-        this.player.stateChanged.on(this.onPlayerStateChanged.bind(this));
-        this.player.positionChanged.on(this.onPlayerPositionChanged.bind(this));
-        this.player.midiEventsPlayed.on(this.onMidiEventsPlayed.bind(this));
-        this.player.playbackRangeChanged.on(this.onPlaybackRangeChanged.bind(this));
-        this.player.finished.on(this.onPlayerFinished.bind(this));
-        this.setupPlayerEvents();
+        this._player.instance = newPlayer;
 
         return false;
     }
@@ -1547,12 +1476,10 @@ export class AlphaTabApiBase<TSettings> {
         this._tickCache = generator.tickLookup;
         this.onMidiLoad(midiFile);
 
-        const player = this.player;
-        if (player) {
-            player.loadMidiFile(midiFile);
-            player.loadBackingTrack(score, generator.syncPoints);
-            player.applyTranspositionPitches(generator.transpositionPitches);
-        }
+        const player = this._player;
+        player.loadMidiFile(midiFile);
+        player.loadBackingTrack(score, generator.syncPoints);
+        player.applyTranspositionPitches(generator.transpositionPitches);
     }
 
     /**
@@ -1591,12 +1518,9 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public changeTrackVolume(tracks: Track[], volume: number): void {
-        if (!this.player) {
-            return;
-        }
         for (const track of tracks) {
-            this.player.setChannelVolume(track.playbackInfo.primaryChannel, volume);
-            this.player.setChannelVolume(track.playbackInfo.secondaryChannel, volume);
+            this._player.setChannelVolume(track.playbackInfo.primaryChannel, volume);
+            this._player.setChannelVolume(track.playbackInfo.secondaryChannel, volume);
         }
     }
 
@@ -1634,12 +1558,9 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public changeTrackSolo(tracks: Track[], solo: boolean): void {
-        if (!this.player) {
-            return;
-        }
         for (const track of tracks) {
-            this.player.setChannelSolo(track.playbackInfo.primaryChannel, solo);
-            this.player.setChannelSolo(track.playbackInfo.secondaryChannel, solo);
+            this._player.setChannelSolo(track.playbackInfo.primaryChannel, solo);
+            this._player.setChannelSolo(track.playbackInfo.secondaryChannel, solo);
         }
     }
 
@@ -1676,12 +1597,9 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public changeTrackMute(tracks: Track[], mute: boolean): void {
-        if (!this.player) {
-            return;
-        }
         for (const track of tracks) {
-            this.player.setChannelMute(track.playbackInfo.primaryChannel, mute);
-            this.player.setChannelMute(track.playbackInfo.secondaryChannel, mute);
+            this._player.setChannelMute(track.playbackInfo.primaryChannel, mute);
+            this._player.setChannelMute(track.playbackInfo.secondaryChannel, mute);
         }
     }
 
@@ -1720,12 +1638,9 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public changeTrackTranspositionPitch(tracks: Track[], semitones: number): void {
-        if (!this.player) {
-            return;
-        }
         for (const track of tracks) {
-            this.player.setChannelTranspositionPitch(track.playbackInfo.primaryChannel, semitones);
-            this.player.setChannelTranspositionPitch(track.playbackInfo.secondaryChannel, semitones);
+            this._player.setChannelTranspositionPitch(track.playbackInfo.primaryChannel, semitones);
+            this._player.setChannelTranspositionPitch(track.playbackInfo.secondaryChannel, semitones);
         }
     }
 
@@ -1757,10 +1672,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public play(): boolean {
-        if (!this.player) {
-            return false;
-        }
-        return this.player.play();
+        return this._player.play();
     }
 
     /**
@@ -1790,10 +1702,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public pause(): void {
-        if (!this.player) {
-            return;
-        }
-        this.player.pause();
+        this._player.pause();
     }
 
     /**
@@ -1825,10 +1734,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public playPause(): void {
-        if (!this.player) {
-            return;
-        }
-        this.player.playPause();
+        this._player.playPause();
     }
 
     /**
@@ -1860,10 +1766,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public stop(): void {
-        if (!this.player) {
-            return;
-        }
-        this.player.stop();
+        this._player.stop();
     }
 
     /**
@@ -1900,10 +1803,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public playBeat(beat: Beat): void {
-        if (!this.player) {
-            return;
-        }
-
         // we generate a new midi file containing only the beat
         const midiFile: MidiFile = new MidiFile();
         const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
@@ -1914,7 +1813,7 @@ export class AlphaTabApiBase<TSettings> {
         );
         generator.generateSingleBeat(beat);
 
-        this.player.playOneTimeMidiFile(midiFile);
+        this._player.playOneTimeMidiFile(midiFile);
     }
 
     /**
@@ -1950,10 +1849,6 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public playNote(note: Note): void {
-        if (!this.player) {
-            return;
-        }
-
         // we generate a new midi file containing only the beat
         const midiFile: MidiFile = new MidiFile();
         const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
@@ -1964,7 +1859,7 @@ export class AlphaTabApiBase<TSettings> {
         );
         generator.generateSingleNote(note);
 
-        this.player.playOneTimeMidiFile(midiFile);
+        this._player.playOneTimeMidiFile(midiFile);
     }
 
     private _cursorWrapper: IContainer | null = null;
@@ -1972,9 +1867,8 @@ export class AlphaTabApiBase<TSettings> {
     private _beatCursor: IContainer | null = null;
     private _selectionWrapper: IContainer | null = null;
     private _previousTick: number = 0;
-    private _playerState: PlayerState = PlayerState.Paused;
     private _currentBeat: MidiTickLookupFindBeatResult | null = null;
-    private _currentBarBounds: MasterBarBounds | null = null;
+    private _currentBeatBounds: BeatBounds | null = null;
     private _previousStateForCursor: PlayerState = PlayerState.Paused;
     private _previousCursorCache: BoundsLookup | null = null;
     private _lastScroll: number = 0;
@@ -2007,37 +1901,6 @@ export class AlphaTabApiBase<TSettings> {
             }
         } else if (!this.settings.player.enableCursor && this._cursorWrapper) {
             this.destroyCursors();
-        }
-    }
-
-    private setupPlayerEvents(): void {
-        //
-        // Hook into events
-        this._previousTick = 0;
-        this._playerState = PlayerState.Paused;
-        // we need to update our position caches if we render a tablature
-        this.renderer.postRenderFinished.on(() => {
-            this._currentBeat = null;
-            this.cursorUpdateTick(this._previousTick, false, 1, this._previousTick > 10);
-        });
-        if (this.player) {
-            this.player.positionChanged.on(e => {
-                this._previousTick = e.currentTick;
-                this.uiFacade.beginInvoke(() => {
-                    const cursorSpeed = e.modifiedTempo / e.originalTempo;
-                    this.cursorUpdateTick(e.currentTick, false, cursorSpeed, false, e.isSeek);
-                });
-            });
-            this.player.stateChanged.on(e => {
-                this._playerState = e.state;
-                if (!e.stopped && e.state === PlayerState.Paused) {
-                    const currentBeat = this._currentBeat;
-                    const tickCache = this._tickCache;
-                    if (currentBeat && tickCache) {
-                        this.player!.tickPosition = tickCache.getBeatStart(currentBeat.beat);
-                    }
-                }
-            });
         }
     }
 
@@ -2103,11 +1966,12 @@ export class AlphaTabApiBase<TSettings> {
             !forceUpdate &&
             beat === previousBeat?.beat &&
             cache === previousCache &&
-            previousState === this._playerState &&
+            previousState === this._player.state &&
             previousBeat?.start === lookupResult.start
         ) {
             return;
         }
+
         const beatBoundings: BeatBounds | null = cache.findBeat(beat);
         if (!beatBoundings) {
             return;
@@ -2117,7 +1981,7 @@ export class AlphaTabApiBase<TSettings> {
         // actually show the cursor
         this._currentBeat = lookupResult;
         this._previousCursorCache = cache;
-        this._previousStateForCursor = this._playerState;
+        this._previousStateForCursor = this._player.state;
 
         this.uiFacade.beginInvoke(() => {
             this.internalCursorUpdateBeat(
@@ -2141,9 +2005,9 @@ export class AlphaTabApiBase<TSettings> {
      * @category Methods - Player
      */
     public scrollToCursor() {
-        const barBounds = this._currentBarBounds;
-        if (barBounds) {
-            this.internalScrollToCursor(barBounds);
+        const beatBounds = this._currentBeatBounds;
+        if (beatBounds) {
+            this.internalScrollToCursor(beatBounds.barBounds.masterBarBounds);
         }
     }
 
@@ -2228,11 +2092,14 @@ export class AlphaTabApiBase<TSettings> {
         const barBoundings: MasterBarBounds = beatBoundings.barBounds.masterBarBounds;
         const barBounds: Bounds = barBoundings.visualBounds;
 
-        this._currentBarBounds = barBoundings;
+        const previousBeatBounds = this._currentBeatBounds;
+        this._currentBeatBounds = beatBoundings;
 
         if (barCursor) {
             barCursor.setBounds(barBounds.x, barBounds.y, barBounds.w, barBounds.h);
         }
+
+        const isPlayingUpdate = this._player.state === PlayerState.Playing && !stop;
 
         let nextBeatX: number = barBoundings.visualBounds.x + barBoundings.visualBounds.w;
         // get position of next beat on same system
@@ -2254,13 +2121,41 @@ export class AlphaTabApiBase<TSettings> {
             if (this.settings.player.enableAnimatedBeatCursor) {
                 const animationWidth = nextBeatX - beatBoundings.onNotesX;
                 const relativePosition = this._previousTick - this._currentBeat!.start;
-                const ratioPosition = relativePosition / this._currentBeat!.tickDuration;
+                const ratioPosition =
+                    this._currentBeat!.tickDuration > 0 ? relativePosition / this._currentBeat!.tickDuration : 0;
                 startBeatX = beatBoundings.onNotesX + animationWidth * ratioPosition;
                 duration -= duration * ratioPosition;
-                beatCursor.transitionToX(0, startBeatX);
-            }
 
-            beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+                if (isPlayingUpdate) {
+                    // we do not "reset" the cursor if we are smoothly moving from left to right.
+                    const jumpCursor =
+                        !previousBeatBounds ||
+                        barBounds.y !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.y ||
+                        startBeatX < previousBeatBounds.onNotesX ||
+                        barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1;
+
+                    if (jumpCursor) {
+                        beatCursor.transitionToX(0, startBeatX);
+                        beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+                    }
+
+                    // we need to put the transition to an own animation frame
+                    // otherwise the stop animation above is not applied.
+                    this.uiFacade.beginInvoke(() => {
+                        // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
+                        // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
+                        // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
+                        const doubleEndBeatX = startBeatX + (nextBeatX - startBeatX) * 2;
+                        beatCursor!.transitionToX((duration / cursorSpeed) * 2, doubleEndBeatX);
+                    });
+                } else {
+                    beatCursor.transitionToX(0, startBeatX);
+                    beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+                }
+            } else {
+                // ticking cursor
+                beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
+            }
         }
 
         // if playing, animate the cursor to the next beat
@@ -2270,7 +2165,6 @@ export class AlphaTabApiBase<TSettings> {
 
         // actively playing? -> animate cursor and highlight items
         let shouldNotifyBeatChange = false;
-        const isPlayingUpdate = this._playerState === PlayerState.Playing && !stop;
         if (isPlayingUpdate) {
             if (this.settings.player.enableElementHighlighting) {
                 for (const highlight of beatsToHighlight) {
@@ -2281,16 +2175,6 @@ export class AlphaTabApiBase<TSettings> {
 
             shouldScroll = !stop;
             shouldNotifyBeatChange = true;
-        }
-
-        if (this.settings.player.enableAnimatedBeatCursor && beatCursor) {
-            if (isPlayingUpdate) {
-                // we need to put the transition to an own animation frame
-                // otherwise the stop animation above is not applied.
-                this.uiFacade.beginInvoke(() => {
-                    beatCursor!.transitionToX(duration / cursorSpeed, nextBeatX);
-                });
-            }
         }
 
         if (shouldScroll && !this._beatMouseDown && this.settings.player.scrollMode !== ScrollMode.Off) {
@@ -2727,7 +2611,7 @@ export class AlphaTabApiBase<TSettings> {
                 );
                 // move to selection start
                 this._currentBeat = null; // reset current beat so it is updating the cursor
-                if (this._playerState === PlayerState.Paused) {
+                if (this._player.state === PlayerState.Paused) {
                     this.cursorUpdateTick(this._tickCache.getBeatStart(this._selectionStart.beat), false, 1);
                 }
                 this.tickPosition = realMasterBarStart + this._selectionStart.beat.playbackStart;
@@ -2995,7 +2879,7 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.scoreLoaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'scoreLoaded', score);
-        if (this.setupPlayer()) {
+        if (this.setupOrDestroyPlayer()) {
             this.loadMidiForScore();
         }
     }
@@ -3197,6 +3081,10 @@ export class AlphaTabApiBase<TSettings> {
         if (this._isDestroyed) {
             return;
         }
+
+        this._currentBeat = null;
+        this.cursorUpdateTick(this._previousTick, false, 1, this._previousTick > 10);
+
         (this.postRenderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'postRenderFinished', null);
     }
@@ -3293,12 +3181,14 @@ export class AlphaTabApiBase<TSettings> {
      * }
      * ```
      */
-    public playerReady: IEventEmitter = new EventEmitter();
+    public get playerReady(): IEventEmitter {
+        return this._player.readyForPlayback;
+    }
+
     private onPlayerReady(): void {
         if (this._isDestroyed) {
             return;
         }
-        (this.playerReady as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'playerReady', null);
     }
 
@@ -3352,12 +3242,13 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public playerFinished: IEventEmitter = new EventEmitter();
+    public get playerFinished(): IEventEmitter {
+        return this._player.finished;
+    }
     private onPlayerFinished(): void {
         if (this._isDestroyed) {
             return;
         }
-        (this.playerFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'playerFinished', null);
     }
 
@@ -3397,12 +3288,13 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public soundFontLoaded: IEventEmitter = new EventEmitter();
+    public get soundFontLoaded(): IEventEmitter {
+        return this._player.soundFontLoaded;
+    }
     private onSoundFontLoaded(): void {
         if (this._isDestroyed) {
             return;
         }
-        (this.soundFontLoaded as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'soundFontLoaded', null);
     }
 
@@ -3545,13 +3437,23 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public playerStateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> =
-        new EventEmitterOfT<PlayerStateChangedEventArgs>();
+    public get playerStateChanged(): IEventEmitterOfT<PlayerStateChangedEventArgs> {
+        return this._player.stateChanged;
+    }
+
     private onPlayerStateChanged(e: PlayerStateChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
         }
-        (this.playerStateChanged as EventEmitterOfT<PlayerStateChangedEventArgs>).trigger(e);
+
+        if (!e.stopped && e.state === PlayerState.Paused) {
+            const currentBeat = this._currentBeat;
+            const tickCache = this._tickCache;
+            if (currentBeat && tickCache) {
+                this._player.tickPosition = tickCache.getBeatStart(currentBeat.beat);
+            }
+        }
+
         this.uiFacade.triggerEvent(this.container, 'playerStateChanged', e);
     }
 
@@ -3591,16 +3493,22 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public playerPositionChanged: IEventEmitterOfT<PositionChangedEventArgs> =
-        new EventEmitterOfT<PositionChangedEventArgs>();
+    public get playerPositionChanged(): IEventEmitterOfT<PositionChangedEventArgs> {
+        return this._player.positionChanged;
+    }
+
     private onPlayerPositionChanged(e: PositionChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
         }
-        if (this.score !== null && this.tracks.length > 0) {
-            (this.playerPositionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
-            this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
-        }
+
+        this._previousTick = e.currentTick;
+        this.uiFacade.beginInvoke(() => {
+            const cursorSpeed = e.modifiedTempo / e.originalTempo;
+            this.cursorUpdateTick(e.currentTick, false, cursorSpeed, false, e.isSeek);
+        });
+
+        this.uiFacade.triggerEvent(this.container, 'playerPositionChanged', e);
     }
 
     /**
@@ -3682,13 +3590,14 @@ export class AlphaTabApiBase<TSettings> {
      * @see {@link SystemCommonEvent}
      * @see {@link SystemExclusiveEvent}
      */
-    public midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
-        new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+    public get midiEventsPlayed(): IEventEmitterOfT<MidiEventsPlayedEventArgs> {
+        return this._player.midiEventsPlayed;
+    }
+
     private onMidiEventsPlayed(e: MidiEventsPlayedEventArgs): void {
         if (this._isDestroyed) {
             return;
         }
-        (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'midiEventsPlayed', e);
     }
 
@@ -3744,13 +3653,13 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
-        new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+    public get playbackRangeChanged(): IEventEmitterOfT<PlaybackRangeChangedEventArgs> {
+        return this._player.playbackRangeChanged;
+    }
     private onPlaybackRangeChanged(e: PlaybackRangeChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
         }
-        (this.playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(e);
         this.uiFacade.triggerEvent(this.container, 'playbackRangeChanged', e);
     }
 
@@ -3818,11 +3727,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
-        if (this.player) {
-            return await this.player.output.enumerateOutputDevices();
-        }
-
-        return [] as ISynthOutputDevice[];
+        return await this._player.output.enumerateOutputDevices();
     }
 
     /**
@@ -3874,9 +3779,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {
-        if (this.player) {
-            await this.player.output.setOutputDevice(device);
-        }
+        await this._player.output.setOutputDevice(device);
     }
 
     /**
@@ -3917,10 +3820,6 @@ export class AlphaTabApiBase<TSettings> {
      *
      */
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
-        if (this.player) {
-            return await this.player.output.getOutputDevice();
-        }
-
-        return null;
+        return await this._player.output.getOutputDevice();
     }
 }
