@@ -147,7 +147,7 @@ export class StaffSystem {
     }
 
     public get lastBarIndex(): number {
-        return this.masterBarsRenderers[this.masterBarsRenderers.length - 1].masterBar.index;
+        return this.masterBarsRenderers[this.masterBarsRenderers.length - 1].lastMasterBarIndex;
     }
 
     public addMasterBarRenderers(tracks: Track[], renderers: MasterBarsRenderers): MasterBarsRenderers | null {
