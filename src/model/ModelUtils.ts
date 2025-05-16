@@ -402,12 +402,21 @@ export class ModelUtils {
         const score = tracks[0].score;
 
         let currentIndex = startIndex;
+        let tempo = score.tempo;
         while (currentIndex <= endIndexInclusive) {
             const currentGroupStartIndex = currentIndex;
             let currentGroup: number[] | null = null;
 
             while (currentIndex <= endIndexInclusive) {
                 const masterBar = score.masterBars[currentIndex];
+
+                let hasTempoChange = false;
+                for(const a of masterBar.tempoAutomations) {
+                    if(a.value !== tempo) {
+                        hasTempoChange = true;
+                    }
+                    tempo = a.value;
+                }
 
                 // check if masterbar breaks multibar rests, it must be fully empty with no annotations
                 if (
@@ -416,7 +425,7 @@ export class ModelUtils {
                     masterBar.isFreeTime ||
                     masterBar.isAnacrusis ||
                     masterBar.section !== null ||
-                    (masterBar.index !== currentGroupStartIndex && masterBar.tempoAutomations.length > 0) ||
+                    (masterBar.index !== currentGroupStartIndex && hasTempoChange) ||
                     (masterBar.fermata !== null && masterBar.fermata.size > 0) ||
                     (masterBar.directions !== null && masterBar.directions.size > 0)
                 ) {
