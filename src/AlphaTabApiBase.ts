@@ -480,13 +480,13 @@ export class AlphaTabApiBase<TSettings> {
             Environment.getRenderEngineFactory(this.settings.core.engine).supportsWorkers
         ) {
             // switch from non-worker to worker renderer
-            if (renderer instanceof ScoreRenderer) {
+            if (renderer.instance instanceof ScoreRenderer) {
                 renderer.destroy();
                 renderer.instance = this.uiFacade.createWorkerRenderer();
             }
         } else {
             // switch from worker to non-worker renderer
-            if (!(renderer instanceof ScoreRenderer)) {
+            if (!(renderer.instance instanceof ScoreRenderer)) {
                 renderer.destroy();
                 renderer.instance = new ScoreRenderer(this.settings);
             }
