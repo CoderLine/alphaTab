@@ -127,14 +127,22 @@ export class AlphaTabApiBase<TSettings> {
     private _renderer: ScoreRendererWrapper;
 
     /**
-     * The actual player mode which is currently active (e.g. allows determining whether a backing track or the synthesizer is active).
+     * The actual player mode which is currently active.
+     * @remarks
+     * Allows determining whether a backing track or the synthesizer is active in case automatic detection is enabled.
+     * @category Properties - Player
+     * @since 1.6.0
      */
     public get actualPlayerMode(): PlayerMode {
         return this._actualPlayerMode;
     }
 
     /**
-     * Gets the UI facade to use for interacting with the user interface.
+     * The UI facade used for interacting with the user interface (like the browser).
+     * @remarks
+     * The implementation depends on the platform alphaTab is running in (e.g. the web version in the browser, WPF in .net etc.)
+     * @category Properties - Core
+     * @since 0.9.4
      */
     public readonly uiFacade: IUiFacade<TSettings>;
 

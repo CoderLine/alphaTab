@@ -38,7 +38,7 @@ export class SyncPointData {
     public barOccurence: number = 0;
     /**
      * The modified tempo at which the cursor should move (aka. the tempo played within the external audio track).
-     * This information is used together with the {@link originalTempo} to calculate how much faster/slower the
+     * This information is used together with normal tempo changes to calculate how much faster/slower the
      * cursor playback is performed to align with the audio track.
      */
     public modifiedTempo: number = 0;
