@@ -220,6 +220,12 @@ const config: Config = {
           position: "left",
           label: "Showcase",
         },
+        {
+          type: "doc",
+          docId: "playground/playground",
+          position: "left",
+          label: "Playground",
+        },
         // Right
         {
           type: "dropdown",

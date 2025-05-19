@@ -13,7 +13,7 @@ import { openFile } from "@site/src/utils";
 
 export interface PlayerControlsGroupProps {
   api: alphaTab.AlphaTabApi;
-  onLayoutChange: (
+  onLayoutChange?: (
     layoutMode: alphaTab.LayoutMode,
     scrollMode: alphaTab.ScrollMode
   ) => void;

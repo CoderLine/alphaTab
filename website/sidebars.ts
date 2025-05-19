@@ -179,7 +179,7 @@ const sidebars: SidebarsConfig = {
         "formats/capella",
       ],
     },
-  ],
+  ]
 };
 
 module.exports = sidebars;

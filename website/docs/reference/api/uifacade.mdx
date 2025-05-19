@@ -1,9 +1,10 @@
 ---
 title: uiFacade
-description: "Gets the UI facade to use for interacting with the user interface."
+description: "The UI facade used for interacting with the user interface (like the browser)."
 sidebar_custom_props:
   kind: property
   category: Properties - Core
+  since: 0.9.4
 ---
 
 import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
@@ -15,12 +16,13 @@ import { SinceBadge } from '@site/src/components/SinceBadge';
 import DynHeading from '@site/src/components/DynHeading';
 import Link from '@docusaurus/Link';
 
+<SinceBadge since="0.9.4" />
 import { PropertyDescription } from '@site/src/components/PropertyDescription';
 
 <PropertyDescription />
 
 ### Description
-Gets the UI facade to use for interacting with the user interface.
+The UI facade used for interacting with the user interface (like the browser). The implementation depends on the platform alphaTab is running in (e.g. the web version in the browser, WPF in .net etc.)
 
 <Tabs defaultValue="js" values={[{label: "JavaScript", value: "js"},{label: "C#", value: "cs"},{label:"Kotlin", value: "kt"}]}>
 <TabItem value="js">
