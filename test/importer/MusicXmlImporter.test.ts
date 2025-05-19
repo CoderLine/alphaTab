@@ -253,4 +253,9 @@ describe('MusicXmlImporterTests', () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/barlines.xml');
         expect(score).toMatchSnapshot();
     });
+
+    it('2102-corrupt-direction', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/2102-corrupt-direction.xml');
+        expect(score).toMatchSnapshot();
+    });
 });
