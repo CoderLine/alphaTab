@@ -98,6 +98,7 @@ import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 import type { CoreSettings } from '@src/CoreSettings';
 import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
 import { AlphaSynthWrapper } from '@src/synth/AlphaSynthWrapper';
+import { ScoreRendererWrapper } from '@src/rendering/ScoreRendererWrapper';
 
 class SelectionInfo {
     public beat: Beat;
@@ -123,6 +124,7 @@ export class AlphaTabApiBase<TSettings> {
     private _tracks: Track[] = [];
     private _actualPlayerMode: PlayerMode = PlayerMode.Disabled;
     private _player!: AlphaSynthWrapper;
+    private _renderer: ScoreRendererWrapper;
 
     /**
      * The actual player mode which is currently active (e.g. allows determining whether a backing track or the synthesizer is active).
@@ -174,7 +176,9 @@ export class AlphaTabApiBase<TSettings> {
      * @category Properties - Core
      * @since 0.9.4
      */
-    public readonly renderer: IScoreRenderer;
+    public get renderer(): IScoreRenderer {
+        return this._renderer;
+    }
 
     /**
      * The score holding all information about the song being rendered
@@ -293,14 +297,15 @@ export class AlphaTabApiBase<TSettings> {
 
         this.canvasElement = uiFacade.createCanvasElement();
         this.container.appendChild(this.canvasElement);
+        this._renderer = new ScoreRendererWrapper();
         if (
             this.settings.core.useWorkers &&
             this.uiFacade.areWorkersSupported &&
             Environment.getRenderEngineFactory(this.settings.core.engine).supportsWorkers
         ) {
-            this.renderer = this.uiFacade.createWorkerRenderer();
+            this._renderer.instance = this.uiFacade.createWorkerRenderer();
         } else {
-            this.renderer = new ScoreRenderer(this.settings);
+            this._renderer.instance = new ScoreRenderer(this.settings);
         }
 
         this.container.resize.on(
@@ -308,35 +313,34 @@ export class AlphaTabApiBase<TSettings> {
                 if (this._isDestroyed) {
                     return;
                 }
-                if (this.container.width !== this.renderer.width) {
+                if (this.container.width !== this._renderer.width) {
                     this.triggerResize();
                 }
             }, uiFacade.resizeThrottle)
         );
         const initialResizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
-        initialResizeEventInfo.oldWidth = this.renderer.width;
+        initialResizeEventInfo.oldWidth = this._renderer.width;
         initialResizeEventInfo.newWidth = this.container.width | 0;
         initialResizeEventInfo.settings = this.settings;
         this.onResize(initialResizeEventInfo);
-        this.renderer.preRender.on(this.onRenderStarted.bind(this));
-        this.renderer.renderFinished.on(renderingResult => {
+        this._renderer.preRender.on(this.onRenderStarted.bind(this));
+        this._renderer.renderFinished.on(renderingResult => {
             this.onRenderFinished(renderingResult);
         });
-        this.renderer.postRenderFinished.on(() => {
+        this._renderer.postRenderFinished.on(() => {
             const duration: number = Date.now() - this._startTime;
             Logger.debug('rendering', `Rendering completed in ${duration}ms`);
             this.onPostRenderFinished();
         });
-        this.renderer.preRender.on(_ => {
+        this._renderer.preRender.on(_ => {
             this._startTime = Date.now();
         });
-        this.renderer.partialLayoutFinished.on(this.appendRenderResult.bind(this));
-        this.renderer.partialRenderFinished.on(this.updateRenderResult.bind(this));
-        this.renderer.renderFinished.on(r => {
-            this.appendRenderResult(r);
-            this.appendRenderResult(null); // marks last element
+        this._renderer.partialLayoutFinished.on(r => this.appendRenderResult(r, false));
+        this._renderer.partialRenderFinished.on(this.updateRenderResult.bind(this));
+        this._renderer.renderFinished.on(r => {
+            this.appendRenderResult(r, true);
         });
-        this.renderer.error.on(this.onError.bind(this));
+        this._renderer.error.on(this.onError.bind(this));
         this.setupPlayerWrapper();
         if (this.settings.player.playerMode !== PlayerMode.Disabled) {
             this.setupOrDestroyPlayer();
@@ -413,7 +417,7 @@ export class AlphaTabApiBase<TSettings> {
         this._isDestroyed = true;
         this._player.destroy();
         this.uiFacade.destroy();
-        this.renderer.destroy();
+        this._renderer.destroy();
     }
 
     /**
@@ -459,12 +463,34 @@ export class AlphaTabApiBase<TSettings> {
         if (score) {
             ModelUtils.applyPitchOffsets(this.settings, score);
         }
-        this.renderer.updateSettings(this.settings);
-        if (this.setupOrDestroyPlayer()) {
-            this.loadMidiForScore();
-        }
+
+        this.updateRenderer();
+
+        this._renderer.updateSettings(this.settings);
+        this.setupOrDestroyPlayer();
 
         this.onSettingsUpdated();
+    }
+
+    private updateRenderer() {
+        const renderer = this._renderer;
+        if (
+            this.settings.core.useWorkers &&
+            this.uiFacade.areWorkersSupported &&
+            Environment.getRenderEngineFactory(this.settings.core.engine).supportsWorkers
+        ) {
+            // switch from non-worker to worker renderer
+            if (renderer.instance instanceof ScoreRenderer) {
+                renderer.destroy();
+                renderer.instance = this.uiFacade.createWorkerRenderer();
+            }
+        } else {
+            // switch from worker to non-worker renderer
+            if (!(renderer.instance instanceof ScoreRenderer)) {
+                renderer.destroy();
+                renderer.instance = new ScoreRenderer(this.settings);
+            }
+        }
     }
 
     /**
@@ -675,30 +701,35 @@ export class AlphaTabApiBase<TSettings> {
             });
         } else {
             const resizeEventInfo: ResizeEventArgs = new ResizeEventArgs();
-            resizeEventInfo.oldWidth = this.renderer.width;
+            resizeEventInfo.oldWidth = this._renderer.width;
             resizeEventInfo.newWidth = this.container.width;
             resizeEventInfo.settings = this.settings;
             this.onResize(resizeEventInfo);
-            this.renderer.updateSettings(this.settings);
-            this.renderer.width = this.container.width;
-            this.renderer.resizeRender();
+            this._renderer.updateSettings(this.settings);
+            this._renderer.width = this.container.width;
+            this._renderer.resizeRender();
         }
     }
 
-    private appendRenderResult(result: RenderFinishedEventArgs | null): void {
-        if (result) {
+    private appendRenderResult(result: RenderFinishedEventArgs, isLast: boolean): void {
+        // resizing the canvas and wrapper elements at the end is enough
+        // it avoids flickering on resizes and re-renders. 
+        // the individual partials are anyhow sized correctly
+        if(isLast) {
             this.canvasElement.width = result.totalWidth;
             this.canvasElement.height = result.totalHeight;
             if (this._cursorWrapper) {
                 this._cursorWrapper.width = result.totalWidth;
                 this._cursorWrapper.height = result.totalHeight;
             }
+        }        
 
-            if (result.width > 0 || result.height > 0) {
-                this.uiFacade.beginAppendRenderResults(result);
-            }
-        } else {
+        if (result.width > 0 || result.height > 0) {
             this.uiFacade.beginAppendRenderResults(result);
+        }
+
+        if (isLast) {
+            this.uiFacade.beginAppendRenderResults(null);
         }
     }
 
@@ -865,13 +896,10 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public render(): void {
-        if (!this.renderer) {
-            return;
-        }
         if (this.uiFacade.canRender) {
             // when font is finally loaded, start rendering
-            this.renderer.width = this.container.width;
-            this.renderer.renderScore(this.score, this._trackIndexes);
+            this._renderer.width = this.container.width;
+            this._renderer.renderScore(this.score, this._trackIndexes);
         } else {
             this.uiFacade.canRenderChanged.on(() => this.render());
         }
@@ -949,7 +977,7 @@ export class AlphaTabApiBase<TSettings> {
      * @since 1.5.0
      */
     public get boundsLookup() {
-        return this.renderer.boundsLookup;
+        return this._renderer.boundsLookup;
     }
 
     /**
@@ -1404,6 +1432,10 @@ export class AlphaTabApiBase<TSettings> {
         this.destroyCursors();
     }
 
+    /**
+     * 
+     * @returns true if a new player was created, false if no player was created (includes destroy & reuse of the current one)
+     */
     private setupOrDestroyPlayer(): boolean {
         let mode = this.settings.player.playerMode;
         if (mode === PlayerMode.EnabledAutomatic) {
@@ -1422,6 +1454,7 @@ export class AlphaTabApiBase<TSettings> {
         let newPlayer: IAlphaSynth | null = null;
         if (mode !== this._actualPlayerMode) {
             this.destroyPlayer();
+            this.updateCursors();
 
             switch (mode) {
                 case PlayerMode.Disabled:
@@ -1439,10 +1472,10 @@ export class AlphaTabApiBase<TSettings> {
             }
         } else {
             // no change in player mode, just update song info if needed
-            return true;
+            this.updateCursors();
+            return false;
         }
 
-        this.updateCursors();
         this._actualPlayerMode = mode;
         if (!newPlayer) {
             return false;
@@ -1453,7 +1486,14 @@ export class AlphaTabApiBase<TSettings> {
         return false;
     }
 
-    private loadMidiForScore(): void {
+    /**
+     * Re-creates the midi for the current score and loads it. 
+     * @remarks
+     * This will result in the player to stop playback. Some setting changes require re-genration of the midi song. 
+     * @category Methods - Player
+     * @since 1.6.0
+     */
+    public loadMidiForScore(): void {
         if (!this.score) {
             return;
         }
@@ -1869,6 +1909,7 @@ export class AlphaTabApiBase<TSettings> {
     private _previousTick: number = 0;
     private _currentBeat: MidiTickLookupFindBeatResult | null = null;
     private _currentBeatBounds: BeatBounds | null = null;
+    private _isInitialBeatCursorUpdate = true;
     private _previousStateForCursor: PlayerState = PlayerState.Paused;
     private _previousCursorCache: BoundsLookup | null = null;
     private _lastScroll: number = 0;
@@ -1895,6 +1936,7 @@ export class AlphaTabApiBase<TSettings> {
                 this._barCursor = cursors.barCursor;
                 this._beatCursor = cursors.beatCursor;
                 this._selectionWrapper = cursors.selectionWrapper;
+                this._isInitialBeatCursorUpdate = true;
             }
             if (this._currentBeat !== null) {
                 this.cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
@@ -1955,7 +1997,7 @@ export class AlphaTabApiBase<TSettings> {
         if (!beat) {
             return;
         }
-        const cache: BoundsLookup | null = this.renderer.boundsLookup;
+        const cache: BoundsLookup | null = this._renderer.boundsLookup;
         if (!cache) {
             return;
         }
@@ -2130,6 +2172,7 @@ export class AlphaTabApiBase<TSettings> {
                     // we do not "reset" the cursor if we are smoothly moving from left to right.
                     const jumpCursor =
                         !previousBeatBounds ||
+                        this._isInitialBeatCursorUpdate ||
                         barBounds.y !== previousBeatBounds.barBounds.masterBarBounds.visualBounds.y ||
                         startBeatX < previousBeatBounds.onNotesX ||
                         barBoundings.index > previousBeatBounds.barBounds.masterBarBounds.index + 1;
@@ -2154,14 +2197,17 @@ export class AlphaTabApiBase<TSettings> {
                 }
             } else {
                 // ticking cursor
+                beatCursor.transitionToX(0, startBeatX);
                 beatCursor.setBounds(startBeatX, barBounds.y, 1, barBounds.h);
             }
+
+            this._isInitialBeatCursorUpdate = false;
+        } else {
+            this._isInitialBeatCursorUpdate = true;
         }
 
         // if playing, animate the cursor to the next beat
-        if (this.settings.player.enableElementHighlighting) {
-            this.uiFacade.removeHighlights();
-        }
+        this.uiFacade.removeHighlights();
 
         // actively playing? -> animate cursor and highlight items
         let shouldNotifyBeatChange = false;
@@ -2679,12 +2725,12 @@ export class AlphaTabApiBase<TSettings> {
             }
             const relX: number = e.getX(this.canvasElement);
             const relY: number = e.getY(this.canvasElement);
-            const beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
+            const beat: Beat | null = this._renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             if (beat) {
                 this.onBeatMouseDown(e, beat);
 
                 if (this.settings.core.includeNoteBounds) {
-                    const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY);
+                    const note = this._renderer.boundsLookup?.getNoteAtPos(beat, relX, relY);
                     if (note) {
                         this.onNoteMouseDown(e, note);
                     }
@@ -2697,12 +2743,12 @@ export class AlphaTabApiBase<TSettings> {
             }
             const relX: number = e.getX(this.canvasElement);
             const relY: number = e.getY(this.canvasElement);
-            const beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
+            const beat: Beat | null = this._renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             if (beat) {
                 this.onBeatMouseMove(e, beat);
 
                 if (this._noteMouseDown) {
-                    const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY);
+                    const note = this._renderer.boundsLookup?.getNoteAtPos(beat, relX, relY);
                     if (note) {
                         this.onNoteMouseMove(e, note);
                     }
@@ -2718,19 +2764,19 @@ export class AlphaTabApiBase<TSettings> {
             }
             const relX: number = e.getX(this.canvasElement);
             const relY: number = e.getY(this.canvasElement);
-            const beat: Beat | null = this.renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
+            const beat: Beat | null = this._renderer.boundsLookup?.getBeatAtPos(relX, relY) ?? null;
             this.onBeatMouseUp(e, beat);
 
             if (this._noteMouseDown) {
                 if (beat) {
-                    const note = this.renderer.boundsLookup?.getNoteAtPos(beat, relX, relY) ?? null;
+                    const note = this._renderer.boundsLookup?.getNoteAtPos(beat, relX, relY) ?? null;
                     this.onNoteMouseUp(e, note);
                 } else {
                     this.onNoteMouseUp(e, null);
                 }
             }
         });
-        this.renderer.postRenderFinished.on(() => {
+        this._renderer.postRenderFinished.on(() => {
             if (
                 !this._selectionStart ||
                 this.settings.player.playerMode === PlayerMode.Disabled ||
@@ -2744,7 +2790,7 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private cursorSelectRange(startBeat: SelectionInfo | null, endBeat: SelectionInfo | null): void {
-        const cache: BoundsLookup | null = this.renderer.boundsLookup;
+        const cache: BoundsLookup | null = this._renderer.boundsLookup;
         if (!cache) {
             return;
         }
@@ -2879,7 +2925,8 @@ export class AlphaTabApiBase<TSettings> {
         }
         (this.scoreLoaded as EventEmitterOfT<Score>).trigger(score);
         this.uiFacade.triggerEvent(this.container, 'scoreLoaded', score);
-        if (this.setupOrDestroyPlayer()) {
+        if (!this.setupOrDestroyPlayer()) {
+            // feed midi into current player (a new player will trigger a midi generation once the player is ready)
             this.loadMidiForScore();
         }
     }
@@ -3083,7 +3130,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         this._currentBeat = null;
-        this.cursorUpdateTick(this._previousTick, false, 1, this._previousTick > 10);
+        this.cursorUpdateTick(this._previousTick, false, 1, true, true);
 
         (this.postRenderFinished as EventEmitter).trigger();
         this.uiFacade.triggerEvent(this.container, 'postRenderFinished', null);
@@ -3664,7 +3711,40 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     /**
-     * @internal
+     * This event is fired when a settings update was requested.
+     *
+     * @eventProperty
+     * @category Events - Core
+     * @since 1.6.0
+     *
+     * @example
+     * JavaScript
+     * ```js
+     * const api = new alphaTab.AlphaTabApi(document.querySelector('#alphaTab'));
+     * api.settingsUpdated.on(() => {
+     *     updateSettingsUI(api.settings);
+     * });
+     * ```
+     *
+     * @example
+     * C#
+     * ```cs
+     * var api = new AlphaTabApi<MyControl>(...);
+     * api.SettingsUpdated.On(() =>
+     * {
+     *     UpdateSettingsUI(api.settings);
+     * });
+     * ```
+     *
+     * @example
+     * Android
+     * ```kotlin
+     * val api = AlphaTabApi<MyControl>(...)
+     * api.SettingsUpdated.on {
+     *     updateSettingsUI(api.settings)
+     * }
+     * ```
+     *
      */
     public settingsUpdated: IEventEmitter = new EventEmitter();
     private onSettingsUpdated(): void {
