@@ -103,6 +103,7 @@ export class ScoreRendererWrapper implements IScoreRenderer {
     }
 
     public updateSettings(settings: Settings): void {
+        this._settings = settings;
         this._instance?.updateSettings(settings);
     }
 
