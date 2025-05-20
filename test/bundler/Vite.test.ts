@@ -63,18 +63,18 @@ describe('Vite', () => {
                     // ensure worklet bootstrapper script is references
                     expect(text).to.include('assets/alphaTab.worklet-');
                     // without custom chunking the app will bundle alphatab directly
-                    expect(text).to.include("font-family: 'alphaTab';");
+                    expect(text).to.include(".at-surface");
                     appValidated = true;
                 } else if (file.name.startsWith('alphaTab.worker-')) {
                     expect(text).to.include('initializeWorker()');
                     // without custom chunking the app will bundle alphatab directly
-                    expect(text).to.include("font-family: 'alphaTab';");
+                    expect(text).to.include(".at-surface");
 
                     workerValidated = true;
                 } else if (file.name.startsWith('alphaTab.worklet-')) {
                     expect(text).to.include('initializeAudioWorklet()');
                     // without custom chunking the app will bundle alphatab directly
-                    expect(text).to.include("font-family: 'alphaTab';");
+                    expect(text).to.include(".at-surface");
                     workletValidated = true;
                 }
             }
