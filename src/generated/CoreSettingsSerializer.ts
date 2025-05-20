@@ -5,6 +5,7 @@
 // </auto-generated>
 import { CoreSettings } from "@src/CoreSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { FontFileFormat } from "@src/CoreSettings";
 import { LogLevel } from "@src/LogLevel";
 export class CoreSettingsSerializer {
     public static fromJson(obj: CoreSettings, m: unknown): void {
@@ -22,6 +23,14 @@ export class CoreSettingsSerializer {
         o.set("scriptfile", obj.scriptFile);
         /*@target web*/
         o.set("fontdirectory", obj.fontDirectory);
+        /*@target web*/
+        if (obj.smfulFontSources !== null) {
+            const m = new Map<string, unknown>();
+            o.set("smfulfontsources", m);
+            for (const [k, v] of obj.smfulFontSources!) {
+                m.set(k.toString(), v);
+            }
+        }
         /*@target web*/
         o.set("file", obj.file);
         /*@target web*/
@@ -44,6 +53,13 @@ export class CoreSettingsSerializer {
             /*@target web*/
             case "fontdirectory":
                 obj.fontDirectory = v as string | null;
+                return true;
+            /*@target web*/
+            case "smfulfontsources":
+                obj.smfulFontSources = new Map<FontFileFormat, string>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.smfulFontSources!.set(JsonHelper.parseEnum<FontFileFormat>(k, FontFileFormat)!, v as string);
+                });
                 return true;
             /*@target web*/
             case "file":

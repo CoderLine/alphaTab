@@ -3,6 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
+import { FontFileFormat } from "@src/CoreSettings";
 import { LogLevel } from "@src/LogLevel";
 /**
  * All main settings of alphaTab controlling rather general aspects of its behavior.
@@ -36,8 +37,20 @@ export interface CoreSettingsJson {
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
+     * @deprecated Use {@link smfulFontSources} for more flexible font configuration.
      */
     fontDirectory?: string | null;
+    /**
+     * Defines the URLs from which to load the SMuFL compliant font files.
+     * @remarks
+     * These sources will be used to load and register the webfonts on the page so
+     * they are available for rendering the music sheet.
+     * @defaultValue Bravura files located at {@link fontDirectory} .
+     * @category Core - JavaScript Specific
+     * @target web
+     * @since 1.6.0
+     */
+    smfulFontSources?: Map<FontFileFormat | keyof typeof FontFileFormat | Lowercase<keyof typeof FontFileFormat>, string>;
     /**
      * The full URL to the input file to be loaded.
      * @remarks

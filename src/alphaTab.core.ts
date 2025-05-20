@@ -1,6 +1,6 @@
 import '@src/alphaTab.polyfills';
 
-export { CoreSettings } from '@src/CoreSettings';
+export { CoreSettings, FontFileFormat } from '@src/CoreSettings';
 export { DisplaySettings, SystemsLayoutMode } from '@src/DisplaySettings';
 export { LayoutMode } from '@src/LayoutMode';
 export { StaveProfile } from '@src/StaveProfile';
