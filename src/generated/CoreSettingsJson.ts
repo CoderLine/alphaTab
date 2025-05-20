@@ -33,18 +33,21 @@ export interface CoreSettingsJson {
      * where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects
      * them to be in a `font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path.
      * Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab.
+     *
+     * Use {@link smuflFontSources} for more flexible font configuration.
      * @defaultValue `"${AlphaTabScriptFolder}/font/"`
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
-     * @deprecated Use {@link smuflFontSources} for more flexible font configuration.
      */
     fontDirectory?: string | null;
     /**
      * Defines the URLs from which to load the SMuFL compliant font files.
      * @remarks
      * These sources will be used to load and register the webfonts on the page so
-     * they are available for rendering the music sheet.
+     * they are available for rendering the music sheet. The sources can be set to any
+     * CSS compatible URL which can be passed into `url()`.
+     * See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
      * @defaultValue Bravura files located at {@link fontDirectory} .
      * @category Core - JavaScript Specific
      * @target web

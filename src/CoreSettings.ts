@@ -67,11 +67,12 @@ export class CoreSettings {
      * where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects
      * them to be in a `font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path.
      * Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab.
+     * 
+     * Use {@link smuflFontSources} for more flexible font configuration.
      * @defaultValue `"${AlphaTabScriptFolder}/font/"`
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
-     * @deprecated Use {@link smuflFontSources} for more flexible font configuration.
      */
     public fontDirectory: string | null = null;
 
