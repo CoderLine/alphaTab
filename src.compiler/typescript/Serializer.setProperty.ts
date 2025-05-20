@@ -321,9 +321,10 @@ function generateSetPropertyBody(serializable: TypeSchema, importer: (name: stri
 
             // obj.fieldName = TypeName.fromJson(value)!
             // return true;
+            const notNull =  prop.type.isNullable || prop.type.isOptional ? '' : '!';
             caseStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
-                    `obj.${fieldName} = ${prop.type.typeAsString}.fromJson(v)!;`,
+                    `obj.${fieldName} = ${prop.type.typeAsString}.fromJson(v)${notNull};`,
                     ts.SyntaxKind.ExpressionStatement
                 )
             );

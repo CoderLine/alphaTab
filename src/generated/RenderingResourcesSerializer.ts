@@ -19,7 +19,7 @@ export class RenderingResourcesSerializer {
             return null;
         }
         const o = new Map<string, unknown>();
-        o.set("smuflfont", Font.toJson(obj.smuflFont)!);
+        o.set("smuflfont", Font.toJson(obj.smuflFont));
         o.set("copyrightfont", Font.toJson(obj.copyrightFont)!);
         o.set("titlefont", Font.toJson(obj.titleFont)!);
         o.set("subtitlefont", Font.toJson(obj.subTitleFont)!);
@@ -47,7 +47,7 @@ export class RenderingResourcesSerializer {
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
         switch (property) {
             case "smuflfont":
-                obj.smuflFont = Font.fromJson(v)!;
+                obj.smuflFont = Font.fromJson(v);
                 return true;
             case "copyrightfont":
                 obj.copyrightFont = Font.fromJson(v)!;
