@@ -79,7 +79,9 @@ export class CoreSettings {
      * Defines the URLs from which to load the SMuFL compliant font files.
      * @remarks
      * These sources will be used to load and register the webfonts on the page so
-     * they are available for rendering the music sheet.
+     * they are available for rendering the music sheet. The sources can be set to any 
+     * CSS compatible URL which can be passed into `url()`.
+     * See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
      * @defaultValue Bravura files located at {@link fontDirectory} .
      * @category Core - JavaScript Specific
      * @target web

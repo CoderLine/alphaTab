@@ -264,8 +264,12 @@ export class Environment {
         }
 
         // normal browser include as <script>
-        if ('document' in Environment.globalThis && document.currentScript) {
-            return (document.currentScript as HTMLScriptElement).src;
+        if (
+            'document' in Environment.globalThis &&
+            document.currentScript &&
+            document.currentScript instanceof HTMLScriptElement
+        ) {
+            return document.currentScript.src;
         }
 
         return null;
