@@ -71,7 +71,7 @@ export class CoreSettings {
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
-     * @deprecated Use {@link smfulFontSources} for more flexible font configuration.
+     * @deprecated Use {@link smuflFontSources} for more flexible font configuration.
      */
     public fontDirectory: string | null = null;
 
@@ -85,11 +85,11 @@ export class CoreSettings {
      * @target web
      * @since 1.6.0
      */
-    public smfulFontSources: Map<FontFileFormat, string> | null = null;
+    public smuflFontSources: Map<FontFileFormat, string> | null = null;
 
     /**
      * Builds the default SMuFL font sources for the usage with alphaTab in cases
-     * where no custom {@link smfulFontSources} are provided.
+     * where no custom {@link smuflFontSources} are provided.
      * @param fontDirectory The {@link fontDirectory} configured.
      * @target web
      */

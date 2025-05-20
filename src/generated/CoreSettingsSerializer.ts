@@ -24,10 +24,10 @@ export class CoreSettingsSerializer {
         /*@target web*/
         o.set("fontdirectory", obj.fontDirectory);
         /*@target web*/
-        if (obj.smfulFontSources !== null) {
+        if (obj.smuflFontSources !== null) {
             const m = new Map<string, unknown>();
-            o.set("smfulfontsources", m);
-            for (const [k, v] of obj.smfulFontSources!) {
+            o.set("smuflfontsources", m);
+            for (const [k, v] of obj.smuflFontSources!) {
                 m.set(k.toString(), v);
             }
         }
@@ -55,10 +55,10 @@ export class CoreSettingsSerializer {
                 obj.fontDirectory = v as string | null;
                 return true;
             /*@target web*/
-            case "smfulfontsources":
-                obj.smfulFontSources = new Map<FontFileFormat, string>();
+            case "smuflfontsources":
+                obj.smuflFontSources = new Map<FontFileFormat, string>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.smfulFontSources!.set(JsonHelper.parseEnum<FontFileFormat>(k, FontFileFormat)!, v as string);
+                    obj.smuflFontSources!.set(JsonHelper.parseEnum<FontFileFormat>(k, FontFileFormat)!, v as string);
                 });
                 return true;
             /*@target web*/

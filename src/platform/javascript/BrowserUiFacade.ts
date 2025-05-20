@@ -357,12 +357,12 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
         // SmuFl Font Specific style
 
-        const smfulFontSources =
-            settings.core.smfulFontSources ?? CoreSettings.buildDefaultSmuflFontSources(settings.core.fontDirectory);
+        const smuflFontSources =
+            settings.core.smuflFontSources ?? CoreSettings.buildDefaultSmuflFontSources(settings.core.fontDirectory);
 
         // create a simple unique hash for the font source definition
         // as data urls might be used we don't want to just use the plain strings.
-        const hash = BrowserUiFacade.cyrb53(smfulFontSources.values());
+        const hash = BrowserUiFacade.cyrb53(smuflFontSources.values());
 
         // reuse existing style if available
         const registeredWebFonts = BrowserUiFacade._registeredWebFonts;
@@ -377,7 +377,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         const fontSuffix = registeredWebFonts.size === 0 ? '' : String(registeredWebFonts.size);
         const familyName = `alphaTab${fontSuffix}`;
 
-        const src = Array.from(smfulFontSources.entries())
+        const src = Array.from(smuflFontSources.entries())
             .map(e => `url(${JSON.stringify(e[1])}) format('${BrowserUiFacade.cssFormat(e[0])}')`)
             .join(',');
 

@@ -37,7 +37,7 @@ export interface CoreSettingsJson {
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
-     * @deprecated Use {@link smfulFontSources} for more flexible font configuration.
+     * @deprecated Use {@link smuflFontSources} for more flexible font configuration.
      */
     fontDirectory?: string | null;
     /**
@@ -50,7 +50,7 @@ export interface CoreSettingsJson {
      * @target web
      * @since 1.6.0
      */
-    smfulFontSources?: Map<FontFileFormat | keyof typeof FontFileFormat | Lowercase<keyof typeof FontFileFormat>, string>;
+    smuflFontSources?: Map<FontFileFormat | keyof typeof FontFileFormat | Lowercase<keyof typeof FontFileFormat>, string>;
     /**
      * The full URL to the input file to be loaded.
      * @remarks
