@@ -16,21 +16,12 @@ export class Html5Canvas implements ICanvas {
     private _context!: CanvasRenderingContext2D;
     private _color: Color = new Color(0, 0, 0, 0xff);
     private _font: Font = new Font('Arial', 10, FontStyle.Plain);
-    private _musicFont: Font;
+    private _musicFont?: Font;
     private _lineWidth: number = 0;
 
     public settings!: Settings;
 
     public constructor() {
-        const fontElement: HTMLElement = document.createElement('span');
-        fontElement.classList.add('at');
-        document.body.appendChild(fontElement);
-        const style: CSSStyleDeclaration = window.getComputedStyle(fontElement);
-        let family: string = style.fontFamily;
-        if (family.startsWith('"') || family.startsWith("'")) {
-            family = family.substr(1, family.length - 2);
-        }
-        this._musicFont = new Font(family, Number.parseFloat(style.fontSize), FontStyle.Plain);
         this._measureCanvas = document.createElement('canvas');
         this._measureCanvas.width = 10;
         this._measureCanvas.height = 10;
@@ -47,6 +38,8 @@ export class Html5Canvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
+        this._musicFont = this.settings.display.resources.smuflFont;
+
         const scale = this.settings.display.scale;
 
         this._canvas = document.createElement('canvas');
@@ -269,7 +262,7 @@ export class Html5Canvas implements ICanvas {
         const textAlign = this._context.textAlign;
         const baseLine = this._context.textBaseline;
         const font: string = this._context.font;
-        this._context.font = this._musicFont.toCssString(relativeScale);
+        this._context.font = this._musicFont!.toCssString(relativeScale);
         this._context.textBaseline = 'middle';
         if (centerAtPosition) {
             this._context.textAlign = 'center';

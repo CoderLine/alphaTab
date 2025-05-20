@@ -47,7 +47,6 @@ import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { ScoreBarRendererFactory } from '@src/rendering/ScoreBarRendererFactory';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
-import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from '@src/rendering/effects/LeftHandTapEffectInfo';
 import { CapellaImporter } from '@src/importer/CapellaImporter';
@@ -142,62 +141,6 @@ export class Environment {
 
     /**
      * @target web
-     * @internal
-     */
-    public static createStyleElement(elementDocument: HTMLDocument, fontDirectory: string | null) {
-        let styleElement: HTMLStyleElement = elementDocument.getElementById('alphaTabStyle') as HTMLStyleElement;
-        if (!styleElement) {
-            if (!fontDirectory) {
-                Logger.error('AlphaTab', 'Font directory could not be detected, cannot create style element');
-                return;
-            }
-
-            styleElement = elementDocument.createElement('style');
-            styleElement.id = 'alphaTabStyle';
-            const css: string = `
-            @font-face {
-                font-display: block;
-                font-family: 'alphaTab';
-                 src: url('${fontDirectory}Bravura.eot');
-                 src: url('${fontDirectory}Bravura.eot?#iefix') format('embedded-opentype')
-                      , url('${fontDirectory}Bravura.woff') format('woff')
-                      , url('${fontDirectory}Bravura.otf') format('opentype')
-                      , url('${fontDirectory}Bravura.svg#Bravura') format('svg');
-                 font-weight: normal;
-                 font-style: normal;
-            }
-            .at-surface * {
-                cursor: default;
-                vertical-align: top;
-                overflow: visible;
-            }
-            .at-surface-svg text {
-                dominant-baseline: central;
-                white-space:pre;
-            }
-            .at {
-                 font-family: 'alphaTab';
-                 speak: none;
-                 font-style: normal;
-                 font-weight: normal;
-                 font-variant: normal;
-                 text-transform: none;
-                 line-height: 1;
-                 line-height: 1;
-                 -webkit-font-smoothing: antialiased;
-                 -moz-osx-font-smoothing: grayscale;
-                 font-size: ${Environment.MusicFontSize}px;
-                 overflow: visible !important;
-            }`;
-
-            styleElement.innerHTML = css;
-            elementDocument.getElementsByTagName('head').item(0)!.appendChild(styleElement);
-            Environment.bravuraFontChecker.checkForFontAvailability();
-        }
-    }
-
-    /**
-     * @target web
      */
     private static _globalThis: any | undefined = undefined;
 
@@ -254,12 +197,6 @@ export class Environment {
      * @target web
      */
     public static readonly fontDirectory: string | null = Environment.detectFontDirectory();
-
-    /**
-     * @target web
-     * @internal
-     */
-    public static readonly bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
 
     /**
      * @target web
@@ -327,8 +264,12 @@ export class Environment {
         }
 
         // normal browser include as <script>
-        if ('document' in Environment.globalThis && document.currentScript) {
-            return (document.currentScript as HTMLScriptElement).src;
+        if (
+            'document' in Environment.globalThis &&
+            document.currentScript &&
+            document.currentScript instanceof HTMLScriptElement
+        ) {
+            return document.currentScript.src;
         }
 
         return null;

@@ -489,14 +489,14 @@ export class Font {
         return this._css;
     }
 
-    public static fromJson(v: unknown): Font | null {
+    public static fromJson(v: unknown): Font | undefined {
         if (v instanceof Font) {
             return v;
         }
 
         switch (typeof v) {
             case 'undefined':
-                return null;
+                return undefined;
             case 'object': {
                 const m = v as Map<string, unknown>;
                 const families = m.get('families') as string[];
@@ -576,11 +576,14 @@ export class Font {
                 return Font.withFamilyList(families, fontSize, fontStyle, fontWeight);
             }
             default:
-                return null;
+                return undefined;
         }
     }
 
-    public static toJson(font: Font): Map<string, unknown> {
+    public static toJson(font: Font | undefined): Map<string, unknown> | undefined {
+        if(!font) {
+            return undefined;
+        }
         const o = new Map<string, unknown>();
         o.set('families', font.families);
         o.set('size', font.size);
