@@ -3,7 +3,7 @@ import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { Environment } from '@src/Environment';
 import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import type { Font } from '@src/model/Font';
+import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { NotationMode } from '@src/NotationSettings';
 import type { IContainer } from '@src/platform/IContainer';
@@ -33,6 +33,7 @@ import { PlayerOutputMode } from '@src/PlayerSettings';
 import type { SettingsJson } from '@src/generated/SettingsJson';
 import { AudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';
 import { BackingTrackPlayer } from '@src/synth/BackingTrackPlayer';
+import { CoreSettings, FontFileFormat } from '@src/CoreSettings';
 
 /**
  * @target web
@@ -57,6 +58,16 @@ interface ResultPlaceholder extends HTMLElement {
 /**
  * @target web
  */
+interface RegisteredWebFont {
+    element: HTMLStyleElement;
+    usages: number;
+    fontSuffix: string;
+    checker: FontLoadingChecker;
+}
+
+/**
+ * @target web
+ */
 export class BrowserUiFacade implements IUiFacade<unknown> {
     private _fontCheckers: Map<string, FontLoadingChecker> = new Map();
     private _api!: AlphaTabApiBase<unknown>;
@@ -67,6 +78,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private _intersectionObserver: IntersectionObserver;
     private _barToElementLookup: Map<number, HTMLElement> = new Map<number, HTMLElement>();
     private _resultIdToElementLookup: Map<string, ResultPlaceholder> = new Map<string, ResultPlaceholder>();
+    private _webFont!: RegisteredWebFont;
 
     public rootContainerBecameVisible: IEventEmitter = new EventEmitter();
     public canRenderChanged: IEventEmitter = new EventEmitter();
@@ -83,11 +95,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     }
 
     private areAllFontsLoaded(): boolean {
-        Environment.bravuraFontChecker.checkForFontAvailability();
-        if (!Environment.bravuraFontChecker.isFontLoaded) {
-            return false;
-        }
-
         let isAnyNotLoaded = false;
         for (const checker of this._fontCheckers.values()) {
             if (!checker.isFontLoaded) {
@@ -120,7 +127,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         rootElement.classList.add('alphaTab');
         this.rootContainer = new HtmlElementContainer(rootElement);
         this.areWorkersSupported = 'Worker' in window;
-        Environment.bravuraFontChecker.fontLoaded.on(this.onFontLoaded.bind(this));
 
         this._intersectionObserver = new IntersectionObserver(this.onElementVisibilityChanged.bind(this), {
             threshold: [0, 0.01, 1]
@@ -193,7 +199,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             this._contents = element.element.innerHTML;
             element.element.innerHTML = '';
         }
-        this.createStyleElement(settings);
+        this.createStyleElements(settings);
         this._file = settings.core.file;
     }
 
@@ -222,11 +228,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
 
     public destroy(): void {
         (this.rootContainer as HtmlElementContainer).element.innerHTML = '';
+        const webFont = this._webFont;
+        webFont.usages--;
+        if (webFont.usages <= 0) {
+            webFont.element.remove();
+        }
     }
 
     public createCanvasElement(): IContainer {
         const canvasElement: HTMLElement = document.createElement('div');
-        canvasElement.className = 'at-surface';
+        canvasElement.classList.add('at-surface', `at${this._webFont.fontSuffix}`);
         canvasElement.style.fontSize = '0';
         canvasElement.style.overflow = 'hidden';
         canvasElement.style.lineHeight = '0';
@@ -340,9 +351,155 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         }
     }
 
-    private createStyleElement(settings: Settings): void {
-        const elementDocument: HTMLDocument = (this._api.container as HtmlElementContainer).element.ownerDocument!;
-        Environment.createStyleElement(elementDocument, settings.core.fontDirectory);
+    private createStyleElements(settings: Settings): void {
+        const root = (this._api.container as HtmlElementContainer).element.ownerDocument!;
+        BrowserUiFacade.createSharedStyleElement(root);
+
+        // SmuFl Font Specific style
+
+        const smfulFontSources =
+            settings.core.smfulFontSources ?? CoreSettings.buildDefaultSmuflFontSources(settings.core.fontDirectory);
+
+        // create a simple unique hash for the font source definition
+        // as data urls might be used we don't want to just use the plain strings.
+        const hash = BrowserUiFacade.cyrb53(smfulFontSources.values());
+
+        // reuse existing style if available
+        const registeredWebFonts = BrowserUiFacade._registeredWebFonts;
+        if (registeredWebFonts.has(hash)) {
+            const webFont = registeredWebFonts.get(hash)!;
+            webFont.usages++;
+            webFont.checker.fontLoaded.on(this.onFontLoaded.bind(this));
+            this._webFont = webFont;
+            return;
+        }
+
+        const fontSuffix = registeredWebFonts.size === 0 ? '' : String(registeredWebFonts.size);
+        const familyName = `alphaTab${fontSuffix}`;
+
+        const src = Array.from(smfulFontSources.entries())
+            .map(e => `url(${JSON.stringify(e[1])}) format('${BrowserUiFacade.cssFormat(e[0])}')`)
+            .join(',');
+
+        const css: string = `
+            @font-face {
+                font-display: block;
+                font-family: '${familyName}';
+                src: ${src};
+                font-weight: normal;
+                font-style: normal;
+            }
+            .at-surface.at${fontSuffix} .at {
+                font-family: '${familyName}';
+                speak: none;
+                font-style: normal;
+                font-weight: normal;
+                font-variant: normal;
+                text-transform: none;
+                line-height: 1;
+                line-height: 1;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+                font-size: ${Environment.MusicFontSize}px;
+                overflow: visible !important;
+            }`;
+
+        const styleElement = root.createElement('style');
+        styleElement.id = `alphaTabStyle${fontSuffix}`;
+        styleElement.innerHTML = css;
+        root.getElementsByTagName('head').item(0)!.appendChild(styleElement);
+        const checker = new FontLoadingChecker([familyName]);
+        checker.fontLoaded.on(this.onFontLoaded.bind(this));
+        this._fontCheckers.set(familyName, checker);
+        checker.checkForFontAvailability();
+
+        settings.display.resources.smuflFont = new Font(
+            familyName,
+            Environment.MusicFontSize,
+            FontStyle.Plain,
+            FontWeight.Regular
+        );
+
+        const webFont: RegisteredWebFont = {
+            element: styleElement,
+            fontSuffix,
+            usages: 1,
+            checker
+        };
+
+        registeredWebFonts.set(hash, webFont);
+        this._webFont = webFont;
+    }
+
+    private static cssFormat(format: FontFileFormat) {
+        switch (format) {
+            case FontFileFormat.EmbeddedOpenType:
+                return 'embedded-opentype';
+            case FontFileFormat.Woff:
+                return 'woff';
+            case FontFileFormat.Woff2:
+                return 'woff2';
+            case FontFileFormat.OpenType:
+                return 'opentype';
+            case FontFileFormat.TrueType:
+                return 'truetype';
+            case FontFileFormat.Svg:
+                return 'svg';
+        }
+    }
+
+    private static _registeredWebFonts: Map<number, RegisteredWebFont> = new Map<number, RegisteredWebFont>();
+
+    /**
+     * cyrb53 (c) 2018 bryc (github.com/bryc)
+     * License: Public domain (or MIT if needed). Attribution appreciated.
+     * A fast and simple 53-bit string hash function with decent collision resistance.
+     * Largely inspired by MurmurHash2/3, but with a focus on speed/simplicity
+     * @param str
+     * @param seed
+     * @returns
+     */
+    private static cyrb53(strings: Iterable<string>, seed: number = 0) {
+        let h1 = 0xdeadbeef ^ seed;
+        let h2 = 0x41c6ce57 ^ seed;
+        for (const str of strings) {
+            for (let i = 0; i < str.length; i++) {
+                const ch = str.charCodeAt(i);
+                h1 = Math.imul(h1 ^ ch, 2654435761);
+                h2 = Math.imul(h2 ^ ch, 1597334677);
+            }
+        }
+        h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+        h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+        h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+        h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+        return 4294967296 * (2097151 & h2) + (h1 >>> 0);
+    }
+
+    /**
+     * Creates the default CSS styles used across all alphaTab instances.
+     * @target web
+     * @internal
+     */
+    public static createSharedStyleElement(root: Document) {
+        let styleElement: HTMLStyleElement = root.getElementById('alphaTabStyle') as HTMLStyleElement;
+        if (!styleElement) {
+            styleElement = document.createElement('style');
+            styleElement.id = 'alphaTabStyleShared';
+            const css: string = `
+                .at-surface * {
+                    cursor: default;
+                    vertical-align: top;
+                    overflow: visible;
+                }
+                .at-surface-svg text {
+                    dominant-baseline: central;
+                    white-space:pre;
+                }`;
+
+            styleElement.innerHTML = css;
+            document.getElementsByTagName('head').item(0)!.appendChild(styleElement);
+        }
     }
 
     public parseTracks(tracksData: unknown): number[] {
