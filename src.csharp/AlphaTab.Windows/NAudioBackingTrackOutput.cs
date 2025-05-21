@@ -18,7 +18,6 @@ namespace AlphaTab
         /// <inheritdoc />
         public double SampleRate => PreferredSampleRate;
 
-        private TimeSpan _padding;
         private ISynthOutputDevice? _device;
         private StreamMediaFoundationReader? _audioFileReader;
         private DirectSoundOut? _context;
@@ -43,7 +42,7 @@ namespace AlphaTab
 
         public void SeekTo(double time)
         {
-            _audioFileReader!.CurrentTime = TimeSpan.FromMilliseconds(time) - _padding;
+            _audioFileReader!.CurrentTime = TimeSpan.FromMilliseconds(time);
         }
 
 
@@ -51,8 +50,6 @@ namespace AlphaTab
         {
             _audioFileReader?.Dispose();
             _context?.Dispose();
-
-            _padding = TimeSpan.FromMilliseconds(backingTrack.Padding);
 
             _audioFileReader = new StreamMediaFoundationReader(new System.IO.MemoryStream(
                 backingTrack.RawAudioFile!.Buffer.Raw,
@@ -102,7 +99,7 @@ namespace AlphaTab
 
         private void UpdatePosition()
         {
-            var timePos = (_context!.PlaybackPosition + _padding).TotalMilliseconds;
+            var timePos = _context!.PlaybackPosition.TotalMilliseconds;
             _invokeUi(() => { ((EventEmitterOfT<double>)TimeUpdate).Trigger(timePos); });
         }
 

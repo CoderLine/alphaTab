@@ -56,7 +56,14 @@ export class MasterBarTickLookup {
      */
     public masterBar!: MasterBar;
 
+    /**
+     * The first beat in the bar. 
+     */
     public firstBeat: BeatTickLookup | null = null;
+
+    /**
+     * The last beat in the bar. 
+     */
     public lastBeat: BeatTickLookup | null = null;
 
     /**

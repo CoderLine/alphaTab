@@ -47,7 +47,6 @@ class AndroidBackingTrackSynthOutput(
             _player.setVolume(value.toFloat(), value.toFloat())
         }
 
-    private var _padding: Int = 0
     private var _device: ISynthOutputDevice? = null
     private val _updateTimer: ScheduledExecutorService = Executors.newScheduledThreadPool(1)
     private var _updateSchedule: ScheduledFuture<*>? = null
@@ -72,7 +71,6 @@ class AndroidBackingTrackSynthOutput(
 
     override fun loadBackingTrack(backingTrack: BackingTrack) {
         _player.reset()
-        _padding = backingTrack.padding.toInt()
         _player.setAudioAttributes(
             AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_MUSIC)
@@ -98,7 +96,7 @@ class AndroidBackingTrackSynthOutput(
     }
 
     private fun updatePosition() {
-        val timePos = _player.currentPosition + _padding
+        val timePos = _player.currentPosition
         synthInvoke {
             (timeUpdate as EventEmitterOfT<Double>).trigger(timePos.toDouble())
         }

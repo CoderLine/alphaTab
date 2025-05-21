@@ -30,7 +30,6 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
     // fake rate
     public readonly sampleRate: number = 44100;
 
-    private _padding: number = 0;
     private _seekPosition: number = 0;
 
     private _handler?: IExternalMediaHandler;
@@ -79,14 +78,13 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
     public seekTo(time: number): void {
         const handler = this.handler;
         if (handler) {
-            handler.seekTo(time - this._padding);
+            handler.seekTo(time);
         } else {
-            this._seekPosition = time - this._padding;
+            this._seekPosition = time;
         }
     }
 
-    public loadBackingTrack(backingTrack: BackingTrack) {
-        this._padding = backingTrack.padding;
+    public loadBackingTrack(_backingTrack: BackingTrack) {
     }
 
     public open(_bufferTimeInMilliseconds: number): void {
@@ -94,7 +92,7 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
     }
 
     public updatePosition(currentTime: number) {
-        (this.timeUpdate as EventEmitterOfT<number>).trigger(currentTime + this._padding);
+        (this.timeUpdate as EventEmitterOfT<number>).trigger(currentTime);
     }
 
     public play(): void {
