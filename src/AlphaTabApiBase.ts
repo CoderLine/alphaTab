@@ -721,16 +721,16 @@ export class AlphaTabApiBase<TSettings> {
 
     private appendRenderResult(result: RenderFinishedEventArgs, isLast: boolean): void {
         // resizing the canvas and wrapper elements at the end is enough
-        // it avoids flickering on resizes and re-renders. 
+        // it avoids flickering on resizes and re-renders.
         // the individual partials are anyhow sized correctly
-        if(isLast) {
+        if (isLast) {
             this.canvasElement.width = result.totalWidth;
             this.canvasElement.height = result.totalHeight;
             if (this._cursorWrapper) {
                 this._cursorWrapper.width = result.totalWidth;
                 this._cursorWrapper.height = result.totalHeight;
             }
-        }        
+        }
 
         if (result.width > 0 || result.height > 0) {
             this.uiFacade.beginAppendRenderResults(result);
@@ -1441,7 +1441,7 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     /**
-     * 
+     *
      * @returns true if a new player was created, false if no player was created (includes destroy & reuse of the current one)
      */
     private setupOrDestroyPlayer(): boolean {
@@ -1495,9 +1495,9 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     /**
-     * Re-creates the midi for the current score and loads it. 
+     * Re-creates the midi for the current score and loads it.
      * @remarks
-     * This will result in the player to stop playback. Some setting changes require re-genration of the midi song. 
+     * This will result in the player to stop playback. Some setting changes require re-genration of the midi song.
      * @category Methods - Player
      * @since 1.6.0
      */
@@ -1526,7 +1526,8 @@ export class AlphaTabApiBase<TSettings> {
 
         const player = this._player;
         player.loadMidiFile(midiFile);
-        player.loadBackingTrack(score, generator.syncPoints);
+        player.loadBackingTrack(score);
+        player.updateSyncPoints(generator.syncPoints);
         player.applyTranspositionPitches(generator.transpositionPitches);
     }
 

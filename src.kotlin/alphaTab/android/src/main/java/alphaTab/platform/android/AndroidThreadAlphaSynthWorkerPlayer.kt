@@ -255,8 +255,12 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         _workerQueue.add { _player?.setChannelTranspositionPitch(channel, semitones) }
     }
 
-    override fun loadBackingTrack(score: Score, syncPoints: List<BackingTrackSyncPoint>) {
-        _workerQueue.add { _player?.loadBackingTrack(score, syncPoints) }
+    override fun loadBackingTrack(score: Score) {
+        _workerQueue.add { _player?.loadBackingTrack(score) }
+    }
+
+    override fun updateSyncPoints(syncPoints: List<BackingTrackSyncPoint>) {
+        _workerQueue.add { _player?.updateSyncPoints(syncPoints) }
     }
 
     override val ready: IEventEmitter = EventEmitter()

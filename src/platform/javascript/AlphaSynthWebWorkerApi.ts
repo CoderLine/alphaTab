@@ -1,5 +1,5 @@
 import type { MidiFile } from '@src/midi/MidiFile';
-import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { BackingTrackSyncPoint, IAlphaSynth } from '@src/synth/IAlphaSynth';
 import type { ISynthOutput } from '@src/synth/ISynthOutput';
 import type { PlaybackRange } from '@src/synth/PlaybackRange';
 import { PlayerState } from '@src/synth/PlayerState';
@@ -475,6 +475,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public loadBackingTrack(_score: Score): void {
+        // ignore
+    }
+
+    public updateSyncPoints(_syncPoints: BackingTrackSyncPoint[]): void {
         // ignore
     }
 }
