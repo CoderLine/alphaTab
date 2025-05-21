@@ -120,31 +120,15 @@ export class MidiFileGenerator {
         }
 
         Logger.debug('Midi', 'Begin midi generation');
-        const controller: MidiPlaybackController = new MidiPlaybackController(this._score);
 
-        let previousMasterBar: MasterBar | null = null;
-
-        let currentTempo = this._score.tempo;
-
-        // store the previous played bar for repeats
-        const barOccurence = new Map<number, number>();
-        while (!controller.finished) {
-            const index: number = controller.index;
-            const bar: MasterBar = this._score.masterBars[index];
-            const currentTick: number = controller.currentTick;
-            controller.processCurrent();
-
-            if (controller.shouldPlay) {
-                let occurence = barOccurence.has(index) ? barOccurence.get(index)! : -1;
-                occurence++;
-                barOccurence.set(index, occurence);
-
+        this.syncPoints = [];
+        MidiFileGenerator.playThroughSong(
+            this._score,
+            this.syncPoints,
+            (bar, previousMasterBar, currentTick, currentTempo, occurence) => {
                 this.generateMasterBar(bar, previousMasterBar, currentTick, currentTempo, occurence);
-
-                if (bar.tempoAutomations.length > 0) {
-                    currentTempo = bar.tempoAutomations[0].value;
-                }
-
+            },
+            (index, currentTick, currentTempo) => {
                 for (const track of this._score.tracks) {
                     for (const staff of track.staves) {
                         if (index < staff.bars.length) {
@@ -152,43 +136,13 @@ export class MidiFileGenerator {
                         }
                     }
                 }
-
-                if (bar.tempoAutomations.length > 0) {
-                    currentTempo = bar.tempoAutomations[bar.tempoAutomations.length - 1].value;
+            },
+            endTick => {
+                for (const track of this._score.tracks) {
+                    this._handler.finishTrack(track.index, endTick);
                 }
             }
-
-            controller.moveNext();
-            previousMasterBar = bar;
-        }
-
-        // here we interpolate the sync point which marks the end of the sync.
-        // Sync points define new tempos at certain positions.
-        // looking from the last sync point to the end we do not assume the end where the audio ends,
-        // but where it ends according to the BPM and the remaining ticks.
-        if (this.syncPoints.length > 0) {
-            const lastSyncPoint = this.syncPoints[this.syncPoints.length - 1];
-            const endTick = controller.currentTick;
-            const remainingTicks = endTick - lastSyncPoint.tick;
-            if (remainingTicks > 0) {
-                const syncPointData = new SyncPointData();
-
-                // last occurence of the last bar
-                syncPointData.barOccurence = barOccurence.get(this._score.masterBars.length - 1)!;
-                // same tempo as last point
-                syncPointData.modifiedTempo = lastSyncPoint.data.modifiedTempo;
-                // interpolated end from last syncPoint
-                syncPointData.millisecondOffset =
-                    lastSyncPoint.data.millisecondOffset +
-                    MidiUtils.ticksToMillis(remainingTicks, syncPointData.modifiedTempo);
-
-                this.syncPoints.push(new BackingTrackSyncPoint(endTick, syncPointData));
-            }
-        }
-
-        for (const track of this._score.tracks) {
-            this._handler.finishTrack(track.index, controller.currentTick);
-        }
+        );
 
         Logger.debug('Midi', 'Midi generation done');
     }
@@ -248,6 +202,119 @@ export class MidiFileGenerator {
             MidiFileGenerator.PitchBendRangeInSemitones
         );
         this.addProgramChange(track, 0, channel, playbackInfo.program);
+    }
+
+    /**
+     * Generates the sync points for the given score without re-generating the midi itself.
+     * @remarks
+     * Use this method if a re-generation of the sync points after modification is required.
+     * It correctly handles repeats and places sync points accoridng to their absolute midi tick when they
+     * need to be considered for synchronization.
+     * @param score The song for which to regenerate the sync points.
+     * @returns The generated sync points for usage in the backing track playback.
+     */
+    public static generateSyncPoints(score: Score): BackingTrackSyncPoint[] {
+        const syncPoints: BackingTrackSyncPoint[] = [];
+
+        MidiFileGenerator.playThroughSong(
+            score,
+            syncPoints,
+            (_masterBar, _previousMasterBar, _currentTick, _currentTempo, _barOccurence) => {
+                // no generation
+            },
+            (_barIndex, _currentTick, _currentTempo) => {
+                // no generation
+            },
+            _endTick => {
+                // no generation
+            }
+        );
+
+        return syncPoints;
+    }
+
+    private static playThroughSong(
+        score: Score,
+        syncPoints: BackingTrackSyncPoint[],
+        generateMasterBar: (
+            masterBar: MasterBar,
+            previousMasterBar: MasterBar | null,
+            currentTick: number,
+            currentTempo: number,
+            barOccurence: number
+        ) => void,
+        generateTracks: (barIndex: number, currentTick: number, currentTempo: number) => void,
+        finish: (endTick: number) => void
+    ) {
+        const controller: MidiPlaybackController = new MidiPlaybackController(score);
+
+        let currentTempo = score.tempo;
+        let previousMasterBar: MasterBar | null = null;
+
+        // store the previous played bar for repeats
+        const barOccurence = new Map<number, number>();
+        while (!controller.finished) {
+            const index: number = controller.index;
+            const bar: MasterBar = score.masterBars[index];
+            const currentTick: number = controller.currentTick;
+            controller.processCurrent();
+
+            if (controller.shouldPlay) {
+                let occurence = barOccurence.has(index) ? barOccurence.get(index)! : -1;
+                occurence++;
+                barOccurence.set(index, occurence);
+
+                generateMasterBar(bar, previousMasterBar, currentTick, currentTempo, occurence);
+
+                const barSyncPoints = bar.syncPoints;
+                if (barSyncPoints) {
+                    for (const syncPoint of barSyncPoints) {
+                        if (syncPoint.syncPointValue!.barOccurence === occurence) {
+                            const tick = currentTick + bar.calculateDuration() * syncPoint.ratioPosition;
+                            syncPoints.push(new BackingTrackSyncPoint(tick, syncPoint.syncPointValue!));
+                        }
+                    }
+                }
+
+                if (bar.tempoAutomations.length > 0) {
+                    currentTempo = bar.tempoAutomations[0].value;
+                }
+
+                generateTracks(index, currentTick, currentTempo);
+
+                if (bar.tempoAutomations.length > 0) {
+                    currentTempo = bar.tempoAutomations[bar.tempoAutomations.length - 1].value;
+                }
+            }
+
+            controller.moveNext();
+            previousMasterBar = bar;
+        }
+
+        // here we interpolate the sync point which marks the end of the sync.
+        // Sync points define new tempos at certain positions.
+        // looking from the last sync point to the end we do not assume the end where the audio ends,
+        // but where it ends according to the BPM and the remaining ticks.
+        if (syncPoints.length > 0) {
+            const lastSyncPoint = syncPoints[syncPoints.length - 1];
+            const remainingTicks = controller.currentTick - lastSyncPoint.tick;
+            if (remainingTicks > 0) {
+                const syncPointData = new SyncPointData();
+
+                // last occurence of the last bar
+                syncPointData.barOccurence = barOccurence.get(score.masterBars.length - 1)!;
+                // same tempo as last point
+                syncPointData.modifiedTempo = lastSyncPoint.data.modifiedTempo;
+                // interpolated end from last syncPoint
+                syncPointData.millisecondOffset =
+                    lastSyncPoint.data.millisecondOffset +
+                    MidiUtils.ticksToMillis(remainingTicks, syncPointData.modifiedTempo);
+
+                syncPoints.push(new BackingTrackSyncPoint(controller.currentTick, syncPointData));
+            }
+        }
+
+        finish(controller.currentTick);
     }
 
     private static toChannelShort(data: number): number {

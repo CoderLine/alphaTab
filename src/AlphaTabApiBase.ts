@@ -1532,6 +1532,21 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     /**
+     * Triggers an update of the sync points for the current score after modification within the data model
+     * @category Methods - Player
+     * @since 1.6.0
+     */
+    public updateSyncPoints() {
+        if (!this.score) {
+            return;
+        }
+
+        const score = this.score!;
+        const player = this._player;
+        player.updateSyncPoints(MidiFileGenerator.generateSyncPoints(score));
+    }
+
+    /**
      * Changes the volume of the given tracks.
      * @param tracks The tracks for which the volume should be changed.
      * @param volume The volume to set for all tracks in percent (0-1)
