@@ -12,8 +12,7 @@ import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-import { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
-import type { SyncPointData } from '@src/model/Automation';
+import type { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
@@ -27,11 +26,18 @@ export class MidiFileSequencerTempoChange {
     }
 }
 
-class BackingTrackSyncPointWithTime extends BackingTrackSyncPoint {
-    public time: number;
-    constructor(tick: number, data: SyncPointData, time: number) {
-        super(tick, data);
-        this.time = time;
+class BackingTrackSyncPointWithTime {
+    public alphaTabTick: number;
+    public alphaTabTime: number;
+
+    public modifiedTempo: number;
+    public millisecondOffset: number;
+
+    constructor(tick: number, time: number, modifiedTempo: number, millisecondOffset: number) {
+        this.alphaTabTick = tick;
+        this.alphaTabTime = time;
+        this.modifiedTempo = modifiedTempo;
+        this.millisecondOffset = millisecondOffset;
     }
 }
 
@@ -160,7 +166,7 @@ export class MidiFileSequencer {
             this._mainState.currentTempo = this._mainState.tempoChanges[0].bpm;
             this._mainState.modifiedTempo =
                 this._mainState.syncPoints.length > 0
-                    ? this._mainState.syncPoints[0].data.modifiedTempo
+                    ? this._mainState.syncPoints[0].modifiedTempo
                     : this._mainState.currentTempo;
             if (this.isPlayingMain) {
                 const metronomeVolume: number = this._synthesizer.metronomeVolume;
@@ -373,31 +379,74 @@ export class MidiFileSequencer {
     public mainUpdateSyncPoints(syncPoints: BackingTrackSyncPoint[]) {
         const state = this._mainState;
         syncPoints.sort((a, b) => a.tick - b.tick); // just in case
-        state.syncPoints = new Array<BackingTrackSyncPointWithTime>(syncPoints.length);
+        state.syncPoints = [];
 
         if (syncPoints.length >= 0) {
             let bpm: number = 120;
             let absTick: number = 0;
             let absTime: number = 0.0;
-            let previousTick: number = 0;
 
             let tempoChangeIndex = 0;
 
             for (let i = 0; i < syncPoints.length; i++) {
                 const p = syncPoints[i];
-                const deltaTick: number = p.tick - previousTick;
-                absTick += deltaTick;
-                absTime += deltaTick * (60000.0 / (bpm * state.division));
-                state.syncPoints[i] = new BackingTrackSyncPointWithTime(p.tick, p.data, absTime);
-                previousTick = p.tick;
+                let deltaTick = 0;
 
+                // remember state from previous sync point (or start). to handle linear interpolation
+                let previousModifiedTempo: number;
+                let previousMillisecondOffset: number;
+                let previousTick: number;
+
+                if (i === 0) {
+                    previousModifiedTempo = bpm;
+                    previousMillisecondOffset = 0;
+                    previousTick = 0;
+                } else {
+                    const previousSyncPoint = syncPoints[i - 1];
+                    previousModifiedTempo = previousSyncPoint.data.modifiedTempo;
+                    previousMillisecondOffset = previousSyncPoint.data.millisecondOffset;
+                    previousTick = previousSyncPoint.tick;
+                }
+
+                // process time until sync point
+                // here it gets a bit tricky. if we have tempo changes on the synthesizer time axis (inbetween two sync points)
+                // we have to calculate a interpolated sync point on the alphaTab time axis.
+                // otherwise the linear interpolation later in the lookup will fail.
+                // goal is to have always a linear increase between two points, no matter if the time axis is sliced by tempo changes or sync points
                 while (
                     tempoChangeIndex < state.tempoChanges.length &&
-                    state.tempoChanges[tempoChangeIndex].ticks <= absTick
+                    state.tempoChanges[tempoChangeIndex].ticks <= p.tick
                 ) {
+                    deltaTick = state.tempoChanges[tempoChangeIndex].ticks - absTick;
+                    if (deltaTick > 0) {
+                        absTick += deltaTick;
+                        absTime += deltaTick * (60000.0 / (bpm * state.division));
+
+                        const millisPerTick =
+                            (p.data.millisecondOffset - previousMillisecondOffset) / (p.tick - previousTick);
+                        const interpolatedMillisecondOffset =
+                            (absTick - previousTick) * millisPerTick + previousMillisecondOffset;
+
+                        state.syncPoints.push(
+                            new BackingTrackSyncPointWithTime(
+                                absTick,
+                                absTime,
+                                previousModifiedTempo,
+                                interpolatedMillisecondOffset
+                            )
+                        );
+                    }
+
                     bpm = state.tempoChanges[tempoChangeIndex].bpm;
                     tempoChangeIndex++;
                 }
+
+                deltaTick = p.tick - absTick;
+                absTick += deltaTick;
+                absTime += deltaTick * (60000.0 / (bpm * state.division));
+                state.syncPoints.push(
+                    new BackingTrackSyncPointWithTime(p.tick, absTime, p.data.modifiedTempo, p.data.millisecondOffset)
+                );
             }
         }
 
@@ -406,7 +455,7 @@ export class MidiFileSequencer {
 
     public currentTimePositionToTickPosition(timePosition: number): number {
         const state = this._currentState;
-        if(state.tempoChanges.length === 0) {
+        if (state.tempoChanges.length === 0) {
             return 0;
         }
 
@@ -415,7 +464,7 @@ export class MidiFileSequencer {
         this.updateCurrentTempo(state, timePosition);
         const lastTempoChange = state.tempoChanges[state.tempoChangeIndex];
         const timeDiff = timePosition - lastTempoChange.time;
-        const ticks = ((timeDiff / (60000.0 / (lastTempoChange.bpm * state.division))) | 0);
+        const ticks = (timeDiff / (60000.0 / (lastTempoChange.bpm * state.division))) | 0;
         // we add 1 for possible rounding errors.(floating point issuses)
         return lastTempoChange.ticks + ticks + 1;
     }
@@ -439,20 +488,20 @@ export class MidiFileSequencer {
         }
 
         const syncPoints = state.syncPoints;
-        if(syncPoints.length > 0) {
+        if (syncPoints.length > 0) {
             let syncPointIndex = Math.min(state.syncPointIndex, syncPoints.length - 1);
-            if (timePosition < syncPoints[syncPointIndex].data.millisecondOffset) {
+            if (timePosition < syncPoints[syncPointIndex].millisecondOffset) {
                 syncPointIndex = 0;
             }
             while (
                 syncPointIndex + 1 < syncPoints.length &&
-                syncPoints[syncPointIndex + 1].data.millisecondOffset <= timePosition
+                syncPoints[syncPointIndex + 1].millisecondOffset <= timePosition
             ) {
                 syncPointIndex++;
             }
             if (syncPointIndex !== state.syncPointIndex) {
                 state.syncPointIndex = syncPointIndex;
-                state.modifiedTempo = syncPoints[syncPointIndex].data.modifiedTempo;
+                state.modifiedTempo = syncPoints[syncPointIndex].modifiedTempo;
             }
         } else {
             state.modifiedTempo = state.currentTempo;
@@ -472,22 +521,21 @@ export class MidiFileSequencer {
         const syncPointIndex = Math.min(mainState.syncPointIndex, syncPoints.length - 1);
 
         const currentSyncPoint = syncPoints[syncPointIndex];
-        const timeDiff = timePosition - currentSyncPoint.data.millisecondOffset;
+        const timeDiff = timePosition - currentSyncPoint.millisecondOffset;
 
         let alphaTabTimeDiff: number;
 
         if (syncPointIndex + 1 < syncPoints.length) {
             const nextSyncPoint = syncPoints[syncPointIndex + 1];
-            const relativeTimeDiff =
-                timeDiff / (nextSyncPoint.data.millisecondOffset - currentSyncPoint.data.millisecondOffset);
+            const relativeTimeDiff = timeDiff / (nextSyncPoint.millisecondOffset - currentSyncPoint.millisecondOffset);
 
-            alphaTabTimeDiff = (nextSyncPoint.time - currentSyncPoint.time) * relativeTimeDiff;
+            alphaTabTimeDiff = (nextSyncPoint.alphaTabTime - currentSyncPoint.alphaTabTime) * relativeTimeDiff;
         } else {
-            const relativeTimeDiff = timeDiff / (backingTrackLength - currentSyncPoint.data.millisecondOffset);
-            alphaTabTimeDiff = (mainState.endTime - currentSyncPoint.time) * relativeTimeDiff;
+            const relativeTimeDiff = timeDiff / (backingTrackLength - currentSyncPoint.millisecondOffset);
+            alphaTabTimeDiff = (mainState.endTime - currentSyncPoint.alphaTabTime) * relativeTimeDiff;
         }
 
-        return (currentSyncPoint.time + alphaTabTimeDiff) / this.playbackSpeed;
+        return (currentSyncPoint.alphaTabTime + alphaTabTimeDiff) / this.playbackSpeed;
     }
 
     public mainTimePositionToBackingTrack(timePosition: number, backingTrackLength: number): number {
@@ -500,26 +548,29 @@ export class MidiFileSequencer {
         timePosition *= this.playbackSpeed;
 
         let syncPointIndex = Math.min(mainState.syncPointIndex, syncPoints.length - 1);
-        if (timePosition < syncPoints[syncPointIndex].time) {
+        if (timePosition < syncPoints[syncPointIndex].alphaTabTime) {
             syncPointIndex = 0;
         }
-        while (syncPointIndex + 1 < syncPoints.length && syncPoints[syncPointIndex + 1].time <= timePosition) {
+        while (syncPointIndex + 1 < syncPoints.length && syncPoints[syncPointIndex + 1].alphaTabTime <= timePosition) {
             syncPointIndex++;
         }
 
+        // NOTE: this logic heavily relies on the interpolation done in mainUpdateSyncPoints
+        // we ensure that we have a linear increase between two points
         const currentSyncPoint = syncPoints[syncPointIndex];
-        const alphaTabTimeDiff = timePosition - currentSyncPoint.time;
+        const alphaTabTimeDiff = timePosition - currentSyncPoint.alphaTabTime;
 
         let backingTrackPos: number;
         if (syncPointIndex + 1 < syncPoints.length) {
             const nextSyncPoint = syncPoints[syncPointIndex + 1];
-            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (nextSyncPoint.time - currentSyncPoint.time);
-            const backingTrackDiff = nextSyncPoint.data.millisecondOffset - currentSyncPoint.data.millisecondOffset;
-            backingTrackPos = currentSyncPoint.data.millisecondOffset + backingTrackDiff * relativeAlphaTabTimeDiff;
+            const relativeAlphaTabTimeDiff =
+                alphaTabTimeDiff / (nextSyncPoint.alphaTabTime - currentSyncPoint.alphaTabTime);
+            const backingTrackDiff = nextSyncPoint.millisecondOffset - currentSyncPoint.millisecondOffset;
+            backingTrackPos = currentSyncPoint.millisecondOffset + backingTrackDiff * relativeAlphaTabTimeDiff;
         } else {
-            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (mainState.endTime - currentSyncPoint.time);
-            const frameDiff = backingTrackLength - currentSyncPoint.data.millisecondOffset;
-            backingTrackPos = currentSyncPoint.data.millisecondOffset + frameDiff * relativeAlphaTabTimeDiff;
+            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (mainState.endTime - currentSyncPoint.alphaTabTime);
+            const frameDiff = backingTrackLength - currentSyncPoint.millisecondOffset;
+            backingTrackPos = currentSyncPoint.millisecondOffset + frameDiff * relativeAlphaTabTimeDiff;
         }
 
         return backingTrackPos;

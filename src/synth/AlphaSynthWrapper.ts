@@ -293,9 +293,15 @@ export class AlphaSynthWrapper implements IAlphaSynth {
         }
     }
 
-    public loadBackingTrack(score: Score, syncPoints: BackingTrackSyncPoint[]): void {
+    public loadBackingTrack(score: Score): void {
         if (this._instance) {
-            this._instance!.loadBackingTrack(score, syncPoints);
+            this._instance!.loadBackingTrack(score);
+        }
+    }
+
+    public updateSyncPoints(syncPoints: BackingTrackSyncPoint[]): void {
+        if (this._instance) {
+            this._instance!.updateSyncPoints(syncPoints);
         }
     }
 

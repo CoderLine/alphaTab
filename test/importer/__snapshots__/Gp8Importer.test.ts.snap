@@ -27,7 +27,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 71.88264,
-            "millisecondoffset" => 0,
+            "millisecondoffset" => 1653.061224489796,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -39,7 +39,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 99.72622,
-            "millisecondoffset" => 1669.387755102041,
+            "millisecondoffset" => 3322.448979591837,
           },
           "ratioposition" => 0.5,
           "text" => "",
@@ -56,7 +56,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 90.66336,
-            "millisecondoffset" => 2872.6530612244896,
+            "millisecondoffset" => 4525.714285714285,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -122,7 +122,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 87.32674,
-            "millisecondoffset" => 37285.71428571428,
+            "millisecondoffset" => 38938.775510204076,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -153,7 +153,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 200.18156,
-            "millisecondoffset" => 42782.31292517007,
+            "millisecondoffset" => 44435.37414965986,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -171,7 +171,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 200.09074,
-            "millisecondoffset" => 43981.22448979592,
+            "millisecondoffset" => 45634.28571428571,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -397,7 +397,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 199.99873,
-            "millisecondoffset" => 102754.55782312925,
+            "millisecondoffset" => 104407.61904761904,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -709,7 +709,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 95.02262,
-            "millisecondoffset" => 189155.10204081633,
+            "millisecondoffset" => 190808.16326530612,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -736,7 +736,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 103.20769,
-            "millisecondoffset" => 192943.67346938775,
+            "millisecondoffset" => 194596.73469387754,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -845,7 +845,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 192.18826,
-            "millisecondoffset" => 211546.9387755102,
+            "millisecondoffset" => 213200,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -884,7 +884,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 195.20833,
-            "millisecondoffset" => 216542.04081632654,
+            "millisecondoffset" => 218195.10204081633,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -946,7 +946,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 200.20428,
-            "millisecondoffset" => 231295.51020408163,
+            "millisecondoffset" => 232948.57142857142,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -992,7 +992,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 200.38033,
-            "millisecondoffset" => 240885.71428571426,
+            "millisecondoffset" => 242538.77551020405,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -1176,7 +1176,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 89.990814,
-            "millisecondoffset" => 289393.4693877551,
+            "millisecondoffset" => 291046.5306122449,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -1215,7 +1215,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 103.1941,
-            "millisecondoffset" => 300061.2244897959,
+            "millisecondoffset" => 301714.28571428574,
           },
           "ratioposition" => 0,
           "text" => "",
@@ -1316,7 +1316,7 @@ Map {
           "syncpointvalue" => Map {
             "baroccurence" => 0,
             "modifiedtempo" => 103.19424,
-            "millisecondoffset" => 320992.6530612245,
+            "millisecondoffset" => 322645.7142857143,
           },
           "ratioposition" => 1,
           "text" => "",
@@ -1330,9 +1330,7 @@ Map {
     "hidedynamics" => true,
     "bracketextendmode" => 0,
   },
-  "backingtrack" => Map {
-    "padding" => -1653.061224489796,
-  },
+  "backingtrack" => Map {},
   "style" => Map {
     "headerandfooter" => Map {
       "3" => Map {

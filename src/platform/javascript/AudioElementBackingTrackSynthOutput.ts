@@ -27,7 +27,6 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
     public readonly sampleRate: number = 44100;
 
     public audioElement!: HTMLAudioElement;
-    private _padding: number = 0;
     private _updateInterval: number = 0;
 
     public get backingTrackDuration(): number {
@@ -52,15 +51,13 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
     }
 
     public seekTo(time: number): void {
-        this.audioElement.currentTime = time / 1000 - this._padding;
+        this.audioElement.currentTime = time / 1000;
     }
 
     public loadBackingTrack(backingTrack: BackingTrack) {
         if (this.audioElement?.src) {
             URL.revokeObjectURL(this.audioElement.src);
         }
-
-        this._padding = backingTrack.padding / 1000;
 
         const blob = new Blob([backingTrack.rawAudioFile!]);
         // https://html.spec.whatwg.org/multipage/media.html#loading-the-media-resource
@@ -82,7 +79,7 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
     }
 
     private updatePosition() {
-        const timePos = (this.audioElement.currentTime + this._padding) * 1000;
+        const timePos = this.audioElement.currentTime * 1000;
         (this.timeUpdate as EventEmitterOfT<number>).trigger(timePos);
     }
 

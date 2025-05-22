@@ -190,9 +190,14 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
         DispatchOnWorkerThread(() => { _player.SetChannelTranspositionPitch(channel, semitones); });
     }
 
-    public void LoadBackingTrack(Score score, IList<BackingTrackSyncPoint> syncPoints)
+    public void LoadBackingTrack(Score score)
     {
-        DispatchOnWorkerThread(() => { _player.LoadBackingTrack(score, syncPoints); });
+        DispatchOnWorkerThread(() => { _player.LoadBackingTrack(score); });
+    }
+
+    public void UpdateSyncPoints( IList<BackingTrackSyncPoint> syncPoints)
+    {
+        DispatchOnWorkerThread(() => { _player.UpdateSyncPoints(syncPoints); });
     }
 
     public IEventEmitter Ready { get; } = new EventEmitter();

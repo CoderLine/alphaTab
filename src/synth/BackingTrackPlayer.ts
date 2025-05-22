@@ -190,12 +190,16 @@ export class BackingTrackPlayer extends AlphaSynthBase {
         }
     }
 
-    public override loadBackingTrack(score: Score, syncPoints: BackingTrackSyncPoint[]): void {
+    public override loadBackingTrack(score: Score): void {
         const backingTrackInfo = score.backingTrack;
         if (backingTrackInfo) {
             this._backingTrackOutput.loadBackingTrack(backingTrackInfo);
-            this.sequencer.mainUpdateSyncPoints(syncPoints);
             this.timePosition = 0;
         }
+    }
+
+    public override updateSyncPoints(syncPoints: BackingTrackSyncPoint[]): void {
+        this.sequencer.mainUpdateSyncPoints(syncPoints);
+        this.tickPosition = this.tickPosition;
     }
 }

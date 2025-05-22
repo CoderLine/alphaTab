@@ -127,6 +127,7 @@ export class GpifParser {
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
+    private _backingTrackPadding:number = 0;
 
     private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
@@ -377,7 +378,7 @@ export class GpifParser {
                     assetId = c.innerText;
                     break;
                 case 'FramePadding':
-                    backingTrack.padding = GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate * 1000;
+                    this._backingTrackPadding = GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate * 1000;
                     break;
             }
         }
@@ -2746,6 +2747,7 @@ export class GpifParser {
                         masterBar.tempoAutomations.push(automation);
                         break;
                     case AutomationType.SyncPoint:
+                        automation.syncPointValue!.millisecondOffset -= this._backingTrackPadding;
                         masterBar.addSyncPoint(automation);
                         break;
                 }

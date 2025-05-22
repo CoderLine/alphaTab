@@ -156,7 +156,13 @@ export interface IAlphaSynth {
      * Loads the synchronization information from the given score (used for backing tracks and external media).
      * @param score
      */
-    loadBackingTrack(score: Score, syncPoints: BackingTrackSyncPoint[]): void;
+    loadBackingTrack(score: Score): void;
+
+    /**
+     * Updates the points used to synchronize the backing track with the synthesized audio for correct cursor placement.
+     * @param syncPoints
+     */
+    updateSyncPoints(syncPoints: BackingTrackSyncPoint[]): void;
 
     /**
      * Applies the given transposition pitches to be used during playback.

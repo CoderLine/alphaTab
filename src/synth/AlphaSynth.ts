@@ -599,7 +599,11 @@ export class AlphaSynthBase implements IAlphaSynth {
         return this.synthesizer.hasSamplesForPercussion(key);
     }
 
-    public loadBackingTrack(_score: Score, _syncPoints: BackingTrackSyncPoint[]): void {
+    public loadBackingTrack(_score: Score): void {
+        // ignore
+    }
+
+    public updateSyncPoints(_syncPoints: BackingTrackSyncPoint[]): void {
         // ignore
     }
 }

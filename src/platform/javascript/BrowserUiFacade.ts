@@ -59,6 +59,7 @@ interface ResultPlaceholder extends HTMLElement {
  * @target web
  */
 interface RegisteredWebFont {
+    hash: number;
     element: HTMLStyleElement;
     usages: number;
     fontSuffix: string;
@@ -232,6 +233,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         webFont.usages--;
         if (webFont.usages <= 0) {
             webFont.element.remove();
+            BrowserUiFacade._registeredWebFonts.delete(webFont.hash);
         }
     }
 
@@ -421,6 +423,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         );
 
         const webFont: RegisteredWebFont = {
+            hash,
             element: styleElement,
             fontSuffix,
             usages: 1,
