@@ -113,9 +113,6 @@ export function beforeEachTest(newTest: Mocha.Test) {
         }
 
         snapshotState = new SnapshotState(currentResolver!.resolveSnapshotPath(newTest.file!), snapshotOptions);
-        console.log('Resolved snapshot state', newTest.file!,
-            snapshotState
-        )
     }
     assertionCalls = 0;
     currentTest = newTest;
