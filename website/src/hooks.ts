@@ -1,7 +1,6 @@
-import React, { DependencyList, EffectCallback, useEffect, useRef, useState } from "react";
+import React, { type DependencyList, type EffectCallback, useEffect, useRef, useState } from "react";
 import * as alphaTab from "@coderline/alphatab";
 import environment from "./environment";
-import { dependencies } from "webpack";
 
 export function useAlphaTab(
   settingsInit: (settings: alphaTab.Settings) => void,
@@ -50,7 +49,7 @@ export type AlphaTabApiEvents = {
 export function useAlphaTabEvent<
   T extends keyof AlphaTabApiEvents,
   H extends Parameters<alphaTab.AlphaTabApi[T]["on"]>[0]
->(api: alphaTab.AlphaTabApi | undefined, event: T, handler: H) {
+>(api: alphaTab.AlphaTabApi | undefined, event: T, handler: H, deps?: DependencyList) {
   useEffect(() => {
     if (api) {
       api[event].on(handler as any);
@@ -58,7 +57,7 @@ export function useAlphaTabEvent<
         api[event].off(handler as any);
       };
     }
-  }, [api, event, handler]);
+  }, [api, event, handler, ...(deps ?? [])]);
 }
 
 export const useIsMount = () => {

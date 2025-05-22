@@ -1,16 +1,17 @@
 'use client';
 
-import type * as alphaTab from '@coderline/alphatab';
-import React, { useEffect, useState } from 'react';
+import * as alphaTab from '@coderline/alphatab';
+import React, { useState } from 'react';
 import { useAlphaTab, useAlphaTabEvent } from '@site/src/hooks';
 import styles from './styles.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solid from '@fortawesome/free-solid-svg-icons';
 import { openFile } from '@site/src/utils';
-import { PlayerControlsGroup, SidePanel } from './player-controls-group';
+import { BottomPanel, PlayerControlsGroup, SidePanel } from './player-controls-group';
 import { PlaygroundSettings } from './playground-settings';
 import { Tooltip } from 'react-tooltip';
 import { PlaygroundTrackSelector } from './track-selector';
+import { MediaSyncEditor } from './media-sync-editor';
 
 interface AlphaTabPlaygroundProps {
     settings?: alphaTab.json.SettingsJson;
@@ -20,12 +21,13 @@ export const AlphaTabPlayground: React.FC<AlphaTabPlaygroundProps> = ({ settings
     const viewPortRef = React.createRef<HTMLDivElement>();
     const [isLoading, setLoading] = useState(true);
     const [sidePanel, setSidePanel] = useState(SidePanel.None);
+    const [bottomPanel, setBottomPanel] = useState(BottomPanel.None);
 
     const [api, element] = useAlphaTab(s => {
         s.core.engine = 'svg';
         s.player.scrollElement = viewPortRef.current!;
         s.player.scrollOffsetY = -10;
-        s.player.enablePlayer = true;
+        s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
         if (settings) {
             s.fillFromJson(settings);
         }
@@ -88,7 +90,18 @@ export const AlphaTabPlayground: React.FC<AlphaTabPlaygroundProps> = ({ settings
                 </div>
 
                 <div className={styles['at-footer']}>
-                    {api && <PlayerControlsGroup api={api} sidePanel={sidePanel} onSidePanelChange={setSidePanel} />}
+                    {api && api?.score && bottomPanel === BottomPanel.MediaSyncEditor && (
+                        <MediaSyncEditor api={api} score={api!.score} />
+                    )}
+                    {api && (
+                        <PlayerControlsGroup
+                            api={api}
+                            sidePanel={sidePanel}
+                            onSidePanelChange={setSidePanel}
+                            bottomPanel={bottomPanel}
+                            onBottomPanelChange={setBottomPanel}
+                        />
+                    )}
                 </div>
             </div>
             <Tooltip anchorSelect="[data-tooltip-content]" id="tooltip-playground" style={{ zIndex: 1200 }} />

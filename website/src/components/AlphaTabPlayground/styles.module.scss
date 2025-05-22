@@ -55,17 +55,13 @@
 
 .at-footer {
     flex: 0 0 auto;
-    background: #436d9d;
 }
-
-.at-footer {
-    color: #fff;
-}
-
 
 .at-player {
     display: flex;
     justify-content: space-between;
+    background: #436d9d;
+    color: #fff;
 }
 
 .at-player>div {
@@ -397,7 +393,136 @@
 
 
 .color-picker {
-    & :global(.dropdown) > button {
+    & :global(.dropdown)>button {
         font-weight: normal;
+    }
+}
+
+.media-sync-editor {
+    height: 20vh;
+    display: flex;
+    flex-direction: column;
+    background: #FFF;
+    border-top: 1px solid rgba(0, 0, 0, 0.12);
+
+    & .toolbar {
+        padding: 0.2rem;
+        display: flex;
+        gap: 0.2rem;
+        align-items: center;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    & .sync-area {
+        overflow-y: hidden;
+        overflow-x: scroll;
+        flex-grow: 1;
+
+        align-items: start;
+        position: relative;
+
+        & .sync-area-canvas-wrap {
+            position: sticky;
+            top: 0;
+            left: 0;
+        }
+
+        & .sync-area-playback-cursor {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 1px;
+            height: 100%;
+            background: rgb(200, 0, 0);
+            pointer-events: none;
+            will-change: transform;
+            transition: transform linear 0.1s;
+            white-space: nowrap;
+            padding-top: 50px;
+            font-size: 12px;;
+        }
+
+        & .sync-area-marker-wrap {
+            position: absolute;
+            top: 0;
+
+            &>.masterbar-marker {
+                position: absolute;
+                width: 20px;
+                top: 0;
+                bottom: 20px;
+                transform: translateX(-50%);
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                font-size: 12px;
+
+                opacity: 0.4;
+
+                &:hover {
+                    opacity: 1;
+                }
+
+                &>.marker-label {
+                    height: 20px;
+                    white-space: nowrap;
+                    display: flex;
+                    align-items: center;
+                }
+
+
+                &>.marker-head {
+                    height: 20px;
+                    width: 20px;
+                    display: grid;
+                    align-items: center;
+                    grid-template-columns: 1fr;
+                    grid-template-rows: 1fr;
+
+                    &>* {
+                        grid-area: 1 / 1 / 2 / 2;
+                    }
+
+                    &>.marker-arrow {
+                        width: 20px;
+                        height: 20px;
+                        clip-path: polygon(0 0, 100% 0, 50% 100%);
+                        background: #444950;
+                    }
+
+                    &>.marker-tempo {
+                        white-space: nowrap;
+                        text-align: left;
+                        transform: translateX(25px);
+                        pointer-events: none;
+                    }
+                }
+
+
+                &>.marker-line {
+                    flex-grow: 1;
+                    width: 1px;
+                    background: #444950;
+                }
+
+                cursor: col-resize;
+
+                &.has-sync-point {
+                    opacity: 0.75;
+
+                    &:hover {
+                        opacity: 1;
+                    }
+
+                    & .marker-arrow {
+                        background: #4972a1;
+                    }
+                }
+
+
+            }
+        }
+
     }
 }

@@ -11,6 +11,8 @@ import { PlayerProgressIndicator } from '../AlphaTabFull/player-progress-indicat
 export interface PlayerControlsGroupProps {
     sidePanel: SidePanel;
     onSidePanelChange: (sidePanel: SidePanel) => void;
+    bottomPanel: BottomPanel;
+    onBottomPanelChange: (sidePanel: BottomPanel) => void;
     api: alphaTab.AlphaTabApi;
 }
 
@@ -20,7 +22,18 @@ export enum SidePanel {
     TrackSelector = 2
 }
 
-export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({ api, sidePanel, onSidePanelChange }) => {
+export enum BottomPanel {
+    None = 0,
+    MediaSyncEditor = 1
+}
+
+export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
+    api,
+    sidePanel,
+    onSidePanelChange,
+    bottomPanel,
+    onBottomPanelChange
+}) => {
     const [soundFontLoadPercentage, setSoundFontLoadPercentage] = useState(0);
     const [isPlaying, setPlaying] = useState(false);
     const [currentTime, setCurrentTime] = useState(0);
@@ -121,6 +134,19 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({ api, s
                 </div>
 
                 <div className={styles['at-player-right']}>
+                    <button
+                        type="button"
+                        onClick={e => {
+                            e.preventDefault();
+                            if (bottomPanel === BottomPanel.MediaSyncEditor) {
+                                onBottomPanelChange(BottomPanel.None);
+                            } else {
+                                onBottomPanelChange(BottomPanel.MediaSyncEditor);
+                            }
+                        }}
+                        className={bottomPanel === BottomPanel.MediaSyncEditor ? styles.active : ''}>
+                        <FontAwesomeIcon icon={solid.faTimeline} /> Media Sync
+                    </button>
                     <button
                         type="button"
                         onClick={e => {
