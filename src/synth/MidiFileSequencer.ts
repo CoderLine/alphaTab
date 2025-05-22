@@ -486,7 +486,9 @@ export class MidiFileSequencer {
             state.tempoChangeIndex = tempoChangeIndex;
             state.currentTempo = state.tempoChanges[state.tempoChangeIndex].bpm;
         }
+    }
 
+    private updateSyncPoints(state: MidiSequencerState, timePosition:number) {
         const syncPoints = state.syncPoints;
         if (syncPoints.length > 0) {
             let syncPointIndex = Math.min(state.syncPointIndex, syncPoints.length - 1);
@@ -516,7 +518,7 @@ export class MidiFileSequencer {
             return timePosition;
         }
 
-        this.updateCurrentTempo(this._mainState, timePosition);
+        this.updateSyncPoints(this._mainState, timePosition);
 
         const syncPointIndex = Math.min(mainState.syncPointIndex, syncPoints.length - 1);
 
