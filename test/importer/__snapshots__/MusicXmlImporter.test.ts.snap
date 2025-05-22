@@ -1,0 +1,3279 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MusicXmlImporterTests 2102-corrupt-direction 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "T1",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests barlines 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturecommon" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 11520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 15360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 19200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 23040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 26880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 30720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 34560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 38400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 42240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 46080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 49920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 53760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 57600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 61440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 65280,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 2,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 4,
+              "barlineright" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 9,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 1,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 9,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 1,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 2,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 3,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 9,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 9,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 9,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 10,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 10,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 10,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 5,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 11,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 11,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 11,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 6,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 12,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 12,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 12,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 7,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 13,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 13,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 13,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 8,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 14,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 14,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 14,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 9,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 15,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 15,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 15,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 10,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 16,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 16,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 16,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineright" => 11,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 17,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 17,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 17,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests partwise-anacrusis 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "Artist",
+  "copyright" => "Copyright",
+  "music" => "Music",
+  "notices" => "Notices",
+  "title" => "Title",
+  "words" => "Words",
+  "tab" => "Tab",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "isanacrusis" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+      "isanacrusis" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 1,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 9,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 9,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 9,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "program" => 1,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "Track 2",
+      "shortname" => "T2",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests partwise-basic 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "Artist",
+  "copyright" => "Copyright",
+  "music" => "Music",
+  "notices" => "Notices",
+  "title" => "Title",
+  "words" => "Words",
+  "tab" => "Tab",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 1,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "program" => 1,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "Track 2",
+      "shortname" => "T2",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 2,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "program" => 2,
+        "primarychannel" => 4,
+        "secondarychannel" => 5,
+      },
+      "name" => "Track 3",
+      "shortname" => "T3",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests partwise-complex-measures 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturecommon" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 5,
+                          "tone" => 2,
+                        },
+                      ],
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 2,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 1440,
+                      "playbackduration" => 1440,
+                      "overridedisplayduration" => 1440,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displaystart" => 2400,
+                      "playbackstart" => 2400,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 3,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2640,
+                      "playbackstart" => 2640,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 6,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 7,
+                          "octave" => 5,
+                          "tone" => 2,
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 9,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 8,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 1440,
+                      "playbackduration" => 1440,
+                      "overridedisplayduration" => 1440,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 10,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displaystart" => 2400,
+                      "playbackstart" => 2400,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 11,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 9,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2640,
+                      "playbackstart" => 2640,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 2880,
+                      "playbackduration" => 2880,
+                      "overridedisplayduration" => 2880,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 4,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displaystart" => 2880,
+                      "playbackstart" => 2880,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 1500,
+                      "playbackduration" => 1500,
+                      "overridedisplayduration" => 1500,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 5,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 2,
+                      "displaystart" => 1500,
+                      "playbackstart" => 1500,
+                      "displayduration" => 1920,
+                      "playbackduration" => 1920,
+                      "overridedisplayduration" => 1920,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 12,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 2880,
+                      "playbackduration" => 2880,
+                      "overridedisplayduration" => 2880,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 13,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 10,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displaystart" => 2880,
+                      "playbackstart" => 2880,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 14,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 1500,
+                      "playbackduration" => 1500,
+                      "overridedisplayduration" => 1500,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 15,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 11,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 2,
+                      "displaystart" => 1500,
+                      "playbackstart" => 1500,
+                      "displayduration" => 1920,
+                      "playbackduration" => 1920,
+                      "overridedisplayduration" => 1920,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "Track 1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 16,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 1920,
+                      "playbackduration" => 1920,
+                      "overridedisplayduration" => 1920,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 17,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 12,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 2,
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 1920,
+                      "playbackduration" => 1920,
+                      "overridedisplayduration" => 1920,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 18,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 19,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 13,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 20,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 1428,
+                      "playbackduration" => 1428,
+                      "overridedisplayduration" => 1428,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 21,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 14,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 1428,
+                      "playbackstart" => 1428,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                    },
+                  ],
+                },
+              ],
+              "keysignature" => 4,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 9,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 22,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 1920,
+                      "playbackduration" => 1920,
+                      "overridedisplayduration" => 1920,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 23,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 15,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 2,
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 1920,
+                      "playbackduration" => 1920,
+                      "overridedisplayduration" => 1920,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 10,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 24,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 25,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 16,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                      "overridedisplayduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 11,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 26,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 1428,
+                      "playbackduration" => 1428,
+                      "overridedisplayduration" => 1428,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 27,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 17,
+                          "octave" => 6,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 1428,
+                      "playbackstart" => 1428,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                    },
+                  ],
+                },
+              ],
+              "keysignature" => 4,
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "Track 2",
+      "shortname" => "Track 2",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests partwise-staff-change 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturecommon" => true,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "duration" => 16,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 13,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displaystart" => 240,
+                      "playbackstart" => 240,
+                      "displayduration" => 2640,
+                      "playbackduration" => 2640,
+                      "overridedisplayduration" => 2640,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 14,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 11,
+                          "octave" => 5,
+                          "tone" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2880,
+                      "playbackstart" => 2880,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 15,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 12,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 3120,
+                      "playbackstart" => 3120,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 16,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 13,
+                          "octave" => 5,
+                          "tone" => 0,
+                          "accidentalmode" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 3360,
+                      "playbackstart" => 3360,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 17,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 14,
+                          "octave" => 5,
+                          "tone" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 3600,
+                      "playbackstart" => 3600,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                  ],
+                },
+              ],
+              "keysignature" => 4,
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "clef" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 0,
+                          "octave" => 3,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 240,
+                      "playbackstart" => 240,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 1,
+                          "octave" => 4,
+                          "tone" => 0,
+                          "accidentalmode" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 480,
+                      "playbackstart" => 480,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 2,
+                          "octave" => 4,
+                          "tone" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 720,
+                      "playbackstart" => 720,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 3,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 4,
+                          "octave" => 4,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1200,
+                      "playbackstart" => 1200,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 5,
+                          "octave" => 4,
+                          "tone" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1440,
+                      "playbackstart" => 1440,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 6,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1680,
+                      "playbackstart" => 1680,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 9,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 7,
+                          "octave" => 5,
+                          "tone" => 0,
+                          "accidentalmode" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 10,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 8,
+                          "octave" => 4,
+                          "tone" => 3,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2160,
+                      "playbackstart" => 2160,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 11,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 9,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2400,
+                      "playbackstart" => 2400,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 12,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 10,
+                          "octave" => 5,
+                          "tone" => 0,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2640,
+                      "playbackstart" => 2640,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 47,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 48,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 49,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 18,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 15,
+                          "octave" => 3,
+                          "tone" => 0,
+                          "isstaccato" => true,
+                          "accidentalmode" => 3,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 19,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 16,
+                          "octave" => 3,
+                          "tone" => 8,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 480,
+                      "playbackstart" => 480,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 20,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 17,
+                          "octave" => 3,
+                          "tone" => 0,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 21,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 18,
+                          "octave" => 3,
+                          "tone" => 8,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 1440,
+                      "playbackstart" => 1440,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 1,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 22,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 19,
+                          "octave" => 3,
+                          "tone" => 0,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 23,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 20,
+                          "octave" => 3,
+                          "tone" => 8,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 2400,
+                      "playbackstart" => 2400,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 24,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 21,
+                          "octave" => 3,
+                          "tone" => 0,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 2880,
+                      "playbackstart" => 2880,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 25,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 22,
+                          "octave" => 3,
+                          "tone" => 8,
+                          "isstaccato" => true,
+                        },
+                      ],
+                      "duration" => 8,
+                      "displaystart" => 3360,
+                      "playbackstart" => 3360,
+                      "displayduration" => 480,
+                      "playbackduration" => 480,
+                      "overridedisplayduration" => 480,
+                      "preferredbeamdirection" => 1,
+                      "beamingmode" => 1,
+                    },
+                  ],
+                },
+              ],
+              "keysignature" => 4,
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "Track 1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 26,
+                      "duration" => 16,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 35,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displaystart" => 240,
+                      "playbackstart" => 240,
+                      "displayduration" => 1680,
+                      "playbackduration" => 1680,
+                      "overridedisplayduration" => 1680,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 36,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 30,
+                          "octave" => 5,
+                          "tone" => 1,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 40,
+                      "duration" => 16,
+                      "displaystart" => 2160,
+                      "playbackstart" => 2160,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 41,
+                      "duration" => 16,
+                      "displaystart" => 2400,
+                      "playbackstart" => 2400,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 42,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 33,
+                          "octave" => 5,
+                          "tone" => 1,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2640,
+                      "playbackstart" => 2640,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 43,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 34,
+                          "octave" => 5,
+                          "tone" => 4,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2880,
+                      "playbackstart" => 2880,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 44,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 35,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 3120,
+                      "playbackstart" => 3120,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 45,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 36,
+                          "octave" => 5,
+                          "tone" => 1,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 3360,
+                      "playbackstart" => 3360,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 46,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 37,
+                          "octave" => 5,
+                          "tone" => 4,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 3600,
+                      "playbackstart" => 3600,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 27,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 28,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 23,
+                          "octave" => 3,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 240,
+                      "playbackstart" => 240,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 29,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 24,
+                          "octave" => 4,
+                          "tone" => 1,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 480,
+                      "playbackstart" => 480,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 30,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 25,
+                          "octave" => 4,
+                          "tone" => 4,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 720,
+                      "playbackstart" => 720,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 31,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 26,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 960,
+                      "playbackstart" => 960,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 32,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 27,
+                          "octave" => 4,
+                          "tone" => 1,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1200,
+                      "playbackstart" => 1200,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 33,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 28,
+                          "octave" => 4,
+                          "tone" => 4,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1440,
+                      "playbackstart" => 1440,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 34,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 29,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 1680,
+                      "playbackstart" => 1680,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 1,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 37,
+                      "isempty" => true,
+                      "duration" => 256,
+                      "displaystart" => 1920,
+                      "playbackstart" => 1920,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 38,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 31,
+                          "octave" => 4,
+                          "tone" => 4,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2160,
+                      "playbackstart" => 2160,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 39,
+                      "notes" => Array [
+                        Map {
+                          "__kind" => "Note",
+                          "id" => 32,
+                          "octave" => 4,
+                          "tone" => 8,
+                        },
+                      ],
+                      "duration" => 16,
+                      "displaystart" => 2400,
+                      "playbackstart" => 2400,
+                      "displayduration" => 240,
+                      "playbackduration" => 240,
+                      "overridedisplayduration" => 240,
+                      "preferredbeamdirection" => 0,
+                      "beamingmode" => 2,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "Track 2",
+      "shortname" => "Track 2",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests timewise-anacrusis 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "Artist",
+  "copyright" => "Copyright",
+  "music" => "Music",
+  "notices" => "Notices",
+  "title" => "Title",
+  "words" => "Words",
+  "tab" => "Tab",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "isanacrusis" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+      "isanacrusis" => true,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 1,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 9,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 9,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 9,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "program" => 1,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "Track 2",
+      "shortname" => "T2",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
+
+exports[`MusicXmlImporterTests timewise-basic 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "Artist",
+  "copyright" => "Copyright",
+  "music" => "Music",
+  "notices" => "Notices",
+  "title" => "Title",
+  "words" => "Words",
+  "tab" => "Tab",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 6,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 6,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "secondarychannel" => 1,
+      },
+      "name" => "Track 1",
+      "shortname" => "T1",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 1,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 4,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 4,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 4,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 7,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 7,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 5,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "program" => 1,
+        "primarychannel" => 2,
+        "secondarychannel" => 3,
+      },
+      "name" => "Track 2",
+      "shortname" => "T2",
+    },
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 6,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 2,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 5,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 5,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 7,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 8,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 8,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 8,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "volume" => 0,
+        "program" => 2,
+        "primarychannel" => 4,
+        "secondarychannel" => 5,
+      },
+      "name" => "Track 3",
+      "shortname" => "T3",
+    },
+  ],
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+  },
+}
+`;
