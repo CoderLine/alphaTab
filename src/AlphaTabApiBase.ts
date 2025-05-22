@@ -2212,8 +2212,9 @@ export class AlphaTabApiBase<TSettings> {
                         // it can happen that the cursor reaches the target position slightly too early (especially on backing tracks)
                         // to avoid the cursor stopping, causing a wierd look, we animate the cursor to the double position in double time.
                         // beatCursor!.transitionToX((duration / cursorSpeed), nextBeatX);
-                        const doubleEndBeatX = startBeatX + (nextBeatX - startBeatX) * 2;
-                        beatCursor!.transitionToX((duration / cursorSpeed) * 2, doubleEndBeatX);
+                        const factor = cursorMode === MidiTickLookupFindBeatResultCursorMode.ToNextBext ? 2 : 1;
+                        const doubleEndBeatX = startBeatX + (nextBeatX - startBeatX) * factor;
+                        beatCursor!.transitionToX((duration / cursorSpeed) * factor, doubleEndBeatX);
                     });
                 } else {
                     beatCursor.transitionToX(0, startBeatX);
