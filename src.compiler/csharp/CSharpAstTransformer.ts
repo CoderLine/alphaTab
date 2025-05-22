@@ -703,7 +703,7 @@ export default class CSharpAstTransformer {
             sourcePath,
             '..',
             '__snapshots__',
-            `${path.basename(sourcePath).toLowerCase()}.snap`
+            `${path.basename(sourcePath)}.snap`
         );
         if (fs.existsSync(snapshotFilePath)) {
             const relative = path.relative(path.resolve(this._context.compilerOptions.baseUrl!), snapshotFilePath);
