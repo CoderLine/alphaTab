@@ -363,16 +363,6 @@ export class MidiFileGenerator {
             masterBarLookup.tempoChanges.push(new MasterBarTickLookupTempoChange(currentTick, currentTempo));
         }
 
-        const syncPoints = masterBar.syncPoints;
-        if (syncPoints) {
-            for (const syncPoint of syncPoints) {
-                if (syncPoint.syncPointValue!.barOccurence === barOccurence) {
-                    const tick = currentTick + masterBarDuration * syncPoint.ratioPosition;
-                    this.syncPoints.push(new BackingTrackSyncPoint(tick, syncPoint.syncPointValue!));
-                }
-            }
-        }
-
         masterBarLookup.masterBar = masterBar;
         masterBarLookup.start = currentTick;
         masterBarLookup.end = masterBarLookup.start + masterBarDuration;
