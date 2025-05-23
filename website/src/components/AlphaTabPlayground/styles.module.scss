@@ -425,6 +425,10 @@
             position: sticky;
             top: 0;
             left: 0;
+
+            &>canvas {
+                font: 12px "Noto Sans";
+            }
         }
 
         & .sync-area-playback-cursor {
@@ -439,90 +443,109 @@
             transition: transform linear 0.1s;
             white-space: nowrap;
             padding-top: 50px;
-            font-size: 12px;;
+            font-size: 12px;
+        }
+    }
+}
+
+.sync-area-marker-wrap {
+    position: absolute;
+    top: 0;
+
+    &>.masterbar-marker {
+        position: absolute;
+        width: 20px;
+        top: 0;
+        bottom: 20px;
+        transform: translateX(-50%);
+        user-select: none;
+
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        font-size: 12px;
+
+        opacity: 0.4;
+
+        &:hover {
+            opacity: 1;
         }
 
-        & .sync-area-marker-wrap {
-            position: absolute;
-            top: 0;
 
-            &>.masterbar-marker {
-                position: absolute;
+        &>.marker-label {
+            height: 20px;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+        }
+
+
+        &>.marker-head {
+            height: 20px;
+            width: 20px;
+            display: grid;
+            align-items: center;
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+
+            &>* {
+                grid-area: 1 / 1 / 2 / 2;
+            }
+
+            &>.marker-arrow {
                 width: 20px;
-                top: 0;
-                bottom: 20px;
-                transform: translateX(-50%);
+                height: 20px;
+                clip-path: polygon(0 0, 100% 0, 50% 100%);
+                background: #444950;
+            }
 
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                font-size: 12px;
-
-                opacity: 0.4;
-
-                &:hover {
-                    opacity: 1;
-                }
-
-                &>.marker-label {
-                    height: 20px;
-                    white-space: nowrap;
-                    display: flex;
-                    align-items: center;
-                }
-
-
-                &>.marker-head {
-                    height: 20px;
-                    width: 20px;
-                    display: grid;
-                    align-items: center;
-                    grid-template-columns: 1fr;
-                    grid-template-rows: 1fr;
-
-                    &>* {
-                        grid-area: 1 / 1 / 2 / 2;
-                    }
-
-                    &>.marker-arrow {
-                        width: 20px;
-                        height: 20px;
-                        clip-path: polygon(0 0, 100% 0, 50% 100%);
-                        background: #444950;
-                    }
-
-                    &>.marker-tempo {
-                        white-space: nowrap;
-                        text-align: left;
-                        transform: translateX(25px);
-                        pointer-events: none;
-                    }
-                }
-
-
-                &>.marker-line {
-                    flex-grow: 1;
-                    width: 1px;
-                    background: #444950;
-                }
-
-                cursor: col-resize;
-
-                &.has-sync-point {
-                    opacity: 0.75;
-
-                    &:hover {
-                        opacity: 1;
-                    }
-
-                    & .marker-arrow {
-                        background: #4972a1;
-                    }
-                }
-
-
+            &>.marker-tempo {
+                white-space: nowrap;
+                text-align: left;
+                transform: translateX(25px);
+                pointer-events: none;
             }
         }
 
+        &>.marker-line {
+            flex-grow: 1;
+            width: 0;
+            border-right: 1px solid #444950;
+        }
+
+        &.masterbar-marker-startmarker,
+        &.masterbar-marker-endmarker {
+            &>.marker-line {
+                border-right-style: solid;
+                border-right-width: 2px;
+            }
+        }
+
+        &.masterbar-marker-masterbar {
+            &>.marker-line {
+                border-right-style: solid;
+            }
+        }
+
+        &.masterbar-marker-intermediate {
+            &>.marker-line {
+                border-right-style: dashed;
+            }
+        }
+
+
+        cursor: col-resize;
+
+        &.has-sync-point {
+            opacity: 0.75;
+
+            &:hover {
+                opacity: 1;
+            }
+
+            & .marker-arrow {
+                background: #4972a1;
+            }
+        }
     }
 }
