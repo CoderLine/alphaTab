@@ -100,7 +100,7 @@
         "html-webpack-plugin": "^5.6.3",
         "jest-snapshot": "^29.7.0",
         "mocha": "^11.1.0",
-        "multer": "^1.4.5-lts.1",
+        "multer": "^2.0.0",
         "opener": "^1.5.2",
         "rimraf": "^6.0.1",
         "rollup-plugin-copy": "^3.5.0",
