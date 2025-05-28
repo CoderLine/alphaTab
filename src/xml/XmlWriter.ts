@@ -48,7 +48,7 @@ export class XmlWriter {
                         this.indent();
                         for (const child of xml.childNodes) {
                             // skip text nodes in case of multiple children
-                            if (child.nodeType === XmlNodeType.Element) {
+                            if (child.nodeType === XmlNodeType.Element || child.nodeType === XmlNodeType.Comment) {
                                 this.writeNode(child);
                             }
                         }
@@ -78,6 +78,9 @@ export class XmlWriter {
                 break;
             case XmlNodeType.DocumentType:
                 this.write(`<!DOCTYPE ${xml.value}>`);
+                break;
+            case XmlNodeType.Comment:
+                this.write(`<!-- ${xml.value} -->`);
                 break;
         }
     }

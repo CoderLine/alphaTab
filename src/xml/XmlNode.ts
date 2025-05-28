@@ -27,7 +27,8 @@ export enum XmlNodeType {
     Text = 2,
     CDATA = 3,
     Document = 4,
-    DocumentType = 5
+    DocumentType = 5,
+    Comment = 6
 }
 
 export class XmlNode {
