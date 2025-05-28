@@ -451,6 +451,8 @@ export class MidiFileSequencer {
         }
 
         state.syncPointIndex = 0;
+        state.modifiedTempo =
+            state.syncPoints.length > 0 ? state.syncPoints[0].modifiedTempo : state.currentTempo;
     }
 
     public currentTimePositionToTickPosition(timePosition: number): number {
@@ -488,7 +490,7 @@ export class MidiFileSequencer {
         }
     }
 
-    private updateSyncPoints(state: MidiSequencerState, timePosition:number) {
+    private updateSyncPoints(state: MidiSequencerState, timePosition: number) {
         const syncPoints = state.syncPoints;
         if (syncPoints.length > 0) {
             let syncPointIndex = Math.min(state.syncPointIndex, syncPoints.length - 1);
