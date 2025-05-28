@@ -71,6 +71,9 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
         const audioElement = document.createElement('audio');
         audioElement.style.display = 'none';
         document.body.appendChild(audioElement);
+        audioElement.addEventListener('seeked', () => {
+            this.updatePosition();
+        });
         audioElement.addEventListener('timeupdate', () => {
             this.updatePosition();
         });
