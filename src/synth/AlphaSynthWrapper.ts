@@ -98,6 +98,7 @@ export class AlphaSynthWrapper implements IAlphaSynth {
                 value.playbackSpeed = this._playbackSpeed;
                 value.isLooping = this._isLooping;
                 value.midiEventsPlayedFilter = this._midiEventsPlayedFilter;
+                (this.ready as EventEmitter).trigger();
             } else {
                 newUnregister.push(
                     value.ready.on(() => {
