@@ -1041,4 +1041,10 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             this.write('break');
         }
     }
+
+    protected override writeLabeledExpression(expr: cs.LabeledExpression) {
+        this.write(expr.label);
+        this.write(': ');
+        this.writeExpression(expr.expression);
+    }
 }

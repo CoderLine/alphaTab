@@ -184,6 +184,8 @@ export default abstract class AstPrinterBase {
     protected abstract writeCastExpression(expr: cs.CastExpression);
     protected abstract writeNonNullExpression(expr: cs.NonNullExpression);
     protected abstract writeYieldExpression(expr: cs.YieldExpression);
+    protected abstract writeLabeledExpression(expr: cs.LabeledExpression) 
+
 
     protected writeToDoExpression(expr: cs.ToDoExpression) {
         this.write('/* TODO */');
@@ -403,11 +405,14 @@ export default abstract class AstPrinterBase {
             case cs.SyntaxKind.TypeReference:
                 this.writeType(expr as cs.TypeReference);
                 break;
+            case cs.SyntaxKind.LabeledExpression:
+                this.writeLabeledExpression(expr as cs.LabeledExpression);
+                break;
             default:
                 throw new Error(`Unhandled expression type: ${cs.SyntaxKind[expr.nodeType]}`);
         }
     }
-
+    
     protected writeStatement(s: cs.Statement) {
         switch (s.nodeType) {
             case cs.SyntaxKind.EmptyStatement:

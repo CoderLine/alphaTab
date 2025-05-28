@@ -82,7 +82,8 @@ export enum SyntaxKind {
 
     SpreadExpression = 73,
     LocalFunction = 74,
-    YieldExpression = 75
+    YieldExpression = 75,
+    LabeledExpression = 76
 }
 
 export interface Node {
@@ -485,6 +486,13 @@ export interface YieldExpression extends Node {
     expression: Expression | null;
 }
 
+// e.g. on named parameter arguments like Call(test: 1, bla: 2)
+export interface LabeledExpression extends Node {
+    nodeType: SyntaxKind.LabeledExpression;
+    label: string;
+    expression: Expression;
+}
+
 // Statements
 
 export interface Statement extends Node {}
@@ -848,4 +856,7 @@ export function isLocalFunction(node: Node): node is LocalFunctionDeclaration {
 }
 export function isYieldExpression(node: Node): node is YieldExpression {
     return node.nodeType === SyntaxKind.YieldExpression;
+}
+export function isLabeledExpression(node: Node): node is LabeledExpression {
+    return node.nodeType === SyntaxKind.LabeledExpression;
 }
