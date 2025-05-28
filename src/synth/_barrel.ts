@@ -15,3 +15,4 @@ export { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynt
 export { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 export { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 export type { IAudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';
+export type { IExternalMediaHandler, IExternalMediaSynthOutput } from '@src/synth/ExternalMediaPlayer';
