@@ -25,6 +25,36 @@ export enum AutomationType {
 }
 
 /**
+ * A simple flat sync point for easy persistence separate to the main data model.
+ * @record
+ */
+export interface FlatSyncPoint {
+    /**
+     * Indicates index of the masterbar for which this sync point is valid.
+     */
+    barIndex: number;
+    /**
+     * Indicates relative position (0-1) of the sync point in within the masterbar.
+     */
+    barPosition: number;
+    /**
+     * Indicates for which repeat occurence this sync point is valid (e.g. 0 on the first time played, 1 on the second time played)
+     */
+    barOccurence: number;
+    /**
+     * The modified tempo at which the cursor should move (aka. the tempo played within the external audio track).
+     * This information is used together with normal tempo changes to calculate how much faster/slower the
+     * cursor playback is performed to align with the audio track.
+     */
+    modifiedTempo: number;
+    /**
+     * The uadio offset marking the position within the audio track in milliseconds.
+     * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
+     */
+    millisecondOffset: number;
+}
+
+/**
  * Represents the data of a sync point for synchronizing the internal time axis with
  * an external audio file.
  * @cloneable
@@ -43,7 +73,7 @@ export class SyncPointData {
      */
     public modifiedTempo: number = 0;
     /**
-     * The uadio offset marking the position within the audio track in milliseconds.
+     * The audio offset marking the position within the audio track in milliseconds.
      * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
      */
     public millisecondOffset: number = 0;
