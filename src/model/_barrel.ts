@@ -1,6 +1,6 @@
 export { AccentuationType } from '@src/model/AccentuationType';
 export { AccidentalType } from '@src/model/AccidentalType';
-export { AutomationType, Automation, SyncPointData } from '@src/model/Automation';
+export { AutomationType, Automation, SyncPointData, type FlatSyncPoint } from '@src/model/Automation';
 export { Bar, SustainPedalMarkerType, SustainPedalMarker, BarSubElement, BarStyle, BarLineStyle } from '@src/model/Bar';
 export { BarreShape } from '@src/model/BarreShape';
 export { Beat, BeatBeamingMode, BeatSubElement, BeatStyle } from '@src/model/Beat';

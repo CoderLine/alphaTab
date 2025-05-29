@@ -169,4 +169,9 @@ describe('Gp7ExporterTest', () => {
     it('gp7-lyrics-null', async () => {
         await testRoundTripEqual('guitarpro7/lyrics-null.gp', null);
     });
+
+
+    // it('gp8', async () => {
+    //     await testRoundTripFolderEqual('guitarpro8');
+    // });
 });

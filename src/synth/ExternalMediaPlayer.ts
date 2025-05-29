@@ -3,6 +3,9 @@ import type { BackingTrack } from '@src/model/BackingTrack';
 import { type IBackingTrackSynthOutput, BackingTrackPlayer } from '@src/synth/BackingTrackPlayer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
+/**
+ * A custom handler for integrating alphaTab with an external media source.
+ */
 export interface IExternalMediaHandler {
     /**
      * The total duration of the backing track in milliseconds.
@@ -22,11 +25,32 @@ export interface IExternalMediaHandler {
      */
     seekTo(time: number): void;
 
+    /**
+     * Instructs the external media to start the playback.
+     */
     play(): void;
+    /**
+     * Instructs the external media to pause the playback.
+     */
     pause(): void;
 }
 
-class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
+/**
+ * A output handling the playback via an external media.
+ */
+export interface IExternalMediaSynthOutput extends IBackingTrackSynthOutput {
+    /**
+     * The handler to which the media control will be delegated.
+     */
+    handler: IExternalMediaHandler | undefined;
+    /**
+     * Updates the playback position from the external media source.
+     * @param currentTime The current time in the external media.
+     */
+    updatePosition(currentTime: number): void;
+}
+
+class ExternalMediaSynthOutput implements IExternalMediaSynthOutput {
     // fake rate
     public readonly sampleRate: number = 44100;
 
@@ -84,8 +108,7 @@ class ExternalMediaSynthOutput implements IBackingTrackSynthOutput {
         }
     }
 
-    public loadBackingTrack(_backingTrack: BackingTrack) {
-    }
+    public loadBackingTrack(_backingTrack: BackingTrack) {}
 
     public open(_bufferTimeInMilliseconds: number): void {
         (this.ready as EventEmitter).trigger();

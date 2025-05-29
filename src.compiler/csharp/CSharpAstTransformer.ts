@@ -412,6 +412,11 @@ export default class CSharpAstTransformer {
     }
 
     protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
+        if (ts.getJSDocTags(node).some(t => t.tagName.text === 'record')) {
+            this.visitRecordDeclaration(node);
+            return;
+        }
+
         let extendsClauses: ts.ExpressionWithTypeArguments[] = [];
 
         if (node.heritageClauses) {
@@ -466,6 +471,193 @@ export default class CSharpAstTransformer {
 
         this._csharpFile.namespace.declarations.push(csInterface);
         this._context.registerSymbol(csInterface);
+    }
+
+    protected visitRecordDeclaration(node: ts.InterfaceDeclaration) {
+        let extendsClause: ts.ExpressionWithTypeArguments | null = null;
+        let implementsClauses: ts.ExpressionWithTypeArguments[] = [];
+
+        if (node.heritageClauses) {
+            for (const c of node.heritageClauses) {
+                if (c.token === ts.SyntaxKind.ExtendsKeyword) {
+                    extendsClause = c.types[0];
+                }
+                if (c.token === ts.SyntaxKind.ImplementsKeyword) {
+                    implementsClauses = c.types.slice();
+                }
+            }
+        }
+
+        const csClass: cs.ClassDeclaration = {
+            visibility: cs.Visibility.Public,
+            name: node.name.text,
+            nodeType: cs.SyntaxKind.ClassDeclaration,
+            parent: this._csharpFile.namespace,
+            isAbstract: false,
+            members: [],
+            tsNode: node,
+            skipEmit: this.shouldSkip(node, false),
+            partial: !!ts.getJSDocTags(node).find(t => t.tagName.text === 'partial'),
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false
+        };
+
+        if (node.name) {
+            csClass.documentation = this.visitDocumentation(node.name);
+        }
+
+        if (node.typeParameters) {
+            csClass.typeParameters = node.typeParameters.map(p => this.visitTypeParameterDeclaration(csClass, p));
+        }
+
+        if (extendsClause) {
+            const ex = extendsClause as ts.ExpressionWithTypeArguments;
+            const baseClass = this.createUnresolvedTypeNode(csClass, ex);
+            if (ex.typeArguments) {
+                baseClass.typeArguments = ex.typeArguments.map(a => this.createUnresolvedTypeNode(csClass, a));
+            } else {
+                baseClass.typeArguments = [];
+            }
+            csClass.baseClass = baseClass;
+        }
+
+        if (implementsClauses && implementsClauses.length > 0) {
+            csClass.interfaces = implementsClauses.map(n => {
+                const inter = this.createUnresolvedTypeNode(csClass, n);
+                if (n.typeArguments) {
+                    inter.typeArguments = n.typeArguments.map(a => this.createUnresolvedTypeNode(csClass, a));
+                } else {
+                    inter.typeArguments = undefined;
+                }
+
+                return inter;
+            });
+        }
+
+        if (!csClass.skipEmit) {
+            const recordMembers: ts.PropertySignature[] = [];
+            for (const m of node.members) {
+                if (ts.isPropertySignature(m)) {
+                    const type = this._context.typeChecker.getTypeAtLocation(m);
+                    recordMembers.push(m);
+                    const csProperty: cs.PropertyDeclaration = {
+                        parent: csClass,
+                        nodeType: cs.SyntaxKind.PropertyDeclaration,
+                        isAbstract: false,
+                        isOverride: false,
+                        isStatic: false,
+                        isVirtual: false,
+                        name: this._context.toPascalCase(m.name.getText()),
+                        type: this.createUnresolvedTypeNode(null, m.type ?? m, type),
+                        visibility: cs.Visibility.Public,
+                        tsNode: m,
+                        tsSymbol: this._context.getSymbolForDeclaration(m),
+                        skipEmit: this.shouldSkip(m, false)
+                    };
+
+                    if (m.name) {
+                        csProperty.documentation = this.visitDocumentation(m.name);
+                    }
+
+                    csProperty.type.parent = csProperty;
+                    csProperty.getAccessor = {
+                        parent: csProperty,
+                        nodeType: cs.SyntaxKind.PropertyAccessorDeclaration,
+                        keyword: 'get'
+                    };
+                    csProperty.setAccessor = {
+                        parent: csProperty,
+                        nodeType: cs.SyntaxKind.PropertyAccessorDeclaration,
+                        keyword: 'set'
+                    };
+
+                    csClass.members.push(csProperty);
+
+                    this._context.registerSymbol(csProperty);
+                } else {
+                    this._context.addTsNodeDiagnostics(
+                        m,
+                        `Record interfaces can only declare property signatures, found ${ts.SyntaxKind[m.kind]}`,
+                        ts.DiagnosticCategory.Error
+                    );
+                }
+            }
+
+            const csConstructor: cs.ConstructorDeclaration = {
+                parent: csClass,
+                nodeType: cs.SyntaxKind.ConstructorDeclaration,
+                name: '.ctor',
+                parameters: [],
+                isStatic: false,
+                visibility: cs.Visibility.Public,
+                tsNode: node,
+                skipEmit: this.shouldSkip(node, false)
+            };
+
+            for (const p of recordMembers) {
+                const type = this._context.typeChecker.getTypeAtLocation(p);
+                const csParameter: cs.ParameterDeclaration = {
+                    nodeType: cs.SyntaxKind.ParameterDeclaration,
+                    name: (p.name as ts.Identifier).text,
+                    parent: csConstructor,
+                    type: this.createUnresolvedTypeNode(null, p.type ?? p, type),
+                    tsNode: p,
+                    params: false,
+                    isOptional: false
+                };
+                csParameter.type!.parent = csParameter;
+                csConstructor.parameters.push(csParameter);
+            }
+
+            csConstructor.body = {
+                nodeType: cs.SyntaxKind.Block,
+                parent: csConstructor,
+                statements: []
+            };
+
+            for (const p of recordMembers) {
+                const stmt: cs.ExpressionStatement = {
+                    nodeType: cs.SyntaxKind.ExpressionStatement,
+                    parent: csConstructor.body,
+                    expression: null!
+                };
+
+                stmt.expression = {
+                    nodeType: cs.SyntaxKind.BinaryExpression,
+                    parent: stmt,
+                    operator: '=',
+                    left: null!,
+                    right: null!
+                } as cs.BinaryExpression;
+
+                (stmt.expression as cs.BinaryExpression).left = {
+                    nodeType: cs.SyntaxKind.MemberAccessExpression,
+                    parent: stmt.expression,
+                    expression: {
+                        nodeType: cs.SyntaxKind.ThisLiteral,
+                        parent: stmt.expression
+                    } as cs.ThisLiteral,
+                    member: this._context.toPascalCase(p.name.getText())
+                } as cs.MemberAccessExpression;
+
+                ((stmt.expression as cs.BinaryExpression).left as cs.MemberAccessExpression).expression.parent = (
+                    stmt.expression as cs.BinaryExpression
+                ).left;
+
+                (stmt.expression as cs.BinaryExpression).right = {
+                    nodeType: cs.SyntaxKind.Identifier,
+                    parent: stmt.expression,
+                    text: (p.name as ts.Identifier).text
+                } as cs.Identifier;
+
+                csConstructor.body.statements.push(stmt);
+            }
+
+            csClass.members.push(csConstructor);
+        }
+
+        this._csharpFile.namespace.declarations.push(csClass);
+        this._context.registerSymbol(csClass);
     }
 
     protected visitTypeParameterDeclaration(
@@ -699,12 +891,7 @@ export default class CSharpAstTransformer {
         parent.members.push(csMethod);
 
         const sourcePath = d.getSourceFile().fileName;
-        const snapshotFilePath = path.resolve(
-            sourcePath,
-            '..',
-            '__snapshots__',
-            `${path.basename(sourcePath)}.snap`
-        );
+        const snapshotFilePath = path.resolve(sourcePath, '..', '__snapshots__', `${path.basename(sourcePath)}.snap`);
         if (fs.existsSync(snapshotFilePath)) {
             const relative = path.relative(path.resolve(this._context.compilerOptions.baseUrl!), snapshotFilePath);
             csMethod.attributes.push({
@@ -3434,6 +3621,59 @@ export default class CSharpAstTransformer {
     }
 
     protected visitObjectLiteralExpression(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
+        const type = this._context.typeChecker.getContextualType(expression);
+        const isRecord = type?.symbol?.declarations?.some(d =>
+            ts.getJSDocTags(d).some(t => t.tagName.text === 'record')
+        );
+        if (isRecord) {
+            const newObject = {
+                nodeType: cs.SyntaxKind.NewExpression,
+                type: this.createUnresolvedTypeNode(null, expression, type, type!.symbol),
+                arguments: [],
+                parent: parent
+            } as cs.NewExpression;
+
+            for (const p of expression.properties) {
+                const assignment = {
+                    parent: newObject,
+                    nodeType: cs.SyntaxKind.LabeledExpression,
+                    label: '',
+                    expression: {} as cs.Expression
+                } as cs.LabeledExpression;
+
+                if (ts.isPropertyAssignment(p)) {
+                    assignment.label = p.name.getText();
+                    assignment.expression = this.visitExpression(assignment, p.initializer)!;
+                    newObject.arguments.push(assignment);
+                } else if (ts.isShorthandPropertyAssignment(p)) {
+                    assignment.label = p.name.getText();
+                    assignment.expression = this.visitExpression(assignment, p.objectAssignmentInitializer!)!;
+                    newObject.arguments.push(assignment);
+                } else if (ts.isSpreadAssignment(p)) {
+                    this._context.addTsNodeDiagnostics(p, 'Spread operator not supported', ts.DiagnosticCategory.Error);
+                } else if (ts.isMethodDeclaration(p)) {
+                    this._context.addTsNodeDiagnostics(
+                        p,
+                        'Method declarations in object literals not supported',
+                        ts.DiagnosticCategory.Error
+                    );
+                } else if (ts.isGetAccessorDeclaration(p)) {
+                    this._context.addTsNodeDiagnostics(
+                        p,
+                        'Get accessor declarations in object literals not supported',
+                        ts.DiagnosticCategory.Error
+                    );
+                } else if (ts.isSetAccessorDeclaration(p)) {
+                    this._context.addTsNodeDiagnostics(
+                        p,
+                        'Set accessor declarations in object literals not supported',
+                        ts.DiagnosticCategory.Error
+                    );
+                }
+            }
+            return newObject;
+        }
+
         const objectLiteral = {
             parent: parent,
             tsNode: expression,

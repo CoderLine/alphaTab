@@ -12,6 +12,7 @@ import { Note } from '@src/model/Note';
 import type { NotationSettings } from '@src/NotationSettings';
 import { TextAlign } from '@src/platform/ICanvas';
 import type { BackingTrack } from '@src/model/BackingTrack';
+import { Automation, AutomationType, type FlatSyncPoint, SyncPointData } from '@src/model/Automation';
 
 /**
  * Lists all graphical sub elements within a {@link Score} which can be styled via {@link Score.style}
@@ -404,5 +405,65 @@ export class Score {
         for (let i: number = 0, j: number = this.tracks.length; i < j; i++) {
             this.tracks[i].finish(settings, sharedDataBag);
         }
+    }
+
+    /**
+     * Applies the given list of {@link FlatSyncPoint} to this song.
+     * @param syncPoints The list of sync points to apply.
+     * @since 1.6.0
+     */
+    public applyFlatSyncPoints(syncPoints: FlatSyncPoint[]) {
+        for (const b of this.masterBars) {
+            b.syncPoints = undefined;
+        }
+
+        for (const syncPoint of syncPoints) {
+            const automation = new Automation();
+            automation.ratioPosition = Math.min(1, Math.max(0, syncPoint.barPosition));
+            automation.type = AutomationType.SyncPoint;
+            automation.syncPointValue = new SyncPointData();
+            automation.syncPointValue.modifiedTempo = syncPoint.modifiedTempo;
+            automation.syncPointValue.millisecondOffset = syncPoint.millisecondOffset;
+            automation.syncPointValue.barOccurence = syncPoint.barOccurence;
+            if (syncPoint.barIndex < this.masterBars.length) {
+                this.masterBars[syncPoint.barIndex].addSyncPoint(automation);
+            }
+        }
+
+        for (const b of this.masterBars) {
+            if (b.syncPoints) {
+                b.syncPoints!.sort((a, b) => {
+                    const occurence = a.syncPointValue!.barOccurence - b.syncPointValue!.barOccurence;
+                    if (occurence !== 0) {
+                        return occurence;
+                    }
+
+                    return a.ratioPosition - b.ratioPosition;
+                });
+            }
+        }
+    }
+
+    /**
+     * Exports all sync points in this song to a {@link FlatSyncPoint} list.
+     * @since 1.6.0
+     */
+    public exportFlatSyncPoints(): FlatSyncPoint[] {
+        const syncPoints: FlatSyncPoint[] = [];
+        for (const masterBar of this.masterBars) {
+            const masterBarSyncPoints = masterBar.syncPoints;
+            if (masterBarSyncPoints) {
+                for (const syncPoint of masterBarSyncPoints) {
+                    syncPoints.push({
+                        barIndex: masterBar.index,
+                        barOccurence: syncPoint.syncPointValue!.barOccurence,
+                        barPosition: syncPoint.ratioPosition,
+                        millisecondOffset: syncPoint.syncPointValue!.millisecondOffset,
+                        modifiedTempo: syncPoint.syncPointValue!.modifiedTempo
+                    });
+                }
+            }
+        }
+        return syncPoints;
     }
 }

@@ -96,7 +96,7 @@ export class GpifParser {
      */
     private static readonly BendPointValueFactor: number = 1 / 25.0;
 
-    // test have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
+    // tests have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
     // they are NOT using the sample rate of the input file. 
     // Downsampling a 44100hz ogg to 8000hz and using it in as audio track resulted in the same frame offset when placing sync points.
     private static readonly SampleRate = 44100;

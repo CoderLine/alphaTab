@@ -1,3 +1,4 @@
+import { VersionInfo } from '@src/generated/VersionInfo';
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
@@ -44,7 +45,7 @@ import { WahPedal } from '@src/model/WahPedal';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { XmlDocument } from '@src/xml/XmlDocument';
-import { XmlNode } from '@src/xml/XmlNode';
+import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
 // Grabbed via Icon Picker beside track name in GP7
 enum GpifIconIds {
@@ -97,6 +98,11 @@ class GpifMidiProgramInfo {
  * This class can write a score.gpif XML from a given score model.
  */
 export class GpifWriter {
+    // tests have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
+    // they are NOT using the sample rate of the input file.
+    // Downsampling a 44100hz ogg to 8000hz and using it in as audio track resulted in the same frame offset when placing sync points.
+    private static readonly SampleRate = 44100;
+
     private _rhythmIdLookup: Map<string, string> = new Map<string, string>();
     private static MidiProgramInfoLookup: Map<number, GpifMidiProgramInfo> = new Map([
         [0, new GpifMidiProgramInfo(GpifIconIds.Piano, 'Acoustic Piano')],
@@ -249,19 +255,26 @@ export class GpifWriter {
         const gpif = parent.addElement('GPIF');
 
         // just some values at the time this was implemented,
-        gpif.addElement('GPVersion').innerText = '7';
+        gpif.addElement('GPVersion').innerText = '8.1.3';
         const gpRevision = gpif.addElement('GPRevision');
-        gpRevision.innerText = '7';
-        gpRevision.attributes.set('required', '12021');
-        gpRevision.attributes.set('recommended', '12023');
-        gpRevision.innerText = '12025';
-        gpif.addElement('Encoding').addElement('EncodingDescription').innerText = 'GP7';
+        gpRevision.attributes.set('required', '12024');
+        gpRevision.attributes.set('recommended', '13000');
+        gpRevision.innerText = '13007';
+        const encoding = gpif.addElement('Encoding');
+        encoding.addElement('EncodingDescription').innerText = 'GP8';
+
+        const alphaTabComment = new XmlNode();
+        alphaTabComment.nodeType = XmlNodeType.Comment;
+        alphaTabComment.value = `Written by alphaTab ${VersionInfo.version} (${VersionInfo.commit})`;
+        encoding.addChild(alphaTabComment);
 
         this.writeScoreNode(gpif, score);
         this.writeMasterTrackNode(gpif, score);
+        this.writeBackingTrackNode(gpif, score);
         this.writeAudioTracksNode(gpif, score);
         this.writeTracksNode(gpif, score);
         this.writeMasterBarsNode(gpif, score);
+        this.writeAssets(gpif, score);
 
         const bars = gpif.addElement('Bars');
         const voices = gpif.addElement('Voices');
@@ -288,6 +301,55 @@ export class GpifWriter {
                 }
             }
         }
+    }
+
+    private writeAssets(parent: XmlNode, score: Score) {
+        if (!score.backingTrack?.rawAudioFile) {
+            return;
+        }
+
+        const assets = parent.addElement('Assets');
+        const asset = assets.addElement('Asset');
+        asset.attributes.set('id', this.backingTrackAssetId!);
+
+        this.backingTrackAssetFileName = 'Content/Assets/backing-track';
+        asset.addElement('EmbeddedFilePath').setCData(this.backingTrackAssetFileName!);
+    }
+
+    private backingTrackAssetId?: string;
+    private backingTrackFramePadding?: number;
+    public backingTrackAssetFileName?: string;
+
+    private writeBackingTrackNode(parent: XmlNode, score: Score) {
+        if (!score.backingTrack?.rawAudioFile) {
+            return;
+        }
+
+        const backingTrackNode = parent.addElement('BackingTrack');
+
+        const backingTrackAssetId = '0';
+        this.backingTrackAssetId = backingTrackAssetId;
+
+        backingTrackNode.addElement('IconId').innerText = '21';
+        backingTrackNode.addElement('Color').innerText = '0 0 0';
+        backingTrackNode.addElement('Name').setCData('Audio Track');
+        backingTrackNode.addElement('ShortName').setCData('a.track');
+        backingTrackNode.addElement('PlaybackState').innerText = 'Default';
+        backingTrackNode.addElement('Enabled').innerText = 'true';
+        backingTrackNode.addElement('Source').innerText = 'Local';
+        backingTrackNode.addElement('AssetId').innerText = backingTrackAssetId;
+
+        const channelStrip = backingTrackNode.addElement('ChannelStrip');
+        channelStrip.addElement('Parameters').innerText =
+            '0.500000 0.500000 0.500000 0.500000 0.500000 0.500000 0.500000 0.500000 0.500000 0.000000 0.500000 0.500000 0.800000 0.500000 0.500000 0.500000';
+        channelStrip.addElement('YouTubeVideoUrl').innerText = '';
+        channelStrip.addElement('Filter').innerText = '6';
+        channelStrip.addElement('FramesPerPixel').innerText = '400';
+
+        const framePadding = this.backingTrackFramePadding !== undefined ? this.backingTrackFramePadding! : 0;
+        backingTrackNode.addElement('FramePadding').innerText = `${framePadding}`;
+        backingTrackNode.addElement('Semitones').innerText = '0';
+        backingTrackNode.addElement('Cents').innerText = '0';
     }
 
     private writeNoteNode(parent: XmlNode, note: Note) {
@@ -1080,6 +1142,14 @@ export class GpifWriter {
             }
         }
 
+        const initialSyncPoint = score.masterBars[0].syncPoints
+            ? score.masterBars[0].syncPoints.find(p => p.ratioPosition === 0 && p.syncPointValue!.barOccurence === 0)
+            : undefined;
+
+        const millisecondPadding = initialSyncPoint ? initialSyncPoint.syncPointValue!.millisecondOffset : 0;
+
+        this.backingTrackFramePadding = (-1 * ((millisecondPadding / 1000) * GpifWriter.SampleRate)) | 0;
+
         for (const mb of score.masterBars) {
             for (const automation of mb.tempoAutomations) {
                 const tempoAutomation = automations.addElement('Automation');
@@ -1091,6 +1161,28 @@ export class GpifWriter {
                 tempoAutomation.addElement('Value').innerText = `${automation.value} 2`;
                 if (automation.text) {
                     tempoAutomation.addElement('Text').innerText = automation.text;
+                }
+            }
+
+            if (mb.syncPoints) {
+                for (const syncPoint of mb.syncPoints) {
+                    const syncPointAutomation = automations.addElement('Automation');
+                    syncPointAutomation.addElement('Type').innerText = 'SyncPoint';
+                    syncPointAutomation.addElement('Linear').innerText = 'false';
+                    syncPointAutomation.addElement('Bar').innerText = mb.index.toString();
+                    syncPointAutomation.addElement('Position').innerText = syncPoint.ratioPosition.toString();
+                    syncPointAutomation.addElement('Visible').innerText = 'true';
+                    const value = syncPointAutomation.addElement('Value');
+
+                    value.addElement('BarIndex').innerText = mb.index.toString();
+                    value.addElement('BarOccurrence').innerText = syncPoint.syncPointValue!.barOccurence.toString();
+                    value.addElement('ModifiedTempo').innerText = syncPoint.syncPointValue!.modifiedTempo.toString();
+                    value.addElement('OriginalTempo').innerText = score.tempo.toString();
+                    const frameOffset =
+                        (((syncPoint.syncPointValue!.millisecondOffset - millisecondPadding) / 1000) *
+                            GpifWriter.SampleRate) |
+                        0;
+                    value.addElement('FrameOffset').innerText = frameOffset.toString();
                 }
             }
         }

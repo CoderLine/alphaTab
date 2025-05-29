@@ -974,7 +974,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
 
         this.write('::class');
-
     }
 
     protected writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {
@@ -1916,5 +1915,11 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeDefaultExpression(_: cs.DefaultExpression): void {
         this.write('null');
+    }
+
+    protected override writeLabeledExpression(expr: cs.LabeledExpression) {
+        this.write(expr.label);
+        this.write(' = ');
+        this.writeExpression(expr.expression);
     }
 }
