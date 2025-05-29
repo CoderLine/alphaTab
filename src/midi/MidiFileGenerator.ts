@@ -362,8 +362,7 @@ export class MidiFileGenerator {
         const endTick = barStartTick + duration;
         const tickOffset = endTick - context.synthTick;
         if (tickOffset > 0) {
-            const timeOffset = MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
-            context.synthTime += timeOffset;
+            context.synthTime += MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
             context.synthTick = endTick;
         }
     }
@@ -392,9 +391,8 @@ export class MidiFileGenerator {
                 tickOffset = absoluteTick - context.synthTick;
 
                 if (tickOffset > 0) {
-                    const timeOffset = MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
                     context.synthTick = absoluteTick;
-                    context.synthTime += timeOffset;
+                    context.synthTime += MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
                 }
 
                 context.currentTempo = tempoChange.value;
@@ -405,8 +403,7 @@ export class MidiFileGenerator {
             tickOffset = syncPointTick - context.synthTick;
             if (tickOffset > 0) {
                 context.synthTick = syncPointTick;
-                const timeOffset = MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
-                context.synthTime += timeOffset;
+                context.synthTime += MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
             }
 
             // update the previous sync point according to the new time
@@ -435,11 +432,10 @@ export class MidiFileGenerator {
         while (tempoChangeIndex < bar.tempoAutomations.length) {
             const tempoChange = bar.tempoAutomations[tempoChangeIndex];
             const absoluteTick = barStartTick + tempoChange.ratioPosition * duration;
-            const tickOffset = absoluteTick - context.synthTick;
+            tickOffset = absoluteTick - context.synthTick;
             if (tickOffset > 0) {
-                const timeOffset = MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
                 context.synthTick = absoluteTick;
-                context.synthTime += timeOffset;
+                context.synthTime += MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
             }
 
             context.currentTempo = tempoChange.value;
@@ -455,10 +451,8 @@ export class MidiFileGenerator {
             const absoluteTick = barStartTick + changes.ratioPosition * duration;
             const tickOffset = absoluteTick - context.synthTick;
             if (tickOffset > 0) {
-                const timeOffset = MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
-
                 context.synthTick = absoluteTick;
-                context.synthTime += timeOffset;
+                context.synthTime += MidiUtils.ticksToMillis(tickOffset, context.currentTempo);
             }
 
             context.currentTempo = changes.value;
