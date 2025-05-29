@@ -204,7 +204,9 @@ export const MediaSyncEditor: React.FC<MediaSyncEditorProps> = ({
             shouldStoreToUndo.current = false;
         }
 
-        applySyncPoints(api, syncPointInfo);
+        if (syncPointInfo.syncPointMarkers.length > 0) {
+            applySyncPoints(api, syncPointInfo);
+        }
     }, [syncPointInfo]);
 
     // cursor handling

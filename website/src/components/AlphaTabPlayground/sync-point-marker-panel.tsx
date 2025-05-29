@@ -78,7 +78,7 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
     };
 
     const startMarkerDrag = (marker: SyncPointMarker, e: React.MouseEvent) => {
-        if (e.button !== 0 || marker.modifiedTempo === undefined) {
+        if (e.button !== 0 || marker.syncBpm === undefined) {
             return;
         }
         e.preventDefault();
@@ -94,7 +94,7 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
                 e.stopPropagation();
 
                 const deltaX = draggingMarkerInfo!.endX - draggingMarkerInfo!.startX;
-                if (deltaX > dragThreshold || (draggingMarker.modifiedTempo !== undefined && Math.abs(deltaX) > 0)) {
+                if (deltaX > dragThreshold || (draggingMarker.syncBpm !== undefined && Math.abs(deltaX) > 0)) {
                     const zoomedPixelPerMillisecond = pixelPerMilliseconds * zoom;
                     const deltaTime = deltaX / zoomedPixelPerMillisecond;
                     const newTimePosition = draggingMarker.syncTime + deltaTime;
@@ -137,13 +137,11 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
                         const newX = thisX + deltaX;
 
                         let previousMarkerIndex = index - 1;
-                        if (draggingMarker!.markerType !== SyncPointMarkerType.Intermediate) {
-                            while (
-                                previousMarkerIndex > 0 &&
-                                !syncPointInfo.syncPointMarkers[previousMarkerIndex].modifiedTempo
-                            ) {
-                                previousMarkerIndex--;
-                            }
+                        while (
+                            previousMarkerIndex > 0 &&
+                            !syncPointInfo.syncPointMarkers[previousMarkerIndex].syncBpm
+                        ) {
+                            previousMarkerIndex--;
                         }
 
                         const previousMarker = syncPointInfo.syncPointMarkers[previousMarkerIndex];
@@ -170,13 +168,11 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
                         const newX = thisX + deltaX;
 
                         let nextMarkerIndex = index + 1;
-                        if (draggingMarker!.markerType !== SyncPointMarkerType.Intermediate) {
-                            while (
-                                nextMarkerIndex < syncPointInfo.syncPointMarkers.length - 1 &&
-                                !syncPointInfo.syncPointMarkers[nextMarkerIndex].modifiedTempo
-                            ) {
-                                nextMarkerIndex++;
-                            }
+                        while (
+                            nextMarkerIndex < syncPointInfo.syncPointMarkers.length - 1 &&
+                            !syncPointInfo.syncPointMarkers[nextMarkerIndex].syncBpm
+                        ) {
+                            nextMarkerIndex++;
                         }
 
                         const nextMarker = syncPointInfo.syncPointMarkers[nextMarkerIndex];
@@ -224,8 +220,8 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
             onClick={onClick}>
             {syncPointInfo.syncPointMarkers.map(m => (
                 <div
-                    key={`${m.masterBarIndex}-${m.occurence}-${m.ratioPosition.toFixed(3)}`}
-                    className={`${styles['masterbar-marker']} ${styles[`masterbar-marker-${SyncPointMarkerType[m.markerType].toLowerCase()}`]}  ${m.modifiedTempo !== undefined ? styles['has-sync-point'] : ''}`}
+                    key={`${m.uniqueId}`}
+                    className={`${styles['masterbar-marker']} ${styles[`masterbar-marker-${SyncPointMarkerType[m.markerType].toLowerCase()}`]}  ${m.syncBpm !== undefined ? styles['has-sync-point'] : ''}`}
                     style={computeMarkerInlineStyle(m, props, draggingMarker, draggingMarkerInfo)}
                     onDoubleClick={e => onToggleMarker(m, e)}
                     onMouseDown={e => {
@@ -234,8 +230,8 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
                     <div className={styles['marker-label']}>{buildMarkerLabel(m)}</div>
                     <div className={styles['marker-head']}>
                         <div className={`${styles['marker-arrow']}`} />
-                        {m.markerType !== SyncPointMarkerType.EndMarker && m.modifiedTempo && (
-                            <div className={styles['marker-tempo']}>{m.modifiedTempo.toFixed(1)} bpm</div>
+                        {m.markerType !== SyncPointMarkerType.EndMarker && m.syncBpm && (
+                            <div className={styles['marker-tempo']}>{m.syncBpm.toFixed(1)} bpm</div>
                         )}
                     </div>
                     <div className={styles['marker-line']} />

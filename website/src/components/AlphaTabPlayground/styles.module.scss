@@ -486,13 +486,6 @@
         align-items: center;
         font-size: 12px;
 
-        opacity: 0.4;
-
-        &:hover {
-            opacity: 1;
-        }
-
-
         &>.marker-label {
             height: 20px;
             white-space: nowrap;
@@ -516,22 +509,33 @@
             &>.marker-arrow {
                 width: 20px;
                 height: 20px;
-                clip-path: polygon(0 0, 100% 0, 50% 100%);
-                background: #444950;
+                background: #FFF;
+
+                &::after {
+                    content: ' ';
+                    display: block;
+                    width: 20px;
+                    height: 20px;
+                    clip-path: polygon(0 0, 100% 0, 50% 100%);
+                    background: #a3b9d0;
+                }
+
             }
 
             &>.marker-tempo {
                 white-space: nowrap;
                 text-align: left;
-                transform: translateX(25px);
+                transform: translateX(20px);
                 pointer-events: none;
+                font-size: 80%;
+                background: #FFF;
             }
         }
 
         &>.marker-line {
             flex-grow: 1;
             width: 0;
-            border-right: 1px solid #444950;
+            border-right: 1px solid #a1a4a7;
         }
 
         &.masterbar-marker-startmarker,
@@ -549,7 +553,15 @@
         }
 
         &.masterbar-marker-intermediate {
-            &>.marker-line {
+            & .marker-arrow {
+                display: none;
+            }
+
+            &.has-sync-point .marker-arrow {
+                display: block;
+            }
+
+            & .marker-line {
                 border-right-style: dashed;
             }
         }
@@ -557,15 +569,14 @@
 
         cursor: col-resize;
 
-        &.has-sync-point {
-            opacity: 0.75;
-
-            &:hover {
-                opacity: 1;
+        &.has-sync-point,
+        &:hover {
+            & .marker-arrow::after {
+                background: #4972a1;
             }
 
-            & .marker-arrow {
-                background: #4972a1;
+            & .marker-line {
+                border-right-color: #444950;
             }
         }
     }

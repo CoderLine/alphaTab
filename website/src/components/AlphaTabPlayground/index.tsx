@@ -38,6 +38,19 @@ export const AlphaTabPlayground: React.FC = () => {
         setLoading(false);
     });
 
+    useAlphaTabEvent(api, 'scoreLoaded', score => {
+        if (score.backingTrack?.rawAudioFile) {
+            setMediaType({
+                type: MediaType.Audio,
+                audioFile: score.backingTrack!.rawAudioFile
+            });
+        } else {
+            setMediaType({
+                type: MediaType.Synth
+            });
+        }
+    });
+
     const onDragOver = (e: React.DragEvent) => {
         e.stopPropagation();
         e.preventDefault();
