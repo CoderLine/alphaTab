@@ -18,7 +18,6 @@ export class SyncPointDataSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("baroccurence", obj.barOccurence);
-        o.set("modifiedtempo", obj.modifiedTempo);
         o.set("millisecondoffset", obj.millisecondOffset);
         return o;
     }
@@ -26,9 +25,6 @@ export class SyncPointDataSerializer {
         switch (property) {
             case "baroccurence":
                 obj.barOccurence = v! as number;
-                return true;
-            case "modifiedtempo":
-                obj.modifiedTempo = v! as number;
                 return true;
             case "millisecondoffset":
                 obj.millisecondOffset = v! as number;

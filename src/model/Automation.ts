@@ -42,13 +42,7 @@ export interface FlatSyncPoint {
      */
     barOccurence: number;
     /**
-     * The modified tempo at which the cursor should move (aka. the tempo played within the external audio track).
-     * This information is used together with normal tempo changes to calculate how much faster/slower the
-     * cursor playback is performed to align with the audio track.
-     */
-    modifiedTempo: number;
-    /**
-     * The uadio offset marking the position within the audio track in milliseconds.
+     * The audio offset marking the position within the audio track in milliseconds.
      * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
      */
     millisecondOffset: number;
@@ -66,12 +60,6 @@ export class SyncPointData {
      * Indicates for which repeat occurence this sync point is valid (e.g. 0 on the first time played, 1 on the second time played)
      */
     public barOccurence: number = 0;
-    /**
-     * The modified tempo at which the cursor should move (aka. the tempo played within the external audio track).
-     * This information is used together with normal tempo changes to calculate how much faster/slower the
-     * cursor playback is performed to align with the audio track.
-     */
-    public modifiedTempo: number = 0;
     /**
      * The audio offset marking the position within the audio track in milliseconds.
      * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
