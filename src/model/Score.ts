@@ -422,7 +422,6 @@ export class Score {
             automation.ratioPosition = Math.min(1, Math.max(0, syncPoint.barPosition));
             automation.type = AutomationType.SyncPoint;
             automation.syncPointValue = new SyncPointData();
-            automation.syncPointValue.modifiedTempo = syncPoint.modifiedTempo;
             automation.syncPointValue.millisecondOffset = syncPoint.millisecondOffset;
             automation.syncPointValue.barOccurence = syncPoint.barOccurence;
             if (syncPoint.barIndex < this.masterBars.length) {
@@ -458,8 +457,7 @@ export class Score {
                         barIndex: masterBar.index,
                         barOccurence: syncPoint.syncPointValue!.barOccurence,
                         barPosition: syncPoint.ratioPosition,
-                        millisecondOffset: syncPoint.syncPointValue!.millisecondOffset,
-                        modifiedTempo: syncPoint.syncPointValue!.modifiedTempo
+                        millisecondOffset: syncPoint.syncPointValue!.millisecondOffset
                     });
                 }
             }

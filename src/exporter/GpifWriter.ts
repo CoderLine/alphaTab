@@ -1,8 +1,9 @@
 import { VersionInfo } from '@src/generated/VersionInfo';
 import { GeneralMidi } from '@src/midi/GeneralMidi';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
-import { AutomationType } from '@src/model/Automation';
+import { type Automation, AutomationType } from '@src/model/Automation';
 import { type Bar, SustainPedalMarkerType } from '@src/model/Bar';
 import { BarreShape } from '@src/model/BarreShape';
 import { type Beat, BeatBeamingMode } from '@src/model/Beat';
@@ -44,6 +45,8 @@ import type { Voice } from '@src/model/Voice';
 import { WahPedal } from '@src/model/WahPedal';
 import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
+import { Lazy } from '@src/util/Lazy';
 import { XmlDocument } from '@src/xml/XmlDocument';
 import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
@@ -1150,6 +1153,10 @@ export class GpifWriter {
 
         this.backingTrackFramePadding = (-1 * ((millisecondPadding / 1000) * GpifWriter.SampleRate)) | 0;
 
+        const modifiedTempoLookup = new Lazy<Map<Automation, BackingTrackSyncPoint>>(() =>
+            MidiFileGenerator.buildModifiedTempoLookup(score)
+        );
+
         for (const mb of score.masterBars) {
             for (const automation of mb.tempoAutomations) {
                 const tempoAutomation = automations.addElement('Automation');
@@ -1176,7 +1183,7 @@ export class GpifWriter {
 
                     value.addElement('BarIndex').innerText = mb.index.toString();
                     value.addElement('BarOccurrence').innerText = syncPoint.syncPointValue!.barOccurence.toString();
-                    value.addElement('ModifiedTempo').innerText = syncPoint.syncPointValue!.modifiedTempo.toString();
+                    value.addElement('ModifiedTempo').innerText = modifiedTempoLookup.value.get(syncPoint)!.syncBpm.toString();
                     value.addElement('OriginalTempo').innerText = score.tempo.toString();
                     const frameOffset =
                         (((syncPoint.syncPointValue!.millisecondOffset - millisecondPadding) / 1000) *

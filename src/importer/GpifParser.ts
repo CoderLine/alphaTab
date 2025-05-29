@@ -472,9 +472,6 @@ export class GpifParser {
                                 case 'BarOccurrence':
                                     syncPointValue.barOccurence = GpifParser.parseIntSafe(vc.innerText, 0);
                                     break;
-                                case 'ModifiedTempo':
-                                    syncPointValue.modifiedTempo = GpifParser.parseFloatSafe(vc.innerText, 0);
-                                    break;
                                 case 'FrameOffset':
                                     const frameOffset = GpifParser.parseFloatSafe(vc.innerText, 0);
                                     syncPointValue.millisecondOffset = (frameOffset / GpifParser.SampleRate) * 1000;
