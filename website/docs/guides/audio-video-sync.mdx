@@ -1,0 +1,48 @@
+--- 
+title: Audio & Video Sync
+---
+
+> [!WARNING]
+> This guide is still incomplete and is currently being extended.
+
+alphaTab can be synchronized with an external audio or video backing track. You can either use Guitar Pro 8 files with an audio track or synchronize alphaTab with an external media using the 
+[Media Sync Editor in the Playground](/docs/playground/playground.mdx).
+
+At this point alphaTab cannot mix the synthesized audio and a backing track together, therefore only either audio will be heard. Using the synchronization information embedded in the data model,
+alphaTab can then place the cursor correctly as an external media is taking over the audio.
+
+### Audio Backing Track 
+
+alphaTab has built-in support for audio backing tracks. To play alphaTab with an audio backing track instead of synthesized audio, following prerequisites have to be fulfilled:
+
+1. The data model ships the backing track audio file.
+2. The data model ships sync points which aligns the external audio track with the music notation.
+3. You enabled the backing track via either `PlayerMode.EnabledAutomatic` or `PlayerMode.EnabledBackingTrack`.
+4. Your platform (browser, operating system,...) has to support the embedded audio file. OGG Vorbis and MP3s are quite widely supported, and if used, there shouldn't be major problems.
+
+To tackle 1. and 2. you can use the Media Sync Editor we provide on our [Playground](/docs/playground/playground.mdx). Learn more about the editor [here](./media-sync-editor.mdx)
+
+### Guitar Pro 8 Files
+
+Since Version 8 Guitar Pro provides built-in audio tracks with the possibility to synchronize the backing track with the music sheet. If the audio file is embedded into the GP file, alphaTab can load and use 
+both the audio file and the sync point information. 
+
+As mentioned above, alphaTab can only play **either** the external audio file **or** the synthesized audio. Also we do not support changes in the audio (like adjusting the pitch).
+
+Beside that you can load Guitar Pro 8 files and directly benefit from the enhanced sound experience.
+
+### Custom External Media Player
+
+alphaTab can be integrated with any external media system but it requires some implementation on the integrator side. To properly synchronize alphaTab and an external media source (audio or video) the `alphaTab.synth.IExternalMediaHandler` interface has to be implemented and provided to alphaTab.
+
+#### YouTube 
+
+YouTube is a great counterpart to alphaTab to provide audio and video for your music sheet. Until now we decided to NOT ship a direct YouTube integration as there are quite some implications to it.
+Some key reasons behind this is:
+
+1. alphaTab is a cross-platform toolkit. While integrating a YouTube player in the web is easy, SDKs for Android or Desktop platforms are way more complex. We want to keep this on the integrator side. 
+2. Looking at data protection laws like GDPR, users have to accept the load and integration of such external media. We want to be sure devs take proper care asking users for consent where required.
+3. The integration of the YouTube player requires further considerations in your user interface (sizing, where to place it, how to configure the YouTube player).
+
+Nevertheless we want to give you some guidance on how to link alphaTab to YouTube. The following steps show how to use the [YouTube Player API Reference for iframe Embeds](https://developers.google.com/youtube/iframe_api_reference) together with alphaTab.
+

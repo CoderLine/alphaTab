@@ -7,6 +7,13 @@ export function timePositionToX(pixelPerMilliseconds: number,
     return timePosition * zoomedPixelPerMilliseconds + leftPadding;
 }
 
+export function xToTimePosition(pixelPerMilliseconds: number,
+    x: number, zoom: number, leftPadding: number): number {
+
+    const zoomedPixelPerMilliseconds = pixelPerMilliseconds * zoom;
+    return (x - leftPadding) / zoomedPixelPerMilliseconds;
+}
+
 type UndoStack = {
     undo: SyncPointInfo[];
     redo: SyncPointInfo[];
@@ -61,3 +68,52 @@ export const useSyncPointInfoUndo = () => {
         }
     }
 };
+
+export type HTMLMediaElementLikeEvents = 'timeupdate' | 'durationchange' | 'seeked' | 'play' | 'pause' | 'ended' | 'volumechange' | 'ratechange' | 'loadedmetadata';
+
+export interface HTMLMediaElementLike {
+    currentTime: number;
+    volume: number;
+    playbackRate: number;
+    readonly duration: number;
+    addEventListener(eventType: HTMLMediaElementLikeEvents, handler: () => void): void;
+    removeEventListener(eventType: HTMLMediaElementLikeEvents, handler: () => void): void;
+
+    play(): void;
+    pause(): void;
+}
+
+export function extractYouTubeVideoId(src: string | undefined) {
+    try {
+        if (!src) {
+            return undefined;
+        }
+        const url = new URL(src);
+        const host = url.host.toLowerCase();
+        if (host.endsWith('youtube.com') && url.searchParams.has('v')) {
+            return url.searchParams.get('v')!;
+        }
+        if (host.endsWith('youtube-nocookie.com')) {
+            return url.pathname.split('/')[2];
+        }
+        if (host.endsWith('youtu.be')) {
+            return url.pathname.split('/')[1];
+        }
+    } catch (e) {
+        return undefined;
+    }
+}
+
+
+export enum MediaType {
+    Synth = 0,
+    Audio = 1,
+    YouTube = 2
+}
+
+export interface MediaTypeState {
+    type: MediaType;
+    audioFile?: Uint8Array
+    youtubeUrl?: string;
+    youtubeVideoDuration?: number;
+}

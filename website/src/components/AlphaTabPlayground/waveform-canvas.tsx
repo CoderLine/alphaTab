@@ -1,5 +1,5 @@
 import type React from 'react';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { timePositionToX } from './helpers';
 
 export type WaveformCanvasProps = {
@@ -19,6 +19,7 @@ export type WaveformCanvasProps = {
     scrollOffset?: number;
 
     sampleRate: number;
+    endTime: number;
     leftSamples: Float32Array;
     rightSamples: Float32Array;
 
@@ -42,7 +43,10 @@ const defaultProps = {
     scrollOffset: 0
 } satisfies Partial<WaveformCanvasProps>;
 
-type DrawWaveFormOptions = typeof defaultProps & WaveformCanvasProps;
+type DrawWaveFormOptions = typeof defaultProps &
+    WaveformCanvasProps & {
+        maxAmplitude: number;
+    };
 
 type CommonDrawInfo = {
     waveFormY: number;
@@ -62,8 +66,8 @@ const drawFrame = (ctx: CanvasRenderingContext2D, options: DrawWaveFormOptions, 
 };
 
 const drawSamples = (ctx: CanvasRenderingContext2D, options: DrawWaveFormOptions, drawInfo: CommonDrawInfo) => {
-    // NOTE: this is not very efficient. 
-    // we likely should render main parts of the waveform once and reuse the drawn images? 
+    // NOTE: this is not very efficient.
+    // we likely should render main parts of the waveform once and reuse the drawn images?
     // e.g. render multiple PNG chunks and simply show them. (re-draw on zoom)
     ctx.save();
 
@@ -84,8 +88,8 @@ const drawSamples = (ctx: CanvasRenderingContext2D, options: DrawWaveFormOptions
         let maxTop = 0;
         let maxBottom = 0;
         for (let sample = startSample; sample <= endSample; sample++) {
-            const magnitudeTop = Math.abs(options.leftSamples[sample] || 0);
-            const magnitudeBottom = Math.abs(options.rightSamples[sample] || 0);
+            const magnitudeTop = Math.abs(options.leftSamples[sample] / options.maxAmplitude || 0);
+            const magnitudeBottom = Math.abs(options.rightSamples[sample] / options.maxAmplitude || 0);
             if (magnitudeTop > maxTop) {
                 maxTop = magnitudeTop;
             }
@@ -182,9 +186,12 @@ const drawWaveform = (can: HTMLCanvasElement, options: DrawWaveFormOptions) => {
 export const WaveformCanvas: React.FC<WaveformCanvasProps> = props => {
     const waveFormCanvas = useRef<HTMLCanvasElement | null>(null);
 
+    const [maxAmplitude, setMaxAmplitude] = useState(1);
+
     const realProps = {
         ...defaultProps,
-        ...props
+        ...props,
+        maxAmplitude
     };
 
     // watch all props by converting them to JSON, all props affect display
@@ -201,7 +208,24 @@ export const WaveformCanvas: React.FC<WaveformCanvasProps> = props => {
             waveFormCanvas.current.height = props.height;
             drawWaveform(waveFormCanvas.current, realProps);
         }
-    }, [watchedProps, realProps.leftPadding, realProps.rightSamples, waveFormCanvas]);
+    }, [watchedProps, realProps.leftSamples, realProps.rightSamples, waveFormCanvas, maxAmplitude]);
+
+    useEffect(() => {
+        let maxAmplitude = 0;
+        for (let i = 0; i < props.leftSamples.length; i++) {
+            let s = Math.abs(props.leftSamples[i]);
+            if (s > maxAmplitude) {
+                maxAmplitude = s;
+            }
+
+            s = Math.abs(props.rightSamples[i]);
+            if (s > maxAmplitude) {
+                maxAmplitude = s;
+            }
+        }
+
+        setMaxAmplitude(maxAmplitude === 0 ? 1 : maxAmplitude);
+    }, [setMaxAmplitude, realProps.leftSamples, realProps.rightSamples]);
 
     return <canvas ref={waveFormCanvas} />;
 };

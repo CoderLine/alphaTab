@@ -7,12 +7,13 @@ import {
     toggleMarker
 } from './sync-point-info';
 import styles from './styles.module.scss';
-import { timePositionToX } from './helpers';
-import { useCallback, useEffect, useState } from 'react';
+import { timePositionToX, xToTimePosition } from './helpers';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export type SyncPointMarkerPanelProps = {
     syncPointInfo: SyncPointInfo;
     onSyncPointInfoChanged(syncPointInfo: SyncPointInfo): void;
+    onSeek(millis: number): void;
 
     zoom: number;
     width: number;
@@ -206,8 +207,21 @@ export const SyncPointMarkerPanel: React.FC<SyncPointMarkerPanelProps> = props =
         };
     }, [draggingMarker, mouseUpListener, mouseMoveListener]);
 
+    const wrapRef = useRef<HTMLDivElement>(null);
+    const onClick = (e: React.MouseEvent) => {
+        if (e.target === wrapRef.current) {
+            const rect = wrapRef.current.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            props.onSeek(xToTimePosition(props.pixelPerMilliseconds, x, props.zoom, props.leftPadding));
+        }
+    };
+
     return (
-        <div className={styles['sync-area-marker-wrap']} style={{ width: `${width}px`, height: `${height}px` }}>
+        <div
+            ref={wrapRef}
+            className={styles['sync-area-marker-wrap']}
+            style={{ width: `${width}px`, height: `${height}px` }}
+            onClick={onClick}>
             {syncPointInfo.syncPointMarkers.map(m => (
                 <div
                     key={`${m.masterBarIndex}-${m.occurence}-${m.ratioPosition.toFixed(3)}`}

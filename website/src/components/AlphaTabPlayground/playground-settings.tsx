@@ -9,6 +9,7 @@ import { createContext, useContext, useEffect, useId, useState } from 'react';
 import Chrome from '@uiw/react-color-chrome';
 import { useDebounce } from '@uidotdev/usehooks';
 import { rgbaToHexa } from '@uiw/react-color';
+import { downloadFile } from '@site/src/utils';
 
 type SettingsContextProps = {
     api: alphaTab.AlphaTabApi;
@@ -866,15 +867,7 @@ export const PlaygroundSettings: React.FC<PlaygroundSettingsProps> = ({ api, isO
                     <button
                         type="button"
                         onClick={() => {
-                            const exporter = new alphaTab.exporter.Gp7Exporter();
-                            const score = api.score!;
-                            const data = exporter.export(score, api.settings);
-                            const a = document.createElement('a');
-                            a.download = score.title.length > 0 ? `${score.title.trim()}.gp` : 'Untitled.gp';
-                            a.href = URL.createObjectURL(new Blob([data], { type: 'application/gp' }));
-                            document.body.appendChild(a);
-                            a.click();
-                            document.body.removeChild(a);
+                            downloadFile();
                         }}
                         className="button button--sm button--secondary">
                         Export Guitar Pro
