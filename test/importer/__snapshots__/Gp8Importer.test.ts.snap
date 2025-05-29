@@ -26,7 +26,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 71.88264,
             "millisecondoffset" => 1653.061224489796,
           },
           "ratioposition" => 0,
@@ -38,7 +37,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 99.72622,
             "millisecondoffset" => 3322.448979591837,
           },
           "ratioposition" => 0.5,
@@ -55,7 +53,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 90.66336,
             "millisecondoffset" => 4525.714285714285,
           },
           "ratioposition" => 0,
@@ -121,7 +118,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 87.32674,
             "millisecondoffset" => 38938.775510204076,
           },
           "ratioposition" => 0,
@@ -152,7 +148,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 200.18156,
             "millisecondoffset" => 44435.37414965986,
           },
           "ratioposition" => 0,
@@ -170,7 +165,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 200.09074,
             "millisecondoffset" => 45634.28571428571,
           },
           "ratioposition" => 0,
@@ -396,7 +390,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 199.99873,
             "millisecondoffset" => 104407.61904761904,
           },
           "ratioposition" => 0,
@@ -708,7 +701,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 95.02262,
             "millisecondoffset" => 190808.16326530612,
           },
           "ratioposition" => 0,
@@ -735,7 +727,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 103.20769,
             "millisecondoffset" => 194596.73469387754,
           },
           "ratioposition" => 0,
@@ -844,7 +835,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 192.18826,
             "millisecondoffset" => 213200,
           },
           "ratioposition" => 0,
@@ -883,7 +873,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 195.20833,
             "millisecondoffset" => 218195.10204081633,
           },
           "ratioposition" => 0,
@@ -945,7 +934,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 200.20428,
             "millisecondoffset" => 232948.57142857142,
           },
           "ratioposition" => 0,
@@ -991,7 +979,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 200.38033,
             "millisecondoffset" => 242538.77551020405,
           },
           "ratioposition" => 0,
@@ -1175,7 +1162,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 89.990814,
             "millisecondoffset" => 291046.5306122449,
           },
           "ratioposition" => 0,
@@ -1214,7 +1200,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 103.1941,
             "millisecondoffset" => 301714.28571428574,
           },
           "ratioposition" => 0,
@@ -1315,7 +1300,6 @@ Map {
           "value" => 0,
           "syncpointvalue" => Map {
             "baroccurence" => 0,
-            "modifiedtempo" => 103.19424,
             "millisecondoffset" => 322645.7142857143,
           },
           "ratioposition" => 1,
