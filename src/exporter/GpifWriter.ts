@@ -266,7 +266,7 @@ export class GpifWriter {
         const alphaTabComment = new XmlNode();
         alphaTabComment.nodeType = XmlNodeType.Comment;
         alphaTabComment.value = `Written by alphaTab ${VersionInfo.version} (${VersionInfo.commit})`;
-        encoding.addChild(alphaTabComment)
+        encoding.addChild(alphaTabComment);
 
         this.writeScoreNode(gpif, score);
         this.writeMasterTrackNode(gpif, score);
@@ -1142,9 +1142,11 @@ export class GpifWriter {
             }
         }
 
-        const millisecondPadding =
-            score.masterBars[0].syncPoints?.find(p => p.ratioPosition === 0 && p.syncPointValue!.barOccurence === 0)
-                ?.syncPointValue!.millisecondOffset ?? 0;
+        const initialSyncPoint = score.masterBars[0].syncPoints
+            ? score.masterBars[0].syncPoints.find(p => p.ratioPosition === 0 && p.syncPointValue!.barOccurence === 0)
+            : undefined;
+
+        const millisecondPadding = initialSyncPoint ? initialSyncPoint.syncPointValue!.millisecondOffset : 0;
 
         this.backingTrackFramePadding = (-1 * ((millisecondPadding / 1000) * GpifWriter.SampleRate)) | 0;
 
