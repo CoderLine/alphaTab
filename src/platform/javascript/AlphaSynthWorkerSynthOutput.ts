@@ -62,7 +62,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public addSamples(samples: Float32Array): void {
         this._worker.postMessage({
             cmd: 'alphaSynth.output.addSamples',
-            samples: samples
+            samples: Environment.prepareForPostMessage(samples)
         });
     }
 

@@ -240,7 +240,7 @@ export class AlphaSynthAudioWorkletOutput extends AlphaSynthWebAudioOutputBase {
     public addSamples(f: Float32Array): void {
         this._worklet?.port.postMessage({
             cmd: AlphaSynthWorkerSynthOutput.CmdOutputAddSamples,
-            samples: f
+            samples: Environment.prepareForPostMessage(f)
         });
     }
 
