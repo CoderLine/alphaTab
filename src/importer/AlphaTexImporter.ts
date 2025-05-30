@@ -245,6 +245,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
             ModelUtils.consolidate(this._score);
             this._score.finish(this.settings);
+            ModelUtils.trimEmptyBarsAtEnd(this._score);
             this._score.rebuildRepeatGroups();
             this._score.applyFlatSyncPoints(this._syncPoints);
             for (const [track, lyrics] of this._lyrics) {
