@@ -113,7 +113,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._midiEventsPlayedFilter = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setMidiEventsPlayedFilter',
-            value: value
+            value: Environment.prepareForPostMessage(value)
         });
     }
 
@@ -188,7 +188,7 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._playbackRange = value;
         this._synth.postMessage({
             cmd: 'alphaSynth.setPlaybackRange',
-            value: value
+            value: Environment.prepareForPostMessage(value)
         });
     }
 
@@ -264,14 +264,14 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     public playOneTimeMidiFile(midi: MidiFile): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.playOneTimeMidiFile',
-            midi: JsonConverter.midiFileToJsObject(midi)
+            midi: JsonConverter.midiFileToJsObject(Environment.prepareForPostMessage(midi))
         });
     }
 
     public loadSoundFont(data: Uint8Array, append: boolean): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.loadSoundFontBytes',
-            data: data,
+            data: Environment.prepareForPostMessage(data),
             append: append
         });
     }
@@ -285,14 +285,14 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     public loadMidiFile(midi: MidiFile): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.loadMidi',
-            midi: JsonConverter.midiFileToJsObject(midi)
+            midi: JsonConverter.midiFileToJsObject(Environment.prepareForPostMessage(midi))
         });
     }
 
     public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.applyTranspositionPitches',
-            transpositionPitches: JSON.stringify(Array.from(transpositionPitches.entries()))
+            transpositionPitches: JSON.stringify(Array.from(Environment.prepareForPostMessage(transpositionPitches).entries()))
         });
     }
 

@@ -178,7 +178,7 @@ export class AlphaSynthWebWorker {
     public onSoundFontLoadFailed(e: any): void {
         this._main.postMessage({
             cmd: 'alphaSynth.soundFontLoadFailed',
-            error: this.serializeException(e)
+            error: this.serializeException(Environment.prepareForPostMessage(e))
         });
     }
 
@@ -212,7 +212,7 @@ export class AlphaSynthWebWorker {
     public onMidiLoadFailed(e: any): void {
         this._main.postMessage({
             cmd: 'alphaSynth.midiLoaded',
-            error: this.serializeException(e)
+            error: this.serializeException(Environment.prepareForPostMessage(e))
         });
     }
 
