@@ -2,7 +2,7 @@ import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AccentuationType } from '@src/model/AccentuationType';
-import { Automation, AutomationType } from '@src/model/Automation';
+import { Automation, AutomationType, type FlatSyncPoint } from '@src/model/Automation';
 import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
@@ -190,6 +190,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _articulationValueToIndex = new Map<number, number>();
 
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
+    private _syncPoints: FlatSyncPoint[] = [];
 
     public logErrors: boolean = false;
 
@@ -235,11 +236,17 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (!anyMetaRead && !anyBarsRead) {
                     throw new UnsupportedFormatError('No alphaTex data found');
                 }
+
+                if (this._sy === AlphaTexSymbols.Dot) {
+                    this._sy = this.newSy();
+                    this.syncPoints();
+                }
             }
 
             ModelUtils.consolidate(this._score);
             this._score.finish(this.settings);
             this._score.rebuildRepeatGroups();
+            this._score.applyFlatSyncPoints(this._syncPoints);
             for (const [track, lyrics] of this._lyrics) {
                 this._score.tracks[track].applyLyrics(lyrics);
             }
@@ -254,6 +261,55 @@ export class AlphaTexImporter extends ScoreImporter {
             }
             throw e;
         }
+    }
+
+    private syncPoints() {
+        while (this._sy !== AlphaTexSymbols.Eof) {
+            this.syncPoint();
+        }
+    }
+
+    private syncPoint() {
+        // \sync BarIndex Occurence MillisecondOffset
+        // \sync BarIndex Occurence MillisecondOffset RatioPosition
+
+        if (this._sy !== AlphaTexSymbols.MetaCommand || this._syData !== 'sync') {
+            this.error('syncPoint', AlphaTexSymbols.MetaCommand, true);
+        }
+
+        this._sy = this.newSy();
+        if (this._sy !== AlphaTexSymbols.Number) {
+            this.error('syncPointBarIndex', AlphaTexSymbols.Number, true);
+        }
+        const barIndex = this._syData as number;
+
+        this._sy = this.newSy();
+        if (this._sy !== AlphaTexSymbols.Number) {
+            this.error('syncPointBarOccurence', AlphaTexSymbols.Number, true);
+        }
+        const barOccurence = this._syData as number;
+
+        this._sy = this.newSy();
+        if (this._sy !== AlphaTexSymbols.Number) {
+            this.error('syncPointBarMillis', AlphaTexSymbols.Number, true);
+        }
+        const millisecondOffset = this._syData as number;
+
+        this._allowFloat = true;
+        this._sy = this.newSy();
+        this._allowFloat = false;
+        let barPosition = 0;
+        if (this._sy === AlphaTexSymbols.Number) {
+            barPosition = this._syData as number;
+            this._sy = this.newSy();
+        }
+
+        this._syncPoints.push({
+            barIndex,
+            barOccurence,
+            barPosition,
+            millisecondOffset
+        });
     }
 
     private error(nonterm: string, expected: AlphaTexSymbols, wrongSymbol: boolean = true): void {

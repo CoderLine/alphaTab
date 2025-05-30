@@ -138,3 +138,124 @@ Map {
   ],
 }
 `;
+
+exports[`AlphaTexImporterTest sync 1`] = `
+Map {
+  "__kind" => "Score",
+  "tempo" => 90,
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 90,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 0,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 1000,
+          },
+          "ratioposition" => 0.5,
+          "text" => "",
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 2000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "isrepeatstart" => true,
+      "start" => 7680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 3000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 1,
+            "millisecondoffset" => 4000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 11520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "repeatcount" => 2,
+      "start" => 15360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 19200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 1,
+            "millisecondoffset" => 5000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 23040,
+    },
+  ],
+}
+`;

@@ -781,7 +781,7 @@ describe('AlphaTexImporterTest', () => {
             [KeySignature.B, KeySignatureType.Major],
             [KeySignature.FSharp, KeySignatureType.Minor]
         ];
-        
+
         for (let i = 0; i < expected.length; i++) {
             expect(bars[i].keySignature).to.equal(expected[i][0]);
             expect(bars[i].keySignatureType).to.equal(expected[i][1]);
@@ -1972,6 +1972,28 @@ describe('AlphaTexImporterTest', () => {
                     \\barlineleft heavylight
                     \\barlineright dashed
             `);
+        expect(score).toMatchSnapshot();
+    });
+
+    it('sync', () => {
+        const score = parseTex(`
+            \\tempo 90
+            .
+            3.4.4*4 | 3.4.4*4 |
+            \\ro 3.4.4*4 | 3.4.4*4 | \\rc 2 3.4.4*4 |
+            3.4.4*4 | 3.4.4*4
+            .
+            \\sync 0 0 0 
+            \\sync 0 0 1000 0.5
+            \\sync 1 0 2000
+            \\sync 3 0 3000
+            \\sync 3 1 4000
+            \\sync 6 1 5000
+            `);
+
+        // simplify snapshot
+        score.tracks = [];
+
         expect(score).toMatchSnapshot();
     });
 });
