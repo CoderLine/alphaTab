@@ -419,8 +419,7 @@ export class ModelUtils {
                 }
 
                 // check if masterbar breaks multibar rests, it must be fully empty with no annotations
-                if (
-                    masterBar.alternateEndings ||
+                if (masterBar.alternateEndings ||
                     (masterBar.isRepeatStart && masterBar.index !== currentGroupStartIndex) ||
                     masterBar.isFreeTime ||
                     masterBar.isAnacrusis ||
@@ -642,11 +641,15 @@ export class ModelUtils {
             const barIndex = score.masterBars.length - 1;
             const masterBar = score.masterBars[barIndex];
 
+            if (masterBar.hasChanges) {
+                return;
+            }
+            
             for (const track of score.tracks) {
                 for (const staff of track.staves) {
                     if (barIndex < staff.bars.length) {
                         const bar = staff.bars[barIndex];
-                        if (!bar.isEmpty) {
+                        if (!bar.isEmpty || bar.hasChanges) {
                             // found a non-empty bar, stop whole cleanup
                             return;
                         }

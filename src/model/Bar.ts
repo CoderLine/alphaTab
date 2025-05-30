@@ -319,6 +319,31 @@ export class Bar {
     }
 
     /**
+     * Whether this bar has any changes applied which are not related to the voices in it.
+     * (e.g. new key signatures)
+     */
+    public get hasChanges(): boolean {
+        if (this.index === 0) {
+            return true;
+        }
+        const hasChangesToPrevious =
+            this.keySignature !== this.previousBar!.keySignature ||
+            this.keySignatureType !== this.previousBar!.keySignatureType ||
+            this.clef !== this.previousBar!.clef ||
+            this.clefOttava !== this.previousBar!.clefOttava;
+        if (hasChangesToPrevious) {
+            return true;
+        }
+
+        return (
+            this.simileMark !== SimileMark.None ||
+            this.sustainPedals.length > 0 ||
+            this.barLineLeft !== BarLineStyle.Automatic ||
+            this.barLineRight !== BarLineStyle.Automatic
+        );
+    }
+
+    /**
      * Whether this bar is empty or has only rests.
      */
     public get isRestOnly(): boolean {

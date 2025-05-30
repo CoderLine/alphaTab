@@ -881,7 +881,7 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('triplet-feel-multi-bar', () => {
-        const tex: string = '\\tf t16 | | | \\tf t8 | | | \\tf no | | ';
+        const tex: string = '\\tf t16 C4 | C4  | C4  | \\tf t8 C4 | C4 | C4 | \\tf no | C4  | C4 ';
         const score: Score = parseTex(tex);
         expect(score.masterBars[0].tripletFeel).to.equal(TripletFeel.Triplet16th);
         expect(score.masterBars[1].tripletFeel).to.equal(TripletFeel.Triplet16th);
@@ -1480,9 +1480,9 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.masterBars).to.have.length(2);
 
-        expect(score.tracks[0].staves[0].bars).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
     });
 
     it('multi-voice-simple-all-voices', () => {
