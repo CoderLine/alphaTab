@@ -303,123 +303,12 @@ function buildSyncPointMarkers(api: alphaTab.AlphaTabApi): SyncPointMarker[] {
             syncTime: syncTime,
             synthTime: synthTime,
             synthBpm: synthBpm,
-            //syncBpm: syncBpm,
 
             markerType: SyncPointMarkerType.EndMarker,
         });
     } else {
-        //lastSyncPoint.syncBpm = syncBpm;
         lastSyncPoint.markerType = SyncPointMarkerType.EndMarker;
     }
-
-
-
-    // for (const masterBar of api.tickCache!.masterBars) {
-    //     const occurence = occurences.get(masterBar.masterBar.index) ?? 0;
-    //     occurences.set(masterBar.masterBar.index, occurence + 1);
-
-    //     const duration = masterBar.end - masterBar.start;
-
-    //     if (masterBar.masterBar.syncPoints) {
-    //         // if we have sync points we have to correctly walk through the points and tempo changes
-    //         // and place the markers accordingly
-
-    //         let tempoChangeIndex = 0;
-    //         for (const syncPoint of masterBar.masterBar.syncPoints) {
-    //             if (syncPoint.syncPointValue!.barOccurence !== occurence) {
-    //                 continue;
-    //             }
-
-    //             const syncPointTick = masterBar.start + syncPoint.ratioPosition * duration;
-
-    //             // first process all tempo change until this sync point
-    //             while (
-    //                 tempoChangeIndex < masterBar.tempoChanges.length &&
-    //                 masterBar.tempoChanges[tempoChangeIndex].tick <= syncPointTick
-    //             ) {
-    //                 const tempoChange = masterBar.tempoChanges[tempoChangeIndex];
-    //                 const absoluteTick = tempoChange.tick;
-    //                 const tickOffset = absoluteTick - synthTickPosition;
-    //                 if (tickOffset > 0) {
-    //                     const timeOffset = ticksToMilliseconds(tickOffset, synthBpm);
-    //                     synthTickPosition = absoluteTick;
-    //                     synthTimePosition += timeOffset;
-    //                 }
-
-    //                 synthBpm = tempoChange.tempo;
-    //                 tempoChangeIndex++;
-    //             }
-
-    //             // process time until sync point
-    //             const tickOffset = syncPointTick - synthTickPosition;
-    //             if (tickOffset > 0) {
-    //                 synthTickPosition = syncPointTick;
-    //                 const timeOffset = ticksToMilliseconds(tickOffset, synthBpm);
-    //                 synthTimePosition += timeOffset;
-    //             }
-
-    //             // create sync point marker
-    //             const newMarker: SyncPointMarker = {
-    //                 masterBarIndex: masterBar.masterBar.index,
-    //                 occurence: occurence,
-    //                 syncTime: syncPoint.syncPointValue!.millisecondOffset,
-    //                 synthTime: synthTimePosition,
-    //                 synthBpm: masterBar.tempoChanges[0].tempo,
-    //                 modifiedTempo: 0 /* calculated by next marker */,
-    //                 markerType:
-    //                     syncPoint.ratioPosition === 0
-    //                         ? SyncPointMarkerType.MasterBar
-    //                         : SyncPointMarkerType.Intermediate,
-    //                 ratioPosition: syncPoint.ratioPosition,
-    //                 synthTick: synthTickPosition
-    //             };
-    //             if (syncPointTick === 0) {
-    //                 newMarker.markerType = SyncPointMarkerType.StartMarker;
-    //             }
-    //             markers.push(newMarker);
-
-    //             if (markers.length > 0) {
-    //                 updateModifiedTempo(markers.at(-1)!, newMarker.synthTime, newMarker.syncTime);
-    //             }
-    //         }
-
-    //         // process remaining tempo changes after all sync points
-    //         while (tempoChangeIndex < masterBar.tempoChanges.length) {
-    //             const tempoChange = masterBar.tempoChanges[tempoChangeIndex];
-    //             const absoluteTick = tempoChange.tick;
-    //             const tickOffset = absoluteTick - synthTickPosition;
-    //             if (tickOffset > 0) {
-    //                 const timeOffset = ticksToMilliseconds(tickOffset, synthBpm);
-    //                 synthTickPosition = absoluteTick;
-    //                 synthTimePosition += timeOffset;
-    //             }
-
-    //             synthBpm = tempoChange.tempo;
-    //             tempoChangeIndex++;
-    //         }
-    //     }
-    // }
-
-    // // at the very end we create the end marker
-    // const lastMasterBar = api.tickCache!.masterBars.at(-1)!;
-    // const endSyncPoint = lastMasterBar.masterBar.syncPoints?.find(m => m.ratioPosition === 1);
-
-    // const tickOffset = lastMasterBar.end - syncLastTick;
-    // const endSyncPointTime = endSyncPoint
-    //     ? endSyncPoint.syncPointValue!.millisecondOffset
-    //     : syncLastMillisecondOffset + ticksToMilliseconds(tickOffset, syncBpm);
-
-    // markers.push({
-    //     masterBarIndex: lastMasterBar.masterBar.index,
-    //     occurence: occurences.get(lastMasterBar.masterBar.index)! - 1,
-    //     syncTime: endSyncPointTime,
-    //     synthTime: synthTimePosition,
-    //     synthBpm,
-    //     modifiedTempo: endSyncPoint?.syncPointValue?.modifiedTempo ?? synthBpm,
-    //     markerType: SyncPointMarkerType.EndMarker,
-    //     ratioPosition: 1,
-    //     synthTick: synthTickPosition
-    // });
 
     return markers;
 }
@@ -524,80 +413,8 @@ export function autoSync(oldState: SyncPointInfo, api: alphaTab.AlphaTabApi, pad
 
     // create initial sync points for all tempo changes to ensure the song and the
     // backing track roughly align
-    let synthBpm = api.tickCache!.masterBars[0].tempoChanges[0].tempo;
-    let synthTimePosition = 0;
-    let synthTickPosition = 0;
-
-    const syncPoints: SyncPointMarker[] = [];
-
-    // first create all changes not respecting the song start and end
-    const occurences = new Map<number, number>();
-    for (const masterBar of api.tickCache!.masterBars) {
-        const occurence = occurences.get(masterBar.masterBar.index) ?? 0;
-        occurences.set(masterBar.masterBar.index, occurence + 1);
-
-        // we are guaranteed to have a tempo change per master bar indicating its own tempo
-        // (even though its not a change)
-        for (const changes of masterBar.tempoChanges) {
-            const absoluteTick = changes.tick;
-            const tickOffset = absoluteTick - synthTickPosition;
-            if (tickOffset > 0) {
-                const timeOffset = ticksToMilliseconds(tickOffset, synthBpm);
-                synthTickPosition = absoluteTick;
-                synthTimePosition += timeOffset;
-            }
-
-            const marker: SyncPointMarker = {
-                uniqueId: uid(),
-                markerType: SyncPointMarkerType.MasterBar,
-                masterBarIndex: masterBar.masterBar.index,
-                masterBarStart: masterBar.start,
-                masterBarEnd: masterBar.end,
-                occurence,
-                syncTime: synthTimePosition,
-                synthBpm,
-                synthTime: synthTimePosition,
-                syncBpm: undefined,
-                synthTick: synthTickPosition
-            };
-
-            if (masterBar.start === 0) {
-                marker.markerType = SyncPointMarkerType.StartMarker;
-            } else if (changes.tick > masterBar.start) {
-                marker.markerType = SyncPointMarkerType.Intermediate;
-            }
-
-            if (changes.tempo !== synthBpm || marker.markerType === SyncPointMarkerType.StartMarker) {
-                syncPoints.push(marker);
-                marker.syncBpm = changes.tempo;
-            }
-
-            synthBpm = changes.tempo;
-
-            state.syncPointMarkers.push(marker);
-        }
-
-        const tickOffset = masterBar.end - synthTickPosition;
-        const timeOffset = ticksToMilliseconds(tickOffset, synthBpm);
-        synthTickPosition += tickOffset;
-        synthTimePosition += timeOffset;
-    }
-
-    // end marker
-    const lastMasterBar = api.tickCache!.masterBars.at(-1)!;
-    state.syncPointMarkers.push({
-        uniqueId: uid(),
-        masterBarIndex: lastMasterBar.masterBar.index,
-        masterBarStart: lastMasterBar.start,
-        masterBarEnd: lastMasterBar.end,
-        occurence: occurences.get(lastMasterBar.masterBar.index)! - 1,
-        syncTime: synthTimePosition,
-        synthTime: synthTimePosition,
-        synthBpm,
-        syncBpm: synthBpm,
-        markerType: SyncPointMarkerType.EndMarker,
-        synthTick: synthTickPosition
-    });
+    
+    state.syncPointMarkers = buildSyncPointMarkers(api);
 
     // with the final durations known, we can "squeeze" together the song
     // from start and end (keeping the relative positions)
@@ -605,18 +422,22 @@ export function autoSync(oldState: SyncPointInfo, api: alphaTab.AlphaTabApi, pad
     if (padToAudio) {
         const [songStart, songEnd] = findAudioStartAndEnd(state);
 
-        const synthDuration = synthTimePosition;
+        const synthDuration = state.syncPointMarkers.at(-1)!.synthTime;
         const realDuration = songEnd - songStart;
         const scaleFactor = realDuration / synthDuration;
+        
+        state.syncPointMarkers.at(0)!.syncBpm = state.syncPointMarkers.at(0)!.synthBpm;
+        state.syncPointMarkers.at(-1)!.syncBpm = state.syncPointMarkers.at(-1)!.synthBpm;
 
         // 1st Pass: shift all tempo change markers relatively and calculate BPM
+        const syncPoints = state.syncPointMarkers.filter(m => m.syncBpm !== undefined);
         let syncTime = songStart;
         for (let i = 0; i < syncPoints.length; i++) {
             const syncPoint = syncPoints[i];
 
             syncPoint.syncTime = syncTime;
 
-            if (i < 0) {
+            if (i > 0) {
                 const previousMarker = syncPoints[i - 1];
                 const synthDuration = syncPoint.synthTime - previousMarker.synthTime;
                 const syncedDuration = syncPoint.syncTime - previousMarker.syncTime;
@@ -897,4 +718,16 @@ export function syncPointsToKotlinCode(info: SyncPointInfo, indent: string): str
     }
 
     return lines.join(',\n');
+}
+
+export function syncPointsToAlphaTex(info: SyncPointInfo): string {
+    const lines: string[] = [];
+
+    const flat = toFlatSyncPoints(info);
+    for (const m of flat) {
+        const barPosition = m.barPosition > 0 ? ` ${Number(m.barPosition.toFixed(3))}` : '';
+        lines.push(`\\sync ${m.barIndex} ${m.barOccurence} ${m.millisecondOffset}${barPosition}`)
+    }
+
+    return lines.join('\n');
 }

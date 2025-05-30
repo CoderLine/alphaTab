@@ -19,7 +19,8 @@ import {
     buildSyncPointInfoFromSynth,
     syncPointsToTypeScriptCode,
     syncPointsToCSharpCode,
-    syncPointsToKotlinCode
+    syncPointsToKotlinCode,
+    syncPointsToAlphaTex
 } from './sync-point-info';
 import { WaveformCanvas } from './waveform-canvas';
 import { SyncPointMarkerPanel } from './sync-point-marker-panel';
@@ -374,7 +375,8 @@ export const MediaSyncEditor: React.FC<MediaSyncEditorProps> = ({
                             values={[
                                 { label: 'TypeScript', value: 'ts' },
                                 { label: 'C#', value: 'cs' },
-                                { label: 'Kotlin', value: 'kt' }
+                                { label: 'Kotlin', value: 'kt' },
+                                { label: 'alphaTex', value: 'at' }
                             ]}>
                             <TabItem value="ts">
                                 <CodeBlock language="typescript" title="SyncPoints">
@@ -459,6 +461,15 @@ export const MediaSyncEditor: React.FC<MediaSyncEditorProps> = ({
                                         'api.score.backingTrack.rawAudioFile = rawAudioFileBytes;',
                                         'api.updateSettings();   // ensures the right backing track player is started',
                                         'api.updateSyncPoints(); // updates the sync points in the player'
+                                    ].join('\n')}
+                                </CodeBlock>
+                            </TabItem>
+                            <TabItem value="at">
+                                Place the following alphaTex at the end of your alphaTex song for applying the sync points on load.
+                                <CodeBlock title="alphaTex Sync Points">
+                                    {[
+                                        '.',
+                                        syncPointsToAlphaTex(syncPointInfo),
                                     ].join('\n')}
                                 </CodeBlock>
                             </TabItem>

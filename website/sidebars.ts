@@ -140,6 +140,7 @@ const sidebars: SidebarsConfig = {
       "alphatex/note-effects",
       "alphatex/percussion",
       "alphatex/lyrics",
+      "alphatex/sync-points",
     ],
   },
   showcase: [
