@@ -274,7 +274,7 @@ export class AlphaTexImporter extends ScoreImporter {
         // \sync BarIndex Occurence MillisecondOffset
         // \sync BarIndex Occurence MillisecondOffset RatioPosition
 
-        if (this._sy !== AlphaTexSymbols.MetaCommand || this._syData !== 'sync') {
+        if (this._sy !== AlphaTexSymbols.MetaCommand || (this._syData as string) !== 'sync') {
             this.error('syncPoint', AlphaTexSymbols.MetaCommand, true);
         }
 
