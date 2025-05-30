@@ -3647,7 +3647,16 @@ export default class CSharpAstTransformer {
                     newObject.arguments.push(assignment);
                 } else if (ts.isShorthandPropertyAssignment(p)) {
                     assignment.label = p.name.getText();
-                    assignment.expression = this.visitExpression(assignment, p.objectAssignmentInitializer!)!;
+                    if(p.objectAssignmentInitializer) {
+                        assignment.expression = this.visitExpression(assignment, p.objectAssignmentInitializer)!;
+                    } else {
+                        assignment.expression = {
+                            nodeType: cs.SyntaxKind.Identifier,
+                            parent: assignment,
+                            tsNode: p.name,
+                            text: p.name.getText()
+                        } as cs.Identifier
+                    }
                     newObject.arguments.push(assignment);
                 } else if (ts.isSpreadAssignment(p)) {
                     this._context.addTsNodeDiagnostics(p, 'Spread operator not supported', ts.DiagnosticCategory.Error);

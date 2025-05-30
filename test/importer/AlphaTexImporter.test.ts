@@ -781,7 +781,7 @@ describe('AlphaTexImporterTest', () => {
             [KeySignature.B, KeySignatureType.Major],
             [KeySignature.FSharp, KeySignatureType.Minor]
         ];
-        
+
         for (let i = 0; i < expected.length; i++) {
             expect(bars[i].keySignature).to.equal(expected[i][0]);
             expect(bars[i].keySignatureType).to.equal(expected[i][1]);
@@ -881,7 +881,7 @@ describe('AlphaTexImporterTest', () => {
     });
 
     it('triplet-feel-multi-bar', () => {
-        const tex: string = '\\tf t16 | | | \\tf t8 | | | \\tf no | | ';
+        const tex: string = '\\tf t16 C4 | C4  | C4  | \\tf t8 C4 | C4 | C4 | \\tf no | C4  | C4 ';
         const score: Score = parseTex(tex);
         expect(score.masterBars[0].tripletFeel).to.equal(TripletFeel.Triplet16th);
         expect(score.masterBars[1].tripletFeel).to.equal(TripletFeel.Triplet16th);
@@ -1480,9 +1480,9 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.masterBars).to.have.length(2);
 
-        expect(score.tracks[0].staves[0].bars).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
-        expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
     });
 
     it('multi-voice-simple-all-voices', () => {
@@ -1972,6 +1972,54 @@ describe('AlphaTexImporterTest', () => {
                     \\barlineleft heavylight
                     \\barlineright dashed
             `);
+        expect(score).toMatchSnapshot();
+    });
+
+    it('sync', () => {
+        const score = parseTex(`
+            \\tempo 90
+            .
+            3.4.4*4 | 3.4.4*4 |
+            \\ro 3.4.4*4 | 3.4.4*4 | \\rc 2 3.4.4*4 |
+            3.4.4*4 | 3.4.4*4
+            .
+            \\sync 0 0 0 
+            \\sync 0 0 1000 0.5
+            \\sync 1 0 2000
+            \\sync 3 0 3000
+            \\sync 3 1 4000
+            \\sync 6 1 5000
+            `);
+
+        // simplify snapshot
+        score.tracks = [];
+
+        expect(score).toMatchSnapshot();
+    });
+
+    it('sync-expect-dot', () => {
+        const score = parseTex(`
+            \\title "Prelude in D Minor"
+            \\artist "J.S. Bach (1685-1750)"
+            \\copyright "Public Domain"
+            \\tempo 80
+            .
+            \\ts 3 4
+            0.4.16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
+            (3.2 0.4).16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) | 
+            (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) | 
+            (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
+            .
+            \\sync 0 0 0
+            \\sync 0 0 1500 0.666
+            \\sync 1 0 4075 0.666
+            \\sync 2 0 6475 0.333
+            \\sync 3 0 10223 1
+        `);
+
+        // simplify snapshot
+        score.tracks = [];
+
         expect(score).toMatchSnapshot();
     });
 });
