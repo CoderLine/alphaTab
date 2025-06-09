@@ -6,7 +6,7 @@ kotlinx-coroutines = "1.10.2"
 dokka = "2.0.0"
 
 espressoCore = "3.6.1"
-appcompat = "1.7.0"
+appcompat = "1.7.1"
 
 coreKtx = "1.16.0"
 junit = "4.13.2"
