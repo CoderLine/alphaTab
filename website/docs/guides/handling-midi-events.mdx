@@ -124,9 +124,7 @@ From this starting point we will be adding the logic.
         <span id="counter">1</span>
         <span id="and">and</span>
     </div>
-    <div id="alphaTab" data-player-scrolloffsety="-30" data-tex="true"
-        data-player-enableplayer="true"
-        data-player-soundfont="https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2">
+    <div id="alphaTab">
         \ts 3 4 
         1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
         1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
@@ -135,7 +133,16 @@ From this starting point we will be adding the logic.
 
     <script type="text/javascript">
         const el = document.getElementById('alphaTab');
-        let api = new alphaTab.AlphaTabApi(el);
+        let api = new alphaTab.AlphaTabApi(el, {
+            core: {
+                tex: true
+            },
+            player: {
+                playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+                scrollOffsetY: -30,
+                soundFont: "https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2"
+            }
+        });
         api.metronomeVolume = 1;
         api.playbackSpeed = 0.5;
 
@@ -300,9 +307,7 @@ also cause some performance degredation and as there is a bit audio latency invo
         <span id="counter">1</span>
         <span id="and">and</span>
     </div>
-    <div id="alphaTab" data-player-scrolloffsety="-30" data-tex="true"
-        data-player-enableplayer="true"
-        data-player-soundfont="https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2">
+    <div id="alphaTab">
         \ts 3 4 
         1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
         1.4.8 1.4{g}.8 2.4.8 2.4{g}.8 3.4.8 3.4{g}.8 | 
@@ -311,7 +316,16 @@ also cause some performance degredation and as there is a bit audio latency invo
 
     <script type="text/javascript">
         const el = document.getElementById('alphaTab');
-        let api = new alphaTab.AlphaTabApi(el);
+        let api = new alphaTab.AlphaTabApi(el, {
+            core: {
+                tex: true
+            },
+            player: {
+                playerMode: alphaTab.PlayerMode.EnabledAutomatic,
+                scrollOffsetY: -30,
+                soundFont: "https://cdn.jsdelivr.net/npm/@coderline/alphatab@alpha/dist/soundfont/sonivox.sf2"
+            }
+        });
         api.metronomeVolume = 1;
         api.playbackSpeed = 0.5;
 
