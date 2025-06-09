@@ -28,7 +28,9 @@ export const AlphaTabFull: React.FC<AlphaTabProps> = ({ settings }) => {
   const [api, element] = useAlphaTab((s) => {
     s.player.scrollElement = viewPortRef.current!;
     s.player.scrollOffsetY = -10;
-    s.player.enablePlayer = true;
+    s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
+    s.player.scrollMode = alphaTab.ScrollMode.Continuous;
+  
     if (settings) {
       s.fillFromJson(settings);
     }

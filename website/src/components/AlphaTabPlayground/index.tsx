@@ -122,8 +122,6 @@ export const AlphaTabPlayground: React.FC = () => {
                 newPlayer.addEventListener('ended', onEnded);
                 newPlayer.addEventListener('volumechange', onVolumeChange);
                 newPlayer.addEventListener('ratechange', onRateChange);
-                newPlayer.addEventListener('volumechange', onVolumeChange);
-                newPlayer.addEventListener('ratechange', onRateChange);
 
                 youtubePlayerUnsubscribe.current = () => {
                     newPlayer.removeEventListener('loadedmetadata', onLoadedMetadata);
@@ -132,8 +130,6 @@ export const AlphaTabPlayground: React.FC = () => {
                     newPlayer.removeEventListener('play', onPlay);
                     newPlayer.removeEventListener('pause', onPause);
                     newPlayer.removeEventListener('ended', onEnded);
-                    newPlayer.removeEventListener('volumechange', onVolumeChange);
-                    newPlayer.removeEventListener('ratechange', onRateChange);
                     newPlayer.removeEventListener('volumechange', onVolumeChange);
                     newPlayer.removeEventListener('ratechange', onRateChange);
                 };

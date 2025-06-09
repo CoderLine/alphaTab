@@ -2,9 +2,6 @@
 title: Audio & Video Sync
 ---
 
-> [!WARNING]
-> This guide is still incomplete and is currently being extended.
-
 alphaTab can be synchronized with an external audio or video backing track. You can either use Guitar Pro 8 files with an audio track or synchronize alphaTab with an external media using the 
 [Media Sync Editor in the Playground](/docs/playground/playground.mdx).
 
@@ -34,6 +31,15 @@ Beside that you can load Guitar Pro 8 files and directly benefit from the enhanc
 ### Custom External Media Player
 
 alphaTab can be integrated with any external media system but it requires some implementation on the integrator side. To properly synchronize alphaTab and an external media source (audio or video) the `alphaTab.synth.IExternalMediaHandler` interface has to be implemented and provided to alphaTab.
+Beside that, alphaTab has to be informed about the time updates on the external media (e.g. during playback and seeking). This update should happen at a rate smaller than two subsequent notes. 50ms updates have shown to work well on even fast songs, but to save power and battery you might want to handle this dynamically.
+
+The following example illustrates a full integration with a HTML Media Element like `<audio />` or `<video />`. This should be a good reference on how to implement the related sync with your media player. 
+Most things should be quite obvious like syncing volume, playback speed and providing the time and duration.
+
+import { ExternalMediaSample } from '@site/src/components/ExternalMediaSample';
+
+<ExternalMediaSample />
+
 
 #### YouTube 
 
@@ -46,3 +52,172 @@ Some key reasons behind this is:
 
 Nevertheless we want to give you some guidance on how to link alphaTab to YouTube. The following steps show how to use the [YouTube Player API Reference for iframe Embeds](https://developers.google.com/youtube/iframe_api_reference) together with alphaTab.
 
+
+```js
+// assuming a <div id="youtube"></div> somewhere
+
+
+//
+// 1. load the YouTube IFrame API. we use promises to have a bit better control over the initialization sequence
+
+const playerElement = document.getElementById('youtube');
+
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/player_api";
+playerElement.parentNode.insertBefore(tag, playerElement);
+
+const youtubeApiReady = Promise.withResolvers();
+window.onYouTubePlayerAPIReady = youtubeApiReady.resolve;
+
+//
+// 2. Already initialize alphaTab
+
+const api = new alphaTab.AlphaTabApi('#alphaTab', {
+    core: {
+        file: 'my-synced-file.gp'
+    },
+    player: {
+        // set the external media mode
+        playerMode: alphaTab.PlayerMode.EnabledExternalMedia
+    }
+});
+window.at = at;
+
+//
+// 3. Wait for the youtube API to be ready
+await youtubeApiReady.promise;
+
+
+//
+// 4. Setup the youtube player and wait for the video to be ready for playback
+const youtubePlayerReady = Promise.withResolvers();
+let currentTimeInterval  = 0;
+const player = new YT.Player(playerElement, {
+    height: '360',
+    width: '640',
+    videoId: 'your-video-id',
+    playerVars: { 'autoplay': 0 }, // we do not want autoplay
+    events: {
+        'onReady': (e) => {
+            youtubePlayerReady.resolve();
+        },
+
+        // when the player state changes we update alphatab accordingly.
+        'onStateChange': (e) => {
+            // 
+            switch (e.data) {
+                case YT.PlayerState.PLAYING:
+                    currentTimeInterval = window.setInterval(() => {
+                        api.player.output.updatePosition(player.getCurrentTime() * 1000)
+                    }, 50);
+                    api.play();
+                    break;
+                case YT.PlayerState.ENDED:
+                    window.clearInterval(currentTimeInterval);
+                    api.stop();
+                    break;
+                case YT.PlayerState.PAUSED:
+                    window.clearInterval(currentTimeInterval);
+                    api.pause();
+                    break;
+                default:
+                    break;
+            }
+        },
+        'onPlaybackRateChange': (e) => {
+            api.playbackSpeed = e.data;
+        },
+        'onError': (e) => {
+            youtubePlayerReady.reject(e);
+        },
+    }
+});
+
+await youtubePlayerReady.promise;
+
+// 
+// 5. Setup the handler to let alphaTab control the youtube player when needed
+
+// Setup alphaTab with youtube handler
+const alphaTabYoutubeHandler = {
+    get backingTrackDuration() {
+        return player.getDuration() * 1000;
+    },
+    get playbackRate() {
+        return player.getPlaybackRate();
+    },
+    set playbackRate(value) {
+        player.setPlaybackRate(value);
+    },
+    get masterVolume() {
+        return player.getVolume() / 100;
+    },
+    set masterVolume(value) {
+        player.setVolume(value * 100);
+    },
+    seekTo(time) {
+        player.seekTo(time / 1000);
+    },
+    play() {
+        player.playVideo();
+    },
+    pause() {
+        player.pauseVideo();
+    }
+};
+api.player.output.handler = alphaTabYoutubeHandler;
+```
+
+As you can see it is again just a matter of passing the right calls and values back and forth just like with an `<audio />` element.
+
+> [!WARNING]
+> The YouTube IFrame API has a quite nasty behavior when it comes to seeking: For some strange reason `seekTo` will start the playback of the video
+> depending on the state. The docs say:
+>
+> > `player.seekTo(seconds:Number, allowSeekAhead:Boolean):Void`
+> >
+> > Seeks to a specified time in the video. If the player is paused when the function is called, it will remain paused. If the function is called from another state (playing, video cued, etc.), the player will play the video.
+>
+> alphaTab might initially do some seeking to the start position. This can cause the video to directly start playing which you might not want. 
+> To workaround this problem you could adjust the handler to check the player state and react accordingly. 
+
+```js
+let initialSeek = -1;
+const alphaTabYoutubeHandler = {
+    get backingTrackDuration() {
+        return player.getDuration() * 1000;
+    },
+    get playbackRate() {
+        return player.getPlaybackRate();
+    },
+    set playbackRate(value) {
+        player.setPlaybackRate(value);
+    },
+    get masterVolume() {
+        return player.getVolume() / 100;
+    },
+    set masterVolume(value) {
+        player.setVolume(value * 100);
+    },
+    seekTo(time) {
+        if (
+            player.getPlayerState() !== YT.PlayerState.PAUSED &&
+            player.getPlayerState() !== YT.PlayerState.PLAYING
+        ) {
+            initialSeek = value / 1000;
+        } else {
+            player.seekTo(value / 1000);
+        }
+    },
+    play() {
+        player.playVideo();
+        if (initialSeek >= 0) {
+            player.seekTo(initialSeek);
+            initialSeek = -1;
+        }
+    },
+    pause() {
+        player.pauseVideo();
+    }
+};
+``` 
