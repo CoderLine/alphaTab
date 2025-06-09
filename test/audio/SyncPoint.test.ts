@@ -6,6 +6,7 @@ import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import type { BackingTrack } from '@src/model/BackingTrack';
 import { Settings } from '@src/Settings';
 import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
+import { ExternalMediaPlayer, type IExternalMediaHandler, type IExternalMediaSynthOutput } from '@src/synth/ExternalMediaPlayer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { FlatMidiEventGenerator } from '@test/audio/FlatMidiEventGenerator';
@@ -32,8 +33,11 @@ describe('SyncPointTests', () => {
     async function syncPointTestScore() {
         // the testfile is built like this:
         // we have the "expected" music sheet in syncpoints-testfile.gp
-        // this file is synchronized with an "actual" audio having completely different tempos. 
+        // this file is synchronized with an "actual" audio having completely different tempos.
         // the file with wrong tempos used as backing track is in syncpoints-testfile-backingtrack.gp
+
+        // the backing track takes 42secs while the original sound would take 48secs
+
         const data = await TestPlatform.loadFile('test-data/audio/syncpoints-testfile.gp');
         const score = ScoreLoader.loadScoreFromBytes(data, new Settings());
         return score;
@@ -79,6 +83,26 @@ describe('SyncPointTests', () => {
         output.backingTrackDuration = 42000;
 
         const player = new BackingTrackPlayer(output, 500);
+        player.loadMidiFile(midi);
+        player.loadBackingTrack(score);
+        player.updateSyncPoints(generator.syncPoints);
+
+        return player;
+    }
+
+    async function prepareExternalMediaPlayer() {
+        const score = await syncPointTestScore();
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const player = new ExternalMediaPlayer(500);
+        const mediaHandler = new TestExternalMediaHandler(player.output as IExternalMediaSynthOutput);
+        mediaHandler.backingTrackDuration = 42000;
+        (player.output as IExternalMediaSynthOutput).handler = mediaHandler;
+
         player.loadMidiFile(midi);
         player.loadBackingTrack(score);
         player.updateSyncPoints(generator.syncPoints);
@@ -137,8 +161,6 @@ describe('SyncPointTests', () => {
 
         expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
         expect(testOutput.seekTimes).toMatchSnapshot();
-
-        // TODO: it appears no mapping happens. due to the sync points the seek times and simulated seeks should result in different times
     });
 
     it('seek-fast-backing-track', async () => {
@@ -151,10 +173,10 @@ describe('SyncPointTests', () => {
         });
 
         // seek on player
-        player.timePosition = 4000;
-        player.timePosition = 10000;
-        player.timePosition = 26000;
-        player.timePosition = 42000;
+        player.timePosition = 4000 / 2;
+        player.timePosition = 10000 / 2;
+        player.timePosition = 26000 / 2;
+        player.timePosition = 42000 / 2;
 
         // seek on backing track
         const testOutput = player.output as TestBackingTrackOutput;
@@ -166,32 +188,90 @@ describe('SyncPointTests', () => {
         expect(testOutput.seekTimes).toMatchSnapshot();
     });
 
-    it('playback-normal-external-media', () => {
-        // ExternalMediaPlayer
-        // play a variety of songs artificially
-        // check
-        // - the positionChanged event list provided
+    it('playback-normal-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+
+        const events: PositionChangedEventArgs[] = [];
+        player.positionChanged.on(e => {
+            events.push(e);
+        });
+        player.play();
+
+        ((player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler).playThroughSong(
+            0,
+            42000,
+            500
+        );
+
+        expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
     });
 
-    it('playback-slow-external-media', () => {
-        // ExternalMediaPlayer
-        // play a variety of songs artificially (other 0.5 speed)
-        // check
-        // - the positionChanged event list provided
+    it('playback-fast-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+        player.playbackSpeed = 2;
+
+        const events: PositionChangedEventArgs[] = [];
+        player.positionChanged.on(e => {
+            events.push(e);
+        });
+        player.play();
+
+        ((player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler).playThroughSong(
+            0,
+            42000,
+            1000
+        );
+
+        expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
     });
 
-    it('seek-normal-external-media', () => {
-        // ExternalMediaPlayer
-        // seek to a given position
-        // check
-        // - the positionChanged event list provided
+    it('seek-normal-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+
+        const events: PositionChangedEventArgs[] = [];
+        player.positionChanged.on(e => {
+            events.push(e);
+        });
+
+        // seek on player
+        player.timePosition = 2000;
+        player.timePosition = 5000;
+        player.timePosition = 13000;
+        player.timePosition = 21000;
+
+        // seek on backing track
+        const testOutput = (player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler;
+        testOutput.simulateSeek(8000);
+        testOutput.simulateSeek(16000);
+        testOutput.simulateSeek(32000);
+
+        expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
+        expect(testOutput.seekTimes).toMatchSnapshot();
     });
 
-    it('seek-slow-external-media', () => {
-        // ExternalMediaPlayer
-        // seek to a given position (playbackSpeed 0.5)
-        // check
-        // - the positionChanged event list provided
+    it('seek-fast-external-media', async () => {
+        const player = await prepareExternalMediaPlayer();
+        player.playbackSpeed = 2;
+
+        const events: PositionChangedEventArgs[] = [];
+        player.positionChanged.on(e => {
+            events.push(e);
+        });
+
+        // seek on player
+        player.timePosition = 4000 / 2;
+        player.timePosition = 10000 / 2;
+        player.timePosition = 26000 / 2;
+        player.timePosition = 42000 / 2;
+
+        // seek on backing track
+        const testOutput = (player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler;
+        testOutput.simulateSeek(8000);
+        testOutput.simulateSeek(16000);
+        testOutput.simulateSeek(32000);
+
+        expect(events.map(e => `${e.currentTime},${e.originalTempo},${e.modifiedTempo}`)).toMatchSnapshot();
+        expect(testOutput.seekTimes).toMatchSnapshot();
     });
 });
 
@@ -218,7 +298,7 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public seekTo(time: number): void {
         this.seekTimes.push(time);
     }
-    public loadBackingTrack(backingTrack: BackingTrack): void {}
+    public loadBackingTrack(_backingTrack: BackingTrack): void {}
     public sampleRate: number = 44100;
 
     public open(_bufferTimeInMilliseconds: number): void {
@@ -242,4 +322,35 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
         return null;
     }
+}
+
+class TestExternalMediaHandler implements IExternalMediaHandler {
+    private _output: IExternalMediaSynthOutput;
+
+    public seekTimes: number[] = [];
+
+    public simulateSeek(time: number) {
+        this._output.updatePosition(time);
+    }
+
+    public playThroughSong(startTime: number, endTime: number, step: number) {
+        let time = startTime;
+        while (time <= endTime) {
+            this.simulateSeek(time);
+            time += step;
+        }
+    }
+
+    public constructor(output: IExternalMediaSynthOutput) {
+        this._output = output;
+    }
+
+    public backingTrackDuration: number = 0;
+    public playbackRate: number = 1;
+    public masterVolume: number = 1;
+    seekTo(time: number): void {
+        this.seekTimes.push(time);
+    }
+    play(): void {}
+    pause(): void {}
 }
