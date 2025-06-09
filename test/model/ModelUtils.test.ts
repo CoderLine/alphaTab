@@ -2,7 +2,7 @@ import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { Settings } from '@src/Settings';
 import { expect } from 'chai';
 
-describe('ModelUtils', () => {
+describe('ModelUtilsTests', () => {
     function trimTest(tex: string, expectedBars: number) {
         const importer = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
