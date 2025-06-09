@@ -241,7 +241,7 @@ export class PlayerSettings {
     /**
      * Whether playback cursors should be displayed.
      * @since 0.9.6
-     * @defaultValue `true`
+     * @defaultValue `true` (if player is not disabled)
      * @category Player
      * @remarks
      * This setting configures whether the playback cursors are shown or not. In case a developer decides to built an own cursor system the default one can be disabled with this setting. Enabling the cursor also requires the player to be active.

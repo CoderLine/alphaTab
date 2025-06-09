@@ -1357,9 +1357,7 @@ export class AlphaTabApiBase<TSettings> {
 
     public set playbackRange(value: PlaybackRange | null) {
         this._player.playbackRange = value;
-        if (this.settings.player.enableCursor) {
-            this.updateSelectionCursor(value);
-        }
+        this.updateSelectionCursor(value);
     }
 
     /**
@@ -1950,7 +1948,8 @@ export class AlphaTabApiBase<TSettings> {
     }
 
     private updateCursors() {
-        if (this.settings.player.enableCursor && !this._cursorWrapper) {
+        const enable = this.hasCursor;
+        if (enable && !this._cursorWrapper) {
             //
             // Create cursors
             const cursors = this.uiFacade.createCursors();
@@ -1965,7 +1964,7 @@ export class AlphaTabApiBase<TSettings> {
             if (this._currentBeat !== null) {
                 this.cursorUpdateBeat(this._currentBeat!, false, this._previousTick > 10, 1, true);
             }
-        } else if (!this.settings.player.enableCursor && this._cursorWrapper) {
+        } else if (!enable && this._cursorWrapper) {
             this.destroyCursors();
         }
     }
@@ -2599,14 +2598,17 @@ export class AlphaTabApiBase<TSettings> {
      */
     public noteMouseUp: IEventEmitterOfT<Note | null> = new EventEmitterOfT<Note | null>();
 
+    private get hasCursor() {
+        return this.settings.player.playerMode !== PlayerMode.Disabled && this.settings.player.enableCursor;
+    }
+
     private onBeatMouseDown(originalEvent: IMouseEventArgs, beat: Beat): void {
         if (this._isDestroyed) {
             return;
         }
 
         if (
-            this.settings.player.playerMode !== PlayerMode.Disabled &&
-            this.settings.player.enableCursor &&
+            this.hasCursor &&
             this.settings.player.enableUserInteraction
         ) {
             this._selectionStart = new SelectionInfo(beat);
@@ -2657,8 +2659,7 @@ export class AlphaTabApiBase<TSettings> {
         }
 
         if (
-            this.settings.player.playerMode !== PlayerMode.Disabled &&
-            this.settings.player.enableCursor &&
+            this.hasCursor &&
             this.settings.player.enableUserInteraction
         ) {
             if (this._selectionEnd) {
@@ -2804,8 +2805,7 @@ export class AlphaTabApiBase<TSettings> {
         this._renderer.postRenderFinished.on(() => {
             if (
                 !this._selectionStart ||
-                this.settings.player.playerMode === PlayerMode.Disabled ||
-                !this.settings.player.enableCursor ||
+                !this.hasCursor ||
                 !this.settings.player.enableUserInteraction
             ) {
                 return;
