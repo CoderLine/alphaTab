@@ -6,7 +6,11 @@ import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import type { BackingTrack } from '@src/model/BackingTrack';
 import { Settings } from '@src/Settings';
 import { BackingTrackPlayer, type IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
-import { ExternalMediaPlayer, type IExternalMediaHandler, type IExternalMediaSynthOutput } from '@src/synth/ExternalMediaPlayer';
+import {
+    ExternalMediaPlayer,
+    type IExternalMediaHandler,
+    type IExternalMediaSynthOutput
+} from '@src/synth/ExternalMediaPlayer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { FlatMidiEventGenerator } from '@test/audio/FlatMidiEventGenerator';
@@ -50,7 +54,9 @@ describe('SyncPointTests', () => {
         const generator = new MidiFileGenerator(score, new Settings(), handler);
         generator.generate();
 
-        expect(generator.syncPoints).toMatchSnapshot();
+        expect(
+            generator.syncPoints.map(p => `${p.masterBarIndex},${p.masterBarOccurence},${p.synthBpm},${p.syncBpm},${p.synthTime},${p.syncTime}`)
+        ).toMatchSnapshot();
 
         const update = MidiFileGenerator.generateSyncPoints(score);
 
@@ -68,7 +74,12 @@ describe('SyncPointTests', () => {
 
     it('modified-tempo-lookup', async () => {
         const score = await syncPointTestScore();
-        expect(MidiFileGenerator.buildModifiedTempoLookup(score)).toMatchSnapshot();
+
+        const entries = Array.from(MidiFileGenerator.buildModifiedTempoLookup(score)).map(
+            e => `${e[0].syncPointValue?.millisecondOffset} => ${e[1].syncBpm}`
+        );
+
+        expect(entries).toMatchSnapshot();
     });
 
     async function prepareBackingTrackPlayer() {

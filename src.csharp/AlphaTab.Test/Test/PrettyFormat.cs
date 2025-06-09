@@ -20,4 +20,18 @@ partial class PrettyFormat
             throw new ArgumentException("Provided value was no map", nameof(map));
         }
     }
+    public static IEnumerable<object?> ArrayAsUnknownIterable(object map)
+    {
+        if (map is IEnumerable enumerable)
+        {
+            foreach (var v in enumerable)
+            {
+                yield return v;
+            }
+        }
+        else
+        {
+            throw new ArgumentException("Provided value was no map", nameof(map));
+        }
+    }
 }

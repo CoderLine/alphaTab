@@ -191,7 +191,7 @@ export class PrettyFormat {
                 ? `[${arrayTypeName}]`
                 : `${
                       min ? '' : `${arrayTypeName} `
-                  }[${PrettyFormat.printIterableValues(val as Iterable<unknown>, config, indentation, depth, refs, PrettyFormat.printer)}]`;
+                  }[${PrettyFormat.printIterableValues(PrettyFormat.arrayAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer)}]`;
         }
 
         if (val instanceof Map) {
@@ -201,6 +201,14 @@ export class PrettyFormat {
         }
 
         return '';
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    private static arrayAsUnknownIterable(array: unknown): Iterable<unknown> {
+        return array as Iterable<unknown>;
     }
 
     /**
