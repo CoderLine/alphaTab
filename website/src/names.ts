@@ -44,24 +44,6 @@ export function toDomEventNames(jsNames: string[]) {
   });
 }
 
-export function tojQueryEventNames(jsNames: string[]) {
-  return jsNames.map((v) => {
-    return `alphaTab.${v}`;
-  });
-}
-
-export function tojQueryMethodNames(jsNames: string[]) {
-  return jsNames.map((v) => {
-    return `alphaTab('${v}')`;
-  });
-}
-
-export function tojQueryPropertyNames(jsNames: string[]) {
-  return jsNames.map((v) => {
-    return `alphaTab('${v}')`;
-  });
-}
-
 export function buildNames(property: Page) {
   const javaScriptOnly = property.prop("javaScriptOnly", false);
   const domWildcard = property.prop("domWildcard", false);
@@ -83,19 +65,6 @@ export function buildNames(property: Page) {
 
   if (property.prop("jsOnParent", false) && jsNames.length > 0) {
     jsNames.push(jsNames[0].split(".")[1]);
-  }
-
-  let jQueryNames = property.props("jQueryName");
-  if (property.prop("jQuery", true) && jQueryNames.length === 0) {
-    if (category.startsWith("Events")) {
-      jQueryNames = tojQueryEventNames(jsNames);
-    } else if (category.startsWith("Methods")) {
-      jQueryNames = tojQueryMethodNames(jsNames);
-    } else if (category.startsWith("Properties")) {
-      jQueryNames = tojQueryPropertyNames(jsNames);
-    } else if (property.prop("jQuery", false)) {
-      jQueryNames = jsNames;
-    }
   }
 
   let domNames = property.props("domName");
@@ -122,7 +91,6 @@ export function buildNames(property: Page) {
     javaScriptOnly,
     jsNames,
     csNames,
-    jQueryNames,
     domNames,
     androidNames
   };

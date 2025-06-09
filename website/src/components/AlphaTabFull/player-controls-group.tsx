@@ -233,7 +233,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
           <LayoutSelector onLayoutChange={onLayoutChange} />
 
           <div className={styles["at-logo"]}>
-            powered by <img src="/img/alphatab.png" />
+            powered by <img src="/img/alphaTab.png" />
           </div>
         </div>
       </div>

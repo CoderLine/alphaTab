@@ -1,9 +1,11 @@
-import type * as alphaTab from "@coderline/alphatab";
+import * as alphaTab from "@coderline/alphatab";
 
 export default {
   setAlphaTabDefaults(settings: alphaTab.Settings) {
     settings.core.fontDirectory = "/font/";
     settings.player.soundFont = "/soundfont/sonivox.sf3";
+    settings.player.scrollMode = alphaTab.ScrollMode.Off;
+    settings.player.playerMode = alphaTab.PlayerMode.Disabled;
 
     if (typeof window !== 'undefined') {
       const params = new URL(window.location.href).searchParams;

@@ -35,7 +35,7 @@ export const AlphaTab: React.FC<AlphaTabProps> = ({
     }
 
     if (player) {
-      s.player.enablePlayer = true;
+      s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
       s.player.scrollOffsetY = -50;
       s.player.scrollMode = alphaTab.ScrollMode.Off;
     }
