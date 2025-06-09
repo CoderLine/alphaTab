@@ -171,7 +171,7 @@ describe('Gp7ExporterTest', () => {
     });
 
 
-    // it('gp8', async () => {
-    //     await testRoundTripFolderEqual('guitarpro8');
-    // });
+    it('gp8', async () => {
+        await testRoundTripFolderEqual('guitarpro8');
+    });
 });
