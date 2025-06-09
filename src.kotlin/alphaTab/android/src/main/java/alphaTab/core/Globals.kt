@@ -2,7 +2,9 @@
 
 package alphaTab.core
 
+import alphaTab.collections.ArrayListWithRemoveRange
 import alphaTab.collections.List
+import alphaTab.collections.MapEntry
 import alphaTab.core.ecmaScript.ArrayBuffer
 import alphaTab.core.ecmaScript.RegExp
 import kotlinx.coroutines.CoroutineScope
@@ -65,7 +67,10 @@ internal inline fun String.replace(pattern: RegExp, replacement: String): String
     return pattern.replace(this, replacement)
 }
 
-internal fun String.replace(pattern: RegExp, replacement: (match:String, group1:String) -> String): String {
+internal fun String.replace(
+    pattern: RegExp,
+    replacement: (match: String, group1: String) -> String
+): String {
     return pattern.replace(this, replacement)
 }
 
@@ -302,6 +307,12 @@ internal val Throwable.stack: String
 
 internal inline fun <reified T> List<T>.spread(): Array<T> {
     return _data.toTypedArray();
+}
+
+internal inline fun <reified TKey, reified TValue, reified TResult> List<MapEntry<TKey, TValue>>.map(func: (v: ArrayTuple<TKey, TValue>) -> TResult): List<TResult> {
+    return List(_data.map { func(ArrayTuple(it.key, it.value)) }.toCollection(
+        ArrayListWithRemoveRange()
+    ))
 }
 
 

@@ -32,6 +32,8 @@ public class List<T> : Iterable<T> {
             _data.add(null as T)
         }
     }
+    @Suppress("UNCHECKED_CAST")
+    internal constructor(size: Double) : this(size.toInt())
 
     public constructor(items: Iterable<T>) {
         _data = items.toCollection(ArrayListWithRemoveRange())
