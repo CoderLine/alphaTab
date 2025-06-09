@@ -327,7 +327,7 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public sampleRequest: IEventEmitter = new EventEmitter();
 
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
-        return new Array<ISynthOutputDevice>(0);
+        return ([] as ISynthOutputDevice[]);
     }
     public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
