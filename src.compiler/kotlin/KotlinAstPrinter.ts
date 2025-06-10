@@ -110,6 +110,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine('    "CanBeVal",');
         this.writeLine('    "CascadeIf",');
         this.writeLine('    "unused",');
+        this.writeLine('    "LocalVariableName",');
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
         this.writeLine('    "UNCHECKED_CAST",');
         this.writeLine('    "USELESS_CAST",');

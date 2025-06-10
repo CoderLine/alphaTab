@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -77,5 +78,45 @@ static partial class TestPlatform
     public static T[] EnumValues<T>(Type type) where T : struct, Enum
     {
         return Enum.GetValues<T>();
+    }
+
+    public static IEnumerable<ArrayTuple<object?, object?>> MapAsUnknownIterable(object map)
+    {
+        if (map is IDictionary mapAsUnknownIterable)
+        {
+            foreach (DictionaryEntry v in mapAsUnknownIterable)
+            {
+                yield return new ArrayTuple<object?, object?>(v.Key, v.Value);
+            }
+        }
+        else
+        {
+            throw new ArgumentException("Provided value was no map", nameof(map));
+        }
+    }
+
+    public static IEnumerable<object?> TypedArrayAsUnknownIterable(object map)
+    {
+        if (map is IEnumerable enumerable)
+        {
+            foreach (var v in enumerable)
+            {
+                yield return v;
+            }
+        }
+        else
+        {
+            throw new ArgumentException("Provided value was no map", nameof(map));
+        }
+    }
+
+    public static IList TypedArrayAsUnknownArray(object? array)
+    {
+        return array switch
+        {
+            IList l => l,
+            _ => throw new InvalidCastException(
+                $"Unknown array type[{array?.GetType().FullName}]")
+        };
     }
 }

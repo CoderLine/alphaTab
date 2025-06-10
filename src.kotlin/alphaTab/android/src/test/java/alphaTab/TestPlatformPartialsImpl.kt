@@ -1,5 +1,14 @@
 package alphaTab
 
+import alphaTab.collections.BooleanList
+import alphaTab.collections.DoubleBooleanMap
+import alphaTab.collections.DoubleDoubleMap
+import alphaTab.collections.DoubleList
+import alphaTab.collections.DoubleObjectMap
+import alphaTab.collections.ObjectBooleanMap
+import alphaTab.collections.ObjectDoubleMap
+import alphaTab.core.ArrayTuple
+import alphaTab.core.IArrayTuple
 import alphaTab.core.ecmaScript.Uint8Array
 import kotlinx.coroutines.CompletableDeferred
 import java.io.ByteArrayOutputStream
@@ -80,6 +89,33 @@ class TestPlatformPartials {
             @Suppress("UNUSED_PARAMETER") type: KClass<T>
         ): alphaTab.collections.List<T> {
             return alphaTab.collections.List(enumValues<T>().toMutableList())
+        }
+
+        internal fun mapAsUnknownIterable(map: Any?): Iterable<IArrayTuple<Any?, Any?>>  = when(map) {
+            is alphaTab.collections.Map<*, *> -> map.map { ArrayTuple(it.key, it.value) }
+            is DoubleBooleanMap -> map.map { ArrayTuple(it.key, it.value) }
+            is DoubleDoubleMap -> map.map { ArrayTuple(it.key, it.value) }
+            is DoubleObjectMap<*> -> map.map { ArrayTuple(it.key, it.value) }
+            is ObjectBooleanMap<*> -> map.map { ArrayTuple(it.key, it.value) }
+            is ObjectDoubleMap<*> -> map.map { ArrayTuple(it.key, it.value) }
+            else -> throw ClassCastException("Invalid map type: " + map?.javaClass?.name)
+        }
+
+        internal fun typedArrayAsUnknownIterable(array: Any?): Iterable<Any?>  = when(array) {
+            is alphaTab.collections.List<*> -> array
+            is DoubleList -> array.map<Any?> { it }
+            is BooleanList -> array.map<Any?> { it }
+            else -> throw ClassCastException("Invalid array type: " + array?.javaClass?.name)
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        internal fun typedArrayAsUnknownArray(array: Any?): alphaTab.collections.List<Any?> = when(array) {
+            is alphaTab.collections.List<*> -> array as alphaTab.collections.List<Any?>
+            is List<*> -> alphaTab.collections.List(array)
+            is DoubleList -> alphaTab.collections.List(array.map<Any?> { it })
+            is BooleanList -> alphaTab.collections.List(array.map<Any?> { it })
+            null -> throw Error("Unknown Array Type: null")
+            else -> throw Error("Unknown Array Type: ${array::class.qualifiedName}")
         }
     }
 }

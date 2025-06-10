@@ -468,7 +468,7 @@ export class BinaryStylesheet {
 
         switch (score.stylesheet.multiTrackTrackNamePolicy) {
             case TrackNamePolicy.Hidden:
-                binaryStylesheet.addValue('System/trackNameModeMulti', false, DataType.Boolean);
+                binaryStylesheet.addValue('System/showTrackNameMulti', false, DataType.Boolean);
                 break;
             case TrackNamePolicy.FirstSystem:
                 binaryStylesheet.addValue('System/trackNameModeMulti', 0, DataType.Integer);

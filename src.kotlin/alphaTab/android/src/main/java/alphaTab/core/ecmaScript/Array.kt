@@ -1,5 +1,7 @@
 package alphaTab.core.ecmaScript
 
+import alphaTab.collections.BooleanList
+import alphaTab.collections.DoubleList
 import alphaTab.collections.IDoubleIterable
 
 @Suppress("NOTHING_TO_INLINE")
@@ -12,7 +14,7 @@ internal class Array {
             return alphaTab.collections.DoubleList(x)
         }
         public inline fun isArray(x:Any?):Boolean {
-            return x is alphaTab.collections.List<*>
+            return x is alphaTab.collections.List<*> || x is DoubleList || x is BooleanList
         }
     }
 }

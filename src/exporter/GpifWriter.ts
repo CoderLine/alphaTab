@@ -1185,10 +1185,9 @@ export class GpifWriter {
                     value.addElement('BarOccurrence').innerText = syncPoint.syncPointValue!.barOccurence.toString();
                     value.addElement('ModifiedTempo').innerText = modifiedTempoLookup.value.get(syncPoint)!.syncBpm.toString();
                     value.addElement('OriginalTempo').innerText = score.tempo.toString();
-                    const frameOffset =
-                        (((syncPoint.syncPointValue!.millisecondOffset - millisecondPadding) / 1000) *
-                            GpifWriter.SampleRate) |
-                        0;
+                    let frameOffset = (((syncPoint.syncPointValue!.millisecondOffset - millisecondPadding) / 1000) *
+                            GpifWriter.SampleRate);
+                    frameOffset = Math.floor(frameOffset + 0.5);
                     value.addElement('FrameOffset').innerText = frameOffset.toString();
                 }
             }
