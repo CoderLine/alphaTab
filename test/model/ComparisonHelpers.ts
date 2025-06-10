@@ -44,13 +44,16 @@ export class ComparisonHelpers {
                     if (Array.isArray(actual) !== Array.isArray(expected)) {
                         assert.fail(`IsArray mismatch on hierarchy: ${path}`);
                     } else if (Array.isArray(actual) && Array.isArray(expected)) {
-                        if (actual.length !== expected.length) {
+                        const actualArray = ComparisonHelpers.asUnknownArray(actual);
+                        const expectedArray = ComparisonHelpers.asUnknownArray(expected);
+
+                        if (actualArray.length !== expectedArray.length) {
                             assert.fail(
-                                `Array Length mismatch on hierarchy: ${path}, actual<${actual.length}> != expected<${expected.length}>`
+                                `Array Length mismatch on hierarchy: ${path}, actual<${actualArray.length}> != expected<${expectedArray.length}>`
                             );
                         } else {
-                            for (let i = 0; i < actual.length; i++) {
-                                ComparisonHelpers.expectJsonEqual(expected[i], actual[i], `${path}[${i}]`, ignoreKeys);
+                            for (let i = 0; i < actualArray.length; i++) {
+                                ComparisonHelpers.expectJsonEqual(expectedArray[i], actualArray[i], `${path}[${i}]`, ignoreKeys);
                             }
                         }
                     } else if (expected instanceof Map) {
@@ -123,6 +126,14 @@ export class ComparisonHelpers {
                 }
                 break;
         }
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static asUnknownArray(array: unknown): unknown[] {
+        return array as unknown[];
     }
 
     /**

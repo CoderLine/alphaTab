@@ -1,5 +1,6 @@
 package alphaTab.model
 
+import alphaTab.collections.BooleanList
 import alphaTab.collections.DoubleList
 import alphaTab.core.assert.Companion.fail
 import kotlin.contracts.ExperimentalContracts
@@ -8,6 +9,13 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 class ComparisonHelpersPartials {
     companion object {
+         fun asUnknownArray(array: Any?): alphaTab.collections.List<Any?> = when(array) {
+             is List<*> -> alphaTab.collections.List(array)
+             is DoubleList -> alphaTab.collections.List(array.map<Any?> { it })
+             is BooleanList -> alphaTab.collections.List(array.map<Any?> { it })
+             else -> throw Error("Unknown Array Type")
+         }
+
          fun compareObjects(expected: Any?, actual: Any?, path: String, ignoreKeys: alphaTab.collections.List<String>?): Boolean {
             if (actual is DoubleList && expected is DoubleList) {
                 if (actual.length != expected.length) {
