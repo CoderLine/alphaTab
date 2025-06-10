@@ -25,8 +25,8 @@ class PrettyFormatPartials {
         }
         fun arrayAsUnknownIterable(array: Any?): Iterable<Any?>  = when(array) {
             is alphaTab.collections.List<*> -> array
-            is DoubleList -> array
-            is BooleanList -> array
+            is DoubleList -> array.map<Any?> { it }
+            is BooleanList -> array.map<Any?> { it }
             else -> throw ClassCastException("Invalid array type: " + array?.javaClass?.name)
         }
     }
