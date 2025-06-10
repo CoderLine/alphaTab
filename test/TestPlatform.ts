@@ -81,4 +81,29 @@ export class TestPlatform {
     public static enumValues<T>(enumType: any): T[] {
         return Object.values(enumType).filter(k => typeof k === 'number') as T[];
     }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static typedArrayAsUnknownArray(array: unknown): unknown[] {
+        return array as unknown[];
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
+    public static typedArrayAsUnknownIterable(array: unknown): Iterable<unknown> {
+        return array as Iterable<unknown>;
+    }
+
+    
+    /**
+     * @target web
+     * @partial
+     */
+    public static mapAsUnknownIterable(map: unknown): Iterable<[unknown, unknown]> {
+        return (map as Map<unknown, unknown>).entries();
+    }
 }

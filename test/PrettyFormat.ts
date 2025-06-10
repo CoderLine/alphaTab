@@ -191,32 +191,16 @@ export class PrettyFormat {
                 ? `[${arrayTypeName}]`
                 : `${
                       min ? '' : `${arrayTypeName} `
-                  }[${PrettyFormat.printIterableValues(PrettyFormat.arrayAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer)}]`;
+                  }[${PrettyFormat.printIterableValues(TestPlatform.typedArrayAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer)}]`;
         }
 
         if (val instanceof Map) {
             return hitMaxDepth
                 ? '[Map]'
-                : `Map {${PrettyFormat.printIteratorEntries(PrettyFormat.mapAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer, ' => ')}}`;
+                : `Map {${PrettyFormat.printIteratorEntries(TestPlatform.mapAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer, ' => ')}}`;
         }
 
         return '';
-    }
-
-    /**
-     * @target web
-     * @partial
-     */
-    private static arrayAsUnknownIterable(array: unknown): Iterable<unknown> {
-        return array as Iterable<unknown>;
-    }
-
-    /**
-     * @target web
-     * @partial
-     */
-    private static mapAsUnknownIterable(map: unknown): Iterable<[unknown, unknown]> {
-        return (map as Map<unknown, unknown>).entries();
     }
 
     /**
@@ -496,7 +480,9 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
                             } else if (dv instanceof Uint32Array && v instanceof Uint32Array) {
                                 isEqual = dv.length === 0 && v.length === 0;
                             } else if (Array.isArray(dv) && Array.isArray(v)) {
-                                isEqual = dv.length === 0 && v.length === 0;
+                                isEqual =
+                                    TestPlatform.typedArrayAsUnknownArray(dv).length === 0 &&
+                                    TestPlatform.typedArrayAsUnknownArray(v).length === 0;
                             } else if (dv instanceof Map && v instanceof Map) {
                                 ScoreSerializerPlugin.sanitizeJson(
                                     v as Map<string, unknown>,

@@ -1,3 +1,4 @@
+import { TestPlatform } from '@test/TestPlatform';
 import { assert } from 'chai';
 
 /**
@@ -44,8 +45,8 @@ export class ComparisonHelpers {
                     if (Array.isArray(actual) !== Array.isArray(expected)) {
                         assert.fail(`IsArray mismatch on hierarchy: ${path}`);
                     } else if (Array.isArray(actual) && Array.isArray(expected)) {
-                        const actualArray = ComparisonHelpers.asUnknownArray(actual);
-                        const expectedArray = ComparisonHelpers.asUnknownArray(expected);
+                        const actualArray = TestPlatform.typedArrayAsUnknownArray(actual);
+                        const expectedArray = TestPlatform.typedArrayAsUnknownArray(expected);
 
                         if (actualArray.length !== expectedArray.length) {
                             assert.fail(
@@ -128,13 +129,6 @@ export class ComparisonHelpers {
         }
     }
 
-    /**
-     * @target web
-     * @partial
-     */
-    public static asUnknownArray(array: unknown): unknown[] {
-        return array as unknown[];
-    }
 
     /**
      * @target web
