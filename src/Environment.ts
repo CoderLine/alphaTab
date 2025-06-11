@@ -745,17 +745,31 @@ export class Environment {
      * @target web
      */
     private static detectWebPlatform(): WebPlatform {
-        try {
-            // Credit of the node.js detection goes to
-            // https://github.com/iliakan/detect-node
-            // MIT License
-            // Copyright (c) 2017 Ilya Kantor
-            // tslint:disable-next-line: strict-type-predicates
-            if (Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]') {
-                return WebPlatform.NodeJs;
+        // There might be polyfills or platforms like Electron which have a global process object defined even in the browser.
+        // We need to differenciate between those platforms and a real nodejs
+
+        // the webPlatform is currently only relevant on the main process side and not within workers/worklets
+        // so it is OK if we wrongly detect node.js inside them.
+        const isBrowserLike =
+            // browser UI thread
+            typeof Environment.globalThis.Window !== 'undefined' &&
+            Environment.globalThis instanceof Environment.globalThis.Window;
+
+        if (!isBrowserLike) {
+            try {
+                // Credit of the node.js detection goes to
+                // https://github.com/iliakan/detect-node
+                // MIT License
+                // Copyright (c) 2017 Ilya Kantor
+                // tslint:disable-next-line: strict-type-predicates
+                if (
+                    Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]'
+                ) {
+                    return WebPlatform.NodeJs;
+                }
+            } catch (e) {
+                // no node.js
             }
-        } catch (e) {
-            // no node.js
         }
 
         try {
@@ -826,7 +840,7 @@ export class Environment {
 
         // Solidjs unwrap: the symbol required to access the raw object is unfortunately hidden and we cannot unwrap it without importing
         // import { unwrap } from "solid-js/store"
-        // alternative for users is to replace this method during runtime. 
+        // alternative for users is to replace this method during runtime.
 
         return object;
     }
