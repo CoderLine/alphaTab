@@ -1,5 +1,6 @@
 package alphaTab.core.ecmaScript
 
+import alphaTab.collections.ArrayListWithRemoveRange
 import alphaTab.collections.BooleanList
 import alphaTab.collections.DoubleList
 import alphaTab.collections.IDoubleIterable
@@ -8,7 +9,7 @@ import alphaTab.collections.IDoubleIterable
 internal class Array {
     companion object {
         public inline fun <T> from(x: Iterable<T>): alphaTab.collections.List<T> {
-            return alphaTab.collections.List(x)
+            return alphaTab.collections.List(x.toCollection(ArrayListWithRemoveRange()))
         }
         public inline fun from(x: IDoubleIterable): alphaTab.collections.DoubleList {
             return alphaTab.collections.DoubleList(x)

@@ -31,6 +31,9 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private var _logLevel: LogLevel
     private var _bufferTimeInMilliseconds: Double
 
+    val player: AlphaSynth?
+        get() = _player
+
     override val output: ISynthOutput
         get() = _output
 
@@ -324,6 +327,10 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     }
 
     private fun onPlaybackRangeChanged(obj: PlaybackRangeChangedEventArgs) {
-        _uiInvoke { (playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(obj) }
+        _uiInvoke {
+            (playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
+                obj
+            )
+        }
     }
 }

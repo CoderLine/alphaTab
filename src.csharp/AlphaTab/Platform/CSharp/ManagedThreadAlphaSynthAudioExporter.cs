@@ -8,21 +8,17 @@ namespace AlphaTab.Platform.CSharp;
 
 internal class ManagedThreadAlphaSynthAudioExporter : IAudioExporterWorker
 {
-    private static int _nextExporterId = 1;
     private readonly ManagedThreadAlphaSynthWorkerApi _worker;
-    private readonly int _exporterId;
     private readonly bool _ownsWorker;
     private TaskCompletionSource<int>? _promise;
+    private AlphaSynthAudioExporter? _exporter;
 
     public ManagedThreadAlphaSynthAudioExporter(ManagedThreadAlphaSynthWorkerApi synthWorker,
         bool ownsWorker)
     {
-        _exporterId = _nextExporterId++;
         _worker = synthWorker;
         _ownsWorker = ownsWorker;
     }
-
-    private readonly Map<int, AlphaSynthAudioExporter> _exporter = new();
 
     private async Task DispatchAsyncOnWorkerThread(Action action)
     {
@@ -66,13 +62,12 @@ internal class ManagedThreadAlphaSynthAudioExporter : IAudioExporterWorker
     {
         await DispatchAsyncOnWorkerThread(() =>
         {
-            var exporter = _worker.Player.ExportAudio(
+            _exporter = _worker.Player.ExportAudio(
                 options,
                 midi,
                 syncPoints,
                 transpositionPitches
             );
-            _exporter.Set(_exporterId, exporter);
         });
     }
 
@@ -81,21 +76,20 @@ internal class ManagedThreadAlphaSynthAudioExporter : IAudioExporterWorker
         AudioExportChunk? chunk = null;
         await DispatchAsyncOnWorkerThread(() =>
         {
-            if (!_exporter.Has(_exporterId))
+            if (_exporter == null)
             {
                 throw new AlphaTabError(AlphaTabErrorType.General,
                     "Exporter was already destroyed");
             }
 
-            var exporter = _exporter.Get(_exporterId);
-            chunk = exporter.Render(milliseconds);
+            chunk = _exporter.Render(milliseconds);
         });
         return chunk;
     }
 
     public void Destroy()
     {
-        _exporter.Delete(_exporterId);
+        _exporter = null;
         if (_ownsWorker)
         {
             _worker.Destroy();
