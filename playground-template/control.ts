@@ -543,7 +543,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
                 const neededSize = totalSamples + chunk.samples.length;
                 if (generated.length < neededSize) {
                     const needed = neededSize - generated.length;
-                    const newBuffer = new Float32Array(generated.length + needed);
+                    const newBuffer:Float32Array = new Float32Array(generated.length + needed);
                     newBuffer.set(generated, 0);
                     generated = newBuffer;
                 }
