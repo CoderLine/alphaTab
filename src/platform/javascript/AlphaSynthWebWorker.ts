@@ -1,4 +1,4 @@
-import { AlphaSynth } from '@src/synth/AlphaSynth';
+import { AlphaSynth, type AlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
 import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
@@ -17,6 +17,7 @@ import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChan
 export class AlphaSynthWebWorker {
     private _player: AlphaSynth;
     private _main: IWorkerScope;
+    private _exporter: Map<number, AlphaSynthAudioExporter> = new Map<number, AlphaSynthAudioExporter>();
 
     public constructor(main: IWorkerScope, bufferTimeInMilliseconds: number) {
         this._main = main;
@@ -139,6 +140,60 @@ export class AlphaSynthWebWorker {
             case 'alphaSynth.applyTranspositionPitches':
                 this._player.applyTranspositionPitches(new Map<number, number>(JSON.parse(data.transpositionPitches)));
                 break;
+        }
+
+        if (cmd.startsWith('alphaSynth.exporter')) {
+            this.handleExporterMessage(e);
+        }
+    }
+    private handleExporterMessage(e: MessageEvent) {
+        const data: any = e.data;
+        const cmd: string = data.cmd;
+        try {
+            switch (cmd) {
+                case 'alphaSynth.exporter.initialize':
+                    const exporter = this._player.exportAudio(
+                        data.options,
+                        JsonConverter.jsObjectToMidiFile(data.midi),
+                        data.syncPoints,
+                        data.transpositionPitches
+                    );
+                    this._exporter.set(data.exporterId, exporter);
+
+                    this._main.postMessage({
+                        cmd: 'alphaSynth.exporter.initialized',
+                        exporterId: data.exporterId
+                    });
+                    break;
+
+                case 'alphaSynth.exporter.render':
+                    if (this._exporter.has(data.exporterId)) {
+                        const exporter = this._exporter.get(data.exporterId)!;
+                        const chunk = exporter.render(data.milliseconds);
+                        this._main.postMessage({
+                            cmd: 'alphaSynth.exporter.rendered',
+                            exporterId: data.exporterId,
+                            chunk
+                        });
+                    } else {
+                        this._main.postMessage({
+                            cmd: 'alphaSynth.exporter.error',
+                            exporterId: data.exporterId,
+                            error: new Error('Unknown exporter ID')
+                        });
+                    }
+                    break;
+
+                case 'alphaSynth.exporter.destroy':
+                    this._exporter.delete(data.exporterId);
+                    break;
+            }
+        } catch (e) {
+            this._main.postMessage({
+                cmd: 'alphaSynth.exporter.error',
+                exporterId: data.exporterId,
+                error: e
+            });
         }
     }
 

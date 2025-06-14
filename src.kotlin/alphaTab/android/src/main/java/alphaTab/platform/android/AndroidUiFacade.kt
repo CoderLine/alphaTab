@@ -1,7 +1,10 @@
 package alphaTab.platform.android
 
-import alphaTab.*
+import alphaTab.AlphaTabApiBase
+import alphaTab.AlphaTabView
+import alphaTab.Environment
 import alphaTab.EventEmitter
+import alphaTab.IEventEmitter
 import alphaTab.core.ecmaScript.Error
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
@@ -10,13 +13,13 @@ import alphaTab.platform.Cursors
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import alphaTab.platform.IUiFacade
-import alphaTab.platform.skia.AlphaSkiaCanvas
 import alphaTab.platform.skia.AlphaSkiaImage
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
 import alphaTab.synth.BackingTrackPlayer
 import alphaTab.synth.IAlphaSynth
+import alphaTab.synth.IAudioExporterWorker
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Handler
@@ -24,13 +27,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.HorizontalScrollView
 import android.widget.RelativeLayout
-import android.widget.ScrollView
 import androidx.core.view.children
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.nio.Buffer
 import java.nio.ByteBuffer
 import kotlin.contracts.ExperimentalContracts
 
@@ -178,6 +178,17 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         }
         return player
     }
+
+    override fun createWorkerAudioExporter(synth: IAlphaSynth?): IAudioExporterWorker {
+        val needNewWorker = synth == null || synth !is AndroidThreadAlphaSynthWorkerPlayer
+        var synthToUse = synth
+        if (needNewWorker) {
+            synthToUse = this.createWorkerPlayer();
+        }
+
+        return AndroidThreadAlphaSynthAudioExporter(synthToUse as AndroidThreadAlphaSynthWorkerPlayer, needNewWorker);
+    }
+
 
     override var rootContainer: IContainer
 

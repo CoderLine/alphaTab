@@ -14,6 +14,11 @@ public class Float32Array : Iterable<Float> {
             return buffer.array().asUByteArray()
         }
 
+    internal inline val byteOffset: Double
+        get() = 0.0
+    internal inline val byteLength: Double
+        get() = (data.size * Float.SIZE_BYTES).toDouble()
+
     public inline val length: Double
         get() {
             return data.size.toDouble()

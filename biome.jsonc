@@ -1,10 +1,22 @@
 {
     "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
     "files": {
-        "include": ["src/**", "test/**", "src.compiler/**"],
-        "ignore": ["dist", ".rollup.cache", "node_modules", "test-data", "src/generated/**"]
+        "ignore": [
+            "dist",
+            ".rollup.cache",
+            "node_modules",
+            "test-data",
+            "src/generated/**"
+        ]
     },
     "formatter": {
+        "include": [
+            "src/**",
+            "test/**",
+            "src.compiler/**",
+            "playground/**",
+            "playground-template/**"
+        ],
         "enabled": true,
         "formatWithErrors": true,
         "ignore": [],
@@ -15,6 +27,12 @@
         "lineEnding": "lf"
     },
     "linter": {
+        "include": [
+            "src/**",
+            "test/**",
+            "src.compiler/**",
+            "playground-template/**"
+        ],
         "enabled": true,
         "rules": {
             "style": {

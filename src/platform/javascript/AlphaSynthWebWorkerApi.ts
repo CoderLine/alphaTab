@@ -59,6 +59,10 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         return Logger.logLevel;
     }
 
+    public get worker(): Worker {
+        return this._synth;
+    }
+
     public set logLevel(value: LogLevel) {
         Logger.logLevel = value;
         this._synth.postMessage({

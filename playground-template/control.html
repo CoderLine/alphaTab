@@ -8,15 +8,13 @@
     <script src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
     <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
     
-    <script src="/node_modules/handlebars/dist/handlebars.min.js"></script>
-
     <link rel="stylesheet" href="control.css" />
 </head>
 
 <body>
     <div id="placeholder"></div>
     <script type="module">
-        import { setupControl } from './control.mjs';
+        import { setupControl } from './control.ts';
         
         const req = new XMLHttpRequest();
         req.onload = function (data) {

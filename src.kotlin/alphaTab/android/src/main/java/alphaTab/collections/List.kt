@@ -5,6 +5,7 @@ internal class ArrayListWithRemoveRange<T> : ArrayList<T> {
     constructor() : super()
     constructor(c: Collection<T>) : super(c)
 
+
     public override fun removeRange(startIndex:Int, endIndex:Int) {
         super.removeRange(startIndex, endIndex);
     }
@@ -33,12 +34,16 @@ public class List<T> : Iterable<T> {
         }
     }
 
-    public constructor(items: Iterable<T>) {
+    internal constructor(items: ArrayListWithRemoveRange<T>) {
+        _data = items
+    }
+
+    internal constructor(items: kotlin.collections.List<T>) {
         _data = items.toCollection(ArrayListWithRemoveRange())
     }
 
-    internal constructor(items: ArrayListWithRemoveRange<T>) {
-        _data = items
+    internal constructor(items: alphaTab.collections.List<T>) {
+        _data = items._data.toCollection(ArrayListWithRemoveRange())
     }
 
     public override fun iterator(): Iterator<T> {
