@@ -21,6 +21,9 @@ import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEv
 import { ModelUtils } from '@src/model/ModelUtils';
 import type { Score } from '@src/model/Score';
 import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
+import { AudioExportChunk, type AudioExportOptions } from '@src/synth/IAudioExporter';
+import type { Preset } from '@src/synth/synthesis/Preset';
+import { MidiUtils } from '@src/midi/MidiUtils';
 
 /**
  * This is the base class for synthesizer components which can be used to
@@ -619,5 +622,205 @@ export class AlphaSynth extends AlphaSynthBase {
      */
     public constructor(output: ISynthOutput, bufferTimeInMilliseconds: number) {
         super(output, new TinySoundFont(output.sampleRate), bufferTimeInMilliseconds);
+    }
+
+    /**
+     * Creates a new audio exporter, initialized with the given data.
+     * @param options The export options to use.
+     * The track volume and transposition pitches must lists must be filled with midi channels.
+     * @param midi The midi file to use.
+     * @param syncPoints The sync points to use
+     * @param transpositionPitches The initial transposition pitches to apply.
+     * @param transpositionPitches The initial transposition pitches to apply.
+     */
+    public exportAudio(
+        options: AudioExportOptions,
+        midi: MidiFile,
+        syncPoints: BackingTrackSyncPoint[],
+        mainTranspositionPitches: Map<number, number>
+    ): AlphaSynthAudioExporter {
+        const exporter = new AlphaSynthAudioExporter(options);
+
+        exporter.loadMidiFile(midi);
+        if (options.useSyncPoints) {
+            exporter.updateSyncPoints(syncPoints);
+        }
+        exporter.applyTranspositionPitches(mainTranspositionPitches);
+
+        for (const [channel, semitones] of options.trackTranspositionPitches) {
+            exporter.setChannelTranspositionPitch(channel, semitones);
+        }
+
+        for (const [channel, volume] of options.trackVolume) {
+            exporter.channelSetMixVolume(channel, volume);
+        }
+
+        if (options.soundFonts) {
+            for (const f of options.soundFonts!) {
+                exporter.loadSoundFont(f);
+            }
+        } else {
+            exporter.loadPresets((this.synthesizer as TinySoundFont).presets);
+        }
+
+        if (options.playbackRange) {
+            exporter.limitExport(options.playbackRange);
+        }
+
+        return exporter;
+    }
+}
+
+/**
+ * A audio exporter allowing streaming synthesis of audio samples with a fixed configuration.
+ */
+export class AlphaSynthAudioExporter {
+    private _synth: TinySoundFont;
+    private _sequencer: MidiFileSequencer;
+
+    constructor(options: AudioExportOptions) {
+        this._synth = new TinySoundFont(options.sampleRate);
+        this._sequencer = new MidiFileSequencer(this._synth);
+
+        this._synth.masterVolume = Math.max(options.masterVolume, SynthConstants.MinVolume);
+        this._synth.metronomeVolume = Math.max(options.metronomeVolume, SynthConstants.MinVolume);
+    }
+
+    /**
+     * Loads the specified sound font.
+     * @param data The soundfont data.
+     */
+    public loadSoundFont(data: Uint8Array) {
+        const input: ByteBuffer = ByteBuffer.fromBuffer(data);
+        const soundFont: Hydra = new Hydra();
+        soundFont.load(input);
+
+        const programs = this._sequencer.instrumentPrograms;
+        const percussionKeys = this._sequencer.percussionKeys;
+
+        this._synth.loadPresets(soundFont, programs, percussionKeys, true);
+    }
+
+    /**
+     * Loads the specified presets.
+     * @param presets The presets to use.
+     */
+    public loadPresets(presets: Preset[] | null) {
+        this._synth.presets = presets;
+    }
+
+    /**
+     * Limits the time range for which the export is done.
+     * @param range The time range
+     */
+    public limitExport(range: PlaybackRange) {
+        this._sequencer.mainPlaybackRange = range;
+        this._sequencer.mainSeek(this._sequencer.mainTickPositionToTimePosition(range.startTick));
+    }
+
+    /**
+     * Sets the transposition pitch of a given channel. This pitch is additionally applied beside the
+     * ones applied already via {@link applyTranspositionPitches}.
+     * @param channel The channel number
+     * @param semitones The number of semitones to apply as pitch offset.
+     */
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+        this._synth.setChannelTranspositionPitch(channel, semitones);
+    }
+
+    /**
+     * Applies the given transposition pitches used for general pitch changes that should be applied to the song.
+     * Used for general transpositions applied to the file.
+     * @param transpositionPitches A map defining for a given list of midi channels the number of semitones that should be adjusted.
+     */
+    public applyTranspositionPitches(mainTranspositionPitches: Map<number, number>) {
+        this._synth.applyTranspositionPitches(mainTranspositionPitches);
+    }
+
+    /**
+     * Loads the given midi file for synthesis.
+     * @param midi The midi file.
+     */
+    public loadMidiFile(midi: MidiFile) {
+        this._sequencer.loadMidi(midi);
+    }
+
+    /**
+     * Updates the sync points used for time synchronization with a backing track.
+     * @param syncPoints  The sync points.
+     */
+    public updateSyncPoints(syncPoints: BackingTrackSyncPoint[]) {
+        this._sequencer.mainUpdateSyncPoints(syncPoints);
+    }
+
+    /**
+     * Sets the current and initial volume of the given channel.
+     * @param channel The channel number.
+     * @param volume The volume of of the channel (0.0-1.0)
+     */
+    public channelSetMixVolume(channel: number, volume: number): void {
+        volume = Math.max(volume, SynthConstants.MinVolume);
+        this._synth.channelSetMixVolume(channel, volume);
+    }
+
+    public render(milliseconds: number): AudioExportChunk | undefined {
+        if (this._sequencer.isFinished) {
+            return undefined;
+        }
+
+        const oneMicroBufferMillis = (SynthConstants.MicroBufferSize * 1000) / this._synth.outSampleRate;
+        const microBufferCount = Math.ceil(milliseconds / oneMicroBufferMillis);
+
+        let samples: Float32Array = new Float32Array(
+            SynthConstants.MicroBufferSize * microBufferCount * SynthConstants.AudioChannels
+        );
+
+        let bufferPos: number = 0;
+        for (let i = 0; i < microBufferCount; i++) {
+            this._sequencer.fillMidiEventQueue();
+            this._synth.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
+
+            bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
+
+            if (this._sequencer.isFinished) {
+                break;
+            }
+        }
+
+        if (bufferPos < samples.length) {
+            samples = samples.subarray(0, bufferPos);
+        }
+
+        const chunk = new AudioExportChunk();
+
+        const alphaTabCurrentTime = this._sequencer.currentTime;
+        const alphaTabEndTime = this._sequencer.currentEndTime;
+
+        const syncPoints = this._sequencer.currentSyncPoints;
+
+        if (syncPoints.length === 0) {
+            chunk.currentTime = alphaTabCurrentTime;
+            chunk.endTime = alphaTabEndTime;
+        } else {
+            const lastSyncPoint = syncPoints[syncPoints.length - 1];
+            let endTime = lastSyncPoint.syncTime;
+            const remainingTicks = this._sequencer.currentEndTick - lastSyncPoint.synthTick;
+            if (remainingTicks > 0) {
+                endTime += MidiUtils.ticksToMillis(remainingTicks, lastSyncPoint.syncBpm);
+            }
+
+            chunk.currentTime = this._sequencer.mainTimePositionToBackingTrack(alphaTabCurrentTime, endTime);
+            chunk.endTime = endTime;
+        }
+
+        chunk.currentTick = this._sequencer.currentTimePositionToTickPosition(alphaTabCurrentTime);
+        chunk.endTick = this._sequencer.currentEndTick;
+        chunk.samples = samples;
+
+        if (this._sequencer.isFinished) {
+            this._synth.noteOffAll(true);
+        }
+
+        return chunk;
     }
 }

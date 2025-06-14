@@ -37,7 +37,6 @@ class MidiSequencerState {
     public division: number = MidiUtils.QuarterTime;
     public eventIndex: number = 0;
     public currentTime: number = 0;
-    public currentTick: number = 0;
     public syncPointIndex: number = 0;
     public playbackRange: PlaybackRange | null = null;
     public playbackRangeStartTime: number = 0;
@@ -120,6 +119,10 @@ export class MidiFileSequencer {
 
     public get modifiedTempo(): number {
         return this._currentState.modifiedTempo * this.playbackSpeed;
+    }
+
+    public get currentSyncPoints(): BackingTrackSyncPoint[] {
+        return this._currentState.syncPoints;
     }
 
     /**

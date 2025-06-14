@@ -1,4 +1,4 @@
-export { AlphaSynthBase, AlphaSynth } from '@src/synth/AlphaSynth';
+export { AlphaSynthBase, AlphaSynth, AlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
 export { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 export { PlaybackRange } from '@src/synth/PlaybackRange';
 export type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
