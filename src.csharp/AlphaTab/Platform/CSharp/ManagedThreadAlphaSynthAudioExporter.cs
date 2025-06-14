@@ -11,7 +11,7 @@ internal class ManagedThreadAlphaSynthAudioExporter : IAudioExporterWorker
     private readonly ManagedThreadAlphaSynthWorkerApi _worker;
     private readonly bool _ownsWorker;
     private TaskCompletionSource<int>? _promise;
-    private AlphaSynthAudioExporter? _exporter;
+    private IAlphaSynthAudioExporter? _exporter;
 
     public ManagedThreadAlphaSynthAudioExporter(ManagedThreadAlphaSynthWorkerApi synthWorker,
         bool ownsWorker)

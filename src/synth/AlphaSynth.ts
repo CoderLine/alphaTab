@@ -21,7 +21,8 @@ import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEv
 import { ModelUtils } from '@src/model/ModelUtils';
 import type { Score } from '@src/model/Score';
 import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-import { AudioExportChunk, type AudioExportOptions } from '@src/synth/IAudioExporter';
+// biome-ignore lint/correctness/noUnusedImports: used in tsdoc
+import { AudioExportChunk, type IAudioExporter, type AudioExportOptions } from '@src/synth/IAudioExporter';
 import type { Preset } from '@src/synth/synthesis/Preset';
 import { MidiUtils } from '@src/midi/MidiUtils';
 
@@ -638,7 +639,7 @@ export class AlphaSynth extends AlphaSynthBase {
         midi: MidiFile,
         syncPoints: BackingTrackSyncPoint[],
         mainTranspositionPitches: Map<number, number>
-    ): AlphaSynthAudioExporter {
+    ): IAlphaSynthAudioExporter {
         const exporter = new AlphaSynthAudioExporter(options);
 
         exporter.loadMidiFile(midi);
@@ -674,9 +675,29 @@ export class AlphaSynth extends AlphaSynthBase {
 }
 
 /**
+ * An audio exporter allowing streaming synthesis of audio samples with a fixed configuration.
+ * This is the internal synchronous version of the public {@link IAudioExporter}.
+ */
+export interface IAlphaSynthAudioExporter {
+    /**
+     * Renders the next chunk of audio and provides it as result.
+     *
+     * @param milliseconds The rough number of milliseconds that should be synthesized and exported as chunk.
+     * @returns The requested chunk holding the samples and time information.
+     * If the song completed playback `undefined` is returned indicating the end.
+     * The provided audio might not be exactly the requested number of milliseconds as the synthesizer internally
+     * uses a fixed block size of 64 samples for synthesizing audio. Depending on the sample rate
+     * slightly longer audio is contained in the result.
+     *
+     * When the song ends, the chunk might contain less than the requested duration.
+     */
+    render(milliseconds: number): AudioExportChunk | undefined;
+}
+
+/**
  * A audio exporter allowing streaming synthesis of audio samples with a fixed configuration.
  */
-export class AlphaSynthAudioExporter {
+export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
     private _synth: TinySoundFont;
     private _sequencer: MidiFileSequencer;
 

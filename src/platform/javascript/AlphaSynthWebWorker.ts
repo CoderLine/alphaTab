@@ -1,4 +1,4 @@
-import { AlphaSynth, type AlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
+import { AlphaSynth, type IAlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
 import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { JsonConverter } from '@src/model/JsonConverter';
@@ -17,7 +17,7 @@ import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChan
 export class AlphaSynthWebWorker {
     private _player: AlphaSynth;
     private _main: IWorkerScope;
-    private _exporter: Map<number, AlphaSynthAudioExporter> = new Map<number, AlphaSynthAudioExporter>();
+    private _exporter: Map<number, IAlphaSynthAudioExporter> = new Map<number, IAlphaSynthAudioExporter>();
 
     public constructor(main: IWorkerScope, bufferTimeInMilliseconds: number) {
         this._main = main;

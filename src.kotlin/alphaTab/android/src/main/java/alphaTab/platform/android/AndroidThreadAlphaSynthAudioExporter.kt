@@ -5,7 +5,7 @@ import alphaTab.AlphaTabErrorType
 import alphaTab.collections.DoubleDoubleMap
 import alphaTab.collections.List
 import alphaTab.midi.MidiFile
-import alphaTab.synth.AlphaSynthAudioExporter
+import alphaTab.synth.IAlphaSynthAudioExporter
 import alphaTab.synth.AudioExportChunk
 import alphaTab.synth.AudioExportOptions
 import alphaTab.synth.BackingTrackSyncPoint
@@ -21,7 +21,7 @@ internal class AndroidThreadAlphaSynthAudioExporter(
     private val ownsWorker: Boolean
 ) : IAudioExporterWorker {
 
-    private var _exporter: AlphaSynthAudioExporter? = null
+    private var _exporter: IAlphaSynthAudioExporter? = null
     private var _deferred: Deferred<*>? = null
 
     override fun initialize(

@@ -1,4 +1,4 @@
-export { AlphaSynthBase, AlphaSynth, AlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
+export { AlphaSynthBase, AlphaSynth, type IAlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
 export { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 export { PlaybackRange } from '@src/synth/PlaybackRange';
 export type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
@@ -18,6 +18,7 @@ export type { IAudioElementBackingTrackSynthOutput } from '@src/platform/javascr
 export type { IExternalMediaHandler, IExternalMediaSynthOutput } from '@src/synth/ExternalMediaPlayer';
 export {
     type IAudioExporter,
+    type IAudioExporterWorker,
     AudioExportChunk,
     AudioExportOptions
 } from '@src/synth/IAudioExporter';

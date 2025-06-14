@@ -484,7 +484,7 @@ export class MidiFileSequencer {
     }
 
     public currentUpdateSyncPoints(timePosition: number) {
-        return this.updateSyncPoints(this._mainState, timePosition);
+        this.updateSyncPoints(this._mainState, timePosition);
     }
 
     private updateSyncPoints(state: MidiSequencerState, timePosition: number) {
