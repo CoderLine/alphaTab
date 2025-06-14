@@ -16,3 +16,8 @@ export { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaS
 export { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 export type { IAudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';
 export type { IExternalMediaHandler, IExternalMediaSynthOutput } from '@src/synth/ExternalMediaPlayer';
+export {
+    type IAudioExporter,
+    AudioExportChunk,
+    AudioExportOptions
+} from '@src/synth/IAudioExporter';
