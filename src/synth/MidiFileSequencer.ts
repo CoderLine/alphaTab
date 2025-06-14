@@ -480,6 +480,10 @@ export class MidiFileSequencer {
         if (tempoChangeIndex !== state.tempoChangeIndex) {
             state.tempoChangeIndex = tempoChangeIndex;
             state.currentTempo = state.tempoChanges[state.tempoChangeIndex].bpm;
+
+            if (state.syncPoints.length === 0) {
+                state.syncPointTempo = state.currentTempo;
+            }
         }
     }
 
