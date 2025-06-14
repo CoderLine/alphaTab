@@ -34,6 +34,8 @@ import type { SettingsJson } from '@src/generated/SettingsJson';
 import { AudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';
 import { BackingTrackPlayer } from '@src/synth/BackingTrackPlayer';
 import { CoreSettings, FontFileFormat } from '@src/CoreSettings';
+import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
+import { AlphaSynthAudioExporterWorkerApi } from '@src/platform/javascript/AlphaSynthAudioExporterWorkerApi';
 
 /**
  * @target web
@@ -691,6 +693,16 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
             });
         }
         return player;
+    }
+
+    public createWorkerAudioExporter(synth: IAlphaSynth | null): IAudioExporterWorker {
+        const needNewWorker = synth === null || !(synth instanceof AlphaSynthWebWorkerApi);
+        if (needNewWorker) {
+            // nowadays we require browsers with workers
+            synth = this.createWorkerPlayer()!;
+        }
+
+        return new AlphaSynthAudioExporterWorkerApi(synth as AlphaSynthWebWorkerApi, needNewWorker);
     }
 
     public beginInvoke(action: () => void): void {

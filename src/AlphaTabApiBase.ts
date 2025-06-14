@@ -99,6 +99,7 @@ import type { CoreSettings } from '@src/CoreSettings';
 import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
 import { AlphaSynthWrapper } from '@src/synth/AlphaSynthWrapper';
 import { ScoreRendererWrapper } from '@src/rendering/ScoreRendererWrapper';
+import { AudioExportOptions, type IAudioExporter, type IAudioExporterWorker } from '@src/synth/IAudioExporter';
 
 class SelectionInfo {
     public beat: Beat;
@@ -2607,10 +2608,7 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        if (
-            this.hasCursor &&
-            this.settings.player.enableUserInteraction
-        ) {
+        if (this.hasCursor && this.settings.player.enableUserInteraction) {
             this._selectionStart = new SelectionInfo(beat);
             this._selectionEnd = null;
         }
@@ -2658,10 +2656,7 @@ export class AlphaTabApiBase<TSettings> {
             return;
         }
 
-        if (
-            this.hasCursor &&
-            this.settings.player.enableUserInteraction
-        ) {
+        if (this.hasCursor && this.settings.player.enableUserInteraction) {
             if (this._selectionEnd) {
                 const startTick: number =
                     this._tickCache?.getBeatStart(this._selectionStart!.beat) ??
@@ -2803,11 +2798,7 @@ export class AlphaTabApiBase<TSettings> {
             }
         });
         this._renderer.postRenderFinished.on(() => {
-            if (
-                !this._selectionStart ||
-                !this.hasCursor ||
-                !this.settings.player.enableUserInteraction
-            ) {
+            if (!this._selectionStart || !this.hasCursor || !this.settings.player.enableUserInteraction) {
                 return;
             }
             this.cursorSelectRange(this._selectionStart, this._selectionEnd);
@@ -3926,5 +3917,65 @@ export class AlphaTabApiBase<TSettings> {
      */
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
         return await this._player.output.getOutputDevice();
+    }
+
+    /**
+     * Starts the audio export for the currently loaded song.
+     * @remarks
+     * This will not export or use any backing track media but will always use the synthesizer to generate the output.
+     * This method works with any PlayerMode active but changing the mode during export can lead to unexpected side effects.
+     * @param options The export options.
+     * @returns An exporter instance to export the audio in a streaming fashion.
+     */
+    public async exportAudio(options: AudioExportOptions): Promise<IAudioExporter> {
+        if (!this.score) {
+            throw new AlphaTabError(AlphaTabErrorType.General, 'No song loaded');
+        }
+
+        let exporter: IAudioExporterWorker;
+
+        switch (this._actualPlayerMode) {
+            case PlayerMode.EnabledSynthesizer:
+                exporter = this.uiFacade.createWorkerAudioExporter(this._player.instance!);
+                break;
+            default:
+                exporter = this.uiFacade.createWorkerAudioExporter(null);
+        }
+
+        const score = this.score!;
+
+        const midiFile: MidiFile = new MidiFile();
+        const handler: AlphaSynthMidiFileHandler = new AlphaSynthMidiFileHandler(midiFile);
+        const generator: MidiFileGenerator = new MidiFileGenerator(score, this.settings, handler);
+        generator.applyTranspositionPitches = false;
+        generator.generate();
+
+        const optionsWithChannels = new AudioExportOptions();
+        optionsWithChannels.soundFonts = options.soundFonts;
+        optionsWithChannels.sampleRate = options.sampleRate;
+        optionsWithChannels.useSyncPoints = options.useSyncPoints;
+        optionsWithChannels.masterVolume = options.masterVolume;
+        optionsWithChannels.metronomeVolume = options.metronomeVolume;
+        optionsWithChannels.playbackRange = options.playbackRange;
+
+        for (const [trackIndex, volume] of options.trackVolume) {
+            if (trackIndex < this.score.tracks.length) {
+                const track = this.score.tracks[trackIndex];
+                optionsWithChannels.trackVolume.set(track.playbackInfo.primaryChannel, volume);
+                optionsWithChannels.trackVolume.set(track.playbackInfo.secondaryChannel, volume);
+            }
+        }
+
+        for (const [trackIndex, semitones] of options.trackTranspositionPitches) {
+            if (trackIndex < this.score.tracks.length) {
+                const track = this.score.tracks[trackIndex];
+                optionsWithChannels.trackTranspositionPitches.set(track.playbackInfo.primaryChannel, semitones);
+                optionsWithChannels.trackTranspositionPitches.set(track.playbackInfo.secondaryChannel, semitones);
+            }
+        }
+
+        await exporter.initialize(optionsWithChannels, midiFile, generator.syncPoints, generator.transpositionPitches);
+
+        return exporter;
     }
 }
