@@ -11,27 +11,76 @@ import {
     type IExternalMediaHandler,
     type IExternalMediaSynthOutput
 } from '@src/synth/ExternalMediaPlayer';
+import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
+import { MidiFileSequencer } from '@src/synth/MidiFileSequencer';
 import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import type { Hydra } from '@src/synth/soundfont/Hydra';
+import type { SynthEvent } from '@src/synth/synthesis/SynthEvent';
 import { FlatMidiEventGenerator } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 describe('SyncPointTests', () => {
-    it('sync-point-update', () => {
-        // MidiFileSequencer
-        // sync points and tempo changes -> expect interpolation
+    it('sync-point-update', async () => {
+        const score = await syncPointTestScore();
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const sequencer = new MidiFileSequencer(new EmptyAudioSynthesizer());
+        sequencer.loadMidi(midi);
+        sequencer.mainUpdateSyncPoints(generator.syncPoints);
+
+        expect(
+            sequencer.currentSyncPoints.map(
+                p =>
+                    `${p.masterBarIndex},${p.masterBarOccurence},${p.synthBpm},${p.syncBpm},${p.synthTime},${p.syncTime}`
+            )
+        ).toMatchSnapshot();
     });
 
-    it('backing-track-time-mapping', () => {
-        // MidiFileSequencer
-        // do a variety of lookups along the time axis.
-        // - sequentially (playback)
-        // - jumps (seeks back and forth)
-        // check
-        // - updated syncPointIndex
-        // - interpolated time
-        // - reverse lookup with mainTimePositionToBackingTrack
+    /**
+     * See #2158
+     */
+    it('no-syncpoints-modified-tempo-', async () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            .
+            \\tempo 90
+            C4 * 4 |
+            \\tempo 120
+            C4 * 4 
+        `);
+
+        const midi = new MidiFile();
+        const handler = new AlphaSynthMidiFileHandler(midi);
+        const generator = new MidiFileGenerator(score, new Settings(), handler);
+        generator.generate();
+
+        const sequencer = new MidiFileSequencer(new EmptyAudioSynthesizer());
+        sequencer.loadMidi(midi);
+
+        sequencer.currentUpdateCurrentTempo(0);
+        expect(sequencer.currentTempo).to.equal(90);
+        expect(sequencer.modifiedTempo).to.equal(90);
+
+        sequencer.currentUpdateCurrentTempo(1000);
+        expect(sequencer.currentTempo).to.equal(90);
+        expect(sequencer.modifiedTempo).to.equal(90);
+
+        sequencer.currentUpdateCurrentTempo(2000);
+        expect(sequencer.currentTempo).to.equal(90);
+        expect(sequencer.modifiedTempo).to.equal(90);
+
+        sequencer.currentUpdateCurrentTempo(3000);
+        expect(sequencer.currentTempo).to.equal(120);
+        expect(sequencer.modifiedTempo).to.equal(120);
+
+        sequencer.currentUpdateCurrentTempo(4000);
+        expect(sequencer.currentTempo).to.equal(120);
+        expect(sequencer.modifiedTempo).to.equal(120);
     });
 
     async function syncPointTestScore() {
@@ -55,7 +104,10 @@ describe('SyncPointTests', () => {
         generator.generate();
 
         expect(
-            generator.syncPoints.map(p => `${p.masterBarIndex},${p.masterBarOccurence},${p.synthBpm},${p.syncBpm},${p.synthTime},${p.syncTime}`)
+            generator.syncPoints.map(
+                p =>
+                    `${p.masterBarIndex},${p.masterBarOccurence},${p.synthBpm},${p.syncBpm},${p.synthTime},${p.syncTime}`
+            )
         ).toMatchSnapshot();
 
         const update = MidiFileGenerator.generateSyncPoints(score);
@@ -327,7 +379,7 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public sampleRequest: IEventEmitter = new EventEmitter();
 
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
-        return ([] as ISynthOutputDevice[]);
+        return [] as ISynthOutputDevice[];
     }
     public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
@@ -364,4 +416,41 @@ class TestExternalMediaHandler implements IExternalMediaHandler {
     }
     play(): void {}
     pause(): void {}
+}
+
+class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
+    public masterVolume: number = 0;
+    public metronomeVolume: number = 0;
+    public outSampleRate: number = 44100;
+    public currentTempo: number = 120;
+    public timeSignatureNumerator: number = 4;
+    public timeSignatureDenominator: number = 4;
+    public activeVoiceCount: number = 0;
+    public noteOffAll(immediate: boolean): void {}
+    public resetSoft(): void {}
+    public resetPresets(): void {}
+    public loadPresets(
+        hydra: Hydra,
+        instrumentPrograms: Set<number>,
+        percussionKeys: Set<number>,
+        append: boolean
+    ): void {}
+    public setupMetronomeChannel(metronomeVolume: number): void {}
+    public synthesizeSilent(sampleCount: number): void {}
+    public dispatchEvent(synthEvent: SynthEvent): void {}
+    public synthesize(buffer: Float32Array, bufferPos: number, sampleCount: number): SynthEvent[] {
+        return [];
+    }
+    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {}
+    public setChannelTranspositionPitch(channel: number, semitones: number): void {}
+    public channelSetMute(channel: number, mute: boolean): void {}
+    public channelSetSolo(channel: number, solo: boolean): void {}
+    public resetChannelStates(): void {}
+    public channelSetMixVolume(channel: number, volume: number): void {}
+    public hasSamplesForProgram(program: number): boolean {
+        return true;
+    }
+    public hasSamplesForPercussion(key: number): boolean {
+        return true;
+    }
 }
