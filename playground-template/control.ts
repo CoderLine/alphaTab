@@ -472,6 +472,107 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
         document.body.removeChild(a);
     };
 
+    control.querySelector<HTMLButtonElement>('.at-download-audio')!.onclick = async () => {
+        const exportOptions = new alphaTab.synth.AudioExportOptions();
+        exportOptions.sampleRate = 44100;
+
+        // use settings as configured currently
+        exportOptions.masterVolume = at.masterVolume;
+        exportOptions.metronomeVolume = at.metronomeVolume;
+        if (at.playbackRange) {
+            exportOptions.playbackRange = at.playbackRange;
+        }
+
+        const trackList = control.querySelectorAll<HTMLElementWithTrack>('.at-track-list .at-track');
+
+        const soloTracks = new Set();
+        for (const t of trackList) {
+            const trackIndex = t.track.index;
+            const volumeSlider = t.querySelector<HTMLInputElement>('.at-track-volume')!;
+            exportOptions.trackVolume.set(trackIndex, volumeSlider.valueAsNumber / t.track.playbackInfo.volume);
+
+            const muteButton = t.querySelector<HTMLButtonElement>('.at-track-mute')!;
+            if (muteButton.classList.contains('active')) {
+                exportOptions.trackVolume.set(trackIndex, 0);
+            }
+
+            const soloButton = t.querySelector<HTMLButtonElement>('.at-track-solo')!;
+            if (soloButton.classList.contains('active')) {
+                soloTracks.add(trackIndex);
+            }
+        }
+
+        if (soloTracks.size > 0) {
+            for (const t of at.score!.tracks) {
+                if (!soloTracks.has(t.index)) {
+                    exportOptions.trackVolume.set(t.index, 0);
+                }
+            }
+        }
+
+        await new Promise<void>((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
+            xhr.responseType = 'arraybuffer';
+            xhr.open('GET', defaultSettings.player.soundFont, true);
+            xhr.onload = () => {
+                exportOptions.soundFonts = [new Uint8Array(xhr.response)];
+                resolve();
+            };
+            xhr.onerror = e => {
+                reject(e);
+            };
+            xhr.send();
+        });
+
+        const exporter = await at.exportAudio(exportOptions);
+        let generated: Float32Array | undefined = undefined;
+        try {
+            let chunk: alphaTab.synth.AudioExportChunk | undefined;
+            let totalSamples = 0;
+
+            while (true) {
+                chunk = await exporter.render(500);
+                if (chunk === undefined) {
+                    break;
+                }
+
+                if (generated === undefined) {
+                    generated = new Float32Array(exportOptions.sampleRate * (chunk.endTime / 1000) * 2 /* Stereo */);
+                }
+
+                const neededSize = totalSamples + chunk.samples.length;
+                if (generated.length < neededSize) {
+                    const needed = neededSize - generated.length;
+                    const newBuffer = new Float32Array(generated.length + needed);
+                    newBuffer.set(generated, 0);
+                    generated = newBuffer;
+                }
+
+                generated!.set(chunk.samples, totalSamples);
+                totalSamples += chunk.samples.length;
+            }
+
+            if (generated && totalSamples < generated.length) {
+                generated = generated.subarray(0, totalSamples);
+            }
+        } finally {
+            exporter.destroy();
+        }
+
+        if (generated) {
+            const a = document.createElement('a');
+            a.download =
+                at.score!.title.length > 0
+                    ? `${at.score!.title}_${exportOptions.sampleRate}_float32.pcm`
+                    : `song_${exportOptions.sampleRate}_float32.pcm`;
+            a.href = URL.createObjectURL(
+                new Blob([new Uint8Array(generated.buffer, generated.byteOffset, generated.byteLength)])
+            );
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+    };
 
     for (const a of control.querySelectorAll<HTMLAnchorElement>('.at-zoom-options a')) {
         a.onclick = e => {

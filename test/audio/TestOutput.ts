@@ -1,8 +1,10 @@
 import type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
 import { EventEmitter, type IEventEmitter, type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 export class TestOutput implements ISynthOutput {
-    public samples: number[] = [];
+    public samples: Float32Array[] = [];
+    public sampleCount: number = 0;
 
     public get sampleRate(): number {
         return 44100;
@@ -30,10 +32,9 @@ export class TestOutput implements ISynthOutput {
     }
 
     public addSamples(f: Float32Array): void {
-        for (let i: number = 0; i < f.length; i++) {
-            this.samples.push(f[i]);
-        }
-        (this.samplesPlayed as EventEmitterOfT<number>).trigger(f.length);
+        this.samples.push(f);
+        this.sampleCount += f.length;
+        (this.samplesPlayed as EventEmitterOfT<number>).trigger(f.length / SynthConstants.AudioChannels);
     }
 
     public resetSamples(): void {
