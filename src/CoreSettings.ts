@@ -93,7 +93,7 @@ export class CoreSettings {
     /**
      * Builds the default SMuFL font sources for the usage with alphaTab in cases
      * where no custom {@link smuflFontSources} are provided.
-     * @param fontDirectory The {@link fontDirectory} configured.
+     * @param fontDirectory The {@link CoreSettings.fontDirectory} configured.
      * @target web
      */
     public static buildDefaultSmuflFontSources(fontDirectory: string | null): Map<FontFileFormat, string> {

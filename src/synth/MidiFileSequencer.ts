@@ -44,7 +44,7 @@ class MidiSequencerState {
     public endTick: number = 0;
     public endTime: number = 0;
     public currentTempo: number = 0;
-    public modifiedTempo: number = 0;
+    public syncPointTempo: number = 0;
 }
 
 /**
@@ -118,7 +118,11 @@ export class MidiFileSequencer {
     }
 
     public get modifiedTempo(): number {
-        return this._currentState.modifiedTempo * this.playbackSpeed;
+        return this._currentState.syncPointTempo * this.playbackSpeed;
+    }
+
+    public get syncPointTempo(): number {
+        return this._currentState.syncPointTempo;
     }
 
     public get currentSyncPoints(): BackingTrackSyncPoint[] {
@@ -152,7 +156,7 @@ export class MidiFileSequencer {
             this._mainState.syncPointIndex = 0;
             this._mainState.tempoChangeIndex = 0;
             this._mainState.currentTempo = this._mainState.tempoChanges[0].bpm;
-            this._mainState.modifiedTempo =
+            this._mainState.syncPointTempo =
                 this._mainState.syncPoints.length > 0
                     ? this._mainState.syncPoints[0].syncBpm
                     : this._mainState.currentTempo;
@@ -290,7 +294,7 @@ export class MidiFileSequencer {
         }
 
         state.currentTempo = state.tempoChanges.length > 0 ? state.tempoChanges[0].bpm : bpm;
-        state.modifiedTempo = state.currentTempo;
+        state.syncPointTempo = state.currentTempo;
 
         state.synthData.sort((a, b) => {
             if (a.time > b.time) {
@@ -437,7 +441,7 @@ export class MidiFileSequencer {
         }
 
         state.syncPointIndex = 0;
-        state.modifiedTempo = state.syncPoints.length > 0 ? state.syncPoints[0].syncBpm : state.currentTempo;
+        state.syncPointTempo = state.syncPoints.length > 0 ? state.syncPoints[0].syncBpm : state.currentTempo;
     }
 
     public currentTimePositionToTickPosition(timePosition: number): number {
@@ -454,6 +458,10 @@ export class MidiFileSequencer {
         const ticks = (timeDiff / (60000.0 / (lastTempoChange.bpm * state.division))) | 0;
         // we add 1 for possible rounding errors.(floating point issuses)
         return lastTempoChange.ticks + ticks + 1;
+    }
+
+    public currentUpdateCurrentTempo(timePosition: number) {
+        this.updateCurrentTempo(this._mainState, timePosition * this.playbackSpeed);
     }
 
     private updateCurrentTempo(state: MidiSequencerState, timePosition: number) {
@@ -475,6 +483,10 @@ export class MidiFileSequencer {
         }
     }
 
+    public currentUpdateSyncPoints(timePosition: number) {
+        this.updateSyncPoints(this._mainState, timePosition);
+    }
+
     private updateSyncPoints(state: MidiSequencerState, timePosition: number) {
         const syncPoints = state.syncPoints;
         if (syncPoints.length > 0) {
@@ -487,10 +499,10 @@ export class MidiFileSequencer {
             }
             if (syncPointIndex !== state.syncPointIndex) {
                 state.syncPointIndex = syncPointIndex;
-                state.modifiedTempo = syncPoints[syncPointIndex].syncBpm;
+                state.syncPointTempo = syncPoints[syncPointIndex].syncBpm;
             }
         } else {
-            state.modifiedTempo = state.currentTempo;
+            state.syncPointTempo = state.currentTempo;
         }
     }
 
@@ -677,7 +689,7 @@ export class MidiFileSequencer {
         state.endTime = metronomeTime;
         state.endTick = metronomeTick;
         state.currentTempo = bpm;
-        state.modifiedTempo = bpm;
+        state.syncPointTempo = bpm;
         this._countInState = state;
     }
 }

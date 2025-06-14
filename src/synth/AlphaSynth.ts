@@ -21,7 +21,8 @@ import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEv
 import { ModelUtils } from '@src/model/ModelUtils';
 import type { Score } from '@src/model/Score';
 import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-import { AudioExportChunk, type AudioExportOptions } from '@src/synth/IAudioExporter';
+// biome-ignore lint/correctness/noUnusedImports: used in tsdoc
+import { AudioExportChunk, type IAudioExporter, type AudioExportOptions } from '@src/synth/IAudioExporter';
 import type { Preset } from '@src/synth/synthesis/Preset';
 import { MidiUtils } from '@src/midi/MidiUtils';
 
@@ -638,7 +639,7 @@ export class AlphaSynth extends AlphaSynthBase {
         midi: MidiFile,
         syncPoints: BackingTrackSyncPoint[],
         mainTranspositionPitches: Map<number, number>
-    ): AlphaSynthAudioExporter {
+    ): IAlphaSynthAudioExporter {
         const exporter = new AlphaSynthAudioExporter(options);
 
         exporter.loadMidiFile(midi);
@@ -667,14 +668,36 @@ export class AlphaSynth extends AlphaSynthBase {
             exporter.limitExport(options.playbackRange);
         }
 
+        exporter.setup();
+
         return exporter;
     }
 }
 
 /**
+ * An audio exporter allowing streaming synthesis of audio samples with a fixed configuration.
+ * This is the internal synchronous version of the public {@link IAudioExporter}.
+ */
+export interface IAlphaSynthAudioExporter {
+    /**
+     * Renders the next chunk of audio and provides it as result.
+     *
+     * @param milliseconds The rough number of milliseconds that should be synthesized and exported as chunk.
+     * @returns The requested chunk holding the samples and time information.
+     * If the song completed playback `undefined` is returned indicating the end.
+     * The provided audio might not be exactly the requested number of milliseconds as the synthesizer internally
+     * uses a fixed block size of 64 samples for synthesizing audio. Depending on the sample rate
+     * slightly longer audio is contained in the result.
+     *
+     * When the song ends, the chunk might contain less than the requested duration.
+     */
+    render(milliseconds: number): AudioExportChunk | undefined;
+}
+
+/**
  * A audio exporter allowing streaming synthesis of audio samples with a fixed configuration.
  */
-export class AlphaSynthAudioExporter {
+export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
     private _synth: TinySoundFont;
     private _sequencer: MidiFileSequencer;
 
@@ -763,6 +786,28 @@ export class AlphaSynthAudioExporter {
         this._synth.channelSetMixVolume(channel, volume);
     }
 
+    private _generatedAudioCurrentTime: number = 0;
+    private _generatedAudioEndTime: number = 0;
+
+    public setup() {
+        this._synth.setupMetronomeChannel(this._synth.metronomeVolume);
+
+        const syncPoints = this._sequencer.currentSyncPoints;
+        const alphaTabEndTime = this._sequencer.currentEndTime;
+
+        if (syncPoints.length === 0) {
+            this._generatedAudioEndTime = alphaTabEndTime;
+        } else {
+            const lastSyncPoint = syncPoints[syncPoints.length - 1];
+            let endTime = lastSyncPoint.syncTime;
+            const remainingTicks = this._sequencer.currentEndTick - lastSyncPoint.synthTick;
+            if (remainingTicks > 0) {
+                endTime += MidiUtils.ticksToMillis(remainingTicks, lastSyncPoint.syncBpm);
+            }
+            this._generatedAudioEndTime = endTime;
+        }
+    }
+
     public render(milliseconds: number): AudioExportChunk | undefined {
         if (this._sequencer.isFinished) {
             return undefined;
@@ -775,12 +820,28 @@ export class AlphaSynthAudioExporter {
             SynthConstants.MicroBufferSize * microBufferCount * SynthConstants.AudioChannels
         );
 
+        const syncPoints = this._sequencer.currentSyncPoints;
+
         let bufferPos: number = 0;
+        let subBufferTime = this._generatedAudioCurrentTime;
+        let alphaTabGeneratedMillis = 0;
         for (let i = 0; i < microBufferCount; i++) {
+            // if we're applying sync points, we calculate the needed tempo and set the playback speed
+            if (syncPoints.length > 0) {
+                this._sequencer.currentUpdateSyncPoints(subBufferTime);
+                this._sequencer.currentUpdateCurrentTempo(this._sequencer.currentTime);
+                const newSpeed = this._sequencer.syncPointTempo / this._sequencer.currentTempo;
+                if (this._sequencer.playbackSpeed !== newSpeed) {
+                    this._sequencer.playbackSpeed = newSpeed;
+                }
+            }
+
             this._sequencer.fillMidiEventQueue();
             this._synth.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
 
             bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
+            subBufferTime += oneMicroBufferMillis;
+            alphaTabGeneratedMillis += oneMicroBufferMillis * this._sequencer.playbackSpeed;
 
             if (this._sequencer.isFinished) {
                 break;
@@ -793,28 +854,14 @@ export class AlphaSynthAudioExporter {
 
         const chunk = new AudioExportChunk();
 
-        const alphaTabCurrentTime = this._sequencer.currentTime;
-        const alphaTabEndTime = this._sequencer.currentEndTime;
+        chunk.currentTime = this._generatedAudioCurrentTime;
+        chunk.endTime = this._generatedAudioEndTime;
 
-        const syncPoints = this._sequencer.currentSyncPoints;
-
-        if (syncPoints.length === 0) {
-            chunk.currentTime = alphaTabCurrentTime;
-            chunk.endTime = alphaTabEndTime;
-        } else {
-            const lastSyncPoint = syncPoints[syncPoints.length - 1];
-            let endTime = lastSyncPoint.syncTime;
-            const remainingTicks = this._sequencer.currentEndTick - lastSyncPoint.synthTick;
-            if (remainingTicks > 0) {
-                endTime += MidiUtils.ticksToMillis(remainingTicks, lastSyncPoint.syncBpm);
-            }
-
-            chunk.currentTime = this._sequencer.mainTimePositionToBackingTrack(alphaTabCurrentTime, endTime);
-            chunk.endTime = endTime;
-        }
-
-        chunk.currentTick = this._sequencer.currentTimePositionToTickPosition(alphaTabCurrentTime);
+        chunk.currentTick = this._sequencer.currentTimePositionToTickPosition(this._sequencer.currentTime);
         chunk.endTick = this._sequencer.currentEndTick;
+
+        this._generatedAudioCurrentTime += milliseconds;
+
         chunk.samples = samples;
 
         if (this._sequencer.isFinished) {
