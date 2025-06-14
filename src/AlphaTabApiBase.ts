@@ -3940,6 +3940,7 @@ export class AlphaTabApiBase<TSettings> {
                 break;
             default:
                 exporter = this.uiFacade.createWorkerAudioExporter(null);
+                break;
         }
 
         const score = this.score!;

@@ -50,7 +50,7 @@ internal class ManagedThreadAlphaSynthWorkerApi : AlphaSynthWorkerApiBase
         return Thread.CurrentThread == _workerThread;
     }
 
-    protected override void DispatchOnWorkerThread(Action action)
+    protected internal override void DispatchOnWorkerThread(Action action)
     {
         if (CheckAccess())
         {

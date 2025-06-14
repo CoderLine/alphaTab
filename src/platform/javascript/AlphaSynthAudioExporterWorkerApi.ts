@@ -5,6 +5,9 @@ import { JsonConverter } from '@src/model/JsonConverter';
 import type { AlphaSynthWebWorkerApi, BackingTrackSyncPoint } from '@src/synth/_barrel';
 import type { AudioExportChunk, AudioExportOptions, IAudioExporterWorker } from '@src/synth/IAudioExporter';
 
+/**
+ * @target web
+ */
 export class AlphaSynthAudioExporterWorkerApi implements IAudioExporterWorker {
     private static _nextExporterId = 1;
     private _worker: AlphaSynthWebWorkerApi;

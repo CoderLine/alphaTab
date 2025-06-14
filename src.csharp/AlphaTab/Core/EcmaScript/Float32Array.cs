@@ -10,6 +10,7 @@ public class Float32Array : IEnumerable<float>
 {
     internal readonly ArraySegment<float> Data;
     public double Length => Data.Count;
+
     internal ArrayBuffer Buffer
     {
         get
@@ -19,6 +20,9 @@ public class Float32Array : IEnumerable<float>
             return new ArrayBuffer(bytes);
         }
     }
+
+    internal double ByteOffset => 0;
+    internal double ByteLength => Length * sizeof(float);
 
     public Float32Array(float[] data)
     {

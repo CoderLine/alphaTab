@@ -29,7 +29,7 @@ public class Uint8Array : IEnumerable<byte>, IEnumerable<double>
     {
     }
 
-    private Uint8Array(ArrayBuffer buffer, double byteOffset, double byteLength)
+    internal Uint8Array(ArrayBuffer buffer, double byteOffset, double byteLength)
     {
         Buffer = buffer;
         ByteOffset = byteOffset;
