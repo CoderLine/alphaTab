@@ -141,33 +141,31 @@ describe('AlphaSynthTests', () => {
         await testVorbisFile('Example');
     });
 
-    it('export-test', async () => {
+    async function testAudioExport(
+        score: Score,
+        fileName: string,
+        prepareOptions: (options: AudioExportOptions) => void
+    ) {
+        // add a fake sync point to get time range (if there are not already sync points)
+        const syncPoints = score.exportFlatSyncPoints();
+        if (syncPoints.length === 0) {
+            score.applyFlatSyncPoints([
+                {
+                    barIndex: 0,
+                    barOccurence: 0,
+                    barPosition: 0,
+                    millisecondOffset: 0
+                }
+            ]);
+        }
+
         const soundFont = await TestPlatform.loadFile('test-data/audio/default.sf2');
-        const tex: string = `
-            \\tempo 120
-            .
-            \\ts 4 4
-            :8 C4 * 8
-        `;
-        const settings = new Settings();
-        const score = ScoreLoader.loadAlphaTex(tex, settings);
-
-        // add a fake sync point to get time range
-        score.applyFlatSyncPoints([
-            {
-                barIndex: 0,
-                barOccurence: 0,
-                barPosition: 0,
-                millisecondOffset: 0
-            }
-        ]);
-
         const synth = new AlphaSynth(new TestOutput(), 500);
 
         const midi: MidiFile = new MidiFile();
         const generator: MidiFileGenerator = new MidiFileGenerator(
             score,
-            settings,
+            new Settings(),
             new AlphaSynthMidiFileHandler(midi)
         );
         generator.applyTranspositionPitches = false;
@@ -178,6 +176,7 @@ describe('AlphaSynthTests', () => {
         exportOptions.metronomeVolume = 0;
         exportOptions.sampleRate = 44100;
         exportOptions.soundFonts = [soundFont];
+        prepareOptions(exportOptions);
 
         const exporter = synth.exportAudio(exportOptions, midi, generator.syncPoints, generator.transpositionPitches);
 
@@ -210,8 +209,8 @@ describe('AlphaSynthTests', () => {
             generated = generated.subarray(0, totalSamples);
         }
 
-        const reference = new DataView((await TestPlatform.loadFile('test-data/audio/export-test.pcm')).buffer);
         try {
+            const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${fileName}.pcm`)).buffer);
             expect(generated.length).to.equal(reference.buffer.byteLength / 4);
 
             for (let i = 0; i < generated.length; i++) {
@@ -219,11 +218,53 @@ describe('AlphaSynthTests', () => {
             }
         } catch (e) {
             await TestPlatform.saveFile(
-                'test-data/audio/export-test-new.pcm',
+                `test-data/audio/${fileName}-new.pcm`,
                 new Uint8Array(generated.buffer, generated.byteOffset, generated.byteLength)
             );
 
             throw e;
         }
+    }
+
+    it('export-test', async () => {
+        const tex: string = `
+            \\tempo 120
+            .
+            \\ts 4 4
+            :8 C4 * 8
+        `;
+        const settings = new Settings();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
+
+        await testAudioExport(score, 'export-test', _options => {
+            // no settings
+        });
+    });
+
+    it('export-silent-with-metronome', async () => {
+        const tex: string = `
+            \\tempo 120
+            .
+            \\ts 4 4
+            :8 C4 * 8
+        `;
+        const settings = new Settings();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
+
+        await testAudioExport(score, 'export-silent-with-metronome', options => {
+            options.metronomeVolume = 1;
+            for(const t of score.tracks){
+                options.trackVolume.set(t.index, 0.5);
+            }
+        });
+    });
+
+    it('export-sync-points', async () => {
+        const data = await TestPlatform.loadFile('test-data/audio/syncpoints-testfile.gp');
+        const score = ScoreLoader.loadScoreFromBytes(data, new Settings());
+
+        await testAudioExport(score, 'export-sync-points', options => {
+            options.useSyncPoints = true;
+        });
     });
 });

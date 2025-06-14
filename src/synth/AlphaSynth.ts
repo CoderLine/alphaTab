@@ -667,6 +667,8 @@ export class AlphaSynth extends AlphaSynthBase {
             exporter.limitExport(options.playbackRange);
         }
 
+        exporter.setup();
+
         return exporter;
     }
 }
@@ -763,6 +765,28 @@ export class AlphaSynthAudioExporter {
         this._synth.channelSetMixVolume(channel, volume);
     }
 
+    private _generatedAudioCurrentTime: number = 0;
+    private _generatedAudioEndTime: number = 0;
+
+    public setup() {
+        this._synth.setupMetronomeChannel(this._synth.metronomeVolume);
+
+        const syncPoints = this._sequencer.currentSyncPoints;
+        const alphaTabEndTime = this._sequencer.currentEndTime;
+
+        if (syncPoints.length === 0) {
+            this._generatedAudioEndTime = alphaTabEndTime;
+        } else {
+            const lastSyncPoint = syncPoints[syncPoints.length - 1];
+            let endTime = lastSyncPoint.syncTime;
+            const remainingTicks = this._sequencer.currentEndTick - lastSyncPoint.synthTick;
+            if (remainingTicks > 0) {
+                endTime += MidiUtils.ticksToMillis(remainingTicks, lastSyncPoint.syncBpm);
+            }
+            this._generatedAudioEndTime = endTime;
+        }
+    }
+
     public render(milliseconds: number): AudioExportChunk | undefined {
         if (this._sequencer.isFinished) {
             return undefined;
@@ -775,12 +799,28 @@ export class AlphaSynthAudioExporter {
             SynthConstants.MicroBufferSize * microBufferCount * SynthConstants.AudioChannels
         );
 
+        const syncPoints = this._sequencer.currentSyncPoints;
+
         let bufferPos: number = 0;
+        let subBufferTime = this._generatedAudioCurrentTime;
+        let alphaTabGeneratedMillis = 0;
         for (let i = 0; i < microBufferCount; i++) {
+            // if we're applying sync points, we calculate the needed tempo and set the playback speed
+            if (syncPoints.length > 0) {
+                this._sequencer.currentUpdateSyncPoints(subBufferTime);
+                this._sequencer.currentUpdateCurrentTempo(this._sequencer.currentTime);
+                const newSpeed = this._sequencer.syncPointTempo / this._sequencer.currentTempo;
+                if (this._sequencer.playbackSpeed !== newSpeed) {
+                    this._sequencer.playbackSpeed = newSpeed;
+                }
+            }
+
             this._sequencer.fillMidiEventQueue();
             this._synth.synthesize(samples, bufferPos, SynthConstants.MicroBufferSize);
 
             bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
+            subBufferTime += oneMicroBufferMillis;
+            alphaTabGeneratedMillis += oneMicroBufferMillis * this._sequencer.playbackSpeed;
 
             if (this._sequencer.isFinished) {
                 break;
@@ -793,28 +833,14 @@ export class AlphaSynthAudioExporter {
 
         const chunk = new AudioExportChunk();
 
-        const alphaTabCurrentTime = this._sequencer.currentTime;
-        const alphaTabEndTime = this._sequencer.currentEndTime;
+        chunk.currentTime = this._generatedAudioCurrentTime;
+        chunk.endTime = this._generatedAudioEndTime;
 
-        const syncPoints = this._sequencer.currentSyncPoints;
-
-        if (syncPoints.length === 0) {
-            chunk.currentTime = alphaTabCurrentTime;
-            chunk.endTime = alphaTabEndTime;
-        } else {
-            const lastSyncPoint = syncPoints[syncPoints.length - 1];
-            let endTime = lastSyncPoint.syncTime;
-            const remainingTicks = this._sequencer.currentEndTick - lastSyncPoint.synthTick;
-            if (remainingTicks > 0) {
-                endTime += MidiUtils.ticksToMillis(remainingTicks, lastSyncPoint.syncBpm);
-            }
-
-            chunk.currentTime = this._sequencer.mainTimePositionToBackingTrack(alphaTabCurrentTime, endTime);
-            chunk.endTime = endTime;
-        }
-
-        chunk.currentTick = this._sequencer.currentTimePositionToTickPosition(alphaTabCurrentTime);
+        chunk.currentTick = this._sequencer.currentTimePositionToTickPosition(this._sequencer.currentTime);
         chunk.endTick = this._sequencer.currentEndTick;
+
+        this._generatedAudioCurrentTime += milliseconds;
+
         chunk.samples = samples;
 
         if (this._sequencer.isFinished) {
