@@ -214,7 +214,10 @@ describe('AlphaSynthTests', () => {
             expect(generated.length).to.equal(reference.buffer.byteLength / 4);
 
             for (let i = 0; i < generated.length; i++) {
-                expect(generated[i]).to.equal(reference.getFloat32(i * 4, true), `Difference at index ${i}`);
+                const expected = reference.getFloat32(i * 4, true);
+                if (generated[i] !== expected) { // custom check, chai assertion has quite huge overhead if called that often
+                    expect(generated[i]).to.equal(expected, `Difference at index ${i}`);
+                }
             }
         } catch (e) {
             await TestPlatform.saveFile(
@@ -253,7 +256,7 @@ describe('AlphaSynthTests', () => {
 
         await testAudioExport(score, 'export-silent-with-metronome', options => {
             options.metronomeVolume = 1;
-            for(const t of score.tracks){
+            for (const t of score.tracks) {
                 options.trackVolume.set(t.index, 0.5);
             }
         });
