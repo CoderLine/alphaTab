@@ -1,0 +1,71 @@
+--- 
+title: Audio Export
+since: 1.6.0
+---
+import { SinceBadge } from '@site/src/components/SinceBadge';
+
+<SinceBadge since="1.6.0" />
+
+This guides shows how to use alphaTab to generate raw audio samples for exporting purposes. The export feature serves following use cases:
+
+1. Allow users to download an audio file of the song. <br /><br />
+If the audio is passed additionally to an audio codec like MP3 or OGG Vorbis, users can save the audio of the music sheet to disk. 
+This is a quite common feature offered to users.
+
+2. Use the raw audio for synchronization with external systems. <br /><br />
+You app might have its own mechanisms to provide media playback. Your app might have additional custom backing tracks or you want to splitup
+the individual audio tracks to play on separate output devices. By pre-computing the audio samples from the synthesizer you can 
+build an external system which combines the alphaTab audio with any custom components. 
+
+The external system can then be combined this with the [Audio & Video Sync](/docs/guides/audio-video-sync) feature to still have an interactive music sheet that shows correctly what's being played. 
+
+
+> [!NOTE]
+> The audio export can be used regardless of the current mode the alphaTab player is in. This allows exporting audio even if an external audio backing track or video is used.
+> Just be sure to pass in the required soundfont in this case. If a synthesizer is already active, it can reuse the already loaded soundfont.
+
+## How to use this?
+
+The audio exporter follows an asynchronous pull pattern:
+
+* _async_ because the exporter uses `Promises` (`Task` for C#, `Deferred` for Kotlin) to provide a clean way of requesting audio data without fighting with callbacks or events. 
+* _pull_ because you request the next chunk of audio to be generated and pull the audio into your consumer code. 
+
+To export the audio you follow tree main steps: 
+
+1. You start a new exporter with [`await api.exportAudio(...)`](/docs/reference/api/exportaudio.mdx). 
+2. You call [`exporter.render(<milliseconds>)`](/docs/reference/types/synth/iaudioexporter/render.mdx) to produce a chunk of audio which you can then process further. (repeated until end is reached).
+3. You cleanup the exporter via [`exporter.destroy()`](/docs/reference/types/synth/iaudioexporter/destroy.mdx). The exporter also implements `Disposable` (`IDisposable` for C#, `AutoCloseable` for `Kotlin`) which allows easy cleanup via language features if supported.
+
+> [!WARNING]
+> The raw audio samples for a whole song can consume quite a huge amount of memory: A calculation example:
+>
+> * 4 bytes per sample (32-bit float samples)
+> * 2 audio channels (left and right for stereo sound)
+> * 44100 samples per second 
+>
+> A 1 minute song already needs ~21MB of memory (`60s * 4bytes * 2channels * 44100samples/s`), multiply accordingly. 
+>
+> To keep the memory pressure low, you might send the chunks into a 3rd party library encoding the audio in a smaller format (e.g. MP3 or OGG Vorbis).
+
+### Available options
+
+The [`AudioExportOptions`](/docs/reference/types/synth/audioexportoptions/index.mdx) allow customizing various aspects of the audio exported: 
+
+* [`soundFonts`](/docs/reference/types/synth/audioexportoptions/soundfonts.mdx) can be used to customize the soundfonts used during export. 
+* [`sampleRate`](/docs/reference/types/synth/audioexportoptions/samplerate.mdx) can be used to customize the sample rate of the exported audio. 
+* [`useSyncPoints`](/docs/reference/types/synth/audioexportoptions/usesyncpoints.mdx) controls whether the sync points of the currently loaded song are appled during audio generation. 
+* [`masterVolume`](/docs/reference/types/synth/audioexportoptions/mastervolume.mdx) controls the master volume of the generated audio. 
+* [`metronomeVolume`](/docs/reference/types/synth/audioexportoptions/metronomevolume.mdx) controls the volume of the metronome ticks. (keep in mind that the use of `useSyncPoints` changes the audio duration, the metronome is aligned with the music notes, not with the synthesized audio)
+* [`playbackRange`](/docs/reference/types/synth/audioexportoptions/playbackrange.mdx) controls the audio range which is exported. 
+* [`trackVolume`](/docs/reference/types/synth/audioexportoptions/trackvolume.mdx) controls the volume of every track (percentage-wise to the already configured absolute volume)
+* [`trackTranspositionPitches`](/docs/reference/types/synth/audioexportoptions/tracktranspositionpitches.mdx) controls an additional transposition pitch for the tracks. 
+
+## Example
+
+This example exports the audio and creates a [WAV File](https://en.wikipedia.org/wiki/WAV) out of the samples. WAV files contain the raw samples, we just need
+to write the correct file header. In this demo we then create a Blob URL in the browser to set the WAV file as source of an `<audio />` tag to play it. 
+
+import { AudioExportSample } from '@site/src/components/AudioExportSample';
+
+<AudioExportSample />
