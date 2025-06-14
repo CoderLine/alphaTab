@@ -1,10 +1,12 @@
 import * as alphaTab from '../src/alphaTab.main';
+import Handlebars from 'handlebars';
+import * as bootstrap from 'bootstrap';
 
-const toDomElement = (function () {
+const toDomElement = (() => {
     const parser = document.createElement('div');
-    return function (html) {
+    return (html: string) => {
         parser.innerHTML = html;
-        return parser.firstElementChild;
+        return parser.firstElementChild as HTMLElement;
     };
 })();
 
@@ -12,7 +14,7 @@ const params = new URL(window.location.href).searchParams;
 
 const defaultSettings = {
     core: {
-        logLevel: params.get('loglevel') ?? 'info',
+        logLevel: (params.get('loglevel') ?? 'info') as alphaTab.json.CoreSettingsJson['logLevel'],
         file: '/test-data/audio/full-song.gp5',
         fontDirectory: '/font/bravura/'
     },
@@ -21,9 +23,9 @@ const defaultSettings = {
         scrollOffsetX: -10,
         soundFont: '/font/sonivox/sonivox.sf2'
     }
-};
+} satisfies alphaTab.json.SettingsJson;
 
-function applyFonts(settings) {
+function applyFonts(settings: alphaTab.Settings) {
     settings.display.resources.copyrightFont.families = ['Noto Sans'];
     settings.display.resources.titleFont.families = ['Noto Serif'];
     settings.display.resources.subTitleFont.families = ['Noto Serif'];
@@ -42,40 +44,48 @@ function applyFonts(settings) {
     settings.display.resources.numberedNotationGraceFont.families = ['Noto Sans'];
 }
 
-function createTrackItem(track, trackSelection) {
-    const trackTemplate = Handlebars.compile(document.querySelector('#at-track-template').innerHTML);
-    const trackItem = toDomElement(trackTemplate(track));
+type HTMLElementWithTrack = HTMLElement & {
+    track: alphaTab.model.Track;
+};
+
+function createTrackItem(
+    at: alphaTab.AlphaTabApi,
+    track: alphaTab.model.Track,
+    trackSelection: Map<number, alphaTab.model.Track>
+) {
+    const trackTemplate = Handlebars.compile(document.querySelector('#at-track-template')!.innerHTML);
+    const trackItem = toDomElement(trackTemplate(track)) as HTMLElementWithTrack;
 
     // init track controls
-    const muteButton = trackItem.querySelector('.at-track-mute');
-    const soloButton = trackItem.querySelector('.at-track-solo');
-    const volumeSlider = trackItem.querySelector('.at-track-volume');
+    const muteButton = trackItem.querySelector<HTMLButtonElement>('.at-track-mute')!;
+    const soloButton = trackItem.querySelector<HTMLButtonElement>('.at-track-solo')!;
+    const volumeSlider = trackItem.querySelector<HTMLInputElement>('.at-track-volume')!;
 
-    muteButton.onclick = function (e) {
+    muteButton.onclick = e => {
         e.stopPropagation();
         muteButton.classList.toggle('active');
         at.changeTrackMute([track], muteButton.classList.contains('active'));
     };
 
-    soloButton.onclick = function (e) {
+    soloButton.onclick = e => {
         e.stopPropagation();
         soloButton.classList.toggle('active');
         at.changeTrackSolo([track], soloButton.classList.contains('active'));
     };
 
-    volumeSlider.oninput = function (e) {
+    volumeSlider.oninput = e => {
         e.preventDefault();
         // Here we need to do some math to map the 1-16 slider to the
         // volume in alphaTab. In alphaTab it is 1.0 for 100% which is
         // equal to the volume in the track information
-        at.changeTrackVolume([track], volumeSlider.value / track.playbackInfo.volume);
+        at.changeTrackVolume([track], volumeSlider.valueAsNumber / track.playbackInfo.volume);
     };
 
-    volumeSlider.onclick = function (e) {
+    volumeSlider.onclick = e => {
         e.stopPropagation();
     };
 
-    trackItem.onclick = function (e) {
+    trackItem.onclick = e => {
         e.stopPropagation();
         if (!e.ctrlKey) {
             trackSelection.clear();
@@ -88,54 +98,53 @@ function createTrackItem(track, trackSelection) {
         at.renderTracks(Array.from(trackSelection.values()).sort(t => t.index));
     };
 
-    muteButton.value = track.playbackInfo.isMute;
-    soloButton.value = track.playbackInfo.isSolo;
-    volumeSlider.value = track.playbackInfo.volume;
+    volumeSlider.valueAsNumber = track.playbackInfo.volume;
 
     trackItem.track = track;
     return trackItem;
 }
 
-let backingTrackScore = null;
-let backingTrackAudioElement = null;
-let waveForm = null;
-let waveFormCursor = null;
-window.onload = ()=>{
-    waveForm = document.querySelector('.at-waveform');
-    waveFormCursor = waveForm.querySelector('.at-waveform-cursor');
-    waveForm.onclick = (e)=>{
-        const percent = e.offsetX / waveForm.offsetWidth;
-        if(backingTrackAudioElement) {
-            backingTrackAudioElement.currentTime = backingTrackAudioElement.duration * percent;
-        }
-    };
+let backingTrackScore: alphaTab.model.Score | null;
+let backingTrackAudioElement!: HTMLAudioElement;
+let waveForm!: HTMLDivElement;
+let waveFormCursor!: HTMLDivElement;
+
+function updateWaveFormCursor() {
+    if (waveFormCursor) {
+        waveFormCursor.style.left = `${(backingTrackAudioElement.currentTime / backingTrackAudioElement.duration) * 100}%`;
+    }
 }
 
-function updateWaveFormCursor(){
-    if(waveFormCursor) {
-        waveFormCursor.style.left = ((backingTrackAudioElement.currentTime / backingTrackAudioElement.duration) * 100) + '%';
-    }
-};
-
-function hideBackingTrack(at) {
-    if(backingTrackAudioElement) {
+function hideBackingTrack() {
+    if (backingTrackAudioElement) {
         backingTrackAudioElement.removeEventListener('timeupdate', updateWaveFormCursor);
         backingTrackAudioElement.removeEventListener('durationchange', updateWaveFormCursor);
         backingTrackAudioElement.removeEventListener('seeked', updateWaveFormCursor);
     }
-    const waveForm = document.querySelector('.at-waveform');
-    waveForm.classList.add('d-none');
+    if (waveForm) {
+        waveForm.classList.add('d-none');
+    }
 }
 
-
-async function showBackingTrack(at) {
-    if(!at.score.backingTrack) {
+async function showBackingTrack(at: alphaTab.AlphaTabApi) {
+    if (!at.score!.backingTrack) {
         hideBackingTrack();
         return;
     }
 
-    const audioElement = at.player.output.audioElement;
-    if(audioElement !== backingTrackAudioElement) {
+    if (!waveForm) {
+        waveForm = document.querySelector<HTMLDivElement>('.at-waveform')!;
+        waveForm.onclick = e => {
+            const percent = e.offsetX / waveForm.offsetWidth;
+            if (backingTrackAudioElement) {
+                backingTrackAudioElement.currentTime = backingTrackAudioElement.duration * percent;
+            }
+        };
+        waveFormCursor = waveForm.querySelector<HTMLDivElement>('.at-waveform-cursor')!;
+    }
+
+    const audioElement = (at.player!.output as alphaTab.synth.IAudioElementBackingTrackSynthOutput).audioElement;
+    if (audioElement !== backingTrackAudioElement) {
         backingTrackAudioElement = audioElement;
         audioElement.addEventListener('timeupdate', updateWaveFormCursor);
         audioElement.addEventListener('durationchange', updateWaveFormCursor);
@@ -144,74 +153,76 @@ async function showBackingTrack(at) {
     }
 
     const score = at.score;
-    if(score === backingTrackScore) {
+    if (score === backingTrackScore) {
         return;
     }
     backingTrackScore = at.score;
 
     const audioContext = new AudioContext();
-    const rawData = await audioContext.decodeAudioData(
-        structuredClone(at.score.backingTrack.rawAudioFile.buffer)
-    );
+    const rawData = await audioContext.decodeAudioData(structuredClone(at.score!.backingTrack.rawAudioFile!.buffer));
 
     const topChannel = rawData.getChannelData(0);
     const bottomChannel = rawData.numberOfChannels > 1 ? rawData.getChannelData(1) : topChannel;
-    const length = topChannel.length
+    const length = topChannel.length;
 
     waveForm.classList.remove('d-none');
 
-    const canvas = document.querySelector('.at-waveform canvas') ?? document.createElement('canvas');
+    const canvas = document.querySelector<HTMLCanvasElement>('.at-waveform canvas') ?? document.createElement('canvas');
     const width = waveForm.offsetWidth;
     const height = 80;
     canvas.width = width;
     canvas.height = height;
     waveForm.appendChild(canvas);
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext('2d')!;
 
     const pixelRatio = window.devicePixelRatio;
     const halfHeight = height / 2;
 
     const barWidth = 2 * pixelRatio;
     const barGap = 1 * pixelRatio;
-    const barIndexScale = width / (barWidth + barGap) / length
+    const barIndexScale = width / (barWidth + barGap) / length;
 
     ctx.beginPath();
 
-    let prevX = 0
-    let maxTop = 0
-    let maxBottom = 0
+    let prevX = 0;
+    let maxTop = 0;
+    let maxBottom = 0;
     for (let i = 0; i <= length; i++) {
-        const x = Math.round(i * barIndexScale)
+        const x = Math.round(i * barIndexScale);
 
         if (x > prevX) {
-            const topBarHeight = Math.round(maxTop * halfHeight)
-            const bottomBarHeight = Math.round(maxBottom * halfHeight)
-            const barHeight = topBarHeight + bottomBarHeight || 1
+            const topBarHeight = Math.round(maxTop * halfHeight);
+            const bottomBarHeight = Math.round(maxBottom * halfHeight);
+            const barHeight = topBarHeight + bottomBarHeight || 1;
 
-            ctx.roundRect(prevX * (barWidth + barGap), halfHeight - topBarHeight, barWidth, barHeight, 2)
+            ctx.roundRect(prevX * (barWidth + barGap), halfHeight - topBarHeight, barWidth, barHeight, 2);
 
-            prevX = x
-            maxTop = 0
-            maxBottom = 0
+            prevX = x;
+            maxTop = 0;
+            maxBottom = 0;
         }
 
-        const magnitudeTop = Math.abs(topChannel[i] || 0)
-        const magnitudeBottom = Math.abs(bottomChannel[i] || 0)
-        if (magnitudeTop > maxTop) maxTop = magnitudeTop
-        if (magnitudeBottom > maxBottom) maxBottom = magnitudeBottom
+        const magnitudeTop = Math.abs(topChannel[i] || 0);
+        const magnitudeBottom = Math.abs(bottomChannel[i] || 0);
+        if (magnitudeTop > maxTop) {
+            maxTop = magnitudeTop;
+        }
+        if (magnitudeBottom > maxBottom) {
+            maxBottom = magnitudeBottom;
+        }
     }
 
-    ctx.fillStyle = '#436d9d'  
-    ctx.fill()
+    ctx.fillStyle = '#436d9d';
+    ctx.fill();
 }
 
-function updateBackingTrack(at) {
-    switch(at.actualPlayerMode) {
+function updateBackingTrack(at: alphaTab.AlphaTabApi) {
+    switch (at.actualPlayerMode) {
         case alphaTab.PlayerMode.Disabled:
         case alphaTab.PlayerMode.EnabledSynthesizer:
         case alphaTab.PlayerMode.EnabledExternalMedia:
-            hideBackingTrack(at);
+            hideBackingTrack();
             break;
         case alphaTab.PlayerMode.EnabledBackingTrack:
             showBackingTrack(at);
@@ -219,12 +230,11 @@ function updateBackingTrack(at) {
     }
 }
 
-export function setupControl(selector, customSettings) {
-    const el = document.querySelector(selector);
-    const control = el.closest('.at-wrap');
+export function setupControl(selector: string, customSettings: alphaTab.json.SettingsJson) {
+    const el = document.querySelector<HTMLElement>(selector)!;
+    const control = el.closest<HTMLDivElement>('.at-wrap')!;
 
-    const viewPort =
-        'playerScrollelement' in el.dataset ? el.dataset.playerScrollelement : control.querySelector('.at-viewport');
+    const viewPort = control.querySelector<HTMLDivElement>('.at-viewport')!;
 
     const settings = new alphaTab.Settings();
     applyFonts(settings);
@@ -232,29 +242,29 @@ export function setupControl(selector, customSettings) {
     settings.fillFromJson({
         player: {
             scrollElement: viewPort
-        },
+        }
     });
     settings.fillFromJson(customSettings);
 
     const at = new alphaTab.AlphaTabApi(el, settings);
-    at.error.on(function (e) {
+    at.error.on(e => {
         console.error('alphaTab error', e);
     });
 
-    el.ondragover = function (e) {
+    el.ondragover = e => {
         e.stopPropagation();
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'link';
+        e.dataTransfer!.dropEffect = 'link';
     };
 
-    el.ondrop = function (e) {
+    el.ondrop = e => {
         e.stopPropagation();
         e.preventDefault();
-        const files = e.dataTransfer.files;
+        const files = e.dataTransfer!.files;
         if (files.length === 1) {
             const reader = new FileReader();
-            reader.onload = function (data) {
-                at.load(data.target.result, [0]);
+            reader.onload = data => {
+                at.load(data.target!.result, [0]);
             };
             reader.readAsArrayBuffer(files[0]);
         }
@@ -262,101 +272,101 @@ export function setupControl(selector, customSettings) {
     };
 
     const tracks = new Map();
-    const trackItems = [];
-    at.renderStarted.on(function (isResize) {
+    const trackItems: HTMLElementWithTrack[] = [];
+    at.renderStarted.on(isResize => {
         if (!isResize) {
             control.classList.add('loading');
         }
 
         tracks.clear();
-        at.tracks.forEach(function (t) {
+        for (const t of at.tracks) {
             tracks.set(t.index, t);
-        });
+        }
 
-        trackItems.forEach(function (trackItem) {
+        for (const trackItem of trackItems) {
             if (tracks.has(trackItem.track.index)) {
                 trackItem.classList.add('active');
             } else {
                 trackItem.classList.remove('active');
             }
-        });
+        }
     });
 
-    const playerLoadingIndicator = control.querySelector('.at-player-loading');
-    at.soundFontLoad.on(function (args) {
+    const playerLoadingIndicator = control.querySelector<HTMLElement>('.at-player-loading')!;
+    at.soundFontLoad.on(args => {
         updateProgress(playerLoadingIndicator, args.loaded / args.total);
     });
-    at.soundFontLoaded.on(function () {
+    at.soundFontLoaded.on(() => {
         playerLoadingIndicator.classList.add('d-none');
     });
-    at.renderFinished.on(function () {
+    at.renderFinished.on(() => {
         control.classList.remove('loading');
     });
 
-    at.scoreLoaded.on(function (score) {
-        control.querySelector('.at-song-title').innerText = score.title;
-        control.querySelector('.at-song-artist').innerText = score.artist;
+    at.scoreLoaded.on(score => {
+        control.querySelector<HTMLElement>('.at-song-title')!.innerText = score.title;
+        control.querySelector<HTMLElement>('.at-song-artist')!.innerText = score.artist;
 
         // fill track selector
-        const trackList = control.querySelector('.at-track-list');
+        const trackList = control.querySelector<HTMLElement>('.at-track-list')!;
         trackList.innerHTML = '';
 
-        score.tracks.forEach(function (track) {
-            const trackItem = createTrackItem(track, tracks);
+        for (const track of score.tracks) {
+            const trackItem = createTrackItem(at, track, tracks);
             trackItems.push(trackItem);
             trackList.appendChild(trackItem);
-        });
+        }
 
         updateBackingTrack(at);
     });
 
-    const timePositionLabel = control.querySelector('.at-time-position');
-    const timeSliderValue = control.querySelector('.at-time-slider-value');
+    const timePositionLabel = control.querySelector<HTMLElement>('.at-time-position')!;
+    const timeSliderValue = control.querySelector<HTMLElement>('.at-time-slider-value')!;
 
-    const timeSlider = control.querySelector('.at-time-slider');
-    let songTimeInfo = null;
-    timeSlider.onclick = (e)=>{
+    const timeSlider = control.querySelector<HTMLInputElement>('.at-time-slider')!;
+    let songTimeInfo: alphaTab.synth.PositionChangedEventArgs | null = null;
+    timeSlider.onclick = e => {
         const percent = e.offsetX / timeSlider.offsetWidth;
-        if(songTimeInfo) {
-            at.timePosition = Math.floor(songTimeInfo.endTime * percent); 
+        if (songTimeInfo) {
+            at.timePosition = Math.floor(songTimeInfo.endTime * percent);
         }
     };
-    at.midiLoaded.on(e => { songTimeInfo = e; });
+    at.midiLoaded.on(e => {
+        songTimeInfo = e;
+    });
 
-    
-
-    function formatDuration(milliseconds) {
+    function formatDuration(milliseconds: number) {
         let seconds = milliseconds / 1000;
         const minutes = (seconds / 60) | 0;
         seconds = (seconds - minutes * 60) | 0;
-        return String(minutes).padStart(2, '0') + ':' + String(seconds).padStart(2, '0');
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
     }
 
     let previousTime = -1;
-    at.playerPositionChanged.on(function (args) {
+    at.playerPositionChanged.on(args => {
         // reduce number of UI updates to second changes.
         const currentSeconds = (args.currentTime / 1000) | 0;
-        if (currentSeconds == previousTime) {
+        if (currentSeconds === previousTime) {
             return;
         }
         previousTime = currentSeconds;
 
-        timePositionLabel.innerText = formatDuration(args.currentTime) + ' / ' + formatDuration(args.endTime);
-        timeSliderValue.style.width = ((args.currentTime / args.endTime) * 100).toFixed(2) + '%';
+        timePositionLabel.innerText = `${formatDuration(args.currentTime)} / ${formatDuration(args.endTime)}`;
+        timeSliderValue.style.width = `${((args.currentTime / args.endTime) * 100).toFixed(2)}%`;
     });
 
-    const playPauseButton = control.querySelector('.at-play-pause');
-    at.playerReady.on(function () {
-        control.querySelectorAll('.at-player .disabled').forEach(function (c) {
+    const playPauseButton = control.querySelector<HTMLButtonElement>('.at-play-pause')!;
+    at.playerReady.on(() => {
+        for (const c of control.querySelectorAll('.at-player .disabled')) {
             c.classList.remove('disabled');
-        });
+        }
 
         updateBackingTrack(at);
     });
 
-    at.playerStateChanged.on(function (args) {
-        const icon = playPauseButton.querySelector('i');
-        if (args.state == 0) {
+    at.playerStateChanged.on(args => {
+        const icon = playPauseButton.querySelector('i')!;
+        if (args.state === 0) {
             icon.classList.remove('fa-pause');
             icon.classList.add('fa-play');
         } else {
@@ -365,23 +375,23 @@ export function setupControl(selector, customSettings) {
         }
     });
 
-    playPauseButton.onclick = function (e) {
+    playPauseButton.onclick = e => {
         e.stopPropagation();
-        if (!e.target.classList.contains('disabled')) {
+        if (!playPauseButton.classList.contains('disabled')) {
             at.playPause();
         }
     };
 
-    control.querySelector('.at-stop').onclick = function (e) {
+    control.querySelector<HTMLButtonElement>('.at-stop')!.onclick = e => {
         e.stopPropagation();
-        if (!e.target.classList.contains('disabled')) {
+        if (!(e.target as HTMLButtonElement).classList.contains('disabled')) {
             at.stop();
         }
     };
 
-    control.querySelector('.at-metronome').onclick = function (e) {
+    control.querySelector<HTMLButtonElement>('.at-metronome')!.onclick = e => {
         e.stopPropagation();
-        const link = e.target.closest('a');
+        const link = (e.target as HTMLElement).closest('a')!;
         link.classList.toggle('active');
         if (link.classList.contains('active')) {
             at.metronomeVolume = 1;
@@ -390,9 +400,9 @@ export function setupControl(selector, customSettings) {
         }
     };
 
-    control.querySelector('.at-count-in').onclick = function (e) {
+    control.querySelector<HTMLElement>('.at-count-in')!.onclick = e => {
         e.stopPropagation();
-        const link = e.target.closest('a');
+        const link = (e.target as HTMLElement).closest('a')!;
         link.classList.toggle('active');
         if (link.classList.contains('active')) {
             at.countInVolume = 1;
@@ -401,7 +411,7 @@ export function setupControl(selector, customSettings) {
         }
     };
 
-    function createOutputDeviceItem(device) {
+    function createOutputDeviceItem(device: alphaTab.synth.ISynthOutputDevice) {
         const item = document.createElement('a');
         item.classList.add('dropdown-item');
         item.href = '#';
@@ -412,13 +422,13 @@ export function setupControl(selector, customSettings) {
         return item;
     }
 
-    control.querySelector('.at-output-device').addEventListener('show.bs.dropdown', async () => {
+    control.querySelector('.at-output-device')!.addEventListener('show.bs.dropdown', async () => {
         const devices = await at.enumerateOutputDevices();
         if (devices.length === 0) {
             return;
         }
 
-        const list = control.querySelector('.at-output-device .dropdown-menu');
+        const list = control.querySelector('.at-output-device .dropdown-menu')!;
         list.innerHTML = '';
         for (const d of devices) {
             const item = createOutputDeviceItem(d);
@@ -426,17 +436,19 @@ export function setupControl(selector, customSettings) {
         }
     });
 
-    control.querySelectorAll('.at-speed-options a').forEach(function (a) {
-        a.onclick = function (e) {
+    for (const a of control.querySelectorAll<HTMLAnchorElement>('.at-speed-options a')) {
+        a.onclick = e => {
             e.preventDefault();
-            at.playbackSpeed = parseFloat(e.target.innerText);
-            control.querySelector('.at-speed-label').innerText = e.target.innerText;
+            at.playbackSpeed = Number.parseFloat((e.target as HTMLAnchorElement).innerText);
+            control.querySelector<HTMLElement>('.at-speed-label')!.innerText = (
+                e.target as HTMLAnchorElement
+            ).innerText;
         };
-    });
+    }
 
-    control.querySelector('.at-loop').onclick = function (e) {
+    control.querySelector<HTMLButtonElement>('.at-loop')!.onclick = e => {
         e.stopPropagation();
-        const link = e.target.closest('a');
+        const link = (e.target as HTMLButtonElement).closest('a')!;
         link.classList.toggle('active');
         if (link.classList.contains('active')) {
             at.isLooping = true;
@@ -445,36 +457,37 @@ export function setupControl(selector, customSettings) {
         }
     };
 
-    control.querySelector('.at-print').onclick = function (e) {
+    control.querySelector<HTMLButtonElement>('.at-print')!.onclick = () => {
         at.print();
     };
 
-    control.querySelector('.at-download').onclick = function (e) {
+    control.querySelector<HTMLButtonElement>('.at-download')!.onclick = () => {
         const exporter = new alphaTab.exporter.Gp7Exporter();
-        const data = exporter.export(at.score, at.settings);
+        const data = exporter.export(at.score!, at.settings);
         const a = document.createElement('a');
-        a.download = at.score.title.length > 0 ? at.score.title + '.gp' : 'song.gp';
+        a.download = at.score!.title.length > 0 ? `${at.score!.title}.gp` : 'song.gp';
         a.href = URL.createObjectURL(new Blob([data]));
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
     };
 
-    control.querySelectorAll('.at-zoom-options a').forEach(function (a) {
-        a.onclick = function (e) {
+
+    for (const a of control.querySelectorAll<HTMLAnchorElement>('.at-zoom-options a')) {
+        a.onclick = e => {
             e.preventDefault();
-            at.settings.display.scale = parseInt(e.target.innerText) / 100.0;
-            control.querySelector('.at-zoom-label').innerText = e.target.innerText;
+            at.settings.display.scale = Number.parseInt((e.target as HTMLAnchorElement).innerText) / 100.0;
+            control.querySelector<HTMLElement>('.at-zoom-label')!.innerText = (e.target as HTMLAnchorElement).innerText;
             at.updateSettings();
             at.render();
         };
-    });
+    }
 
-    control.querySelectorAll('.at-layout-options a').forEach(function (a) {
-        a.onclick = function (e) {
+    for (const a of control.querySelectorAll<HTMLAnchorElement>('.at-layout-options a')) {
+        a.onclick = e => {
             e.preventDefault();
             const settings = at.settings;
-            switch (e.target.dataset.layout) {
+            switch ((e.target as HTMLAnchorElement).dataset.layout) {
                 case 'page':
                     settings.display.layoutMode = alphaTab.LayoutMode.Page;
                     settings.player.scrollMode = alphaTab.ScrollMode.Continuous;
@@ -492,7 +505,7 @@ export function setupControl(selector, customSettings) {
             at.updateSettings();
             at.render();
         };
-    });
+    }
 
     for (const t of control.querySelectorAll('[data-toggle="tooltip"]')) {
         new bootstrap.Tooltip(t);
@@ -501,21 +514,22 @@ export function setupControl(selector, customSettings) {
     return at;
 }
 
-function updateProgress(el, value) {
+function percentageToDegrees(percentage: number) {
+    return (percentage / 100) * 360;
+}
+
+function updateProgress(el: HTMLElement, value: number) {
     value = value * 100;
-    const left = el.querySelector('.progress-left .progress-bar');
-    const right = el.querySelector('.progress-right .progress-bar');
-    function percentageToDegrees(percentage) {
-        return (percentage / 100) * 360;
-    }
+    const left = el.querySelector<HTMLElement>('.progress-left .progress-bar')!;
+    const right = el.querySelector<HTMLElement>('.progress-right .progress-bar')!;
 
     if (value > 0) {
         if (value <= 50) {
-            right.style.transform = 'rotate(' + percentageToDegrees(value) + 'deg)';
+            right.style.transform = `rotate(${percentageToDegrees(value)}deg)`;
         } else {
             right.style.transform = 'rotate(180deg)';
-            left.style.transform = 'rotate(' + percentageToDegrees(value - 50) + 'deg)';
+            left.style.transform = `rotate(${percentageToDegrees(value - 50)}deg)`;
         }
     }
-    el.querySelector('.progress-value-number').innerText = value | 0;
+    el.querySelector<HTMLElement>('.progress-value-number')!.innerText = String(value | 0);
 }
