@@ -403,6 +403,15 @@ Array [
 ]
 `;
 
+exports[`SyncPointTests sync-point-generation-new 1`] = `
+Array [
+  "0,0,120,120,0,0",
+  "4,0,60,60,8000,8000",
+  "8,0,80,80,24000,24000",
+  "11,0,80,80,48000,48000",
+]
+`;
+
 exports[`SyncPointTests sync-point-update 1`] = `
 Array [
   "0,0,120,120,0,0",
