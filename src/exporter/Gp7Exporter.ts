@@ -9,11 +9,11 @@ import { PartConfiguration } from '@src/importer/PartConfiguration';
 import { ZipWriter } from '@src/zip/ZipWriter';
 import { LayoutConfiguration } from '@src/importer/LayoutConfiguration';
 /**
- * This ScoreExporter can write Guitar Pro 7 (gp) files.
+ * This ScoreExporter can write Guitar Pro 7+ (gp) files.
  */
 export class Gp7Exporter extends ScoreExporter {
     public get name(): string {
-        return 'Guitar Pro 7';
+        return 'Guitar Pro 7-8';
     }
 
     public writeScore(score: Score): void {
@@ -32,6 +32,11 @@ export class Gp7Exporter extends ScoreExporter {
         fileSystem.writeEntry(new ZipEntry('Content/PartConfiguration', partConfiguration));
         fileSystem.writeEntry(new ZipEntry('Content/LayoutConfiguration', layoutConfiguration));
         fileSystem.writeEntry(new ZipEntry('Content/score.gpif', IOHelper.stringToBytes(gpifXml)));
+
+        if(gpifWriter.backingTrackAssetFileName) {
+            fileSystem.writeEntry(new ZipEntry(gpifWriter.backingTrackAssetFileName!, score.backingTrack!.rawAudioFile!));
+        }
+
         fileSystem.end();
     }
 }

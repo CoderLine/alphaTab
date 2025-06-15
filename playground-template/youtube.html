@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>AlphaTab Youtube Sync</title>
+
+    <script src="/node_modules/@popperjs/core/dist/umd/popper.min.js"></script>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+
+    <script src="/node_modules/handlebars/dist/handlebars.min.js"></script>
+
+    <link rel="stylesheet" href="control.css" />
+    <link rel="stylesheet" href="youtube.css" />
+</head>
+
+<body>
+    <div class="youtube-wrap">
+        <div id="youtube"></div>
+    </div>
+    <div id="placeholder"></div>
+
+    <script type="module">
+        import { setupControl } from './control.ts';
+        import * as alphaTab from '../src/alphaTab.main';
+
+        const playerElement = document.getElementById('youtube');
+        const tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/player_api";
+        playerElement.parentNode.insertBefore(tag, playerElement);
+
+        const youtubeApiReady = Promise.withResolvers();
+        window.onYouTubePlayerAPIReady = youtubeApiReady.resolve;
+
+        const req = new XMLHttpRequest();
+        req.onload = async (data) => {
+            document.getElementById('placeholder').outerHTML = req.responseText;
+            const at = setupControl('#alphaTab', {
+                core: {
+                    file: '/test-data/guitarpro8/canon-audio-track.gp'
+                },
+                player: {
+                    playerMode: alphaTab.PlayerMode.EnabledExternalMedia
+                }
+            });
+            window.at = at;
+
+
+            //
+            // Youtube
+
+            // Wait for Youtube API
+            await youtubeApiReady.promise; // wait for API
+
+            // Setup youtube player
+            const youtubePlayerReady = Promise.withResolvers();
+            let currentTimeInterval  = undefined;
+            const player = new YT.Player(playerElement, {
+                height: '360',
+                width: '640',
+                videoId: 'by8oyJztzwo',
+                playerVars: { 'autoplay': 0 },
+                events: {
+                    'onReady': (e) => {
+                        youtubePlayerReady.resolve();
+                        console.log('YT onReady', player, e)
+                    },
+                    'onStateChange': (e) => {
+                        switch (e.data) {
+                            case YT.PlayerState.PLAYING:
+                                currentTimeInterval = setInterval(() => {
+                                    at.player.output.updatePosition(player.getCurrentTime() * 1000)
+                                }, 50);
+                                at.play();
+                                break;
+                            case YT.PlayerState.ENDED:
+                                clearInterval(currentTimeInterval);
+                                at.stop();
+                                break;
+                            case YT.PlayerState.PAUSED:
+                                clearInterval(currentTimeInterval);
+                                at.pause();
+                                break;
+                            default:
+                                break;
+                        }
+                    },
+                    'onPlaybackRateChange': (e) => {
+                        at.playbackSpeed = e.data;
+                    },
+                    'onError': (e) => {
+                        youtubePlayerReady.reject(e);
+                        console.log('YT onError', player, e)
+                    },
+                }
+            });
+
+            await youtubePlayerReady.promise;
+
+            // Setup alphaTab with youtube handler
+            const alphaTabYoutubeHandler = {
+                get backingTrackDuration() {
+                    return player ? player?.getDuration() * 1000 : 0;
+                },
+                get playbackRate() {
+                    return player ? player.getPlaybackRate() : 1;
+                },
+                set playbackRate(value) {
+                    if (player) {
+                        player.setPlaybackRate(value);
+                    }
+                },
+                get masterVolume() {
+                    return player ? player.getVolume() / 100 : 1;
+                },
+                set masterVolume(value) {
+                    if (player) {
+                        player.setVolume(value * 100);
+                    }
+                },
+                seekTo(time) {
+                    if (player) {
+                        player.seekTo(time / 1000);
+                    }
+                },
+                play() {
+                    if (player) {
+                        player.playVideo();
+                    }
+                },
+                pause() {
+                    if (player) {
+                        player.pauseVideo();
+                    }
+                }
+            };
+            at.player.output.handler = alphaTabYoutubeHandler;
+        };
+        req.open('GET', 'control-template.html');
+        req.send();
+    </script>
+</body>
+
+</html>

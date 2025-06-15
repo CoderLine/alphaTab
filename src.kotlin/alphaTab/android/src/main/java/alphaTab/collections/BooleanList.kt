@@ -47,4 +47,12 @@ internal class BooleanList : IBooleanIterable {
     public inline fun indexOf(v: Boolean): Double {
         return _data.indexOf(v).toDouble()
     }
+
+    public fun <TOut> map(transform: (v: Boolean) -> TOut): List<TOut> {
+        val mapped = List<TOut>()
+        for (el in this) {
+            mapped.push(transform(el))
+        }
+        return mapped
+    }
 }

@@ -1,0 +1,384 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`AlphaTexImporterTest barlines 1`] = `
+Map {
+  "__kind" => "Score",
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 3840,
+    },
+  ],
+  "tracks" => Array [
+    Map {
+      "__kind" => "Track",
+      "staves" => Array [
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 0,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 0,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 0,
+                      "isempty" => true,
+                      "automations" => Array [
+                        Map {
+                          "islinear" => false,
+                          "type" => 2,
+                          "value" => 0,
+                          "ratioposition" => 0,
+                          "text" => "",
+                        },
+                      ],
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 1,
+              "barlineright" => 2,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 1,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 1,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 1,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 4,
+              "barlineright" => 4,
+            },
+          ],
+        },
+        Map {
+          "__kind" => "Staff",
+          "bars" => Array [
+            Map {
+              "__kind" => "Bar",
+              "id" => 2,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 2,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 2,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 7,
+              "barlineright" => 6,
+            },
+            Map {
+              "__kind" => "Bar",
+              "id" => 3,
+              "voices" => Array [
+                Map {
+                  "__kind" => "Voice",
+                  "id" => 3,
+                  "beats" => Array [
+                    Map {
+                      "__kind" => "Beat",
+                      "id" => 3,
+                      "isempty" => true,
+                      "displayduration" => 960,
+                      "playbackduration" => 960,
+                    },
+                  ],
+                },
+              ],
+              "barlineleft" => 5,
+              "barlineright" => 1,
+            },
+          ],
+        },
+      ],
+      "playbackinfo" => Map {
+        "secondarychannel" => 1,
+      },
+      "name" => "T1",
+      "shortname" => "T1",
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest sync 1`] = `
+Map {
+  "__kind" => "Score",
+  "tempo" => 90,
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 90,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 0,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 1000,
+          },
+          "ratioposition" => 0.5,
+          "text" => "",
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 2000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "isrepeatstart" => true,
+      "start" => 7680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 3000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 1,
+            "millisecondoffset" => 4000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 11520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "repeatcount" => 2,
+      "start" => 15360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 19200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 1,
+            "millisecondoffset" => 5000,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 23040,
+    },
+  ],
+}
+`;
+
+exports[`AlphaTexImporterTest sync-expect-dot 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "J.S. Bach (1685-1750)",
+  "copyright" => "Public Domain",
+  "title" => "Prelude in D Minor",
+  "tempo" => 80,
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 80,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 0,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 1500,
+          },
+          "ratioposition" => 0.666,
+          "text" => "",
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 4075,
+          },
+          "ratioposition" => 0.666,
+          "text" => "",
+        },
+      ],
+      "start" => 2880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 6475,
+          },
+          "ratioposition" => 0.333,
+          "text" => "",
+        },
+      ],
+      "start" => 5760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 3,
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 10223,
+          },
+          "ratioposition" => 1,
+          "text" => "",
+        },
+      ],
+      "start" => 8640,
+    },
+  ],
+  "style" => Map {
+    "headerandfooter" => Map {
+      "0" => Map {
+        "template" => "%TITLE%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "2" => Map {
+        "template" => "%ARTIST%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "8" => Map {
+        "template" => "%COPYRIGHT%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+    },
+    "colors" => Map {},
+  },
+}
+`;

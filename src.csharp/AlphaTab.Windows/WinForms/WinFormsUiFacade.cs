@@ -101,6 +101,14 @@ namespace AlphaTab.WinForms
             return new NAudioSynthOutput();
         }
 
+        public override IAlphaSynth CreateBackingTrackPlayer()
+        {
+            return new BackingTrackPlayer(
+                new NAudioBackingTrackOutput(BeginInvoke),
+                Api.Settings.Player.BufferTimeInMilliseconds
+            );
+        }
+
         public override void Destroy()
         {
             SettingsContainer.SettingsChanged -= OnSettingsChanged;

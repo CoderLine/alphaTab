@@ -29,6 +29,16 @@ export class PositionChangedEventArgs {
     public isSeek: boolean;
 
     /**
+     * The original tempo in which alphaTab internally would be playing right now.
+     */
+    public originalTempo: number = 0;
+
+    /**
+     * The modified tempo in which the actual playback is happening (e.g. due to playback speed or external audio synchronization)
+     */
+    public modifiedTempo: number = 0;
+
+    /**
      * Initializes a new instance of the {@link PositionChangedEventArgs} class.
      * @param currentTime The current time.
      * @param endTime The end time.
@@ -36,11 +46,21 @@ export class PositionChangedEventArgs {
      * @param endTick The end tick.
      * @param isSeek Whether the time was seeked.
      */
-    public constructor(currentTime: number, endTime: number, currentTick: number, endTick: number, isSeek: boolean) {
+    public constructor(
+        currentTime: number,
+        endTime: number,
+        currentTick: number,
+        endTick: number,
+        isSeek: boolean,
+        originalTempo: number,
+        modifiedTempo: number
+    ) {
         this.currentTime = currentTime;
         this.endTime = endTime;
         this.currentTick = currentTick;
         this.endTick = endTick;
         this.isSeek = isSeek;
+        this.originalTempo = originalTempo;
+        this.modifiedTempo = modifiedTempo;
     }
 }

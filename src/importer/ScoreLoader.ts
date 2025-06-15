@@ -9,12 +9,26 @@ import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all
  * available importers
  */
 export class ScoreLoader {
+    /**
+     * Loads the given alphaTex string.
+     * @param tex The alphaTex string.
+     * @param settings The settings to use for parsing.
+     * @returns The parsed {@see Score}.
+     */
+    public static loadAlphaTex(tex: string, settings?: Settings): Score {
+        const parser = new AlphaTexImporter();
+        parser.logErrors = true;
+        parser.initFromString(tex, settings ?? new Settings());
+        return parser.readScore();
+    }
+
     /**
      * Loads a score asynchronously from the given datasource
      * @param path the source path to load the binary file from

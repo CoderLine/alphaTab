@@ -235,7 +235,7 @@ function generateToJsonBody(serializable: TypeSchema, importer: (name: string, m
             }
         } else if (prop.type.isJsonImmutable) {
             importer(prop.type.typeAsString, prop.type.modulePath);
-            const notNull = !prop.type.isNullable ? '!' : '';
+            const notNull = prop.type.isNullable || prop.type.isOptional ? '' : '!';
             propertyStatements.push(
                 createNodeFromSource<ts.ExpressionStatement>(
                     `

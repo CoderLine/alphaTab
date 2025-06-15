@@ -311,6 +311,8 @@ export abstract class ScoreLayout {
                         this.tuningGlyph.addGlyph(item);
                     }
                 }
+            } else {
+                this.tuningGlyph = null;
             }
         }
         // chord diagram glyphs
@@ -344,6 +346,13 @@ export abstract class ScoreLayout {
                     }
                 }
             }
+
+            if(this.chordDiagrams.isEmpty) {
+                this.chordDiagrams = null;
+            }
+
+        } else {
+            this.chordDiagrams = null;
         }
     }
 

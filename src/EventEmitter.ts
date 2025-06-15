@@ -1,21 +1,50 @@
+/**
+ * An emitter for an event without any value passed to the listeners.
+ */
 export interface IEventEmitter {
-    on(value: () => void): void;
+    /**
+     * Registers to the event with the given handler
+     * @param value The function to call when the event occurs.
+     * @returns A function which can be called to unregister the registered handler.
+     * This is usedful if the original function passed to this is not stored somewhere but
+     * unregistering of the event needs to be done.
+     */
+    on(value: () => void): () => void;
+    /**
+     * Unregisters the given handler from this event.
+     * @param value The value originally passed into {@link on}, NOT the function returned by it.
+     */
     off(value: () => void): void;
 }
 
 /**
+ * An emitter for an event with a single parameter passed to the listeners.
  * @partial
  */
 export interface IEventEmitterOfT<T> {
-    on(value: (arg: T) => void): void;
+    /**
+     * Registers to the event with the given handler
+     * @param value The function to call when the event occurs.
+     * @returns A function which can be called to unregister the registered handler.
+     * This is usedful if the original function passed to this is not stored somewhere but
+     * unregistering of the event needs to be done.
+     */
+    on(value: (arg: T) => void): () => void;
+    /**
+     * Unregisters the given handler from this event.
+     * @param value The value originally passed into {@link on}, NOT the function returned by it.
+     */
     off(value: (arg: T) => void): void;
 }
 
 export class EventEmitter implements IEventEmitter {
     private _listeners: (() => void)[] = [];
 
-    public on(value: () => void): void {
+    public on(value: () => void): () => void {
         this._listeners.push(value);
+        return () => {
+            this.off(value);
+        };
     }
 
     public off(value: () => void): void {
@@ -35,8 +64,11 @@ export class EventEmitter implements IEventEmitter {
 export class EventEmitterOfT<T> implements IEventEmitterOfT<T> {
     private _listeners: ((arg: T) => void)[] = [];
 
-    public on(value: (arg: T) => void): void {
+    public on(value: (arg: T) => void): () => void {
         this._listeners.push(value);
+        return () => {
+            this.off(value);
+        };
     }
 
     public off(value: (arg: T) => void): void {

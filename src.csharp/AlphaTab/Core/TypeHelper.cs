@@ -407,6 +407,13 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TResult> Map<TKey, TValue, TResult>(this IEnumerable<AlphaTab.Collections.MapEntry<TKey, TValue>> source,
+            Func<ArrayTuple<TKey, TValue>, TResult> func)
+        {
+            return source.Select(i => func(new ArrayTuple<TKey, TValue>(i.Key, i.Value))).ToList();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string SubstringIndex(this string s, double startIndex, double endIndex)
         {
             return s.Substring((int)startIndex, (int)(endIndex - startIndex));

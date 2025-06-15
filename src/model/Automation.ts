@@ -17,7 +17,54 @@ export enum AutomationType {
     /**
      * Balance change.
      */
-    Balance = 3
+    Balance = 3,
+    /**
+     * A sync point for synchronizing the internal time axis with an external audio track.
+     */
+    SyncPoint = 4
+}
+
+/**
+ * A simple flat sync point for easy persistence separate to the main data model.
+ * @record
+ */
+export interface FlatSyncPoint {
+    /**
+     * Indicates index of the masterbar for which this sync point is valid.
+     */
+    barIndex: number;
+    /**
+     * Indicates relative position (0-1) of the sync point in within the masterbar.
+     */
+    barPosition: number;
+    /**
+     * Indicates for which repeat occurence this sync point is valid (e.g. 0 on the first time played, 1 on the second time played)
+     */
+    barOccurence: number;
+    /**
+     * The audio offset marking the position within the audio track in milliseconds.
+     * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
+     */
+    millisecondOffset: number;
+}
+
+/**
+ * Represents the data of a sync point for synchronizing the internal time axis with
+ * an external audio file.
+ * @cloneable
+ * @json
+ * @json_strict
+ */
+export class SyncPointData {
+    /**
+     * Indicates for which repeat occurence this sync point is valid (e.g. 0 on the first time played, 1 on the second time played)
+     */
+    public barOccurence: number = 0;
+    /**
+     * The audio offset marking the position within the audio track in milliseconds.
+     * This information is used to regularly sync (or on seeking) to match a given external audio time axis with the internal time axis.
+     */
+    public millisecondOffset: number = 0;
 }
 
 /**
@@ -41,6 +88,11 @@ export class Automation {
      * Gets or sets the target value of the automation.
      */
     public value: number = 0;
+
+    /**
+     * The sync point data in case of {@link AutomationType.SyncPoint}
+     */
+    public syncPointValue: SyncPointData | undefined;
 
     /**
      * Gets or sets the relative position of of the automation.

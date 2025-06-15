@@ -47,13 +47,10 @@ import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { ScoreBarRendererFactory } from '@src/rendering/ScoreBarRendererFactory';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
-import { FontLoadingChecker } from '@src/util/FontLoadingChecker';
 import { Logger } from '@src/Logger';
 import { LeftHandTapEffectInfo } from '@src/rendering/effects/LeftHandTapEffectInfo';
 import { CapellaImporter } from '@src/importer/CapellaImporter';
-import { ResizeObserverPolyfill } from '@src/platform/javascript/ResizeObserverPolyfill';
 import { WebPlatform } from '@src/platform/javascript/WebPlatform';
-import { IntersectionObserverPolyfill } from '@src/platform/javascript/IntersectionObserverPolyfill';
 import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { SkiaCanvas } from '@src/platform/skia/SkiaCanvas';
 import type { Font } from '@src/model/Font';
@@ -144,62 +141,6 @@ export class Environment {
 
     /**
      * @target web
-     * @internal
-     */
-    public static createStyleElement(elementDocument: HTMLDocument, fontDirectory: string | null) {
-        let styleElement: HTMLStyleElement = elementDocument.getElementById('alphaTabStyle') as HTMLStyleElement;
-        if (!styleElement) {
-            if (!fontDirectory) {
-                Logger.error('AlphaTab', 'Font directory could not be detected, cannot create style element');
-                return;
-            }
-
-            styleElement = elementDocument.createElement('style');
-            styleElement.id = 'alphaTabStyle';
-            const css: string = `
-            @font-face {
-                font-display: block;
-                font-family: 'alphaTab';
-                 src: url('${fontDirectory}Bravura.eot');
-                 src: url('${fontDirectory}Bravura.eot?#iefix') format('embedded-opentype')
-                      , url('${fontDirectory}Bravura.woff') format('woff')
-                      , url('${fontDirectory}Bravura.otf') format('opentype')
-                      , url('${fontDirectory}Bravura.svg#Bravura') format('svg');
-                 font-weight: normal;
-                 font-style: normal;
-            }
-            .at-surface * {
-                cursor: default;
-                vertical-align: top;
-                overflow: visible;
-            }
-            .at-surface-svg text {
-                dominant-baseline: central;
-                white-space:pre;
-            }
-            .at {
-                 font-family: 'alphaTab';
-                 speak: none;
-                 font-style: normal;
-                 font-weight: normal;
-                 font-variant: normal;
-                 text-transform: none;
-                 line-height: 1;
-                 line-height: 1;
-                 -webkit-font-smoothing: antialiased;
-                 -moz-osx-font-smoothing: grayscale;
-                 font-size: ${Environment.MusicFontSize}px;
-                 overflow: visible !important;
-            }`;
-
-            styleElement.innerHTML = css;
-            elementDocument.getElementsByTagName('head').item(0)!.appendChild(styleElement);
-            Environment.bravuraFontChecker.checkForFontAvailability();
-        }
-    }
-
-    /**
-     * @target web
      */
     private static _globalThis: any | undefined = undefined;
 
@@ -256,12 +197,6 @@ export class Environment {
      * @target web
      */
     public static readonly fontDirectory: string | null = Environment.detectFontDirectory();
-
-    /**
-     * @target web
-     * @internal
-     */
-    public static readonly bravuraFontChecker: FontLoadingChecker = new FontLoadingChecker(['alphaTab']);
 
     /**
      * @target web
@@ -329,8 +264,12 @@ export class Environment {
         }
 
         // normal browser include as <script>
-        if ('document' in Environment.globalThis && document.currentScript) {
-            return (document.currentScript as HTMLScriptElement).src;
+        if (
+            'document' in Environment.globalThis &&
+            document.currentScript &&
+            document.currentScript instanceof HTMLScriptElement
+        ) {
+            return document.currentScript.src;
         }
 
         return null;
@@ -720,32 +659,6 @@ export class Environment {
         if (Environment.webPlatform === WebPlatform.Browser || Environment.webPlatform === WebPlatform.BrowserModule) {
             Environment.registerJQueryPlugin();
             Environment.HighDpiFactor = window.devicePixelRatio;
-            // ResizeObserver API does not yet exist so long on Safari (only start 2020 with iOS Safari 13.7 and Desktop 13.1)
-            // so we better add a polyfill for it
-            if (!('ResizeObserver' in Environment.globalThis)) {
-                (Environment.globalThis as any).ResizeObserver = ResizeObserverPolyfill;
-            }
-            // IntersectionObserver API does not on older iOS versions
-            // so we better add a polyfill for it
-            if (!('IntersectionObserver' in Environment.globalThis)) {
-                (Environment.globalThis as any).IntersectionObserver = IntersectionObserverPolyfill;
-            }
-
-            if (!('replaceChildren' in Element.prototype)) {
-                (Element.prototype as Element).replaceChildren = function (...nodes: (Node | string)[]) {
-                    this.innerHTML = '';
-                    this.append(...nodes);
-                };
-                (Document.prototype as Document).replaceChildren = (Element.prototype as Element).replaceChildren;
-                (DocumentFragment.prototype as DocumentFragment).replaceChildren = (
-                    Element.prototype as Element
-                ).replaceChildren;
-            }
-            if (!('replaceAll' in String.prototype)) {
-                (String.prototype as any).replaceAll = function (str: string, newStr: string) {
-                    return this.replace(new RegExp(str, 'g'), newStr);
-                };
-            }
         }
 
         Environment.createWebWorker = createWebWorker;
@@ -832,17 +745,31 @@ export class Environment {
      * @target web
      */
     private static detectWebPlatform(): WebPlatform {
-        try {
-            // Credit of the node.js detection goes to
-            // https://github.com/iliakan/detect-node
-            // MIT License
-            // Copyright (c) 2017 Ilya Kantor
-            // tslint:disable-next-line: strict-type-predicates
-            if (Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]') {
-                return WebPlatform.NodeJs;
+        // There might be polyfills or platforms like Electron which have a global process object defined even in the browser.
+        // We need to differenciate between those platforms and a real nodejs
+
+        // the webPlatform is currently only relevant on the main process side and not within workers/worklets
+        // so it is OK if we wrongly detect node.js inside them.
+        const isBrowserLike =
+            // browser UI thread
+            typeof Environment.globalThis.Window !== 'undefined' &&
+            Environment.globalThis instanceof Environment.globalThis.Window;
+
+        if (!isBrowserLike) {
+            try {
+                // Credit of the node.js detection goes to
+                // https://github.com/iliakan/detect-node
+                // MIT License
+                // Copyright (c) 2017 Ilya Kantor
+                // tslint:disable-next-line: strict-type-predicates
+                if (
+                    Object.prototype.toString.call(typeof process !== 'undefined' ? process : 0) === '[object process]'
+                ) {
+                    return WebPlatform.NodeJs;
+                }
+            } catch (e) {
+                // no node.js
             }
-        } catch (e) {
-            // no node.js
         }
 
         try {
@@ -888,5 +815,33 @@ export class Environment {
             print(`Window Size: ${window.outerWidth}x${window.outerHeight}`);
             print(`Screen Size: ${window.screen.width}x${window.screen.height}`);
         }
+    }
+
+    /**
+     * Prepares the given object to be sent to workers. Web Frameworks like Vue might
+     * create proxy objects for all objects used. This code handles the necessary unwrapping.
+     * @internal
+     * @target web
+     */
+    public static prepareForPostMessage<T>(object: T): T {
+        if (!object) {
+            return object;
+        }
+
+        // Vue toRaw:
+        // https://github.com/vuejs/core/blob/e7381761cc7971c0d40ae0a0a72687a500fd8db3/packages/reactivity/src/reactive.ts#L378-L381
+
+        if (typeof object === 'object') {
+            const unwrapped = (object as any).__v_raw;
+            if (unwrapped) {
+                return Environment.prepareForPostMessage(unwrapped);
+            }
+        }
+
+        // Solidjs unwrap: the symbol required to access the raw object is unfortunately hidden and we cannot unwrap it without importing
+        // import { unwrap } from "solid-js/store"
+        // alternative for users is to replace this method during runtime.
+
+        return object;
     }
 }

@@ -1,4 +1,6 @@
-export { CoreSettings } from '@src/CoreSettings';
+import '@src/alphaTab.polyfills';
+
+export { CoreSettings, FontFileFormat } from '@src/CoreSettings';
 export { DisplaySettings, SystemsLayoutMode } from '@src/DisplaySettings';
 export { LayoutMode } from '@src/LayoutMode';
 export { StaveProfile } from '@src/StaveProfile';
@@ -9,7 +11,8 @@ export {
     ScrollMode,
     SlidePlaybackSettings,
     VibratoPlaybackSettings,
-    PlayerOutputMode
+    PlayerOutputMode,
+    PlayerMode
 } from '@src/PlayerSettings';
 export { ProgressEventArgs } from '@src/ProgressEventArgs';
 export { RenderingResources } from '@src/RenderingResources';

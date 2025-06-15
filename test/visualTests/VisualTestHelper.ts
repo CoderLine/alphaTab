@@ -235,8 +235,6 @@ export class VisualTestHelper {
     }
 
     static prepareSettingsForTest(settings: Settings) {
-        /**@target web*/
-        settings.core.fontDirectory = 'font/bravura/';
         settings.core.engine = 'skia';
         Environment.HighDpiFactor = 1; // test data is in scale 1
         settings.core.enableLazyLoading = false;

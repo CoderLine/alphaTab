@@ -1,0 +1,1374 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Gp8ImporterTest audio-track 1`] = `
+Map {
+  "__kind" => "Score",
+  "artist" => "JerryC",
+  "music" => "JerryC",
+  "title" => "Canon Rock",
+  "tempo" => 90,
+  "masterbars" => Array [
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 90,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 1653.061224489796,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 3322.448979591837,
+          },
+          "ratioposition" => 0.5,
+          "text" => "",
+        },
+      ],
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 4525.714285714285,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 3840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 7680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 11520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 15360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 19200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 23040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 26880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 30720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 34560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 38400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 42240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 46080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 49920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 38938.775510204076,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 53760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 57600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 200,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 44435.37414965986,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 61440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 45634.28571428571,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 65280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 69120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 72960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 76800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 80640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 84480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 88320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 92160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 96000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 99840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 103680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 107520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 111360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 115200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 119040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 122880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 126720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 130560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 134400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 138240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 142080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 145920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 149760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 153600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 157440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 161280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 165120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 168960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 172800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 176640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 180480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 184320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 188160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 192000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 195840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 215,
+          "ratioposition" => 0.25,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 200,
+          "ratioposition" => 0.5,
+          "text" => "",
+        },
+      ],
+      "start" => 199680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 203520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 207360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 211200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 215040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 218880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 222720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 226560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 230400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 234240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 238080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 241920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 245760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 249600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 104407.61904761904,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 253440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 257280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 261120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 264960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 268800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 272640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 276480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 280320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 284160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 288000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 291840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 295680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 299520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 303360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 307200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 311040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 314880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 318720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 322560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 326400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 330240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 334080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 337920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 341760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 345600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 349440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 353280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 357120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 360960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 364800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 368640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 372480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 376320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 380160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 384000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 387840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 391680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 395520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 399360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 403200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 407040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 410880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 414720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 418560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 422400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 426240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 430080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 433920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 437760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 441600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 445440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 449280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 453120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 456960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 460800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 464640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 468480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 472320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 476160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 480000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 483840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 487680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 491520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 495360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 499200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 503040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 506880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 510720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 514560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 518400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 522240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 526080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 6,
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 91,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 190808.16326530612,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 529920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 97,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 194596.73469387754,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 535680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 539520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 100,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 543360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 99,
+          "ratioposition" => 0.5,
+          "text" => "",
+        },
+      ],
+      "start" => 547200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 98,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 551040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 101,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 554880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 100,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 558720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 102,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 562560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 200,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 213200,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 566400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 570240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 200,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 574080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 577920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 218195.10204081633,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 581760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 585600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 589440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 593280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 597120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 600960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 604800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 608640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 612480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 616320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 620160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 624000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 232948.57142857142,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 627840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 631680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 635520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 639360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 643200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 647040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 650880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 654720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 242538.77551020405,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 658560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 662400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 666240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 670080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 673920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 677760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 681600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 685440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "timesignaturenumerator" => 6,
+      "start" => 689280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 695040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 698880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 702720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 706560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 710400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 714240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 718080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 721920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 725760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 729600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 733440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 737280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 741120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 744960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 748800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 752640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 756480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 760320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 764160,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 768000,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 771840,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 775680,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 779520,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 783360,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 787200,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 791040,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 794880,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 798720,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 802560,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 806400,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 810240,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 88,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 291046.5306122449,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 814080,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 817920,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 821760,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 825600,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 91,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 301714.28571428574,
+          },
+          "ratioposition" => 0,
+          "text" => "",
+        },
+      ],
+      "start" => 829440,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 833280,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 837120,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 840960,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 94,
+          "ratioposition" => 0.125,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 100,
+          "ratioposition" => 0.791667,
+          "text" => "",
+        },
+      ],
+      "start" => 844800,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 76,
+          "ratioposition" => 0.875,
+          "text" => "",
+        },
+      ],
+      "start" => 848640,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 90,
+          "ratioposition" => 0,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0.205479,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 85,
+          "ratioposition" => 0.369863,
+          "text" => "",
+        },
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 90,
+          "ratioposition" => 0.424658,
+          "text" => "",
+        },
+      ],
+      "start" => 852480,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "start" => 856320,
+    },
+    Map {
+      "__kind" => "MasterBar",
+      "syncpoints" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 4,
+          "value" => 0,
+          "syncpointvalue" => Map {
+            "baroccurence" => 0,
+            "millisecondoffset" => 322645.7142857143,
+          },
+          "ratioposition" => 1,
+          "text" => "",
+        },
+      ],
+      "start" => 860160,
+    },
+  ],
+  "defaultsystemslayout" => 4,
+  "stylesheet" => Map {
+    "hidedynamics" => true,
+    "bracketextendmode" => 0,
+  },
+  "backingtrack" => Map {},
+  "style" => Map {
+    "headerandfooter" => Map {
+      "3" => Map {
+        "template" => "%ALBUM%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "6" => Map {
+        "template" => "Words & Music by %MUSIC%",
+        "isvisible" => true,
+        "textalign" => 2,
+      },
+      "9" => Map {
+        "template" => "All Rights Reserved - International Copyright Secured",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "5" => Map {
+        "template" => "Music by %MUSIC%",
+        "isvisible" => true,
+        "textalign" => 2,
+      },
+      "7" => Map {
+        "template" => "Tabbed by %TABBER%",
+        "isvisible" => false,
+        "textalign" => 2,
+      },
+      "8" => Map {
+        "template" => "%COPYRIGHT%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "2" => Map {
+        "template" => "%ARTIST%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "0" => Map {
+        "template" => "%TITLE%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "1" => Map {
+        "template" => "%SUBTITLE%",
+        "isvisible" => true,
+        "textalign" => 1,
+      },
+      "4" => Map {
+        "template" => "Words by %WORDS%",
+        "isvisible" => true,
+        "textalign" => 0,
+      },
+    },
+    "colors" => Map {},
+  },
+}
+`;

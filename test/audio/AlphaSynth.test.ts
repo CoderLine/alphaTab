@@ -11,6 +11,8 @@ import { expect } from 'chai';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import { AudioExportOptions } from '@src/synth/IAudioExporter';
 
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
@@ -137,5 +139,135 @@ describe('AlphaSynthTests', () => {
 
     it('ogg-vorbis-example', async () => {
         await testVorbisFile('Example');
+    });
+
+    async function testAudioExport(
+        score: Score,
+        fileName: string,
+        prepareOptions: (options: AudioExportOptions) => void
+    ) {
+        // add a fake sync point to get time range (if there are not already sync points)
+        const syncPoints = score.exportFlatSyncPoints();
+        if (syncPoints.length === 0) {
+            score.applyFlatSyncPoints([
+                {
+                    barIndex: 0,
+                    barOccurence: 0,
+                    barPosition: 0,
+                    millisecondOffset: 0
+                }
+            ]);
+        }
+
+        const soundFont = await TestPlatform.loadFile('test-data/audio/default.sf2');
+        const synth = new AlphaSynth(new TestOutput(), 500);
+
+        const midi: MidiFile = new MidiFile();
+        const generator: MidiFileGenerator = new MidiFileGenerator(
+            score,
+            new Settings(),
+            new AlphaSynthMidiFileHandler(midi)
+        );
+        generator.applyTranspositionPitches = false;
+        generator.generate();
+
+        const exportOptions = new AudioExportOptions();
+        exportOptions.masterVolume = 1;
+        exportOptions.metronomeVolume = 0;
+        exportOptions.sampleRate = 44100;
+        exportOptions.soundFonts = [soundFont];
+        prepareOptions(exportOptions);
+
+        const exporter = synth.exportAudio(exportOptions, midi, generator.syncPoints, generator.transpositionPitches);
+
+        let generated: Float32Array = new Float32Array(
+            exportOptions.sampleRate *
+                (generator.syncPoints[generator.syncPoints.length - 1].syncTime / 1000) *
+                SynthConstants.AudioChannels
+        );
+
+        let totalSamples = 0;
+        while (true) {
+            const chunk = exporter.render(300);
+            if (chunk === undefined) {
+                break;
+            }
+
+            const neededSize = totalSamples + chunk.samples.length;
+            if (generated.length < neededSize) {
+                const needed = neededSize - generated.length;
+                const newBuffer = new Float32Array(generated.length + needed);
+                newBuffer.set(generated, 0);
+                generated = newBuffer;
+            }
+
+            generated.set(chunk.samples, totalSamples);
+            totalSamples += chunk.samples.length;
+        }
+
+        if (totalSamples < generated.length) {
+            generated = generated.subarray(0, totalSamples);
+        }
+
+        try {
+            const reference = new DataView((await TestPlatform.loadFile(`test-data/audio/${fileName}.pcm`)).buffer);
+            expect(generated.length).to.equal(reference.buffer.byteLength / 4);
+
+            for (let i = 0; i < generated.length; i++) {
+                const expected = reference.getFloat32(i * 4, true);
+                if (generated[i] !== expected) { // custom check, chai assertion has quite huge overhead if called that often
+                    expect(generated[i]).to.equal(expected, `Difference at index ${i}`);
+                }
+            }
+        } catch (e) {
+            await TestPlatform.saveFile(
+                `test-data/audio/${fileName}-new.pcm`,
+                new Uint8Array(generated.buffer, generated.byteOffset, generated.byteLength)
+            );
+
+            throw e;
+        }
+    }
+
+    it('export-test', async () => {
+        const tex: string = `
+            \\tempo 120
+            .
+            \\ts 4 4
+            :8 C4 * 8
+        `;
+        const settings = new Settings();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
+
+        await testAudioExport(score, 'export-test', _options => {
+            // no settings
+        });
+    });
+
+    it('export-silent-with-metronome', async () => {
+        const tex: string = `
+            \\tempo 120
+            .
+            \\ts 4 4
+            :8 C4 * 8
+        `;
+        const settings = new Settings();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
+
+        await testAudioExport(score, 'export-silent-with-metronome', options => {
+            options.metronomeVolume = 1;
+            for (const t of score.tracks) {
+                options.trackVolume.set(t.index, 0.5);
+            }
+        });
+    });
+
+    it('export-sync-points', async () => {
+        const data = await TestPlatform.loadFile('test-data/audio/syncpoints-testfile.gp');
+        const score = ScoreLoader.loadScoreFromBytes(data, new Settings());
+
+        await testAudioExport(score, 'export-sync-points', options => {
+            options.useSyncPoints = true;
+        });
     });
 });

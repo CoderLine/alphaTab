@@ -5,13 +5,15 @@ import { MidiFile, MidiFileFormat } from '@src/midi/MidiFile';
 import { LayoutMode } from '@src/LayoutMode';
 import { type IEventEmitterOfT, EventEmitterOfT } from '@src/EventEmitter';
 import type { Track } from '@src/model/Track';
-import type { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWorkerApi';
 import { BrowserUiFacade } from '@src/platform/javascript/BrowserUiFacade';
-import type { ProgressEventArgs } from '@src/ProgressEventArgs';
+import { ProgressEventArgs } from '@src/ProgressEventArgs';
 import type { Settings } from '@src/Settings';
 import { JsonConverter } from '@src/model/JsonConverter';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import type { SettingsJson } from '@src/generated/SettingsJson';
+import { PlayerMode } from '@src/PlayerSettings';
+import { Logger } from '@src/Logger';
+import { FileLoadError } from '@src/FileLoadError';
 
 /**
  * @target web
@@ -137,7 +139,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         settings.core.file = null;
         settings.core.tracks = null;
         settings.player.enableCursor = false;
-        settings.player.enablePlayer = false;
+        settings.player.playerMode = PlayerMode.Disabled;
         settings.player.enableElementHighlighting = false;
         settings.player.enableUserInteraction = false;
         settings.player.soundFont = null;
@@ -266,12 +268,31 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * @since 0.9.4
      */
     public loadSoundFontFromUrl(url: string, append: boolean): void {
-        if (!this.player) {
+        const player = this.player;
+        if (!player) {
             return;
         }
-        (this.player as AlphaSynthWebWorkerApi).loadSoundFontFromUrl(url, append, e => {
-            (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(e);
-            this.uiFacade.triggerEvent(this.container, 'soundFontLoad', e);
-        });
+
+        Logger.debug('AlphaSynth', `Start loading Soundfont from url ${url}`);
+        const request: XMLHttpRequest = new XMLHttpRequest();
+        request.open('GET', url, true, null, null);
+        request.responseType = 'arraybuffer';
+        request.onload = _ => {
+            const buffer: Uint8Array = new Uint8Array(request.response);
+            this.loadSoundFont(buffer, append);
+        };
+        request.onerror = e => {
+            Logger.error('AlphaSynth', `Loading failed: ${(e as any).message}`);
+            (player.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(
+                new FileLoadError((e as any).message, request)
+            );
+        };
+        request.onprogress = e => {
+            Logger.debug('AlphaSynth', `Soundfont downloading: ${e.loaded}/${e.total} bytes`);
+            const args = new ProgressEventArgs(e.loaded, e.total);
+            (this.soundFontLoad as EventEmitterOfT<ProgressEventArgs>).trigger(args);
+            this.uiFacade.triggerEvent(this.container, 'soundFontLoad', args);
+        };
+        request.send();
     }
 }

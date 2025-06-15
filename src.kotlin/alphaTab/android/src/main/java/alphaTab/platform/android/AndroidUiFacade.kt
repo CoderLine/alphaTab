@@ -1,7 +1,10 @@
 package alphaTab.platform.android
 
-import alphaTab.*
+import alphaTab.AlphaTabApiBase
+import alphaTab.AlphaTabView
+import alphaTab.Environment
 import alphaTab.EventEmitter
+import alphaTab.IEventEmitter
 import alphaTab.core.ecmaScript.Error
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.importer.ScoreLoader
@@ -10,12 +13,13 @@ import alphaTab.platform.Cursors
 import alphaTab.platform.IContainer
 import alphaTab.platform.IMouseEventArgs
 import alphaTab.platform.IUiFacade
-import alphaTab.platform.skia.AlphaSkiaCanvas
 import alphaTab.platform.skia.AlphaSkiaImage
 import alphaTab.rendering.IScoreRenderer
 import alphaTab.rendering.RenderFinishedEventArgs
 import alphaTab.rendering.utils.Bounds
+import alphaTab.synth.BackingTrackPlayer
 import alphaTab.synth.IAlphaSynth
+import alphaTab.synth.IAudioExporterWorker
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
 import android.os.Handler
@@ -23,13 +27,10 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.HorizontalScrollView
 import android.widget.RelativeLayout
-import android.widget.ScrollView
 import androidx.core.view.children
 import java.io.ByteArrayOutputStream
 import java.io.InputStream
-import java.nio.Buffer
 import java.nio.ByteBuffer
 import kotlin.contracts.ExperimentalContracts
 
@@ -56,18 +57,20 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _renderSurface = renderSurface
         _renderWrapper = renderWrapper
 
-        rootContainer = AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
+        rootContainer =
+            AndroidRootViewContainer(outerScroll, innerScroll, renderSurface, this::beginInvoke)
         _handler = Handler(outerScroll.context.mainLooper)
 
         rootContainerBecameVisible = object : IEventEmitter,
             ViewTreeObserver.OnGlobalLayoutListener, View.OnLayoutChangeListener {
-            override fun on(value: () -> Unit) {
+            override fun on(value: () -> Unit): () -> Unit {
                 if (rootContainer.isVisible) {
                     value()
                 } else {
                     outerScroll.viewTreeObserver.addOnGlobalLayoutListener(this)
                     outerScroll.addOnLayoutChangeListener(this)
                 }
+                return fun() { off(value) }
             }
 
             override fun off(value: () -> Unit) {
@@ -176,6 +179,17 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         return player
     }
 
+    override fun createWorkerAudioExporter(synth: IAlphaSynth?): IAudioExporterWorker {
+        val needNewWorker = synth == null || synth !is AndroidThreadAlphaSynthWorkerPlayer
+        var synthToUse = synth
+        if (needNewWorker) {
+            synthToUse = this.createWorkerPlayer();
+        }
+
+        return AndroidThreadAlphaSynthAudioExporter(synthToUse as AndroidThreadAlphaSynthWorkerPlayer, needNewWorker);
+    }
+
+
     override var rootContainer: IContainer
 
     private val _canRenderChanged: EventEmitter = EventEmitter()
@@ -226,8 +240,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
         _handler.post {
             // convert AlphaSkia image to Android Bitmap
             val renderResult = renderResults.renderResult
-            if (renderResult is AlphaSkiaImage)
-            {
+            if (renderResult is AlphaSkiaImage) {
                 renderResults.renderResult = convertAlphaSkiaImageToAndroidBitmap(renderResult)
             }
 
@@ -237,7 +250,8 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
 
     private fun convertAlphaSkiaImageToAndroidBitmap(renderResult: AlphaSkiaImage): Bitmap {
         renderResult.use {
-            val bitmap = Bitmap.createBitmap(renderResult.width.toInt(), renderResult.height.toInt(),
+            val bitmap = Bitmap.createBitmap(
+                renderResult.width.toInt(), renderResult.height.toInt(),
                 Bitmap.Config.ARGB_8888
             )
             val pixels = renderResult.readPixels()!!
@@ -386,6 +400,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 success(data as Score)
                 return true
             }
+
             (data is ByteArray) -> {
                 success(
                     ScoreLoader.loadScoreFromBytes(
@@ -395,6 +410,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
+
             (data is UByteArray) -> {
                 success(
                     ScoreLoader.loadScoreFromBytes(
@@ -404,6 +420,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
+
             (data is InputStream) -> {
                 val bos = ByteArrayOutputStream()
                 (data as InputStream).copyTo(bos)
@@ -415,6 +432,7 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 )
                 return true
             }
+
             else -> {
                 return false
             }
@@ -429,19 +447,29 @@ internal class AndroidUiFacade : IUiFacade<AlphaTabView> {
                 player.loadSoundFont(Uint8Array((data as ByteArray).asUByteArray()), append)
                 return true
             }
+
             (data is UByteArray) -> {
                 player.loadSoundFont(Uint8Array((data as UByteArray)), append)
                 return true
             }
+
             (data is InputStream) -> {
                 val bos = ByteArrayOutputStream()
                 (data as InputStream).copyTo(bos)
                 player.loadSoundFont(Uint8Array(bos.toByteArray().asUByteArray()), append)
                 return true
             }
+
             else -> {
                 return false
             }
         }
+    }
+
+    override fun createBackingTrackPlayer(): IAlphaSynth {
+        return BackingTrackPlayer(
+            AndroidBackingTrackSynthOutput(_renderWrapper.context, this::beginInvoke),
+            this.api.settings.player.bufferTimeInMilliseconds
+        )
     }
 }

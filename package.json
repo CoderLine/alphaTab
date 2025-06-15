@@ -1,8 +1,15 @@
 {
     "name": "@coderline/alphatab",
-    "version": "1.5.0",
+    "version": "1.6.0",
     "description": "alphaTab is a music notation and guitar tablature rendering library",
-    "keywords": ["guitar", "music-notation", "music-sheet", "html5", "svg", "guitar-tablature"],
+    "keywords": [
+        "guitar",
+        "music-notation",
+        "music-sheet",
+        "html5",
+        "svg",
+        "guitar-tablature"
+    ],
     "homepage": "https://alphatab.net",
     "bugs": {
         "url": "https://github.com/coderline/alphaTab/issues"
@@ -66,8 +73,8 @@
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",
         "@coderline/alphaskia": "^3.3.135",
-        "@coderline/alphaskia-windows": "^3.3.135",
         "@coderline/alphaskia-linux": "^3.3.135",
+        "@coderline/alphaskia-windows": "^3.3.135",
         "@fontsource/noto-sans": "^5.1.1",
         "@fontsource/noto-serif": "^5.1.1",
         "@fortawesome/fontawesome-free": "^6.7.2",
@@ -78,6 +85,7 @@
         "@rollup/plugin-replace": "^6.0.2",
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.2",
+        "@types/bootstrap": "^5.2.10",
         "@types/chai": "^5.0.1",
         "@types/cors": "^2.8.17",
         "@types/express": "^5.0.0",
@@ -100,7 +108,7 @@
         "html-webpack-plugin": "^5.6.3",
         "jest-snapshot": "^29.7.0",
         "mocha": "^11.1.0",
-        "multer": "^1.4.5-lts.1",
+        "multer": "^2.0.0",
         "opener": "^1.5.2",
         "rimraf": "^6.0.1",
         "rollup-plugin-copy": "^3.5.0",

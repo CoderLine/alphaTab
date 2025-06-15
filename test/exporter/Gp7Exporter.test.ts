@@ -46,12 +46,16 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, `<${fileName}>`, ignoreKeys);
     }
 
-    async function testRoundTripFolderEqual(name: string, ignoredFiles?: string[]): Promise<void> {
+    async function testRoundTripFolderEqual(
+        name: string,
+        ignoredFiles?: string[],
+        ignoreKeys: string[] | null = null
+    ): Promise<void> {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
         const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
             if (!ignoredFilesLookup.has(file)) {
-                await testRoundTripEqual(`${name}/${file}`, null);
+                await testRoundTripEqual(`${name}/${file}`, ignoreKeys);
             }
         }
     }
@@ -160,13 +164,20 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
 
         expect(actual.tracks[0].percussionArticulations).to.have.length(2);
-        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0)
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].percussionArticulation).to.equal(0);
         expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].percussionArticulation).to.equal(1);
-        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(0)
+        expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].percussionArticulation).to.equal(0);
         expect(actual.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(1);
     });
 
     it('gp7-lyrics-null', async () => {
         await testRoundTripEqual('guitarpro7/lyrics-null.gp', null);
+    });
+
+    it('gp8', async () => {
+        await testRoundTripFolderEqual('guitarpro8', undefined, [
+            'bendpoints',
+            'bendtype',
+        ]);
     });
 });

@@ -3,6 +3,7 @@ package alphaTab.io
 import alphaTab.AlphaTabError
 import alphaTab.AlphaTabErrorType
 import alphaTab.collections.Map
+import alphaTab.core.toIntOrNaN
 import kotlin.contracts.ExperimentalContracts
 import kotlin.jvm.JvmName
 import kotlin.reflect.KClass
@@ -31,17 +32,21 @@ internal open class JsonHelperPartials {
                 // NOTE: We know that we only have Map<String, Any?> in our serialization
                 // handling. we need this cast to satisfy Kotlin type checks.
                 @Suppress("UNCHECKED_CAST") val unsafeMap = o as Map<String, Any?>
-				return if (unsafeMap.has(k)) unsafeMap.get(k) else null
+                return if (unsafeMap.has(k)) unsafeMap.get(k) else null
             }
 
-			return null
+            return null
         }
 
 
         public fun <T : Enum<T>> parseEnum(value: String, values: Array<T>): T? {
+            val valueInt = value.toIntOrNaN()
+            val isNaN = valueInt.isNaN()
             val valueLower = value.lowercase()
             for (e in values) {
-                if (valueLower.equals(e.name, true)) {
+                if (valueLower.equals(e.name, true) ||
+                    (!isNaN && e is alphaTab.core.IAlphaTabEnum && e.value == valueInt.toInt())
+                ) {
                     return e
                 }
             }

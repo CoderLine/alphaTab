@@ -1,4 +1,5 @@
 import { XmlDocument } from '@src/xml/XmlDocument';
+import { XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 import { expect } from 'chai';
 
 describe('XmlWriteTest', () => {
@@ -88,5 +89,18 @@ describe('XmlWriteTest', () => {
         xml.firstElement!.attributes.set('apos', "'");
         xml.firstElement!.attributes.set('quot', '"');
         expect(xml.toFormattedString()).to.equal('<test lt="&lt;" gt="&gt;" amp="&amp;" apos="&apos;" quot="&quot;"/>');
+    });
+    it('writeComment', () => {
+        const s: string = '<test/>';
+        const xml: XmlDocument = new XmlDocument();
+        xml.parse(s);
+
+        xml.firstElement!.addElement('test2')
+
+        const alphaTabComment = new XmlNode();
+        alphaTabComment.nodeType = XmlNodeType.Comment;
+        alphaTabComment.value = 'Written by alphaTab';
+        xml.firstElement!.addChild(alphaTabComment);
+        expect(xml.toFormattedString()).to.equal('<test><test2/><!-- Written by alphaTab --></test>');
     });
 });

@@ -227,7 +227,7 @@ const globalConfig: Config.ProjectConfig = {
 const argvCi = !!process.env.CI;
 const argvUpdateSnapshot = process.argv.includes('--updateSnapshot');
 const snapshotOptions: SnapshotStateOptions = {
-    updateSnapshot: argvCi && argvUpdateSnapshot ? 'none' : argvUpdateSnapshot ? 'all' : 'new',
+    updateSnapshot: argvCi ? 'none' : (argvUpdateSnapshot ? 'all' : 'new'),
     rootDir: globalConfig.rootDir,
     snapshotFormat: globalConfig.snapshotFormat,
     expand: undefined,

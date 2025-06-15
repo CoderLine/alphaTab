@@ -11,6 +11,7 @@ import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
 import { TestPlatform } from '@test/TestPlatform';
 
 class TestUiContainer implements IContainer {
@@ -201,6 +202,10 @@ export class TestUiFacade implements IUiFacade<unknown> {
         throw new Error('Not supported');
     }
 
+    public createWorkerAudioExporter(synth: IAlphaSynth | null): IAudioExporterWorker {
+        throw new Error('Not supported');
+    }
+
     public createWorkerPlayer(): IAlphaSynth | null {
         throw new Error('Not supported');
     }
@@ -305,6 +310,10 @@ export class TestUiFacade implements IUiFacade<unknown> {
             return true;
         }
         return false;
+    }
+
+    public createBackingTrackPlayer(): IAlphaSynth | null {
+        return null;
     }
 
     public readonly canRenderChanged: IEventEmitter = new EventEmitter();

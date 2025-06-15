@@ -7,6 +7,7 @@ import alphaTab.core.ecmaScript.Error
 import alphaTab.core.ecmaScript.Uint8Array
 import alphaTab.midi.MidiEventType
 import alphaTab.midi.MidiFile
+import alphaTab.model.Score
 import alphaTab.synth.*
 import android.util.Log
 import java.util.concurrent.BlockingQueue
@@ -29,6 +30,9 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     private val _output: ISynthOutput
     private var _logLevel: LogLevel
     private var _bufferTimeInMilliseconds: Double
+
+    val player: AlphaSynth?
+        get() = _player
 
     override val output: ISynthOutput
         get() = _output
@@ -254,6 +258,14 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
         _workerQueue.add { _player?.setChannelTranspositionPitch(channel, semitones) }
     }
 
+    override fun loadBackingTrack(score: Score) {
+        _workerQueue.add { _player?.loadBackingTrack(score) }
+    }
+
+    override fun updateSyncPoints(syncPoints: List<BackingTrackSyncPoint>) {
+        _workerQueue.add { _player?.updateSyncPoints(syncPoints) }
+    }
+
     override val ready: IEventEmitter = EventEmitter()
     override val readyForPlayback: IEventEmitter = EventEmitter()
     override val finished: IEventEmitter = EventEmitter()
@@ -315,6 +327,10 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
     }
 
     private fun onPlaybackRangeChanged(obj: PlaybackRangeChangedEventArgs) {
-        _uiInvoke { (playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(obj) }
+        _uiInvoke {
+            (playbackRangeChanged as EventEmitterOfT<PlaybackRangeChangedEventArgs>).trigger(
+                obj
+            )
+        }
     }
 }

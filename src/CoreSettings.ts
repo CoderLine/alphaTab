@@ -4,6 +4,42 @@ import { LogLevel } from '@src/LogLevel';
 import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 
 /**
+ * Lists the known file formats for font files.
+ * @target web
+ */
+export enum FontFileFormat {
+    /**
+     * .eot
+     */
+    EmbeddedOpenType = 0,
+
+    /**
+     * .woff
+     */
+    Woff = 1,
+
+    /**
+     * .woff2
+     */
+    Woff2 = 2,
+
+    /**
+     * .otf
+     */
+    OpenType = 3,
+
+    /**
+     * .ttf
+     */
+    TrueType = 4,
+
+    /**
+     * .svg
+     */
+    Svg = 5
+}
+
+/**
  * All main settings of alphaTab controlling rather general aspects of its behavior.
  * @json
  * @json_declaration
@@ -31,12 +67,44 @@ export class CoreSettings {
      * where the Web Font files of [Bravura](https://github.com/steinbergmedia/bravura) are. Normally alphaTab expects
      * them to be in a `font` subfolder beside the script file. If this is not the case, this setting must be used to configure the path.
      * Alternatively also a global variable `ALPHATAB_FONT` can be set on the page before initializing alphaTab.
+     * 
+     * Use {@link smuflFontSources} for more flexible font configuration.
      * @defaultValue `"${AlphaTabScriptFolder}/font/"`
      * @category Core - JavaScript Specific
      * @target web
      * @since 0.9.6
      */
     public fontDirectory: string | null = null;
+
+    /**
+     * Defines the URLs from which to load the SMuFL compliant font files.
+     * @remarks
+     * These sources will be used to load and register the webfonts on the page so
+     * they are available for rendering the music sheet. The sources can be set to any 
+     * CSS compatible URL which can be passed into `url()`.
+     * See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
+     * @defaultValue Bravura files located at {@link fontDirectory} .
+     * @category Core - JavaScript Specific
+     * @target web
+     * @since 1.6.0
+     */
+    public smuflFontSources: Map<FontFileFormat, string> | null = null;
+
+    /**
+     * Builds the default SMuFL font sources for the usage with alphaTab in cases
+     * where no custom {@link smuflFontSources} are provided.
+     * @param fontDirectory The {@link CoreSettings.fontDirectory} configured.
+     * @target web
+     */
+    public static buildDefaultSmuflFontSources(fontDirectory: string | null): Map<FontFileFormat, string> {
+        const map = new Map<FontFileFormat, string>();
+        // WOFF, WOFF2 and OTF should cover all our platform needs
+        const prefix = fontDirectory ?? '';
+        map.set(FontFileFormat.Woff2, `${prefix}Bravura.woff2`);
+        map.set(FontFileFormat.Woff, `${prefix}Bravura.woff`);
+        map.set(FontFileFormat.OpenType, `${prefix}Bravura.otf`);
+        return map;
+    }
 
     /**
      * The full URL to the input file to be loaded.

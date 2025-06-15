@@ -8,6 +8,7 @@ import type { Cursors } from '@src/platform/Cursors';
 import type { IScoreRenderer } from '@src/rendering/IScoreRenderer';
 import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
 import type { Bounds } from '@src/rendering/utils/Bounds';
+import type { IAudioExporterWorker } from '@src/synth/IAudioExporter';
 
 /**
  * This interface represents the UI abstraction between alphaTab and the corresponding UI framework being used.
@@ -88,10 +89,25 @@ export interface IUiFacade<TSettings> {
     createWorkerRenderer(): IScoreRenderer;
 
     /**
-     * Tells the UI layer to create a player worker.
+     * Tells the UI layer to create a player worker for the synthesizer.
      * @returns
      */
     createWorkerPlayer(): IAlphaSynth | null;
+
+    /**
+     * Tells the UI layer to create a new audio exporter.
+     * @param synth The currently active alphaSynth that might be used for synthesizing.
+     * If the provided synthesizer is already an active player worker (created via {@link createWorkerPlayer}),
+     * it can reuse the already initialized state.
+     * @returns
+     */
+    createWorkerAudioExporter(synth: IAlphaSynth | null): IAudioExporterWorker;
+
+    /**
+     * Tells the UI layer to create a player which can play backing tracks.
+     * @returns
+     */
+    createBackingTrackPlayer(): IAlphaSynth | null;
 
     /**
      * Creates the cursor objects that are used to highlight the currently played beats and bars.

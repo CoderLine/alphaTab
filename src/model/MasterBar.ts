@@ -45,6 +45,39 @@ export class MasterBar {
     public index: number = 0;
 
     /**
+     * Whether the masterbar is has any changes applied to it (e.g. tempo changes, time signature changes etc)
+     * The first bar is always considered changed due to initial setup of values. It does not consider
+     * elements like whether the tempo really changes to the previous bar.
+     */
+    public get hasChanges() {
+        if (this.index === 0) {
+            return false;
+        }
+
+        const hasChangesToPrevious =
+            this.timeSignatureCommon !== this.previousMasterBar!.timeSignatureCommon ||
+            this.timeSignatureNumerator !== this.previousMasterBar!.timeSignatureNumerator ||
+            this.timeSignatureDenominator !== this.previousMasterBar!.timeSignatureDenominator ||
+            this.tripletFeel !== this.previousMasterBar!.tripletFeel;
+        if (hasChangesToPrevious) {
+            return true;
+        }
+
+        return (
+            this.alternateEndings !== 0 ||
+            this.isRepeatStart ||
+            this.isRepeatEnd ||
+            this.isFreeTime ||
+            this.isSectionStart ||
+            this.tempoAutomations.length > 0 ||
+            this.syncPoints && this.syncPoints!.length > 0 ||
+            (this.fermata !== null && this.fermata!.size > 0) ||
+            (this.directions !== null && this.directions!.size > 0) ||
+            this.isAnacrusis
+        );
+    }
+
+    /**
      * The key signature used on all bars.
      * @deprecated Use key signatures on bar level
      */
@@ -150,6 +183,13 @@ export class MasterBar {
     public tempoAutomations: Automation[] = [];
 
     /**
+     * The sync points for this master bar to synchronize the alphaTab time axis with the
+     * external backing track audio.
+     * @json_add addSyncPoint
+     */
+    public syncPoints: Automation[] | undefined;
+
+    /**
      * Gets or sets the reference to the score this song belongs to.
      * @json_ignore
      */
@@ -246,5 +286,16 @@ export class MasterBar {
             return fermataMap.get(beat.playbackStart)!;
         }
         return null;
+    }
+
+    /**
+     * Adds the given sync point to the list of sync points for this bar.
+     * @param syncPoint  The sync point to add.
+     */
+    public addSyncPoint(syncPoint: Automation) {
+        if (!this.syncPoints) {
+            this.syncPoints = [];
+        }
+        this.syncPoints!.push(syncPoint);
     }
 }

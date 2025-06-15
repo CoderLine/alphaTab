@@ -56,6 +56,19 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
         return player;
     }
 
+    public IAudioExporterWorker CreateWorkerAudioExporter(IAlphaSynth? synth)
+    {
+        var needNewWorker = synth == null || synth is not ManagedThreadAlphaSynthWorkerApi;
+        if (needNewWorker)
+        {
+            synth = CreateWorkerPlayer();
+        }
+
+        return new ManagedThreadAlphaSynthAudioExporter((ManagedThreadAlphaSynthWorkerApi)synth, needNewWorker);
+    }
+
+    public abstract IAlphaSynth? CreateBackingTrackPlayer();
+
     protected abstract ISynthOutput CreateSynthOutput();
 
     public abstract IContainer RootContainer { get; }
@@ -76,7 +89,7 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
         {
             // rendering was possibly delayed due to invisible element
             // in this case we need the correct width for autosize
-            Api.Renderer.Width = (int) RootContainer.Width;
+            Api.Renderer.Width = (int)RootContainer.Width;
             Api.Renderer.UpdateSettings(Api.Settings);
 
             RenderTracks();
@@ -109,16 +122,16 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
                 success(ScoreLoader.LoadScoreFromBytes(new Uint8Array(b), Api.Settings));
                 return true;
             case Stream s:
-            {
-                using (var ms = new MemoryStream())
                 {
-                    s.CopyTo(ms);
-                    success(ScoreLoader.LoadScoreFromBytes(new Uint8Array(ms.ToArray()),
-                        Api.Settings));
-                }
+                    using (var ms = new MemoryStream())
+                    {
+                        s.CopyTo(ms);
+                        success(ScoreLoader.LoadScoreFromBytes(new Uint8Array(ms.ToArray()),
+                            Api.Settings));
+                    }
 
-                return true;
-            }
+                    return true;
+                }
             default:
                 return false;
         }
@@ -132,15 +145,15 @@ public abstract class ManagedUiFacade<TSettings> : IUiFacade<TSettings>
                 Api.Player.LoadSoundFont(new Uint8Array(bytes), append);
                 return true;
             case Stream stream:
-            {
-                using (var ms = new MemoryStream())
                 {
-                    stream.CopyTo(ms);
-                    Api.Player.LoadSoundFont(new Uint8Array(ms.ToArray()), append);
-                }
+                    using (var ms = new MemoryStream())
+                    {
+                        stream.CopyTo(ms);
+                        Api.Player.LoadSoundFont(new Uint8Array(ms.ToArray()), append);
+                    }
 
-                return true;
-            }
+                    return true;
+                }
             default:
                 return false;
         }

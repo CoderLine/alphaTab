@@ -12,6 +12,17 @@ export class RenderingResources {
     private static serifFont: string = 'Georgia, serif';
 
     /**
+     * The SMuFL Font to use for rendering music symbols.
+     * @remarks
+     * This is only meant for internal passing of font family information between components.
+     * Setting this manually can lead to unexpected side effects.
+     * @defaultValue `alphaTab`
+     * @since 0.9.6
+     * @internal
+     */
+    public smuflFont?: Font;
+
+    /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.
      * @defaultValue `bold 12px Arial, sans-serif`
      * @since 0.9.6

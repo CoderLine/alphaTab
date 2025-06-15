@@ -43,6 +43,9 @@ export default function (emitters: Emitter[], handleErrors: boolean = false) {
         /*extendedConfigCache*/ undefined,
         commandLine.watchOptions
     )!;
+
+    parsedCommandLine.fileNames = parsedCommandLine.fileNames.filter(f => !f.includes('playground'));
+
     const pretty = !!ts.sys.writeOutputIsTTY?.();
     if (pretty) {
         reportDiagnostic = createDiagnosticReporter(true);

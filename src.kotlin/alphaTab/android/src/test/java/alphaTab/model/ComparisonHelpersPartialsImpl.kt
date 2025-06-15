@@ -1,5 +1,6 @@
 package alphaTab.model
 
+import alphaTab.collections.BooleanList
 import alphaTab.collections.DoubleList
 import alphaTab.core.assert.Companion.fail
 import kotlin.contracts.ExperimentalContracts
@@ -8,6 +9,7 @@ import kotlin.contracts.ExperimentalContracts
 @ExperimentalContracts
 class ComparisonHelpersPartials {
     companion object {
+
          fun compareObjects(expected: Any?, actual: Any?, path: String, ignoreKeys: alphaTab.collections.List<String>?): Boolean {
             if (actual is DoubleList && expected is DoubleList) {
                 if (actual.length != expected.length) {

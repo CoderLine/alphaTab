@@ -110,6 +110,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine('    "CanBeVal",');
         this.writeLine('    "CascadeIf",');
         this.writeLine('    "unused",');
+        this.writeLine('    "LocalVariableName",');
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
         this.writeLine('    "UNCHECKED_CAST",');
         this.writeLine('    "USELESS_CAST",');
@@ -974,7 +975,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
 
         this.write('::class');
-
     }
 
     protected writePrefixUnaryExpression(expr: cs.PrefixUnaryExpression) {
@@ -1916,5 +1916,11 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeDefaultExpression(_: cs.DefaultExpression): void {
         this.write('null');
+    }
+
+    protected override writeLabeledExpression(expr: cs.LabeledExpression) {
+        this.write(expr.label);
+        this.write(' = ');
+        this.writeExpression(expr.expression);
     }
 }

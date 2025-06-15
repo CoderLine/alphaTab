@@ -9,6 +9,66 @@ import type { LogLevel } from '@src/LogLevel';
 import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import type { MidiEventType } from '@src/midi/MidiEvent';
 import type { ISynthOutput } from '@src/synth/ISynthOutput';
+import type { Score } from '@src/model/Score';
+
+/**
+ * Rerpresents a point to sync the alphaTab time axis with an external backing track.
+ */
+export class BackingTrackSyncPoint {
+    /**
+     * The index of the masterbar to which this sync point belongs to.
+     * @remarks
+     * This property is purely informative for external use like in editors.
+     * It has no impact to the synchronization itself.
+     */
+    public masterBarIndex: number = 0;
+
+    /**
+     * The occurence of the masterbar to which this sync point belongs to. The occurence
+     * is 0-based and increases with every repeated play of a masterbar (e.g. on repeats or jumps).
+     * @remarks
+     * This property is purely informative for external use like in editors.
+     * It has no impact to the synchronization itself.
+     */
+    public masterBarOccurence: number = 0;
+
+    /**
+     * The BPM the synthesizer has at the exact tick position of this sync point.
+     */
+    public synthBpm: number = 0;
+
+    /**
+     * The millisecond time position of the synthesizer when this sync point is reached.
+     */
+    public synthTime: number = 0;
+
+    /**
+     * The midi tick position of the synthesizer when this sync point is reached.
+     */
+    public synthTick: number = 0;
+
+    /**
+     * The millisecond time in the external media marking the synchronization point.
+     */
+    public syncTime: number = 0;
+    /**
+     * The BPM the song will have virtually after this sync point to align the external media time axis
+     * with the one from the synthesizer.
+     */
+    public syncBpm: number = 0;
+
+    /**
+     * Updates the synchronization BPM that will apply after this sync point.
+     * @param nextSyncPointSynthTime The synthesizer time of the next sync point after this one.
+     * @param nextSyncPointSyncTime The synchronization time of the next sync point after this one.
+     */
+    public updateSyncBpm(nextSyncPointSynthTime: number, nextSyncPointSyncTime: number) {
+        const synthDuration = nextSyncPointSynthTime - this.synthTime;
+        const syncedDuration = nextSyncPointSyncTime - this.syncTime;
+        const modifiedTempo = (synthDuration / syncedDuration) * this.synthBpm;
+        this.syncBpm = modifiedTempo;
+    }
+}
 
 /**
  * The public API interface for interacting with the synthesizer.
@@ -136,6 +196,18 @@ export interface IAlphaSynth {
      * @param midi
      */
     loadMidiFile(midi: MidiFile): void;
+
+    /**
+     * Loads the synchronization information from the given score (used for backing tracks and external media).
+     * @param score
+     */
+    loadBackingTrack(score: Score): void;
+
+    /**
+     * Updates the points used to synchronize the backing track with the synthesized audio for correct cursor placement.
+     * @param syncPoints
+     */
+    updateSyncPoints(syncPoints: BackingTrackSyncPoint[]): void;
 
     /**
      * Applies the given transposition pitches to be used during playback.

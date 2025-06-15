@@ -4,6 +4,7 @@
 // the code is regenerated.
 // </auto-generated>
 import { PlayerOutputMode } from "@src/PlayerSettings";
+import { PlayerMode } from "@src/PlayerSettings";
 import { ScrollMode } from "@src/PlayerSettings";
 import { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";
 import { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJson";
@@ -53,6 +54,7 @@ export interface PlayerSettingsJson {
      * @since 0.9.6
      * @defaultValue `false`
      * @category Player
+     * @deprecated Use {@link playerMode} instead.
      * @remarks
      * This setting configures whether the player feature is enabled or not. Depending on the platform enabling the player needs some additional actions of the developer.
      * For the JavaScript version the [player.soundFont](/docs/reference/settings/player/soundfont) property must be set to the URL of the sound font that should be used or it must be loaded manually via API.
@@ -62,9 +64,40 @@ export interface PlayerSettingsJson {
      */
     enablePlayer?: boolean;
     /**
+     * Whether the player should be enabled and which mode it should use.
+     * @since 1.6.0
+     * @defaultValue `PlayerMode.Disabled`
+     * @category Player
+     * @remarks
+     * This setting configures whether the player feature is enabled or not. Depending on the platform enabling the player needs some additional actions of the developer.
+     *
+     * **Synthesizer**
+     *
+     * If the synthesizer is used (via {@link PlayerMode.EnabledAutomatic} or {@link PlayerMode.EnabledSynthesizer}) a sound font is needed so that the midi synthesizer can produce the audio samples.
+     *
+     * For the JavaScript version the [player.soundFont](/docs/reference/settings/player/soundfont) property must be set to the URL of the sound font that should be used or it must be loaded manually via API.
+     * For .net manually the soundfont must be loaded.
+     *
+     * **Backing Track**
+     *
+     * For a built-in backing track of the input file no additional data needs to be loaded (assuming everything is filled via the input file).
+     * Otherwise the `score.backingTrack` needs to be filled before loading and the related sync points need to be configured.
+     *
+     * **External Media**
+     *
+     * For synchronizing alphaTab with an external media no data needs to be loaded into alphaTab. The configured sync points on the MasterBars are used
+     * as reference to synchronize the external media with the internal time axis. Then the related APIs on the AlphaTabApi object need to be used
+     * to update the playback state and exterrnal audio position during playback.
+     *
+     * **User Interface**
+     *
+     * AlphaTab does not ship a default UI for the player. The API must be hooked up to some UI controls to allow the user to interact with the player.
+     */
+    playerMode?: PlayerMode | keyof typeof PlayerMode | Lowercase<keyof typeof PlayerMode>;
+    /**
      * Whether playback cursors should be displayed.
      * @since 0.9.6
-     * @defaultValue `true`
+     * @defaultValue `true` (if player is not disabled)
      * @category Player
      * @remarks
      * This setting configures whether the playback cursors are shown or not. In case a developer decides to built an own cursor system the default one can be disabled with this setting. Enabling the cursor also requires the player to be active.

@@ -402,6 +402,7 @@ export class ModelUtils {
         const score = tracks[0].score;
 
         let currentIndex = startIndex;
+        let tempo = score.tempo;
         while (currentIndex <= endIndexInclusive) {
             const currentGroupStartIndex = currentIndex;
             let currentGroup: number[] | null = null;
@@ -409,14 +410,21 @@ export class ModelUtils {
             while (currentIndex <= endIndexInclusive) {
                 const masterBar = score.masterBars[currentIndex];
 
+                let hasTempoChange = false;
+                for (const a of masterBar.tempoAutomations) {
+                    if (a.value !== tempo) {
+                        hasTempoChange = true;
+                    }
+                    tempo = a.value;
+                }
+
                 // check if masterbar breaks multibar rests, it must be fully empty with no annotations
-                if (
-                    masterBar.alternateEndings ||
+                if (masterBar.alternateEndings ||
                     (masterBar.isRepeatStart && masterBar.index !== currentGroupStartIndex) ||
                     masterBar.isFreeTime ||
                     masterBar.isAnacrusis ||
                     masterBar.section !== null ||
-                    (masterBar.index !== currentGroupStartIndex && masterBar.tempoAutomations.length > 0) ||
+                    (masterBar.index !== currentGroupStartIndex && hasTempoChange) ||
                     (masterBar.fermata !== null && masterBar.fermata.size > 0) ||
                     (masterBar.directions !== null && masterBar.directions.size > 0)
                 ) {
@@ -621,6 +629,48 @@ export class ModelUtils {
                     }
                 }
             }
+        }
+    }
+
+    /**
+     * Trims any empty bars at the end of the song.
+     * @param score
+     */
+    public static trimEmptyBarsAtEnd(score: Score) {
+        while (score.masterBars.length > 1) {
+            const barIndex = score.masterBars.length - 1;
+            const masterBar = score.masterBars[barIndex];
+
+            if (masterBar.hasChanges) {
+                return;
+            }
+            
+            for (const track of score.tracks) {
+                for (const staff of track.staves) {
+                    if (barIndex < staff.bars.length) {
+                        const bar = staff.bars[barIndex];
+                        if (!bar.isEmpty || bar.hasChanges) {
+                            // found a non-empty bar, stop whole cleanup
+                            return;
+                        }
+                    }
+                }
+            }
+
+            // if we reach here, all found bars are empty, remove the bar
+            for (const track of score.tracks) {
+                for (const staff of track.staves) {
+                    if (barIndex < staff.bars.length) {
+                        const bar = staff.bars[barIndex];
+                        staff.bars.pop();
+                        // unlink
+                        bar.previousBar!.nextBar = null;
+                    }
+                }
+            }
+
+            score.masterBars.pop();
+            masterBar.previousMasterBar!.nextMasterBar = null;
         }
     }
 }

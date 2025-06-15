@@ -8,10 +8,11 @@ import {
 import type { MidiFile } from '@src/midi/MidiFile';
 import type { PlaybackRange } from '@src/synth/PlaybackRange';
 import { SynthEvent } from '@src/synth/synthesis/SynthEvent';
-import type { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 import { Logger } from '@src/Logger';
 import { SynthConstants } from '@src/synth/SynthConstants';
 import { MidiUtils } from '@src/midi/MidiUtils';
+import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
+import { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
 
 export class MidiFileSequencerTempoChange {
     public bpm: number;
@@ -27,6 +28,8 @@ export class MidiFileSequencerTempoChange {
 
 class MidiSequencerState {
     public tempoChanges: MidiFileSequencerTempoChange[] = [];
+    public tempoChangeIndex: number = 0;
+    public syncPoints: BackingTrackSyncPoint[] = [];
     public firstProgramEventPerChannel: Map<number, SynthEvent> = new Map();
     public firstTimeSignatureNumerator: number = 0;
     public firstTimeSignatureDenominator: number = 0;
@@ -34,11 +37,14 @@ class MidiSequencerState {
     public division: number = MidiUtils.QuarterTime;
     public eventIndex: number = 0;
     public currentTime: number = 0;
+    public syncPointIndex: number = 0;
     public playbackRange: PlaybackRange | null = null;
     public playbackRangeStartTime: number = 0;
     public playbackRangeEndTime: number = 0;
     public endTick: number = 0;
     public endTime: number = 0;
+    public currentTempo: number = 0;
+    public syncPointTempo: number = 0;
 }
 
 /**
@@ -46,7 +52,7 @@ class MidiSequencerState {
  * synthesize position. The sequencer does not consider the playback speed.
  */
 export class MidiFileSequencer {
-    private _synthesizer: TinySoundFont;
+    private _synthesizer: IAudioSampleSynthesizer;
     private _currentState: MidiSequencerState;
     private _mainState: MidiSequencerState;
     private _oneTimeState: MidiSequencerState | null = null;
@@ -64,7 +70,7 @@ export class MidiFileSequencer {
         return this._currentState === this._countInState;
     }
 
-    public constructor(synthesizer: TinySoundFont) {
+    public constructor(synthesizer: IAudioSampleSynthesizer) {
         this._synthesizer = synthesizer;
         this._mainState = new MidiSequencerState();
         this._currentState = this._mainState;
@@ -107,6 +113,22 @@ export class MidiFileSequencer {
         return this._currentState.endTime / this.playbackSpeed;
     }
 
+    public get currentTempo(): number {
+        return this._currentState.currentTempo;
+    }
+
+    public get modifiedTempo(): number {
+        return this._currentState.syncPointTempo * this.playbackSpeed;
+    }
+
+    public get syncPointTempo(): number {
+        return this._currentState.syncPointTempo;
+    }
+
+    public get currentSyncPoints(): BackingTrackSyncPoint[] {
+        return this._currentState.syncPoints;
+    }
+
     /**
      * Gets or sets the playback speed.
      */
@@ -131,6 +153,13 @@ export class MidiFileSequencer {
             // we have to restart the midi to make sure we get the right state: instruments, volume, pan, etc
             this._mainState.currentTime = 0;
             this._mainState.eventIndex = 0;
+            this._mainState.syncPointIndex = 0;
+            this._mainState.tempoChangeIndex = 0;
+            this._mainState.currentTempo = this._mainState.tempoChanges[0].bpm;
+            this._mainState.syncPointTempo =
+                this._mainState.syncPoints.length > 0
+                    ? this._mainState.syncPoints[0].syncBpm
+                    : this._mainState.currentTempo;
             if (this.isPlayingMain) {
                 const metronomeVolume: number = this._synthesizer.metronomeVolume;
                 this._synthesizer.noteOffAll(true);
@@ -232,7 +261,7 @@ export class MidiFileSequencer {
 
             if (mEvent.type === MidiEventType.TempoChange) {
                 const meta: TempoChangeEvent = mEvent as TempoChangeEvent;
-                bpm = 60000000 / meta.microSecondsPerQuarterNote;
+                bpm = meta.beatsPerMinute;
                 state.tempoChanges.push(new MidiFileSequencerTempoChange(bpm, absTick, absTime));
                 metronomeLengthInMillis = metronomeLengthInTicks * (60000.0 / (bpm * midiFile.division));
             } else if (mEvent.type === MidiEventType.TimeSignature) {
@@ -264,6 +293,9 @@ export class MidiFileSequencer {
             }
         }
 
+        state.currentTempo = state.tempoChanges.length > 0 ? state.tempoChanges[0].bpm : bpm;
+        state.syncPointTempo = state.currentTempo;
+
         state.synthData.sort((a, b) => {
             if (a.time > b.time) {
                 return 1;
@@ -281,6 +313,28 @@ export class MidiFileSequencer {
 
     public fillMidiEventQueue(): boolean {
         return this.fillMidiEventQueueLimited(-1);
+    }
+
+    public fillMidiEventQueueToEndTime(endTime: number) {
+        while (this._mainState.currentTime < endTime) {
+            if (this.fillMidiEventQueueLimited(endTime - this._mainState.currentTime)) {
+                this._synthesizer.synthesizeSilent(SynthConstants.MicroBufferSize);
+            }
+        }
+
+        let anyEventsDispatched: boolean = false;
+        this._currentState.currentTime = endTime;
+        while (
+            this._currentState.eventIndex < this._currentState.synthData.length &&
+            this._currentState.synthData[this._currentState.eventIndex].time < this._currentState.currentTime
+        ) {
+            const synthEvent = this._currentState.synthData[this._currentState.eventIndex];
+            this._synthesizer.dispatchEvent(synthEvent);
+            this._currentState.eventIndex++;
+            anyEventsDispatched = true;
+        }
+
+        return anyEventsDispatched;
     }
 
     private fillMidiEventQueueLimited(maxMilliseconds: number): boolean {
@@ -314,12 +368,213 @@ export class MidiFileSequencer {
         return this.tickPositionToTimePositionWithSpeed(this._mainState, tickPosition, this.playbackSpeed);
     }
 
-    public mainTimePositionToTickPosition(timePosition: number): number {
-        return this.timePositionToTickPositionWithSpeed(this._mainState, timePosition, this.playbackSpeed);
+    public mainUpdateSyncPoints(syncPoints: BackingTrackSyncPoint[]) {
+        const state = this._mainState;
+        syncPoints.sort((a, b) => a.synthTick - b.synthTick); // just in case
+        state.syncPoints = [];
+
+        if (syncPoints.length >= 0) {
+            let bpm: number = 120;
+            let absTick: number = 0;
+            let absTime: number = 0.0;
+
+            let tempoChangeIndex = 0;
+
+            for (let i = 0; i < syncPoints.length; i++) {
+                const p = syncPoints[i];
+                let deltaTick = 0;
+
+                // TODO: merge interpolation into MidiFileGenerator where we already play through
+                // the time axis.
+
+                // remember state from previous sync point (or start). to handle linear interpolation
+                let previousModifiedTempo: number;
+                let previousMillisecondOffset: number;
+                let previousTick: number;
+
+                if (i === 0) {
+                    previousModifiedTempo = bpm;
+                    previousMillisecondOffset = 0;
+                    previousTick = 0;
+                } else {
+                    const previousSyncPoint = syncPoints[i - 1];
+                    previousModifiedTempo = previousSyncPoint.syncBpm;
+                    previousMillisecondOffset = previousSyncPoint.syncTime;
+                    previousTick = previousSyncPoint.synthTick;
+                }
+
+                // process time until sync point
+                // here it gets a bit tricky. if we have tempo changes on the synthesizer time axis (inbetween two sync points)
+                // we have to calculate a interpolated sync point on the alphaTab time axis.
+                // otherwise the linear interpolation later in the lookup will fail.
+                // goal is to have always a linear increase between two points, no matter if the time axis is sliced by tempo changes or sync points
+                while (
+                    tempoChangeIndex < state.tempoChanges.length &&
+                    state.tempoChanges[tempoChangeIndex].ticks <= p.synthTick
+                ) {
+                    deltaTick = state.tempoChanges[tempoChangeIndex].ticks - absTick;
+                    if (deltaTick > 0) {
+                        absTick += deltaTick;
+                        absTime += deltaTick * (60000.0 / (bpm * state.division));
+
+                        const millisPerTick = (p.syncTime - previousMillisecondOffset) / (p.synthTick - previousTick);
+                        const interpolatedMillisecondOffset =
+                            (absTick - previousTick) * millisPerTick + previousMillisecondOffset;
+
+                        const syncPoint = new BackingTrackSyncPoint();
+                        syncPoint.synthTick = absTick;
+                        syncPoint.synthBpm = bpm;
+                        syncPoint.synthTime = absTime;
+                        syncPoint.syncTime = interpolatedMillisecondOffset;
+                        syncPoint.syncBpm = previousModifiedTempo;
+                    }
+
+                    bpm = state.tempoChanges[tempoChangeIndex].bpm;
+                    tempoChangeIndex++;
+                }
+
+                deltaTick = p.synthTick - absTick;
+                absTick += deltaTick;
+                absTime += deltaTick * (60000.0 / (bpm * state.division));
+                state.syncPoints.push(p);
+            }
+        }
+
+        state.syncPointIndex = 0;
+        state.syncPointTempo = state.syncPoints.length > 0 ? state.syncPoints[0].syncBpm : state.currentTempo;
     }
 
     public currentTimePositionToTickPosition(timePosition: number): number {
-        return this.timePositionToTickPositionWithSpeed(this._currentState, timePosition, this.playbackSpeed);
+        const state = this._currentState;
+        if (state.tempoChanges.length === 0) {
+            return 0;
+        }
+
+        timePosition *= this.playbackSpeed;
+
+        this.updateCurrentTempo(state, timePosition);
+        const lastTempoChange = state.tempoChanges[state.tempoChangeIndex];
+        const timeDiff = timePosition - lastTempoChange.time;
+        const ticks = (timeDiff / (60000.0 / (lastTempoChange.bpm * state.division))) | 0;
+        // we add 1 for possible rounding errors.(floating point issuses)
+        return lastTempoChange.ticks + ticks + 1;
+    }
+
+    public currentUpdateCurrentTempo(timePosition: number) {
+        this.updateCurrentTempo(this._mainState, timePosition * this.playbackSpeed);
+    }
+
+    private updateCurrentTempo(state: MidiSequencerState, timePosition: number) {
+        let tempoChangeIndex = state.tempoChangeIndex;
+        if (timePosition < state.tempoChanges[tempoChangeIndex].time) {
+            tempoChangeIndex = 0;
+        }
+
+        while (
+            tempoChangeIndex + 1 < state.tempoChanges.length &&
+            state.tempoChanges[tempoChangeIndex + 1].time <= timePosition
+        ) {
+            tempoChangeIndex++;
+        }
+
+        if (tempoChangeIndex !== state.tempoChangeIndex) {
+            state.tempoChangeIndex = tempoChangeIndex;
+            state.currentTempo = state.tempoChanges[state.tempoChangeIndex].bpm;
+
+            if (state.syncPoints.length === 0) {
+                state.syncPointTempo = state.currentTempo;
+            }
+        }
+    }
+
+    public currentUpdateSyncPoints(timePosition: number) {
+        this.updateSyncPoints(this._mainState, timePosition);
+    }
+
+    private updateSyncPoints(state: MidiSequencerState, timePosition: number) {
+        const syncPoints = state.syncPoints;
+        if (syncPoints.length > 0) {
+            let syncPointIndex = Math.min(state.syncPointIndex, syncPoints.length - 1);
+            if (timePosition < syncPoints[syncPointIndex].syncTime) {
+                syncPointIndex = 0;
+            }
+            while (syncPointIndex + 1 < syncPoints.length && syncPoints[syncPointIndex + 1].syncTime <= timePosition) {
+                syncPointIndex++;
+            }
+            if (syncPointIndex !== state.syncPointIndex) {
+                state.syncPointIndex = syncPointIndex;
+                state.syncPointTempo = syncPoints[syncPointIndex].syncBpm;
+            }
+        } else {
+            state.syncPointTempo = state.currentTempo;
+        }
+    }
+
+    public mainTimePositionFromBackingTrack(timePosition: number, backingTrackLength: number): number {
+        const mainState = this._mainState;
+        const syncPoints = mainState.syncPoints;
+
+        if (timePosition < 0 || syncPoints.length === 0) {
+            return timePosition;
+        }
+
+        this.updateSyncPoints(this._mainState, timePosition);
+
+        const syncPointIndex = Math.min(mainState.syncPointIndex, syncPoints.length - 1);
+
+        const currentSyncPoint = syncPoints[syncPointIndex];
+        const timeDiff = timePosition - currentSyncPoint.syncTime;
+
+        let alphaTabTimeDiff: number;
+
+        if (syncPointIndex + 1 < syncPoints.length) {
+            const nextSyncPoint = syncPoints[syncPointIndex + 1];
+            const relativeTimeDiff = timeDiff / (nextSyncPoint.syncTime - currentSyncPoint.syncTime);
+
+            alphaTabTimeDiff = (nextSyncPoint.synthTime - currentSyncPoint.synthTime) * relativeTimeDiff;
+        } else {
+            const relativeTimeDiff = timeDiff / (backingTrackLength - currentSyncPoint.syncTime);
+            alphaTabTimeDiff = (mainState.endTime - currentSyncPoint.synthTime) * relativeTimeDiff;
+        }
+
+        return (currentSyncPoint.synthTime + alphaTabTimeDiff) / this.playbackSpeed;
+    }
+
+    public mainTimePositionToBackingTrack(timePosition: number, backingTrackLength: number): number {
+        const mainState = this._mainState;
+        const syncPoints = mainState.syncPoints;
+        if (timePosition < 0 || syncPoints.length === 0) {
+            return timePosition;
+        }
+
+        timePosition *= this.playbackSpeed;
+
+        let syncPointIndex = Math.min(mainState.syncPointIndex, syncPoints.length - 1);
+        if (timePosition < syncPoints[syncPointIndex].synthTime) {
+            syncPointIndex = 0;
+        }
+        while (syncPointIndex + 1 < syncPoints.length && syncPoints[syncPointIndex + 1].synthTime <= timePosition) {
+            syncPointIndex++;
+        }
+
+        // NOTE: this logic heavily relies on the interpolation done in mainUpdateSyncPoints
+        // we ensure that we have a linear increase between two points
+        const currentSyncPoint = syncPoints[syncPointIndex];
+        const alphaTabTimeDiff = timePosition - currentSyncPoint.synthTime;
+
+        let backingTrackPos: number;
+        if (syncPointIndex + 1 < syncPoints.length) {
+            const nextSyncPoint = syncPoints[syncPointIndex + 1];
+            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (nextSyncPoint.synthTime - currentSyncPoint.synthTime);
+            const backingTrackDiff = nextSyncPoint.syncTime - currentSyncPoint.syncTime;
+            backingTrackPos = currentSyncPoint.syncTime + backingTrackDiff * relativeAlphaTabTimeDiff;
+        } else {
+            const relativeAlphaTabTimeDiff = alphaTabTimeDiff / (mainState.endTime - currentSyncPoint.synthTime);
+            const frameDiff = backingTrackLength - currentSyncPoint.syncTime;
+            backingTrackPos = currentSyncPoint.syncTime + frameDiff * relativeAlphaTabTimeDiff;
+        }
+
+        return backingTrackPos;
     }
 
     private tickPositionToTimePositionWithSpeed(
@@ -347,34 +602,6 @@ export class MidiFileSequencer {
         timePosition += tickPosition * (60000.0 / (bpm * state.division));
 
         return timePosition / playbackSpeed;
-    }
-
-    private timePositionToTickPositionWithSpeed(
-        state: MidiSequencerState,
-        timePosition: number,
-        playbackSpeed: number
-    ): number {
-        timePosition *= playbackSpeed;
-
-        let ticks: number = 0;
-        let bpm: number = 120.0;
-        let lastChange: number = 0;
-
-        // find start and bpm of last tempo change before time
-        for (const c of state.tempoChanges) {
-            if (timePosition < c.time) {
-                break;
-            }
-            ticks = c.ticks;
-            bpm = c.bpm;
-            lastChange = c.time;
-        }
-
-        // add the missing ticks
-        timePosition -= lastChange;
-        ticks += (timePosition / (60000.0 / (bpm * state.division))) | 0;
-        // we add 1 for possible rounding errors.(floating point issuses)
-        return ticks + 1;
     }
 
     private get internalEndTime(): number {
@@ -465,6 +692,8 @@ export class MidiFileSequencer {
         });
         state.endTime = metronomeTime;
         state.endTick = metronomeTick;
+        state.currentTempo = bpm;
+        state.syncPointTempo = bpm;
         this._countInState = state;
     }
 }

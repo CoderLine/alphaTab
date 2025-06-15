@@ -48,7 +48,7 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     private serializeSettingsForWorker(settings: Settings): unknown {
-        const jsObject = JsonConverter.settingsToJsObject(settings)!;
+        const jsObject = JsonConverter.settingsToJsObject(Environment.prepareForPostMessage(settings))!;
         // cut out player settings, they are only needed on UI thread side
         jsObject.delete('player');
         return jsObject;
@@ -113,11 +113,11 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
     }
 
     public renderScore(score: Score | null, trackIndexes: number[] | null): void {
-        const jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(score);
+        const jsObject: unknown = score == null ? null : JsonConverter.scoreToJsObject(Environment.prepareForPostMessage(score));
         this._worker.postMessage({
             cmd: 'alphaTab.renderScore',
             score: jsObject,
-            trackIndexes: trackIndexes,
+            trackIndexes: Environment.prepareForPostMessage(trackIndexes),
             fontSizes: FontSizes.FontSizeLookupTables
         });
     }

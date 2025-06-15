@@ -1,8 +1,9 @@
-export { AlphaSynth } from '@src/synth/AlphaSynth';
+export { AlphaSynthBase, AlphaSynth, type IAlphaSynthAudioExporter } from '@src/synth/AlphaSynth';
 export { CircularSampleBuffer } from '@src/synth/ds/CircularSampleBuffer';
 export { PlaybackRange } from '@src/synth/PlaybackRange';
 export type { ISynthOutput, ISynthOutputDevice } from '@src/synth/ISynthOutput';
-export type { IAlphaSynth } from '@src/synth/IAlphaSynth';
+export type { IBackingTrackSynthOutput } from '@src/synth/BackingTrackPlayer';
+export { type IAlphaSynth, BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
 export { PlayerState } from '@src/synth/PlayerState';
 export { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
 export { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
@@ -13,3 +14,11 @@ export { AlphaSynthWebWorkerApi } from '@src/platform/javascript/AlphaSynthWebWo
 export { AlphaSynthWebAudioOutputBase } from '@src/platform/javascript/AlphaSynthWebAudioOutputBase';
 export { AlphaSynthScriptProcessorOutput } from '@src/platform/javascript/AlphaSynthScriptProcessorOutput';
 export { AlphaSynthAudioWorkletOutput } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
+export type { IAudioElementBackingTrackSynthOutput } from '@src/platform/javascript/AudioElementBackingTrackSynthOutput';
+export type { IExternalMediaHandler, IExternalMediaSynthOutput } from '@src/synth/ExternalMediaPlayer';
+export {
+    type IAudioExporter,
+    type IAudioExporterWorker,
+    AudioExportChunk,
+    AudioExportOptions
+} from '@src/synth/IAudioExporter';
