@@ -124,6 +124,19 @@ describe('SyncPointTests', () => {
         }
     });
 
+    it('sync-point-generation-new', async () => {
+        const score = await syncPointTestScore();
+
+        const update = MidiFileGenerator.generateSyncPoints(score, true);
+        expect(
+            update.map(
+                p =>
+                    `${p.masterBarIndex},${p.masterBarOccurence},${p.synthBpm},${p.syncBpm},${p.synthTime},${p.syncTime}`
+            )
+        ).toMatchSnapshot();
+
+    });
+
     it('modified-tempo-lookup', async () => {
         const score = await syncPointTestScore();
 
