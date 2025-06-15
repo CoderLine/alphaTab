@@ -1,0 +1,79 @@
+--- 
+title: jQuery
+---
+
+> [!WARNING]
+> Listening to alphaTab via DOM events has been deprecated in 1.5 and will be removed in 2.x. 
+
+jQuery used to be, and is still, a big player in the Web Development world. For alphaTab we decided
+that it is not worth to have a dedicated alphaTab jQuery plugin anymore as the AlphaTabApi object already 
+provides an easy-to-use interface making jQuery an unnecessary overhead to maintain. 
+
+We recommend migrating all codebases to standard modern JavaScript and our API object. 
+
+For historical reference this page describes some aspects on how to use the alphaTab jQuery plugin but avoid using it for new developments.
+
+
+To initialize alphaTab on any element use `jQuery('.selector').alphaTab()`. With alphaTab initialized you can either access the API object via `jQuery('.selector').alphaTab('api')` or use
+a subset of the API surface. Parameters and return values can be passed accordingly. For properties, if no value is provided, the current value is loaded, if one is provided it is set.
+
+* `jq.alphaTab('print')` - Delegates to [`api.print()`](/docs/reference/api/print.mdx)
+* `jq.alphaTab('load')` - Delegates to [`api.load()`](/docs/reference/api/load.mdx)
+* `jq.alphaTab('render')` - Delegates to [`api.render()`](/docs/reference/api/render.mdx)
+* `jq.alphaTab('renderScore')` - Delegates to [`api.renderScore()`](/docs/reference/api/renderscore.mdx)
+* `jq.alphaTab('renderTracks')` - Delegates to [`api.renderTracks()`](/docs/reference/api/rendertracks.mdx)
+* `jq.alphaTab('invalidate')` - Delegates to [`api.render()`](/docs/reference/api/render.mdx)
+* `jq.alphaTab('tex')` - Delegates to [`api.tex()`](/docs/reference/api/tex.mdx)
+* `jq.alphaTab('muteTrack')` - Delegates to [`api.changeTrackMute()`](/docs/reference/api/changetrackmute.mdx)
+* `jq.alphaTab('soloTrack')` - Delegates to [`api.changeTrackSolo()`](/docs/reference/api/changetracksolo.mdx)
+* `jq.alphaTab('trackVolume')` - Delegates to [`api.changeTrackVolume()`](/docs/reference/api/changetrackvolume.mdx)
+* `jq.alphaTab('loadSoundFont')` - Delegates to [`api.loadSoundFont()`](/docs/reference/api/loadsoundfont.mdx)
+* `jq.alphaTab('resetSoundFonts')` - Delegates to [`api.resetSoundFonts()`](/docs/reference/api/resetsoundfonts.mdx)
+* `jq.alphaTab('pause')` - Delegates to [`api.pause()`](/docs/reference/api/pause.mdx)
+* `jq.alphaTab('play')` - Delegates to [`api.play()`](/docs/reference/api/play.mdx)
+* `jq.alphaTab('playPause')` - Delegates to [`api.playPause()`](/docs/reference/api/playpause.mdx)
+* `jq.alphaTab('stop')` - Delegates to [`api.stop()`](/docs/reference/api/stop.mdx)
+* `jq.alphaTab('player')` - Delegates to [`api.player`](/docs/reference/api/player.mdx)
+* `jq.alphaTab('isReadyForPlayback')` - Delegates to [`api.isReadyForPlayback`](/docs/reference/api/isreadyforplayback.mdx)
+* `jq.alphaTab('playerState')` - Delegates to [`api.playerState`](/docs/reference/api/playerstate.mdx)
+* `jq.alphaTab('masterVolume')` - Delegates to [`api.masterVolume`](/docs/reference/api/mastervolume.mdx)
+* `jq.alphaTab('metronomeVolume')` - Delegates to [`api.metronomeVolume`](/docs/reference/api/metronomevolume.mdx)
+* `jq.alphaTab('countInVolume')` - Delegates to [`api.countInVolume`](/docs/reference/api/countinvolume.mdx)
+* `jq.alphaTab('midiEventsPlayedFilter')` - Delegates to [`api.midiEventsPlayedFilter`](/docs/reference/api/midieventsplayedfilter.mdx)
+* `jq.alphaTab('playbackSpeed')` - Delegates to [`api.playbackSpeed`](/docs/reference/api/playbackspeed.mdx)
+* `jq.alphaTab('tickPosition')` - Delegates to [`api.tickPosition`](/docs/reference/api/tickposition.mdx)
+* `jq.alphaTab('timePosition')` - Delegates to [`api.timePosition`](/docs/reference/api/timeposition.mdx)
+* `jq.alphaTab('loop')` - Delegates to [`api.isLooping`](/docs/reference/api/islooping.mdx)
+* `jq.alphaTab('renderer')` - Delegates to [`api.renderer`](/docs/reference/api/renderer.mdx)
+* `jq.alphaTab('score')` - Delegates to [`api.score`](/docs/reference/api/score.mdx)
+* `jq.alphaTab('settings')` - Delegates to [`api.settings`](/docs/reference/api/settings.mdx)
+* `jq.alphaTab('tracks')` - Delegates to [`api.tracks`](/docs/reference/api/tracks.mdx)
+* `jq.alphaTab('destroy')` - Delegates to [`api.destroy`](/docs/reference/api/destroy.mdx)
+
+Additionally you can subscribe to alphaTab events via the jQuery event listener mechanisms:
+
+* `jq.on('soundFontLoad')` - Subscribes to [`api.destroy`](/docs/reference/api/soundfontload.mdx)
+* `jq.on('playedBeatChanged')` - Subscribes to [`api.playedBeatChanged`](/docs/reference/api/playedbeatchanged.mdx)
+* `jq.on('activeBeatsChanged')` - Subscribes to [`api.activeBeatsChanged`](/docs/reference/api/activebeatschanged.mdx)
+* `jq.on('beatMouseDown')` - Subscribes to [`api.beatMouseDown`](/docs/reference/api/beatmousedown.mdx)
+* `jq.on('noteMouseDown')` - Subscribes to [`api.noteMouseDown`](/docs/reference/api/notemousedown.mdx)
+* `jq.on('beatMouseMove')` - Subscribes to [`api.beatMouseMove`](/docs/reference/api/beatmousemove.mdx)
+* `jq.on('noteMouseMove')` - Subscribes to [`api.noteMouseMove`](/docs/reference/api/notemousemove.mdx)
+* `jq.on('beatMouseUp')` - Subscribes to [`api.beatMouseUp`](/docs/reference/api/beatmouseup.mdx)
+* `jq.on('noteMouseUp')` - Subscribes to [`api.noteMouseUp`](/docs/reference/api/notemouseup.mdx)
+* `jq.on('scoreLoaded')` - Subscribes to [`api.scoreLoaded`](/docs/reference/api/scoreloaded.mdx)
+* `jq.on('resize')` - Subscribes to [`api.resize`](/docs/reference/api/resize.mdx)
+* `jq.on('renderStarted')` - Subscribes to [`api.renderStarted`](/docs/reference/api/renderstarted.mdx)
+* `jq.on('renderFinished')` - Subscribes to [`api.renderFinished`](/docs/reference/api/renderfinished.mdx)
+* `jq.on('postRenderFinished')` - Subscribes to [`api.postRenderFinished`](/docs/reference/api/postrenderfinished.mdx)
+* `jq.on('error')` - Subscribes to [`api.error`](/docs/reference/api/error.mdx)
+* `jq.on('playerReady')` - Subscribes to [`api.playerReady`](/docs/reference/api/playerready.mdx)
+* `jq.on('playerFinished')` - Subscribes to [`api.playerFinished`](/docs/reference/api/playerfinished.mdx)
+* `jq.on('soundFontLoaded')` - Subscribes to [`api.soundFontLoaded`](/docs/reference/api/soundfontloaded.mdx)
+* `jq.on('midiLoad')` - Subscribes to [`api.midiLoad`](/docs/reference/api/midiload.mdx)
+* `jq.on('midiFileLoaded')` - Subscribes to [`api.midiLoaded`](/docs/reference/api/midiloaded.mdx)
+* `jq.on('playerStateChanged')` - Subscribes to [`api.playerStateChanged`](/docs/reference/api/playerstatechanged.mdx)
+* `jq.on('playerPositionChanged')` - Subscribes to [`api.playerPositionChanged`](/docs/reference/api/playerpositionchanged.mdx)
+* `jq.on('midiEventsPlayed')` - Subscribes to [`api.midiEventsPlayed`](/docs/reference/api/midieventsplayed.mdx)
+* `jq.on('playbackRangeChanged')` - Subscribes to [`api.playbackRangeChanged`](/docs/reference/api/playbackrangechanged.mdx)
+* `jq.on('settingsUpdated')` - Subscribes to [`api.settingsUpdated`](/docs/reference/api/settingsupdated.mdx)

@@ -13,9 +13,8 @@ Simply create a div container where you want alphaTab to be located on your page
 to the available width of the div when using the page layout. If you prefer a fixed layout simply set a fixed width on the div via CSS
 and no resizes to alphaTab will happen either. 
 
-If jQuery is detected on the page you can use the jQuery plugin to interact with alphaTab. Otherwise alphaTab is initailized using a special `API`
-object. The main namespace `alphaTab` contains every class and enum exposed by the API. The main api is the `alphaTab.AlphaTabApi`
-class:
+The main namespace `alphaTab` and its sub-namespaces like `model` or `midi` contain all types and functionalities by alphaTab. The main api is the `alphaTab.AlphaTabApi`
+class which can be used to initialize and interface with alphaTab:
 
 ```html
 <div id="alphaTab"></div>
@@ -27,77 +26,19 @@ const api = new alphaTab.AlphaTabApi(element);
 
 ## Settings
 
-There are 2 main ways to initialize alphaTab: either via a settings object or via data attributes. 
-Depending on the technologies used in your project either the direct code initialization or the data attributes might be easier to use. 
-
-The data attributes might be more suitable for server side rendering technologies where settings are provided from a backend infrastructure
-during page rendering. When printing the main alphaTab div element to the DOM you can pass on any settings you might want to have. 
-
-When using client side frontend frameworks like Angular, React or even plain JavaScript it might be more suitable to initialize alphaTab
-via a settings object. 
-
-Both systems can be combined while the data attributes will overrule the JSON settings. 
-The full list of settings can be found in the [API Reference](/docs/reference/settings). 
-
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'Settings Object', value: 'js', },
-    { label: 'jQuery', value: 'jq', },
-    { label: 'Data Attributes', value: 'html', },
-  ]
-}>
-<TabItem value="js">
-
 The settings object is passed to the constructor of the API object as second parameter: 
 
 ```js
 const api = new alphaTab.AlphaTabApi(element, {
     // any settings go here    
 });
+
 ```
-
-</TabItem>
-<TabItem value="jq">
-
-AlphaTab is initialized via the `$.alphaTab()` plugin. The first parameter is the settings object and the API object will be returned. 
-
-```js
-const api = $('#alphaTab').alphaTab();
-```
-
-</TabItem>
-<TabItem value="html">
-
-Data Attributes will only allow configuration, you still need to manually initailize alphaTab with one of the other variants. 
-But the settings parameter can be simply left out. 
-
-```html
-<div id="alphaTab" data-layout-mode="horizontal"></div>
-```
-```js
-const api = new alphaTab.AlphaTabApi(element);
-```
-
-</TabItem>
-</Tabs>
 
 ## Events
 
-Events of alphaTab can be either subscribed on the API object directly, or via the DOM element to which alphaTab is attached. 
+Events of alphaTab should be either subscribed on the API object.
 Please refer to the [API Reference](/docs/reference/api) to find a full list of events available.
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'API Object', value: 'js', },
-    { label: 'DOM events', value: 'html', }
-  ]
-}>
-<TabItem value="js">
 
 Each event has an `.on(handler)` and `.off(handler)` function to subscribe or unsubscribe. 
 
@@ -108,35 +49,12 @@ api.scoreLoaded.on( (score) => {
 });
 ```
 
-</TabItem>
-</Tabs>
-
 ## API
 
-The main interaction with alphaTab happens through the API object or via jQuery plugin. 
+The main interaction with alphaTab happens through the API object. 
 Simply use any [available API](/docs/reference/api) to get/set details or trigger actions. 
-
-<Tabs
-  defaultValue="js"
-  values={[
-    { label: 'API Object', value: 'js', },
-    { label: 'jQuery API', value: 'jq', }
-  ]
-}>
-<TabItem value="js">
 
 ```js
 const api = new alphaTab.AlphaTabApi(element);
 api.tex('\title "Hello AlphaTab" . 1.1*4')
 ```
-
-</TabItem>
-<TabItem value="jq">
-
-```js
-$(element).alphaTab('tex', '\title "Hello AlphaTab" . 1.1*4')
-```
-
-</TabItem>
-
-</Tabs>

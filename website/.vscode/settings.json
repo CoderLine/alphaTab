@@ -25,5 +25,7 @@
         "titleBar.inactiveBackground": "#21573299",
         "titleBar.inactiveForeground": "#e7e7e799"
     },
-    "peacock.color": "#215732"
+    "peacock.color": "#215732",
+    "editor.snippetSuggestions": "bottom",
+    "emmet.showSuggestionsAsSnippets": true,
 }

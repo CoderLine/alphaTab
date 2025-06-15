@@ -4,6 +4,11 @@
   "compilerOptions": {
     "baseUrl": ".",
     "downlevelIteration": true,
-    "strictNullChecks": true
+    "strictNullChecks": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "ES2024.Promise"
+    ]
   }
 }

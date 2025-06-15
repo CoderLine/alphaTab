@@ -13,7 +13,7 @@ import { openFile } from "@site/src/utils";
 
 export interface PlayerControlsGroupProps {
   api: alphaTab.AlphaTabApi;
-  onLayoutChange: (
+  onLayoutChange?: (
     layoutMode: alphaTab.LayoutMode,
     scrollMode: alphaTab.ScrollMode
   ) => void;
@@ -233,7 +233,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
           <LayoutSelector onLayoutChange={onLayoutChange} />
 
           <div className={styles["at-logo"]}>
-            powered by <img src="/img/alphatab.png" />
+            powered by <img src="/img/alphaTab.png" />
           </div>
         </div>
       </div>

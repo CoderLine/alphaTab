@@ -1,0 +1,31 @@
+---
+title: core.smuflFontSources
+description: "Defines the URLs from which to load the SMuFL compliant font files."
+sidebar_custom_props:
+  javaScriptOnly: true
+  jsOnParent: true
+  category: Core - JavaScript Specific
+  since: 1.6.0
+---
+
+import { ParameterTable, ParameterRow } from '@site/src/components/ParameterTable';
+import CodeBlock from '@theme/CodeBlock';
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+import { CodeBadge } from '@site/src/components/CodeBadge';
+import { SinceBadge } from '@site/src/components/SinceBadge';
+import DynHeading from '@site/src/components/DynHeading';
+import Link from '@docusaurus/Link';
+
+import { SettingsHeader } from '@site/src/components/SettingsHeader';
+
+<SettingsHeader />
+
+### Description
+Defines the URLs from which to load the SMuFL compliant font files. These sources will be used to load and register the webfonts on the page so
+they are available for rendering the music sheet. The sources can be set to any
+CSS compatible URL which can be passed into `url()`.
+See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
+
+<div className="codeBlockContainer"><div className="codeBlockContent"><pre className="codeBlock"><code className="codeBlockLines" style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}><span style={{"color":"#36acaa"}}>{"smuflFontSources"}</span><span style={{"color":"#393A34"}}>{":"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/fontfileformat"}>{"Map"}</Link><span style={{"color":"#393A34"}}>{"<"}</span><Link style={{"color":"#36acaa"}} to={"/docs/reference/types/fontfileformat"}>{"FontFileFormat"}</Link><span style={{"color":"#393A34"}}>{","}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"string"}</span><span style={{"color":"#393A34"}}>{">"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"|"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#00009f"}}>{"null"}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#393A34"}}>{"="}</span><span style={{"color":"#393A34","backgroundColor":"#f6f8fa"}}>{" "}</span><span style={{"color":"#36acaa"}}>{"Bravura files located at <code style={{\"color\":\"#393A34\",\"backgroundColor\":\"#f6f8fa\"}}><Link style={{\"color\":\"#36acaa\"}} to={\"/docs/reference/settings/core/fontdirectory\"}>{\"fontDirectory\"}</Link></code> ."}</span><span style={{"color":"#393A34"}}>{";"}</span></code></pre></div></div>
+

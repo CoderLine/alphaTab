@@ -10,11 +10,9 @@ export type Platform =
   | "js-html"
   | "json-js-html"
   | "js"
-  | "js-jquery"
   | "json"
   | "json-html"
   | "html"
-  | "jquery"
   | "android";
 
 export type CodeBadgeProps = {
@@ -61,10 +59,6 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({ type, name, link }) => {
     case "js":
       title = "JavaScript";
       break;
-    case "js-jquery":
-      typeStyle = styles.js;
-      title = "JavaScript & jQuery";
-      break;
     case "json":
       title = "JSON";
       break;
@@ -74,10 +68,6 @@ export const CodeBadge: React.FC<CodeBadgeProps> = ({ type, name, link }) => {
       break;
     case "html":
       title = "HTML";
-      break;
-    case "jquery":
-      typeStyle = styles.jq;
-      title = "jQuery";
       break;
   }
   const css = `${styles["code-badge"]} ${typeStyle}`;

@@ -1,13 +1,12 @@
 'use client';
 
 import * as alphaTab from "@coderline/alphatab";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { PlayerControlsGroup } from "./player-controls-group";
 import { TrackItem } from "./track-item";
 import styles from "./styles.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
-import environment from "@site/src/environment";
 import { useAlphaTab, useAlphaTabEvent } from "@site/src/hooks";
 import { openFile } from "@site/src/utils";
 
@@ -29,7 +28,9 @@ export const AlphaTabFull: React.FC<AlphaTabProps> = ({ settings }) => {
   const [api, element] = useAlphaTab((s) => {
     s.player.scrollElement = viewPortRef.current!;
     s.player.scrollOffsetY = -10;
-    s.player.enablePlayer = true;
+    s.player.playerMode = alphaTab.PlayerMode.EnabledAutomatic;
+    s.player.scrollMode = alphaTab.ScrollMode.Continuous;
+  
     if (settings) {
       s.fillFromJson(settings);
     }
