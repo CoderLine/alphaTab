@@ -4,7 +4,10 @@ import environment from "../../environment";
 import './styles.module.scss'
 import CodeBlock from '@theme/CodeBlock';
 
-export const ExternalMediaSample: React.FC = () => {
+export type ExternalMediaSampleProps = {
+    showCode?: boolean
+}
+export const ExternalMediaSample: React.FC<ExternalMediaSampleProps> = ({showCode}) => {
 
     const alphaTabWithExternalMedia = useRef<HTMLDivElement>(null);
     const audio = useRef<HTMLAudioElement>(null);
@@ -117,7 +120,7 @@ export const ExternalMediaSample: React.FC = () => {
     return <>
         <audio ref={audio} src="/files/Bach_Prelude_BWV999_original.ogg" controls={true} autoPlay={false} />
         <div ref={alphaTabWithExternalMedia} />
-        <CodeBlock language="typescript" title="TypeScript Code for this sample">
+        {showCode !== false && <CodeBlock language="typescript" title="TypeScript Code for this sample">
             {[
                 "const audio = document.querySelector('#audio-element');",
                 "let updateTimer = 0;",
@@ -194,7 +197,6 @@ export const ExternalMediaSample: React.FC = () => {
                 "    newApi.playbackSpeed = audio.playbackRate;",
                 "});",
             ].join('\n')}
-        </CodeBlock>
-
+        </CodeBlock>}
     </>
 };

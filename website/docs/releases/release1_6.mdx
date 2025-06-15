@@ -1,0 +1,216 @@
+---
+title: v1.6
+---
+
+import { AlphaTab } from '@site/src/components/AlphaTab/';
+
+## 1.6.0
+
+Another fresh release for alphaTab mainly focusing on two new features around the player. 😎🎉
+Want to integrate alphaTab with YouTube Videos or audio recordings? Now you can.
+
+### Player
+
+#### External Cursor API
+
+https://github.com/CoderLine/alphaTab/issues/1961
+
+<video src='/img/landing/audio.mp4' autoPlay={true} muted={true} loop={true} controls={false} style={{maxWidth: "100%"}} />
+
+This is the highlight feature of this release. It covers all extensions needed to synchronize the music sheet shown by alphaTab 
+with an external media like audio backing tracks and videos. 
+
+The foundation of this feature is a "sync point" system which configures any time differences between an external media and how
+alphaTab would play it precisely via the synthesizer. With this information configured, there are two options:
+
+1. Pass in a supported audio file and let alphaTab handle the media control for you. 
+2. Provide a custom handler which receives calls from alphaTab, and provides to alphaTab any information to synchronize with the external media. 
+
+
+For 1. we also added support for Guitar Pro 8 Backing Tracks. alphaTab can use audio backing tracks embedded into Guitar Pro 8 files including the synchronization details. 
+With this alphaTab can play the integrated audio instead of using the synthesizer bringing an amazing sound experience to your music sheets. 
+
+
+For 2. you can control yourself what external media system is used instead of the synthesized audio. With the synchronization information provided 
+through the data model, you can supply custom logic to alphaTab telling it about the state of your media like whether it is playing and its current time.
+Via this system you can integrate with player like the YouTube iFrame API for which we even provide a small example. 
+
+
+Enrich your alphaTab music sheets with your own video or audio recordings or generated audio tracks using high quality sound synthesizers.
+
+import { ExternalMediaSample } from '@site/src/components/ExternalMediaSample';
+
+<ExternalMediaSample showCode={false} />
+
+Use our new [Playground](/docs/playground/playground.mdx) with the Media Sync Editor to synchronize your external audio tracks or videos with your input files. 
+
+Dive deeper on this feature with our new guides: 
+
+* [Audio & Video Sync](/docs/guides/audio-video-sync.mdx)
+* [Media Sync Editor](/docs/guides/media-sync-editor.mdx)
+
+Under the hood we made various improvements to the cursor placement to ensure a smooth display and animation.
+
+#### Audio Export API
+
+The second big feature in this release is the possibility to obtain the raw audio data alphaTab synthesizes with its internal player, allowing 
+you to build new features like "Export Audio" options or feeding the audio into other media systems. 
+
+Unfortunately there is not much to show visually, but to learn more about this feature head to [the related feature guide](/docs/guides/audio-export.mdx).
+
+With the raw audio available in a new asynchronous streaming API, you can pull individual chunks of audio for custom processing. 
+
+Build your own audio pipelines:
+
+* Compress the audio by sending the samples into audio codecs (MP3, OGG Vorbis, whatever library you have) with keeping the memory usage low. 
+* Send the audio to any custom target. Let your users share parts of the song with others (live through web platform features like WebRTC) or by sending the audio to your server. 
+* Combine the audio samples of alphaTab with other systems like mixing it together with other audio, sending it through further audio processors or splitup the playback of separate tracks to separate output devices. 
+
+With the new audio export API you can obtain the audio as you need it. 
+
+### Website
+
+#### Playground
+
+In this release we added a [more advanced playground](/docs/playground/) to our website. 
+Long time ago we had a similar playground already but it didn't survive. Now was time to revive this feature
+allowing users to explore alphaTab more deeply before actually developing an app. 
+
+The main trigger for the playground was to have a home for the new Media Sync Editor, but it felt 
+wrong to only build the editor and miss the opportunity to show the other alphaTab capabilities. 
+
+The playground is really meant as such and it's main purpose is to explore the functional capabilities 
+of alphaTab. Some features are still missing but might come in future (like advanced coloring). 
+It is currently not the plan that this area becomes like an end-user app. There are other plans for that.  
+
+It complements the first demo on the homepage and we hope that it can also act as a bug reporting tool at some point.
+
+**Settings**
+
+Most of the available settings can be changed via the settings side panel to explore.
+
+![Settings](/img/release/v16/playground-settings.png)
+
+**Tracks**
+
+The track selector also allows some more customizations to dynamically show/hide staves and transpose them. 
+
+![Tracks](/img/release/v16/playground-tracks.png)
+
+
+#### Media Sync Editor
+
+THe media sync editor is one of the highlight pieces from this release. It complements the new features to synchronize alphaTab 
+with external media like audio tracks or videos. It allows online editing of sync points for media synchronization and downloading of
+the synchronized file or code to synchronize the song within the app code. 
+
+![Media Sync Editor](/img/release/v16/media-sync-editor.png)
+
+It also offers synchronization with YouTube videos if you decide to integate with the YouTube iFrame API to synchronize alphaTab with online videos.
+
+![Media Sync Editor YouTube](/img/release/v16/media-sync-editor-youtube.png)
+
+[Learn more about the editor here](/docs/guides/media-sync-editor.mdx)
+
+### Rendering
+
+#### web: Allow customization of Web Font Sources
+
+https://github.com/CoderLine/alphaTab/issues/2113
+https://github.com/CoderLine/alphaTab/discussions/2112
+https://github.com/CoderLine/alphaTab/pull/2114
+
+Historically alphaTab expected the Bravura font to be placed at a configurable URL, but with fixed file names and formats. 
+The [`fontDirectory`](/docs/reference/settings/core/fontdirectory.mdx) allowed changing the some base URL and path, but not more. 
+
+With this new feature, devs can now specify more precisely what formats and URLs should be used to load Web Fonts. 
+
+This also allows an easier use in more isolated environments where the fonts have to be embedded into the app itself.
+By using data or blob urls fonts can not be loaded through custom means and then passed to alphaTab for usage. 
+
+The [smuflFontSources](/docs/reference/settings/core/smuflfontsources/) option is also a first preparation to allow the use of alternative
+[SMuFL](https://www.smufl.org/) compliant fonts. 
+
+Full support will come with [#1949](https://github.com/CoderLine/alphaTab/issues/1949) where we will add support of reading the required
+sizes, paddings and other metadata to really align symbols correctly. 
+
+### Improvements & Bugfixes
+
+#### player: Ensure synth stops voices when end is reached
+
+https://github.com/CoderLine/alphaTab/pull/2080
+https://github.com/CoderLine/alphaTab/issues/2076
+https://github.com/CoderLine/alphaTab/issues/1803
+
+There was a problem in the synthesizer which caused it to "continue playing" even though it was supposed to stop. 
+Internally it can happen that voices stay active and produce audio samples (typically silence only). 
+
+This fix ensures that alphaTab additionally requests a stop of these voices so that the playback fully stops. 
+
+In cases of count-in this could cause delays until the real audio started. 
+In cases where only a limited time range should be played this caused the player to continue.
+
+#### kotlin: Android platform OutOfMemory crash
+
+https://github.com/CoderLine/alphaTab/pull/2085
+https://github.com/CoderLine/alphaTab/issues/1959
+
+We had some problematic list implementation on the Kotlin platform which was mainly causing 
+problems on the `Queue` datastructure we used in the area of the synthesizer. 
+
+The `java.util.ArrayList.subList()` method in the Java platform behaved different than we expected. Instead of giving us a copy, 
+it created a `java.util.ArrayList$SubList` sharing the internal storage with the main list. If you then make modifications on the two lists separately,
+the lists can get corrupt. 
+
+The docs mention: 
+
+> Returns a **view** of the portion of this list ... The semantics of the list returned by this method become undefined if the backing list 
+(i.e., this list) is structurally modified in any way other than via the returned list. 
+
+We now avoid this problem by making proper copies of the ArrayList where needed.
+
+#### musicxml: Allow empty direction-type
+
+https://github.com/CoderLine/alphaTab/pull/2111
+https://github.com/CoderLine/alphaTab/issues/2102
+
+If the MusicXML spec is not followed, this can lead to wrong expectations in the MusicXML importer of alphaTab. 
+In this case MuseScore had a bug that it did not write a required child tag. Due to this we improved the MusicXML importer
+to handle such cases more gracefully. We now try to always check if certain tags and attributes are really there and try to mitigate
+any problems if the spec is not followed.
+
+#### api: Dynamic setting changes
+
+https://github.com/CoderLine/alphaTab/pull/2098
+
+While building the new playground for the website we noticed that some dynamic setting changes did not result in the expected behavior. 
+With these changes we now allow dynamic switching of all settings more gracefully. 
+
+e.g. switching from HTML5 to SVG and back could lead to problems that alphaTab stopped working. 
+
+#### vue: Unwrap Vue Proxies when possible
+
+https://github.com/CoderLine/alphaTab/issues/2097
+https://github.com/CoderLine/alphaTab/pull/2132
+
+The reactivity system of Vue wraps all objects into proxies. When using alphaTab in such a setup, 
+you always needed to call [`toRaw`](https://vuejs.org/api/reactivity-advanced#toraw) to avoid proxies
+being passed to areas where they lead to problems.
+
+With these changes we try to unwrap the proxies for Vue automatically where needed, avoiding problems when 
+sending objects to workers.
+
+On the web platform `alphaTab.Environment.prepareForPostMessage` can be replaced if a custom mechanism for another framework is needed. 
+e.g. for Solidjs a call to `unwrap` would be needed.
+
+#### platform: Electron and Obsidian compatibility
+
+https://github.com/CoderLine/alphaTab/discussions/1933
+https://github.com/CoderLine/alphaTab/issues/2151
+https://github.com/CoderLine/alphaTab/pull/2152
+
+Electron injects some globals into the renderer process (browser) which are normally only available in Node.js.
+Due to this alphaTab wrongly detected the environment as Node.js and blocked the use of `AlphaTabApi`. 
+
+With the improvements done here, we now better detect if we're running in a browser window allowing easier usage in Electron apps. 
+

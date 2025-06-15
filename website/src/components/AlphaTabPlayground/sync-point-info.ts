@@ -70,7 +70,7 @@ export function buildSyncPointInfoFromYoutube(
         return autoSync(state, api, false);
     }
 
-    state.syncPointMarkers = buildSyncPointMarkers(api);
+    state.syncPointMarkers = buildSyncPointMarkers(api, false);
     return state;
 }
 
@@ -157,17 +157,17 @@ export async function buildSyncPointInfoFromAudio(
         return autoSync(state, api);
     }
 
-    state.syncPointMarkers = buildSyncPointMarkers(api);
+    state.syncPointMarkers = buildSyncPointMarkers(api, false);
     return state;
 }
 
-function buildSyncPointMarkers(api: alphaTab.AlphaTabApi): SyncPointMarker[] {
+function buildSyncPointMarkers(api: alphaTab.AlphaTabApi, createNewSyncPoints: boolean): SyncPointMarker[] {
     const markers: SyncPointMarker[] = [];
 
     const occurences = new Map<number, number>();
 
     // phase 1: generate actual sync points all details set like tempos and times
-    const syncPointsWithTime = alphaTab.midi.MidiFileGenerator.generateSyncPoints(api.score!);
+    const syncPointsWithTime = alphaTab.midi.MidiFileGenerator.generateSyncPoints(api.score!, createNewSyncPoints);
 
     // phase 2: create markers and placeholder markers for the sync points
     let nextSyncPointIndex = 0;
@@ -413,8 +413,8 @@ export function autoSync(oldState: SyncPointInfo, api: alphaTab.AlphaTabApi, pad
 
     // create initial sync points for all tempo changes to ensure the song and the
     // backing track roughly align
-    
-    state.syncPointMarkers = buildSyncPointMarkers(api);
+
+    state.syncPointMarkers = buildSyncPointMarkers(api, true);
 
     // with the final durations known, we can "squeeze" together the song
     // from start and end (keeping the relative positions)
@@ -425,7 +425,7 @@ export function autoSync(oldState: SyncPointInfo, api: alphaTab.AlphaTabApi, pad
         const synthDuration = state.syncPointMarkers.at(-1)!.synthTime;
         const realDuration = songEnd - songStart;
         const scaleFactor = realDuration / synthDuration;
-        
+
         state.syncPointMarkers.at(0)!.syncBpm = state.syncPointMarkers.at(0)!.synthBpm;
         state.syncPointMarkers.at(-1)!.syncBpm = state.syncPointMarkers.at(-1)!.synthBpm;
 
@@ -652,7 +652,7 @@ export function resetSyncPoints(api: alphaTab.AlphaTabApi, state: SyncPointInfo)
 
     return {
         ...state,
-        syncPointMarkers: buildSyncPointMarkers(api)
+        syncPointMarkers: buildSyncPointMarkers(api, false)
     };
 }
 
