@@ -16,7 +16,7 @@ export class TabTieGlyph extends TieGlyph {
 
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
         if (this.startNote === this.endNote) {
-            return 15;
+            return this.startNoteRenderer!.smuflMetrics.tabTieEmptyHeight;
         }
         return super.getTieHeight(startX, startY, endX, endY);
     }
@@ -49,7 +49,7 @@ export class TabTieGlyph extends TieGlyph {
 
     protected override getStartX(): number {
         if (this.startNote === this.endNote) {
-            return this.getEndX() - 20;
+            return this.getEndX() - this.renderer.smuflMetrics.tabTieEmptyWidth;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }

@@ -10,6 +10,7 @@ import { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs'
 import { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
 import type { Settings } from '@src/Settings';
 import { Logger } from '@src/Logger';
+import { SmuflMetrics } from '@src/rendering/SmuflMetrics';
 
 /**
  * This is the main wrapper of the rendering engine which
@@ -31,12 +32,15 @@ export class ScoreRenderer implements IScoreRenderer {
     public boundsLookup: BoundsLookup | null = null;
     public width: number = 0;
 
+    public smuflMetrics: SmuflMetrics;
+
     /**
      * Initializes a new instance of the {@link ScoreRenderer} class.
      * @param settings The settings to use for rendering.
      */
     public constructor(settings: Settings) {
         this.settings = settings;
+        this.smuflMetrics = new SmuflMetrics();
         this.recreateCanvas();
         this.recreateLayout();
     }

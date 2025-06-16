@@ -16,7 +16,7 @@ export class TabBrushGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 10;
+        this.width = this.renderer.smuflMetrics.tabBrushWidth;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -24,7 +24,7 @@ export class TabBrushGlyph extends Glyph {
         const startY: number = cy + this.x + tabBarRenderer.getNoteY(this._beat.maxStringNote!, NoteYPosition.Top);
         const endY: number = cy + this.y + tabBarRenderer.getNoteY(this._beat.minStringNote!, NoteYPosition.Bottom);
         const arrowX: number = (cx + this.x + this.width / 2) | 0;
-        const arrowSize: number = 8;
+        const arrowSize: number = this.renderer.smuflMetrics.tabBrushArrowSize;
         if (this._beat.brushType !== BrushType.None) {
             if (this._beat.brushType === BrushType.BrushUp || this._beat.brushType === BrushType.BrushDown) {
                 canvas.beginPath();
@@ -32,7 +32,7 @@ export class TabBrushGlyph extends Glyph {
                 canvas.lineTo(arrowX, endY);
                 canvas.stroke();
             } else if (this._beat.brushType === BrushType.ArpeggioUp) {
-                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
+                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.tabBrushVibratoScale, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
 
@@ -40,11 +40,11 @@ export class TabBrushGlyph extends Glyph {
                 const lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + 4, lineEndY, -90);
+                canvas.beginRotate(cx + this.x + this.renderer.smuflMetrics.tabBrushArpeggioOffset, lineEndY, -90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
-                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2, true);
+                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.tabBrushVibratoScale, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
 
@@ -52,7 +52,7 @@ export class TabBrushGlyph extends Glyph {
                 const lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + 4, lineStartY, 90);
+                canvas.beginRotate(cx + this.x + this.renderer.smuflMetrics.tabBrushArpeggioOffset, lineStartY, 90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             }

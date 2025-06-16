@@ -4,6 +4,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { ICanvas } from '@src/platform/ICanvas';
 
 export class NoteHeadGlyph extends MusicFontGlyph {
+    // TODO: SmuFL
     public static readonly GraceScale: number = 0.75;
 
     private _isGrace: boolean;
@@ -15,7 +16,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const offset: number = this._isGrace ? 1 : 0;
+        const offset: number = this._isGrace ? this.renderer.smuflMetrics.graceNoteHeadPadding : 0;
         if (this.centerOnStem) {
             this.center = true;
         }

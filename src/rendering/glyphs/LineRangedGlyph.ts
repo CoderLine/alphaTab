@@ -4,10 +4,6 @@ import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import type { RenderingResources } from '@src/RenderingResources';
 
 export class LineRangedGlyph extends GroupedEffectGlyph {
-    public static readonly LineSpacing: number = 3;
-    public static readonly LineTopPadding: number = 4;
-    public static readonly LineTopOffset: number = 5;
-    public static readonly LineSize: number = 8;
     private _label: string;
     private _dashed: boolean;
 
@@ -37,11 +33,11 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         this.paintNonGrouped(cx, cy, canvas);
-        const lineSpacing: number = 3;
+        const lineSpacing: number = this.renderer.smuflMetrics.lineRangedGlyphSpacing;
         const textWidth: number = canvas.measureText(this._label).width;
         const startX: number = cx + this.x + textWidth / 2 + lineSpacing;
-        const lineY: number = cy + this.y + 4;
-        const lineSize: number = 8;
+        const lineY: number = cy + this.y + this.renderer.smuflMetrics.lineRangedGlyphTopPadding;
+        const lineSize: number = this.renderer.smuflMetrics.lineRangedGlyphSize;
         if (this._dashed) {
             if (endX > startX) {
                 let lineX: number = startX;
@@ -53,15 +49,15 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
                     canvas.stroke();
                 }
                 canvas.beginPath();
-                canvas.moveTo(endX, (lineY - 5) | 0);
-                canvas.lineTo(endX, (lineY + 5) | 0);
+                canvas.moveTo(endX, (lineY - this.renderer.smuflMetrics.lineRangedGlyphTopOffset) | 0);
+                canvas.lineTo(endX, (lineY + this.renderer.smuflMetrics.lineRangedGlyphTopOffset) | 0);
                 canvas.stroke();
             }
         } else {
             canvas.beginPath();
             canvas.moveTo(startX, lineY | 0);
             canvas.lineTo(endX, lineY | 0);
-            canvas.lineTo(endX, (lineY + 5) | 0);
+            canvas.lineTo(endX, (lineY + this.renderer.smuflMetrics.lineRangedGlyphTopOffset) | 0);
             canvas.stroke();
         }
     }

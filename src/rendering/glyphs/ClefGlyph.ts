@@ -40,50 +40,40 @@ export class ClefGlyph extends MusicFontGlyph {
         super.paint(cx, cy, canvas);
         let numberGlyph: Glyph;
         let top: boolean = false;
+        let ottavaX = 0;
+        if(this.renderer.smuflMetrics.clefOttavaOffsetX.has(this._clefOttava)) {
+            ottavaX = this.renderer.smuflMetrics.clefOttavaOffsetX.get(this._clefOttava)!;
+        }
+        const ottavaScale = this.renderer.smuflMetrics.clefOttavaScale;
         switch (this._clefOttava) {
             case Ottavia._15ma:
-                numberGlyph = new MusicFontGlyph(-4, 0, 0.5, MusicFontSymbol.Quindicesima);
+                numberGlyph = new MusicFontGlyph(ottavaX, 0, ottavaScale, MusicFontSymbol.Quindicesima);
                 top = true;
                 break;
             case Ottavia._8va:
-                numberGlyph = new MusicFontGlyph(-2, 0, 0.5, MusicFontSymbol.Ottava);
+                numberGlyph = new MusicFontGlyph(ottavaX, 0, ottavaScale, MusicFontSymbol.Ottava);
                 top = true;
                 break;
             case Ottavia._8vb:
-                numberGlyph = new MusicFontGlyph(-6, 0, 0.5, MusicFontSymbol.Ottava);
+                numberGlyph = new MusicFontGlyph(ottavaX, 0, ottavaScale, MusicFontSymbol.Ottava);
                 break;
             case Ottavia._15mb:
-                numberGlyph = new MusicFontGlyph(-8, 0, 0.5, MusicFontSymbol.Quindicesima);
+                numberGlyph = new MusicFontGlyph(ottavaX, 0, ottavaScale, MusicFontSymbol.Quindicesima);
                 break;
             default:
                 return;
         }
         let offsetY: number = 0;
         let offsetX: number = 0;
-        switch (this._clef) {
-            case Clef.Neutral:
-                offsetY = top ? -12 : 15;
-                offsetX = 0;
-                break;
-            case Clef.C3:
-                offsetY = top ? -19 : 27;
-                offsetX = 0;
-                break;
-            case Clef.C4:
-                offsetY = top ? -19 : 27;
-                offsetX = 0;
-                break;
-            case Clef.F4:
-                offsetY = top ? -9 : 27;
-                offsetX = -4;
-                break;
-            case Clef.G2:
-                offsetY = top ? -37 : 30;
-                offsetX = 0;
-                break;
-            default:
-                return;
+        const offsetYLookup = top ? this.renderer.smuflMetrics.clefOffsetYTop : this.renderer.smuflMetrics.clefOffsetY;
+        if(offsetYLookup.has(this._clef)) {
+            offsetY = offsetYLookup.get(this._clef)!;
         }
+
+        if(this.renderer.smuflMetrics.clefOffsetX.has(this._clef)) {
+            offsetX = this.renderer.smuflMetrics.clefOffsetX.get(this._clef)!;
+        }
+
         numberGlyph.renderer = this.renderer;
         numberGlyph.doLayout();
         const x: number = this.width / 2;

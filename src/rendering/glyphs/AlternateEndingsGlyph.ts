@@ -4,7 +4,6 @@ import type { RenderingResources } from '@src/RenderingResources';
 import { ModelUtils } from '@src/model/ModelUtils';
 
 export class AlternateEndingsGlyph extends EffectGlyph {
-    private static readonly Padding: number = 3;
     private _endings: number[];
     private _endingsString: string = '';
     private _openLine: boolean;
@@ -19,7 +18,7 @@ export class AlternateEndingsGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.resources.wordsFont.size + (AlternateEndingsGlyph.Padding + 2);
+        this.height = this.renderer.resources.wordsFont.size + this.renderer.smuflMetrics.alternateEndingsPaddingY;
         let endingsStrings: string = '';
         for (let i: number = 0, j: number = this._endings.length; i < j; i++) {
             endingsStrings += this._endings[i] + 1;
@@ -29,10 +28,12 @@ export class AlternateEndingsGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const width = this._closeLine ? this.width - 4 : this.width;
+        const width = this._closeLine
+            ? this.width - this.renderer.smuflMetrics.alternateEndingsCloseLinePadding
+            : this.width;
 
-        cx = (cx | 0) + 0.5;
-        cy = (cy | 0) + 0.5;
+        cx = (cx | 0) + (canvas.lineWidth / 2);
+        cy = (cy | 0) + (canvas.lineWidth / 2);
 
         if (this._openLine) {
             canvas.moveTo(cx + this.x, cy + this.y + this.height);
@@ -54,7 +55,11 @@ export class AlternateEndingsGlyph extends EffectGlyph {
             canvas.textBaseline = TextBaseline.Top;
             const res: RenderingResources = this.renderer.resources;
             canvas.font = res.wordsFont;
-            canvas.fillText(this._endingsString, cx + this.x + AlternateEndingsGlyph.Padding, cy + this.y);
+            canvas.fillText(
+                this._endingsString,
+                cx + this.x + this.renderer.smuflMetrics.alternateEndingsPaddingX,
+                cy + this.y
+            );
             canvas.textBaseline = baseline;
         }
     }

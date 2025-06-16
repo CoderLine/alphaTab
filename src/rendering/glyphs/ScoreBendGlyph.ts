@@ -15,7 +15,6 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
@@ -127,7 +126,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         } else {
             endBeatX += startNoteRenderer.getBeatX(this._beat.nextBeat!, BeatXPosition.PreNotes);
         }
-        endBeatX -= 8;
+        endBeatX -= this.renderer.smuflMetrics.scoreBendEndPadding;
         const middleX: number = (startX + endBeatX) / 2;
         if (this._middleNoteGlyph) {
             this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.noteHeadOffset;
@@ -146,7 +145,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         let direction: BeamDirection =
             this._notes.length === 1 ? this.getTieDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
 
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
 
         // draw slurs
         for (let i: number = 0; i < this._notes.length; i++) {
@@ -189,8 +188,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            22,
-                            4
+                            this.renderer.smuflMetrics.scoreBendHoldOffset,
+                            this.renderer.smuflMetrics.scoreBendHoldSize
                         );
                     } else {
                         this.drawBendSlur(
@@ -220,8 +219,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            22,
-                            4
+                            this.renderer.smuflMetrics.scoreBendHoldOffset,
+                            this.renderer.smuflMetrics.scoreBendHoldSize
                         );
                     } else {
                         this.drawBendSlur(

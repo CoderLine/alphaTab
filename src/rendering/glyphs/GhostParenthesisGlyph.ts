@@ -4,7 +4,6 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
 export class GhostParenthesisGlyph extends Glyph {
-    private static readonly Size: number = 6;
     private _isOpen: boolean;
 
     public colorOverride?: Color;
@@ -16,7 +15,7 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.width = GhostParenthesisGlyph.Size;
+        this.width = this.renderer.smuflMetrics.ghostParenthesisSize;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -33,11 +32,21 @@ export class GhostParenthesisGlyph extends Glyph {
                 cx + this.x + this.width,
                 cy + this.y,
                 false,
-                6,
-                3
+                this.renderer.smuflMetrics.ghostParenthesisSize,
+                this.renderer.smuflMetrics.ghostParenthesisSize / 2
             );
         } else {
-            TieGlyph.paintTie(canvas, 1, cx + this.x, cy + this.y, cx + this.x, cy + this.y + this.height, false, 6, 3);
+            TieGlyph.paintTie(
+                canvas,
+                1,
+                cx + this.x,
+                cy + this.y,
+                cx + this.x,
+                cy + this.y + this.height,
+                false,
+                this.renderer.smuflMetrics.ghostParenthesisSize,
+                this.renderer.smuflMetrics.ghostParenthesisSize / 2
+            );
         }
         canvas.color = c;
     }

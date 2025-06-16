@@ -3,7 +3,6 @@ import type { ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _type: VibratoType;
@@ -12,7 +11,7 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _symbolSize: number = 0;
     private _partialWaves: boolean;
 
-    public constructor(x: number, y: number, type: VibratoType, scale: number = 1.2, partialWaves: boolean = false) {
+    public constructor(x: number, y: number, type: VibratoType, scale: number /*= 1.2*/, partialWaves: boolean = false) {
         super(BeatXPosition.EndBeat);
         this._type = type;
         this._scale = scale;
@@ -32,8 +31,8 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
                 break;
         }
 
-        this._symbolSize = MusicFontSymbolSizes.Widths.get(this._symbol)! * this._scale;
-        this.height = MusicFontSymbolSizes.Heights.get(this._symbol)! * this._scale;
+        this._symbolSize = this.renderer.smuflMetrics.GlyphWidths.get(this._symbol)! * this._scale;
+        this.height = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)! * this._scale;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {

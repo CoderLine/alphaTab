@@ -15,10 +15,6 @@ import { VibratoType } from '@src/model/VibratoType';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
 
 export class TabBendGlyph extends Glyph {
-    private static readonly ArrowSize: number = 6;
-    private static readonly DashSize: number = 3;
-    private static readonly BendValueHeight: number = 6;
-
     private _notes: Note[] = [];
     private _renderPoints: Map<number, TabBendRenderPoint[]> = new Map();
     private _preBendMinValue: number = -1;
@@ -126,7 +122,7 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const bendHeight: number = this._maxBendValue * TabBendGlyph.BendValueHeight;
+        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendBendValueHeight;
         this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (const note of this._notes) {
@@ -258,20 +254,12 @@ export class TabBendGlyph extends Glyph {
             let startX: number = 0;
             let endX: number = 0;
             const topY: number = cy + startNoteRenderer.y;
-            // float bottomY = cy + startNoteRenderer.Y + startNoteRenderer.GetNoteY(note);
             startX = cx + startNoteRenderer.x;
             if (renderPoints[0].value > 0 || note.isContinuedBend) {
                 startX += startNoteRenderer.getBeatX(note.beat, BeatXPosition.MiddleNotes);
             } else {
                 startX += startNoteRenderer.getNoteX(note, NoteXPosition.Right);
             }
-            // canvas.Color = Color.Random();
-            // canvas.FillRect(
-            //    cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.MiddleNotes),
-            //    cy + startNoteRenderer.Y, 10, 10);
-            // canvas.FillRect(
-            //    cx + startNoteRenderer.X + startNoteRenderer.GetBeatX(_note.Beat, BeatXPosition.EndBeat),
-            //    cy + startNoteRenderer.Y + 10, 10, 10);
             if (!endBeat || (endBeat.isLastOfVoice && !endNoteHasBend)) {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.postBeatGlyphsStart;
             } else if (endNoteHasBend || !endBeat.nextBeat) {
@@ -282,7 +270,7 @@ export class TabBendGlyph extends Glyph {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
             }
             if (!isMultiBeatBend) {
-                endX -= TabBendGlyph.ArrowSize;
+                endX -=  this.renderer.smuflMetrics.tabBendArrowSize;
             }
             // we need some pixels for the arrow. otherwise we might draw into the next
             // note
@@ -299,7 +287,7 @@ export class TabBendGlyph extends Glyph {
                 }
                 if (note.bendType !== BendType.Prebend) {
                     if (i === 0) {
-                        startX += 2;
+                        startX += this.renderer.smuflMetrics.tabPreBendPadding;
                     }
                     this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
@@ -311,11 +299,11 @@ export class TabBendGlyph extends Glyph {
             }
 
             if (endNote.vibrato !== VibratoType.None) {
-                const vibratoStartX = endX - cx + TabBendGlyph.ArrowSize - endNoteRenderer.x;
+                const vibratoStartX = endX - cx +  this.renderer.smuflMetrics.tabBendArrowSize - endNoteRenderer.x;
                 const vibratoStartY: number =
-                    topY - cy - TabBendGlyph.BendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
+                    topY - cy -  this.renderer.smuflMetrics.tabBendBendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
 
-                const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato, 1.2);
+                const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato, this.renderer.smuflMetrics.tabBendVibratoScale);
                 vibrato.beat = endNote.beat;
                 vibrato.renderer = endNoteRenderer;
                 vibrato.doLayout();
@@ -340,7 +328,7 @@ export class TabBendGlyph extends Glyph {
         const res: RenderingResources = this.renderer.resources;
         const overflowOffset: number = r.lineOffset / 2;
         const x1: number = cx + dX * firstPt.offset;
-        const bendValueHeight: number = TabBendGlyph.BendValueHeight;
+        const bendValueHeight: number =  this.renderer.smuflMetrics.tabBendBendValueHeight;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
@@ -360,7 +348,7 @@ export class TabBendGlyph extends Glyph {
         }
         // what type of arrow? (up/down)
         let arrowOffset: number = 0;
-        const arrowSize: number = TabBendGlyph.ArrowSize;
+        const arrowSize: number =  this.renderer.smuflMetrics.tabBendArrowSize;
         if (secondPt.value > firstPt.value) {
             if (y2 + arrowSize > y1) {
                 y2 = y1 - arrowSize;
@@ -391,7 +379,7 @@ export class TabBendGlyph extends Glyph {
             // we draw from right to left. it's okay if the space is at the beginning
             if (firstPt.lineValue > 0) {
                 let dashX: number = x2;
-                const dashSize: number = TabBendGlyph.DashSize;
+                const dashSize: number =  this.renderer.smuflMetrics.tabBendDashSize;
                 const end: number = x1 + dashSize;
                 const dashes: number = (dashX - x1) / (dashSize * 2);
                 if (dashes < 1) {
@@ -425,7 +413,7 @@ export class TabBendGlyph extends Glyph {
             let x: number = 0;
             if (y1 > y2) {
                 const h: number = Math.abs(y1 - y2);
-                y = h > canvas.font.size * 1.3 ? y1 - h / 2 : y1;
+                y = h > canvas.font.size * this.renderer.smuflMetrics.tabBendFontSizeToHeight ? y1 - h / 2 : y1;
                 x = (x1 + x2 - size) / 2;
             } else {
                 y = y1;
@@ -461,7 +449,7 @@ export class TabBendGlyph extends Glyph {
                 // draw label
                 canvas.font = res.tablatureFont;
                 const size: number = canvas.measureText(s).width;
-                const y: number = startY - res.tablatureFont.size * 0.5 - 2;
+                const y: number = startY - res.tablatureFont.size * this.renderer.smuflMetrics.tabBendFontSizeToPadding - this.renderer.smuflMetrics.tabBendLabelYOffset;
                 const x: number = x2 - size / 2;
                 canvas.fillText(s, x, y);
             }

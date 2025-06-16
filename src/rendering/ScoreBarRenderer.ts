@@ -6,7 +6,7 @@ import { Duration } from '@src/model/Duration';
 import type { Note } from '@src/model/Note';
 import type { Voice } from '@src/model/Voice';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { ClefGlyph } from '@src/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
@@ -67,11 +67,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return BarRendererBase.RawLineSpacing;
+        return this.smuflMetrics.RawLineSpacing;
     }
 
     public override get heightLineCount(): number {
-        return 5;
+        return this.smuflMetrics.scoreBarRendererLineHeightCount;
     }
 
     public override get drawnLineCount(): number {
@@ -113,7 +113,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         super.doLayout();
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             const top: number = this.getScoreY(-2);
-            const bottom: number = this.getScoreY(10);
+            const bottom: number = this.getScoreY(this.heightLineCount * 2);
             const whammyOffset: number = this.simpleWhammyOverflow;
 
             const beatEffectsMinY = this.beatEffectsMinY;
@@ -224,29 +224,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     private getBarStemSize(duration: Duration): number {
         let size: number = 0;
-        switch (duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.Half:
-            case Duration.Quarter:
-            case Duration.Eighth:
-            case Duration.Sixteenth:
-                size = 6;
-                break;
-            case Duration.ThirtySecond:
-                size = 8;
-                break;
-            case Duration.SixtyFourth:
-                size = 9;
-                break;
-            case Duration.OneHundredTwentyEighth:
-                size = 9;
-                break;
-            case Duration.TwoHundredFiftySixth:
-                size = 10;
-                break;
-            default:
-                size = 0;
-                break;
+        if (this.smuflMetrics.barStemSizes.has(duration)) {
+            size = this.smuflMetrics.barStemSizes.get(duration)!;
         }
         return this.getScoreHeight(size);
     }
@@ -334,7 +313,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // 2. ensure max height
             // we use the min/max notes to place the beam along their real position
             // we only want a maximum of 10 offset for their gradient
-            const maxDistance: number = 10;
+            const maxDistance: number = this.smuflMetrics.scoreBarRendererBeamMaxDistance;
             if (
                 direction === BeamDirection.Down &&
                 drawingInfo.startY > drawingInfo.endY &&
@@ -394,8 +373,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
                     const scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
-                        barCount * (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
-                    barSpacing += BarRendererBase.BeamSpacing;
+                        barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
+                    barSpacing += this.smuflMetrics.beamSpacing;
 
                     if (direction === BeamDirection.Up && h.minRestLine !== null) {
                         const yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
@@ -484,7 +463,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.addPreBeatGlyph(
                 new ClefGlyph(
                     0,
-                    this.getScoreY(offset) + 0.5 * BarRendererBase.StaffLineThickness,
+                    this.getScoreY(offset) + this.smuflMetrics.clefTopPadding * this.smuflMetrics.staffLineThickness,
                     this.bar.clef,
                     this.bar.clefOttava
                 )
@@ -590,7 +569,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.scoreBarRendererPreTimeSignaturePadding));
 
         const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
@@ -651,11 +630,12 @@ export class ScoreBarRenderer extends LineBarRenderer {
         canvas: ICanvas
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
-        canvas.lineWidth = BarRendererBase.StemWidth;
+        const lineWidth = canvas.lineWidth;
+        canvas.lineWidth = this.smuflMetrics.stemWidth;
         canvas.beginPath();
         canvas.moveTo(x, topY);
         canvas.lineTo(x, bottomY);
         canvas.stroke();
-        canvas.lineWidth = 1;
+        canvas.lineWidth = lineWidth;
     }
 }

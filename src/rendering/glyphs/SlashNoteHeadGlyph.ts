@@ -6,7 +6,6 @@ import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import { NoteSubElement } from '@src/model/Note';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
 
@@ -47,11 +46,11 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     public override doLayout(): void {
         const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
 
-        this.width = MusicFontSymbolSizes.Widths.get(this._symbol)! * scale;
-        this.height = MusicFontSymbolSizes.Heights.get(this._symbol)! * scale;
+        this.width = this.renderer.smuflMetrics.GlyphWidths.get(this._symbol)! * scale;
+        this.height = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)! * scale;
 
-        const effectSpacing: number = 7;
-        let effectY = MusicFontSymbolSizes.Heights.get(this._symbol)!;
+        const effectSpacing: number = this.renderer.smuflMetrics.slashNoteHeadEffectSpacing;
+        let effectY = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)!;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;

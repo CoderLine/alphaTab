@@ -2,7 +2,6 @@ import type { Automation } from '@src/model/Automation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 /**
  * This glyph renders tempo annotations for tempo automations
@@ -18,7 +17,7 @@ export class BarTempoGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = 25;
+        this.height = this.renderer.smuflMetrics.barTempoHeight;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -32,13 +31,13 @@ export class BarTempoGlyph extends EffectGlyph {
             if (automation.text) {
                 const size = canvas.measureText(automation.text);
                 canvas.fillText(automation.text, x, cy + this.y + canvas.font.size / 2);
-                x += size.width + canvas.font.size * 0.7;
+                x += size.width + canvas.font.size * this.renderer.smuflMetrics.barTempoTextPaddingScale;
             }
-            canvas.fillMusicFontSymbol(x, cy + this.y + this.height * 0.8, 0.5, MusicFontSymbol.NoteQuarterUp, true);
+            canvas.fillMusicFontSymbol(x, cy + this.y + this.height * this.renderer.smuflMetrics.barTempoSymbolYScale, this.renderer.smuflMetrics.barTempoSymbolScale, MusicFontSymbol.NoteQuarterUp, true);
             canvas.fillText(
                 `= ${automation.value.toString()}`,
-                x + MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteQuarterUp)! * 0.5 + 3,
-                cy + this.y + canvas.font.size / 2
+                x + this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.NoteQuarterUp)! * this.renderer.smuflMetrics.barTempoSymbolScale + this.renderer.smuflMetrics.barTempoValuePadding,
+                cy + this.y + canvas.font.size * this.renderer.smuflMetrics.barTempoSymbolScale
             );
         }
     }

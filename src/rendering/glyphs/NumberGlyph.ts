@@ -1,11 +1,8 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import type { ICanvas } from '@src/platform/ICanvas';
 
 export class NumberGlyph extends Glyph {
-    public static readonly numberHeight: number = 18;
-
     private _scale: number = 0;
 
     private _symbols: MusicFontSymbol[] = [];
@@ -56,7 +53,7 @@ export class NumberGlyph extends Glyph {
     public override doLayout(): void {
         let w = 0;
         for (const d of this._symbols) {
-            w += MusicFontSymbolSizes.Widths.get(d)!;
+            w += this.renderer.smuflMetrics.GlyphWidths.get(d)!;
         }
         this.width = w;
     }

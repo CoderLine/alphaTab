@@ -6,7 +6,6 @@ import { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
@@ -138,7 +137,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 cx - linePadding + this.noteStartX,
                 (cy + y) | 0,
                 lineWidth,
-                BarRendererBase.StaffLineThickness
+                this.renderer.smuflMetrics.staffLineThickness
             );
             y -= lineSpacing;
         }
@@ -149,7 +148,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 cx - linePadding + this.noteStartX,
                 (cy + y) | 0,
                 lineWidth,
-                BarRendererBase.StaffLineThickness
+                this.renderer.smuflMetrics.staffLineThickness
             );
             y += lineSpacing;
         }

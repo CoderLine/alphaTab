@@ -40,7 +40,7 @@ export class NumberedTieGlyph extends TieGlyph {
 
     protected override getStartX(): number {
         if (this.startNote === this.endNote) {
-            return this.getEndX() - 20;
+            return this.getEndX() - this.startNoteRenderer!.smuflMetrics.numberedTieEmptySize;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }

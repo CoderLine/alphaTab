@@ -13,7 +13,7 @@ export class CircleGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = this._size + 3;
+        this.width = this._size + this.renderer.smuflMetrics.circleGlyphPadding;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

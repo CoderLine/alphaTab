@@ -2,10 +2,6 @@ import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 export class BeatTimerGlyph extends EffectGlyph {
-    private static readonly PaddingX = 2;
-    private static readonly PaddingY = 2;
-    private static readonly MarginY = 2;
-
     private _timer: number;
     private _text: string = '';
     private _textWidth: number = 0;
@@ -25,17 +21,17 @@ export class BeatTimerGlyph extends EffectGlyph {
 
         const size = c.measureText(this._text);
 
-        this._textHeight = c.font.size + BeatTimerGlyph.PaddingY * 2;
-        this._textWidth = size.width + BeatTimerGlyph.PaddingX * 2;
+        this._textHeight = c.font.size + this.renderer.smuflMetrics.beatTimerPaddingY * 2;
+        this._textWidth = size.width + this.renderer.smuflMetrics.beatTimerPaddingX * 2;
 
-        this.height = this._textHeight + BeatTimerGlyph.MarginY * 2;
+        this.height = this._textHeight + this.renderer.smuflMetrics.beatTimerMarginY * 2;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const halfWidth = (this._textWidth / 2) | 0;
         canvas.strokeRect(
             cx + this.x - halfWidth,
-            cy + this.y + BeatTimerGlyph.MarginY,
+            cy + this.y + this.renderer.smuflMetrics.beatTimerMarginY,
             this._textWidth,
             this._textHeight
         );

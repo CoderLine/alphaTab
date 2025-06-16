@@ -4,10 +4,14 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class PictEdgeOfCymbalGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number) {
-        super(x, y, 0.5, MusicFontSymbol.PictEdgeOfCymbal);
+        super(x, y, 1, MusicFontSymbol.PictEdgeOfCymbal);
+    }
+
+    public override doLayout(): void {
+        this.glyphScale = this.renderer.smuflMetrics.pictEdgeOfCymbalScale;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx - 3, cy + this.height, canvas);
+        super.paint(cx - this.renderer.smuflMetrics.pictEdgeOfCymbalOffsetX, cy + this.height, canvas);
     }
 }

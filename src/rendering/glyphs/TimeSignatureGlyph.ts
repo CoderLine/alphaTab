@@ -39,7 +39,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
 
     public override doLayout(): void {
         let x = 0;
-        const numberHeight = NumberGlyph.numberHeight;
+        const numberHeight = this.renderer.smuflMetrics.timeSignatureNumberHeight;
         if (this._isFreeTime) {
             const g = new GhostParenthesisGlyph(true);
             g.renderer = this.renderer;
@@ -47,7 +47,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
             g.height = numberHeight * 2;
             g.doLayout();
             this.addGlyph(g);
-            x += g.width + 10 * 1;
+            x += g.width + this.renderer.smuflMetrics.timeSignatureGhostParenthesisLeftPadding;
         }
 
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
@@ -73,7 +73,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
         if (this._isFreeTime) {
             const g = new GhostParenthesisGlyph(false);
             g.renderer = this.renderer;
-            g.x = this.width + 13;
+            g.x = this.width + this.renderer.smuflMetrics.timeSignatureGhostParenthesisRightPadding;
             g.y = -numberHeight;
             g.height = numberHeight * 2;
             g.doLayout();

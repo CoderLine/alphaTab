@@ -75,13 +75,6 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
-    protected static readonly RawLineSpacing: number = 8;
-    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.RawLineSpacing;
-    public static readonly StaffLineThickness: number =
-        0.13 /*bravura staffLineThickness */ * BarRendererBase.RawLineSpacing;
-    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.RawLineSpacing;
-    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.RawLineSpacing;
-
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
     private _postBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
@@ -107,6 +100,10 @@ export class BarRendererBase {
     public layoutingInfo!: BarLayoutingInfo;
     public bar: Bar;
     public additionalMultiRestBars: Bar[] | null = null;
+
+    public get smuflMetrics() {
+        return this.scoreRenderer.smuflMetrics;
+    }
 
     public get lastBar(): Bar {
         if (this.additionalMultiRestBars) {
@@ -582,7 +579,7 @@ export class BarRendererBase {
             case SimileMark.Simple:
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
                 canvas.fillMusicFontSymbol(
-                    cx + this.x + (this.width - 20) / 2,
+                    cx + this.x + (this.width - this.smuflMetrics.simileMarkSimpleWidth) / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat1Bar,
@@ -595,7 +592,7 @@ export class BarRendererBase {
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
 
                 canvas.fillMusicFontSymbol(
-                    cx + this.x - 28 / 2,
+                    cx + this.x - this.smuflMetrics.simileMarkDoubleWidth / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat2Bars,

@@ -4,7 +4,7 @@ import { Duration } from '@src/model/Duration';
 import type { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { TabBeatContainerGlyph } from '@src/rendering/glyphs/TabBeatContainerGlyph';
 import { TabBeatGlyph } from '@src/rendering/glyphs/TabBeatGlyph';
@@ -27,7 +27,6 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
  */
 export class TabBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'tab';
-    public static readonly TabLineSpacing: number = 10;
 
     private _hasTuplets = false;
 
@@ -69,7 +68,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return TabBarRenderer.TabLineSpacing;
+        return this.smuflMetrics.tabLineSpacing;
     }
 
     public override get heightLineCount(): number {
@@ -103,7 +102,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
-        const padding: number = 1;
+        const padding: number = this.smuflMetrics.tabNumberSpacePadding;
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -157,7 +156,7 @@ export class TabBarRenderer extends LineBarRenderer {
         // Clef
         if (this.isFirstOfLine) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
-            this.addPreBeatGlyph(new TabClefGlyph(5, this.getTabY(center)));
+            this.addPreBeatGlyph(new TabClefGlyph(this.smuflMetrics.tabClefLeftPadding, this.getTabY(center)));
         }
         // Time Signature
         if (
@@ -179,7 +178,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.tabBarRendererPreTimeSignaturePadding));
 
         const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
         this.addPreBeatGlyph(
@@ -289,7 +288,8 @@ export class TabBarRenderer extends LineBarRenderer {
 
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabStem, beat);
 
-        canvas.lineWidth = BarRendererBase.StemWidth;
+        const lineWidth = canvas.lineWidth;
+        canvas.lineWidth = this.smuflMetrics.stemWidth;
         canvas.beginPath();
 
         let holes: ReservedLayoutAreaSlot[] = [];
@@ -316,6 +316,6 @@ export class TabBarRenderer extends LineBarRenderer {
         }
         canvas.stroke();
 
-        canvas.lineWidth = 1;
+        canvas.lineWidth = lineWidth;
     }
 }

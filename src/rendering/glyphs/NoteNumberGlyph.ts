@@ -108,7 +108,7 @@ export class NoteNumberGlyph extends Glyph {
         using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
         const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + 3, cy + this.y);
+        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + this.renderer.smuflMetrics.trillTextPadding, cy + this.y);
         this.renderer.scoreRenderer.canvas!.font = prevFont;
     }
 

@@ -5,11 +5,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { RenderingResources } from '@src/RenderingResources';
 
 export class ChordDiagramGlyph extends EffectGlyph {
-    private static readonly Padding: number[] = [5, 2];
     private static readonly Frets: number = 5;
-    private static readonly CircleRadius: number = 2.5;
-    private static readonly StringSpacing: number = 10;
-    private static readonly FretSpacing: number = 12;
 
     private _chord: Chord;
     private _textRow: number = 0;
@@ -24,32 +20,32 @@ export class ChordDiagramGlyph extends EffectGlyph {
     public override doLayout(): void {
         super.doLayout();
         const res: RenderingResources = this.renderer.resources;
-        this._textRow = res.effectFont.size * 1.5;
-        this._fretRow = res.effectFont.size * 1.5;
+        this._textRow = res.effectFont.size * this.renderer.smuflMetrics.chordDiagramFontToRow;
+        this._fretRow = res.effectFont.size * this.renderer.smuflMetrics.chordDiagramFontToRow;
         if (this._chord.firstFret > 1) {
-            this._firstFretSpacing = ChordDiagramGlyph.FretSpacing;
+            this._firstFretSpacing = this.renderer.smuflMetrics.chordDiagramFretSpacing;
         } else {
             this._firstFretSpacing = 0;
         }
         this.height =
             this._textRow +
             this._fretRow +
-            ChordDiagramGlyph.Frets * ChordDiagramGlyph.FretSpacing +
-            2 * ChordDiagramGlyph.Padding[1];
+            ChordDiagramGlyph.Frets * this.renderer.smuflMetrics.chordDiagramFretSpacing +
+            2 * this.renderer.smuflMetrics.chordDiagramPaddingY;
         this.width =
             this._firstFretSpacing +
-            (this._chord.strings.length - 1) * ChordDiagramGlyph.StringSpacing +
-            2 * ChordDiagramGlyph.Padding[0];
+            (this._chord.strings.length - 1) * this.renderer.smuflMetrics.chordDiagramStringSpacing +
+            2 * this.renderer.smuflMetrics.chordDiagramPaddingX;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        cx += this.x + ChordDiagramGlyph.Padding[0] + this._firstFretSpacing;
+        cx += this.x + this.renderer.smuflMetrics.chordDiagramPaddingX + this._firstFretSpacing;
         cy += this.y;
-        const stringSpacing: number = ChordDiagramGlyph.StringSpacing;
-        const fretSpacing: number = ChordDiagramGlyph.FretSpacing;
+        const stringSpacing: number = this.renderer.smuflMetrics.chordDiagramStringSpacing;
+        const fretSpacing: number = this.renderer.smuflMetrics.chordDiagramFretSpacing;
         const res: RenderingResources = this.renderer.resources;
-        const circleRadius: number = ChordDiagramGlyph.CircleRadius;
-        const w: number = this.width - 2 * ChordDiagramGlyph.Padding[0] - this._firstFretSpacing;
+        const circleRadius: number = this.renderer.smuflMetrics.chordDiagramCircleRadius;
+        const w: number = this.width - 2 * this.renderer.smuflMetrics.chordDiagramPaddingX - this._firstFretSpacing;
 
         const align: TextAlign = canvas.textAlign;
         const baseline: TextBaseline = canvas.textBaseline;
@@ -88,10 +84,15 @@ export class ChordDiagramGlyph extends EffectGlyph {
             canvas.fillText(this._chord.firstFret.toString(), cx - this._firstFretSpacing, cy + fretSpacing / 2);
         }
 
-        canvas.fillRect(cx, cy - 1, w, 2);
+        canvas.fillRect(
+            cx,
+            cy - this.renderer.smuflMetrics.chordDiagramNutHeight / 2,
+            w,
+            this.renderer.smuflMetrics.chordDiagramNutHeight
+        );
         for (let i: number = 0; i <= ChordDiagramGlyph.Frets; i++) {
             const y: number = cy + i * fretSpacing;
-            canvas.fillRect(cx, y, w, 1);
+            canvas.fillRect(cx, y, w, this.renderer.smuflMetrics.chordDiagramFretHeight);
         }
 
         const barreLookup = new Map<number, number[]>();

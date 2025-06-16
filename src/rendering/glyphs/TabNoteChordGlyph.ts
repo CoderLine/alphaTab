@@ -61,7 +61,7 @@ export class TabNoteChordGlyph extends Glyph {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= n.height / 2 + 2;
+                    pos -= n.height / 2 + this.renderer.smuflMetrics.tabNoteYTopOffset;
                     break;
                 case NoteYPosition.Center:
                     break;
@@ -102,7 +102,7 @@ export class TabNoteChordGlyph extends Glyph {
             const tabHeight: number = this.renderer.resources.tablatureFont.size;
             let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
             // TODO: take care of actual glyph height
-            const effectSpacing: number = 7;
+            const effectSpacing: number = this.renderer.smuflMetrics.tabNoteChordEffectSpacing;
             for (const g of this.beatEffects.values()) {
                 g.y += effectY;
                 g.x += this.width / 2;

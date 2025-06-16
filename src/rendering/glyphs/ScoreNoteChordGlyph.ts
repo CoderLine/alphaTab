@@ -110,7 +110,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         const direction: BeamDirection = this.direction;
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
-        let belowEffectSpacing = 1;
+        let belowEffectSpacing = this.renderer.smuflMetrics.scoreNoteBelowEffectSpacing;
         let aboveEffectSpacing = -belowEffectSpacing;
 
         let belowEffectSpacingShiftBefore = false;
@@ -192,19 +192,16 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             const baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
             let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
             const speed: Duration = this.beat.tremoloSpeed!;
-            switch (speed) {
-                case Duration.ThirtySecond:
-                    offset = direction === BeamDirection.Up ? -15 : 15;
-                    break;
-                case Duration.Sixteenth:
-                    offset = direction === BeamDirection.Up ? -12 : 15;
-                    break;
-                case Duration.Eighth:
-                    offset = direction === BeamDirection.Up ? -10 : 10;
-                    break;
-                default:
-                    offset = direction === BeamDirection.Up ? -10 : 15;
-                    break;
+            const scoreTremoloOffsetLookup =
+                direction === BeamDirection.Up
+                    ? this.renderer.smuflMetrics.scoreTremoloOffsetUp
+                    : this.renderer.smuflMetrics.scoreTremoloOffsetDown;
+            if (scoreTremoloOffsetLookup.has(speed)) {
+                offset = scoreTremoloOffsetLookup.get(speed)!;
+            } else if (direction === BeamDirection.Up) {
+                offset = this.renderer.smuflMetrics.scoreTremoloOffsetUpOther;
+            } else {
+                offset = this.renderer.smuflMetrics.scoreTremoloOffsetDownOther;
             }
 
             if (this.beat.duration < Duration.Half) {

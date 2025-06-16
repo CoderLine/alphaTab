@@ -95,17 +95,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
                 let offset: number = 0;
                 const speed = this.container.beat.tremoloSpeed!;
-                let tremoloX = 5;
-                switch (speed) {
-                    case Duration.ThirtySecond:
-                        offset = 10;
-                        break;
-                    case Duration.Sixteenth:
-                        offset = 5;
-                        break;
-                    case Duration.Eighth:
-                        offset = 0;
-                        break;
+                let tremoloX = this.renderer.smuflMetrics.tabTremoloXDefault;
+                if(this.renderer.smuflMetrics.tabTremoloOffsetX.has(speed)){
+                    offset = this.renderer.smuflMetrics.tabTremoloOffsetX.get(speed)!;
                 }
 
                 if (this.container.beat.duration < Duration.Half) {
@@ -118,14 +110,14 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
-                this.addNormal(new SpacingGlyph(0, 0, 5));
+                this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.tabNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     this.addEffect(
                         new CircleGlyph(
                             0,
                             tabRenderer.lineOffset * tabRenderer.bar.staff.tuning.length +
                                 tabRenderer.settings.notation.rhythmHeight,
-                            1.5
+                             this.renderer.smuflMetrics.tabNoteDotSize
                         )
                     );
                 }
@@ -142,9 +134,9 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.showRests) {
-                this.addNormal(new SpacingGlyph(0, 0, 5));
+                this.addNormal(new SpacingGlyph(0, 0,  this.renderer.smuflMetrics.tabNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    this.addEffect(new CircleGlyph(0, y, 1.5));
+                    this.addEffect(new CircleGlyph(0, y,  this.renderer.smuflMetrics.tabNoteDotSize));
                 }
             }
         }

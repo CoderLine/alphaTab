@@ -2,7 +2,6 @@ import type { ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import type { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { Color } from '@src/model/Color';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class MusicFontGlyph extends EffectGlyph {
     protected glyphScale: number = 0;
@@ -17,12 +16,12 @@ export class MusicFontGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = MusicFontSymbolSizes.Widths.has(this.symbol)
-            ? MusicFontSymbolSizes.Widths.get(this.symbol)! * this.glyphScale
+        this.width = this.renderer.smuflMetrics.GlyphWidths.has(this.symbol)
+            ? this.renderer.smuflMetrics.GlyphWidths.get(this.symbol)! * this.glyphScale
             : 0;
 
-        this.height = MusicFontSymbolSizes.Heights.has(this.symbol)
-            ? MusicFontSymbolSizes.Heights.get(this.symbol)! * this.glyphScale
+        this.height = this.renderer.smuflMetrics.GlyphHeights.has(this.symbol)
+            ? this.renderer.smuflMetrics.GlyphHeights.get(this.symbol)! * this.glyphScale
             : 0;
     }
 

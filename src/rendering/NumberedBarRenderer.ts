@@ -3,7 +3,7 @@ import { type Beat, BeatSubElement } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
 import type { Voice } from '@src/model/Voice';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
@@ -19,7 +19,6 @@ import { ModelUtils } from '@src/model/ModelUtils';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BarNumberGlyph } from '@src/rendering/glyphs/BarNumberGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import { BarLineGlyph } from '@src/rendering/glyphs/BarLineGlyph';
 import { Duration } from '@src/model/Duration';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
@@ -73,11 +72,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return BarRendererBase.RawLineSpacing;
+        return this.smuflMetrics.RawLineSpacing;
     }
 
     public override get heightLineCount(): number {
-        return 5;
+        return this.smuflMetrics.numberedBarRendererLineHeightCount;
     }
 
     public override get drawnLineCount(): number {
@@ -113,14 +112,14 @@ export class NumberedBarRenderer extends LineBarRenderer {
         if (!this.bar.isEmpty) {
             const barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
             if (barCount > 0) {
-                const barSpacing: number = NumberedBarRenderer.BarSpacing;
-                const barSize: number = NumberedBarRenderer.BarSize;
+                const barSpacing: number = this.smuflMetrics.numberedBarRendererBarSpacing;
+                const barSize: number = this.smuflMetrics.numberedBarRendererBarSize;
                 const barOverflow = (barCount - 1) * barSpacing + barSize;
 
                 let dotOverflow = 0;
                 const lowestOctave = this.lowestOctave;
                 if (lowestOctave !== null) {
-                    dotOverflow = Math.abs(lowestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize;
+                    dotOverflow = Math.abs(lowestOctave) * this.smuflMetrics.numberedBarRendererDotSpacing + this.smuflMetrics.numberedBarRendererDotSize;
                 }
 
                 this.registerOverflowBottom(barOverflow + dotOverflow);
@@ -129,17 +128,11 @@ export class NumberedBarRenderer extends LineBarRenderer {
             const highestOctave = this.highestOctave;
             if (highestOctave !== null) {
                 const dotOverflow =
-                    Math.abs(highestOctave) * NumberedBarRenderer.DotSpacing + NumberedBarRenderer.DotSize;
+                    Math.abs(highestOctave) * this.smuflMetrics.numberedBarRendererDotSpacing + this.smuflMetrics.numberedBarRendererDotSize;
                 this.registerOverflowTop(dotOverflow);
             }
         }
     }
-
-    private static BarSpacing = BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness;
-    public static BarSize = 2;
-
-    private static DotSpacing = 5;
-    public static DotSize = 2;
 
     protected override paintFlag(
         cx: number,
@@ -170,8 +163,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
             //
             // draw line
             //
-            const barSpacing: number = NumberedBarRenderer.BarSpacing;
-            const barSize: number = NumberedBarRenderer.BarSize;
+            const barSpacing: number = this.smuflMetrics.numberedBarRendererBarSpacing;
+            const barSize: number = this.smuflMetrics.numberedBarRendererBarSize;
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;
 
@@ -209,17 +202,17 @@ export class NumberedBarRenderer extends LineBarRenderer {
             let dotsOffset = 0;
             if (dotCount > 0) {
                 dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
-                dotsOffset = NumberedBarRenderer.DotSpacing * -1;
+                dotsOffset = this.smuflMetrics.numberedBarRendererDotSpacing * -1;
             } else if (dotCount < 0) {
                 dotsY = barStart + beamY + barCount * barSpacing;
-                dotsOffset = NumberedBarRenderer.DotSpacing;
+                dotsOffset = this.smuflMetrics.numberedBarRendererDotSpacing;
             }
-            const dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + 4 - this.beatGlyphsStart;
+            const dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + this.smuflMetrics.numberedBarRendererDotPadding - this.beatGlyphsStart;
 
             dotCount = Math.abs(dotCount);
 
             for (let d = 0; d < dotCount; d++) {
-                canvas.fillCircle(cx + this.x + dotX, dotsY, NumberedBarRenderer.DotSize);
+                canvas.fillCircle(cx + this.x + dotX, dotsY, this.smuflMetrics.numberedBarRendererDotSize);
                 dotsY += dotsOffset;
             }
         }
@@ -234,12 +227,12 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
@@ -265,7 +258,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
@@ -314,7 +307,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.numberedBarRendererPreTimeSignaturePadding));
 
         const masterBar = this.bar.masterBar;
         const g = new ScoreTimeSignatureGlyph(

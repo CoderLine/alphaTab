@@ -16,8 +16,8 @@ import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import type { SmuflMetrics } from '@src/rendering/SmuflMetrics';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -29,7 +29,7 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
-    public finalizeBracket() {
+    public finalizeBracket(smuflMetrics:SmuflMetrics) {
         // systems with just a single staff do not have a bracket
         if (this.firstStaffInBracket === this.lastStaffInBracket) {
             this.width = 0;
@@ -37,8 +37,8 @@ export abstract class SystemBracket {
         }
 
         // SMUFL: The brace glyph should have a height of 1em, i.e. the height of a single five-line stave, and should be scaled proportionally
-        const bravuraBraceHeightAtMusicFontSize = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.Brace)!;
-        const bravuraBraceWidthAtMusicFontSize = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceHeightAtMusicFontSize = smuflMetrics.GlyphHeights.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceWidthAtMusicFontSize = smuflMetrics.GlyphWidths.get(MusicFontSymbol.Brace)!;
 
         // normal bracket width
         this.width = bravuraBraceWidthAtMusicFontSize;
@@ -361,7 +361,7 @@ export class StaffSystem {
 
             let braceWidth = 0;
             for (const b of this._brackets) {
-                b.finalizeBracket();
+                b.finalizeBracket(this.layout.renderer.smuflMetrics);
                 braceWidth = Math.max(braceWidth, b.width);
             }
 
@@ -469,14 +469,14 @@ export class StaffSystem {
 
             canvas.fillMusicFontSymbol(
                 cx + this.x,
-                cy + this.y + this.height - 10,
+                cy + this.y + this.height - this.layout.renderer.smuflMetrics.staffSystemSeparatorOffsetY,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
             );
             canvas.fillMusicFontSymbol(
-                cx + this.x + this.width - StaffSystem.SystemSignSeparatorWidth,
-                cy + this.y + this.height - StaffSystem.SystemSignSeparatorPadding,
+                cx + this.x + this.width - this.layout.renderer.smuflMetrics.systemSignSeparatorWidth,
+                cy + this.y + this.height - this.layout.renderer.smuflMetrics.staffSystemSeparatorOffsetY,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
@@ -663,10 +663,6 @@ export class StaffSystem {
         }
     }
 
-    private static readonly SystemSignSeparatorHeight = 40;
-    private static readonly SystemSignSeparatorPadding = 10;
-    private static readonly SystemSignSeparatorWidth = 36;
-
     public finalizeSystem(): void {
         const settings = this.layout.renderer.settings;
         if (this.index === 0) {
@@ -679,7 +675,7 @@ export class StaffSystem {
             this.layout.renderer.score!.stylesheet.useSystemSignSeparator &&
             this.layout.renderer.tracks!.length > 1
         ) {
-            this.bottomPadding += StaffSystem.SystemSignSeparatorHeight;
+            this.bottomPadding += this.layout.renderer.smuflMetrics.systemSignSeparatorHeight;
             this._hasSystemSeparator = true;
         }
 
@@ -692,7 +688,7 @@ export class StaffSystem {
         }
 
         for (const b of this._brackets!) {
-            b.finalizeBracket();
+            b.finalizeBracket(this.layout.renderer.smuflMetrics);
         }
     }
 

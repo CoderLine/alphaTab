@@ -11,9 +11,6 @@ export enum TripletFeelGlyphBarType {
 }
 
 export class TripletFeelGlyph extends EffectGlyph {
-    private static readonly NoteScale: number = 0.5;
-    private static readonly TupletScale: number = 0.7;
-
     private _tripletFeel: TripletFeel;
 
     public constructor(tripletFeel: TripletFeel) {
@@ -23,19 +20,19 @@ export class TripletFeelGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = 25;
+        this.height = this.renderer.smuflMetrics.tripletFeelHeight;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
         const noteY: number = cy + this.height * NoteHeadGlyph.GraceScale;
-        const tupletY: number = noteY + 8;
+        const tupletY: number = noteY + this.renderer.smuflMetrics.tripletFeelYPadding;
         canvas.font = this.renderer.resources.effectFont;
-        canvas.fillText('(', cx, cy + this.height * 0.3);
+        canvas.fillText('(', cx, cy + this.height * this.renderer.smuflMetrics.tripletFeelBracketsHeightToY);
 
-        const leftNoteX: number = cx + 10;
-        const rightNoteX: number = cx + 40;
+        const leftNoteX: number = cx + this.renderer.smuflMetrics.tripletFeelLeftNoteXPadding;
+        const rightNoteX: number = cx + this.renderer.smuflMetrics.tripletFeelRightNoteXPadding;
 
         let leftNoteSymbols: MusicFontSymbol[] = [];
         let rightAugmentationSymbols: MusicFontSymbol[] = [];
@@ -124,7 +121,11 @@ export class TripletFeelGlyph extends EffectGlyph {
                     MusicFontSymbol.TextCont16thBeamLongStem,
                     MusicFontSymbol.TextBlackNoteFrac32ndLongStem
                 ];
-                canvas.fillCircle(rightNoteX + 9, noteY, 1);
+                canvas.fillCircle(
+                    rightNoteX + this.renderer.smuflMetrics.tripletFeelCircleOffset,
+                    noteY,
+                    this.renderer.smuflMetrics.tripletFeelCircleSize
+                );
                 break;
             case TripletFeel.Scottish8th:
                 leftNoteSymbols = [
@@ -156,22 +157,48 @@ export class TripletFeelGlyph extends EffectGlyph {
                 break;
         }
 
-        canvas.fillMusicFontSymbols(leftNoteX, noteY, TripletFeelGlyph.NoteScale, leftNoteSymbols, false);
-        canvas.fillText('=', cx + 32, cy + 5);
-        canvas.fillMusicFontSymbols(rightNoteX, noteY, TripletFeelGlyph.NoteScale, rightNoteSymbols, false);
+        canvas.fillMusicFontSymbols(
+            leftNoteX,
+            noteY,
+            this.renderer.smuflMetrics.tripletFeelNoteScale,
+            leftNoteSymbols,
+            false
+        );
+        canvas.fillText(
+            '=',
+            cx + this.renderer.smuflMetrics.tripletFeelEqualsOffsetX,
+            cy + this.renderer.smuflMetrics.tripletFeelEqualsOffsetY
+        );
+        canvas.fillMusicFontSymbols(
+            rightNoteX,
+            noteY,
+            this.renderer.smuflMetrics.tripletFeelNoteScale,
+            rightNoteSymbols,
+            false
+        );
         if (rightAugmentationSymbols.length > 0) {
             canvas.fillMusicFontSymbols(
-                rightNoteX + 7,
+                rightNoteX + this.renderer.smuflMetrics.tripletFeelAugmentationOffsetX,
                 noteY,
-                TripletFeelGlyph.NoteScale,
+                this.renderer.smuflMetrics.tripletFeelNoteScale,
                 rightAugmentationSymbols,
                 false
             );
         }
         if (rightTupletSymbols.length > 0) {
-            canvas.fillMusicFontSymbols(rightNoteX, tupletY, TripletFeelGlyph.TupletScale, rightTupletSymbols, false);
+            canvas.fillMusicFontSymbols(
+                rightNoteX,
+                tupletY,
+                this.renderer.smuflMetrics.tripletFeelTupletScale,
+                rightTupletSymbols,
+                false
+            );
         }
 
-        canvas.fillText(')', cx + 65, cy + this.height * 0.3);
+        canvas.fillText(
+            ')',
+            cx + this.renderer.smuflMetrics.tripletFeelCloseParenthesisOffsetX,
+            cy + this.height * this.renderer.smuflMetrics.tripletFeelBracketsHeightToY
+        );
     }
 }

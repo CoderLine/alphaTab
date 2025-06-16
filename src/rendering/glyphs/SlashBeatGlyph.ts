@@ -76,7 +76,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= g.height / 2 + 2;
+                    pos -= g.height / 2 + this.renderer.smuflMetrics.slashBeatNoteYTopPadding;
                     break;
                 case NoteYPosition.Center:
                     break;
@@ -151,9 +151,9 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         // Note dots
         //
         if (this.container.beat.dots > 0) {
-            this.addNormal(new SpacingGlyph(0, 0, 5));
+            this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.slashBeatNoteDotPadding));
             for (let i: number = 0; i < this.container.beat.dots; i++) {
-                this.addEffect(new CircleGlyph(0, sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5), 1.5));
+                this.addEffect(new CircleGlyph(0, sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5), this.renderer.smuflMetrics.slashBeatNoteDotSize));
             }
         }
 

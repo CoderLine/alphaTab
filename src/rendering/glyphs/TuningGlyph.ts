@@ -5,7 +5,6 @@ import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import type { Color } from '@src/model/Color';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
@@ -41,14 +40,13 @@ export class TuningGlyph extends GlyphGroup {
         canvas.color = c;
     }
 
-    public static readonly CircleNumberScale: number = 0.7;
 
     private createGlyphs(tuning: Tuning): void {
         const res = this.renderer.resources;
         this.height = 0;
 
-        const rowHeight = 15;
-        const textPadding = 1;
+        const rowHeight = this.renderer.smuflMetrics.tuningGlyphRowHeight;
+        const textPadding = this.renderer.smuflMetrics.tuningGlyphTextPadding;
 
         // Track name
         if (this._trackLabel.length > 0) {
@@ -70,7 +68,7 @@ export class TuningGlyph extends GlyphGroup {
         tuningName.y += tuningName.height / 2;
         this.addGlyph(tuningName);
 
-        const stringColumnWidth = 64;
+        const stringColumnWidth = this.renderer.smuflMetrics.tuningGlyphStringColumnWidth;
 
         this.renderer.scoreRenderer.canvas!.font = res.effectFont;
         this.width = Math.max(
@@ -80,8 +78,8 @@ export class TuningGlyph extends GlyphGroup {
 
         if (!tuning.isStandard) {
             this.height += rowHeight;
-            const circleScale = TuningGlyph.CircleNumberScale;
-            const circleHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.GuitarString0)! * circleScale;
+            const circleScale = this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
+            const circleHeight = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
@@ -104,6 +102,6 @@ export class TuningGlyph extends GlyphGroup {
             this.height += stringsPerColumn * rowHeight;
         }
 
-        this.width += 15;
+        this.width += this.renderer.smuflMetrics.tuningGlyphEndPaddingX;
     }
 }

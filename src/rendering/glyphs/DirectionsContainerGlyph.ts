@@ -13,11 +13,11 @@ class TargetDirectionGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.height = 27 /* glyph */;
+        this.height = this.renderer.smuflMetrics.targetDirectionGlyphHeight;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, 0.8, this._symbols, true);
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, this.renderer.smuflMetrics.targetDirectionGlyphScale, this._symbols, true);
     }
 }
 
@@ -30,7 +30,7 @@ class JumpDirectionGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.height = this.renderer.resources.directionsFont.size * 1.5;
+        this.height = this.renderer.resources.directionsFont.size * this.renderer.smuflMetrics.jumpDirectionFontSizeToHeight;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -134,7 +134,7 @@ export class DirectionsContainerGlyph extends EffectGlyph {
     private doSideLayout(glyphs: Glyph[]): number {
         let y = 0;
 
-        const padding = 3;
+        const padding = this.renderer.smuflMetrics.directionsContainerPadding;
 
         for (const g of glyphs) {
             g.y = y;

@@ -3,7 +3,6 @@ import { RowGlyphContainer } from '@src/rendering/glyphs/RowGlyphContainer';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
 export class RowContainerGlyph extends GlyphGroup {
-    private static readonly Padding: number = 3;
     private _rows: RowGlyphContainer[] = [];
     private _align: TextAlign;
 
@@ -17,7 +16,7 @@ export class RowContainerGlyph extends GlyphGroup {
     public override doLayout(): void {
         let x: number = 0;
         let y: number = 0;
-        const padding: number = RowContainerGlyph.Padding;
+        const padding: number = this.renderer.smuflMetrics.rowContainerPadding;
         this._rows = [];
         let row: RowGlyphContainer = new RowGlyphContainer(x, y, this._align);
         row.width = this.width;

@@ -6,9 +6,6 @@ import { type Beat, BeatSubElement } from '@src/model/Beat';
 import { NoteSubElement } from '@src/model/Note';
 
 export class NumberedNoteHeadGlyph extends Glyph {
-    public static readonly NoteHeadHeight: number = 17;
-    public static readonly NoteHeadWidth: number = 12;
-
     private _isGrace: boolean;
     private _beat: Beat;
     private _number: string;
@@ -36,7 +33,7 @@ export class NumberedNoteHeadGlyph extends Glyph {
 
     public override doLayout(): void {
         const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        this.width = NumberedNoteHeadGlyph.NoteHeadWidth * scale;
-        this.height = NumberedNoteHeadGlyph.NoteHeadHeight * scale;
+        this.width = this.renderer.smuflMetrics.numberedNoteHeadWidth * scale;
+        this.height = this.renderer.smuflMetrics.numberedNoteHeadHeight * scale;
     }
 }

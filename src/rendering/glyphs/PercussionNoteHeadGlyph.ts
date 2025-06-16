@@ -4,7 +4,6 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { Duration } from '@src/model/Duration';
 import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
@@ -49,10 +48,10 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     public override doLayout(): void {
         super.doLayout();
         if (this.width === 0) {
-            this.height = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteheadBlack)!;
+            this.height = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.NoteheadBlack)!;
         }
         if (this.height === 0) {
-            this.height = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+            this.height = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         }
     }
 }

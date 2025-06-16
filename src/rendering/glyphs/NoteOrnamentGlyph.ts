@@ -24,6 +24,6 @@ export class NoteOrnamentGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height - 4, canvas);
+        super.paint(cx, cy + this.height - this.renderer.smuflMetrics.noteOrnamentBottomOffset, canvas);
     }
 }

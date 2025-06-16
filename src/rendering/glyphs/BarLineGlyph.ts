@@ -7,7 +7,7 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 abstract class BarLineGlyphBase extends Glyph {
     public override doLayout(): void {
-        this.width = 1;
+        this.width = this.renderer.smuflMetrics.barLineWidth;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -21,13 +21,13 @@ abstract class BarLineGlyphBase extends Glyph {
 }
 class BarLineLightGlyph extends BarLineGlyphBase {
     protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        canvas.fillRect(left, top, 1, h);
+        canvas.fillRect(left, top, this.renderer.smuflMetrics.barLineWidth, h);
     }
 }
 
 class BarLineDottedGlyph extends BarLineGlyphBase {
     protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        const circleRadius: number = 1;
+        const circleRadius: number = this.renderer.smuflMetrics.dottedBarLineCircleRadius;
         const x = left;
 
         const lineHeight = (this.renderer as LineBarRenderer).getLineHeight(1);
@@ -43,10 +43,9 @@ class BarLineDottedGlyph extends BarLineGlyphBase {
 }
 
 class BarLineDashedGlyph extends BarLineGlyphBase {
-    private static readonly DashSize: number = 4;
 
     protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        const dashSize: number = BarLineDashedGlyph.DashSize;
+        const dashSize: number = this.renderer.smuflMetrics.dashedBarLineSize;
         const x = left + 0.5;
         const dashes: number = Math.ceil(h / 2 / dashSize);
         const bottom = top + h;
@@ -74,7 +73,7 @@ class BarLineDashedGlyph extends BarLineGlyphBase {
 
 class BarLineHeavyGlyph extends BarLineGlyphBase {
     public override doLayout(): void {
-        this.width = 4;
+        this.width = this.renderer.smuflMetrics.heavyBarLineWidth;
     }
 
     protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
@@ -85,9 +84,9 @@ class BarLineHeavyGlyph extends BarLineGlyphBase {
 class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
     protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
         const bottom = top + h;
-        const circleSize: number = 1.5;
+        const circleSize: number = this.renderer.smuflMetrics.repeatDotsCircleSize;
         const middle: number = (top + bottom) / 2;
-        const dotOffset: number = 3;
+        const dotOffset: number = this.renderer.smuflMetrics.repeatDotsCircleOffset;
         canvas.fillCircle(left, middle - circleSize * dotOffset, circleSize);
         canvas.fillCircle(left, middle + circleSize * dotOffset, circleSize);
     }
@@ -147,7 +146,7 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             }
         }
 
-        const barLineSpace = 3;
+        const barLineSpace = this.renderer.smuflMetrics.barLineSpace;
 
         if (this._isRight) {
             if (masterBar.isRepeatEnd) {

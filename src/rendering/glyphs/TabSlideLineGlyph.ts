@@ -35,13 +35,13 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        const sizeX: number = 12;
-        const sizeY: number = 3;
+        const sizeX: number = this.renderer.smuflMetrics.tabSlideSizeX;
+        const sizeY: number =  this.renderer.smuflMetrics.tabSlideSizeY;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
-        const offsetX = 2;
+        const offsetX = this.renderer.smuflMetrics.tabSlideOffsetX;
         switch (this._inType) {
             case SlideInType.IntoFromBelow:
                 endX =
@@ -79,15 +79,15 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        const sizeX: number = 12;
-        const sizeY: number = 3;
+        const sizeX: number = this.renderer.smuflMetrics.tabSlideSizeX;
+        const sizeY: number =  this.renderer.smuflMetrics.tabSlideSizeY;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
         let waves: boolean = false;
 
-        const offsetX = 2;
+        const offsetX =  this.renderer.smuflMetrics.tabSlideOffsetX;
 
         switch (this._outType) {
             case SlideOutType.Shift:
@@ -214,7 +214,7 @@ export class TabSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.tabSlideVibratoScale);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 

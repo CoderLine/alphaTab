@@ -9,6 +9,6 @@ export class ArticStaccatoAboveGlyph extends MusicFontGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx + 3, cy + 5, canvas);
+        super.paint(cx + this.renderer.smuflMetrics.articStaccatoAbovePaddingX, cy + this.renderer.smuflMetrics.articStaccatoAbovePaddingY, canvas);
     }
 }

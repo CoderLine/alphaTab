@@ -3,8 +3,6 @@ import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import type { RenderingResources } from '@src/RenderingResources';
 
 export class LeftHandTapGlyph extends EffectGlyph {
-    private static readonly Padding = 4;
-
     public constructor() {
         super(0, 0);
     }
@@ -12,7 +10,7 @@ export class LeftHandTapGlyph extends EffectGlyph {
     public override doLayout(): void {
         super.doLayout();
         const font = this.renderer.resources.effectFont;
-        this.height = font.size + LeftHandTapGlyph.Padding;
+        this.height = font.size + this.renderer.smuflMetrics.leftHandTappingPadding;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -24,8 +22,8 @@ export class LeftHandTapGlyph extends EffectGlyph {
         canvas.textAlign = old;
         canvas.strokeCircle(
             cx + this.x,
-            cy + this.y + canvas.font.size / 2 + (LeftHandTapGlyph.Padding - 1),
-            canvas.font.size / 1.6
+            cy + this.y + canvas.font.size / 2 + (this.renderer.smuflMetrics.leftHandTappingPadding - 1),
+            canvas.font.size * this.renderer.smuflMetrics.leftHandTappingCircleScale
         );
     }
 }

@@ -30,11 +30,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected tupletSize: number = 0;
 
     public get lineOffset(): number {
-        return this.lineSpacing + 1;
+        return this.lineSpacing + this.smuflMetrics.staffLineThickness;
     }
 
     public get tupletOffset(): number {
-        return 10;
+        return this.smuflMetrics.tupletOffset;
     }
 
     public abstract get lineSpacing(): number;
@@ -43,12 +43,18 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected get topGlyphOverflow() {
         const res = this.resources;
-        return res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2;
+        return (
+            res.tablatureFont.size / 2 +
+            res.tablatureFont.size * this.smuflMetrics.lineBarRendererOverflowFontSiteToPadding
+        );
     }
 
     protected get bottomGlyphOverflow() {
         const res = this.resources;
-        return res.tablatureFont.size / 2 + res.tablatureFont.size * 0.2;
+        return (
+            res.tablatureFont.size / 2 +
+            res.tablatureFont.size * this.smuflMetrics.lineBarRendererOverflowFontSiteToPadding
+        );
     }
 
     protected initLineBasedSizes() {
@@ -78,7 +84,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public override doLayout(): void {
         this.initLineBasedSizes();
         this.updateFirstLineY();
-        this.tupletSize = 15 + this.resources.effectFont.size * 0.3;
+        // TODO SmufL
+        this.tupletSize =
+            this.smuflMetrics.tupletSize +
+            this.resources.effectFont.size * this.smuflMetrics.lineBarRendererTupletFontSiteToPadding;
         super.doLayout();
     }
 
@@ -140,7 +149,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     cx + this.x + lineX,
                     (cy + this.y + lineY) | 0,
                     line[0] - lineX,
-                    BarRendererBase.StaffLineThickness
+                    this.smuflMetrics.staffLineThickness
                 );
                 lineX = line[0] + line[1];
             }
@@ -148,7 +157,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 cx + this.x + lineX,
                 (cy + this.y + lineY) | 0,
                 lineWidth - lineX,
-                BarRendererBase.StaffLineThickness
+                this.smuflMetrics.staffLineThickness
             );
         }
     }
@@ -244,7 +253,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         // check if we need to paint simple footer
         let offset: number = this.tupletOffset;
-        let size: number = 5;
+        let size: number = this.tupletSize - this.tupletOffset;
 
         using _ = ElementStyleHelper.beat(canvas, beatElement, h.beats[0]);
 
@@ -321,7 +330,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Calculate how many space the text will need
             canvas.font = res.effectFont;
             const sw: number = canvas.measureText(s).width;
-            const sp: number = 3;
+            const sp: number = this.smuflMetrics.tupletTextMargin;
             //
             // Calculate the offsets where to break the bracket
             const middleX: number = (startX + endX) / 2;
@@ -492,8 +501,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
             if (beat.graceType === GraceType.BeforeBeat) {
-                const graceSizeY: number = 15;
-                const graceSizeX: number = 12;
+                const graceSizeY: number = this.smuflMetrics.graceFlagSizeY;
+                const graceSizeX: number = this.smuflMetrics.graceFlagSizeY;
                 canvas.beginPath();
                 if (direction === BeamDirection.Down) {
                     canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + bottomY - graceSizeY);
@@ -509,7 +518,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Draw flag
             //
             if (h.hasFlag(true, beat)) {
-                const glyph: FlagGlyph = new FlagGlyph(beatLineX - 1 / 2, beamY, beat.duration, direction, isGrace);
+                const glyph: FlagGlyph = new FlagGlyph(beatLineX - this.smuflMetrics.flagStemOffset, beamY, beat.duration, direction, isGrace);
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(cx + this.x, cy + this.y, canvas);
@@ -538,10 +547,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             case Duration.SixtyFourth:
             case Duration.OneHundredTwentyEighth:
             case Duration.TwoHundredFiftySixth:
-                size = 3;
+                size = this.smuflMetrics.flagStemSize;
                 break;
             default:
-                size = forceMinStem ? 3 : 0;
+                size = forceMinStem ?  this.smuflMetrics.flagStemSize : 0;
                 break;
         }
         return this.getLineHeight(size);
@@ -617,9 +626,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
             } else if (i !== 0) {
                 fingeringY -= canvas.font.size * 1.5;
             }
-            const brokenBarOffset: number = 6 * scaleMod;
-            let barSpacing: number = (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
-            let barSize: number = BarRendererBase.BeamThickness * scaleMod;
+            const brokenBarOffset: number = this.smuflMetrics.brokenBarOffset * scaleMod;
+            let barSpacing: number = (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
+            let barSize: number = this.smuflMetrics.beamThickness * scaleMod;
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;
             if (direction === BeamDirection.Down) {

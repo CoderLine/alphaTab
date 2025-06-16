@@ -102,7 +102,7 @@ export class TieGlyph extends Glyph {
                     this._endY,
                     this.tieDirection === BeamDirection.Down,
                     this._tieHeight,
-                    4
+                    this.renderer.smuflMetrics.tieSize
                 );
 
                 this.height = tieBoundingBox.h;
@@ -130,7 +130,8 @@ export class TieGlyph extends Glyph {
                     cx + this._endX,
                     cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
-                    1
+                    1,
+                    this.renderer.smuflMetrics.bendSlurHeight
                 );
             } else {
                 TieGlyph.paintTie(
@@ -142,7 +143,7 @@ export class TieGlyph extends Glyph {
                     cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
                     this._tieHeight,
-                    4
+                    this.renderer.smuflMetrics.tieSize
                 );
             }
         }
@@ -153,7 +154,7 @@ export class TieGlyph extends Glyph {
     }
 
     protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
-        return 22;
+        return this.renderer.smuflMetrics.tieHeight;
     }
 
     protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
@@ -295,9 +296,9 @@ export class TieGlyph extends Glyph {
         y1: number,
         x2: number,
         y2: number,
-        down: boolean = false,
-        offset: number = 22,
-        size: number = 4
+        down: boolean /*= false*/,
+        offset: number /*= 22*/,
+        size: number /*= 4*/
     ): void {
         const cps = TieGlyph.computeBezierControlPoints(scale, x1, y1, x2, y2, down, offset, size);
 
@@ -324,8 +325,6 @@ export class TieGlyph extends Glyph {
         // canvas.color = c;
     }
 
-    private static readonly BendSlurHeight: number = 11;
-
     public static drawBendSlur(
         canvas: ICanvas,
         x1: number,
@@ -334,7 +333,8 @@ export class TieGlyph extends Glyph {
         y2: number,
         down: boolean,
         scale: number,
-        slurText?: string
+        bendSlurHeight:number,
+        slurText?: string,
     ): void {
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;
@@ -351,7 +351,7 @@ export class TieGlyph extends Glyph {
         // TODO: should be 1/3
         const centerX: number = (x2 + x1) / 2;
         const centerY: number = (y2 + y1) / 2;
-        let offset: number = TieGlyph.BendSlurHeight * scale;
+        let offset: number = bendSlurHeight * scale;
         if (x2 - x1 < 20) {
             offset /= 2;
         }

@@ -16,7 +16,7 @@ export class SlashTieGlyph extends TieGlyph {
 
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
         if (this.startNote === this.endNote) {
-            return 15;
+            return this.startNoteRenderer!.smuflMetrics.slashTieEmptyHeight;
         }
         return super.getTieHeight(startX, startY, endX, endY);
     }
@@ -39,7 +39,7 @@ export class SlashTieGlyph extends TieGlyph {
 
     protected override getStartX(): number {
         if (this.startNote === this.endNote) {
-            return this.getEndX() - 20;
+            return this.getEndX() - this.renderer.smuflMetrics.slashTieEmptyWidth;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Right);
     }

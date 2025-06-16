@@ -37,8 +37,8 @@ export class ScoreSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const sizeX: number = 12;
-        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2;
+        const sizeX: number = startNoteRenderer.smuflMetrics.scoreSlideLineSizeX;
+        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - startNoteRenderer.smuflMetrics.scoreSlideLineEndPadding;
         const endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
         let startX = endX - sizeX;
         let startY: number = cy + startNoteRenderer.y;
@@ -70,9 +70,9 @@ export class ScoreSlideLineGlyph extends Glyph {
 
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const sizeX: number = 12;
-        const offsetX: number = 2;
-        const offsetY: number = 2;
+        const sizeX: number = startNoteRenderer.smuflMetrics.scoreSlideLineSizeX;
+        const offsetX: number = startNoteRenderer.smuflMetrics.scoreSlideLineOffsetX;
+        const offsetY: number = startNoteRenderer.smuflMetrics.scoreSlideLineOffsetY;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -195,7 +195,7 @@ export class ScoreSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.scoreSlideVibratoScale);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 

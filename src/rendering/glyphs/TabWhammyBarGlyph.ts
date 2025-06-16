@@ -14,8 +14,6 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class TabWhammyBarGlyph extends Glyph {
     private static readonly TopOffsetSharedDataKey: string = 'tab.whammy.topoffset';
-    public static readonly PerHalfSize: number = 6;
-    private static readonly DashSize: number = 3;
     private _beat: Beat;
     private _renderPoints: BendPoint[];
     private _isSimpleDip: boolean = false;
@@ -97,7 +95,7 @@ export class TabWhammyBarGlyph extends Glyph {
             return 0;
         }
         let offset: number =
-            TabWhammyBarGlyph.PerHalfSize + Math.log2(Math.abs(value) / 2) * TabWhammyBarGlyph.PerHalfSize;
+            this.renderer.smuflMetrics.tabWhammyPerHalfSize + Math.log2(Math.abs(value) / 2) * this.renderer.smuflMetrics.tabWhammyPerHalfSize;
         if (value < 0) {
             offset = -offset;
         }
@@ -134,12 +132,12 @@ export class TabWhammyBarGlyph extends Glyph {
         let startX: number = 0;
         let endX: number = 0;
         if (this._isSimpleDip) {
-            startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) - 2;
-            endX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) + 2;
+            startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) - this.renderer.smuflMetrics.tabWhammySimpleDipPadding;
+            endX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) + this.renderer.smuflMetrics.tabWhammySimpleDipPadding;
         } else {
             startX = cx + startNoteRenderer.x + startNoteRenderer.getBeatX(this._beat, BeatXPosition.MiddleNotes);
             endX = !endNoteRenderer
-                ? cx + startNoteRenderer.x + startNoteRenderer.width - 2
+                ? cx + startNoteRenderer.x + startNoteRenderer.width - this.renderer.smuflMetrics.tabWhammySimpleDipPadding
                 : cx + endNoteRenderer.x + endNoteRenderer.getBeatX(endBeat!, endXPositionType);
         }
         const old: TextAlign = canvas.textAlign;
@@ -184,7 +182,7 @@ export class TabWhammyBarGlyph extends Glyph {
         const y1: number = cy - this.getOffset(firstPt.value);
         const y2: number = cy - this.getOffset(secondPt.value);
         if (firstPt.offset === secondPt.offset) {
-            const dashSize: number = TabWhammyBarGlyph.DashSize;
+            const dashSize: number = this.renderer.smuflMetrics.tabWhammyDashSize;
             const dashes: number = Math.abs(y2 - y1) / (dashSize * 2);
             if (dashes < 1) {
                 canvas.moveTo(x1, y1);
@@ -200,7 +198,7 @@ export class TabWhammyBarGlyph extends Glyph {
             }
             canvas.stroke();
         } else if (firstPt.value === secondPt.value) {
-            const dashSize: number = TabWhammyBarGlyph.DashSize;
+            const dashSize: number = this.renderer.smuflMetrics.tabWhammyDashSize;
             const dashes: number = Math.abs(x2 - x1) / (dashSize * 2);
             if (dashes < 1) {
                 canvas.moveTo(x1, y1);
@@ -222,12 +220,12 @@ export class TabWhammyBarGlyph extends Glyph {
         const res: RenderingResources = this.renderer.resources;
         if (isFirst && !this._beat.isContinuedWhammy && !this._isSimpleDip) {
             let y: number = y1;
-            y -= res.tablatureFont.size + 2;
+            y -= res.tablatureFont.size + this.renderer.smuflMetrics.tabWhammyTextPadding;
             if (this.renderer.settings.notation.isNotationElementVisible(NotationElement.ZerosOnDiveWhammys)) {
                 canvas.fillText('0', x1, y);
             }
             if (slurText) {
-                y -= res.tablatureFont.size + 2;
+                y -= res.tablatureFont.size + this.renderer.smuflMetrics.tabWhammyTextPadding;
                 canvas.fillText(slurText, x1, y);
             }
         }
@@ -255,12 +253,12 @@ export class TabWhammyBarGlyph extends Glyph {
             }
             let y: number = 0;
             if (this._isSimpleDip) {
-                y = Math.min(y1, y2) - res.tablatureFont.size - 2;
+                y = Math.min(y1, y2) - res.tablatureFont.size - this.renderer.smuflMetrics.tabWhammyTextPadding;
             } else {
                 y = firstPt.offset === secondPt.offset ? Math.min(y1, y2) : y2;
-                y -= res.tablatureFont.size + 2;
+                y -= res.tablatureFont.size + this.renderer.smuflMetrics.tabWhammyTextPadding;
                 if (nextPt && nextPt.value > secondPt.value) {
-                    y -= 2;
+                    y -= this.renderer.smuflMetrics.tabWhammyTextPadding;
                 }
             }
             const x: number = x2;

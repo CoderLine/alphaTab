@@ -13,16 +13,12 @@ import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { RenderingResources } from '@src/RenderingResources';
-import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
-    public static readonly SimpleDipHeight: number = TabWhammyBarGlyph.PerHalfSize * 2;
-    public static readonly SimpleDipPadding: number = 2;
     private _beat: Beat;
 
     public constructor(beat: Beat) {
@@ -62,9 +58,9 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     if (whammyMode === NotationMode.SongBook) {
                         const res: RenderingResources = this.renderer.resources;
                         (this.renderer as ScoreBarRenderer).simpleWhammyOverflow =
-                            res.tablatureFont.size * 1.5 +
-                            ScoreWhammyBarGlyph.SimpleDipHeight +
-                            ScoreWhammyBarGlyph.SimpleDipPadding;
+                            res.tablatureFont.size * this.renderer.smuflMetrics.scoreWhammyFontSizeToOverflow +
+                            this.renderer.smuflMetrics.scoreWhammySimpleDipHeight +
+                            this.renderer.smuflMetrics.scoreWhammySimpleDipPadding;
                     } else {
                         const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         middleGlyphs.renderer = this.renderer;
@@ -123,7 +119,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
         const beatDirection: BeamDirection = this.getTieDirection(beat, startNoteRenderer);
         let direction: BeamDirection = this._beat.notes.length === 1 ? beatDirection : BeamDirection.Up;
         const textalign: TextAlign = canvas.textAlign;
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
 
         for (let i: number = 0; i < beat.notes.length; i++) {
             const note: Note = beat.notes[i];
@@ -208,8 +204,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             beatDirection === BeamDirection.Down,
-                            22,
-                            4
+                            this.renderer.smuflMetrics.scoreBendHoldSize,
+                            this.renderer.smuflMetrics.scoreBendHoldOffset
                         );
                     }
                     break;
@@ -244,8 +240,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             beatDirection === BeamDirection.Down,
-                            22,
-                            4
+                            this.renderer.smuflMetrics.scoreBendHoldSize,
+                            this.renderer.smuflMetrics.scoreBendHoldOffset
                         );
                     }
                     break;
@@ -256,12 +252,12 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 cx +
                                 startNoteRenderer.x +
                                 startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) -
-                                2;
+                                this.renderer.smuflMetrics.scoreWhammySongBookPadding;
                             const simpleEndX: number =
                                 cx +
                                 startNoteRenderer.x +
                                 startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) +
-                                2;
+                                this.renderer.smuflMetrics.scoreWhammySongBookPadding;
                             const middleX: number = (simpleStartX + simpleEndX) / 2;
                             const text: string = (
                                 ((this._beat.whammyBarPoints![1].value - this._beat.whammyBarPoints![0].value) / 4) |
@@ -269,8 +265,9 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             ).toString();
                             canvas.font = this.renderer.resources.tablatureFont;
                             canvas.fillText(text, middleX, cy + this.y);
-                            const simpleStartY: number = cy + this.y + canvas.font.size + 2;
-                            const simpleEndY: number = simpleStartY + ScoreWhammyBarGlyph.SimpleDipHeight;
+                            const simpleStartY: number = cy + this.y + canvas.font.size + this.renderer.smuflMetrics.scoreWhammySongBookPadding;
+                            const simpleEndY: number =
+                                simpleStartY + this.renderer.smuflMetrics.scoreWhammySimpleDipHeight;
                             if (this._beat.whammyBarPoints![1].value > this._beat.whammyBarPoints![0].value) {
                                 canvas.moveTo(simpleStartX, simpleEndY);
                                 canvas.lineTo(middleX, simpleStartY);
@@ -291,8 +288,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 endX,
                                 endY,
                                 beatDirection === BeamDirection.Down,
-                                22,
-                                4
+                                this.renderer.smuflMetrics.scoreBendHoldSize,
+                                this.renderer.smuflMetrics.scoreBendHoldOffset                                
                             );
                         }
                     } else {

@@ -11,12 +11,10 @@ import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
 import type { BarBounds } from '@src/rendering/utils/BarBounds';
 import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
-import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 
 export class BeatContainerGlyph extends Glyph {
-    public static readonly GraceBeatPadding: number = 3;
     public voiceContainer: VoiceContainerGlyph;
     public beat: Beat;
     public preNotes!: BeatGlyphBase;
@@ -53,16 +51,16 @@ export class BeatContainerGlyph extends Glyph {
         if (this.beat.graceType !== GraceType.None) {
             // flagged grace
             if (this.beat.graceGroup!.beats.length === 1) {
-                postBeatStretch += FlagGlyph.FlagWidth * NoteHeadGlyph.GraceScale;
+                postBeatStretch += this.renderer.smuflMetrics.flagWidth * NoteHeadGlyph.GraceScale;
             }
             // grace with bars, some space for bar unless last
             else if (this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
-                postBeatStretch += 7;
+                postBeatStretch += this.renderer.smuflMetrics.graceBeatPostBeatStretch;
             } else {
-                postBeatStretch += BeatContainerGlyph.GraceBeatPadding;
+                postBeatStretch += this.renderer.smuflMetrics.graceBeatPadding;
             }
         } else if (helper && this.drawBeamHelperAsFlags(helper)) {
-            postBeatStretch += FlagGlyph.FlagWidth;
+            postBeatStretch += this.renderer.smuflMetrics.flagWidth;
         }
         for (const tie of this.ties) {
             postBeatStretch += tie.width;
@@ -99,14 +97,14 @@ export class BeatContainerGlyph extends Glyph {
             if (this.onNotes.beamingHelper.beats.length === 1) {
                 // make space for flag
                 if (this.beat.duration >= Duration.Eighth) {
-                    this.minWidth += 20;
+                    this.minWidth += this.renderer.smuflMetrics.beatPaddingFlagEighthAndAbove;
                 }
             } else {
                 // ensure some space for small notes
                 switch (this.beat.duration) {
                     case Duration.OneHundredTwentyEighth:
                     case Duration.TwoHundredFiftySixth:
-                        this.minWidth += 10;
+                        this.minWidth += this.renderer.smuflMetrics.beatPaddingOneHundredAndAbove;
                         break;
                 }
             }
@@ -234,7 +232,7 @@ export class BeatContainerGlyph extends Glyph {
             const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
             if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
                 beatBoundings.visualBounds.w +=
-                    FlagGlyph.FlagWidth * (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
+                    this.renderer.smuflMetrics.flagWidth * (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
             }
 
             beatBoundings.visualBounds.y = barBounds.visualBounds.y;

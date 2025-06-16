@@ -2,7 +2,7 @@ import { GraceType } from '@src/model/GraceType';
 import type { TupletGroup } from '@src/model/TupletGroup';
 import { type Voice, VoiceSubElement } from '@src/model/Voice';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
+import type { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import type { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
@@ -60,7 +60,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                                 .nextBeat;
                         const preBeatStretch = afterGraceBeat
                             ? this.renderer.layoutingInfo.getPreBeatSize(afterGraceBeat) +
-                              BeatContainerGlyph.GraceBeatPadding
+                              this.renderer.smuflMetrics.graceBeatPadding
                             : 0;
 
                         // move right in front to the note
