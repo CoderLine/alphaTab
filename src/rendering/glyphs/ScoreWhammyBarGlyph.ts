@@ -204,8 +204,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             beatDirection === BeamDirection.Down,
-                            this.renderer.smuflMetrics.scoreBendHoldSize,
-                            this.renderer.smuflMetrics.scoreBendHoldOffset
+                            this.renderer.smuflMetrics.scoreBendHoldOffset,
+                            this.renderer.smuflMetrics.scoreBendHoldSize
                         );
                     }
                     break;
@@ -240,8 +240,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             beatDirection === BeamDirection.Down,
-                            this.renderer.smuflMetrics.scoreBendHoldSize,
-                            this.renderer.smuflMetrics.scoreBendHoldOffset
+                            this.renderer.smuflMetrics.scoreBendHoldOffset,
+                            this.renderer.smuflMetrics.scoreBendHoldSize
                         );
                     }
                     break;
@@ -288,8 +288,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 endX,
                                 endY,
                                 beatDirection === BeamDirection.Down,
-                                this.renderer.smuflMetrics.scoreBendHoldSize,
-                                this.renderer.smuflMetrics.scoreBendHoldOffset                                
+                                this.renderer.smuflMetrics.scoreBendHoldOffset,                                
+                                this.renderer.smuflMetrics.scoreBendHoldSize
                             );
                         }
                     } else {

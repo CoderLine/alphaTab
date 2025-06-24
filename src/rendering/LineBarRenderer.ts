@@ -30,7 +30,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected tupletSize: number = 0;
 
     public get lineOffset(): number {
-        return this.lineSpacing + this.smuflMetrics.staffLineThickness;
+        return this.lineSpacing + this.smuflMetrics.lineBarRendererLineOffset;
     }
 
     public get tupletOffset(): number {
@@ -253,7 +253,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
         // check if we need to paint simple footer
         let offset: number = this.tupletOffset;
-        let size: number = this.tupletSize - this.tupletOffset;
+        let size: number = this.smuflMetrics.tupletSize - this.smuflMetrics.tupletOffset;
 
         using _ = ElementStyleHelper.beat(canvas, beatElement, h.beats[0]);
 
@@ -502,7 +502,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             if (beat.graceType === GraceType.BeforeBeat) {
                 const graceSizeY: number = this.smuflMetrics.graceFlagSizeY;
-                const graceSizeX: number = this.smuflMetrics.graceFlagSizeY;
+                const graceSizeX: number = this.smuflMetrics.graceFlagSizeX;
                 canvas.beginPath();
                 if (direction === BeamDirection.Down) {
                     canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + bottomY - graceSizeY);

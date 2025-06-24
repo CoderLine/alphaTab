@@ -9,6 +9,7 @@ import { Ottavia } from '@src/model/Ottavia';
  */
 export class SmuflMetrics {
     public readonly RawLineSpacing: number = 8;
+    public readonly lineBarRendererLineOffset: number = 1;
     public get stemWidth(): number {
         return 0.12 /*bravura stemThickness */ * this.RawLineSpacing;
     }
@@ -89,7 +90,7 @@ export class SmuflMetrics {
     public readonly beatTimerMarginY: number = 2;
     public readonly slightBeatVibratoStepSize: number = 12;
     public readonly wideBeatVibratoStepSize: number = 23;
-    public readonly beatVibratoHeight: number = 15;
+    public readonly beatVibratoHeight: number = 18;
     public readonly bendNoteHeadElementPadding: number = 2;
     public readonly chordDiagramPaddingX: number = 5;
     public readonly chordDiagramPaddingY: number = 2;
@@ -114,7 +115,7 @@ export class SmuflMetrics {
         [Clef.G2, -37],
     ]);
     public readonly clefOffsetY = new Map<Clef, number>([
-        [Clef.Neutral, -15],
+        [Clef.Neutral, 15],
         [Clef.C3, 27],
         [Clef.C4, 27],
         [Clef.F4, 27],
@@ -176,8 +177,8 @@ export class SmuflMetrics {
     public readonly scorePreFingeringPadding: number = 2;
     public readonly scorePreAccidentalPadding: number = 2;
     public readonly scoreBendEndPadding: number = 8;
-    public readonly scoreBendHoldOffset: number = 4;
-    public readonly scoreBendHoldSize: number = 22;
+    public readonly scoreBendHoldOffset: number = 22;
+    public readonly scoreBendHoldSize: number = 4;
     public readonly arpeggioWidth: number = 10;
     public readonly arpeggioVibratoScale: number = 1.2;
     public readonly arpeggioArrowSize: number = 8;
@@ -287,11 +288,11 @@ export class SmuflMetrics {
     public readonly barStemSizes:Map<Duration, number> = new Map<Duration, number>([
         [Duration.QuadrupleWhole, 6],
         [Duration.Half, 6],
-        [Duration.QuadrupleWhole, 6],
+        [Duration.Quarter, 6],
         [Duration.Eighth, 6],
         [Duration.Sixteenth, 6],
         [Duration.ThirtySecond, 8],
-        [Duration.Sixteenth, 9],
+        [Duration.SixtyFourth, 9],
         [Duration.OneHundredTwentyEighth, 9],
         [Duration.TwoHundredFiftySixth, 10],
     ]);

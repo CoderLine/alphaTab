@@ -9,8 +9,8 @@ export class DynamicsGlyph extends MusicFontGlyph {
     }
 
     public override doLayout(): void {
-        super.doLayout();
         this.glyphScale = this.renderer.smuflMetrics.dynamicsScale;
+        super.doLayout();
         this.y += this.height / 2;
     }
 
