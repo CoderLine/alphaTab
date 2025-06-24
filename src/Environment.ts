@@ -807,11 +807,11 @@ export class Environment {
      * @partial
      */
     private static printPlatformInfo(print: (message: string) => void) {
-        print(`Browser: ${navigator.userAgent}`);
         print(`Platform: ${WebPlatform[Environment.webPlatform]}`);
         print(`WebPack: ${Environment.isWebPackBundled}`);
         print(`Vite: ${Environment.isViteBundled}`);
         if (Environment.webPlatform !== WebPlatform.NodeJs) {
+            print(`Browser: ${navigator.userAgent}`);
             print(`Window Size: ${window.outerWidth}x${window.outerHeight}`);
             print(`Screen Size: ${window.screen.width}x${window.screen.height}`);
         }
