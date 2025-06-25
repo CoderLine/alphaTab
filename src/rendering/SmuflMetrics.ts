@@ -8,7 +8,25 @@ import { Ottavia } from '@src/model/Ottavia';
  * spacings etc.
  */
 export class SmuflMetrics {
+    
+    // SmuFL TODO: 
+    // - Spec: "Diving the EM in four provides analogue for a five-line staff."
+    // - Spec: "All Glyphs should be drawn at scale consistent with the key measurement that one staff space = 0.25em"
+    // - If `Environment.MusicFontSize=34` (px), 1 staff space (sp) is 34/4 => 8.5px, but we currently have 1sp as 8px
+    // - Spec: "Unless otherwise stated, all glyphs shall have zero-width side bearings, i.e. no blank space to the left or right of the glyph"
+    // - Spec: "Glyphs for movable notations that apply to some vertical staff position (e.g. note heads, accidentals) shall
+    //          be registered such that the font baseline lies eactly at that position."
+    // - Spec: Letters from dynamics should be scaled such that the caps height is around 0.5em and the x-height is around 0.25em. 
+    // - Spec: digits from time signatures should be scaled such that each digit is two staff spaces tal (i.e. 0.5em) and vertically centered on the baseline. 
+    // - Spec: Tessellating glyphs (such as wavy lines or the component parts of complex trills and mordents) should have negative side bearings, in order to achieve correct tessellation when set in a single run.
+    // - Generally we should eliminate the custom spaces in this file unless they are for some specialized 
+    //   glyphs or annotations which have no strict SmuFL spec (e.g. chord diagrams)
+   
+    //
+    // general music sheet and renderer sizes
     public readonly RawLineSpacing: number = 8;
+    public readonly tabLineSpacing: number = 10;
+
     public readonly lineBarRendererLineOffset: number = 1;
     public get stemWidth(): number {
         return 0.12 /*bravura stemThickness */ * this.RawLineSpacing;
@@ -26,82 +44,127 @@ export class SmuflMetrics {
     public get numberedBarRendererBarSpacing() {
         return this.beamSpacing + this.beamThickness;
     }
-    public readonly numberedBarRendererBarSize = 2;
-    public readonly numberedBarRendererDotSpacing = 5;
-    public readonly numberedBarRendererDotSize = 2;
 
-    public readonly crescendoHeight = 17;
-    public readonly barTempoHeight = 25;
+    public readonly tabNumberSpacePadding: number = 1;
 
-    public readonly numberedDashGlyphPadding = 3;
-    public readonly numberedDashGlyphWidth = 14;
-    public readonly simileMarkSimpleWidth = 20;
-    public readonly simileMarkDoubleWidth = 28;
-    public readonly tupletOffset = 10;
-    public readonly tupletSize = 15;
-    public readonly tupletTextMargin = 3;
-    public readonly lineBarRendererOverflowFontSiteToPadding = 0.2;
-    public readonly lineBarRendererTupletFontSiteToPadding = 0.3;
-    public readonly graceFlagSizeX = 12;
-    public readonly graceFlagSizeY = 15;
-    public readonly flagStemOffset = 0.5;
-    public readonly flagStemSize = 3;
-    public readonly brokenBarOffset = 6;
+    // move to inlined values again?
     public readonly numberedBarRendererLineHeightCount = 5;
     public readonly scoreBarRendererLineHeightCount = 5;
     public readonly slashBarRendererLineHeightCount = 5;
+
+    //
+    // combined sizes (TODO: splitup into paddings and glyph sizes)
+    public readonly deadSlappedBeatWidth: number = 26;
+
+    //
+    // paddings/margins between elements (TODO: try to eliminate custom paddings)
+    public readonly directionsContainerPadding: number = 3;
+    public readonly leftHandTappingPadding: number = 6;
+    public readonly multiBarRestPadding: number = 10;
+    public readonly graceNoteHeadPadding: number = 1;
+    public readonly trillTextPadding: number = 3;
+
+    public readonly numberedBeatPostAccidentalPadding: number = 4;
+
+    public readonly slashBeatNoteDotPadding: number = 5;
+    public readonly numberedBeatNoteDotPadding: number = 5;
+    public readonly scoreBeatNoteDotPadding: number = 5;
+    public readonly numberedBarRendererDotSpacing = 5;
     public readonly numberedBarRendererDotPadding = 4;
+    public readonly tabNoteDotPadding = 5;
+
     public readonly numberedBarRendererPreTimeSignaturePadding = 5;
     public readonly scoreBarRendererPreTimeSignaturePadding = 5;
     public readonly slashBarRendererPreTimeSignaturePadding = 5;
     public readonly tabBarRendererPreTimeSignaturePadding = 5;
-    public readonly scoreBarRendererBeamMaxDistance = 10;
-    public readonly clefTopPadding = 0.5;
-    public readonly tabLineSpacing: number = 10;
-    public readonly tabNumberSpacePadding: number = 1;
+
+    public readonly rowContainerPadding: number = 3;
+
+    public readonly scoreBeatGhostSpace: number = 4;
+    public readonly scorePreNotePadding: number = 4;
+    public readonly scorePreFingeringPadding: number = 2;
+    public readonly scorePreAccidentalPadding: number = 2;
+
+    public readonly scoreBendEndPadding: number = 8;
+    public readonly scoreBendHoldOffset: number = 22;
+    public readonly scoreBendHoldSize: number = 4;
+
+    public readonly scoreHelperNotesEndPadding: number =((10 / 2) | 0) + 3;
+    public readonly scoreHelperNotesEndPadding2: number  = 10;
+
+    public readonly scoreNoteBelowEffectSpacing: number  = 1;
+
+    public readonly tupletTextMargin = 3;
     public readonly tabClefLeftPadding: number = 5;
-    public readonly slightNoteVibratoScale: number = 1.2;
-    public readonly wideNoteVibratoScale: number = 1.2;
-    public readonly accentuationPadding: number = 2;
-    public readonly accidentalHeight: number = 21;
+
     public readonly alternateEndingsPaddingX: number = 3;
     public readonly alternateEndingsPaddingY: number = 5;
     public readonly alternateEndingsCloseLinePadding: number = 4;
-    public readonly articStaccatoAbovePaddingX: number = 3;
-    public readonly articStaccatoAbovePaddingY: number = 5;
-    public readonly barLineWidth: number = 1
-    public readonly heavyBarLineWidth: number = 4;
-    public readonly dottedBarLineCircleRadius: number = 1;
-    public readonly dashedBarLineSize: number = 4;
-    public readonly repeatDotsCircleSize: number = 1.5;
-    public readonly repeatDotsCircleOffset: number = 3;
-    public readonly barLineSpace: number = 3;
-    public readonly barNumberMarginPaddingRight: number = 5;
-    public readonly barTempoTextPaddingScale: number = 0.7;
-    public readonly barTempoSymbolYScale: number = 0.8;
-    public readonly barTempoSymbolScale: number = 0.5;
-    public readonly barTempoValuePadding: number = 3;
-    public readonly graceBeatPadding: number = 3;
-    public readonly graceBeatPostBeatStretch: number = 7;
-    public readonly beatPaddingFlagEighthAndAbove: number = 20;
-    public readonly beatPaddingOneHundredAndAbove: number = 10;
+
     public readonly beatTimerPaddingX: number = 2;
     public readonly beatTimerPaddingY: number = 2;
     public readonly beatTimerMarginY: number = 2;
+
+    public readonly bendNoteHeadElementPadding: number = 2;
+
+    public readonly circleGlyphPadding: number = 3;
+
+    public readonly scoreSlideLineEndPadding = 2;
+    public readonly scoreSlideLineOffsetX = 2;
+    public readonly scoreSlideLineOffsetY = 2;
+
+    public readonly scoreWhammySimpleDipPadding = 2;
+    public readonly scoreWhammySongBookPadding = 2;
+    public readonly slashNoteHeadEffectSpacing = 7;
+
+    public readonly tabPreNotesPadding = 4;
+    public readonly tabNoteChordEffectSpacing: number = 7;
+
+    public readonly tabWhammySimpleDipPadding = 2;
+    public readonly tabWhammyTextPadding = 2;
+
+    //
+    // range glyphs (TODO: check for SMuFL spec)
+    public readonly lineRangedGlyphSpacing: number = 3;
+    public readonly lineRangedGlyphTopPadding: number = 4;
+    public readonly lineRangedGlyphTopOffset: number = 5;
+    public readonly lineRangedGlyphSize: number = 8;
+    public readonly ottavaLineSize: number = 8;
+    public readonly ottavaLineSpacing: number = 3;
+    public readonly ottavaPaddingY: number = 2;
+
+    public readonly numberedDashGlyphPadding = 3;
+    public readonly stringNumberCirclePadding = 3;
+    public readonly sustainPedalTextLinePadding = 3;
+    public readonly sustainPedalStarLinePadding = 3;
+
+    public readonly timeSignatureGhostParenthesisLeftPadding= 10;
+    public readonly timeSignatureGhostParenthesisRightPadding= 13;
+
+    //
+    // repeated glyph advance
     public readonly slightBeatVibratoStepSize: number = 12;
     public readonly wideBeatVibratoStepSize: number = 23;
-    public readonly beatVibratoHeight: number = 18;
-    public readonly bendNoteHeadElementPadding: number = 2;
-    public readonly chordDiagramPaddingX: number = 5;
-    public readonly chordDiagramPaddingY: number = 2;
-    public readonly chordDiagramCircleRadius: number = 2.5;
-    public readonly chordDiagramStringSpacing: number = 10;
-    public readonly chordDiagramFretSpacing: number = 12;
-    public readonly chordDiagramFontToRow: number = 1.5;
-    public readonly chordDiagramNutHeight: number = 2;
-    public readonly chordDiagramFretHeight: number = 1;
-    public readonly circleGlyphPadding: number = 3;
-    public readonly clefOttavaOffsetX = new Map<Ottavia, number>([
+    public readonly tabBrushArpeggioOffset: number = 4;
+
+    //
+    // glyph positioning/alignment offsets (TODO: try to eliminate or calculate from bounding box)
+    public readonly pictEdgeOfCymbalOffsetX: number = 3;
+    public readonly arpeggioXOffset: number = 5;
+    public readonly noteOrnamentBottomOffset: number = 4;
+
+    public readonly numberedBeatNoteYTopPadding: number = 2;
+    public readonly slashBeatNoteYTopPadding: number = 2;
+
+    public readonly tupletOffset = 10;
+
+    public readonly flagStemOffset = 0.5;
+
+    public readonly tabClefOffsetX: number = 5;
+    public readonly tabNoteYTopOffset: number = 2;
+
+    public readonly clefTopPadding = 0.5;
+        public readonly clefOttavaOffsetX = new Map<Ottavia, number>([
         [Ottavia._15ma, -4],
         [Ottavia._8va, -2],
         [Ottavia._8vb, -6],
@@ -128,64 +191,16 @@ export class SmuflMetrics {
         [Clef.F4, -4],
         [Clef.G2, 0],
     ]);
-    public readonly clefOttavaScale: number = 0.5;
-    public readonly deadSlappedBeatWidth: number = 26;
-    public readonly deadSlappedLineWidth: number = 2;
-    public readonly targetDirectionGlyphHeight: number = 27;
-    public readonly targetDirectionGlyphScale: number = 0.8;
-    public readonly jumpDirectionFontSizeToHeight: number = 1.5;
-    public readonly directionsContainerPadding: number = 3;
-    public readonly dynamicsScale: number = 0.6;
-    public readonly flagWidth: number = 11;
-    public readonly ghostParenthesisSize: number = 6;
-    public readonly leftHandTappingPadding: number = 6;
-    public readonly leftHandTappingCircleScale: number = 0.625;
-    
 
-    public readonly lineRangedGlyphSpacing: number = 3;
-    public readonly lineRangedGlyphTopPadding: number = 4;
-    public readonly lineRangedGlyphTopOffset: number = 5;
-    public readonly lineRangedGlyphSize: number = 8;
-    
-    public readonly multiBarRestWidth: number = 60;
-    public readonly multiBarRestPadding: number = 10;
-    public readonly graceNoteHeadPadding: number = 1;
-    public readonly trillTextPadding: number = 3;
-    public readonly noteOrnamentBottomOffset: number = 4;
-    public readonly numberedBeatPostAccidentalPadding: number = 4;
-    public readonly numberedBeatNoteYTopPadding: number = 2;
-    public readonly slashBeatNoteYTopPadding: number = 2;
-    public readonly slashBeatNoteDotPadding: number = 5;
-    public readonly slashBeatNoteDotSize: number = 1.5;
-    public readonly numberedBeatNoteDotPadding: number = 5;
-    public readonly numberedBeatNoteDotSize: number = 1.5;
-    public readonly numberedKeySignatureScale: number = 0.7;
-    public readonly numberedNoteHeadWidth: number = 12;
-    public readonly numberedNoteHeadHeight: number = 17;
-    public readonly numberedTieEmptySize: number = 20;
-    public readonly ottavaScale: number = 0.8;
-    public readonly ottavaLineSize: number = 8;
-    public readonly ottavaLineSpacing: number = 3;
-    public readonly ottavaPaddingY: number = 2;
-    public readonly pictEdgeOfCymbalScale: number = 0.5;
-    public readonly pictEdgeOfCymbalOffsetX: number = 3;
-    public readonly rowContainerPadding: number = 3;
-    public readonly scoreBeatGhostSpace: number = 4;
-    public readonly scoreBeatNoteDotPadding: number = 5;
-    public readonly scoreBeatNoteDotSize: number = 1.5;
-    public readonly scorePreNotePadding: number = 4;
-    public readonly scorePreFingeringPadding: number = 2;
-    public readonly scorePreAccidentalPadding: number = 2;
-    public readonly scoreBendEndPadding: number = 8;
-    public readonly scoreBendHoldOffset: number = 22;
-    public readonly scoreBendHoldSize: number = 4;
-    public readonly arpeggioWidth: number = 10;
-    public readonly arpeggioVibratoScale: number = 1.2;
-    public readonly arpeggioArrowSize: number = 8;
-    public readonly arpeggioXOffset: number = 5;
-    public readonly scoreHelperNotesEndPadding: number =((10 / 2) | 0) + 3;
-    public readonly scoreHelperNotesEndPadding2: number  = 10;
-    public readonly scoreNoteBelowEffectSpacing: number  = 1;
+    public readonly accentuationPadding: number = 2;
+
+    public readonly articStaccatoAbovePaddingX: number = 3;
+    public readonly articStaccatoAbovePaddingY: number = 5;
+    public readonly barTempoValuePadding: number = 3;
+
+    public readonly graceBeatPadding: number = 3;
+    public readonly graceBeatPostBeatStretch: number = 7;
+
     public readonly scoreTremoloOffsetUp = new Map<Duration, number>([
         [Duration.ThirtySecond, -15],
         [Duration.Sixteenth, -12],
@@ -198,92 +213,323 @@ export class SmuflMetrics {
         [Duration.Eighth, 10],
     ]);
     public readonly scoreTremoloOffsetDownOther = 15;
-    public readonly scoreSlideLineSizeX = 12;
-    public readonly scoreSlideLineEndPadding = 2;
-    public readonly scoreSlideLineOffsetX = 2;
-    public readonly scoreSlideLineOffsetY = 2;
-    public readonly scoreSlideVibratoScale = 1.2;
-    public readonly scoreTimeSignatureCommonScale = 1;
-    public readonly scoreTimeSignatureNumberScale = 1;
-    public get scoreWhammySimpleDipHeight() { return this.tabWhammyPerHalfSize * 2; };
-    public readonly scoreWhammySimpleDipPadding = 2;
-    public readonly scoreWhammyFontSizeToOverflow = 1.5;
-    public readonly scoreWhammySongBookPadding = 2;
-    public readonly slashNoteHeadEffectSpacing = 7;
-    public readonly slashTieEmptyHeight = 15;
-    public readonly slashTieEmptyWidth = 20;
-    public readonly stringNumberCirclePadding = 3;
-    public readonly sustainPedalTextLinePadding = 3;
-    public readonly sustainPedalStarLinePadding = 3;
-    public readonly sustainPedalLineWidth = 1;
     public readonly tabTremoloOffsetX = new Map<Duration, number>([
         [Duration.ThirtySecond, 10],
         [Duration.Sixteenth, 5],
         [Duration.Eighth, 0],
     ]);
     public readonly tabTremoloXDefault = 5;
-    public readonly tabNoteDotPadding = 5;
+    public readonly tabPreBendPadding: number = 2;
+    public readonly tabBendLabelYOffset: number = 2;
+    public readonly tabSlideOffsetX: number = 2;
+    public readonly staffSystemSeparatorOffsetY = /* glyphBBoxes.systemDivider.bBoxSW[1] */-0.272 * this.RawLineSpacing;
+
+    public getStemDownOffsetY(symbol:MusicFontSymbol) {
+        return this.stemDownOffsetY.has(symbol) ? this.stemDownOffsetY.get(symbol)! * this.RawLineSpacing : 0;
+    }
+
+    private readonly stemDownOffsetY = new Map<MusicFontSymbol, number>([
+        // From bravura_metadata.json 
+        // glyphsWithAnchors.glyph.stemDownNW[1]
+
+        [MusicFontSymbol.NoteheadDoubleWholeSquare,0],
+        [MusicFontSymbol.NoteheadDoubleWhole,0],
+        [MusicFontSymbol.NoteheadWhole,0],
+        [MusicFontSymbol.NoteheadHalf, -0.168],
+        [MusicFontSymbol.NoteheadBlack, -0.168],
+        [MusicFontSymbol.NoteheadNull,0],
+        [MusicFontSymbol.NoteheadXOrnate, -0.312],
+
+        [MusicFontSymbol.NoteheadPlusDoubleWhole,0],
+        [MusicFontSymbol.NoteheadPlusWhole,0],
+        [MusicFontSymbol.NoteheadPlusHalf, -0.112],
+        [MusicFontSymbol.NoteheadPlusBlack,0],
+
+        [MusicFontSymbol.NoteheadSquareWhite, -0.5],
+        [MusicFontSymbol.NoteheadSquareBlack,-0.5],
+
+        [MusicFontSymbol.NoteheadTriangleUpDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpHalf, -0.46],
+        [MusicFontSymbol.NoteheadTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteheadTriangleRightWhite,-0.5],
+        [MusicFontSymbol.NoteheadTriangleRightBlack, -0.5],
+
+        [MusicFontSymbol.NoteheadTriangleDownDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownHalf, 0.464],
+        [MusicFontSymbol.NoteheadTriangleDownBlack,0.5],
+
+        [MusicFontSymbol.NoteheadDiamondDoubleWhole,0],
+        [MusicFontSymbol.NoteheadDiamondWhole,0],
+        [MusicFontSymbol.NoteheadDiamondHalf,0],
+        [MusicFontSymbol.NoteheadDiamondBlack,0],
+
+        [MusicFontSymbol.NoteheadDiamondBlackWide,0],
+        [MusicFontSymbol.NoteheadDiamondWhite,0],
+        [MusicFontSymbol.NoteheadDiamondWhiteWide, 0.004],
+        [MusicFontSymbol.NoteheadCircleXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadCircleXWhole,0],
+        [MusicFontSymbol.NoteheadCircleXHalf,0],
+        [MusicFontSymbol.NoteheadCircleX,0],
+        [MusicFontSymbol.NoteheadXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadXWhole,0],
+        [MusicFontSymbol.NoteheadXHalf,  -0.412],
+        [MusicFontSymbol.NoteheadXBlack,  -0.44],
+        [MusicFontSymbol.NoteheadParenthesis,0],
+        [MusicFontSymbol.NoteheadSlashedBlack1, -0.172],
+        [MusicFontSymbol.NoteheadSlashedBlack2, -0.172],
+        [MusicFontSymbol.NoteheadSlashedHalf1, -0.168],
+        [MusicFontSymbol.NoteheadSlashedHalf2,  -0.164],
+        [MusicFontSymbol.NoteheadSlashedWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedWhole2,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole2,0],
+
+        [MusicFontSymbol.NoteheadCircledBlack, -0.164],
+        [MusicFontSymbol.NoteheadCircledHalf,-0.144],
+        [MusicFontSymbol.NoteheadCircledWhole,0],
+        [MusicFontSymbol.NoteheadCircledDoubleWhole,0],
+
+        [MusicFontSymbol.NoteheadCircleSlash,0],
+        [MusicFontSymbol.NoteheadHeavyX, -0.436],
+        [MusicFontSymbol.NoteheadHeavyXHat,-0.436],
+
+        [MusicFontSymbol.NoteheadSlashVerticalEnds,-0.664],
+        [MusicFontSymbol.NoteheadSlashWhiteWhole,0],
+        [MusicFontSymbol.NoteheadSlashWhiteHalf,-1.0],
+ 
+        [MusicFontSymbol.NoteheadRoundWhiteWithDot,0],
+
+        [MusicFontSymbol.NoteheadSquareBlackLarge,0],
+        [MusicFontSymbol.NoteheadSquareBlackWhite,-1.0],
+
+        [MusicFontSymbol.NoteheadClusterDoubleWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterHalf3rd,-0.164],
+        [MusicFontSymbol.NoteheadClusterQuarter3rd, 0.26],
+
+        [MusicFontSymbol.NoteShapeRoundWhite,-0.168],
+        [MusicFontSymbol.NoteShapeRoundBlack,-0.168],
+
+        [MusicFontSymbol.NoteShapeSquareWhite,-0.5],
+        [MusicFontSymbol.NoteShapeSquareBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleRightWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleRightBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleLeftWhite, 0.5],
+        [MusicFontSymbol.NoteShapeTriangleLeftBlack,0.5],
+
+        [MusicFontSymbol.NoteShapeDiamondWhite,0],
+        [MusicFontSymbol.NoteShapeDiamondBlack,0],
+
+        [MusicFontSymbol.NoteShapeTriangleUpWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeMoonWhite,0.072],
+        [MusicFontSymbol.NoteShapeMoonBlack,0.068],
+
+        [MusicFontSymbol.NoteShapeTriangleRoundWhite, 0.172],
+        [MusicFontSymbol.NoteShapeTriangleRoundBlack, 0.172],
+    ])
+    private readonly stemUpOffsetY = new Map<MusicFontSymbol, number>([
+        // From bravura_metadata.json 
+        // glyphsWithAnchors.glyph.stemUpSE[1]
+
+        [MusicFontSymbol.NoteheadDoubleWholeSquare,0],
+        [MusicFontSymbol.NoteheadDoubleWhole,0],
+        [MusicFontSymbol.NoteheadWhole,0],
+        [MusicFontSymbol.NoteheadHalf,  0.2],
+        [MusicFontSymbol.NoteheadBlack, 0.204],
+        [MusicFontSymbol.NoteheadNull,0],
+        [MusicFontSymbol.NoteheadXOrnate, 0.316],
+
+        [MusicFontSymbol.NoteheadPlusDoubleWhole,0],
+        [MusicFontSymbol.NoteheadPlusWhole,0],
+        [MusicFontSymbol.NoteheadPlusHalf,   0.088],
+        [MusicFontSymbol.NoteheadPlusBlack,0],
+
+        [MusicFontSymbol.NoteheadSquareWhite, 0.5],
+        [MusicFontSymbol.NoteheadSquareBlack,0.5],
+
+        [MusicFontSymbol.NoteheadTriangleUpDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpHalf,  -0.46],
+        [MusicFontSymbol.NoteheadTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteheadTriangleRightWhite, 0.5],
+        [MusicFontSymbol.NoteheadTriangleRightBlack, 0.5],
+
+        [MusicFontSymbol.NoteheadTriangleDownDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownHalf, 0.464],
+        [MusicFontSymbol.NoteheadTriangleDownBlack,0.5],
+
+        [MusicFontSymbol.NoteheadDiamondDoubleWhole,0],
+        [MusicFontSymbol.NoteheadDiamondWhole,0],
+        [MusicFontSymbol.NoteheadDiamondHalf,0],
+        [MusicFontSymbol.NoteheadDiamondBlack,0],
+
+        [MusicFontSymbol.NoteheadDiamondBlackWide,0],
+        [MusicFontSymbol.NoteheadDiamondWhite,0],
+        [MusicFontSymbol.NoteheadDiamondWhiteWide, 0],
+        [MusicFontSymbol.NoteheadCircleXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadCircleXWhole,0],
+        [MusicFontSymbol.NoteheadCircleXHalf,0],
+        [MusicFontSymbol.NoteheadCircleX,0],
+        [MusicFontSymbol.NoteheadXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadXWhole,0],
+        [MusicFontSymbol.NoteheadXHalf,  0.412],
+        [MusicFontSymbol.NoteheadXBlack,  0.444],
+        [MusicFontSymbol.NoteheadParenthesis,0],
+        [MusicFontSymbol.NoteheadSlashedBlack1, 0.164],
+        [MusicFontSymbol.NoteheadSlashedBlack2,  0.164],
+        [MusicFontSymbol.NoteheadSlashedHalf1, 0.164],
+        [MusicFontSymbol.NoteheadSlashedHalf2,   0.168],
+        [MusicFontSymbol.NoteheadSlashedWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedWhole2,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole2,0],
+
+        [MusicFontSymbol.NoteheadCircledBlack,  0.168],
+        [MusicFontSymbol.NoteheadCircledHalf,0.156],
+        [MusicFontSymbol.NoteheadCircledWhole,0],
+        [MusicFontSymbol.NoteheadCircledDoubleWhole,0],
+
+        [MusicFontSymbol.NoteheadCircleSlash,0],
+        [MusicFontSymbol.NoteheadHeavyX,   0.44],
+        [MusicFontSymbol.NoteheadHeavyXHat, 0.456],
+
+        [MusicFontSymbol.NoteheadSlashVerticalEnds, 0.656],
+        [MusicFontSymbol.NoteheadSlashWhiteWhole,0],
+        [MusicFontSymbol.NoteheadSlashWhiteHalf,1.0],
+ 
+        [MusicFontSymbol.NoteheadRoundWhiteWithDot,0],
+
+        [MusicFontSymbol.NoteheadSquareBlackLarge,0],
+        [MusicFontSymbol.NoteheadSquareBlackWhite,1.0],
+
+        [MusicFontSymbol.NoteheadClusterDoubleWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterHalf3rd,1.144],
+        [MusicFontSymbol.NoteheadClusterQuarter3rd,  0.744],
+
+        [MusicFontSymbol.NoteShapeRoundWhite,0.168],
+        [MusicFontSymbol.NoteShapeRoundBlack,0.168],
+
+        [MusicFontSymbol.NoteShapeSquareWhite,0.5],
+        [MusicFontSymbol.NoteShapeSquareBlack, 0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleRightWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleRightBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleLeftWhite, 0.5],
+        [MusicFontSymbol.NoteShapeTriangleLeftBlack,0.5],
+
+        [MusicFontSymbol.NoteShapeDiamondWhite,0],
+        [MusicFontSymbol.NoteShapeDiamondBlack,0],
+
+        [MusicFontSymbol.NoteShapeTriangleUpWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeMoonWhite, 0.068],
+        [MusicFontSymbol.NoteShapeMoonBlack,0.068],
+
+        [MusicFontSymbol.NoteShapeTriangleRoundWhite, 0.172],
+        [MusicFontSymbol.NoteShapeTriangleRoundBlack, 0.172],
+    ])
+
+    public getStemUpOffsetY(symbol:MusicFontSymbol) {
+        return this.stemUpOffsetY.has(symbol) ? this.stemUpOffsetY.get(symbol)! * this.RawLineSpacing : 0;
+    }
+
+    //
+    // glyph sizes (TODO: move to lookup or check if SmuFL has other constants)
+    public readonly deadSlappedLineWidth: number = 2;
+    public readonly targetDirectionGlyphHeight: number = 27;
+    public readonly flagWidth: number = 11;
+    public readonly ghostParenthesisSize: number = 6;
+    public readonly leftHandTappingCircleScale: number = 0.625;
+    public readonly multiBarRestWidth: number = 60;
+    public readonly numberedNoteHeadWidth: number = 12;
+    public readonly numberedNoteHeadHeight: number = 17;
+    public readonly numberedTieEmptySize: number = 20;
+    public readonly arpeggioWidth: number = 10;
+    public readonly arpeggioArrowSize: number = 8;
+
+    
+    public readonly slashBeatNoteDotSize: number = 1.5;
+    public readonly numberedBeatNoteDotSize: number = 1.5;
+    public readonly scoreBeatNoteDotSize: number = 1.5;
+    public readonly numberedBarRendererDotSize = 2;
     public readonly tabNoteDotSize = 1.5;
-    public readonly tabPreNotesPadding = 4;
+
+    public readonly numberedBarRendererBarSize = 2;
+
+    public readonly crescendoHeight = 17;
+
+    public readonly barTempoHeight = 25;
+    public readonly numberedDashGlyphWidth = 14;
+    public readonly simileMarkSimpleWidth = 20;
+    public readonly simileMarkDoubleWidth = 28;
+
+    public readonly tupletSize = 15;
+
+    public readonly graceFlagSizeX = 12;
+    public readonly graceFlagSizeY = 15;
+
+    public readonly flagStemSize = 3;
+    public readonly brokenBarOffset = 6;
+
+    public readonly scoreBarRendererBeamMaxDistance = 10;
+    public readonly accidentalHeight: number = 21;
+
+    public readonly barLineWidth: number = 1
+    public readonly heavyBarLineWidth: number = 4;
+    public readonly dottedBarLineCircleRadius: number = 1;
+    public readonly dashedBarLineSize: number = 4;
+    public readonly repeatDotsCircleSize: number = 1.5;
+    public readonly repeatDotsCircleOffset: number = 3;
+
+    public readonly beatPaddingFlagEighthAndAbove: number = 20;
+    public readonly beatPaddingOneHundredAndAbove: number = 10;
+
+    public readonly barLineSpace: number = 3;
+    public readonly barNumberMarginPaddingRight: number = 5;
+
+    public readonly beatVibratoHeight: number = 18;
+    public readonly scoreSlideLineSizeX = 12;
+
+    public get scoreWhammySimpleDipHeight() { return this.tabWhammyPerHalfSize * 2; };
+
+    public readonly slashTieEmptyHeight = 15;
+    public readonly slashTieEmptyWidth = 20;
+
+    public readonly sustainPedalLineWidth = 1;
+
     public readonly tabBendArrowSize: number = 6;
     public readonly tabBendDashSize: number = 3;
     public readonly tabBendBendValueHeight: number = 6;
-    public readonly tabPreBendPadding: number = 2;
-    public readonly tabBendVibratoScale: number = 1.2;
-    public readonly tabBendFontSizeToHeight: number = 1.3;
-    public readonly tabBendFontSizeToPadding: number = 0.5;
-    public readonly tabBendLabelYOffset: number = 2;
+
     public readonly tabBrushWidth: number = 10;
     public readonly tabBrushArrowSize: number = 8;
-    public readonly tabBrushVibratoScale: number = 1.2;
-    public readonly tabBrushArpeggioOffset: number = 4;
-    public readonly tabClefOffsetX: number = 5;
-    public readonly tabNoteYTopOffset: number = 2;
-    public readonly tabNoteChordEffectSpacing: number = 7;
-    public readonly tabRestInvisibleWidth: number = 10;
+        public readonly tabRestInvisibleWidth: number = 10;
     public readonly tabSlideSizeX: number = 12;
     public readonly tabSlideSizeY: number = 3;
-    public readonly tabSlideOffsetX: number = 2;
-    public readonly tabSlideVibratoScale: number = 1.2;
+
     public readonly tabTieEmptyHeight: number = 15;
     public readonly tabTieEmptyWidth: number = 20;
 
     public readonly tabWhammyPerHalfSize = 6;
     public readonly tabWhammyDashSize = 3;
-    public readonly tabWhammySimpleDipPadding = 2;
-    public readonly tabWhammyTextPadding = 2;
+        
     public readonly tieSize = 4;
     public readonly tieHeight= 22;
     public readonly bendSlurHeight= 11;
+
     public readonly timeSignatureNumberHeight= 18;
-    public readonly timeSignatureGhostParenthesisLeftPadding= 10;
-    public readonly timeSignatureGhostParenthesisRightPadding= 13;
-    public readonly trillWaveScale= 1.2;
-    public readonly trillLoopHeightToY = 1.37;
-    public readonly tripletFeelNoteScale = 0.5;
-    public readonly tripletFeelTupletScale = 0.7;
-    public readonly tripletFeelHeight = 25;
-    public readonly tripletFeelYPadding = 8;
-    public readonly tripletFeelBracketsHeightToY = 0.3;
-    public readonly tripletFeelLeftNoteXPadding = 10;
-    public readonly tripletFeelRightNoteXPadding = 40;
-    public readonly tripletFeelCircleOffset = 9;
-    public readonly tripletFeelCircleSize = 1;
-    public readonly tripletFeelEqualsOffsetX =32;
-    public readonly tripletFeelEqualsOffsetY =5;
-    public readonly tripletFeelAugmentationOffsetX =7;
-    public readonly tripletFeelCloseParenthesisOffsetX =65;
-    public readonly tuningGlyphCircleNumberScale =0.7;
-    public readonly tuningGlyphRowHeight =15;
-    public readonly tuningGlyphTextPadding =1;
-    public readonly tuningGlyphStringColumnWidth = 64;
-    public readonly tuningGlyphEndPaddingX = 15;
-    public readonly scoreInfoFontSizeToHeight = 1.2;
-    public readonly staffSystemSeparatorOffsetY = 10;
-
-    public readonly systemSignSeparatorHeight = 40;
-    public readonly systemSignSeparatorWidth = 36;
-
 
     public readonly barStemSizes:Map<Duration, number> = new Map<Duration, number>([
         [Duration.QuadrupleWhole, 6],
@@ -297,13 +543,7 @@ export class SmuflMetrics {
         [Duration.TwoHundredFiftySixth, 10],
     ]);
 
-    public stringsToTabClefSymbolAndScale(strings: number): [MusicFontSymbol, number] {
-        if (strings <= 4) {
-            return [MusicFontSymbol.FourStringTabClef, strings / 4.5];
-        }
-
-        return [MusicFontSymbol.SixStringTabClef, strings / 6.5];
-    }
+    
 
     /**
      * The widths of the bounding box for the respective glyphs.
@@ -312,7 +552,7 @@ export class SmuflMetrics {
         [MusicFontSymbol.Brace, 3],
         [MusicFontSymbol.BracketTop, 0],
         [MusicFontSymbol.BracketBottom, 0],
-        [MusicFontSymbol.SystemDivider, 0],
+        [MusicFontSymbol.SystemDivider, 36],
 
         [MusicFontSymbol.GClef, 28],
         [MusicFontSymbol.CClef, 28],
@@ -597,7 +837,7 @@ export class SmuflMetrics {
         [MusicFontSymbol.Brace, 34],
         [MusicFontSymbol.BracketTop, 0],
         [MusicFontSymbol.BracketBottom, 0],
-        [MusicFontSymbol.SystemDivider, 0],
+        [MusicFontSymbol.SystemDivider, 40],
 
         [MusicFontSymbol.GClef, 0],
         [MusicFontSymbol.CClef, 0],
@@ -875,226 +1115,85 @@ export class SmuflMetrics {
         [MusicFontSymbol.OctaveBaselineB, 0]
     ]);
 
-    public getStemDownOffsetY(symbol:MusicFontSymbol) {
-        return this.stemDownOffsetY.has(symbol) ? this.stemDownOffsetY.get(symbol)! * this.RawLineSpacing : 0;
+    //
+    // chord diagram (TODO: check if SmuFL has some glyphs we can check)
+    public readonly chordDiagramPaddingX: number = 5;
+    public readonly chordDiagramPaddingY: number = 2;
+    public readonly chordDiagramCircleRadius: number = 2.5;
+    public readonly chordDiagramStringSpacing: number = 10;
+    public readonly chordDiagramFretSpacing: number = 12;
+    public readonly chordDiagramNutHeight: number = 2;
+    public readonly chordDiagramFretHeight: number = 1;
+
+    //
+    // glyph scales (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
+    public readonly clefOttavaScale: number = 0.5;
+    public readonly targetDirectionGlyphScale: number = 0.8;
+    public readonly dynamicsScale: number = 0.6;
+    public readonly numberedKeySignatureScale: number = 0.7;
+    public readonly ottavaScale: number = 0.8;
+    public readonly pictEdgeOfCymbalScale: number = 0.5;
+    public readonly arpeggioVibratoScale: number = 1.2;
+    public readonly slightNoteVibratoScale: number = 1.2;
+    public readonly wideNoteVibratoScale: number = 1.2;
+    public readonly scoreSlideVibratoScale = 1.2;
+    public readonly tabBendVibratoScale: number = 1.2;
+    public readonly tabBrushVibratoScale: number = 1.2;
+    public readonly tabSlideVibratoScale: number = 1.2;
+    public readonly trillWaveScale= 1.2;
+    public readonly trillLoopHeightToY = 1.37;
+
+    public readonly barTempoSymbolYScale: number = 0.8;
+    public readonly barTempoSymbolScale: number = 0.5;
+
+    public readonly scoreTimeSignatureCommonScale = 1;
+    public readonly scoreTimeSignatureNumberScale = 1;
+
+    public stringsToTabClefSymbolAndScale(strings: number): [MusicFontSymbol, number] {
+        if (strings <= 4) {
+            return [MusicFontSymbol.FourStringTabClef, strings / 4.5];
+        }
+
+        return [MusicFontSymbol.SixStringTabClef, strings / 6.5];
     }
 
-    private readonly stemDownOffsetY = new Map<MusicFontSymbol, number>([
-        // From bravura_metadata.json 
-        // glyphsWithAnchors.glyph.stemDownNW[1]
+    //
+    // tuning (TODO: fixed values or take others as reference?)
+    public readonly tuningGlyphCircleNumberScale =0.7;
+    public readonly tuningGlyphRowHeight =15;
+    public readonly tuningGlyphTextPadding =1;
+    public readonly tuningGlyphStringColumnWidth = 64;
+    public readonly tuningGlyphEndPaddingX = 15;
 
-        [MusicFontSymbol.NoteheadDoubleWholeSquare,0],
-        [MusicFontSymbol.NoteheadDoubleWhole,0],
-        [MusicFontSymbol.NoteheadWhole,0],
-        [MusicFontSymbol.NoteheadHalf, -0.168],
-        [MusicFontSymbol.NoteheadBlack, -0.168],
-        [MusicFontSymbol.NoteheadNull,0],
-        [MusicFontSymbol.NoteheadXOrnate, -0.312],
+    //
+    // triplet feel (TODO: fixed values or take others as reference?)
+    public readonly tripletFeelNoteScale = 0.5;
+    public readonly tripletFeelTupletScale = 0.7;
+    public readonly tripletFeelHeight = 25;
+    public readonly tripletFeelYPadding = 8;
+    public readonly tripletFeelBracketsHeightToY = 0.3;
+    public readonly tripletFeelLeftNoteXPadding = 10;
+    public readonly tripletFeelRightNoteXPadding = 40;
+    public readonly tripletFeelCircleOffset = 9;
+    public readonly tripletFeelCircleSize = 1;
+    public readonly tripletFeelEqualsOffsetX =32;
+    public readonly tripletFeelEqualsOffsetY =5;
+    public readonly tripletFeelAugmentationOffsetX =7;
+    public readonly tripletFeelCloseParenthesisOffsetX =65;
 
-        [MusicFontSymbol.NoteheadPlusDoubleWhole,0],
-        [MusicFontSymbol.NoteheadPlusWhole,0],
-        [MusicFontSymbol.NoteheadPlusHalf, -0.112],
-        [MusicFontSymbol.NoteheadPlusBlack,0],
+    //
+    // font size > height factors (TODO: use proper measuring?)
+    public readonly scoreInfoFontSizeToHeight = 1.2;
+    public readonly scoreWhammyFontSizeToOverflow = 1.5;
+        public readonly lineBarRendererOverflowFontSiteToPadding = 0.2;
+    public readonly lineBarRendererTupletFontSiteToPadding = 0.3;
+    public readonly chordDiagramFontToRow: number = 1.5;
+    public readonly jumpDirectionFontSizeToHeight: number = 1.5;
+    public readonly tabBendFontSizeToHeight: number = 1.3;
+    public readonly tabBendFontSizeToPadding: number = 0.5;
+    public readonly barTempoTextPaddingScale: number = 0.7;
 
-        [MusicFontSymbol.NoteheadSquareWhite, -0.5],
-        [MusicFontSymbol.NoteheadSquareBlack,-0.5],
 
-        [MusicFontSymbol.NoteheadTriangleUpDoubleWhole,0],
-        [MusicFontSymbol.NoteheadTriangleUpWhole,0],
-        [MusicFontSymbol.NoteheadTriangleUpHalf, -0.46],
-        [MusicFontSymbol.NoteheadTriangleUpBlack, -0.5],
-
-        [MusicFontSymbol.NoteheadTriangleRightWhite,-0.5],
-        [MusicFontSymbol.NoteheadTriangleRightBlack, -0.5],
-
-        [MusicFontSymbol.NoteheadTriangleDownDoubleWhole,0],
-        [MusicFontSymbol.NoteheadTriangleDownWhole,0],
-        [MusicFontSymbol.NoteheadTriangleDownHalf, 0.464],
-        [MusicFontSymbol.NoteheadTriangleDownBlack,0.5],
-
-        [MusicFontSymbol.NoteheadDiamondDoubleWhole,0],
-        [MusicFontSymbol.NoteheadDiamondWhole,0],
-        [MusicFontSymbol.NoteheadDiamondHalf,0],
-        [MusicFontSymbol.NoteheadDiamondBlack,0],
-
-        [MusicFontSymbol.NoteheadDiamondBlackWide,0],
-        [MusicFontSymbol.NoteheadDiamondWhite,0],
-        [MusicFontSymbol.NoteheadDiamondWhiteWide, 0.004],
-        [MusicFontSymbol.NoteheadCircleXDoubleWhole,0],
-        [MusicFontSymbol.NoteheadCircleXWhole,0],
-        [MusicFontSymbol.NoteheadCircleXHalf,0],
-        [MusicFontSymbol.NoteheadCircleX,0],
-        [MusicFontSymbol.NoteheadXDoubleWhole,0],
-        [MusicFontSymbol.NoteheadXWhole,0],
-        [MusicFontSymbol.NoteheadXHalf,  -0.412],
-        [MusicFontSymbol.NoteheadXBlack,  -0.44],
-        [MusicFontSymbol.NoteheadParenthesis,0],
-        [MusicFontSymbol.NoteheadSlashedBlack1, -0.172],
-        [MusicFontSymbol.NoteheadSlashedBlack2, -0.172],
-        [MusicFontSymbol.NoteheadSlashedHalf1, -0.168],
-        [MusicFontSymbol.NoteheadSlashedHalf2,  -0.164],
-        [MusicFontSymbol.NoteheadSlashedWhole1,0],
-        [MusicFontSymbol.NoteheadSlashedWhole2,0],
-        [MusicFontSymbol.NoteheadSlashedDoubleWhole1,0],
-        [MusicFontSymbol.NoteheadSlashedDoubleWhole2,0],
-
-        [MusicFontSymbol.NoteheadCircledBlack, -0.164],
-        [MusicFontSymbol.NoteheadCircledHalf,-0.144],
-        [MusicFontSymbol.NoteheadCircledWhole,0],
-        [MusicFontSymbol.NoteheadCircledDoubleWhole,0],
-
-        [MusicFontSymbol.NoteheadCircleSlash,0],
-        [MusicFontSymbol.NoteheadHeavyX, -0.436],
-        [MusicFontSymbol.NoteheadHeavyXHat,-0.436],
-
-        [MusicFontSymbol.NoteheadSlashVerticalEnds,-0.664],
-        [MusicFontSymbol.NoteheadSlashWhiteWhole,0],
-        [MusicFontSymbol.NoteheadSlashWhiteHalf,-1.0],
- 
-        [MusicFontSymbol.NoteheadRoundWhiteWithDot,0],
-
-        [MusicFontSymbol.NoteheadSquareBlackLarge,0],
-        [MusicFontSymbol.NoteheadSquareBlackWhite,-1.0],
-
-        [MusicFontSymbol.NoteheadClusterDoubleWhole3rd,0],
-        [MusicFontSymbol.NoteheadClusterWhole3rd,0],
-        [MusicFontSymbol.NoteheadClusterHalf3rd,-0.164],
-        [MusicFontSymbol.NoteheadClusterQuarter3rd, 0.26],
-
-        [MusicFontSymbol.NoteShapeRoundWhite,-0.168],
-        [MusicFontSymbol.NoteShapeRoundBlack,-0.168],
-
-        [MusicFontSymbol.NoteShapeSquareWhite,-0.5],
-        [MusicFontSymbol.NoteShapeSquareBlack, -0.5],
-
-        [MusicFontSymbol.NoteShapeTriangleRightWhite,-0.5],
-        [MusicFontSymbol.NoteShapeTriangleRightBlack, -0.5],
-
-        [MusicFontSymbol.NoteShapeTriangleLeftWhite, 0.5],
-        [MusicFontSymbol.NoteShapeTriangleLeftBlack,0.5],
-
-        [MusicFontSymbol.NoteShapeDiamondWhite,0],
-        [MusicFontSymbol.NoteShapeDiamondBlack,0],
-
-        [MusicFontSymbol.NoteShapeTriangleUpWhite,-0.5],
-        [MusicFontSymbol.NoteShapeTriangleUpBlack, -0.5],
-
-        [MusicFontSymbol.NoteShapeMoonWhite,0.072],
-        [MusicFontSymbol.NoteShapeMoonBlack,0.068],
-
-        [MusicFontSymbol.NoteShapeTriangleRoundWhite, 0.172],
-        [MusicFontSymbol.NoteShapeTriangleRoundBlack, 0.172],
-    ])
-    private readonly stemUpOffsetY = new Map<MusicFontSymbol, number>([
-        // From bravura_metadata.json 
-        // glyphsWithAnchors.glyph.stemUpSE[1]
-
-        [MusicFontSymbol.NoteheadDoubleWholeSquare,0],
-        [MusicFontSymbol.NoteheadDoubleWhole,0],
-        [MusicFontSymbol.NoteheadWhole,0],
-        [MusicFontSymbol.NoteheadHalf,  0.2],
-        [MusicFontSymbol.NoteheadBlack, 0.204],
-        [MusicFontSymbol.NoteheadNull,0],
-        [MusicFontSymbol.NoteheadXOrnate, 0.316],
-
-        [MusicFontSymbol.NoteheadPlusDoubleWhole,0],
-        [MusicFontSymbol.NoteheadPlusWhole,0],
-        [MusicFontSymbol.NoteheadPlusHalf,   0.088],
-        [MusicFontSymbol.NoteheadPlusBlack,0],
-
-        [MusicFontSymbol.NoteheadSquareWhite, 0.5],
-        [MusicFontSymbol.NoteheadSquareBlack,0.5],
-
-        [MusicFontSymbol.NoteheadTriangleUpDoubleWhole,0],
-        [MusicFontSymbol.NoteheadTriangleUpWhole,0],
-        [MusicFontSymbol.NoteheadTriangleUpHalf,  -0.46],
-        [MusicFontSymbol.NoteheadTriangleUpBlack, -0.5],
-
-        [MusicFontSymbol.NoteheadTriangleRightWhite, 0.5],
-        [MusicFontSymbol.NoteheadTriangleRightBlack, 0.5],
-
-        [MusicFontSymbol.NoteheadTriangleDownDoubleWhole,0],
-        [MusicFontSymbol.NoteheadTriangleDownWhole,0],
-        [MusicFontSymbol.NoteheadTriangleDownHalf, 0.464],
-        [MusicFontSymbol.NoteheadTriangleDownBlack,0.5],
-
-        [MusicFontSymbol.NoteheadDiamondDoubleWhole,0],
-        [MusicFontSymbol.NoteheadDiamondWhole,0],
-        [MusicFontSymbol.NoteheadDiamondHalf,0],
-        [MusicFontSymbol.NoteheadDiamondBlack,0],
-
-        [MusicFontSymbol.NoteheadDiamondBlackWide,0],
-        [MusicFontSymbol.NoteheadDiamondWhite,0],
-        [MusicFontSymbol.NoteheadDiamondWhiteWide, 0],
-        [MusicFontSymbol.NoteheadCircleXDoubleWhole,0],
-        [MusicFontSymbol.NoteheadCircleXWhole,0],
-        [MusicFontSymbol.NoteheadCircleXHalf,0],
-        [MusicFontSymbol.NoteheadCircleX,0],
-        [MusicFontSymbol.NoteheadXDoubleWhole,0],
-        [MusicFontSymbol.NoteheadXWhole,0],
-        [MusicFontSymbol.NoteheadXHalf,  0.412],
-        [MusicFontSymbol.NoteheadXBlack,  0.444],
-        [MusicFontSymbol.NoteheadParenthesis,0],
-        [MusicFontSymbol.NoteheadSlashedBlack1, 0.164],
-        [MusicFontSymbol.NoteheadSlashedBlack2,  0.164],
-        [MusicFontSymbol.NoteheadSlashedHalf1, 0.164],
-        [MusicFontSymbol.NoteheadSlashedHalf2,   0.168],
-        [MusicFontSymbol.NoteheadSlashedWhole1,0],
-        [MusicFontSymbol.NoteheadSlashedWhole2,0],
-        [MusicFontSymbol.NoteheadSlashedDoubleWhole1,0],
-        [MusicFontSymbol.NoteheadSlashedDoubleWhole2,0],
-
-        [MusicFontSymbol.NoteheadCircledBlack,  0.168],
-        [MusicFontSymbol.NoteheadCircledHalf,0.156],
-        [MusicFontSymbol.NoteheadCircledWhole,0],
-        [MusicFontSymbol.NoteheadCircledDoubleWhole,0],
-
-        [MusicFontSymbol.NoteheadCircleSlash,0],
-        [MusicFontSymbol.NoteheadHeavyX,   0.44],
-        [MusicFontSymbol.NoteheadHeavyXHat, 0.456],
-
-        [MusicFontSymbol.NoteheadSlashVerticalEnds, 0.656],
-        [MusicFontSymbol.NoteheadSlashWhiteWhole,0],
-        [MusicFontSymbol.NoteheadSlashWhiteHalf,1.0],
- 
-        [MusicFontSymbol.NoteheadRoundWhiteWithDot,0],
-
-        [MusicFontSymbol.NoteheadSquareBlackLarge,0],
-        [MusicFontSymbol.NoteheadSquareBlackWhite,1.0],
-
-        [MusicFontSymbol.NoteheadClusterDoubleWhole3rd,0],
-        [MusicFontSymbol.NoteheadClusterWhole3rd,0],
-        [MusicFontSymbol.NoteheadClusterHalf3rd,1.144],
-        [MusicFontSymbol.NoteheadClusterQuarter3rd,  0.744],
-
-        [MusicFontSymbol.NoteShapeRoundWhite,0.168],
-        [MusicFontSymbol.NoteShapeRoundBlack,0.168],
-
-        [MusicFontSymbol.NoteShapeSquareWhite,0.5],
-        [MusicFontSymbol.NoteShapeSquareBlack, 0.5],
-
-        [MusicFontSymbol.NoteShapeTriangleRightWhite,-0.5],
-        [MusicFontSymbol.NoteShapeTriangleRightBlack, -0.5],
-
-        [MusicFontSymbol.NoteShapeTriangleLeftWhite, 0.5],
-        [MusicFontSymbol.NoteShapeTriangleLeftBlack,0.5],
-
-        [MusicFontSymbol.NoteShapeDiamondWhite,0],
-        [MusicFontSymbol.NoteShapeDiamondBlack,0],
-
-        [MusicFontSymbol.NoteShapeTriangleUpWhite,-0.5],
-        [MusicFontSymbol.NoteShapeTriangleUpBlack, -0.5],
-
-        [MusicFontSymbol.NoteShapeMoonWhite, 0.068],
-        [MusicFontSymbol.NoteShapeMoonBlack,0.068],
-
-        [MusicFontSymbol.NoteShapeTriangleRoundWhite, 0.172],
-        [MusicFontSymbol.NoteShapeTriangleRoundBlack, 0.172],
-    ])
-
-    public getStemUpOffsetY(symbol:MusicFontSymbol) {
-        return this.stemUpOffsetY.has(symbol) ? this.stemUpOffsetY.get(symbol)! * this.RawLineSpacing : 0;
-    }
 
     // SMuFL read from metadata into props and use for rendering
     // - glyphsWithAnchors.glyph
