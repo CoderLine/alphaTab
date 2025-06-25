@@ -467,16 +467,18 @@ export class StaffSystem {
                 this._allStaves[0].modelStaff.track
             );
 
+            // NOTE: Prevent cropping of separator if it overlaps
+            const overlap = Math.min(0, this.layout.renderer.smuflMetrics.staffSystemSeparatorOffsetY);
             canvas.fillMusicFontSymbol(
                 cx + this.x,
-                cy + this.y + this.height - this.layout.renderer.smuflMetrics.staffSystemSeparatorOffsetY,
+                cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
             );
             canvas.fillMusicFontSymbol(
-                cx + this.x + this.width - this.layout.renderer.smuflMetrics.systemSignSeparatorWidth,
-                cy + this.y + this.height - this.layout.renderer.smuflMetrics.staffSystemSeparatorOffsetY,
+                cx + this.x + this.width - this.layout.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.SystemDivider)!,
+                cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
@@ -675,7 +677,11 @@ export class StaffSystem {
             this.layout.renderer.score!.stylesheet.useSystemSignSeparator &&
             this.layout.renderer.tracks!.length > 1
         ) {
-            this.bottomPadding += this.layout.renderer.smuflMetrics.systemSignSeparatorHeight;
+            // NOTE: Reuse padding to place separato
+            const neededHeight = this.layout.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.SystemDivider)!;
+            this.bottomPadding = Math.max(this.bottomPadding, 
+                neededHeight
+            );
             this._hasSystemSeparator = true;
         }
 
