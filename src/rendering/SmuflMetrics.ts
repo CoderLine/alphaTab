@@ -874,4 +874,264 @@ export class SmuflMetrics {
         [MusicFontSymbol.OctaveBaselineM, 0],
         [MusicFontSymbol.OctaveBaselineB, 0]
     ]);
+
+    public getStemDownOffsetY(symbol:MusicFontSymbol) {
+        return this.stemDownOffsetY.has(symbol) ? this.stemDownOffsetY.get(symbol)! * this.RawLineSpacing : 0;
+    }
+
+    private readonly stemDownOffsetY = new Map<MusicFontSymbol, number>([
+        // From bravura_metadata.json 
+        // glyphsWithAnchors.glyph.stemDownNW[1]
+
+        [MusicFontSymbol.NoteheadDoubleWholeSquare,0],
+        [MusicFontSymbol.NoteheadDoubleWhole,0],
+        [MusicFontSymbol.NoteheadWhole,0],
+        [MusicFontSymbol.NoteheadHalf, -0.168],
+        [MusicFontSymbol.NoteheadBlack, -0.168],
+        [MusicFontSymbol.NoteheadNull,0],
+        [MusicFontSymbol.NoteheadXOrnate, -0.312],
+
+        [MusicFontSymbol.NoteheadPlusDoubleWhole,0],
+        [MusicFontSymbol.NoteheadPlusWhole,0],
+        [MusicFontSymbol.NoteheadPlusHalf, -0.112],
+        [MusicFontSymbol.NoteheadPlusBlack,0],
+
+        [MusicFontSymbol.NoteheadSquareWhite, -0.5],
+        [MusicFontSymbol.NoteheadSquareBlack,-0.5],
+
+        [MusicFontSymbol.NoteheadTriangleUpDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpHalf, -0.46],
+        [MusicFontSymbol.NoteheadTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteheadTriangleRightWhite,-0.5],
+        [MusicFontSymbol.NoteheadTriangleRightBlack, -0.5],
+
+        [MusicFontSymbol.NoteheadTriangleDownDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownHalf, 0.464],
+        [MusicFontSymbol.NoteheadTriangleDownBlack,0.5],
+
+        [MusicFontSymbol.NoteheadDiamondDoubleWhole,0],
+        [MusicFontSymbol.NoteheadDiamondWhole,0],
+        [MusicFontSymbol.NoteheadDiamondHalf,0],
+        [MusicFontSymbol.NoteheadDiamondBlack,0],
+
+        [MusicFontSymbol.NoteheadDiamondBlackWide,0],
+        [MusicFontSymbol.NoteheadDiamondWhite,0],
+        [MusicFontSymbol.NoteheadDiamondWhiteWide, 0.004],
+        [MusicFontSymbol.NoteheadCircleXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadCircleXWhole,0],
+        [MusicFontSymbol.NoteheadCircleXHalf,0],
+        [MusicFontSymbol.NoteheadCircleX,0],
+        [MusicFontSymbol.NoteheadXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadXWhole,0],
+        [MusicFontSymbol.NoteheadXHalf,  -0.412],
+        [MusicFontSymbol.NoteheadXBlack,  -0.44],
+        [MusicFontSymbol.NoteheadParenthesis,0],
+        [MusicFontSymbol.NoteheadSlashedBlack1, -0.172],
+        [MusicFontSymbol.NoteheadSlashedBlack2, -0.172],
+        [MusicFontSymbol.NoteheadSlashedHalf1, -0.168],
+        [MusicFontSymbol.NoteheadSlashedHalf2,  -0.164],
+        [MusicFontSymbol.NoteheadSlashedWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedWhole2,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole2,0],
+
+        [MusicFontSymbol.NoteheadCircledBlack, -0.164],
+        [MusicFontSymbol.NoteheadCircledHalf,-0.144],
+        [MusicFontSymbol.NoteheadCircledWhole,0],
+        [MusicFontSymbol.NoteheadCircledDoubleWhole,0],
+
+        [MusicFontSymbol.NoteheadCircleSlash,0],
+        [MusicFontSymbol.NoteheadHeavyX, -0.436],
+        [MusicFontSymbol.NoteheadHeavyXHat,-0.436],
+
+        [MusicFontSymbol.NoteheadSlashVerticalEnds,-0.664],
+        [MusicFontSymbol.NoteheadSlashWhiteWhole,0],
+        [MusicFontSymbol.NoteheadSlashWhiteHalf,-1.0],
+ 
+        [MusicFontSymbol.NoteheadRoundWhiteWithDot,0],
+
+        [MusicFontSymbol.NoteheadSquareBlackLarge,0],
+        [MusicFontSymbol.NoteheadSquareBlackWhite,-1.0],
+
+        [MusicFontSymbol.NoteheadClusterDoubleWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterHalf3rd,-0.164],
+        [MusicFontSymbol.NoteheadClusterQuarter3rd, 0.26],
+
+        [MusicFontSymbol.NoteShapeRoundWhite,-0.168],
+        [MusicFontSymbol.NoteShapeRoundBlack,-0.168],
+
+        [MusicFontSymbol.NoteShapeSquareWhite,-0.5],
+        [MusicFontSymbol.NoteShapeSquareBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleRightWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleRightBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleLeftWhite, 0.5],
+        [MusicFontSymbol.NoteShapeTriangleLeftBlack,0.5],
+
+        [MusicFontSymbol.NoteShapeDiamondWhite,0],
+        [MusicFontSymbol.NoteShapeDiamondBlack,0],
+
+        [MusicFontSymbol.NoteShapeTriangleUpWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeMoonWhite,0.072],
+        [MusicFontSymbol.NoteShapeMoonBlack,0.068],
+
+        [MusicFontSymbol.NoteShapeTriangleRoundWhite, 0.172],
+        [MusicFontSymbol.NoteShapeTriangleRoundBlack, 0.172],
+    ])
+    private readonly stemUpOffsetY = new Map<MusicFontSymbol, number>([
+        // From bravura_metadata.json 
+        // glyphsWithAnchors.glyph.stemUpSE[1]
+
+        [MusicFontSymbol.NoteheadDoubleWholeSquare,0],
+        [MusicFontSymbol.NoteheadDoubleWhole,0],
+        [MusicFontSymbol.NoteheadWhole,0],
+        [MusicFontSymbol.NoteheadHalf,  0.2],
+        [MusicFontSymbol.NoteheadBlack, 0.204],
+        [MusicFontSymbol.NoteheadNull,0],
+        [MusicFontSymbol.NoteheadXOrnate, 0.316],
+
+        [MusicFontSymbol.NoteheadPlusDoubleWhole,0],
+        [MusicFontSymbol.NoteheadPlusWhole,0],
+        [MusicFontSymbol.NoteheadPlusHalf,   0.088],
+        [MusicFontSymbol.NoteheadPlusBlack,0],
+
+        [MusicFontSymbol.NoteheadSquareWhite, 0.5],
+        [MusicFontSymbol.NoteheadSquareBlack,0.5],
+
+        [MusicFontSymbol.NoteheadTriangleUpDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpWhole,0],
+        [MusicFontSymbol.NoteheadTriangleUpHalf,  -0.46],
+        [MusicFontSymbol.NoteheadTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteheadTriangleRightWhite, 0.5],
+        [MusicFontSymbol.NoteheadTriangleRightBlack, 0.5],
+
+        [MusicFontSymbol.NoteheadTriangleDownDoubleWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownWhole,0],
+        [MusicFontSymbol.NoteheadTriangleDownHalf, 0.464],
+        [MusicFontSymbol.NoteheadTriangleDownBlack,0.5],
+
+        [MusicFontSymbol.NoteheadDiamondDoubleWhole,0],
+        [MusicFontSymbol.NoteheadDiamondWhole,0],
+        [MusicFontSymbol.NoteheadDiamondHalf,0],
+        [MusicFontSymbol.NoteheadDiamondBlack,0],
+
+        [MusicFontSymbol.NoteheadDiamondBlackWide,0],
+        [MusicFontSymbol.NoteheadDiamondWhite,0],
+        [MusicFontSymbol.NoteheadDiamondWhiteWide, 0],
+        [MusicFontSymbol.NoteheadCircleXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadCircleXWhole,0],
+        [MusicFontSymbol.NoteheadCircleXHalf,0],
+        [MusicFontSymbol.NoteheadCircleX,0],
+        [MusicFontSymbol.NoteheadXDoubleWhole,0],
+        [MusicFontSymbol.NoteheadXWhole,0],
+        [MusicFontSymbol.NoteheadXHalf,  0.412],
+        [MusicFontSymbol.NoteheadXBlack,  0.444],
+        [MusicFontSymbol.NoteheadParenthesis,0],
+        [MusicFontSymbol.NoteheadSlashedBlack1, 0.164],
+        [MusicFontSymbol.NoteheadSlashedBlack2,  0.164],
+        [MusicFontSymbol.NoteheadSlashedHalf1, 0.164],
+        [MusicFontSymbol.NoteheadSlashedHalf2,   0.168],
+        [MusicFontSymbol.NoteheadSlashedWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedWhole2,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole1,0],
+        [MusicFontSymbol.NoteheadSlashedDoubleWhole2,0],
+
+        [MusicFontSymbol.NoteheadCircledBlack,  0.168],
+        [MusicFontSymbol.NoteheadCircledHalf,0.156],
+        [MusicFontSymbol.NoteheadCircledWhole,0],
+        [MusicFontSymbol.NoteheadCircledDoubleWhole,0],
+
+        [MusicFontSymbol.NoteheadCircleSlash,0],
+        [MusicFontSymbol.NoteheadHeavyX,   0.44],
+        [MusicFontSymbol.NoteheadHeavyXHat, 0.456],
+
+        [MusicFontSymbol.NoteheadSlashVerticalEnds, 0.656],
+        [MusicFontSymbol.NoteheadSlashWhiteWhole,0],
+        [MusicFontSymbol.NoteheadSlashWhiteHalf,1.0],
+ 
+        [MusicFontSymbol.NoteheadRoundWhiteWithDot,0],
+
+        [MusicFontSymbol.NoteheadSquareBlackLarge,0],
+        [MusicFontSymbol.NoteheadSquareBlackWhite,1.0],
+
+        [MusicFontSymbol.NoteheadClusterDoubleWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterWhole3rd,0],
+        [MusicFontSymbol.NoteheadClusterHalf3rd,1.144],
+        [MusicFontSymbol.NoteheadClusterQuarter3rd,  0.744],
+
+        [MusicFontSymbol.NoteShapeRoundWhite,0.168],
+        [MusicFontSymbol.NoteShapeRoundBlack,0.168],
+
+        [MusicFontSymbol.NoteShapeSquareWhite,0.5],
+        [MusicFontSymbol.NoteShapeSquareBlack, 0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleRightWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleRightBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeTriangleLeftWhite, 0.5],
+        [MusicFontSymbol.NoteShapeTriangleLeftBlack,0.5],
+
+        [MusicFontSymbol.NoteShapeDiamondWhite,0],
+        [MusicFontSymbol.NoteShapeDiamondBlack,0],
+
+        [MusicFontSymbol.NoteShapeTriangleUpWhite,-0.5],
+        [MusicFontSymbol.NoteShapeTriangleUpBlack, -0.5],
+
+        [MusicFontSymbol.NoteShapeMoonWhite, 0.068],
+        [MusicFontSymbol.NoteShapeMoonBlack,0.068],
+
+        [MusicFontSymbol.NoteShapeTriangleRoundWhite, 0.172],
+        [MusicFontSymbol.NoteShapeTriangleRoundBlack, 0.172],
+    ])
+
+    public getStemUpOffsetY(symbol:MusicFontSymbol) {
+        return this.stemUpOffsetY.has(symbol) ? this.stemUpOffsetY.get(symbol)! * this.RawLineSpacing : 0;
+    }
+
+    // SMuFL read from metadata into props and use for rendering
+    // - glyphsWithAnchors.glyph
+    //   - stemDownNW[0]
+    //   - stemDownSE[0]
+    //   - graceNoteSlashSW
+    //   - graceNoteSlashNE
+    //   - graceNoteSlashNW
+    //   - graceNoteSlashSE
+    // - engravingDefaults
+    //   - staffLineThickness
+    //   - stemThickness
+    //   - beamThickness
+    //   - beamSpacing
+    //   - legerLineThickness
+    //   - legerLineExtension
+    //   - slurEndPointTickness
+    //   - slurMidPointThickness
+    //   - tieEndpointThickness
+    //   - tieMidpointThickness
+    //   - thinBarLineThickness
+    //   - thickBarLineThickness
+    //   - dashedBarlineThickness
+    //   - dashedBarlineDashLength
+    //   - dashedBarlineGapLength
+    //   - barLineSeparation
+    //   - thinThickBarLineSeparation
+    //   - repeatBarlineDotSeparation
+    //   - bracketThickness
+    //   - subBracketCThickness
+    //   - hairpinThickness
+    //   - octaveLineThickness
+    //   - pedalLineThickness
+    //   - repeatEndingLineThickness
+    //   - arrowShaftThickness
+    //   - lyricLineThickness
+    //   - tupletBracketThickness
+    //   - hBarThickness
+    // glyphBBoxes 
 }

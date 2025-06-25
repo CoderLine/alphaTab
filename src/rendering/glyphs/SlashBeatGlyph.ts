@@ -13,6 +13,7 @@ import { SlashRestGlyph } from '@src/rendering/glyphs/SlashRestGlyph';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeatSubElement } from '@src/model/Beat';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: SlashNoteHeadGlyph | null = null;
@@ -62,10 +63,12 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
-    public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
+        let symbol:MusicFontSymbol = MusicFontSymbol.None;
         if (this.noteHeads) {
             g = this.noteHeads;
+            symbol = SlashNoteHeadGlyph.getSymbol(note.beat.duration);
         } else if (this.deadSlapped) {
             g = this.deadSlapped;
         }
@@ -83,6 +86,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.Bottom:
                 case NoteYPosition.BottomWithStem:
                     pos += g.height / 2;
+                    break;
+
+                case NoteYPosition.StemUp:
+                    pos -= this.renderer.smuflMetrics.getStemUpOffsetY(symbol);
+                    break;
+                case NoteYPosition.StemDown:
+                    pos -= this.renderer.smuflMetrics.getStemDownOffsetY(symbol);
                     break;
             }
 

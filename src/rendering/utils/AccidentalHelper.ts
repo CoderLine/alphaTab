@@ -12,7 +12,9 @@ import type { KeySignature } from '@src/model/KeySignature';
 
 class BeatLines {
     public maxLine: number = -1000;
+    public maxLineNote: Note|null=null;
     public minLine: number = -1000;
+    public minLineNote: Note|null=null;
 }
 
 /**
@@ -374,13 +376,13 @@ export class AccidentalHelper {
         }
 
         if (!isHelperNote) {
-            this.registerLine(relatedBeat, steps);
+            this.registerLine(relatedBeat, steps, note);
         }
 
         return accidentalToSet;
     }
 
-    private registerLine(relatedBeat: Beat, line: number) {
+    private registerLine(relatedBeat: Beat, line: number, note:Note|null) {
         let lines: BeatLines;
         if (this._beatLines.has(relatedBeat.id)) {
             lines = this._beatLines.get(relatedBeat.id)!;
@@ -390,9 +392,11 @@ export class AccidentalHelper {
         }
         if (lines.minLine === -1000 || line < lines.minLine) {
             lines.minLine = line;
+            lines.minLineNote = note;
         }
         if (lines.minLine === -1000 || line > lines.maxLine) {
             lines.maxLine = line;
+            lines.maxLineNote = note;
         }
     }
 
@@ -400,8 +404,16 @@ export class AccidentalHelper {
         return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.maxLine : 0;
     }
 
+    public getMaxLineNote(b: Beat): Note|null {
+        return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.maxLineNote : null;
+    }
+
     public getMinLine(b: Beat): number {
         return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.minLine : 0;
+    }
+    
+    public getMinLineNote(b: Beat): Note|null {
+        return this._beatLines.has(b.id) ? this._beatLines.get(b.id)!.minLineNote : null;
     }
 
     public static calculateNoteSteps(keySignature: KeySignature, clef: Clef, noteValue: number): number {

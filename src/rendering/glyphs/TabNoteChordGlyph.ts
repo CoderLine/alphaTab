@@ -69,6 +69,10 @@ export class TabNoteChordGlyph extends Glyph {
                 case NoteYPosition.BottomWithStem:
                     pos += n.height / 2;
                     break;
+
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
+                    break;
             }
 
             return pos;

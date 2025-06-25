@@ -60,7 +60,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
         }
     }
 
-    private static getSymbol(duration: Duration): MusicFontSymbol {
+    public static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.QuadrupleWhole:
             case Duration.DoubleWhole:

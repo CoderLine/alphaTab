@@ -190,6 +190,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         const slashY = this.getLineY(line);
+        // TODO: SmuFL stem offsets
         return slashY;
     }
 
@@ -197,12 +198,24 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (beat.slashed) {
             return this.getSlashFlagY(beat.duration, direction);
         }
+
+        const minNote = this.accidentalHelper.getMinLineNote(beat);
+        if(minNote) {
+            return this.getBeatContainer(beat)!.onNotes.getNoteY(minNote, 
+                direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.StemDown); 
+        }
         return this.getScoreY(this.accidentalHelper.getMinLine(beat));
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
         if (beat.slashed) {
             return this.getSlashFlagY(beat.duration, direction);
+        }
+        
+        const maxNote = this.accidentalHelper.getMaxLineNote(beat);
+        if(maxNote) {
+            return this.getBeatContainer(beat)!.onNotes.getNoteY(maxNote, 
+                direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.StemDown); 
         }
         return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
     }
@@ -427,9 +440,19 @@ export class ScoreBarRenderer extends LineBarRenderer {
             return this.getSlashFlagY(beat.duration, direction);
         }
 
-        return direction === BeamDirection.Up
-            ? this.getScoreY(this.accidentalHelper.getMaxLine(beat))
-            : this.getScoreY(this.accidentalHelper.getMinLine(beat));
+        if(direction === BeamDirection.Up) {
+            const maxNote = this.accidentalHelper.getMaxLineNote(beat);
+            if(maxNote) {
+                return this.getBeatContainer(beat)!.onNotes.getNoteY(maxNote, NoteYPosition.StemUp); 
+            }
+            return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+        }
+
+        const minNote = this.accidentalHelper.getMinLineNote(beat);
+        if(minNote) {
+            return this.getBeatContainer(beat)!.onNotes.getNoteY(minNote, NoteYPosition.StemDown); 
+        }
+        return this.getScoreY(this.accidentalHelper.getMinLine(beat));
     }
 
     protected override createLinePreBeatGlyphs(): void {

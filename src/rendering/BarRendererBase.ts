@@ -50,7 +50,15 @@ export enum NoteYPosition {
     /**
      * Gets the note y-position on the bottom of the note stem or tab number.
      */
-    BottomWithStem = 4
+    BottomWithStem = 4,
+    /**
+     * The position where the upwards stem should be placed.
+     */
+    StemUp = 5,
+    /**
+     * The position where the downwards stem should be placed.
+     */
+    StemDown = 6
 }
 
 /**

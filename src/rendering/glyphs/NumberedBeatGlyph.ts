@@ -167,6 +167,10 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
                 case NoteYPosition.BottomWithStem:
                     pos += g.height / 2;
                     break;
+
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
+                    break;
             }
 
             return pos;

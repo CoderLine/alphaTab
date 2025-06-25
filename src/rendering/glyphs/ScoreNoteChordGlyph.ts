@@ -16,9 +16,10 @@ import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
-    private _noteGlyphLookup: Map<number, EffectGlyph> = new Map();
+    private _noteGlyphLookup: Map<number, MusicFontGlyph> = new Map();
     private _notes: Note[] = [];
     private _deadSlapped: DeadSlappedBeatGlyph | null = null;
     private _tremoloPicking: Glyph | null = null;
@@ -72,6 +73,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 case NoteYPosition.BottomWithStem:
                     pos += (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
                     break;
+
+                case NoteYPosition.StemUp:
+                    pos -= this.renderer.smuflMetrics.getStemUpOffsetY(n.symbol)
+                    break;
+                case NoteYPosition.StemDown:
+                    pos -= this.renderer.smuflMetrics.getStemDownOffsetY(n.symbol);
+                    break;
             }
 
             return pos;
@@ -79,7 +87,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return 0;
     }
 
-    public addNoteGlyph(noteGlyph: EffectGlyph, note: Note, noteLine: number): void {
+    public addNoteGlyph(noteGlyph: MusicFontGlyph, note: Note, noteLine: number): void {
         super.add(noteGlyph, noteLine);
         this._noteGlyphLookup.set(note.id, noteGlyph);
         this._notes.push(note);
