@@ -1,6 +1,6 @@
 import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
-import { Font, FontStyle } from '@src/model/Font';
+import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import type { Settings } from '@src/Settings';
@@ -91,13 +91,13 @@ export class Html5Canvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._context.fillRect(x | 0, y | 0, w, h);
+            this._context.fillRect(x, y, w, h);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
-        this._context.strokeRect((x | 0) + blurOffset, (y | 0) + blurOffset, w, h);
+        this._context.strokeRect(x + blurOffset, y + blurOffset, w, h);
     }
 
     public beginPath(): void {

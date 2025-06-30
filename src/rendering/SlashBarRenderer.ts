@@ -50,7 +50,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return this.smuflMetrics.RawLineSpacing;
+        return this.smuflMetrics.oneStaffSpace;
     }
 
     public override get heightLineCount(): number {

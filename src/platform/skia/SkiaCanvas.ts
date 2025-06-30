@@ -151,15 +151,15 @@ export class SkiaCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._canvas.fillRect((x * this._scale) | 0, (y * this._scale) | 0, w * this._scale, h * this._scale);
+            this._canvas.fillRect(x * this._scale, y * this._scale, w * this._scale, h * this._scale);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
         this._canvas.strokeRect(
-            ((x * this._scale) | 0) + blurOffset,
-            ((y * this._scale) | 0) + blurOffset,
+            (x * this._scale) + blurOffset,
+            (y * this._scale) + blurOffset,
             w * this._scale,
             h * this._scale
         );
@@ -317,7 +317,7 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.fillText(
             symbols,
             SkiaCanvas.musicTextStyle!,
-            Environment.MusicFontSize * this._scale * relativeScale,
+            this.settings.display.resources.smuflMetrics.musicFontSize * this._scale * relativeScale,
             x * this._scale,
             y * this._scale,
             centerAtPosition

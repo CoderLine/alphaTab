@@ -50,7 +50,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this.buffer += `<rect x="${(x * this.scale) | 0}" y="${(y * this.scale) | 0}" width="${
+            this.buffer += `<rect x="${x * this.scale}" y="${y * this.scale}" width="${
                 w * this.scale
             }" height="${h * this.scale}" fill="${this.color.rgba}" />\n`;
         }
@@ -58,7 +58,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
-        this.buffer += `<rect x="${((x * this.scale) | 0) + blurOffset}" y="${((y * this.scale) | 0) + blurOffset}" width="${
+        this.buffer += `<rect x="${(x * this.scale) + blurOffset}" y="${(y * this.scale) + blurOffset}" width="${
             w * this.scale
         }" height="${h * this.scale}" stroke="${this.color.rgba}"`;
         if (this.lineWidth !== 1) {

@@ -30,7 +30,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected tupletSize: number = 0;
 
     public get lineOffset(): number {
-        return this.lineSpacing + this.smuflMetrics.lineBarRendererLineOffset;
+        return this.lineSpacing;
     }
 
     public get tupletOffset(): number {
@@ -113,7 +113,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         this.paintSimileMark(cx, cy, canvas);
     }
 
-    private paintStaffLines(cx: number, cy: number, canvas: ICanvas) {
+    protected paintStaffLines(cx: number, cy: number, canvas: ICanvas) {
         using _ = ElementStyleHelper.bar(canvas, this.staffLineBarSubElement, this.bar, true);
 
         // collect tab note position for spaces
@@ -140,14 +140,18 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // this way we avoid holes
         const lineWidth = Math.ceil(this.width);
 
+        // we want the lines to be exactly virtually aligned with the respective Y-position
+        // for note heads to align correctly 
+        const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
+
         for (let i: number = 0; i < this.drawnLineCount; i++) {
-            const lineY = this.getLineY(i);
+            const lineY = this.getLineY(i) - lineYOffset;
 
             let lineX: number = 0;
             for (const line of spaces[i]) {
                 canvas.fillRect(
                     cx + this.x + lineX,
-                    (cy + this.y + lineY) | 0,
+                    cy + this.y + lineY,
                     line[0] - lineX,
                     this.smuflMetrics.staffLineThickness
                 );
@@ -155,7 +159,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
             canvas.fillRect(
                 cx + this.x + lineX,
-                (cy + this.y + lineY) | 0,
+                cy + this.y + lineY,
                 lineWidth - lineX,
                 this.smuflMetrics.staffLineThickness
             );
