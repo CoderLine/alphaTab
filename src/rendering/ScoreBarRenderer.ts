@@ -463,7 +463,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.bar.clef !== this.bar.previousBar!.clef ||
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {
-            let offset: number = 0;
+            // SMUFL: Clefs should be positioned such that the pitch the clef refers to is on the baseline 
+            // (e.g. the F clef is placed such that the upper dot is above and the lower dot below the baseline). 
+            // If a clef does not refer specifically to a pitch, its y=0 should coincide with the center staff line on a five-line staff, or the visual center for staves with more or fewer than five lines (e.g. tablature staves).
+
+            let offset = 0;
             switch (this.bar.clef) {
                 case Clef.Neutral:
                     offset = this.bar.staff.standardNotationLineCount - 1;
@@ -486,7 +490,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.addPreBeatGlyph(
                 new ClefGlyph(
                     0,
-                    this.getScoreY(offset) + this.smuflMetrics.clefTopPadding * this.smuflMetrics.staffLineThickness,
+                    this.getScoreY(offset),
                     this.bar.clef,
                     this.bar.clefOttava
                 )
