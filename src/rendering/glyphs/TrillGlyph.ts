@@ -22,13 +22,12 @@ export class TrillGlyph extends GroupedEffectGlyph {
 
         startX += this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.OrnamentTrill)! / 2;
 
-        const waveScale: number = this.renderer.smuflMetrics.trillWaveScale;
-        const step: number = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.WiggleTrill)! * waveScale;
+        const step: number = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.WiggleTrill)!;
         const loops: number = Math.floor((endX - startX) / step);
         const loopY: number = cy + this.y + this.height * this.renderer.smuflMetrics.trillLoopHeightToY;
         let loopX: number = startX;
         for (let i: number = 0; i < loops; i++) {
-            canvas.fillMusicFontSymbol(loopX, loopY, waveScale, MusicFontSymbol.WiggleTrill, false);
+            canvas.fillMusicFontSymbol(loopX, loopY, 1, MusicFontSymbol.WiggleTrill, false);
             loopX += step;
         }
     }

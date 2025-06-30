@@ -303,7 +303,7 @@ export class TabBendGlyph extends Glyph {
                 const vibratoStartY: number =
                     topY - cy -  this.renderer.smuflMetrics.tabBendBendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
 
-                const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato, this.renderer.smuflMetrics.tabBendVibratoScale);
+                const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato);
                 vibrato.beat = endNote.beat;
                 vibrato.renderer = endNoteRenderer;
                 vibrato.doLayout();

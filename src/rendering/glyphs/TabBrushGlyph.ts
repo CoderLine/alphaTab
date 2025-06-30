@@ -32,7 +32,7 @@ export class TabBrushGlyph extends Glyph {
                 canvas.lineTo(arrowX, endY);
                 canvas.stroke();
             } else if (this._beat.brushType === BrushType.ArpeggioUp) {
-                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.tabBrushVibratoScale, true);
+                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
 
@@ -44,7 +44,7 @@ export class TabBrushGlyph extends Glyph {
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
-                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.tabBrushVibratoScale, true);
+                const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, true);
                 glyph.renderer = this.renderer;
                 glyph.doLayout();
 
