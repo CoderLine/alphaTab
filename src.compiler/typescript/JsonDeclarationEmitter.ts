@@ -132,7 +132,7 @@ function createJsonMember(
     input: ts.PropertyDeclaration,
     importer: (name: string, module: string) => void
 ): ts.TypeElement {
-    const typeInfo = getTypeWithNullableInfo(program, input.type!, true, false, undefined);
+    const typeInfo = getTypeWithNullableInfo(program, input.type ?? program.getTypeChecker().getTypeAtLocation(input.name), true, false, undefined);
     const type = createJsonTypeNode(program.getTypeChecker(), typeInfo, importer) ?? typeInfo.createTypeNode();
 
     const prop = ts.factory.createPropertySignature(

@@ -67,7 +67,7 @@ export function buildTypeSchema(program: ts.Program, input: ts.ClassDeclaration)
                         jsDocTags: jsDoc,
                         type: getTypeWithNullableInfo(
                             program,
-                            member.type!,
+                            member.type ?? program.getTypeChecker().getTypeAtLocation(member.name),
                             asRaw || isReadonly,
                             !!member.questionToken,
                             typeArgumentMapping
