@@ -32,7 +32,7 @@ export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new NoteVibratoGlyph(0, 0, VibratoType.Slight, renderer.smuflMetrics.slightNoteVibratoScale);
+        return new NoteVibratoGlyph(0, 0, VibratoType.Slight);
     }
 
     public constructor(hideOnTiedBend: boolean) {

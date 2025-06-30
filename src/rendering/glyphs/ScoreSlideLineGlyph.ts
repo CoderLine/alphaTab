@@ -195,7 +195,7 @@ export class ScoreSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, this.renderer.smuflMetrics.scoreSlideVibratoScale);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 

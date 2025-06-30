@@ -32,8 +32,7 @@ export class ScoreBrushGlyph extends Glyph {
             const arrowX: number = cx + this.x + this.width / 2;
             const arrowSize: number = this.renderer.smuflMetrics.arpeggioArrowSize;
 
-            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 
-                this.renderer.smuflMetrics.arpeggioVibratoScale, true);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, true);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 

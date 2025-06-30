@@ -24,6 +24,6 @@ export class WideNoteVibratoEffectInfo extends NoteEffectInfoBase {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new NoteVibratoGlyph(0, 0, VibratoType.Wide, renderer.smuflMetrics.wideNoteVibratoScale);
+        return new NoteVibratoGlyph(0, 0, VibratoType.Wide);
     }
 }

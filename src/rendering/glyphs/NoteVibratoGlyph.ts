@@ -6,15 +6,14 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class NoteVibratoGlyph extends GroupedEffectGlyph {
     private _type: VibratoType;
-    private _scale: number = 0;
     private _symbol: MusicFontSymbol = MusicFontSymbol.None;
     private _symbolSize: number = 0;
+    private _symbolOffsetY: number = 0;
     private _partialWaves: boolean;
 
-    public constructor(x: number, y: number, type: VibratoType, scale: number /*= 1.2*/, partialWaves: boolean = false) {
+    public constructor(x: number, y: number, type: VibratoType, partialWaves: boolean = false) {
         super(BeatXPosition.EndBeat);
         this._type = type;
-        this._scale = scale;
         this.x = x;
         this.y = y;
         this._partialWaves = partialWaves;
@@ -31,8 +30,9 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
                 break;
         }
 
-        this._symbolSize = this.renderer.smuflMetrics.GlyphWidths.get(this._symbol)! * this._scale;
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)! * this._scale;
+        this._symbolSize = this.renderer.smuflMetrics.GlyphWidths.get(this._symbol)!;
+        this._symbolOffsetY = this.renderer.smuflMetrics.GlyphTop.get(this._symbol)!;
+        this.height = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)!;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
@@ -40,6 +40,7 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         const width: number = endX - startX;
         const step: number = this._symbolSize;
 
+        // TODO: respect overlap for calculation?
         let loops: number = width / step;
         if (!this._partialWaves) {
             loops = Math.floor(loops);
@@ -48,17 +49,17 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
             loops = 1;
         }
 
-        let loopX: number = 0;
-
+        const symbols:MusicFontSymbol[]=[];
         for (let i: number = 0; i < loops; i++) {
-            canvas.fillMusicFontSymbol(
-                cx + this.x + loopX,
-                cy + this.y + this.height * 2,
-                this._scale,
-                this._symbol,
-                false
-            );
-            loopX += step;
+            symbols.push(this._symbol);
         }
+
+        canvas.fillMusicFontSymbols(
+            cx + this.x,
+            cy + this.y + this._symbolOffsetY,
+            1,
+            symbols,
+            false
+        );
     }
 }
