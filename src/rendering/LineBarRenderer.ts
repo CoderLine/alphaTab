@@ -522,7 +522,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Draw flag
             //
             if (h.hasFlag(true, beat)) {
-                const glyph: FlagGlyph = new FlagGlyph(beatLineX - this.smuflMetrics.flagStemOffset, beamY, beat.duration, direction, isGrace);
+                const glyph: FlagGlyph = new FlagGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(cx + this.x, cy + this.y, canvas);

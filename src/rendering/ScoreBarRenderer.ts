@@ -657,12 +657,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
         canvas: ICanvas
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
-        const lineWidth = canvas.lineWidth;
-        canvas.lineWidth = this.smuflMetrics.stemWidth;
-        canvas.beginPath();
-        canvas.moveTo(x, topY);
-        canvas.lineTo(x, bottomY);
-        canvas.stroke();
-        canvas.lineWidth = lineWidth;
+        canvas.fillRect(
+            x, topY,
+            this.smuflMetrics.stemWidth,
+            bottomY - topY
+        );
     }
 }

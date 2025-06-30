@@ -7,20 +7,17 @@ export class NoteHeadGlyph extends MusicFontGlyph {
     // TODO: SmuFL
     public static readonly GraceScale: number = 0.75;
 
-    private _isGrace: boolean;
     public centerOnStem = false;
 
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean) {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, NoteHeadGlyph.getSymbol(duration));
-        this._isGrace = isGrace;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const offset: number = this._isGrace ? this.renderer.smuflMetrics.graceNoteHeadPadding : 0;
         if (this.centerOnStem) {
             this.center = true;
         }
-        super.paint(cx, cy + offset, canvas);
+        super.paint(cx, cy, canvas);
     }
 
     private static getSymbol(duration: Duration): MusicFontSymbol {

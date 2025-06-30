@@ -65,7 +65,7 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
-        let symbol:MusicFontSymbol = MusicFontSymbol.None;
+        let symbol: MusicFontSymbol = MusicFontSymbol.None;
         if (this.noteHeads) {
             g = this.noteHeads;
             symbol = SlashNoteHeadGlyph.getSymbol(note.beat.duration);
@@ -89,10 +89,14 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
                     break;
 
                 case NoteYPosition.StemUp:
-                    pos -= this.renderer.smuflMetrics.getStemUpOffsetY(symbol);
+                    pos -= this.renderer.smuflMetrics.stemUp.has(symbol)
+                        ? this.renderer.smuflMetrics.stemUp.get(symbol)!.bottomY
+                        : 0;
                     break;
                 case NoteYPosition.StemDown:
-                    pos -= this.renderer.smuflMetrics.getStemDownOffsetY(symbol);
+                    pos -= this.renderer.smuflMetrics.stemDown.has(symbol)
+                        ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topY
+                        : 0;
                     break;
             }
 
@@ -163,7 +167,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         if (this.container.beat.dots > 0) {
             this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.slashBeatNoteDotPadding));
             for (let i: number = 0; i < this.container.beat.dots; i++) {
-                this.addEffect(new CircleGlyph(0, sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5), this.renderer.smuflMetrics.slashBeatNoteDotSize));
+                this.addEffect(
+                    new CircleGlyph(
+                        0,
+                        sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5),
+                        this.renderer.smuflMetrics.slashBeatNoteDotSize
+                    )
+                );
             }
         }
 

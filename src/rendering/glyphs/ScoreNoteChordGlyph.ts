@@ -16,7 +16,7 @@ import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, MusicFontGlyph> = new Map();
@@ -37,7 +37,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         if (this._noteGlyphLookup.has(note.id)) {
             const n = this._noteGlyphLookup.get(note.id)!;
 
-            let pos = this.x + n.x + this._noteHeadPadding;
+            let pos = this.x + n.x;
             switch (requestedPosition) {
                 case NoteXPosition.Left:
                     break;
@@ -74,11 +74,16 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     pos += (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
                     break;
 
+                    
                 case NoteYPosition.StemUp:
-                    pos -= this.renderer.smuflMetrics.getStemUpOffsetY(n.symbol)
+                    pos -= this.renderer.smuflMetrics.stemUp.has(n.symbol) 
+                        ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
+                        : 0;
                     break;
                 case NoteYPosition.StemDown:
-                    pos -= this.renderer.smuflMetrics.getStemDownOffsetY(n.symbol);
+                    pos -= this.renderer.smuflMetrics.stemDown.has(n.symbol) 
+                        ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
+                        : 0;
                     break;
             }
 
@@ -229,7 +234,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 const noteBounds: NoteBounds = new NoteBounds();
                 noteBounds.note = note;
                 noteBounds.noteHeadBounds = new Bounds();
-                noteBounds.noteHeadBounds.x = cx + this.x + this._noteHeadPadding + glyph.x;
+                noteBounds.noteHeadBounds.x = cx + this.x + glyph.x;
                 noteBounds.noteHeadBounds.y = cy + this.y + glyph.y - glyph.height / 2;
                 noteBounds.noteHeadBounds.w = glyph.width;
                 noteBounds.noteHeadBounds.h = glyph.height;

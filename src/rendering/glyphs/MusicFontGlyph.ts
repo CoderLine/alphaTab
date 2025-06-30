@@ -6,7 +6,7 @@ import type { Color } from '@src/model/Color';
 export class MusicFontGlyph extends EffectGlyph {
     protected glyphScale: number = 0;
     public symbol: MusicFontSymbol;
-    protected center: boolean = false;
+    public center: boolean = false;
     public colorOverride?: Color;
 
     public constructor(x: number, y: number, glyphScale: number, symbol: MusicFontSymbol) {

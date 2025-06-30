@@ -7,17 +7,16 @@ import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
+import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
-    protected _noteHeadPadding: number = 0;
 
     public minNote: ScoreNoteGlyphInfo | null = null;
     public maxNote: ScoreNoteGlyphInfo | null = null;
     public spacingChanged: IEventEmitter = new EventEmitter();
     public upLineX: number = 0;
     public downLineX: number = 0;
-    public displacedX: number = 0;
     public noteStartX: number = 0;
 
     public constructor() {
@@ -26,7 +25,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
     public abstract get direction(): BeamDirection;
 
-    protected add(noteGlyph: Glyph, noteLine: number): void {
+    protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
         const info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
         this._infos.push(info);
         if (!this.minNote || this.minNote.steps > info.steps) {
@@ -41,76 +40,101 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         this._infos.sort((a, b) => {
             return b.steps - a.steps;
         });
-        let displacedX: number = 0;
-        let lastDisplaced: boolean = false;
+        let stemUpX: number = 0;
+        let stemDownX: number = 0;
+        let lastDisplaced: boolean = true;
         let lastStep: number = 0;
-        let anyDisplaced: boolean = false;
         const direction: BeamDirection = this.direction;
-        let w: number = 0;
-        for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
-            const g: Glyph = this._infos[i].glyph;
+
+        // first get stem position on the right side (displacedX)
+        // to align all note heads accordingly (they might have different widths)
+        const smufl = this.renderer.smuflMetrics;
+        for (const i of this._infos) {
+            const g = i.glyph;
             g.renderer = this.renderer;
             g.doLayout();
-            let displace: boolean = false;
-            if (i === 0) {
-                displacedX = g.width;
-            } else {
-                // check if note needs to be repositioned
-                if (Math.abs(lastStep - this._infos[i].steps) <= 1) {
-                    // reposition if needed
-                    if (!lastDisplaced) {
-                        displace = true;
-                        g.x = displacedX;
-                        anyDisplaced = true;
-                        lastDisplaced = true; // let next iteration know we are displace now
-                    } else {
-                        lastDisplaced = false; // let next iteration know that we weren't displaced now
-                    }
+
+            if (smufl.stemUp.has(g.symbol)) {
+                const stemInfo = smufl.stemUp.get(g.symbol)!;
+                if (stemInfo.topX > stemUpX) {
+                    stemUpX = stemInfo.topX;
+                }
+            }
+
+            if (smufl.stemDown.has(g.symbol)) {
+                const stemInfo = smufl.stemDown.get(g.symbol)!;
+                if (stemInfo.topX > stemDownX) {
+                    const diff = stemInfo.topX - stemDownX;
+                    stemDownX = stemInfo.topX;
+                    stemUpX += diff; // shift right accordingly
+                }
+            }
+        }
+
+        // align all notes so that they align with the stem positions
+        let w: number = 0;
+        for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
+            const g = this._infos[i].glyph;
+            let alignDisplaced: boolean = false;
+
+            if (i > 0 && Math.abs(lastStep - this._infos[i].steps) <= 1) {
+                if (!lastDisplaced) {
+                    alignDisplaced = true;
+                    lastDisplaced = true;
                 } else {
                     lastDisplaced = false;
                 }
+            } else {
+                lastDisplaced = false;
             }
+
             // for beat direction down we invert the displacement.
             // this means: displaced is on the left side of the stem and not displaced is right
             if (direction === BeamDirection.Down) {
-                g.x = displace ? 0 : displacedX;
+                if (alignDisplaced) {
+                    g.x = stemUpX;
+                } else {
+                    g.x = stemDownX;
+                }
+
+                if (smufl.stemDown.has(g.symbol)) {
+                    g.x -= smufl.stemDown.get(g.symbol)!.topX;
+                }
             } else {
-                g.x = displace ? displacedX : 0;
+                if (alignDisplaced) {
+                    g.x = stemDownX;
+                } else {
+                    g.x = stemUpX;
+                }
+
+                if (smufl.stemUp.has(g.symbol)) {
+                    g.x -= smufl.stemUp.get(g.symbol)!.topX;
+                }
             }
+
             g.x += this.noteStartX;
             lastStep = this._infos[i].steps;
             w = Math.max(w, g.x + g.width);
 
             // after size calculation, re-align glyph to stem if needed
             if (g instanceof NoteHeadGlyph && (g as NoteHeadGlyph).centerOnStem) {
-                g.x = displacedX;
+                g.x = stemUpX;
             }
         }
-        if (anyDisplaced) {
-            this._noteHeadPadding = 0;
-            this.upLineX = displacedX;
-            this.downLineX = displacedX;
-        } else {
-            this._noteHeadPadding = direction === BeamDirection.Down ? -displacedX : 0;
-            w += this._noteHeadPadding;
-            this.upLineX = w;
-            this.downLineX = 0;
-        }
-        this.displacedX = displacedX;
+
+        this.upLineX = stemUpX;
+        this.downLineX = stemDownX;
         this.width = w;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
-        // TODO: this method seems to be quite heavy according to the profiler, why?
-        // TODO: Take care of beateffects in overflow
         this.paintLedgerLines(cx, cy, canvas);
         const infos: ScoreNoteGlyphInfo[] = this._infos;
-        const x: number = cx + this._noteHeadPadding;
         for (const g of infos) {
             g.glyph.renderer = this.renderer;
-            g.glyph.paint(x, cy, canvas);
+            g.glyph.paint(cx, cy, canvas);
         }
     }
     private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
