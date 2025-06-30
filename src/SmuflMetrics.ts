@@ -193,11 +193,6 @@ export class SmuflMetrics {
 
     public tabNumberSpacePadding: number = 1;
 
-    // move to inlined values again?
-    public numberedBarRendererLineHeightCount = 5;
-    public scoreBarRendererLineHeightCount = 5;
-    public slashBarRendererLineHeightCount = 5;
-
     //
     // combined sizes (TODO: splitup into paddings and glyph sizes)
     public deadSlappedBeatWidth: number = 26;

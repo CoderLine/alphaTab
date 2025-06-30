@@ -29,9 +29,6 @@ export class SmuflMetricsSerializer {
         o.set("beamthickness", obj.beamThickness);
         o.set("beamspacing", obj.beamSpacing);
         o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
-        o.set("numberedbarrendererlineheightcount", obj.numberedBarRendererLineHeightCount);
-        o.set("scorebarrendererlineheightcount", obj.scoreBarRendererLineHeightCount);
-        o.set("slashbarrendererlineheightcount", obj.slashBarRendererLineHeightCount);
         o.set("deadslappedbeatwidth", obj.deadSlappedBeatWidth);
         o.set("directionscontainerpadding", obj.directionsContainerPadding);
         o.set("lefthandtappingpadding", obj.leftHandTappingPadding);
@@ -314,15 +311,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tabnumberspacepadding":
                 obj.tabNumberSpacePadding = v! as number;
-                return true;
-            case "numberedbarrendererlineheightcount":
-                obj.numberedBarRendererLineHeightCount = v! as number;
-                return true;
-            case "scorebarrendererlineheightcount":
-                obj.scoreBarRendererLineHeightCount = v! as number;
-                return true;
-            case "slashbarrendererlineheightcount":
-                obj.slashBarRendererLineHeightCount = v! as number;
                 return true;
             case "deadslappedbeatwidth":
                 obj.deadSlappedBeatWidth = v! as number;

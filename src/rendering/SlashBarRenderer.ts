@@ -54,7 +54,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     public override get heightLineCount(): number {
-        return this.smuflMetrics.slashBarRendererLineHeightCount;
+        return 5;
     }
 
     public override get drawnLineCount(): number {

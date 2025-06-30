@@ -26,9 +26,6 @@ export interface SmuflMetricsJson {
     beamThickness?: number;
     beamSpacing?: number;
     tabNumberSpacePadding?: number;
-    numberedBarRendererLineHeightCount?: number;
-    scoreBarRendererLineHeightCount?: number;
-    slashBarRendererLineHeightCount?: number;
     deadSlappedBeatWidth?: number;
     directionsContainerPadding?: number;
     leftHandTappingPadding?: number;

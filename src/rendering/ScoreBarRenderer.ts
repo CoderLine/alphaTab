@@ -71,7 +71,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override get heightLineCount(): number {
-        return this.smuflMetrics.scoreBarRendererLineHeightCount;
+        return 5;
     }
 
     public override get drawnLineCount(): number {

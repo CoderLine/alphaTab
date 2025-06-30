@@ -76,7 +76,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get heightLineCount(): number {
-        return this.smuflMetrics.numberedBarRendererLineHeightCount;
+        return 5;
     }
 
     public override get drawnLineCount(): number {
