@@ -21,6 +21,8 @@ export interface SmuflMetricsJson {
     musicFontSize?: number;
     oneStaffSpace?: number;
     tabLineSpacing?: number;
+    ledgerLineThickness?: number;
+    ledgerLineExtension?: number;
     stemWidth?: number;
     staffLineThickness?: number;
     beamThickness?: number;

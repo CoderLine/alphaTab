@@ -24,6 +24,8 @@ export class SmuflMetricsSerializer {
         o.set("musicfontsize", obj.musicFontSize);
         o.set("onestaffspace", obj.oneStaffSpace);
         o.set("tablinespacing", obj.tabLineSpacing);
+        o.set("ledgerlinethickness", obj.ledgerLineThickness);
+        o.set("ledgerlineextension", obj.ledgerLineExtension);
         o.set("stemwidth", obj.stemWidth);
         o.set("stafflinethickness", obj.staffLineThickness);
         o.set("beamthickness", obj.beamThickness);
@@ -296,6 +298,12 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tablinespacing":
                 obj.tabLineSpacing = v! as number;
+                return true;
+            case "ledgerlinethickness":
+                obj.ledgerLineThickness = v! as number;
+                return true;
+            case "ledgerlineextension":
+                obj.ledgerLineExtension = v! as number;
                 return true;
             case "stemwidth":
                 obj.stemWidth = v! as number;

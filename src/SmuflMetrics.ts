@@ -90,7 +90,8 @@ export interface SmuflMetadata {
  * @json
  * @json_declaration
  */
-export class SmuflStemInfo { // TODO: json serializer record support
+export class SmuflStemInfo {
+    // TODO: json serializer record support
     public topY = 0;
     public bottomY = 0;
     public topX = 0;
@@ -128,6 +129,9 @@ export class SmuflMetrics {
     public oneStaffSpace: number = this.musicFontSize / 4;
     public tabLineSpacing: number = this.oneStaffSpace * 1.2;
 
+    public ledgerLineThickness = 0;
+    public ledgerLineExtension = 0;
+
     public static get bravuraDefaults() {
         const metrics = new SmuflMetrics();
         metrics.initialize(SmuflMetrics.bravuraMetadata);
@@ -139,6 +143,8 @@ export class SmuflMetrics {
         this.staffLineThickness = smufl.engravingDefaults.staffLineThickness * this.oneStaffSpace;
         this.beamThickness = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
         this.beamSpacing = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
+        this.ledgerLineExtension = smufl.engravingDefaults.legerLineExtension * this.oneStaffSpace;
+        this.ledgerLineThickness = smufl.engravingDefaults.legerLineThickness * this.oneStaffSpace;
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
@@ -151,7 +157,7 @@ export class SmuflMetrics {
                     b.bottomX = v.stemDownSW[0] * this.oneStaffSpace;
                     b.bottomY = v.stemDownSW[1] * this.oneStaffSpace;
                 } else {
-                    b.bottomX = b.topX;
+                    b.bottomX = b.topX + this.stemWidth;
                     b.bottomY = 0;
                 }
                 this.stemDown.set(symbol, b);
@@ -164,7 +170,7 @@ export class SmuflMetrics {
                     b.topX = v.stemUpNW[0] * this.oneStaffSpace;
                     b.topY = v.stemUpNW[1] * this.oneStaffSpace;
                 } else {
-                    b.topX = b.bottomX;
+                    b.topX = b.bottomX - this.stemWidth;
                     b.topY = 0;
                 }
                 this.stemUp.set(symbol, b);
