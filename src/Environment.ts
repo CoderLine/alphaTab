@@ -128,12 +128,6 @@ export class Environment {
     private static readonly StaffIdBeforeEndAlways = 'before-end-always';
 
     /**
-     * The font size of the music font in pixel.
-     * @internal
-     */
-    public static readonly MusicFontSize = 34;
-
-    /**
      * The scaling factor to use when rending raster graphics for sharper rendering on high-dpi displays.
      * @internal
      */

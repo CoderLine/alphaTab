@@ -110,7 +110,7 @@ export class BarRendererBase {
     public additionalMultiRestBars: Bar[] | null = null;
 
     public get smuflMetrics() {
-        return this.scoreRenderer.smuflMetrics;
+        return this.settings.display.resources.smuflMetrics;
     }
 
     public get lastBar(): Bar {

@@ -16,6 +16,14 @@ export {
 } from '@src/PlayerSettings';
 export { ProgressEventArgs } from '@src/ProgressEventArgs';
 export { RenderingResources } from '@src/RenderingResources';
+export {
+    SmuflMetrics,
+    type SmuflEngravingDefaults,
+    type SmuflGlyphBoundingBox,
+    type SmuflGlyphWithAnchor,
+    type SmuflMetadata,
+    SmuflStemInfo
+} from '@src/SmuflMetrics';
 export { ResizeEventArgs } from '@src/ResizeEventArgs';
 export { Settings } from '@src/Settings';
 export { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
@@ -33,7 +41,7 @@ export { WebPlatform } from '@src/platform/javascript/WebPlatform';
 
 export { VersionInfo as meta } from '@src/generated/VersionInfo';
 
-// alphaTab2.0: We should reliminate the big bundles but ship individual 
+// alphaTab2.0: We should reliminate the big bundles but ship individual
 // modules which can be imported. e.g. import { Track } from '@coderline/alphatab/model/Track'
 // for this generally some reoganization is likely needed to void circular dependencies better
 export * as importer from '@src/importer/_barrel';

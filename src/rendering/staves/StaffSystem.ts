@@ -17,7 +17,7 @@ import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import type { SmuflMetrics } from '@src/rendering/SmuflMetrics';
+import type { SmuflMetrics } from '@src/SmuflMetrics';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -361,7 +361,7 @@ export class StaffSystem {
 
             let braceWidth = 0;
             for (const b of this._brackets) {
-                b.finalizeBracket(this.layout.renderer.smuflMetrics);
+                b.finalizeBracket(settings.display.resources.smuflMetrics);
                 braceWidth = Math.max(braceWidth, b.width);
             }
 
@@ -468,7 +468,8 @@ export class StaffSystem {
             );
 
             // NOTE: Prevent cropping of separator if it overlaps
-            const overlap = Math.min(0, this.layout.renderer.smuflMetrics.staffSystemSeparatorOffsetY);
+            const smuflMetrics = this.layout.renderer.settings.display.resources.smuflMetrics
+            const overlap = Math.min(0, smuflMetrics.GlyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
             canvas.fillMusicFontSymbol(
                 cx + this.x,
                 cy + this.y + this.height + overlap,
@@ -477,7 +478,7 @@ export class StaffSystem {
                 false
             );
             canvas.fillMusicFontSymbol(
-                cx + this.x + this.width - this.layout.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.SystemDivider)!,
+                cx + this.x + this.width - smuflMetrics.GlyphWidths.get(MusicFontSymbol.SystemDivider)!,
                 cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
@@ -678,7 +679,7 @@ export class StaffSystem {
             this.layout.renderer.tracks!.length > 1
         ) {
             // NOTE: Reuse padding to place separato
-            const neededHeight = this.layout.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.SystemDivider)!;
+            const neededHeight = settings.display.resources.smuflMetrics.GlyphHeights.get(MusicFontSymbol.SystemDivider)!;
             this.bottomPadding = Math.max(this.bottomPadding, 
                 neededHeight
             );
@@ -694,7 +695,7 @@ export class StaffSystem {
         }
 
         for (const b of this._brackets!) {
-            b.finalizeBracket(this.layout.renderer.smuflMetrics);
+            b.finalizeBracket(settings.display.resources.smuflMetrics);
         }
     }
 

@@ -11,6 +11,8 @@ export type { NotationSettingsJson } from "@src/generated/NotationSettingsJson";
 export type { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";
 export type { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJson";
 export type { PlayerSettingsJson } from "@src/generated/PlayerSettingsJson";
+export type { SmuflMetricsJson } from "@src/generated/SmuflMetricsJson";
 export type { FontJson } from "@src/model/Font";
 export type { ColorJson } from "@src/model/Color";
 export type { SettingsJson } from "@src/generated/SettingsJson";
+export type { SmuflStemInfoJson } from "@src/generated/SmuflStemInfoJson";

@@ -3,6 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
+import { SmuflMetricsJson } from "@src/generated/SmuflMetricsJson";
 import { FontJson } from "@src/model/Font";
 import { ColorJson } from "@src/model/Color";
 /**
@@ -18,10 +19,16 @@ export interface RenderingResourcesJson {
      * This is only meant for internal passing of font family information between components.
      * Setting this manually can lead to unexpected side effects.
      * @defaultValue `alphaTab`
-     * @since 0.9.6
      * @internal
+     * @since 1.6.0
      */
-    smuflFont?: FontJson;
+    smuflFontFamilyName?: string;
+    /**
+     * The SMuFL Metrics to use for rendering music symbols.
+     * @defaultValue `alphaTab`
+     * @since 1.6.0
+     */
+    smuflMetrics?: SmuflMetricsJson;
     /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.
      * @defaultValue `bold 12px Arial, sans-serif`

@@ -38,7 +38,13 @@ export class Html5Canvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
-        this._musicFont = this.settings.display.resources.smuflFont;
+        this._musicFont = new Font(
+            this.settings.display.resources.smuflFontFamilyName!,
+            this.settings.display.resources.smuflMetrics.musicFontSize,
+            FontStyle.Plain,
+            FontWeight.Regular
+        );
+
 
         const scale = this.settings.display.scale;
 

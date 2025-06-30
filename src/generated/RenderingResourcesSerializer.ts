@@ -5,6 +5,7 @@
 // </auto-generated>
 import { RenderingResources } from "@src/RenderingResources";
 import { JsonHelper } from "@src/io/JsonHelper";
+import { SmuflMetricsSerializer } from "@src/generated/SmuflMetricsSerializer";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
 export class RenderingResourcesSerializer {
@@ -19,7 +20,8 @@ export class RenderingResourcesSerializer {
             return null;
         }
         const o = new Map<string, unknown>();
-        o.set("smuflfont", Font.toJson(obj.smuflFont));
+        o.set("smuflfontfamilyname", obj.smuflFontFamilyName);
+        o.set("smuflmetrics", SmuflMetricsSerializer.toJson(obj.smuflMetrics));
         o.set("copyrightfont", Font.toJson(obj.copyrightFont)!);
         o.set("titlefont", Font.toJson(obj.titleFont)!);
         o.set("subtitlefont", Font.toJson(obj.subTitleFont)!);
@@ -46,8 +48,8 @@ export class RenderingResourcesSerializer {
     }
     public static setProperty(obj: RenderingResources, property: string, v: unknown): boolean {
         switch (property) {
-            case "smuflfont":
-                obj.smuflFont = Font.fromJson(v);
+            case "smuflfontfamilyname":
+                obj.smuflFontFamilyName = v as string | undefined;
                 return true;
             case "copyrightfont":
                 obj.copyrightFont = Font.fromJson(v)!;
@@ -115,6 +117,10 @@ export class RenderingResourcesSerializer {
             case "scoreinfocolor":
                 obj.scoreInfoColor = Color.fromJson(v)!;
                 return true;
+        }
+        if (["smuflmetrics"].indexOf(property) >= 0) {
+            SmuflMetricsSerializer.fromJson(obj.smuflMetrics, v as Map<string, unknown>);
+            return true;
         }
         return false;
     }

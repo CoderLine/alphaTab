@@ -1,6 +1,7 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { ScoreSubElement } from '@src/model/Score';
+import { SmuflMetrics } from '@src/SmuflMetrics';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.
@@ -17,10 +18,17 @@ export class RenderingResources {
      * This is only meant for internal passing of font family information between components.
      * Setting this manually can lead to unexpected side effects.
      * @defaultValue `alphaTab`
-     * @since 0.9.6
      * @internal
+     * @since 1.6.0
      */
-    public smuflFont?: Font;
+    public smuflFontFamilyName?: string;
+
+    /**
+     * The SMuFL Metrics to use for rendering music symbols.
+     * @defaultValue `alphaTab`
+     * @since 1.6.0
+     */
+    public smuflMetrics:SmuflMetrics = SmuflMetrics.bravuraDefaults;
 
     /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.
