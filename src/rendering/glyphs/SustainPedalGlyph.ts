@@ -11,7 +11,7 @@ export class SustainPedalGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.KeyboardPedalPed)!;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.KeyboardPedalPed)!;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -22,8 +22,8 @@ export class SustainPedalGlyph extends EffectGlyph {
 
         const markers = renderer.bar.sustainPedals;
 
-        const textWidth = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.KeyboardPedalPed)!;
-        const starSize = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.KeyboardPedalUp)!;
+        const textWidth = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.KeyboardPedalPed)!;
+        const starSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.KeyboardPedalUp)!;
 
         let markerIndex = 0;
         while (markerIndex < markers.length) {

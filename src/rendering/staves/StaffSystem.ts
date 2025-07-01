@@ -37,8 +37,8 @@ export abstract class SystemBracket {
         }
 
         // SMUFL: The brace glyph should have a height of 1em, i.e. the height of a single five-line stave, and should be scaled proportionally
-        const bravuraBraceHeightAtMusicFontSize = smuflMetrics.GlyphHeights.get(MusicFontSymbol.Brace)!;
-        const bravuraBraceWidthAtMusicFontSize = smuflMetrics.GlyphWidths.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceHeightAtMusicFontSize = smuflMetrics.glyphHeights.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceWidthAtMusicFontSize = smuflMetrics.glyphWidths.get(MusicFontSymbol.Brace)!;
 
         // normal bracket width
         this.width = bravuraBraceWidthAtMusicFontSize;
@@ -469,7 +469,7 @@ export class StaffSystem {
 
             // NOTE: Prevent cropping of separator if it overlaps
             const smuflMetrics = this.layout.renderer.settings.display.resources.smuflMetrics
-            const overlap = Math.min(0, smuflMetrics.GlyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
+            const overlap = Math.min(0, smuflMetrics.glyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
             canvas.fillMusicFontSymbol(
                 cx + this.x,
                 cy + this.y + this.height + overlap,
@@ -478,7 +478,7 @@ export class StaffSystem {
                 false
             );
             canvas.fillMusicFontSymbol(
-                cx + this.x + this.width - smuflMetrics.GlyphWidths.get(MusicFontSymbol.SystemDivider)!,
+                cx + this.x + this.width - smuflMetrics.glyphWidths.get(MusicFontSymbol.SystemDivider)!,
                 cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
@@ -679,7 +679,7 @@ export class StaffSystem {
             this.layout.renderer.tracks!.length > 1
         ) {
             // NOTE: Reuse padding to place separato
-            const neededHeight = settings.display.resources.smuflMetrics.GlyphHeights.get(MusicFontSymbol.SystemDivider)!;
+            const neededHeight = settings.display.resources.smuflMetrics.glyphHeights.get(MusicFontSymbol.SystemDivider)!;
             this.bottomPadding = Math.max(this.bottomPadding, 
                 neededHeight
             );

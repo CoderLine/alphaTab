@@ -6,7 +6,7 @@ import { BarSubElement } from '@src/model/Bar';
 
 export class TabClefGlyph extends Glyph {
     public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.SixStringTabClef)!;
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.SixStringTabClef)!;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

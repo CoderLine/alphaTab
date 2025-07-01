@@ -28,8 +28,8 @@ export class AccentuationGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.ArticAccentAbove)!;
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.ArticAccentAbove)!;
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArticAccentAbove)!;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.ArticAccentAbove)!;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

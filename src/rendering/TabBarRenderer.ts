@@ -289,7 +289,7 @@ export class TabBarRenderer extends LineBarRenderer {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabStem, beat);
 
         const lineWidth = canvas.lineWidth;
-        canvas.lineWidth = this.smuflMetrics.stemWidth;
+        canvas.lineWidth = this.smuflMetrics.stemThickness;
         canvas.beginPath();
 
         let holes: ReservedLayoutAreaSlot[] = [];

@@ -48,10 +48,10 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     public override doLayout(): void {
         super.doLayout();
         if (this.width === 0) {
-            this.height = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.NoteheadBlack)!;
+            this.height = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteheadBlack)!;
         }
         if (this.height === 0) {
-            this.height = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
+            this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         }
     }
 }

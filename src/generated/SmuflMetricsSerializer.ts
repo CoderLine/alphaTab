@@ -24,12 +24,21 @@ export class SmuflMetricsSerializer {
         o.set("musicfontsize", obj.musicFontSize);
         o.set("onestaffspace", obj.oneStaffSpace);
         o.set("tablinespacing", obj.tabLineSpacing);
-        o.set("ledgerlinethickness", obj.ledgerLineThickness);
-        o.set("ledgerlineextension", obj.ledgerLineExtension);
-        o.set("stemwidth", obj.stemWidth);
-        o.set("stafflinethickness", obj.staffLineThickness);
-        o.set("beamthickness", obj.beamThickness);
+        o.set("barlineseparation", obj.barlineSeparation);
         o.set("beamspacing", obj.beamSpacing);
+        o.set("beamthickness", obj.beamThickness);
+        o.set("dashedbarlinedashlength", obj.dashedBarlineDashLength);
+        o.set("dashedbarlinegaplength", obj.dashedBarlineGapLength);
+        o.set("dashedbarlinethickness", obj.dashedBarlineThickness);
+        o.set("legerlinethickness", obj.legerLineThickness);
+        o.set("legerlineextension", obj.legerLineExtension);
+        o.set("repeatbarlinedotseparation", obj.repeatBarlineDotSeparation);
+        o.set("repeatendinglinethickness", obj.repeatEndingLineThickness);
+        o.set("stafflinethickness", obj.staffLineThickness);
+        o.set("stemthickness", obj.stemThickness);
+        o.set("thickbarlinethickness", obj.thickBarlineThickness);
+        o.set("thinbarlinethickness", obj.thinBarlineThickness);
+        o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
         o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
         o.set("deadslappedbeatwidth", obj.deadSlappedBeatWidth);
         o.set("directionscontainerpadding", obj.directionsContainerPadding);
@@ -178,15 +187,9 @@ export class SmuflMetricsSerializer {
         o.set("brokenbaroffset", obj.brokenBarOffset);
         o.set("scorebarrendererbeammaxdistance", obj.scoreBarRendererBeamMaxDistance);
         o.set("accidentalheight", obj.accidentalHeight);
-        o.set("barlinewidth", obj.barLineWidth);
-        o.set("heavybarlinewidth", obj.heavyBarLineWidth);
         o.set("dottedbarlinecircleradius", obj.dottedBarLineCircleRadius);
-        o.set("dashedbarlinesize", obj.dashedBarLineSize);
-        o.set("repeatdotscirclesize", obj.repeatDotsCircleSize);
-        o.set("repeatdotscircleoffset", obj.repeatDotsCircleOffset);
         o.set("beatpaddingflageighthandabove", obj.beatPaddingFlagEighthAndAbove);
         o.set("beatpaddingonehundredandabove", obj.beatPaddingOneHundredAndAbove);
-        o.set("barlinespace", obj.barLineSpace);
         o.set("barnumbermarginpaddingright", obj.barNumberMarginPaddingRight);
         o.set("beatvibratoheight", obj.beatVibratoHeight);
         o.set("scoreslidelinesizex", obj.scoreSlideLineSizeX);
@@ -219,28 +222,28 @@ export class SmuflMetricsSerializer {
         {
             const m = new Map<string, unknown>();
             o.set("glyphtop", m);
-            for (const [k, v] of obj.GlyphTop!) {
+            for (const [k, v] of obj.glyphTop!) {
                 m.set(k.toString(), v);
             }
         }
         {
             const m = new Map<string, unknown>();
             o.set("glyphbottom", m);
-            for (const [k, v] of obj.GlyphBottom!) {
+            for (const [k, v] of obj.glyphBottom!) {
                 m.set(k.toString(), v);
             }
         }
         {
             const m = new Map<string, unknown>();
             o.set("glyphwidths", m);
-            for (const [k, v] of obj.GlyphWidths!) {
+            for (const [k, v] of obj.glyphWidths!) {
                 m.set(k.toString(), v);
             }
         }
         {
             const m = new Map<string, unknown>();
             o.set("glyphheights", m);
-            for (const [k, v] of obj.GlyphHeights!) {
+            for (const [k, v] of obj.glyphHeights!) {
                 m.set(k.toString(), v);
             }
         }
@@ -299,23 +302,50 @@ export class SmuflMetricsSerializer {
             case "tablinespacing":
                 obj.tabLineSpacing = v! as number;
                 return true;
-            case "ledgerlinethickness":
-                obj.ledgerLineThickness = v! as number;
+            case "barlineseparation":
+                obj.barlineSeparation = v! as number;
                 return true;
-            case "ledgerlineextension":
-                obj.ledgerLineExtension = v! as number;
-                return true;
-            case "stemwidth":
-                obj.stemWidth = v! as number;
-                return true;
-            case "stafflinethickness":
-                obj.staffLineThickness = v! as number;
+            case "beamspacing":
+                obj.beamSpacing = v! as number;
                 return true;
             case "beamthickness":
                 obj.beamThickness = v! as number;
                 return true;
-            case "beamspacing":
-                obj.beamSpacing = v! as number;
+            case "dashedbarlinedashlength":
+                obj.dashedBarlineDashLength = v! as number;
+                return true;
+            case "dashedbarlinegaplength":
+                obj.dashedBarlineGapLength = v! as number;
+                return true;
+            case "dashedbarlinethickness":
+                obj.dashedBarlineThickness = v! as number;
+                return true;
+            case "legerlinethickness":
+                obj.legerLineThickness = v! as number;
+                return true;
+            case "legerlineextension":
+                obj.legerLineExtension = v! as number;
+                return true;
+            case "repeatbarlinedotseparation":
+                obj.repeatBarlineDotSeparation = v! as number;
+                return true;
+            case "repeatendinglinethickness":
+                obj.repeatEndingLineThickness = v! as number;
+                return true;
+            case "stafflinethickness":
+                obj.staffLineThickness = v! as number;
+                return true;
+            case "stemthickness":
+                obj.stemThickness = v! as number;
+                return true;
+            case "thickbarlinethickness":
+                obj.thickBarlineThickness = v! as number;
+                return true;
+            case "thinbarlinethickness":
+                obj.thinBarlineThickness = v! as number;
+                return true;
+            case "thinthickbarlineseparation":
+                obj.thinThickBarlineSeparation = v! as number;
                 return true;
             case "tabnumberspacepadding":
                 obj.tabNumberSpacePadding = v! as number;
@@ -690,32 +720,14 @@ export class SmuflMetricsSerializer {
             case "accidentalheight":
                 obj.accidentalHeight = v! as number;
                 return true;
-            case "barlinewidth":
-                obj.barLineWidth = v! as number;
-                return true;
-            case "heavybarlinewidth":
-                obj.heavyBarLineWidth = v! as number;
-                return true;
             case "dottedbarlinecircleradius":
                 obj.dottedBarLineCircleRadius = v! as number;
-                return true;
-            case "dashedbarlinesize":
-                obj.dashedBarLineSize = v! as number;
-                return true;
-            case "repeatdotscirclesize":
-                obj.repeatDotsCircleSize = v! as number;
-                return true;
-            case "repeatdotscircleoffset":
-                obj.repeatDotsCircleOffset = v! as number;
                 return true;
             case "beatpaddingflageighthandabove":
                 obj.beatPaddingFlagEighthAndAbove = v! as number;
                 return true;
             case "beatpaddingonehundredandabove":
                 obj.beatPaddingOneHundredAndAbove = v! as number;
-                return true;
-            case "barlinespace":
-                obj.barLineSpace = v! as number;
                 return true;
             case "barnumbermarginpaddingright":
                 obj.barNumberMarginPaddingRight = v! as number;
@@ -790,27 +802,27 @@ export class SmuflMetricsSerializer {
                 });
                 return true;
             case "glyphtop":
-                obj.GlyphTop = new Map<MusicFontSymbol, number>();
+                obj.glyphTop = new Map<MusicFontSymbol, number>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.GlyphTop.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                    obj.glyphTop.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
                 });
                 return true;
             case "glyphbottom":
-                obj.GlyphBottom = new Map<MusicFontSymbol, number>();
+                obj.glyphBottom = new Map<MusicFontSymbol, number>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.GlyphBottom.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                    obj.glyphBottom.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
                 });
                 return true;
             case "glyphwidths":
-                obj.GlyphWidths = new Map<MusicFontSymbol, number>();
+                obj.glyphWidths = new Map<MusicFontSymbol, number>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.GlyphWidths.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                    obj.glyphWidths.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
                 });
                 return true;
             case "glyphheights":
-                obj.GlyphHeights = new Map<MusicFontSymbol, number>();
+                obj.glyphHeights = new Map<MusicFontSymbol, number>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.GlyphHeights.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                    obj.glyphHeights.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
                 });
                 return true;
             case "chorddiagrampaddingx":

@@ -53,7 +53,7 @@ export class NumberGlyph extends Glyph {
     public override doLayout(): void {
         let w = 0;
         for (const d of this._symbols) {
-            w += this.renderer.smuflMetrics.GlyphWidths.get(d)!;
+            w += this.renderer.smuflMetrics.glyphWidths.get(d)!;
         }
         this.width = w;
     }

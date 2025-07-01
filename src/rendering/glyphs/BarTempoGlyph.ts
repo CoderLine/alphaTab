@@ -36,7 +36,7 @@ export class BarTempoGlyph extends EffectGlyph {
             canvas.fillMusicFontSymbol(x, cy + this.y + this.height * this.renderer.smuflMetrics.barTempoSymbolYScale, this.renderer.smuflMetrics.barTempoSymbolScale, MusicFontSymbol.NoteQuarterUp, true);
             canvas.fillText(
                 `= ${automation.value.toString()}`,
-                x + this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.NoteQuarterUp)! * this.renderer.smuflMetrics.barTempoSymbolScale + this.renderer.smuflMetrics.barTempoValuePadding,
+                x + this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteQuarterUp)! * this.renderer.smuflMetrics.barTempoSymbolScale + this.renderer.smuflMetrics.barTempoValuePadding,
                 cy + this.y + canvas.font.size * this.renderer.smuflMetrics.barTempoSymbolScale
             );
         }

@@ -102,9 +102,9 @@ export class ClefGlyph extends MusicFontGlyph {
         ottavaGlyph.doLayout();
         const ottavaX: number = this.width / 2;
         const ottavaY = top
-            ? this.renderer.smuflMetrics.GlyphTop.get(this.symbol)!
-            : this.renderer.smuflMetrics.GlyphBottom.get(this.symbol)! -
-              this.renderer.smuflMetrics.GlyphHeights.get(ottavaGlyph.symbol)!;
+            ? this.renderer.smuflMetrics.glyphTop.get(this.symbol)!
+            : this.renderer.smuflMetrics.glyphBottom.get(this.symbol)! -
+              this.renderer.smuflMetrics.glyphHeights.get(ottavaGlyph.symbol)!;
         ottavaGlyph.paint(cx + this.x + ottavaX, cy + this.y - ottavaY, canvas);
     }
 }

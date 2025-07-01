@@ -23,7 +23,7 @@ export class CrescendoGlyph extends GroupedEffectGlyph {
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         const startX: number = cx + this.x;
         const height: number = this.height;
-        const padding = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.NoteheadBlack)! / 2;
+        const padding = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteheadBlack)! / 2;
         canvas.beginPath();
         if (this._crescendo === CrescendoType.Crescendo) {
             endX -= padding;

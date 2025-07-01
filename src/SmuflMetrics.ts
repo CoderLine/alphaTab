@@ -129,8 +129,22 @@ export class SmuflMetrics {
     public oneStaffSpace: number = this.musicFontSize / 4;
     public tabLineSpacing: number = this.oneStaffSpace * 1.2;
 
-    public ledgerLineThickness = 0;
-    public ledgerLineExtension = 0;
+    // engraving defaults (TODO: reuse SmuflEngravingDefaults when all are supported)
+    public barlineSeparation: number = 0;
+    public beamSpacing: number = 0;
+    public beamThickness: number = 0;
+    public dashedBarlineDashLength: number = 0;
+    public dashedBarlineGapLength: number = 0;
+    public dashedBarlineThickness: number = 0;
+    public legerLineThickness = 0;
+    public legerLineExtension = 0;
+    public repeatBarlineDotSeparation: number = 0;
+    public repeatEndingLineThickness: number = 0;
+    public staffLineThickness: number = 0;
+    public stemThickness: number = 0;
+    public thickBarlineThickness: number = 0;
+    public thinBarlineThickness: number = 0;
+    public thinThickBarlineSeparation: number = 0;
 
     public static get bravuraDefaults() {
         const metrics = new SmuflMetrics();
@@ -139,12 +153,34 @@ export class SmuflMetrics {
     }
 
     public initialize(smufl: SmuflMetadata) {
-        this.stemWidth = smufl.engravingDefaults.stemThickness * this.oneStaffSpace;
-        this.staffLineThickness = smufl.engravingDefaults.staffLineThickness * this.oneStaffSpace;
-        this.beamThickness = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
+        // TODO arrowShaftThickness
+        this.barlineSeparation = smufl.engravingDefaults.barlineSeparation * this.oneStaffSpace;
         this.beamSpacing = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
-        this.ledgerLineExtension = smufl.engravingDefaults.legerLineExtension * this.oneStaffSpace;
-        this.ledgerLineThickness = smufl.engravingDefaults.legerLineThickness * this.oneStaffSpace;
+        this.beamThickness = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
+        // TODO bracketThickness
+        this.dashedBarlineDashLength = smufl.engravingDefaults.dashedBarlineDashLength * this.oneStaffSpace;
+        this.dashedBarlineGapLength = smufl.engravingDefaults.dashedBarlineGapLength * this.oneStaffSpace;
+        this.dashedBarlineThickness = smufl.engravingDefaults.dashedBarlineThickness * this.oneStaffSpace;
+        // TODO hairpinThickness
+        this.legerLineExtension = smufl.engravingDefaults.legerLineExtension * this.oneStaffSpace;
+        this.legerLineThickness = smufl.engravingDefaults.legerLineThickness * this.oneStaffSpace;
+        // TODO lyricLineThickness
+        // TODO octaveLineThickness
+        // TODO pedalLineThickness
+        this.repeatBarlineDotSeparation = smufl.engravingDefaults.repeatBarlineDotSeparation * this.oneStaffSpace;
+        this.repeatEndingLineThickness = smufl.engravingDefaults.repeatEndingLineThickness * this.oneStaffSpace; // TODO which line is this exactly?
+        // TODO slurEndpointThickness
+        // TODO slurMidpointThickness
+        this.staffLineThickness = smufl.engravingDefaults.staffLineThickness * this.oneStaffSpace;
+        this.stemThickness = smufl.engravingDefaults.stemThickness * this.oneStaffSpace;
+        // TODO subBracketThickness
+        // TODO textEnclosureThickness
+        this.thickBarlineThickness = smufl.engravingDefaults.thickBarlineThickness * this.oneStaffSpace;
+        this.thinBarlineThickness = smufl.engravingDefaults.thinBarlineThickness * this.oneStaffSpace;
+        this.thinThickBarlineSeparation = smufl.engravingDefaults.thinThickBarlineSeparation * this.oneStaffSpace;
+        // TODO tieEndpointThickness
+        // TODO tieMidpointThickness
+        // TODO tupletBracketThickness
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
@@ -157,7 +193,7 @@ export class SmuflMetrics {
                     b.bottomX = v.stemDownSW[0] * this.oneStaffSpace;
                     b.bottomY = v.stemDownSW[1] * this.oneStaffSpace;
                 } else {
-                    b.bottomX = b.topX + this.stemWidth;
+                    b.bottomX = b.topX + this.stemThickness;
                     b.bottomY = 0;
                 }
                 this.stemDown.set(symbol, b);
@@ -170,31 +206,23 @@ export class SmuflMetrics {
                     b.topX = v.stemUpNW[0] * this.oneStaffSpace;
                     b.topY = v.stemUpNW[1] * this.oneStaffSpace;
                 } else {
-                    b.topX = b.bottomX - this.stemWidth;
+                    b.topX = b.bottomX - this.stemThickness;
                     b.topY = 0;
                 }
                 this.stemUp.set(symbol, b);
             }
         }
+
         for (const [g, v] of Object.entries(smufl.glyphBBoxes)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
             const symbol = JsonHelper.parseEnum<MusicFontSymbol>(name, MusicFontSymbol);
             if (symbol) {
-                this.GlyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
-                this.GlyphBottom.set(symbol, v.bBoxSW[1] * this.oneStaffSpace);
-                this.GlyphWidths.set(symbol, (v.bBoxNE[0] - v.bBoxSW[0]) * this.oneStaffSpace);
-                this.GlyphHeights.set(symbol, (v.bBoxNE[1] - v.bBoxSW[1]) * this.oneStaffSpace);
+                this.glyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
+                this.glyphBottom.set(symbol, v.bBoxSW[1] * this.oneStaffSpace);
+                this.glyphWidths.set(symbol, (v.bBoxNE[0] - v.bBoxSW[0]) * this.oneStaffSpace);
+                this.glyphHeights.set(symbol, (v.bBoxNE[1] - v.bBoxSW[1]) * this.oneStaffSpace);
             }
         }
-    }
-
-    public stemWidth: number = 0;
-    public staffLineThickness: number = 0;
-    public beamThickness: number = 0;
-    public beamSpacing: number = 0;
-
-    public get numberedBarRendererBarSpacing() {
-        return this.beamSpacing + this.beamThickness;
     }
 
     public tabNumberSpacePadding: number = 1;
@@ -202,6 +230,9 @@ export class SmuflMetrics {
     //
     // combined sizes (TODO: splitup into paddings and glyph sizes)
     public deadSlappedBeatWidth: number = 26;
+    public get numberedBarRendererBarSpacing() {
+        return this.beamSpacing + this.beamThickness;
+    }
 
     //
     // paddings/margins between elements (TODO: try to eliminate custom paddings)
@@ -381,17 +412,11 @@ export class SmuflMetrics {
     public scoreBarRendererBeamMaxDistance = 10;
     public accidentalHeight: number = 21;
 
-    public barLineWidth: number = 1;
-    public heavyBarLineWidth: number = 4;
     public dottedBarLineCircleRadius: number = 1;
-    public dashedBarLineSize: number = 4;
-    public repeatDotsCircleSize: number = 1.5;
-    public repeatDotsCircleOffset: number = 3;
 
     public beatPaddingFlagEighthAndAbove: number = 20;
     public beatPaddingOneHundredAndAbove: number = 10;
 
-    public barLineSpace: number = 3;
     public barNumberMarginPaddingRight: number = 5;
 
     public beatVibratoHeight: number = 18;
@@ -440,17 +465,17 @@ export class SmuflMetrics {
         [Duration.TwoHundredFiftySixth, 10]
     ]);
 
-    public GlyphTop: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-    public GlyphBottom: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+    public glyphTop: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+    public glyphBottom: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
 
     /**
      * The widths of the bounding box for the respective glyphs.
      */
-    public GlyphWidths: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+    public glyphWidths: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
     /**
      * The heights of the bounding box for the respective glyphs.
      */
-    public GlyphHeights: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+    public glyphHeights: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
 
     //
     // chord diagram (TODO: check if SmuFL has some glyphs we can check)
@@ -518,45 +543,6 @@ export class SmuflMetrics {
     public tabBendFontSizeToPadding: number = 0.5;
     public barTempoTextPaddingScale: number = 0.7;
 
-    // SMuFL read from metadata into props and use for rendering
-    // - glyphsWithAnchors.glyph
-    //   - stemDownNW[0]
-    //   - stemDownSE[0]
-    //   - graceNoteSlashSW
-    //   - graceNoteSlashNE
-    //   - graceNoteSlashNW
-    //   - graceNoteSlashSE
-    // - engravingDefaults
-    //   - staffLineThickness
-    //   - stemThickness
-    //   - beamThickness
-    //   - beamSpacing
-    //   - legerLineThickness
-    //   - legerLineExtension
-    //   - slurEndPointTickness
-    //   - slurMidPointThickness
-    //   - tieEndpointThickness
-    //   - tieMidpointThickness
-    //   - thinBarLineThickness
-    //   - thickBarLineThickness
-    //   - dashedBarlineThickness
-    //   - dashedBarlineDashLength
-    //   - dashedBarlineGapLength
-    //   - barLineSeparation
-    //   - thinThickBarLineSeparation
-    //   - repeatBarlineDotSeparation
-    //   - bracketThickness
-    //   - subBracketCThickness
-    //   - hairpinThickness
-    //   - octaveLineThickness
-    //   - pedalLineThickness
-    //   - repeatEndingLineThickness
-    //   - arrowShaftThickness
-    //   - lyricLineThickness
-    //   - tupletBracketThickness
-    //   - hBarThickness
-    // glyphBBoxes
-
     public static readonly bravuraMetadata: SmuflMetadata = {
         engravingDefaults: {
             arrowShaftThickness: 0.16,
@@ -582,8 +568,8 @@ export class SmuflMetrics {
             subBracketThickness: 0.16,
             textEnclosureThickness: 0.16,
             thickBarlineThickness: 0.5,
-            thinThickBarlineSeparation: 0.4,
             thinBarlineThickness: 0.16,
+            thinThickBarlineSeparation: 0.4,
             tieEndpointThickness: 0.1,
             tieMidpointThickness: 0.22,
             tupletBracketThickness: 0.16
@@ -1288,6 +1274,10 @@ export class SmuflMetrics {
             repeat2Bars: {
                 bBoxNE: [3.048, 1.116],
                 bBoxSW: [0, -1]
+            },
+            repeatDot: {
+                bBoxNE: [0.4, 0.7],
+                bBoxSW: [0, 0.3]
             },
             restDoubleWhole: {
                 bBoxNE: [0.5, 1],

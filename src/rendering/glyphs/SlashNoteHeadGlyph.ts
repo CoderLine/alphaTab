@@ -46,11 +46,11 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     public override doLayout(): void {
         const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
 
-        this.width = this.renderer.smuflMetrics.GlyphWidths.get(this._symbol)! * scale;
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)! * scale;
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(this._symbol)! * scale;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)! * scale;
 
         const effectSpacing: number = this.renderer.smuflMetrics.slashNoteHeadEffectSpacing;
-        let effectY = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)!;
+        let effectY = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;

@@ -30,9 +30,9 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
                 break;
         }
 
-        this._symbolSize = this.renderer.smuflMetrics.GlyphWidths.get(this._symbol)!;
-        this._symbolOffsetY = this.renderer.smuflMetrics.GlyphTop.get(this._symbol)!;
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(this._symbol)!;
+        this._symbolSize = this.renderer.smuflMetrics.glyphWidths.get(this._symbol)!;
+        this._symbolOffsetY = this.renderer.smuflMetrics.glyphTop.get(this._symbol)!;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {

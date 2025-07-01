@@ -93,12 +93,12 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
@@ -119,7 +119,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
@@ -180,7 +180,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
         const lineWidth = canvas.lineWidth;
-        canvas.lineWidth = this.smuflMetrics.stemWidth;
+        canvas.lineWidth = this.smuflMetrics.stemThickness;
         canvas.beginPath();
         canvas.moveTo(x, topY);
         canvas.lineTo(x, bottomY);

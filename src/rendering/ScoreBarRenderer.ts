@@ -659,7 +659,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
         canvas.fillRect(
             x, topY,
-            this.smuflMetrics.stemWidth,
+            this.smuflMetrics.stemThickness,
             bottomY - topY
         );
     }

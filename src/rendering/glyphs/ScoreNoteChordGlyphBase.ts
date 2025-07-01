@@ -8,7 +8,6 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { dir } from 'console';
 
 export abstract class ScoreNoteChordGlyphBase extends Glyph {
     private _infos: ScoreNoteGlyphInfo[] = [];
@@ -148,7 +147,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
 
-        const lineExtension: number = this.renderer.smuflMetrics.ledgerLineExtension;
+        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension;
         const lineWidth: number = this.width - this.noteStartX + lineExtension * 2;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
@@ -157,13 +156,13 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         const minNoteLineY = scoreRenderer.getLineY(this.minNote!.steps / 2);
         const maxNoteLineY = scoreRenderer.getLineY(this.maxNote!.steps / 2);
 
-        let y = firstTopLedgerY - this.renderer.smuflMetrics.ledgerLineThickness / 2;
+        let y = firstTopLedgerY - this.renderer.smuflMetrics.legerLineThickness / 2;
         while (y >= minNoteLineY) {
             canvas.fillRect(
                 cx - lineExtension + this.noteStartX,
                 cy + y,
                 lineWidth,
-                this.renderer.smuflMetrics.ledgerLineThickness
+                this.renderer.smuflMetrics.legerLineThickness
             );
             y -= lineSpacing;
         }
@@ -174,7 +173,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 cx - lineExtension + this.noteStartX,
                 cy + y,
                 lineWidth,
-                this.renderer.smuflMetrics.ledgerLineThickness
+                this.renderer.smuflMetrics.legerLineThickness
             );
             y += lineSpacing;
         }

@@ -16,7 +16,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.QuindicesimaAlta)!;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.QuindicesimaAlta)!;
     }
 
     protected override paintNonGrouped(cx: number, cy: number, canvas: ICanvas): void {
@@ -28,7 +28,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
         const ottavaScale = this.renderer.smuflMetrics.ottavaScale;
         switch (this._ottava) {
             case Ottavia._15ma:
-                size = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.QuindicesimaAlta)! * ottavaScale;
+                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.QuindicesimaAlta)! * ottavaScale;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
@@ -38,7 +38,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 );
                 break;
             case Ottavia._8va:
-                size = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.OttavaAlta)! * ottavaScale;
+                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaAlta)! * ottavaScale;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
@@ -48,7 +48,7 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 );
                 break;
             case Ottavia._8vb:
-                size = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.OttavaBassaVb)! * ottavaScale;
+                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaBassaVb)! * ottavaScale;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
@@ -59,9 +59,9 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 break;
             case Ottavia._15mb:
                 size =
-                    (this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.Quindicesima)! +
-                        this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.OctaveBaselineM)! +
-                        this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.OctaveBaselineB)!) *
+                    (this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Quindicesima)! +
+                        this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OctaveBaselineM)! +
+                        this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OctaveBaselineB)!) *
                     ottavaScale;
 
                 // NOTE: SMUFL does not have a glyph for 15mb so we build it

@@ -12,7 +12,7 @@ export class TrillGlyph extends GroupedEffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.OrnamentTrill)! / 2;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.OrnamentTrill)! / 2;
     }
 
     protected override paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
@@ -20,9 +20,9 @@ export class TrillGlyph extends GroupedEffectGlyph {
 
         canvas.fillMusicFontSymbol(startX, cy + this.y + this.height, 1, MusicFontSymbol.OrnamentTrill, true);
 
-        startX += this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.OrnamentTrill)! / 2;
+        startX += this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OrnamentTrill)! / 2;
 
-        const step: number = this.renderer.smuflMetrics.GlyphWidths.get(MusicFontSymbol.WiggleTrill)!;
+        const step: number = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.WiggleTrill)!;
         const loops: number = Math.floor((endX - startX) / step);
         const loopY: number = cy + this.y + this.height * this.renderer.smuflMetrics.trillLoopHeightToY;
         let loopX: number = startX;

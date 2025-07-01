@@ -21,12 +21,21 @@ export interface SmuflMetricsJson {
     musicFontSize?: number;
     oneStaffSpace?: number;
     tabLineSpacing?: number;
-    ledgerLineThickness?: number;
-    ledgerLineExtension?: number;
-    stemWidth?: number;
-    staffLineThickness?: number;
-    beamThickness?: number;
+    barlineSeparation?: number;
     beamSpacing?: number;
+    beamThickness?: number;
+    dashedBarlineDashLength?: number;
+    dashedBarlineGapLength?: number;
+    dashedBarlineThickness?: number;
+    legerLineThickness?: number;
+    legerLineExtension?: number;
+    repeatBarlineDotSeparation?: number;
+    repeatEndingLineThickness?: number;
+    staffLineThickness?: number;
+    stemThickness?: number;
+    thickBarlineThickness?: number;
+    thinBarlineThickness?: number;
+    thinThickBarlineSeparation?: number;
     tabNumberSpacePadding?: number;
     deadSlappedBeatWidth?: number;
     directionsContainerPadding?: number;
@@ -145,15 +154,9 @@ export interface SmuflMetricsJson {
     brokenBarOffset?: number;
     scoreBarRendererBeamMaxDistance?: number;
     accidentalHeight?: number;
-    barLineWidth?: number;
-    heavyBarLineWidth?: number;
     dottedBarLineCircleRadius?: number;
-    dashedBarLineSize?: number;
-    repeatDotsCircleSize?: number;
-    repeatDotsCircleOffset?: number;
     beatPaddingFlagEighthAndAbove?: number;
     beatPaddingOneHundredAndAbove?: number;
-    barLineSpace?: number;
     barNumberMarginPaddingRight?: number;
     beatVibratoHeight?: number;
     scoreSlideLineSizeX?: number;
@@ -177,16 +180,16 @@ export interface SmuflMetricsJson {
     bendSlurHeight?: number;
     timeSignatureNumberHeight?: number;
     barStemSizes?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
-    GlyphTop?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
-    GlyphBottom?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
+    glyphTop?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
+    glyphBottom?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     /**
      * The widths of the bounding box for the respective glyphs.
      */
-    GlyphWidths?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
+    glyphWidths?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     /**
      * The heights of the bounding box for the respective glyphs.
      */
-    GlyphHeights?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
+    glyphHeights?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     chordDiagramPaddingX?: number;
     chordDiagramPaddingY?: number;
     chordDiagramCircleRadius?: number;

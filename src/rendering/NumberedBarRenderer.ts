@@ -227,12 +227,12 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
@@ -258,7 +258,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 

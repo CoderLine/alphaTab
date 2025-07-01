@@ -145,7 +145,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         let direction: BeamDirection =
             this._notes.length === 1 ? this.getTieDirection(directionBeat, startNoteRenderer) : BeamDirection.Up;
 
-        const noteHeadHeight = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
+        const noteHeadHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
 
         // draw slurs
         for (let i: number = 0; i < this._notes.length; i++) {

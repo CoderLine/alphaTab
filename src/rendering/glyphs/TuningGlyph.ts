@@ -79,7 +79,7 @@ export class TuningGlyph extends GlyphGroup {
         if (!tuning.isStandard) {
             this.height += rowHeight;
             const circleScale = this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
-            const circleHeight = this.renderer.smuflMetrics.GlyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
+            const circleHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;

@@ -28,6 +28,7 @@ export class RenderingResources {
      * @defaultValue `alphaTab`
      * @since 1.6.0
      */
+    // TODO: make part of stylesheet and define a default stylesheet on settings? 
     public smuflMetrics:SmuflMetrics = SmuflMetrics.bravuraDefaults;
 
     /**
