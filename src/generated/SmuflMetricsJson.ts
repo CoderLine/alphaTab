@@ -36,6 +36,7 @@ export interface SmuflMetricsJson {
     thickBarlineThickness?: number;
     thinBarlineThickness?: number;
     thinThickBarlineSeparation?: number;
+    effectBandSeparation?: number;
     tabNumberSpacePadding?: number;
     deadSlappedBeatWidth?: number;
     directionsContainerPadding?: number;
@@ -97,8 +98,6 @@ export interface SmuflMetricsJson {
     sustainPedalStarLinePadding?: number;
     timeSignatureGhostParenthesisLeftPadding?: number;
     timeSignatureGhostParenthesisRightPadding?: number;
-    slightBeatVibratoStepSize?: number;
-    wideBeatVibratoStepSize?: number;
     tabBrushArpeggioOffset?: number;
     pictEdgeOfCymbalOffsetX?: number;
     arpeggioXOffset?: number;
@@ -125,6 +124,7 @@ export interface SmuflMetricsJson {
     tabSlideOffsetX?: number;
     stemUp?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     stemDown?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
+    repeatOffsetX?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     deadSlappedLineWidth?: number;
     targetDirectionGlyphHeight?: number;
     flagWidth?: number;
@@ -158,7 +158,6 @@ export interface SmuflMetricsJson {
     beatPaddingFlagEighthAndAbove?: number;
     beatPaddingOneHundredAndAbove?: number;
     barNumberMarginPaddingRight?: number;
-    beatVibratoHeight?: number;
     scoreSlideLineSizeX?: number;
     slashTieEmptyHeight?: number;
     slashTieEmptyWidth?: number;

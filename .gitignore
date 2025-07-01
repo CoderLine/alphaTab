@@ -12,6 +12,7 @@ temp/
 test-results/
 debug.log
 src/generated/VersionInfo.ts
+font/bravura/bravura_alphatab_metadata.json
 
 .gradle
 build/

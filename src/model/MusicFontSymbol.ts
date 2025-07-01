@@ -27,8 +27,8 @@ export enum MusicFontSymbol {
     UnpitchedPercussionClef1 = 0xe069,
     SixStringTabClef = 0xe06d,
     FourStringTabClef = 0xe06e,
-    Clef8 = 0xE07D,
-    Clef15 = 0xE07E,
+    Clef8 = 0xe07d,
+    Clef15 = 0xe07e,
 
     TimeSig0 = 0xe080,
     TimeSig1 = 0xe081,
@@ -294,7 +294,11 @@ export enum MusicFontSymbol {
     FretboardO = 0xe85a,
 
     WiggleTrill = 0xeaa4,
+    GuitarVibratoStroke = 0xeab2,
+    GuitarWideVibratoStroke = 0xeab3,
     WiggleVibratoMediumFast = 0xeade,
+    WiggleSawtoothNarrow = 0xeaba,
+    WiggleSawtooth = 0xeabb,
 
     OctaveBaselineM = 0xec95,
     OctaveBaselineB = 0xec93

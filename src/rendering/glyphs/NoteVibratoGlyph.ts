@@ -4,10 +4,10 @@ import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { GroupedEffectGlyph } from '@src/rendering/glyphs/GroupedEffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
-export class NoteVibratoGlyph extends GroupedEffectGlyph {
+export abstract class VibratoGlyphBase extends GroupedEffectGlyph {
     private _type: VibratoType;
     private _symbol: MusicFontSymbol = MusicFontSymbol.None;
-    private _symbolSize: number = 0;
+    private _repeatOffsetX: number = 0;
     private _symbolOffsetY: number = 0;
     private _partialWaves: boolean;
 
@@ -19,18 +19,21 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
         this._partialWaves = partialWaves;
     }
 
+    protected abstract get slightVibratoGlyph(): MusicFontSymbol;
+    protected abstract get wideVibratoGlyph(): MusicFontSymbol;
+
     public override doLayout(): void {
         super.doLayout();
         switch (this._type) {
             case VibratoType.Slight:
-                this._symbol = MusicFontSymbol.WiggleTrill;
+                this._symbol = this.slightVibratoGlyph;
                 break;
             case VibratoType.Wide:
-                this._symbol = MusicFontSymbol.WiggleVibratoMediumFast;
+                this._symbol = this.wideVibratoGlyph;
                 break;
         }
 
-        this._symbolSize = this.renderer.smuflMetrics.glyphWidths.get(this._symbol)!;
+        this._repeatOffsetX = this.renderer.smuflMetrics.repeatOffsetX.get(this._symbol)!;
         this._symbolOffsetY = this.renderer.smuflMetrics.glyphTop.get(this._symbol)!;
         this.height = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
     }
@@ -38,10 +41,9 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         const startX: number = cx + this.x;
         const width: number = endX - startX;
-        const step: number = this._symbolSize;
+        const repeatOffset: number = this._repeatOffsetX;
 
-        // TODO: respect overlap for calculation?
-        let loops: number = width / step;
+        let loops: number = width / repeatOffset;
         if (!this._partialWaves) {
             loops = Math.floor(loops);
         }
@@ -49,17 +51,21 @@ export class NoteVibratoGlyph extends GroupedEffectGlyph {
             loops = 1;
         }
 
-        const symbols:MusicFontSymbol[]=[];
+        const symbols: MusicFontSymbol[] = [];
         for (let i: number = 0; i < loops; i++) {
             symbols.push(this._symbol);
         }
 
-        canvas.fillMusicFontSymbols(
-            cx + this.x,
-            cy + this.y + this._symbolOffsetY,
-            1,
-            symbols,
-            false
-        );
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this._symbolOffsetY, 1, symbols, false);
+    }
+}
+
+export class NoteVibratoGlyph extends VibratoGlyphBase {
+    protected override get slightVibratoGlyph(): MusicFontSymbol {
+        return MusicFontSymbol.GuitarVibratoStroke;
+    }
+
+    protected override get wideVibratoGlyph(): MusicFontSymbol {
+        return MusicFontSymbol.GuitarWideVibratoStroke;
     }
 }

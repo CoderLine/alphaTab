@@ -39,6 +39,7 @@ export class SmuflMetricsSerializer {
         o.set("thickbarlinethickness", obj.thickBarlineThickness);
         o.set("thinbarlinethickness", obj.thinBarlineThickness);
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
+        o.set("effectbandseparation", obj.effectBandSeparation);
         o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
         o.set("deadslappedbeatwidth", obj.deadSlappedBeatWidth);
         o.set("directionscontainerpadding", obj.directionsContainerPadding);
@@ -100,8 +101,6 @@ export class SmuflMetricsSerializer {
         o.set("sustainpedalstarlinepadding", obj.sustainPedalStarLinePadding);
         o.set("timesignatureghostparenthesisleftpadding", obj.timeSignatureGhostParenthesisLeftPadding);
         o.set("timesignatureghostparenthesisrightpadding", obj.timeSignatureGhostParenthesisRightPadding);
-        o.set("slightbeatvibratostepsize", obj.slightBeatVibratoStepSize);
-        o.set("widebeatvibratostepsize", obj.wideBeatVibratoStepSize);
         o.set("tabbrusharpeggiooffset", obj.tabBrushArpeggioOffset);
         o.set("pictedgeofcymbaloffsetx", obj.pictEdgeOfCymbalOffsetX);
         o.set("arpeggioxoffset", obj.arpeggioXOffset);
@@ -158,6 +157,13 @@ export class SmuflMetricsSerializer {
                 m.set(k.toString(), SmuflStemInfoSerializer.toJson(v));
             }
         }
+        {
+            const m = new Map<string, unknown>();
+            o.set("repeatoffsetx", m);
+            for (const [k, v] of obj.repeatOffsetX!) {
+                m.set(k.toString(), v);
+            }
+        }
         o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
         o.set("targetdirectionglyphheight", obj.targetDirectionGlyphHeight);
         o.set("flagwidth", obj.flagWidth);
@@ -191,7 +197,6 @@ export class SmuflMetricsSerializer {
         o.set("beatpaddingflageighthandabove", obj.beatPaddingFlagEighthAndAbove);
         o.set("beatpaddingonehundredandabove", obj.beatPaddingOneHundredAndAbove);
         o.set("barnumbermarginpaddingright", obj.barNumberMarginPaddingRight);
-        o.set("beatvibratoheight", obj.beatVibratoHeight);
         o.set("scoreslidelinesizex", obj.scoreSlideLineSizeX);
         o.set("slashtieemptyheight", obj.slashTieEmptyHeight);
         o.set("slashtieemptywidth", obj.slashTieEmptyWidth);
@@ -346,6 +351,9 @@ export class SmuflMetricsSerializer {
                 return true;
             case "thinthickbarlineseparation":
                 obj.thinThickBarlineSeparation = v! as number;
+                return true;
+            case "effectbandseparation":
+                obj.effectBandSeparation = v! as number;
                 return true;
             case "tabnumberspacepadding":
                 obj.tabNumberSpacePadding = v! as number;
@@ -530,12 +538,6 @@ export class SmuflMetricsSerializer {
             case "timesignatureghostparenthesisrightpadding":
                 obj.timeSignatureGhostParenthesisRightPadding = v! as number;
                 return true;
-            case "slightbeatvibratostepsize":
-                obj.slightBeatVibratoStepSize = v! as number;
-                return true;
-            case "widebeatvibratostepsize":
-                obj.wideBeatVibratoStepSize = v! as number;
-                return true;
             case "tabbrusharpeggiooffset":
                 obj.tabBrushArpeggioOffset = v! as number;
                 return true;
@@ -631,6 +633,12 @@ export class SmuflMetricsSerializer {
                     const i = new SmuflStemInfo();
                     SmuflStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
                     obj.stemDown.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
+                });
+                return true;
+            case "repeatoffsetx":
+                obj.repeatOffsetX = new Map<MusicFontSymbol, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.repeatOffsetX.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
                 });
                 return true;
             case "deadslappedlinewidth":
@@ -731,9 +739,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "barnumbermarginpaddingright":
                 obj.barNumberMarginPaddingRight = v! as number;
-                return true;
-            case "beatvibratoheight":
-                obj.beatVibratoHeight = v! as number;
                 return true;
             case "scoreslidelinesizex":
                 obj.scoreSlideLineSizeX = v! as number;

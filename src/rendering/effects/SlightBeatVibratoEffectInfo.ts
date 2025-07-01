@@ -30,7 +30,7 @@ export class SlightBeatVibratoEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new BeatVibratoGlyph(VibratoType.Slight);
+        return new BeatVibratoGlyph(0, 0, VibratoType.Slight);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

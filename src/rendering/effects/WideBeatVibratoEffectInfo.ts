@@ -30,7 +30,7 @@ export class WideBeatVibratoEffectInfo extends EffectBarRendererInfo {
     }
 
     public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
-        return new BeatVibratoGlyph(VibratoType.Wide);
+        return new BeatVibratoGlyph(0, 0, VibratoType.Wide);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {
