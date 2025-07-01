@@ -188,6 +188,7 @@ export enum MusicFontSymbol {
     AccidentalQuarterToneSharpArrowUp = 0xe274,
     AccidentalQuarterToneNaturalArrowUp = 0xe272,
 
+    RepeatDot = 0xe044,
     Segno = 0xe047,
     Coda = 0xe048,
 

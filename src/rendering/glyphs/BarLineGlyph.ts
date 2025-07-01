@@ -4,95 +4,111 @@ import { BarLineStyle } from '@src/model/Bar';
 import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 abstract class BarLineGlyphBase extends Glyph {
     public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.barLineWidth;
+        this.width = this.renderer.smuflMetrics.thinBarlineThickness;
+    }
+}
+class BarLineLightGlyph extends BarLineGlyphBase {
+    private _isRepeat: boolean;
+    constructor(x: number, y: number, isRepeat: boolean) {
+        super(x, y);
+        this._isRepeat = isRepeat;
+    }
+
+    public override doLayout(): void {
+        this.width = this._isRepeat
+            ? this.renderer.smuflMetrics.repeatEndingLineThickness
+            : this.renderer.smuflMetrics.thinBarlineThickness;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const left: number = cx + this.x;
-        const top: number = cy + this.y + this.renderer.topPadding;
-        const bottom: number = cy + this.y + this.renderer.height - this.renderer.bottomPadding;
-        const h: number = bottom - top;
-        this.paintInternal(left, top, h, canvas);
-    }
-    protected abstract paintInternal(left: number, top: number, h: number, canvas: ICanvas): void;
-}
-class BarLineLightGlyph extends BarLineGlyphBase {
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        canvas.fillRect(left, top, this.renderer.smuflMetrics.barLineWidth, h);
+        canvas.fillRect(cx + this.x, cy + this.y, this.renderer.smuflMetrics.thinBarlineThickness, this.height);
     }
 }
 
 class BarLineDottedGlyph extends BarLineGlyphBase {
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const circleRadius: number = this.renderer.smuflMetrics.dottedBarLineCircleRadius;
-        const x = left;
 
         const lineHeight = (this.renderer as LineBarRenderer).getLineHeight(1);
 
-        let circleY = top + lineHeight * 0.5 + circleRadius;
+        let circleY = cy + this.y + lineHeight * 0.5 + circleRadius;
 
-        const bottom = top + h;
+        const bottom = cy + this.y + this.height;
         while (circleY < bottom) {
-            canvas.fillCircle(x, circleY, circleRadius);
+            canvas.fillCircle(cx + this.x, circleY, circleRadius);
             circleY += lineHeight;
         }
     }
 }
 
 class BarLineDashedGlyph extends BarLineGlyphBase {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const dashSize: number = this.renderer.smuflMetrics.dashedBarlineDashLength;
+        const x = cx + this.x - this.width / 2;
+        const dashes: number = Math.ceil(this.height / 2 / dashSize);
+        const bottom = cy + this.y + this.height;
+        const dashGapLength = this.renderer.smuflMetrics.dashedBarlineGapLength;
 
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        const dashSize: number = this.renderer.smuflMetrics.dashedBarLineSize;
-        const x = left + 0.5;
-        const dashes: number = Math.ceil(h / 2 / dashSize);
-        const bottom = top + h;
-
+        const lw = canvas.lineWidth;
+        canvas.lineWidth = this.renderer.smuflMetrics.dashedBarlineThickness;
         canvas.beginPath();
         if (dashes < 1) {
-            canvas.moveTo(x, top);
+            canvas.moveTo(x, cy + this.y);
             canvas.lineTo(x, bottom);
         } else {
-            let dashY = top;
-
-            // spread the dashes so they complete directly on the end-Y
-            const freeSpace = h - dashes * dashSize;
-            const freeSpacePerDash = freeSpace / (dashes - 1);
-
+            let dashY = cy + this.y;
             while (dashY < bottom) {
                 canvas.moveTo(x, dashY);
-                canvas.lineTo(x, dashY + dashSize);
-                dashY += dashSize + freeSpacePerDash;
+                const remaining = Math.min(bottom - dashY, dashSize);
+                canvas.lineTo(x, dashY + remaining);
+                dashY += dashSize + dashGapLength;
             }
         }
         canvas.stroke();
+        canvas.lineWidth = lw;
     }
 }
 
 class BarLineHeavyGlyph extends BarLineGlyphBase {
     public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.heavyBarLineWidth;
+        this.width = this.renderer.smuflMetrics.thickBarlineThickness;
     }
 
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        canvas.fillRect(left, top, this.width, h);
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
     }
 }
 
 class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
-        const bottom = top + h;
-        const circleSize: number = this.renderer.smuflMetrics.repeatDotsCircleSize;
-        const middle: number = (top + bottom) / 2;
-        const dotOffset: number = this.renderer.smuflMetrics.repeatDotsCircleOffset;
-        canvas.fillCircle(left, middle - circleSize * dotOffset, circleSize);
-        canvas.fillCircle(left, middle + circleSize * dotOffset, circleSize);
+    public override doLayout(): void {
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.RepeatDot)!;
+    }
+
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        const renderer = this.renderer as LineBarRenderer;
+
+        const lineOffset = renderer.heightLineCount % 2 === 0 ? 1 : 0.5;
+
+        const exactCenter = cy + this.y + this.height / 2;
+        const lineHeight = renderer.getLineHeight(lineOffset);
+
+        // SMuFL: the baseline of repeat dots seem inconsistent across fonts
+        // we need to use the bounding box info to align.
+        const dotTop = renderer.smuflMetrics.glyphTop.get(MusicFontSymbol.RepeatDot)!;
+        const dotHeight = renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.RepeatDot)!;
+
+        const dotOffset = dotTop - dotHeight / 2;
+
+        canvas.fillMusicFontSymbol(cx + this.x, exactCenter + dotOffset - lineHeight, 1, MusicFontSymbol.RepeatDot);
+        canvas.fillMusicFontSymbol(cx + this.x, exactCenter + dotOffset + lineHeight, 1, MusicFontSymbol.RepeatDot);
     }
 }
 class BarLineShortGlyph extends BarLineGlyphBase {
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const renderer = this.renderer as LineBarRenderer;
         const lines = renderer.drawnLineCount;
         const gaps = lines - 1;
@@ -100,22 +116,23 @@ class BarLineShortGlyph extends BarLineGlyphBase {
             return;
         }
 
-        const lineHeight = renderer.getLineHeight(1);
-        const height = lineHeight * 2;
-        const centerY = (gaps / 2) * lineHeight;
-        const lineY = centerY - height / 2;
+        const padding = renderer.smuflMetrics.staffLineThickness / 2;
+        const centerLine = (renderer.drawnLineCount - 1) / 2;
+        const top = renderer.getLineY(centerLine - 1) - padding;
+        const bottom = renderer.getLineY(centerLine + 1) + padding;
 
-        canvas.fillRect(left, top + lineY, 1, height);
+        canvas.fillRect(cx + this.x, cy + top, renderer.smuflMetrics.thinBarlineThickness, bottom - top);
     }
 }
+
 class BarLineTickGlyph extends BarLineGlyphBase {
-    protected override paintInternal(left: number, top: number, h: number, canvas: ICanvas): void {
+    public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const renderer = this.renderer as LineBarRenderer;
 
         const lineHeight = renderer.getLineHeight(1);
         const lineY = -(lineHeight / 2) + 1;
 
-        canvas.fillRect(left, top + lineY, 1, lineHeight);
+        canvas.fillRect(cx + this.x, cy + this.y + lineY, 1, lineHeight);
     }
 }
 
@@ -134,6 +151,8 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             ? bar.getActualBarLineRight()
             : bar.getActualBarLineLeft(this.renderer.index === 0);
 
+        const isRepeatHeavy = (this._isRight && masterBar.isRepeatEnd) || (!this._isRight && masterBar.isRepeatStart);
+
         // ensure we don't draw the same line type twice (we prefer drawing it as part of the "right" line)
         let previousLineType = BarLineStyle.Automatic;
         if (!this._isRight) {
@@ -146,12 +165,10 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
             }
         }
 
-        const barLineSpace = this.renderer.smuflMetrics.barLineSpace;
-
         if (this._isRight) {
             if (masterBar.isRepeatEnd) {
                 this.addGlyph(new BarLineRepeatDotsGlyph(0, 0));
-                this.width += barLineSpace;
+                this.width += this.renderer.smuflMetrics.repeatBarlineDotSeparation;
             }
         }
 
@@ -173,7 +190,7 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                 if (previousLineType !== BarLineStyle.LightHeavy && previousLineType !== BarLineStyle.Heavy) {
                     this.addGlyph(new BarLineHeavyGlyph(0, 0));
                 }
-                this.width += barLineSpace;
+                this.width += this.renderer.smuflMetrics.barlineSeparation;
                 this.addGlyph(new BarLineHeavyGlyph(0, 0));
                 break;
             case BarLineStyle.HeavyLight:
@@ -185,8 +202,8 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                 ) {
                     this.addGlyph(new BarLineHeavyGlyph(0, 0));
                 }
-                this.width += barLineSpace;
-                this.addGlyph(new BarLineLightGlyph(0, 0));
+                this.width += this.renderer.smuflMetrics.thinThickBarlineSeparation;
+                this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
                 break;
 
             case BarLineStyle.LightHeavy:
@@ -196,25 +213,25 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
                     previousLineType !== BarLineStyle.Regular &&
                     previousLineType !== BarLineStyle.LightLight
                 ) {
-                    this.addGlyph(new BarLineLightGlyph(0, 0));
+                    this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
                 }
-                this.width += barLineSpace;
+                this.width += this.renderer.smuflMetrics.thinThickBarlineSeparation;
                 this.addGlyph(new BarLineHeavyGlyph(0, 0));
                 break;
             case BarLineStyle.LightLight:
                 // use previous light bar
                 if (previousLineType !== BarLineStyle.HeavyLight && previousLineType !== BarLineStyle.Regular) {
-                    this.addGlyph(new BarLineLightGlyph(0, 0));
+                    this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
                 }
-                this.width += barLineSpace;
-                this.addGlyph(new BarLineLightGlyph(0, 0));
+                this.width += this.renderer.smuflMetrics.barlineSeparation;
+                this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
                 break;
             case BarLineStyle.None:
                 break;
             case BarLineStyle.Regular:
                 // use previous light bar
                 if (previousLineType !== BarLineStyle.HeavyLight && previousLineType !== BarLineStyle.LightLight) {
-                    this.addGlyph(new BarLineLightGlyph(0, 0));
+                    this.addGlyph(new BarLineLightGlyph(0, 0, isRepeatHeavy));
                 }
                 break;
             case BarLineStyle.Short:
@@ -228,9 +245,16 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
 
         if (!this._isRight) {
             if (masterBar.isRepeatStart) {
-                this.width += barLineSpace;
+                this.width += this.renderer.smuflMetrics.repeatBarlineDotSeparation;
                 this.addGlyph(new BarLineRepeatDotsGlyph(0, 0));
             }
+        }
+
+        const lineRenderer = this.renderer as LineBarRenderer;
+        const linePadding = lineRenderer.smuflMetrics.staffLineThickness / 2;
+        for (const g of this.glyphs!) {
+            g.y = lineRenderer.getLineY(0) - linePadding;
+            g.height = lineRenderer.getLineY(lineRenderer.drawnLineCount - 1) - g.y + linePadding;
         }
     }
 
