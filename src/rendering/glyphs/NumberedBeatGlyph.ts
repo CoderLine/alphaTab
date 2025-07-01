@@ -301,7 +301,6 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Note dots
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
-                this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.numberedBeatNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     const dot = new AugmentationDotGlyph(0, sr.getLineY(0));
                     dot.renderer = this.renderer;

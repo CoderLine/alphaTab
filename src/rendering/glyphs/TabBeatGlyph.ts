@@ -6,7 +6,6 @@ import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { TabNoteChordGlyph } from '@src/rendering/glyphs/TabNoteChordGlyph';
 import { TabRestGlyph } from '@src/rendering/glyphs/TabRestGlyph';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
@@ -110,7 +109,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.rhythmMode !== TabRhythmMode.Hidden) {
-                this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.tabNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     this.addEffect(
                         new AugmentationDotGlyph(
@@ -133,7 +131,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note dots
             //
             if (this.container.beat.dots > 0 && tabRenderer.showRests) {
-                this.addNormal(new SpacingGlyph(0, 0,  this.renderer.smuflMetrics.tabNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     this.addEffect(new AugmentationDotGlyph(0, y));
                 }

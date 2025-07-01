@@ -2,7 +2,6 @@ import { GraceType } from '@src/model/GraceType';
 import type { Note } from '@src/model/Note';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
@@ -165,7 +164,6 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         // Note dots
         //
         if (this.container.beat.dots > 0) {
-            this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.slashBeatNoteDotPadding));
             for (let i: number = 0; i < this.container.beat.dots; i++) {
                 this.addEffect(
                     new AugmentationDotGlyph(

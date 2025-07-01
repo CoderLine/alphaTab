@@ -155,9 +155,6 @@ export class SmuflMetrics {
     }
 
     public initialize(smufl: SmuflMetadata) {
-        // custom alphatab
-        this.effectBandSeparation = this.oneStaffSpace / 4;
-
         // SmuFl spec
 
         // TODO arrowShaftThickness
@@ -188,6 +185,11 @@ export class SmuflMetrics {
         // TODO tieEndpointThickness
         // TODO tieMidpointThickness
         // TODO tupletBracketThickness
+
+        // custom alphatab
+        this.effectBandSeparation = this.oneStaffSpace / 4;
+        this.numberedBarRendererBarSize = this.staffLineThickness * 2;
+        this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
@@ -239,9 +241,10 @@ export class SmuflMetrics {
 
     //
     // combined sizes (TODO: splitup into paddings and glyph sizes)
-    public get numberedBarRendererBarSpacing() {
-        return this.beamSpacing + this.beamThickness;
-    }
+
+    // NOTE: SMuFL has no numbered notation yet
+    public numberedBarRendererBarSize = 0;
+    public numberedBarRendererBarSpacing = 0;
 
     //
     // paddings/margins between elements (TODO: try to eliminate custom paddings)
@@ -251,13 +254,6 @@ export class SmuflMetrics {
     public trillTextPadding: number = 3;
 
     public numberedBeatPostAccidentalPadding: number = 4;
-
-    public slashBeatNoteDotPadding: number = 5;
-    public numberedBeatNoteDotPadding: number = 5;
-    public scoreBeatNoteDotPadding: number = 5;
-    public numberedBarRendererDotSpacing = 5;
-    public numberedBarRendererDotPadding = 4;
-    public tabNoteDotPadding = 5;
 
     public numberedBarRendererPreTimeSignaturePadding = 5;
     public scoreBarRendererPreTimeSignaturePadding = 5;
@@ -393,8 +389,6 @@ export class SmuflMetrics {
     public numberedTieEmptySize: number = 20;
     public arpeggioWidth: number = 10;
     public arpeggioArrowSize: number = 8;
-
-    public numberedBarRendererBarSize = 2;
 
     public crescendoHeight = 17;
 

@@ -35,6 +35,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
     public shortestDuration = Duration.QuadrupleWhole;
     public lowestOctave: number | null = null;
     public highestOctave: number | null = null;
+    get dotSpacing(): number {
+        return this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)! * 2;
+    }
 
     public registerOctave(octave: number) {
         if (this.lowestOctave === null) {
@@ -111,6 +114,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
         if (!this.bar.isEmpty) {
             const barCount: number = ModelUtils.getIndex(this.shortestDuration) - 2;
+            const dotSpacing = this.dotSpacing;
             if (barCount > 0) {
                 const barSpacing: number = this.smuflMetrics.numberedBarRendererBarSpacing;
                 const barSize: number = this.smuflMetrics.numberedBarRendererBarSize;
@@ -119,7 +123,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 let dotOverflow = 0;
                 const lowestOctave = this.lowestOctave;
                 if (lowestOctave !== null) {
-                    dotOverflow = Math.abs(lowestOctave) * this.smuflMetrics.numberedBarRendererDotSpacing + this.smuflMetrics.numberedBarRendererDotSize;
+                    dotOverflow =
+                        Math.abs(lowestOctave) * dotSpacing +
+                        this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)!;
                 }
 
                 this.registerOverflowBottom(barOverflow + dotOverflow);
@@ -128,7 +134,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
             const highestOctave = this.highestOctave;
             if (highestOctave !== null) {
                 const dotOverflow =
-                    Math.abs(highestOctave) * this.smuflMetrics.numberedBarRendererDotSpacing + this.smuflMetrics.numberedBarRendererDotSize;
+                    Math.abs(highestOctave) * dotSpacing +
+                    this.smuflMetrics.glyphHeights.get(MusicFontSymbol.AugmentationDot)!;
                 this.registerOverflowTop(dotOverflow);
             }
         }
@@ -198,21 +205,22 @@ export class NumberedBarRenderer extends LineBarRenderer {
 
             const onNotes = this.getBeatContainer(beat)!.onNotes;
             let dotCount = onNotes instanceof NumberedBeatGlyph ? (onNotes as NumberedBeatGlyph).octaveDots : 0;
+            const dotSpacing = this.dotSpacing;
             let dotsY = 0;
             let dotsOffset = 0;
             if (dotCount > 0) {
                 dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
-                dotsOffset = this.smuflMetrics.numberedBarRendererDotSpacing * -1;
+                dotsOffset = dotSpacing * -1;
             } else if (dotCount < 0) {
                 dotsY = barStart + beamY + barCount * barSpacing;
-                dotsOffset = this.smuflMetrics.numberedBarRendererDotSpacing;
+                dotsOffset = dotSpacing;
             }
-            const dotX: number = this.getBeatX(beat, BeatXPosition.OnNotes) + this.smuflMetrics.numberedBarRendererDotPadding - this.beatGlyphsStart;
+            const dotX: number = this.getBeatX(beat, BeatXPosition.MiddleNotes) - this.beatGlyphsStart;
 
             dotCount = Math.abs(dotCount);
 
             for (let d = 0; d < dotCount; d++) {
-                canvas.fillCircle(cx + this.x + dotX, dotsY, this.smuflMetrics.numberedBarRendererDotSize);
+                canvas.fillMusicFontSymbol(cx + this.x + dotX, dotsY, 1, MusicFontSymbol.AugmentationDot, true);
                 dotsY += dotsOffset;
             }
         }
@@ -297,12 +305,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
     private createKeySignatureGlyphs() {
         this.addPreBeatGlyph(
-            new NumberedKeySignatureGlyph(
-                0,
-                this.getLineY(0),
-                this.bar.keySignature,
-                this.bar.keySignatureType
-            )
+            new NumberedKeySignatureGlyph(0, this.getLineY(0), this.bar.keySignature, this.bar.keySignatureType)
         );
     }
 

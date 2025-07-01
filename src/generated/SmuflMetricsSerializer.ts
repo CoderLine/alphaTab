@@ -41,17 +41,13 @@ export class SmuflMetricsSerializer {
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
         o.set("effectbandseparation", obj.effectBandSeparation);
         o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
+        o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
+        o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
         o.set("directionscontainerpadding", obj.directionsContainerPadding);
         o.set("lefthandtappingpadding", obj.leftHandTappingPadding);
         o.set("multibarrestpadding", obj.multiBarRestPadding);
         o.set("trilltextpadding", obj.trillTextPadding);
         o.set("numberedbeatpostaccidentalpadding", obj.numberedBeatPostAccidentalPadding);
-        o.set("slashbeatnotedotpadding", obj.slashBeatNoteDotPadding);
-        o.set("numberedbeatnotedotpadding", obj.numberedBeatNoteDotPadding);
-        o.set("scorebeatnotedotpadding", obj.scoreBeatNoteDotPadding);
-        o.set("numberedbarrendererdotspacing", obj.numberedBarRendererDotSpacing);
-        o.set("numberedbarrendererdotpadding", obj.numberedBarRendererDotPadding);
-        o.set("tabnotedotpadding", obj.tabNoteDotPadding);
         o.set("numberedbarrendererpretimesignaturepadding", obj.numberedBarRendererPreTimeSignaturePadding);
         o.set("scorebarrendererpretimesignaturepadding", obj.scoreBarRendererPreTimeSignaturePadding);
         o.set("slashbarrendererpretimesignaturepadding", obj.slashBarRendererPreTimeSignaturePadding);
@@ -174,7 +170,6 @@ export class SmuflMetricsSerializer {
         o.set("numberedtieemptysize", obj.numberedTieEmptySize);
         o.set("arpeggiowidth", obj.arpeggioWidth);
         o.set("arpeggioarrowsize", obj.arpeggioArrowSize);
-        o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("crescendoheight", obj.crescendoHeight);
         o.set("bartempoheight", obj.barTempoHeight);
         o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
@@ -352,6 +347,12 @@ export class SmuflMetricsSerializer {
             case "tabnumberspacepadding":
                 obj.tabNumberSpacePadding = v! as number;
                 return true;
+            case "numberedbarrendererbarsize":
+                obj.numberedBarRendererBarSize = v! as number;
+                return true;
+            case "numberedbarrendererbarspacing":
+                obj.numberedBarRendererBarSpacing = v! as number;
+                return true;
             case "directionscontainerpadding":
                 obj.directionsContainerPadding = v! as number;
                 return true;
@@ -366,24 +367,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "numberedbeatpostaccidentalpadding":
                 obj.numberedBeatPostAccidentalPadding = v! as number;
-                return true;
-            case "slashbeatnotedotpadding":
-                obj.slashBeatNoteDotPadding = v! as number;
-                return true;
-            case "numberedbeatnotedotpadding":
-                obj.numberedBeatNoteDotPadding = v! as number;
-                return true;
-            case "scorebeatnotedotpadding":
-                obj.scoreBeatNoteDotPadding = v! as number;
-                return true;
-            case "numberedbarrendererdotspacing":
-                obj.numberedBarRendererDotSpacing = v! as number;
-                return true;
-            case "numberedbarrendererdotpadding":
-                obj.numberedBarRendererDotPadding = v! as number;
-                return true;
-            case "tabnotedotpadding":
-                obj.tabNoteDotPadding = v! as number;
                 return true;
             case "numberedbarrendererpretimesignaturepadding":
                 obj.numberedBarRendererPreTimeSignaturePadding = v! as number;
@@ -664,9 +647,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "arpeggioarrowsize":
                 obj.arpeggioArrowSize = v! as number;
-                return true;
-            case "numberedbarrendererbarsize":
-                obj.numberedBarRendererBarSize = v! as number;
                 return true;
             case "crescendoheight":
                 obj.crescendoHeight = v! as number;

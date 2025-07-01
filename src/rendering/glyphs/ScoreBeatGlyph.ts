@@ -157,7 +157,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Note dots
                 //
                 if (this.container.beat.dots > 0) {
-                    this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.scoreBeatNoteDotPadding));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;
@@ -211,7 +210,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                 // Note dots
                 //
                 if (this.container.beat.dots > 0) {
-                    this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.scoreBeatNoteDotPadding));
                     for (let i: number = 0; i < this.container.beat.dots; i++) {
                         const group: GlyphGroup = new GlyphGroup(0, 0);
                         group.renderer = this.renderer;

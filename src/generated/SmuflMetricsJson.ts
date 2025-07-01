@@ -38,17 +38,13 @@ export interface SmuflMetricsJson {
     thinThickBarlineSeparation?: number;
     effectBandSeparation?: number;
     tabNumberSpacePadding?: number;
+    numberedBarRendererBarSize?: number;
+    numberedBarRendererBarSpacing?: number;
     directionsContainerPadding?: number;
     leftHandTappingPadding?: number;
     multiBarRestPadding?: number;
     trillTextPadding?: number;
     numberedBeatPostAccidentalPadding?: number;
-    slashBeatNoteDotPadding?: number;
-    numberedBeatNoteDotPadding?: number;
-    scoreBeatNoteDotPadding?: number;
-    numberedBarRendererDotSpacing?: number;
-    numberedBarRendererDotPadding?: number;
-    tabNoteDotPadding?: number;
     numberedBarRendererPreTimeSignaturePadding?: number;
     scoreBarRendererPreTimeSignaturePadding?: number;
     slashBarRendererPreTimeSignaturePadding?: number;
@@ -135,7 +131,6 @@ export interface SmuflMetricsJson {
     numberedTieEmptySize?: number;
     arpeggioWidth?: number;
     arpeggioArrowSize?: number;
-    numberedBarRendererBarSize?: number;
     crescendoHeight?: number;
     barTempoHeight?: number;
     numberedDashGlyphWidth?: number;
