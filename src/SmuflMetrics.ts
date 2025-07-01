@@ -239,7 +239,6 @@ export class SmuflMetrics {
 
     //
     // combined sizes (TODO: splitup into paddings and glyph sizes)
-    public deadSlappedBeatWidth: number = 26;
     public get numberedBarRendererBarSpacing() {
         return this.beamSpacing + this.beamThickness;
     }

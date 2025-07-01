@@ -41,7 +41,6 @@ export class SmuflMetricsSerializer {
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
         o.set("effectbandseparation", obj.effectBandSeparation);
         o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
-        o.set("deadslappedbeatwidth", obj.deadSlappedBeatWidth);
         o.set("directionscontainerpadding", obj.directionsContainerPadding);
         o.set("lefthandtappingpadding", obj.leftHandTappingPadding);
         o.set("multibarrestpadding", obj.multiBarRestPadding);
@@ -357,9 +356,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tabnumberspacepadding":
                 obj.tabNumberSpacePadding = v! as number;
-                return true;
-            case "deadslappedbeatwidth":
-                obj.deadSlappedBeatWidth = v! as number;
                 return true;
             case "directionscontainerpadding":
                 obj.directionsContainerPadding = v! as number;

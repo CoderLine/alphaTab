@@ -38,7 +38,6 @@ export interface SmuflMetricsJson {
     thinThickBarlineSeparation?: number;
     effectBandSeparation?: number;
     tabNumberSpacePadding?: number;
-    deadSlappedBeatWidth?: number;
     directionsContainerPadding?: number;
     leftHandTappingPadding?: number;
     multiBarRestPadding?: number;
