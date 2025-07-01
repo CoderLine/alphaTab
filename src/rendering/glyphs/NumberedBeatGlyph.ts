@@ -14,7 +14,7 @@ import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
+import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
 import { NumberedDashGlyph } from '@src/rendering/glyphs/NumberedDashGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
@@ -303,7 +303,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
                 this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.numberedBeatNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    const dot = new CircleGlyph(0, sr.getLineY(0), this.renderer.smuflMetrics.numberedBeatNoteDotSize);
+                    const dot = new AugmentationDotGlyph(0, sr.getLineY(0));
                     dot.renderer = this.renderer;
                     this.addEffect(dot);
                 }

@@ -135,11 +135,6 @@ export interface SmuflMetricsJson {
     numberedTieEmptySize?: number;
     arpeggioWidth?: number;
     arpeggioArrowSize?: number;
-    slashBeatNoteDotSize?: number;
-    numberedBeatNoteDotSize?: number;
-    scoreBeatNoteDotSize?: number;
-    numberedBarRendererDotSize?: number;
-    tabNoteDotSize?: number;
     numberedBarRendererBarSize?: number;
     crescendoHeight?: number;
     barTempoHeight?: number;

@@ -5,7 +5,7 @@ import { HarmonicType } from '@src/model/HarmonicType';
 import { type Note, NoteSubElement } from '@src/model/Note';
 import { AccentuationGlyph } from '@src/rendering/glyphs/AccentuationGlyph';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
+import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
 import { DeadNoteHeadGlyph } from '@src/rendering/glyphs/DeadNoteHeadGlyph';
 import { DiamondNoteHeadGlyph } from '@src/rendering/glyphs/DiamondNoteHeadGlyph';
 import { GhostNoteContainerGlyph } from '@src/rendering/glyphs/GhostNoteContainerGlyph';
@@ -235,7 +235,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
     private createBeatDot(line: number, group: GlyphGroup) {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const g = new CircleGlyph(0, sr.getScoreY(line), this.renderer.smuflMetrics.scoreBeatNoteDotSize);
+        const g = new AugmentationDotGlyph(0, sr.getScoreY(line));
         group.addGlyph(g);
         return g;
     }

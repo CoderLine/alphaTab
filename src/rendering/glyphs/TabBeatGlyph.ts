@@ -3,7 +3,7 @@ import { GraceType } from '@src/model/GraceType';
 import { type Note, NoteSubElement } from '@src/model/Note';
 import { TabRhythmMode } from '@src/NotationSettings';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
+import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
@@ -113,11 +113,10 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.tabNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
                     this.addEffect(
-                        new CircleGlyph(
+                        new AugmentationDotGlyph(
                             0,
                             tabRenderer.lineOffset * tabRenderer.bar.staff.tuning.length +
-                                tabRenderer.settings.notation.rhythmHeight,
-                             this.renderer.smuflMetrics.tabNoteDotSize
+                                tabRenderer.settings.notation.rhythmHeight
                         )
                     );
                 }
@@ -136,7 +135,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             if (this.container.beat.dots > 0 && tabRenderer.showRests) {
                 this.addNormal(new SpacingGlyph(0, 0,  this.renderer.smuflMetrics.tabNoteDotPadding));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    this.addEffect(new CircleGlyph(0, y,  this.renderer.smuflMetrics.tabNoteDotSize));
+                    this.addEffect(new AugmentationDotGlyph(0, y));
                 }
             }
         }

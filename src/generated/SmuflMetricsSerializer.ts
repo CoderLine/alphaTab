@@ -174,11 +174,6 @@ export class SmuflMetricsSerializer {
         o.set("numberedtieemptysize", obj.numberedTieEmptySize);
         o.set("arpeggiowidth", obj.arpeggioWidth);
         o.set("arpeggioarrowsize", obj.arpeggioArrowSize);
-        o.set("slashbeatnotedotsize", obj.slashBeatNoteDotSize);
-        o.set("numberedbeatnotedotsize", obj.numberedBeatNoteDotSize);
-        o.set("scorebeatnotedotsize", obj.scoreBeatNoteDotSize);
-        o.set("numberedbarrendererdotsize", obj.numberedBarRendererDotSize);
-        o.set("tabnotedotsize", obj.tabNoteDotSize);
         o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("crescendoheight", obj.crescendoHeight);
         o.set("bartempoheight", obj.barTempoHeight);
@@ -669,21 +664,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "arpeggioarrowsize":
                 obj.arpeggioArrowSize = v! as number;
-                return true;
-            case "slashbeatnotedotsize":
-                obj.slashBeatNoteDotSize = v! as number;
-                return true;
-            case "numberedbeatnotedotsize":
-                obj.numberedBeatNoteDotSize = v! as number;
-                return true;
-            case "scorebeatnotedotsize":
-                obj.scoreBeatNoteDotSize = v! as number;
-                return true;
-            case "numberedbarrendererdotsize":
-                obj.numberedBarRendererDotSize = v! as number;
-                return true;
-            case "tabnotedotsize":
-                obj.tabNoteDotSize = v! as number;
                 return true;
             case "numberedbarrendererbarsize":
                 obj.numberedBarRendererBarSize = v! as number;

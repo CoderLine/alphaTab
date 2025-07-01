@@ -394,12 +394,6 @@ export class SmuflMetrics {
     public arpeggioWidth: number = 10;
     public arpeggioArrowSize: number = 8;
 
-    public slashBeatNoteDotSize: number = 1.5;
-    public numberedBeatNoteDotSize: number = 1.5;
-    public scoreBeatNoteDotSize: number = 1.5;
-    public numberedBarRendererDotSize = 2;
-    public tabNoteDotSize = 1.5;
-
     public numberedBarRendererBarSize = 2;
 
     public crescendoHeight = 17;
@@ -639,6 +633,10 @@ export class SmuflMetrics {
                 articTenutoBelow: {
                     bBoxNE: [1.352, 0],
                     bBoxSW: [-0.004, -0.192]
+                },
+                augmentationDot: {
+                    bBoxNE: [0.4, 0.2],
+                    bBoxSW: [0, -0.2]
                 },
                 brace: {
                     bBoxNE: [0.328, 3.988],

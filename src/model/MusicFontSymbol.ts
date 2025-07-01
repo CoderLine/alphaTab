@@ -148,6 +148,8 @@ export enum MusicFontSymbol {
     NoteQuarterUp = 0xe1d5,
     NoteEighthUp = 0xe1d7,
 
+    AugmentationDot = 0xe1e7,
+
     TextBlackNoteLongStem = 0xe1f1,
     TextBlackNoteFrac8thLongStem = 0xe1f3,
     TextBlackNoteFrac16thLongStem = 0xe1f5,
