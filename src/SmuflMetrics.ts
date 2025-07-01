@@ -255,11 +255,6 @@ export class SmuflMetrics {
 
     public numberedBeatPostAccidentalPadding: number = 4;
 
-    public numberedBarRendererPreTimeSignaturePadding = 5;
-    public scoreBarRendererPreTimeSignaturePadding = 5;
-    public slashBarRendererPreTimeSignaturePadding = 5;
-    public tabBarRendererPreTimeSignaturePadding = 5;
-
     public rowContainerPadding: number = 3;
 
     public scoreBeatGhostSpace: number = 4;

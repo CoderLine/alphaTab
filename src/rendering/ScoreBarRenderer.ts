@@ -596,7 +596,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.scoreBarRendererPreTimeSignaturePadding));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(

@@ -48,10 +48,6 @@ export class SmuflMetricsSerializer {
         o.set("multibarrestpadding", obj.multiBarRestPadding);
         o.set("trilltextpadding", obj.trillTextPadding);
         o.set("numberedbeatpostaccidentalpadding", obj.numberedBeatPostAccidentalPadding);
-        o.set("numberedbarrendererpretimesignaturepadding", obj.numberedBarRendererPreTimeSignaturePadding);
-        o.set("scorebarrendererpretimesignaturepadding", obj.scoreBarRendererPreTimeSignaturePadding);
-        o.set("slashbarrendererpretimesignaturepadding", obj.slashBarRendererPreTimeSignaturePadding);
-        o.set("tabbarrendererpretimesignaturepadding", obj.tabBarRendererPreTimeSignaturePadding);
         o.set("rowcontainerpadding", obj.rowContainerPadding);
         o.set("scorebeatghostspace", obj.scoreBeatGhostSpace);
         o.set("scoreprenotepadding", obj.scorePreNotePadding);
@@ -367,18 +363,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "numberedbeatpostaccidentalpadding":
                 obj.numberedBeatPostAccidentalPadding = v! as number;
-                return true;
-            case "numberedbarrendererpretimesignaturepadding":
-                obj.numberedBarRendererPreTimeSignaturePadding = v! as number;
-                return true;
-            case "scorebarrendererpretimesignaturepadding":
-                obj.scoreBarRendererPreTimeSignaturePadding = v! as number;
-                return true;
-            case "slashbarrendererpretimesignaturepadding":
-                obj.slashBarRendererPreTimeSignaturePadding = v! as number;
-                return true;
-            case "tabbarrendererpretimesignaturepadding":
-                obj.tabBarRendererPreTimeSignaturePadding = v! as number;
                 return true;
             case "rowcontainerpadding":
                 obj.rowContainerPadding = v! as number;

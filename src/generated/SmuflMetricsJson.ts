@@ -45,10 +45,6 @@ export interface SmuflMetricsJson {
     multiBarRestPadding?: number;
     trillTextPadding?: number;
     numberedBeatPostAccidentalPadding?: number;
-    numberedBarRendererPreTimeSignaturePadding?: number;
-    scoreBarRendererPreTimeSignaturePadding?: number;
-    slashBarRendererPreTimeSignaturePadding?: number;
-    tabBarRendererPreTimeSignaturePadding?: number;
     rowContainerPadding?: number;
     scoreBeatGhostSpace?: number;
     scorePreNotePadding?: number;

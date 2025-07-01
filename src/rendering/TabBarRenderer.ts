@@ -178,7 +178,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.tabBarRendererPreTimeSignaturePadding));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
         this.addPreBeatGlyph(
