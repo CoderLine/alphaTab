@@ -146,6 +146,8 @@ export class SmuflMetrics {
     public thinBarlineThickness: number = 0;
     public thinThickBarlineSeparation: number = 0;
 
+    public effectBandSeparation: number = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
+
     public static get bravuraDefaults() {
         const metrics = new SmuflMetrics();
         metrics.initialize(SmuflMetrics.bravuraMetadata);
@@ -153,6 +155,11 @@ export class SmuflMetrics {
     }
 
     public initialize(smufl: SmuflMetadata) {
+        // custom alphatab
+        this.effectBandSeparation = this.oneStaffSpace / 4;
+
+        // SmuFl spec
+
         // TODO arrowShaftThickness
         this.barlineSeparation = smufl.engravingDefaults.barlineSeparation * this.oneStaffSpace;
         this.beamSpacing = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
