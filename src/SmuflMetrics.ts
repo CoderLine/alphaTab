@@ -191,6 +191,7 @@ export class SmuflMetrics {
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
+        this.tabBendArrowSize = 1 * this.oneStaffSpace;
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
@@ -359,7 +360,6 @@ export class SmuflMetrics {
     ]);
     public tabTremoloXDefault = 5;
     public tabPreBendPadding: number = 2;
-    public tabBendLabelYOffset: number = 2;
     public tabSlideOffsetX: number = 2;
 
     public stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
@@ -413,7 +413,7 @@ export class SmuflMetrics {
 
     public sustainPedalLineWidth = 1;
 
-    public tabBendArrowSize: number = 6;
+    public tabBendArrowSize: number = 0;
     public tabBendDashSize: number = 3;
     public tabBendBendValueHeight: number = 6;
 
@@ -511,14 +511,9 @@ export class SmuflMetrics {
 
     //
     // font size > height factors (TODO: use proper measuring?)
-    public scoreInfoFontSizeToHeight = 1.2;
     public scoreWhammyFontSizeToOverflow = 1.5;
-    public lineBarRendererOverflowFontSiteToPadding = 0.2;
     public lineBarRendererTupletFontSiteToPadding = 0.3;
     public chordDiagramFontToRow: number = 1.5;
-    public jumpDirectionFontSizeToHeight: number = 1.5;
-    public tabBendFontSizeToHeight: number = 1.3;
-    public tabBendFontSizeToPadding: number = 0.5;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata

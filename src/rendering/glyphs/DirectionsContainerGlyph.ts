@@ -14,9 +14,9 @@ class TargetDirectionGlyph extends Glyph {
 
     public override doLayout(): void {
         this.height = 0;
-        for(const s of this._symbols) {
+        for (const s of this._symbols) {
             const h = this.renderer.smuflMetrics.glyphHeights.get(s)!;
-            if(h > this.height){
+            if (h > this.height) {
                 this.height = h;
             }
         }
@@ -36,7 +36,9 @@ class JumpDirectionGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.height = this.renderer.resources.directionsFont.size * this.renderer.smuflMetrics.jumpDirectionFontSizeToHeight;
+        const c = this.renderer.scoreRenderer.canvas!;
+        c.font = this.renderer.resources.directionsFont;
+        this.height = c.measureText(this._text).height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

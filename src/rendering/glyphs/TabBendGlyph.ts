@@ -408,16 +408,16 @@ export class TabBendGlyph extends Glyph {
         }
         if (slurText && firstPt.offset < secondPt.offset) {
             canvas.font = res.graceFont;
-            const size: number = canvas.measureText(slurText).width;
+            const size = canvas.measureText(slurText);
             let y: number = 0;
             let x: number = 0;
             if (y1 > y2) {
                 const h: number = Math.abs(y1 - y2);
-                y = h > canvas.font.size * this.renderer.smuflMetrics.tabBendFontSizeToHeight ? y1 - h / 2 : y1;
-                x = (x1 + x2 - size) / 2;
+                y = h > size.height ? y1 - h / 2 : y1;
+                x = (x1 + x2 - size.width) / 2;
             } else {
                 y = y1;
-                x = x2 - size;
+                x = x2 - size.width;
             }
             canvas.fillText(slurText, x, y);
         }
@@ -448,9 +448,9 @@ export class TabBendGlyph extends Glyph {
                 }
                 // draw label
                 canvas.font = res.tablatureFont;
-                const size: number = canvas.measureText(s).width;
-                const y: number = startY - res.tablatureFont.size * this.renderer.smuflMetrics.tabBendFontSizeToPadding - this.renderer.smuflMetrics.tabBendLabelYOffset;
-                const x: number = x2 - size / 2;
+                const size = canvas.measureText(s);
+                const y: number = startY;
+                const x: number = x2 - size.width / 2;
                 canvas.fillText(s, x, y);
             }
         }

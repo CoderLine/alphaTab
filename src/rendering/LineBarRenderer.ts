@@ -42,19 +42,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public abstract get drawnLineCount(): number;
 
     protected get topGlyphOverflow() {
-        const res = this.resources;
-        return (
-            res.tablatureFont.size / 2 +
-            res.tablatureFont.size * this.smuflMetrics.lineBarRendererOverflowFontSiteToPadding
-        );
+        return this.smuflMetrics.oneStaffSpace;
     }
 
     protected get bottomGlyphOverflow() {
-        const res = this.resources;
-        return (
-            res.tablatureFont.size / 2 +
-            res.tablatureFont.size * this.smuflMetrics.lineBarRendererOverflowFontSiteToPadding
-        );
+        return this.smuflMetrics.oneStaffSpace;
     }
 
     protected initLineBasedSizes() {

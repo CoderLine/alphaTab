@@ -126,7 +126,6 @@ export class SmuflMetricsSerializer {
         }
         o.set("tabtremoloxdefault", obj.tabTremoloXDefault);
         o.set("tabprebendpadding", obj.tabPreBendPadding);
-        o.set("tabbendlabelyoffset", obj.tabBendLabelYOffset);
         o.set("tabslideoffsetx", obj.tabSlideOffsetX);
         {
             const m = new Map<string, unknown>();
@@ -255,14 +254,9 @@ export class SmuflMetricsSerializer {
         o.set("tripletfeelequalsoffsety", obj.tripletFeelEqualsOffsetY);
         o.set("tripletfeelaugmentationoffsetx", obj.tripletFeelAugmentationOffsetX);
         o.set("tripletfeelcloseparenthesisoffsetx", obj.tripletFeelCloseParenthesisOffsetX);
-        o.set("scoreinfofontsizetoheight", obj.scoreInfoFontSizeToHeight);
         o.set("scorewhammyfontsizetooverflow", obj.scoreWhammyFontSizeToOverflow);
-        o.set("linebarrendereroverflowfontsitetopadding", obj.lineBarRendererOverflowFontSiteToPadding);
         o.set("linebarrenderertupletfontsitetopadding", obj.lineBarRendererTupletFontSiteToPadding);
         o.set("chorddiagramfonttorow", obj.chordDiagramFontToRow);
-        o.set("jumpdirectionfontsizetoheight", obj.jumpDirectionFontSizeToHeight);
-        o.set("tabbendfontsizetoheight", obj.tabBendFontSizeToHeight);
-        o.set("tabbendfontsizetopadding", obj.tabBendFontSizeToPadding);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -537,9 +531,6 @@ export class SmuflMetricsSerializer {
             case "tabprebendpadding":
                 obj.tabPreBendPadding = v! as number;
                 return true;
-            case "tabbendlabelyoffset":
-                obj.tabBendLabelYOffset = v! as number;
-                return true;
             case "tabslideoffsetx":
                 obj.tabSlideOffsetX = v! as number;
                 return true;
@@ -808,29 +799,14 @@ export class SmuflMetricsSerializer {
             case "tripletfeelcloseparenthesisoffsetx":
                 obj.tripletFeelCloseParenthesisOffsetX = v! as number;
                 return true;
-            case "scoreinfofontsizetoheight":
-                obj.scoreInfoFontSizeToHeight = v! as number;
-                return true;
             case "scorewhammyfontsizetooverflow":
                 obj.scoreWhammyFontSizeToOverflow = v! as number;
-                return true;
-            case "linebarrendereroverflowfontsitetopadding":
-                obj.lineBarRendererOverflowFontSiteToPadding = v! as number;
                 return true;
             case "linebarrenderertupletfontsitetopadding":
                 obj.lineBarRendererTupletFontSiteToPadding = v! as number;
                 return true;
             case "chorddiagramfonttorow":
                 obj.chordDiagramFontToRow = v! as number;
-                return true;
-            case "jumpdirectionfontsizetoheight":
-                obj.jumpDirectionFontSizeToHeight = v! as number;
-                return true;
-            case "tabbendfontsizetoheight":
-                obj.tabBendFontSizeToHeight = v! as number;
-                return true;
-            case "tabbendfontsizetopadding":
-                obj.tabBendFontSizeToPadding = v! as number;
                 return true;
         }
         return false;

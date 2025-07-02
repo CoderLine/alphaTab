@@ -105,7 +105,6 @@ export interface SmuflMetricsJson {
     tabTremoloOffsetX?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
     tabTremoloXDefault?: number;
     tabPreBendPadding?: number;
-    tabBendLabelYOffset?: number;
     tabSlideOffsetX?: number;
     stemUp?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     stemDown?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
@@ -192,12 +191,7 @@ export interface SmuflMetricsJson {
     tripletFeelEqualsOffsetY?: number;
     tripletFeelAugmentationOffsetX?: number;
     tripletFeelCloseParenthesisOffsetX?: number;
-    scoreInfoFontSizeToHeight?: number;
     scoreWhammyFontSizeToOverflow?: number;
-    lineBarRendererOverflowFontSiteToPadding?: number;
     lineBarRendererTupletFontSiteToPadding?: number;
     chordDiagramFontToRow?: number;
-    jumpDirectionFontSizeToHeight?: number;
-    tabBendFontSizeToHeight?: number;
-    tabBendFontSizeToPadding?: number;
 }
