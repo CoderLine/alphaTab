@@ -89,7 +89,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
                     this.addNormal(accidentals);
-                    this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.numberedBeatPostAccidentalPadding));
+                    this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.oneStaffSpace));
                 }
             }
         }

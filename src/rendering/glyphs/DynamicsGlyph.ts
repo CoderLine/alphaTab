@@ -5,11 +5,10 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 export class DynamicsGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, dynamics: DynamicValue) {
         super(x, y, 1, DynamicsGlyph.getSymbol(dynamics));
-        this.center = true;
+        this.center = true; // TODO: use opticalCenter or advanceWidth/2 if available
     }
 
     public override doLayout(): void {
-        this.glyphScale = this.renderer.smuflMetrics.dynamicsScale;
         super.doLayout();
         this.y += this.height / 2;
     }

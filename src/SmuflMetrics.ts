@@ -187,9 +187,10 @@ export class SmuflMetrics {
         // TODO tupletBracketThickness
 
         // custom alphatab
-        this.effectBandSeparation = this.oneStaffSpace / 4;
+        this.effectBandSeparation = 0.25 * this.oneStaffSpace;
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
+        this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
@@ -239,28 +240,27 @@ export class SmuflMetrics {
 
     public tabNumberSpacePadding: number = 1;
 
+
+
     //
-    // combined sizes (TODO: splitup into paddings and glyph sizes)
+    // combined sizes
 
     // NOTE: SMuFL has no numbered notation yet
     public numberedBarRendererBarSize = 0;
     public numberedBarRendererBarSpacing = 0;
 
     //
-    // paddings/margins between elements (TODO: try to eliminate custom paddings)
+    // paddings/margins between elements
+    public preNoteEffectPadding: number = 0;
+
+
+    //  (TODO: try to eliminate custom paddings)
     public directionsContainerPadding: number = 3;
     public leftHandTappingPadding: number = 6;
     public multiBarRestPadding: number = 10;
     public trillTextPadding: number = 3;
 
-    public numberedBeatPostAccidentalPadding: number = 4;
-
     public rowContainerPadding: number = 3;
-
-    public scoreBeatGhostSpace: number = 4;
-    public scorePreNotePadding: number = 4;
-    public scorePreFingeringPadding: number = 2;
-    public scorePreAccidentalPadding: number = 2;
 
     public scoreBendEndPadding: number = 8;
     public scoreBendHoldOffset: number = 22;
@@ -294,7 +294,6 @@ export class SmuflMetrics {
     public scoreWhammySongBookPadding = 2;
     public slashNoteHeadEffectSpacing = 7;
 
-    public tabPreNotesPadding = 4;
     public tabNoteChordEffectSpacing: number = 7;
 
     public tabWhammySimpleDipPadding = 2;
@@ -374,7 +373,6 @@ export class SmuflMetrics {
     //
     // glyph sizes (TODO: move to lookup or check if SmuFL has other constants)
     public deadSlappedLineWidth: number = 2;
-    public targetDirectionGlyphHeight: number = 27;
     public flagWidth: number = 11;
     public ghostParenthesisSize: number = 6;
     public leftHandTappingCircleScale: number = 0.625;
@@ -402,8 +400,6 @@ export class SmuflMetrics {
 
     public scoreBarRendererBeamMaxDistance = 10;
     public accidentalHeight: number = 21;
-
-    public dottedBarLineCircleRadius: number = 1;
 
     public beatPaddingFlagEighthAndAbove: number = 20;
     public beatPaddingOneHundredAndAbove: number = 10;
@@ -479,10 +475,7 @@ export class SmuflMetrics {
 
     //
     // glyph scales (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
-    public targetDirectionGlyphScale: number = 0.8;
-    public dynamicsScale: number = 0.6;
-    public numberedKeySignatureScale: number = 0.7;
-    public ottavaScale: number = 0.8;
+
     public pictEdgeOfCymbalScale: number = 0.5;
     public trillLoopHeightToY = 1.37;
 

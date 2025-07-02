@@ -13,11 +13,17 @@ class TargetDirectionGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.height = this.renderer.smuflMetrics.targetDirectionGlyphHeight;
+        this.height = 0;
+        for(const s of this._symbols) {
+            const h = this.renderer.smuflMetrics.glyphHeights.get(s)!;
+            if(h > this.height){
+                this.height = h;
+            }
+        }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, this.renderer.smuflMetrics.targetDirectionGlyphScale, this._symbols, true);
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, 1, this._symbols, true);
     }
 }
 

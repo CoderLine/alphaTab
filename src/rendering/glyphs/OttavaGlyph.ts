@@ -25,34 +25,33 @@ export class OttavaGlyph extends GroupedEffectGlyph {
 
     private paintOttava(cx: number, cy: number, canvas: ICanvas): number {
         let size: number = 0;
-        const ottavaScale = this.renderer.smuflMetrics.ottavaScale;
         switch (this._ottava) {
             case Ottavia._15ma:
-                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.QuindicesimaAlta)! * ottavaScale;
+                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.QuindicesimaAlta)!;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
-                    ottavaScale,
+                    1,
                     MusicFontSymbol.QuindicesimaAlta,
                     false
                 );
                 break;
             case Ottavia._8va:
-                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaAlta)! * ottavaScale;
+                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaAlta)!;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
-                    ottavaScale,
+                    1,
                     MusicFontSymbol.OttavaAlta,
                     false
                 );
                 break;
             case Ottavia._8vb:
-                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaBassaVb)! * ottavaScale;
+                size = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OttavaBassaVb)!;
                 canvas.fillMusicFontSymbol(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
-                    ottavaScale,
+                    1,
                     MusicFontSymbol.OttavaBassaVb,
                     false
                 );
@@ -62,13 +61,13 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                     (this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Quindicesima)! +
                         this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OctaveBaselineM)! +
                         this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OctaveBaselineB)!) *
-                    ottavaScale;
+                    1;
 
                 // NOTE: SMUFL does not have a glyph for 15mb so we build it
                 canvas.fillMusicFontSymbols(
                     cx + this.x - size / 2,
                     cy + this.y + this.height,
-                    ottavaScale,
+                    1,
                     [MusicFontSymbol.Quindicesima, MusicFontSymbol.OctaveBaselineM, MusicFontSymbol.OctaveBaselineB],
                     false
                 );

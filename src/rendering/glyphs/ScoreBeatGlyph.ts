@@ -14,7 +14,6 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { ScoreNoteChordGlyph } from '@src/rendering/glyphs/ScoreNoteChordGlyph';
 import { ScoreRestGlyph } from '@src/rendering/glyphs/ScoreRestGlyph';
 import { ScoreWhammyBarGlyph } from '@src/rendering/glyphs/ScoreWhammyBarGlyph';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
@@ -134,13 +133,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                     this.addNormal(noteHeads);
                     if (!ghost.isEmpty) {
-                        this.addNormal(
-                            new SpacingGlyph(
-                                0,
-                                0,
-                                this.renderer.smuflMetrics.scoreBeatGhostSpace * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
-                            )
-                        );
                         this.addEffect(ghost);
                     }
                 }

@@ -43,16 +43,12 @@ export class SmuflMetricsSerializer {
         o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
         o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
+        o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
         o.set("directionscontainerpadding", obj.directionsContainerPadding);
         o.set("lefthandtappingpadding", obj.leftHandTappingPadding);
         o.set("multibarrestpadding", obj.multiBarRestPadding);
         o.set("trilltextpadding", obj.trillTextPadding);
-        o.set("numberedbeatpostaccidentalpadding", obj.numberedBeatPostAccidentalPadding);
         o.set("rowcontainerpadding", obj.rowContainerPadding);
-        o.set("scorebeatghostspace", obj.scoreBeatGhostSpace);
-        o.set("scoreprenotepadding", obj.scorePreNotePadding);
-        o.set("scoreprefingeringpadding", obj.scorePreFingeringPadding);
-        o.set("scorepreaccidentalpadding", obj.scorePreAccidentalPadding);
         o.set("scorebendendpadding", obj.scoreBendEndPadding);
         o.set("scorebendholdoffset", obj.scoreBendHoldOffset);
         o.set("scorebendholdsize", obj.scoreBendHoldSize);
@@ -75,7 +71,6 @@ export class SmuflMetricsSerializer {
         o.set("scorewhammysimpledippadding", obj.scoreWhammySimpleDipPadding);
         o.set("scorewhammysongbookpadding", obj.scoreWhammySongBookPadding);
         o.set("slashnoteheadeffectspacing", obj.slashNoteHeadEffectSpacing);
-        o.set("tabprenotespadding", obj.tabPreNotesPadding);
         o.set("tabnotechordeffectspacing", obj.tabNoteChordEffectSpacing);
         o.set("tabwhammysimpledippadding", obj.tabWhammySimpleDipPadding);
         o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
@@ -156,7 +151,6 @@ export class SmuflMetricsSerializer {
             }
         }
         o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
-        o.set("targetdirectionglyphheight", obj.targetDirectionGlyphHeight);
         o.set("flagwidth", obj.flagWidth);
         o.set("ghostparenthesissize", obj.ghostParenthesisSize);
         o.set("lefthandtappingcirclescale", obj.leftHandTappingCircleScale);
@@ -178,7 +172,6 @@ export class SmuflMetricsSerializer {
         o.set("brokenbaroffset", obj.brokenBarOffset);
         o.set("scorebarrendererbeammaxdistance", obj.scoreBarRendererBeamMaxDistance);
         o.set("accidentalheight", obj.accidentalHeight);
-        o.set("dottedbarlinecircleradius", obj.dottedBarLineCircleRadius);
         o.set("beatpaddingflageighthandabove", obj.beatPaddingFlagEighthAndAbove);
         o.set("beatpaddingonehundredandabove", obj.beatPaddingOneHundredAndAbove);
         o.set("barnumbermarginpaddingright", obj.barNumberMarginPaddingRight);
@@ -244,10 +237,6 @@ export class SmuflMetricsSerializer {
         o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
         o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
         o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
-        o.set("targetdirectionglyphscale", obj.targetDirectionGlyphScale);
-        o.set("dynamicsscale", obj.dynamicsScale);
-        o.set("numberedkeysignaturescale", obj.numberedKeySignatureScale);
-        o.set("ottavascale", obj.ottavaScale);
         o.set("pictedgeofcymbalscale", obj.pictEdgeOfCymbalScale);
         o.set("trillloopheighttoy", obj.trillLoopHeightToY);
         o.set("bartemposymbolyscale", obj.barTempoSymbolYScale);
@@ -349,6 +338,9 @@ export class SmuflMetricsSerializer {
             case "numberedbarrendererbarspacing":
                 obj.numberedBarRendererBarSpacing = v! as number;
                 return true;
+            case "prenoteeffectpadding":
+                obj.preNoteEffectPadding = v! as number;
+                return true;
             case "directionscontainerpadding":
                 obj.directionsContainerPadding = v! as number;
                 return true;
@@ -361,23 +353,8 @@ export class SmuflMetricsSerializer {
             case "trilltextpadding":
                 obj.trillTextPadding = v! as number;
                 return true;
-            case "numberedbeatpostaccidentalpadding":
-                obj.numberedBeatPostAccidentalPadding = v! as number;
-                return true;
             case "rowcontainerpadding":
                 obj.rowContainerPadding = v! as number;
-                return true;
-            case "scorebeatghostspace":
-                obj.scoreBeatGhostSpace = v! as number;
-                return true;
-            case "scoreprenotepadding":
-                obj.scorePreNotePadding = v! as number;
-                return true;
-            case "scoreprefingeringpadding":
-                obj.scorePreFingeringPadding = v! as number;
-                return true;
-            case "scorepreaccidentalpadding":
-                obj.scorePreAccidentalPadding = v! as number;
                 return true;
             case "scorebendendpadding":
                 obj.scoreBendEndPadding = v! as number;
@@ -444,9 +421,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "slashnoteheadeffectspacing":
                 obj.slashNoteHeadEffectSpacing = v! as number;
-                return true;
-            case "tabprenotespadding":
-                obj.tabPreNotesPadding = v! as number;
                 return true;
             case "tabnotechordeffectspacing":
                 obj.tabNoteChordEffectSpacing = v! as number;
@@ -602,9 +576,6 @@ export class SmuflMetricsSerializer {
             case "deadslappedlinewidth":
                 obj.deadSlappedLineWidth = v! as number;
                 return true;
-            case "targetdirectionglyphheight":
-                obj.targetDirectionGlyphHeight = v! as number;
-                return true;
             case "flagwidth":
                 obj.flagWidth = v! as number;
                 return true;
@@ -667,9 +638,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "accidentalheight":
                 obj.accidentalHeight = v! as number;
-                return true;
-            case "dottedbarlinecircleradius":
-                obj.dottedBarLineCircleRadius = v! as number;
                 return true;
             case "beatpaddingflageighthandabove":
                 obj.beatPaddingFlagEighthAndAbove = v! as number;
@@ -790,18 +758,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "chorddiagramfretheight":
                 obj.chordDiagramFretHeight = v! as number;
-                return true;
-            case "targetdirectionglyphscale":
-                obj.targetDirectionGlyphScale = v! as number;
-                return true;
-            case "dynamicsscale":
-                obj.dynamicsScale = v! as number;
-                return true;
-            case "numberedkeysignaturescale":
-                obj.numberedKeySignatureScale = v! as number;
-                return true;
-            case "ottavascale":
-                obj.ottavaScale = v! as number;
                 return true;
             case "pictedgeofcymbalscale":
                 obj.pictEdgeOfCymbalScale = v! as number;

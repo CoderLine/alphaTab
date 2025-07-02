@@ -12,23 +12,23 @@ export class TrillGlyph extends GroupedEffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.OrnamentTrill)! / 2;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.OrnamentTrill)!;
     }
 
     protected override paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
-        let startX: number = cx + this.x;
+        const trillSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OrnamentTrill)!;
+        const startX: number = cx + this.x;
 
-        canvas.fillMusicFontSymbol(startX, cy + this.y + this.height, 1, MusicFontSymbol.OrnamentTrill, true);
+        const lineStart = startX + trillSize;
 
-        startX += this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.OrnamentTrill)! / 2;
+        const step: number = this.renderer.smuflMetrics.repeatOffsetX.get(MusicFontSymbol.WiggleTrill)!;
+        const loops: number = Math.ceil((endX - lineStart) / step);
 
-        const step: number = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.WiggleTrill)!;
-        const loops: number = Math.floor((endX - startX) / step);
-        const loopY: number = cy + this.y + this.height * this.renderer.smuflMetrics.trillLoopHeightToY;
-        let loopX: number = startX;
+        const symbols: MusicFontSymbol[] = [MusicFontSymbol.OrnamentTrill];
         for (let i: number = 0; i < loops; i++) {
-            canvas.fillMusicFontSymbol(loopX, loopY, 1, MusicFontSymbol.WiggleTrill, false);
-            loopX += step;
+            symbols.push(MusicFontSymbol.WiggleTrill);
         }
+
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, 1, symbols, false);
     }
 }

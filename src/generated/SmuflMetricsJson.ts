@@ -40,16 +40,12 @@ export interface SmuflMetricsJson {
     tabNumberSpacePadding?: number;
     numberedBarRendererBarSize?: number;
     numberedBarRendererBarSpacing?: number;
+    preNoteEffectPadding?: number;
     directionsContainerPadding?: number;
     leftHandTappingPadding?: number;
     multiBarRestPadding?: number;
     trillTextPadding?: number;
-    numberedBeatPostAccidentalPadding?: number;
     rowContainerPadding?: number;
-    scoreBeatGhostSpace?: number;
-    scorePreNotePadding?: number;
-    scorePreFingeringPadding?: number;
-    scorePreAccidentalPadding?: number;
     scoreBendEndPadding?: number;
     scoreBendHoldOffset?: number;
     scoreBendHoldSize?: number;
@@ -72,7 +68,6 @@ export interface SmuflMetricsJson {
     scoreWhammySimpleDipPadding?: number;
     scoreWhammySongBookPadding?: number;
     slashNoteHeadEffectSpacing?: number;
-    tabPreNotesPadding?: number;
     tabNoteChordEffectSpacing?: number;
     tabWhammySimpleDipPadding?: number;
     tabWhammyTextPadding?: number;
@@ -117,7 +112,6 @@ export interface SmuflMetricsJson {
     stemDown?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     repeatOffsetX?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     deadSlappedLineWidth?: number;
-    targetDirectionGlyphHeight?: number;
     flagWidth?: number;
     ghostParenthesisSize?: number;
     leftHandTappingCircleScale?: number;
@@ -139,7 +133,6 @@ export interface SmuflMetricsJson {
     brokenBarOffset?: number;
     scoreBarRendererBeamMaxDistance?: number;
     accidentalHeight?: number;
-    dottedBarLineCircleRadius?: number;
     beatPaddingFlagEighthAndAbove?: number;
     beatPaddingOneHundredAndAbove?: number;
     barNumberMarginPaddingRight?: number;
@@ -181,10 +174,6 @@ export interface SmuflMetricsJson {
     chordDiagramFretSpacing?: number;
     chordDiagramNutHeight?: number;
     chordDiagramFretHeight?: number;
-    targetDirectionGlyphScale?: number;
-    dynamicsScale?: number;
-    numberedKeySignatureScale?: number;
-    ottavaScale?: number;
     pictEdgeOfCymbalScale?: number;
     trillLoopHeightToY?: number;
     barTempoSymbolYScale?: number;

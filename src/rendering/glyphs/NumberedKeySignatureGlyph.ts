@@ -176,7 +176,7 @@ export class NumberedKeySignatureGlyph extends Glyph {
             canvas.fillMusicFontSymbol(
                 cx + this.x + this._accidentalOffset,
                 cy + this.y,
-                this.renderer.smuflMetrics.numberedKeySignatureScale,
+                1,
                 AccidentalGlyph.getMusicSymbol(this._accidental),
                 false
             );

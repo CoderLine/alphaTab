@@ -31,7 +31,7 @@ class BarLineLightGlyph extends BarLineGlyphBase {
 
 class BarLineDottedGlyph extends BarLineGlyphBase {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const circleRadius: number = this.renderer.smuflMetrics.dottedBarLineCircleRadius;
+        const circleRadius: number = this.renderer.smuflMetrics.thinBarlineThickness / 2;
 
         const lineHeight = (this.renderer as LineBarRenderer).getLineHeight(1);
 
