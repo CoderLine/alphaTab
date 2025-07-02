@@ -1,4 +1,3 @@
-import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
 import { BarSubElement } from '@src/model/Bar';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
@@ -14,7 +13,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
     public minNote: ScoreNoteGlyphInfo | null = null;
     public maxNote: ScoreNoteGlyphInfo | null = null;
-    public spacingChanged: IEventEmitter = new EventEmitter();
     public upLineX: number = 0;
     public downLineX: number = 0;
     public noteStartX: number = 0;
@@ -24,6 +22,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     }
 
     public abstract get direction(): BeamDirection;
+    public abstract get scale(): number;
 
     protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
         const info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
@@ -50,6 +49,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         // first get stem position on the right side (displacedX)
         // to align all note heads accordingly (they might have different widths)
         const smufl = this.renderer.smuflMetrics;
+        const scale = this.scale;
         const displaced = new Map<number, boolean>();
         for (let i: number = 0, j: number = this._infos.length; i < j; i++) {
             const g = this._infos[i].glyph;
@@ -71,16 +71,18 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
             if (smufl.stemUp.has(g.symbol)) {
                 const stemInfo = smufl.stemUp.get(g.symbol)!;
-                if (stemInfo.topX > stemUpX) {
-                    stemUpX = stemInfo.topX;
+                const topX = stemInfo.topX * scale;
+                if (topX > stemUpX) {
+                    stemUpX = topX * scale;
                 }
             }
 
             if (smufl.stemDown.has(g.symbol)) {
                 const stemInfo = smufl.stemDown.get(g.symbol)!;
-                if (stemInfo.topX > stemDownX) {
-                    const diff = stemInfo.topX - stemDownX;
-                    stemDownX = stemInfo.topX;
+                const topX= stemInfo.topX * scale;
+                if (topX > stemDownX) {
+                    const diff = topX - stemDownX;
+                    stemDownX = topX;
                     stemUpX += diff; // shift right accordingly
                 }
             }
@@ -105,7 +107,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 // not displaced: align on left side (where down stem would be for notes)
                 g.x = stemDownX;
                 if (smufl.stemDown.has(g.symbol)) {
-                    g.x -= smufl.stemDown.get(g.symbol)!.topX;
+                    g.x -= smufl.stemDown.get(g.symbol)!.topX * scale;
                 }
             }
 
@@ -138,6 +140,9 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             g.glyph.paint(cx, cy, canvas);
         }
     }
+
+
+
     private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
         if (!this.minNote) {
             return;
@@ -147,7 +152,8 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
         using _ = ElementStyleHelper.bar(canvas, BarSubElement.StandardNotationStaffLine, scoreRenderer.bar, true);
 
-        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension;
+        const scale = this.scale;
+        const lineExtension: number = this.renderer.smuflMetrics.legerLineExtension * scale;
         const lineWidth: number = this.width - this.noteStartX + lineExtension * 2;
 
         const lineSpacing = scoreRenderer.getLineHeight(1);
@@ -162,7 +168,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 cx - lineExtension + this.noteStartX,
                 cy + y,
                 lineWidth,
-                this.renderer.smuflMetrics.legerLineThickness
+                this.renderer.smuflMetrics.legerLineThickness * scale
             );
             y -= lineSpacing;
         }
@@ -173,7 +179,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 cx - lineExtension + this.noteStartX,
                 cy + y,
                 lineWidth,
-                this.renderer.smuflMetrics.legerLineThickness
+                this.renderer.smuflMetrics.legerLineThickness * scale
             );
             y += lineSpacing;
         }

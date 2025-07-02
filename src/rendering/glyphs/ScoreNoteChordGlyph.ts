@@ -17,6 +17,8 @@ import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { GraceType } from '@src/model/GraceType';
+import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
 export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     private _noteGlyphLookup: Map<number, MusicFontGlyph> = new Map();
@@ -31,6 +33,10 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
     public get direction(): BeamDirection {
         return this.beamingHelper.direction;
+    }
+
+    public override get scale(): number {
+        return this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
     }
 
     public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
@@ -74,14 +80,13 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                     pos += (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
                     break;
 
-                    
                 case NoteYPosition.StemUp:
-                    pos -= this.renderer.smuflMetrics.stemUp.has(n.symbol) 
+                    pos -= this.renderer.smuflMetrics.stemUp.has(n.symbol)
                         ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
                         : 0;
                     break;
                 case NoteYPosition.StemDown:
-                    pos -= this.renderer.smuflMetrics.stemDown.has(n.symbol) 
+                    pos -= this.renderer.smuflMetrics.stemDown.has(n.symbol)
                         ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
                         : 0;
                     break;

@@ -22,6 +22,10 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     private _postNoteParenthesis: GhostNoteContainerGlyph | null = null;
     public isEmpty: boolean = true;
 
+    public override get scale(): number {
+        return NoteHeadGlyph.GraceScale;
+    }
+
     public get direction(): BeamDirection {
         return BeamDirection.Up;
     }
