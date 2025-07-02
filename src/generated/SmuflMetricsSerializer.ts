@@ -99,7 +99,6 @@ export class SmuflMetricsSerializer {
         o.set("accentuationpadding", obj.accentuationPadding);
         o.set("articstaccatoabovepaddingx", obj.articStaccatoAbovePaddingX);
         o.set("articstaccatoabovepaddingy", obj.articStaccatoAbovePaddingY);
-        o.set("bartempovaluepadding", obj.barTempoValuePadding);
         o.set("gracebeatpadding", obj.graceBeatPadding);
         o.set("gracebeatpostbeatstretch", obj.graceBeatPostBeatStretch);
         {
@@ -161,7 +160,6 @@ export class SmuflMetricsSerializer {
         o.set("arpeggiowidth", obj.arpeggioWidth);
         o.set("arpeggioarrowsize", obj.arpeggioArrowSize);
         o.set("crescendoheight", obj.crescendoHeight);
-        o.set("bartempoheight", obj.barTempoHeight);
         o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
         o.set("similemarksimplewidth", obj.simileMarkSimpleWidth);
         o.set("similemarkdoublewidth", obj.simileMarkDoubleWidth);
@@ -237,10 +235,8 @@ export class SmuflMetricsSerializer {
         o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
         o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
         o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
+        o.set("temponotescale", obj.tempoNoteScale);
         o.set("pictedgeofcymbalscale", obj.pictEdgeOfCymbalScale);
-        o.set("trillloopheighttoy", obj.trillLoopHeightToY);
-        o.set("bartemposymbolyscale", obj.barTempoSymbolYScale);
-        o.set("bartemposymbolscale", obj.barTempoSymbolScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
         o.set("tuningglyphrowheight", obj.tuningGlyphRowHeight);
         o.set("tuningglyphtextpadding", obj.tuningGlyphTextPadding);
@@ -267,7 +263,6 @@ export class SmuflMetricsSerializer {
         o.set("jumpdirectionfontsizetoheight", obj.jumpDirectionFontSizeToHeight);
         o.set("tabbendfontsizetoheight", obj.tabBendFontSizeToHeight);
         o.set("tabbendfontsizetopadding", obj.tabBendFontSizeToPadding);
-        o.set("bartempotextpaddingscale", obj.barTempoTextPaddingScale);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -506,9 +501,6 @@ export class SmuflMetricsSerializer {
             case "articstaccatoabovepaddingy":
                 obj.articStaccatoAbovePaddingY = v! as number;
                 return true;
-            case "bartempovaluepadding":
-                obj.barTempoValuePadding = v! as number;
-                return true;
             case "gracebeatpadding":
                 obj.graceBeatPadding = v! as number;
                 return true;
@@ -605,9 +597,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "crescendoheight":
                 obj.crescendoHeight = v! as number;
-                return true;
-            case "bartempoheight":
-                obj.barTempoHeight = v! as number;
                 return true;
             case "numbereddashglyphwidth":
                 obj.numberedDashGlyphWidth = v! as number;
@@ -759,17 +748,11 @@ export class SmuflMetricsSerializer {
             case "chorddiagramfretheight":
                 obj.chordDiagramFretHeight = v! as number;
                 return true;
+            case "temponotescale":
+                obj.tempoNoteScale = v! as number;
+                return true;
             case "pictedgeofcymbalscale":
                 obj.pictEdgeOfCymbalScale = v! as number;
-                return true;
-            case "trillloopheighttoy":
-                obj.trillLoopHeightToY = v! as number;
-                return true;
-            case "bartemposymbolyscale":
-                obj.barTempoSymbolYScale = v! as number;
-                return true;
-            case "bartemposymbolscale":
-                obj.barTempoSymbolScale = v! as number;
                 return true;
             case "tuningglyphcirclenumberscale":
                 obj.tuningGlyphCircleNumberScale = v! as number;
@@ -848,9 +831,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tabbendfontsizetopadding":
                 obj.tabBendFontSizeToPadding = v! as number;
-                return true;
-            case "bartempotextpaddingscale":
-                obj.barTempoTextPaddingScale = v! as number;
                 return true;
         }
         return false;

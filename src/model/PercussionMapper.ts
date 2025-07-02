@@ -1,6 +1,5 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { TextBaseline } from '@src/platform/ICanvas';
-import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { InstrumentArticulation, TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
 import type { Note } from '@src/model/Note';
 
 export class PercussionMapper {
@@ -238,7 +237,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.PictEdgeOfCymbal,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -273,7 +272,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.ArticStaccatoAbove,
-                TextBaseline.Top
+                TechniqueSymbolPlacement.Above
             )
         ],
         [
@@ -297,7 +296,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.ArticStaccatoAbove,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -343,7 +342,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHeavyX,
                 MusicFontSymbol.NoteheadHeavyX,
                 MusicFontSymbol.ArticStaccatoAbove,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -367,7 +366,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHeavyX,
                 MusicFontSymbol.NoteheadHeavyX,
                 MusicFontSymbol.ArticStaccatoAbove,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -479,7 +478,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.NoteheadParenthesis,
-                TextBaseline.Middle
+                TechniqueSymbolPlacement.Inside
             )
         ],
         [
@@ -514,7 +513,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.NoteheadParenthesis,
-                TextBaseline.Middle
+                TechniqueSymbolPlacement.Inside
             )
         ],
         [
@@ -604,7 +603,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.NoteheadParenthesis,
-                TextBaseline.Middle
+                TechniqueSymbolPlacement.Inside
             )
         ],
         [
@@ -639,7 +638,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.NoteheadParenthesis,
-                TextBaseline.Middle
+                TechniqueSymbolPlacement.Inside
             )
         ],
         [
@@ -707,7 +706,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadParenthesis,
-                TextBaseline.Middle
+                TechniqueSymbolPlacement.Inside
             )
         ],
         [
@@ -731,7 +730,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.StringsUpBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -744,7 +743,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.NoteheadTriangleUpBlack,
                 MusicFontSymbol.StringsDownBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -812,7 +811,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadParenthesis,
-                TextBaseline.Middle
+                TechniqueSymbolPlacement.Inside
             )
         ],
         [
@@ -869,7 +868,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -915,7 +914,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -939,7 +938,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -963,7 +962,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -987,7 +986,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadHalf,
                 MusicFontSymbol.NoteheadWhole,
                 MusicFontSymbol.StringsUpBow,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -1011,7 +1010,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.GuitarGolpe,
-                TextBaseline.Top
+                TechniqueSymbolPlacement.Above
             )
         ],
         [
@@ -1024,7 +1023,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.NoteheadNull,
                 MusicFontSymbol.GuitarGolpe,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -1081,7 +1080,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.PictEdgeOfCymbal,
-                TextBaseline.Bottom
+                TechniqueSymbolPlacement.Below
             )
         ],
         [
@@ -1116,7 +1115,7 @@ export class PercussionMapper {
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.NoteheadXBlack,
                 MusicFontSymbol.ArticStaccatoAbove,
-                TextBaseline.Top
+                TechniqueSymbolPlacement.Above
             )
         ],
         [

@@ -96,7 +96,6 @@ export interface SmuflMetricsJson {
     accentuationPadding?: number;
     articStaccatoAbovePaddingX?: number;
     articStaccatoAbovePaddingY?: number;
-    barTempoValuePadding?: number;
     graceBeatPadding?: number;
     graceBeatPostBeatStretch?: number;
     scoreTremoloOffsetUp?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
@@ -122,7 +121,6 @@ export interface SmuflMetricsJson {
     arpeggioWidth?: number;
     arpeggioArrowSize?: number;
     crescendoHeight?: number;
-    barTempoHeight?: number;
     numberedDashGlyphWidth?: number;
     simileMarkSimpleWidth?: number;
     simileMarkDoubleWidth?: number;
@@ -174,10 +172,8 @@ export interface SmuflMetricsJson {
     chordDiagramFretSpacing?: number;
     chordDiagramNutHeight?: number;
     chordDiagramFretHeight?: number;
+    tempoNoteScale?: number;
     pictEdgeOfCymbalScale?: number;
-    trillLoopHeightToY?: number;
-    barTempoSymbolYScale?: number;
-    barTempoSymbolScale?: number;
     tuningGlyphCircleNumberScale?: number;
     tuningGlyphRowHeight?: number;
     tuningGlyphTextPadding?: number;
@@ -204,5 +200,4 @@ export interface SmuflMetricsJson {
     jumpDirectionFontSizeToHeight?: number;
     tabBendFontSizeToHeight?: number;
     tabBendFontSizeToPadding?: number;
-    barTempoTextPaddingScale?: number;
 }

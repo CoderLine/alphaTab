@@ -32,9 +32,13 @@ export enum TextBaseline {
      */
     Middle = 1,
     /**
-     * Text is aligend on the bottom.
+     * Text is aligned on the bottom.
      */
-    Bottom = 2
+    Bottom = 2,
+    /**
+     * Text is aligned on the alphabetic baseline.
+     */
+    Alphabetic = 3
 }
 
 /**

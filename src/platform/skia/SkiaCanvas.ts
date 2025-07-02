@@ -252,6 +252,9 @@ export class SkiaCanvas implements ICanvas {
             case TextBaseline.Bottom:
                 textBaseline = SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Bottom;
                 break;
+            case TextBaseline.Alphabetic:
+                textBaseline = SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic;
+                break;
         }
 
         // NOTE: Avoiding sub-pixel text positions as they can lead to strange artifacts.

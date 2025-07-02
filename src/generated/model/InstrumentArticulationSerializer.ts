@@ -6,7 +6,7 @@
 import { InstrumentArticulation } from "@src/model/InstrumentArticulation";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
-import { TextBaseline } from "@src/platform/ICanvas";
+import { TechniqueSymbolPlacement } from "@src/model/InstrumentArticulation";
 export class InstrumentArticulationSerializer {
     public static fromJson(obj: InstrumentArticulation, m: unknown): void {
         if (!m) {
@@ -50,7 +50,7 @@ export class InstrumentArticulationSerializer {
                 obj.techniqueSymbol = JsonHelper.parseEnum<MusicFontSymbol>(v, MusicFontSymbol)!;
                 return true;
             case "techniquesymbolplacement":
-                obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TextBaseline>(v, TextBaseline)!;
+                obj.techniqueSymbolPlacement = JsonHelper.parseEnum<TechniqueSymbolPlacement>(v, TechniqueSymbolPlacement)!;
                 return true;
             case "outputmidinumber":
                 obj.outputMidiNumber = v! as number;

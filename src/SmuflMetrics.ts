@@ -240,8 +240,6 @@ export class SmuflMetrics {
 
     public tabNumberSpacePadding: number = 1;
 
-
-
     //
     // combined sizes
 
@@ -252,7 +250,6 @@ export class SmuflMetrics {
     //
     // paddings/margins between elements
     public preNoteEffectPadding: number = 0;
-
 
     //  (TODO: try to eliminate custom paddings)
     public directionsContainerPadding: number = 3;
@@ -339,7 +336,6 @@ export class SmuflMetrics {
 
     public articStaccatoAbovePaddingX: number = 3;
     public articStaccatoAbovePaddingY: number = 5;
-    public barTempoValuePadding: number = 3;
 
     public graceBeatPadding: number = 3;
     public graceBeatPostBeatStretch: number = 7;
@@ -372,6 +368,7 @@ export class SmuflMetrics {
 
     //
     // glyph sizes (TODO: move to lookup or check if SmuFL has other constants)
+
     public deadSlappedLineWidth: number = 2;
     public flagWidth: number = 11;
     public ghostParenthesisSize: number = 6;
@@ -385,7 +382,6 @@ export class SmuflMetrics {
 
     public crescendoHeight = 17;
 
-    public barTempoHeight = 25;
     public numberedDashGlyphWidth = 14;
     public simileMarkSimpleWidth = 20;
     public simileMarkDoubleWidth = 28;
@@ -474,13 +470,12 @@ export class SmuflMetrics {
     public chordDiagramFretHeight: number = 1;
 
     //
-    // glyph scales (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
+    // glyph scales
+    public tempoNoteScale = 0.7;
+
+    // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
 
     public pictEdgeOfCymbalScale: number = 0.5;
-    public trillLoopHeightToY = 1.37;
-
-    public barTempoSymbolYScale: number = 0.8;
-    public barTempoSymbolScale: number = 0.5;
 
     public stringsToTabClefSymbolAndScale(strings: number): [MusicFontSymbol, number] {
         if (strings <= 4) {
@@ -524,7 +519,6 @@ export class SmuflMetrics {
     public jumpDirectionFontSizeToHeight: number = 1.5;
     public tabBendFontSizeToHeight: number = 1.3;
     public tabBendFontSizeToPadding: number = 0.5;
-    public barTempoTextPaddingScale: number = 0.7;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata
@@ -895,6 +889,10 @@ export class SmuflMetrics {
                 keyboardPedalUp: {
                     bBoxNE: [1.8, 1.8],
                     bBoxSW: [0, 0]
+                },
+                metNoteQuarterUp: {
+                    bBoxNE: [1.328, 2.752],
+                    bBoxSW: [0, -0.564]
                 },
                 noteQuarterUp: {
                     bBoxNE: [1.328, 3.5],

@@ -1,6 +1,24 @@
-import { TextBaseline } from '@src/platform/ICanvas';
 import { Duration } from '@src/model/Duration';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+
+
+/**
+ * This public enum lists all base line modes
+ */
+export enum TechniqueSymbolPlacement {
+    /**
+     * Symbol is shown above
+     */
+    Above = 0,
+    /**
+     * Symbol is shown inside
+     */
+    Inside = 1,
+    /**
+     * Symbol is shown below.
+     */
+    Below = 2
+}
 
 /**
  * Describes an instrument articulation which is used for percussions.
@@ -40,7 +58,7 @@ export class InstrumentArticulation {
     /**
      * Gets or sets where the technique symbol should be placed.
      */
-    public techniqueSymbolPlacement: TextBaseline;
+    public techniqueSymbolPlacement: TechniqueSymbolPlacement;
 
     /**
      * Gets or sets which midi key to use when playing the note.
@@ -55,7 +73,7 @@ export class InstrumentArticulation {
         noteHeadHalf: MusicFontSymbol = MusicFontSymbol.None,
         noteHeadWhole: MusicFontSymbol = MusicFontSymbol.None,
         techniqueSymbol: MusicFontSymbol = MusicFontSymbol.None,
-        techniqueSymbolPlacement: TextBaseline = TextBaseline.Middle
+        techniqueSymbolPlacement: TechniqueSymbolPlacement = TechniqueSymbolPlacement.Inside
     ) {
         this.elementType = elementType;
         this.outputMidiNumber = outputMidiNumber;

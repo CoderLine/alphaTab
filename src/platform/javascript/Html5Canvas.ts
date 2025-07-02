@@ -193,6 +193,8 @@ export class Html5Canvas implements ICanvas {
                 return TextBaseline.Middle;
             case 'bottom':
                 return TextBaseline.Bottom;
+            case 'alphabetic':
+                return TextBaseline.Alphabetic;
             default:
                 return TextBaseline.Top;
         }
@@ -208,6 +210,9 @@ export class Html5Canvas implements ICanvas {
                 break;
             case TextBaseline.Bottom:
                 this._context.textBaseline = 'bottom';
+                break;
+            case TextBaseline.Alphabetic:
+                this._context.textBaseline = 'alphabetic';
                 break;
         }
     }

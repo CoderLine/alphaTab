@@ -20,6 +20,7 @@ import { Fingers } from '@src/model/Fingers';
 import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
+import { TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import type { MasterBar } from '@src/model/MasterBar';
@@ -43,7 +44,6 @@ import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import type { Voice } from '@src/model/Voice';
 import { WahPedal } from '@src/model/WahPedal';
-import { TextBaseline } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
 import { Lazy } from '@src/util/Lazy';
@@ -1719,13 +1719,13 @@ export class GpifWriter {
                 ].join(' ');
 
                 switch (articulation.techniqueSymbolPlacement) {
-                    case TextBaseline.Top:
+                    case TechniqueSymbolPlacement.Below:
                         articulationNode.addElement('TechniquePlacement').innerText = 'below';
                         break;
-                    case TextBaseline.Middle:
+                    case TechniqueSymbolPlacement.Inside:
                         articulationNode.addElement('TechniquePlacement').innerText = 'inside';
                         break;
-                    case TextBaseline.Bottom:
+                    case TechniqueSymbolPlacement.Above:
                         articulationNode.addElement('TechniquePlacement').innerText = 'above';
                         break;
                 }
