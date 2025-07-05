@@ -270,7 +270,7 @@ export class TabBendGlyph extends Glyph {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
             }
             if (!isMultiBeatBend) {
-                endX -=  this.renderer.smuflMetrics.tabBendArrowSize;
+                endX -= this.renderer.smuflMetrics.tabBendArrowSize;
             }
             // we need some pixels for the arrow. otherwise we might draw into the next
             // note
@@ -299,9 +299,11 @@ export class TabBendGlyph extends Glyph {
             }
 
             if (endNote.vibrato !== VibratoType.None) {
-                const vibratoStartX = endX - cx +  this.renderer.smuflMetrics.tabBendArrowSize - endNoteRenderer.x;
+                const vibratoStartX = endX - cx + this.renderer.smuflMetrics.tabBendArrowSize - endNoteRenderer.x;
                 const vibratoStartY: number =
-                    topY - cy -  this.renderer.smuflMetrics.tabBendBendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
+                    topY -
+                    cy -
+                    this.renderer.smuflMetrics.tabBendBendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
 
                 const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato);
                 vibrato.beat = endNote.beat;
@@ -328,7 +330,7 @@ export class TabBendGlyph extends Glyph {
         const res: RenderingResources = this.renderer.resources;
         const overflowOffset: number = r.lineOffset / 2;
         const x1: number = cx + dX * firstPt.offset;
-        const bendValueHeight: number =  this.renderer.smuflMetrics.tabBendBendValueHeight;
+        const bendValueHeight: number = this.renderer.smuflMetrics.tabBendBendValueHeight;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
@@ -348,7 +350,7 @@ export class TabBendGlyph extends Glyph {
         }
         // what type of arrow? (up/down)
         let arrowOffset: number = 0;
-        const arrowSize: number =  this.renderer.smuflMetrics.tabBendArrowSize;
+        const arrowSize: number = this.renderer.smuflMetrics.tabBendArrowSize;
         if (secondPt.value > firstPt.value) {
             if (y2 + arrowSize > y1) {
                 y2 = y1 - arrowSize;
@@ -372,6 +374,8 @@ export class TabBendGlyph extends Glyph {
             canvas.fill();
             arrowOffset = -arrowSize;
         }
+        const l = canvas.lineWidth;
+        canvas.lineWidth = this.renderer.smuflMetrics.arrowShaftThickness;
         canvas.beginPath();
         if (firstPt.value === secondPt.value) {
             // draw horizontal dashed line
@@ -379,7 +383,7 @@ export class TabBendGlyph extends Glyph {
             // we draw from right to left. it's okay if the space is at the beginning
             if (firstPt.lineValue > 0) {
                 let dashX: number = x2;
-                const dashSize: number =  this.renderer.smuflMetrics.tabBendDashSize;
+                const dashSize: number = this.renderer.smuflMetrics.tabBendDashSize;
                 const end: number = x1 + dashSize;
                 const dashes: number = (dashX - x1) / (dashSize * 2);
                 if (dashes < 1) {
@@ -449,11 +453,13 @@ export class TabBendGlyph extends Glyph {
                 // draw label
                 canvas.font = res.tablatureFont;
                 const size = canvas.measureText(s);
-                const y: number = startY;
+                const y: number = startY - size.height / 2;
                 const x: number = x2 - size.width / 2;
                 canvas.fillText(s, x, y);
             }
         }
+
+        canvas.lineWidth = l;
     }
 
     public static getFractionSign(steps: number): string {

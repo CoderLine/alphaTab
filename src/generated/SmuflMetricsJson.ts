@@ -21,12 +21,15 @@ export interface SmuflMetricsJson {
     musicFontSize?: number;
     oneStaffSpace?: number;
     tabLineSpacing?: number;
+    arrowShaftThickness?: number;
     barlineSeparation?: number;
     beamSpacing?: number;
     beamThickness?: number;
+    bracketThickness?: number;
     dashedBarlineDashLength?: number;
     dashedBarlineGapLength?: number;
     dashedBarlineThickness?: number;
+    hairpinThickness?: number;
     legerLineThickness?: number;
     legerLineExtension?: number;
     repeatBarlineDotSeparation?: number;
@@ -36,6 +39,7 @@ export interface SmuflMetricsJson {
     thickBarlineThickness?: number;
     thinBarlineThickness?: number;
     thinThickBarlineSeparation?: number;
+    tupletBracketThickness?: number;
     effectBandSeparation?: number;
     numberedBarRendererBarSize?: number;
     numberedBarRendererBarSpacing?: number;
@@ -49,7 +53,6 @@ export interface SmuflMetricsJson {
     scoreHelperNotesEndPadding?: number;
     scoreHelperNotesEndPadding2?: number;
     scoreNoteBelowEffectSpacing?: number;
-    tupletTextMargin?: number;
     alternateEndingsPaddingX?: number;
     alternateEndingsPaddingY?: number;
     alternateEndingsCloseLinePadding?: number;
@@ -86,7 +89,6 @@ export interface SmuflMetricsJson {
     noteOrnamentBottomOffset?: number;
     numberedBeatNoteYTopPadding?: number;
     slashBeatNoteYTopPadding?: number;
-    tupletOffset?: number;
     tabNoteYTopOffset?: number;
     accentuationPadding?: number;
     articStaccatoAbovePaddingX?: number;
@@ -118,7 +120,6 @@ export interface SmuflMetricsJson {
     numberedDashGlyphWidth?: number;
     simileMarkSimpleWidth?: number;
     simileMarkDoubleWidth?: number;
-    tupletSize?: number;
     graceFlagSizeX?: number;
     graceFlagSizeY?: number;
     brokenBarOffset?: number;
@@ -183,6 +184,5 @@ export interface SmuflMetricsJson {
     tripletFeelAugmentationOffsetX?: number;
     tripletFeelCloseParenthesisOffsetX?: number;
     scoreWhammyFontSizeToOverflow?: number;
-    lineBarRendererTupletFontSiteToPadding?: number;
     chordDiagramFontToRow?: number;
 }

@@ -24,12 +24,15 @@ export class SmuflMetricsSerializer {
         o.set("musicfontsize", obj.musicFontSize);
         o.set("onestaffspace", obj.oneStaffSpace);
         o.set("tablinespacing", obj.tabLineSpacing);
+        o.set("arrowshaftthickness", obj.arrowShaftThickness);
         o.set("barlineseparation", obj.barlineSeparation);
         o.set("beamspacing", obj.beamSpacing);
         o.set("beamthickness", obj.beamThickness);
+        o.set("bracketthickness", obj.bracketThickness);
         o.set("dashedbarlinedashlength", obj.dashedBarlineDashLength);
         o.set("dashedbarlinegaplength", obj.dashedBarlineGapLength);
         o.set("dashedbarlinethickness", obj.dashedBarlineThickness);
+        o.set("hairpinthickness", obj.hairpinThickness);
         o.set("legerlinethickness", obj.legerLineThickness);
         o.set("legerlineextension", obj.legerLineExtension);
         o.set("repeatbarlinedotseparation", obj.repeatBarlineDotSeparation);
@@ -39,6 +42,7 @@ export class SmuflMetricsSerializer {
         o.set("thickbarlinethickness", obj.thickBarlineThickness);
         o.set("thinbarlinethickness", obj.thinBarlineThickness);
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
+        o.set("tupletbracketthickness", obj.tupletBracketThickness);
         o.set("effectbandseparation", obj.effectBandSeparation);
         o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
@@ -52,7 +56,6 @@ export class SmuflMetricsSerializer {
         o.set("scorehelpernotesendpadding", obj.scoreHelperNotesEndPadding);
         o.set("scorehelpernotesendpadding2", obj.scoreHelperNotesEndPadding2);
         o.set("scorenotebeloweffectspacing", obj.scoreNoteBelowEffectSpacing);
-        o.set("tuplettextmargin", obj.tupletTextMargin);
         o.set("alternateendingspaddingx", obj.alternateEndingsPaddingX);
         o.set("alternateendingspaddingy", obj.alternateEndingsPaddingY);
         o.set("alternateendingscloselinepadding", obj.alternateEndingsCloseLinePadding);
@@ -89,7 +92,6 @@ export class SmuflMetricsSerializer {
         o.set("noteornamentbottomoffset", obj.noteOrnamentBottomOffset);
         o.set("numberedbeatnoteytoppadding", obj.numberedBeatNoteYTopPadding);
         o.set("slashbeatnoteytoppadding", obj.slashBeatNoteYTopPadding);
-        o.set("tupletoffset", obj.tupletOffset);
         o.set("tabnoteytopoffset", obj.tabNoteYTopOffset);
         o.set("accentuationpadding", obj.accentuationPadding);
         o.set("articstaccatoabovepaddingx", obj.articStaccatoAbovePaddingX);
@@ -157,7 +159,6 @@ export class SmuflMetricsSerializer {
         o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
         o.set("similemarksimplewidth", obj.simileMarkSimpleWidth);
         o.set("similemarkdoublewidth", obj.simileMarkDoubleWidth);
-        o.set("tupletsize", obj.tupletSize);
         o.set("graceflagsizex", obj.graceFlagSizeX);
         o.set("graceflagsizey", obj.graceFlagSizeY);
         o.set("brokenbaroffset", obj.brokenBarOffset);
@@ -246,7 +247,6 @@ export class SmuflMetricsSerializer {
         o.set("tripletfeelaugmentationoffsetx", obj.tripletFeelAugmentationOffsetX);
         o.set("tripletfeelcloseparenthesisoffsetx", obj.tripletFeelCloseParenthesisOffsetX);
         o.set("scorewhammyfontsizetooverflow", obj.scoreWhammyFontSizeToOverflow);
-        o.set("linebarrenderertupletfontsitetopadding", obj.lineBarRendererTupletFontSiteToPadding);
         o.set("chorddiagramfonttorow", obj.chordDiagramFontToRow);
         return o;
     }
@@ -261,6 +261,9 @@ export class SmuflMetricsSerializer {
             case "tablinespacing":
                 obj.tabLineSpacing = v! as number;
                 return true;
+            case "arrowshaftthickness":
+                obj.arrowShaftThickness = v! as number;
+                return true;
             case "barlineseparation":
                 obj.barlineSeparation = v! as number;
                 return true;
@@ -270,6 +273,9 @@ export class SmuflMetricsSerializer {
             case "beamthickness":
                 obj.beamThickness = v! as number;
                 return true;
+            case "bracketthickness":
+                obj.bracketThickness = v! as number;
+                return true;
             case "dashedbarlinedashlength":
                 obj.dashedBarlineDashLength = v! as number;
                 return true;
@@ -278,6 +284,9 @@ export class SmuflMetricsSerializer {
                 return true;
             case "dashedbarlinethickness":
                 obj.dashedBarlineThickness = v! as number;
+                return true;
+            case "hairpinthickness":
+                obj.hairpinThickness = v! as number;
                 return true;
             case "legerlinethickness":
                 obj.legerLineThickness = v! as number;
@@ -305,6 +314,9 @@ export class SmuflMetricsSerializer {
                 return true;
             case "thinthickbarlineseparation":
                 obj.thinThickBarlineSeparation = v! as number;
+                return true;
+            case "tupletbracketthickness":
+                obj.tupletBracketThickness = v! as number;
                 return true;
             case "effectbandseparation":
                 obj.effectBandSeparation = v! as number;
@@ -344,9 +356,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "scorenotebeloweffectspacing":
                 obj.scoreNoteBelowEffectSpacing = v! as number;
-                return true;
-            case "tuplettextmargin":
-                obj.tupletTextMargin = v! as number;
                 return true;
             case "alternateendingspaddingx":
                 obj.alternateEndingsPaddingX = v! as number;
@@ -455,9 +464,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "slashbeatnoteytoppadding":
                 obj.slashBeatNoteYTopPadding = v! as number;
-                return true;
-            case "tupletoffset":
-                obj.tupletOffset = v! as number;
                 return true;
             case "tabnoteytopoffset":
                 obj.tabNoteYTopOffset = v! as number;
@@ -573,9 +579,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "similemarkdoublewidth":
                 obj.simileMarkDoubleWidth = v! as number;
-                return true;
-            case "tupletsize":
-                obj.tupletSize = v! as number;
                 return true;
             case "graceflagsizex":
                 obj.graceFlagSizeX = v! as number;
@@ -765,9 +768,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "scorewhammyfontsizetooverflow":
                 obj.scoreWhammyFontSizeToOverflow = v! as number;
-                return true;
-            case "linebarrenderertupletfontsitetopadding":
-                obj.lineBarRendererTupletFontSiteToPadding = v! as number;
                 return true;
             case "chorddiagramfonttorow":
                 obj.chordDiagramFontToRow = v! as number;

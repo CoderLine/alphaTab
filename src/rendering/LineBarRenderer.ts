@@ -16,6 +16,8 @@ import type { BarSubElement } from '@src/model/Bar';
 import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import type { TupletGroup } from '@src/model/TupletGroup';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { BeatXPosition } from '@src/rendering/BeatXPosition';
 
 /**
  * This is a base class for any bar renderer which renders music notation on a staff
@@ -34,7 +36,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     }
 
     public get tupletOffset(): number {
-        return this.smuflMetrics.tupletOffset;
+        return this.smuflMetrics.oneStaffSpace * 0.5;
     }
 
     public abstract get lineSpacing(): number;
@@ -76,9 +78,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public override doLayout(): void {
         this.initLineBasedSizes();
         this.updateFirstLineY();
-        this.tupletSize =
-            this.smuflMetrics.tupletSize +
-            this.resources.effectFont.size * this.smuflMetrics.lineBarRendererTupletFontSiteToPadding;
+        this.tupletSize = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tuplet0)!;
         super.doLayout();
     }
 
@@ -216,41 +216,60 @@ export abstract class LineBarRenderer extends BarRendererBase {
         canvas.color = h.voice.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
         canvas.textAlign = TextAlign.Center;
         canvas.textBaseline = TextBaseline.Middle;
-        let s: string;
+        let s: MusicFontSymbol[];
         const num: number = h.beats[0].tupletNumerator;
         const den: number = h.beats[0].tupletDenominator;
         // list as in Guitar Pro 7. for certain tuplets only the numerator is shown
         if (num === 2 && den === 3) {
-            s = '2';
+            s = [MusicFontSymbol.Tuplet2];
         } else if (num === 3 && den === 2) {
-            s = '3';
+            s = [MusicFontSymbol.Tuplet3];
         } else if (num === 4 && den === 6) {
-            s = '4';
+            s = [MusicFontSymbol.Tuplet4];
         } else if (num === 5 && den === 4) {
-            s = '5';
+            s = [MusicFontSymbol.Tuplet5];
         } else if (num === 6 && den === 4) {
-            s = '6';
+            s = [MusicFontSymbol.Tuplet6];
         } else if (num === 7 && den === 4) {
-            s = '7';
+            s = [MusicFontSymbol.Tuplet7];
         } else if (num === 9 && den === 8) {
-            s = '9';
+            s = [MusicFontSymbol.Tuplet9];
         } else if (num === 10 && den === 8) {
-            s = '10';
+            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet0];
         } else if (num === 11 && den === 8) {
-            s = '11';
+            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet1];
         } else if (num === 12 && den === 8) {
-            s = '12';
+            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet2];
         } else if (num === 13 && den === 8) {
-            s = '13';
+            s = [MusicFontSymbol.Tuplet1, MusicFontSymbol.Tuplet3];
         } else {
-            s = `${num}:${den}`;
+            s = [];
+            const zero = MusicFontSymbol.Tuplet0 as number;
+            if (num > 10) {
+                s.push((zero + Math.floor(num / 10)) as MusicFontSymbol);
+                s.push((zero + (num - 10)) as MusicFontSymbol);
+            } else {
+                s.push((zero + num) as MusicFontSymbol);
+            }
+
+            s.push(MusicFontSymbol.TupletColon);
+
+            if (den > 10) {
+                s.push((zero + Math.floor(den / 10)) as MusicFontSymbol);
+                s.push((zero + (den - 10)) as MusicFontSymbol);
+            } else {
+                s.push((zero + den) as MusicFontSymbol);
+            }
         }
 
         // check if we need to paint simple footer
-        let offset: number = this.tupletOffset;
-        let size: number = this.smuflMetrics.tupletSize - this.smuflMetrics.tupletOffset;
+        const offset: number = this.tupletOffset;
+        const size: number = this.tupletSize;
 
         using _ = ElementStyleHelper.beat(canvas, beatElement, h.beats[0]);
+
+        const l = canvas.lineWidth;
+        canvas.lineWidth = this.smuflMetrics.tupletBracketThickness;
 
         if (h.beats.length === 1 || !h.isFull) {
             for (const beat of h.beats) {
@@ -270,8 +289,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     tupletY -= offset + size;
                 }
 
-                canvas.font = res.effectFont;
-                canvas.fillText(s, cx + this.x + tupletX, cy + this.y + tupletY);
+                canvas.fillMusicFontSymbols(cx + this.x + tupletX, cy + this.y + tupletY, 1, s, true);
             }
         } else {
             const firstBeat: Beat = h.beats[0];
@@ -305,9 +323,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
             //
             // Calculate the overall area of the tuplet bracket
             const firstBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
-            const lastBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastBeat.index)!;
-            const startX: number = firstBeamingHelper.getBeatLineX(firstBeat);
-            const endX: number = lastBeamingHelper.getBeatLineX(lastBeat);
+            const startX: number = this.getBeatX(firstBeat, BeatXPosition.OnNotes) - this.beatGlyphsStart;
+            const endX: number = this.getBeatX(lastBeat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
 
             //
             // calculate the y positions for our bracket
@@ -321,11 +338,21 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 endY = startY;
             }
 
+            // align line centered in available space
+            const shift = offset + size * 0.5;
+            if (direction === BeamDirection.Down) {
+                startY += shift;
+                endY += shift;
+            } else {
+                startY -= shift;
+                endY -= shift;
+            }
+
             //
             // Calculate how many space the text will need
-            canvas.font = res.effectFont;
-            const sw: number = canvas.measureText(s).width;
-            const sp: number = this.smuflMetrics.tupletTextMargin;
+            const sw: number = s.reduce((acc, sym) => acc + res.smuflMetrics.glyphWidths.get(sym)!, 0);
+            const sp = res.smuflMetrics.oneStaffSpace * 0.5;
+
             //
             // Calculate the offsets where to break the bracket
             const middleX: number = (startX + endX) / 2;
@@ -337,50 +364,53 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const offset1Y: number = k * offset1X + d;
             const middleY: number = k * middleX + d;
             const offset2Y: number = k * offset2X + d;
-            if (direction === BeamDirection.Down) {
-                offset *= -1;
-                size *= -1;
-            }
+
+            const angleStartY = direction === BeamDirection.Down ? startY - size * 0.5 : startY + size * 0.5;
+            const angleEndY = direction === BeamDirection.Down ? endY - size * 0.5 : endY + size * 0.5;
 
             //
             // draw the bracket
+            const pixelAlignment = canvas.lineWidth % 2 === 0 ? 0 : 0.5;
+            cx += pixelAlignment;
+            cy += pixelAlignment;
+
             canvas.beginPath();
-            canvas.moveTo(cx + this.x + startX, (cy + this.y + startY - offset) | 0);
+            canvas.moveTo(cx + this.x + startX, cy + this.y + angleStartY);
             if (bracketsAsArcs) {
                 canvas.quadraticCurveTo(
                     cx + this.x + (offset1X + startX) / 2,
-                    (cy + this.y + offset1Y - offset - size) | 0,
+                    cy + this.y + offset1Y,
                     cx + this.x + offset1X,
-                    (cy + this.y + offset1Y - offset - size) | 0
+                    cy + this.y + offset1Y
                 );
             } else {
-                canvas.lineTo(cx + this.x + startX, (cy + this.y + startY - offset - size) | 0);
-                canvas.lineTo(cx + this.x + offset1X, (cy + this.y + offset1Y - offset - size) | 0);
+                canvas.lineTo(cx + this.x + startX, cy + this.y + startY);
+                canvas.lineTo(cx + this.x + offset1X, cy + this.y + offset1Y);
             }
-            canvas.stroke();
 
-            canvas.beginPath();
-            canvas.moveTo(cx + this.x + offset2X, (cy + this.y + offset2Y - offset - size) | 0);
+            canvas.moveTo(cx + this.x + offset2X, cy + this.y + offset2Y);
             if (bracketsAsArcs) {
                 canvas.quadraticCurveTo(
                     cx + this.x + (endX + offset2X) / 2,
-                    (cy + this.y + offset2Y - offset - size) | 0,
+                    cy + this.y + offset2Y,
                     cx + this.x + endX,
-                    (cy + this.y + endY - offset) | 0
+                    cy + this.y + endY
                 );
             } else {
-                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset - size) | 0);
-                canvas.lineTo(cx + this.x + endX, (cy + this.y + endY - offset) | 0);
+                canvas.lineTo(cx + this.x + endX, cy + this.y + endY);
+                canvas.lineTo(cx + this.x + endX, cy + this.y + angleEndY);
             }
 
             canvas.stroke();
+
             //
             // Draw the string
-            canvas.fillText(s, cx + this.x + middleX, cy + this.y + middleY - offset - size);
+            canvas.fillMusicFontSymbols(cx + this.x + middleX, cy + this.y + middleY + size * 0.5, 1, s, true);
         }
 
         canvas.textAlign = oldAlign;
         canvas.textBaseline = oldBaseLine;
+        canvas.lineWidth = l;
     }
 
     protected paintBeams(
@@ -478,14 +508,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 continue;
             }
 
-            this.paintBeamingStem(
-                beat,
-                cy + this.y,
-                cx + this.x + beatLineX,
-                topY,
-                bottomY,
-                canvas
-            );
+            this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, topY, bottomY, canvas);
 
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
@@ -507,7 +530,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Draw flag
             //
             if (h.hasFlag(true, beat)) {
-                const glyph: FlagGlyph = new FlagGlyph(cx + this.x + beatLineX, flagY, beat.duration, direction, isGrace);
+                const glyph: FlagGlyph = new FlagGlyph(
+                    cx + this.x + beatLineX,
+                    flagY,
+                    beat.duration,
+                    direction,
+                    isGrace
+                );
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(0, 0, canvas);

@@ -36,6 +36,9 @@ export class CrescendoGlyph extends GroupedEffectGlyph {
             canvas.lineTo(endX, cy + this.y + height / 2);
             canvas.lineTo(startX, cy + this.y + height);
         }
+        const lineWidth = canvas.lineWidth;
+        canvas.lineWidth = this.renderer.smuflMetrics.hairpinThickness;
         canvas.stroke();
+        canvas.lineWidth = lineWidth;
     }
 }

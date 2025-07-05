@@ -41,7 +41,11 @@ export abstract class SystemBracket {
         const bravuraBraceWidthAtMusicFontSize = smuflMetrics.glyphWidths.get(MusicFontSymbol.Brace)!;
 
         // normal bracket width
-        this.width = bravuraBraceWidthAtMusicFontSize;
+        if(this.drawAsBrace) {
+            this.width = bravuraBraceWidthAtMusicFontSize;
+        } else {
+            this.width = smuflMetrics.bracketThickness;
+        }
         if (!this.drawAsBrace || !this.firstStaffInBracket || !this.lastStaffInBracket) {
             return;
         }
@@ -658,7 +662,7 @@ export class StaffSystem {
                             Math.ceil(accoladeEnd - accoladeStart)
                         );
 
-                        const spikeX: number = barStartX - barOffset - barSize - 0.5;
+                        const spikeX: number = barStartX - barOffset - barSize;
                         canvas.fillMusicFontSymbol(spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
                         canvas.fillMusicFontSymbol(spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
                     }

@@ -299,6 +299,18 @@ export enum MusicFontSymbol {
     FretboardX = 0xe859,
     FretboardO = 0xe85a,
 
+    Tuplet0 = 0xe880,
+    Tuplet1 = 0xe881,
+    Tuplet2 = 0xe882,
+    Tuplet3 = 0xe883,
+    Tuplet4 = 0xe884,
+    Tuplet5 = 0xe885,
+    Tuplet6 = 0xe886,
+    Tuplet7 = 0xe887,
+    Tuplet8 = 0xe888,
+    Tuplet9 = 0xe889,
+    TupletColon = 0xe88a,
+
     WiggleTrill = 0xeaa4,
     GuitarVibratoStroke = 0xeab2,
     GuitarWideVibratoStroke = 0xeab3,
@@ -309,5 +321,5 @@ export enum MusicFontSymbol {
     OctaveBaselineM = 0xec95,
     OctaveBaselineB = 0xec93,
 
-    GuitarLeftHandTapping = 0xE840,
+    GuitarLeftHandTapping = 0xe840
 }

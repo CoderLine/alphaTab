@@ -130,12 +130,15 @@ export class SmuflMetrics {
     public tabLineSpacing: number = this.oneStaffSpace * 1.5;
 
     // engraving defaults (TODO: reuse SmuflEngravingDefaults when all are supported)
+    public arrowShaftThickness: number = 0;
     public barlineSeparation: number = 0;
     public beamSpacing: number = 0;
     public beamThickness: number = 0;
+    public bracketThickness: number = 0;
     public dashedBarlineDashLength: number = 0;
     public dashedBarlineGapLength: number = 0;
     public dashedBarlineThickness: number = 0;
+    public hairpinThickness: number = 0;
     public legerLineThickness = 0;
     public legerLineExtension = 0;
     public repeatBarlineDotSeparation: number = 0;
@@ -145,6 +148,7 @@ export class SmuflMetrics {
     public thickBarlineThickness: number = 0;
     public thinBarlineThickness: number = 0;
     public thinThickBarlineSeparation: number = 0;
+    public tupletBracketThickness: number = 0;
 
     public effectBandSeparation: number = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
 
@@ -157,15 +161,15 @@ export class SmuflMetrics {
     public initialize(smufl: SmuflMetadata) {
         // SmuFl spec
 
-        // TODO arrowShaftThickness
+        this.arrowShaftThickness = smufl.engravingDefaults.arrowShaftThickness * this.oneStaffSpace;
         this.barlineSeparation = smufl.engravingDefaults.barlineSeparation * this.oneStaffSpace;
         this.beamSpacing = smufl.engravingDefaults.beamSpacing * this.oneStaffSpace;
         this.beamThickness = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
-        // TODO bracketThickness
+        this.bracketThickness = smufl.engravingDefaults.bracketThickness * this.oneStaffSpace;
         this.dashedBarlineDashLength = smufl.engravingDefaults.dashedBarlineDashLength * this.oneStaffSpace;
         this.dashedBarlineGapLength = smufl.engravingDefaults.dashedBarlineGapLength * this.oneStaffSpace;
         this.dashedBarlineThickness = smufl.engravingDefaults.dashedBarlineThickness * this.oneStaffSpace;
-        // TODO hairpinThickness
+        this.hairpinThickness = smufl.engravingDefaults.hairpinThickness * this.oneStaffSpace;
         this.legerLineExtension = smufl.engravingDefaults.legerLineExtension * this.oneStaffSpace;
         this.legerLineThickness = smufl.engravingDefaults.legerLineThickness * this.oneStaffSpace;
         // TODO lyricLineThickness
@@ -184,7 +188,7 @@ export class SmuflMetrics {
         this.thinThickBarlineSeparation = smufl.engravingDefaults.thinThickBarlineSeparation * this.oneStaffSpace;
         // TODO tieEndpointThickness
         // TODO tieMidpointThickness
-        // TODO tupletBracketThickness
+        this.tupletBracketThickness = smufl.engravingDefaults.tupletBracketThickness * this.oneStaffSpace;
 
         // custom alphatab
         this.effectBandSeparation = 0.25 * this.oneStaffSpace;
@@ -303,8 +307,6 @@ export class SmuflMetrics {
 
     public scoreNoteBelowEffectSpacing: number = 1;
 
-    public tupletTextMargin = 3;
-
     public alternateEndingsPaddingX: number = 3;
     public alternateEndingsPaddingY: number = 5;
     public alternateEndingsCloseLinePadding: number = 4;
@@ -361,8 +363,6 @@ export class SmuflMetrics {
     public numberedBeatNoteYTopPadding: number = 2;
     public slashBeatNoteYTopPadding: number = 2;
 
-    public tupletOffset = 10;
-
     public tabNoteYTopOffset: number = 2;
 
     public accentuationPadding: number = 2;
@@ -417,8 +417,6 @@ export class SmuflMetrics {
     public numberedDashGlyphWidth = 14;
     public simileMarkSimpleWidth = 20;
     public simileMarkDoubleWidth = 28;
-
-    public tupletSize = 15;
 
     public graceFlagSizeX = 12;
     public graceFlagSizeY = 15;
@@ -519,7 +517,6 @@ export class SmuflMetrics {
     //
     // font size > height factors (TODO: use proper measuring?)
     public scoreWhammyFontSizeToOverflow = 1.5;
-    public lineBarRendererTupletFontSiteToPadding = 0.3;
     public chordDiagramFontToRow: number = 1.5;
 
     public static readonly bravuraMetadata: SmuflMetadata =
@@ -1491,6 +1488,50 @@ export class SmuflMetrics {
                 tremolo3: {
                     bBoxNE: [0.6, 1.112],
                     bBoxSW: [-0.6, -1.12]
+                },
+                tuplet0: {
+                    bBoxNE: [1.2731041262817027, 1.5],
+                    bBoxSW: [-0.001204330173715796, -0.032]
+                },
+                tuplet1: {
+                    bBoxNE: [1.024, 1.488],
+                    bBoxSW: [0.04, 0]
+                },
+                tuplet2: {
+                    bBoxNE: [1.316, 1.5],
+                    bBoxSW: [0.04, -0.024]
+                },
+                tuplet3: {
+                    bBoxNE: [1.224, 1.5],
+                    bBoxSW: [0.04, -0.032]
+                },
+                tuplet4: {
+                    bBoxNE: [1.252, 1.488],
+                    bBoxSW: [0.04, 0]
+                },
+                tuplet5: {
+                    bBoxNE: [1.308, 1.492],
+                    bBoxSW: [0.04, -0.032]
+                },
+                tuplet6: {
+                    bBoxNE: [1.256, 1.5],
+                    bBoxSW: [0.04105974105482295, -0.032]
+                },
+                tuplet7: {
+                    bBoxNE: [1.332, 1.488],
+                    bBoxSW: [0.12, -0.016]
+                },
+                tuplet8: {
+                    bBoxNE: [1.292, 1.5],
+                    bBoxSW: [0.04, -0.032]
+                },
+                tuplet9: {
+                    bBoxNE: [1.254940258945177, 1.5],
+                    bBoxSW: [0.04, -0.032]
+                },
+                tupletColon: {
+                    bBoxNE: [0.484, 1.072],
+                    bBoxSW: [0.04, 0.232]
                 },
                 unpitchedPercussionClef1: {
                     bBoxNE: [1.528, 1],

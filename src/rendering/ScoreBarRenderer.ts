@@ -151,10 +151,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.ensureDrawingInfo(maxNoteHelper, maxNoteHelper.direction);
                 const maxNoteDrawingInfo = maxNoteHelper.drawingInfos.get(maxNoteHelper.direction)!;
                 maxNoteY = maxNoteDrawingInfo.startY - noteOverflowPadding;
-                if (maxNoteHelper.hasTuplet) {
-                    maxNoteY -= this.tupletSize;
-                }
             }
+            if (maxNoteHelper.hasTuplet) {
+                maxNoteY -= this.tupletSize + this.tupletOffset;
+            }
+
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
@@ -176,9 +177,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.ensureDrawingInfo(minNoteHelper, minNoteHelper.direction);
                 const minNoteDrawingInfo = minNoteHelper.drawingInfos.get(minNoteHelper.direction)!;
                 minNoteY = minNoteDrawingInfo.startY + noteOverflowPadding;
-                if (minNoteHelper.hasTuplet) {
-                    minNoteY += this.tupletSize;
-                }
+            }
+
+            if (minNoteHelper.hasTuplet) {
+                minNoteY += this.tupletSize + this.tupletOffset;
             }
 
             if (minNoteY > bottom) {
@@ -309,6 +311,12 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
+        if (h.beats.length === 0) {
+            return direction === BeamDirection.Up
+                ? this.getFlagTopY(h.beats[0], direction)
+                : this.getFlagBottomY(h.beats[0], direction);
+        }
+
         this.ensureDrawingInfo(h, direction);
         return h.drawingInfos.get(direction)!.calcY(x);
     }

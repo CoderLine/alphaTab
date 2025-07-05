@@ -37,6 +37,7 @@ export class BarTempoGlyph extends EffectGlyph {
                 this.renderer.smuflMetrics.glyphBottom.get(MusicFontSymbol.MetNoteQuarterUp)! *
                     res.smuflMetrics.tempoNoteScale;
 
+            const b = canvas.textBaseline;
             canvas.textBaseline = TextBaseline.Alphabetic;
             if (automation.text) {
                 const text = `${automation.text} `; // additional space
@@ -51,6 +52,7 @@ export class BarTempoGlyph extends EffectGlyph {
                 res.smuflMetrics.tempoNoteScale;
 
             canvas.fillText(` = ${automation.value.toString()}`, x, notePosY);
+            canvas.textBaseline = b;
 
             x += canvas.measureText(` = ${automation.value.toString()}`).width;
         }

@@ -4,7 +4,7 @@ import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
-import { Color } from '@src/model/Color';
+import type { Color } from '@src/model/Color';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
