@@ -226,7 +226,10 @@ export class TabBarRenderer extends LineBarRenderer {
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
         }
-        return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
+        return (
+            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
+            this.smuflMetrics.staffLineThickness
+        );
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
@@ -238,14 +241,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
-        const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-        if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
-            return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
-        }
-        return (
-            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
-            this.lineOffset / 2
-        );
+        return this.getFlagTopY(beat, direction);
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -289,10 +285,6 @@ export class TabBarRenderer extends LineBarRenderer {
 
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabStem, beat);
 
-        const lineWidth = canvas.lineWidth;
-        canvas.lineWidth = this.smuflMetrics.stemThickness;
-        canvas.beginPath();
-
         let holes: ReservedLayoutAreaSlot[] = [];
         if (this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
             holes = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.slots.slice();
@@ -301,22 +293,17 @@ export class TabBarRenderer extends LineBarRenderer {
 
         let y = bottomY;
         while (y > topY) {
-            canvas.moveTo(x, y);
-
             let lineY = topY;
             // draw until next hole (if hole reaches into line)
             if (holes.length > 0 && holes[holes.length - 1].bottomY > lineY) {
                 const bottomHole = holes.pop()!;
                 lineY = cy + bottomHole.bottomY;
-                canvas.lineTo(x, lineY);
+                canvas.fillRect(x, lineY, this.smuflMetrics.stemThickness, y - lineY);
                 y = cy + bottomHole.topY;
             } else {
-                canvas.lineTo(x, lineY);
+                canvas.fillRect(x, lineY, this.smuflMetrics.stemThickness, y - lineY);
                 break;
             }
         }
-        canvas.stroke();
-
-        canvas.lineWidth = lineWidth;
     }
 }
