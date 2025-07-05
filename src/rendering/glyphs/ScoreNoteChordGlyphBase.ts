@@ -166,7 +166,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         while (y >= minNoteLineY) {
             canvas.fillRect(
                 cx - lineExtension + this.noteStartX,
-                cy + y - this.renderer.smuflMetrics.legerLineThickness / 2,
+                cy + y,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale
             );

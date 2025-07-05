@@ -62,39 +62,60 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         if (this._noteGlyphLookup.has(note.id)) {
             const n = this._noteGlyphLookup.get(note.id)!;
-            let pos = this.y + n.y;
-
-            switch (requestedPosition) {
-                case NoteYPosition.TopWithStem:
-                    pos -= (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
-                    break;
-                case NoteYPosition.Top:
-                    pos -= n.height / 2;
-                    break;
-                case NoteYPosition.Center:
-                    break;
-                case NoteYPosition.Bottom:
-                    pos += n.height / 2;
-                    break;
-                case NoteYPosition.BottomWithStem:
-                    pos += (this.renderer as ScoreBarRenderer).getStemSize(this.beamingHelper);
-                    break;
-
-                case NoteYPosition.StemUp:
-                    pos -= this.renderer.smuflMetrics.stemUp.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
-                        : 0;
-                    break;
-                case NoteYPosition.StemDown:
-                    pos -= this.renderer.smuflMetrics.stemDown.has(n.symbol)
-                        ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
-                        : 0;
-                    break;
-            }
-
-            return pos;
+            return this.internalGetNoteY(n, requestedPosition);
         }
         return 0;
+    }
+
+    private internalGetNoteY(n: MusicFontGlyph, requestedPosition: NoteYPosition): number {
+        let pos = this.y + n.y;
+
+        const scale = this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+        switch (requestedPosition) {
+            case NoteYPosition.TopWithStem:
+                // stem start
+                pos -= (this.renderer.smuflMetrics.stemUp.has(n.symbol)
+                    ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
+                    : 0) * scale;
+
+                // stem size according to duration
+                pos -= this.renderer.smuflMetrics.standardStemLength * scale;
+
+                const topCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.beamingHelper);
+                return Math.min(topCenterY, pos);
+
+            case NoteYPosition.Top:
+                pos -= n.height / 2;
+                break;
+            case NoteYPosition.Center:
+                break;
+            case NoteYPosition.Bottom:
+                pos += n.height / 2;
+                break;
+            case NoteYPosition.BottomWithStem:
+                pos -= (this.renderer.smuflMetrics.stemDown.has(n.symbol)
+                    ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
+                    : 0) * scale;
+
+                // stem size according to duration
+                pos += this.renderer.smuflMetrics.standardStemLength * scale;
+
+                const bottomCenterY = (this.renderer as ScoreBarRenderer).centerStaffStemY(this.beamingHelper);
+                return Math.max(bottomCenterY, pos);
+
+            case NoteYPosition.StemUp:
+                pos -= (this.renderer.smuflMetrics.stemUp.has(n.symbol)
+                    ? this.renderer.smuflMetrics.stemUp.get(n.symbol)!.bottomY
+                    : 0) * scale;
+                break;
+            case NoteYPosition.StemDown:
+                pos -= (this.renderer.smuflMetrics.stemDown.has(n.symbol)
+                    ? this.renderer.smuflMetrics.stemDown.get(n.symbol)!.topY
+                    : 0) * scale;
+                break;
+        }
+
+        return pos;
     }
 
     public addNoteGlyph(noteGlyph: MusicFontGlyph, note: Note, noteLine: number): void {
@@ -142,16 +163,14 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
                 belowEffectSpacingShiftBefore = false;
                 aboveEffectSpacingShiftBefore = true;
                 belowBeatEffectsY = scoreRenderer.getScoreY(this.maxNote!.steps + 2);
-                aboveBeatEffectsY =
-                    scoreRenderer.getScoreY(this.minNote!.steps) - scoreRenderer.getStemSize(this.beamingHelper, true);
+                aboveBeatEffectsY = this.internalGetNoteY(this.minNote!.glyph, NoteYPosition.TopWithStem);
             } else {
                 belowEffectSpacingShiftBefore = true;
                 aboveEffectSpacingShiftBefore = false;
                 belowBeatEffectsY = scoreRenderer.getScoreY(this.minNote!.steps - 1);
                 belowEffectSpacing *= -1;
                 aboveEffectSpacing *= -1;
-                aboveBeatEffectsY =
-                    scoreRenderer.getScoreY(this.maxNote!.steps) + scoreRenderer.getStemSize(this.beamingHelper, true);
+                aboveBeatEffectsY = this.internalGetNoteY(this.maxNote!.glyph, NoteYPosition.TopWithStem);
             }
         }
 

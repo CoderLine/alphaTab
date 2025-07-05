@@ -121,9 +121,7 @@ export interface SmuflMetricsJson {
     tupletSize?: number;
     graceFlagSizeX?: number;
     graceFlagSizeY?: number;
-    flagStemSize?: number;
     brokenBarOffset?: number;
-    scoreBarRendererBeamMaxDistance?: number;
     accidentalHeight?: number;
     beatPaddingFlagEighthAndAbove?: number;
     beatPaddingOneHundredAndAbove?: number;
@@ -148,7 +146,8 @@ export interface SmuflMetricsJson {
     tieHeight?: number;
     bendSlurHeight?: number;
     timeSignatureNumberHeight?: number;
-    barStemSizes?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
+    standardStemLength?: number;
+    stemFlagOffsets?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
     glyphTop?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     glyphBottom?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     /**
@@ -168,11 +167,8 @@ export interface SmuflMetricsJson {
     chordDiagramFretHeight?: number;
     tempoNoteScale?: number;
     tuningGlyphCircleNumberScale?: number;
+    tuningGlyphStringColumnScale?: number;
     pictEdgeOfCymbalScale?: number;
-    tuningGlyphRowHeight?: number;
-    tuningGlyphTextPadding?: number;
-    tuningGlyphStringColumnWidth?: number;
-    tuningGlyphEndPaddingX?: number;
     tripletFeelNoteScale?: number;
     tripletFeelTupletScale?: number;
     tripletFeelHeight?: number;

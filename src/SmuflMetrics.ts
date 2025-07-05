@@ -193,37 +193,77 @@ export class SmuflMetrics {
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
         this.tabBendArrowSize = 1 * this.oneStaffSpace;
 
+        const standardStemLength = 3 * this.oneStaffSpace;
+        this.standardStemLength = standardStemLength;
+        this.stemFlagOffsets.set(Duration.QuadrupleWhole, 0);
+        this.stemFlagOffsets.set(Duration.DoubleWhole, 0);
+        this.stemFlagOffsets.set(Duration.Whole, 0);
+        this.stemFlagOffsets.set(Duration.Half, 0);
+        this.stemFlagOffsets.set(Duration.Quarter, 0);
+        this.stemFlagOffsets.set(Duration.Eighth, 0);
+        this.stemFlagOffsets.set(Duration.Sixteenth, 0);
+        this.stemFlagOffsets.set(Duration.ThirtySecond, 0);
+        this.stemFlagOffsets.set(Duration.SixtyFourth, 0);
+        this.stemFlagOffsets.set(Duration.OneHundredTwentyEighth, 0);
+        this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
+
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
             const name = g.substring(0, 1).toUpperCase() + g.substring(1);
             const symbol = JsonHelper.parseEnum<MusicFontSymbol>(name, MusicFontSymbol);
-            if (symbol && v.stemDownNW) {
-                const b = new SmuflStemInfo();
-                b.topX = v.stemDownNW[0] * this.oneStaffSpace;
-                b.topY = v.stemDownNW[1] * this.oneStaffSpace;
-                if (v.stemDownSW) {
-                    b.bottomX = v.stemDownSW[0] * this.oneStaffSpace;
-                    b.bottomY = v.stemDownSW[1] * this.oneStaffSpace;
-                } else {
-                    b.bottomX = b.topX + this.stemThickness;
-                    b.bottomY = 0;
+            if (symbol) {
+                if (v.stemDownNW) {
+                    const b = new SmuflStemInfo();
+                    b.topX = v.stemDownNW[0] * this.oneStaffSpace;
+                    b.topY = v.stemDownNW[1] * this.oneStaffSpace;
+                    if (v.stemDownSW) {
+                        b.bottomX = v.stemDownSW[0] * this.oneStaffSpace;
+                        b.bottomY = v.stemDownSW[1] * this.oneStaffSpace;
+                    } else {
+                        b.bottomX = b.topX + this.stemThickness;
+                        b.bottomY = 0;
+                    }
+                    this.stemDown.set(symbol, b);
                 }
-                this.stemDown.set(symbol, b);
-            }
-            if (symbol && v.stemUpSE) {
-                const b = new SmuflStemInfo();
-                b.bottomX = v.stemUpSE[0] * this.oneStaffSpace;
-                b.bottomY = v.stemUpSE[1] * this.oneStaffSpace;
+                if (v.stemUpSE) {
+                    const b = new SmuflStemInfo();
+                    b.bottomX = v.stemUpSE[0] * this.oneStaffSpace;
+                    b.bottomY = v.stemUpSE[1] * this.oneStaffSpace;
+                    if (v.stemUpNW) {
+                        b.topX = v.stemUpNW[0] * this.oneStaffSpace;
+                        b.topY = v.stemUpNW[1] * this.oneStaffSpace;
+                    } else {
+                        b.topX = b.bottomX - this.stemThickness;
+                        b.topY = 0;
+                    }
+                    this.stemUp.set(symbol, b);
+                }
+                if (v.repeatOffset) {
+                    this.repeatOffsetX.set(symbol, v.repeatOffset[0] * this.oneStaffSpace);
+                }
+
                 if (v.stemUpNW) {
-                    b.topX = v.stemUpNW[0] * this.oneStaffSpace;
-                    b.topY = v.stemUpNW[1] * this.oneStaffSpace;
-                } else {
-                    b.topX = b.bottomX - this.stemThickness;
-                    b.topY = 0;
+                    const stemLength = v.stemUpNW[1] * this.oneStaffSpace;
+                    switch (symbol) {
+                        case MusicFontSymbol.Flag8thUp:
+                            this.stemFlagOffsets.set(Duration.Eighth, stemLength);
+                            break;
+                        case MusicFontSymbol.Flag16thUp:
+                            this.stemFlagOffsets.set(Duration.Sixteenth, stemLength);
+                            break;
+                        case MusicFontSymbol.Flag32ndUp:
+                            this.stemFlagOffsets.set(Duration.ThirtySecond, stemLength);
+                            break;
+                        case MusicFontSymbol.Flag64thUp:
+                            this.stemFlagOffsets.set(Duration.SixtyFourth, stemLength);
+                            break;
+                        case MusicFontSymbol.Flag128thUp:
+                            this.stemFlagOffsets.set(Duration.OneHundredTwentyEighth, stemLength);
+                            break;
+                        case MusicFontSymbol.Flag256thUp:
+                            this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, stemLength);
+                            break;
+                    }
                 }
-                this.stemUp.set(symbol, b);
-            }
-            if (symbol && v.repeatOffset) {
-                this.repeatOffsetX.set(symbol, v.repeatOffset[0] * this.oneStaffSpace);
             }
         }
 
@@ -383,10 +423,8 @@ export class SmuflMetrics {
     public graceFlagSizeX = 12;
     public graceFlagSizeY = 15;
 
-    public flagStemSize = 3;
     public brokenBarOffset = 6;
 
-    public scoreBarRendererBeamMaxDistance = 10;
     public accidentalHeight: number = 21;
 
     public beatPaddingFlagEighthAndAbove: number = 20;
@@ -427,17 +465,8 @@ export class SmuflMetrics {
 
     public timeSignatureNumberHeight = 18;
 
-    public barStemSizes: Map<Duration, number> = new Map<Duration, number>([
-        [Duration.QuadrupleWhole, 6],
-        [Duration.Half, 6],
-        [Duration.Quarter, 6],
-        [Duration.Eighth, 6],
-        [Duration.Sixteenth, 6],
-        [Duration.ThirtySecond, 8],
-        [Duration.SixtyFourth, 9],
-        [Duration.OneHundredTwentyEighth, 9],
-        [Duration.TwoHundredFiftySixth, 10]
-    ]);
+    public standardStemLength: number = 0;
+    public stemFlagOffsets: Map<Duration, number> = new Map<Duration, number>();
 
     public glyphTop: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
     public glyphBottom: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
@@ -465,17 +494,11 @@ export class SmuflMetrics {
     // glyph scales
     public tempoNoteScale = 0.7;
     public tuningGlyphCircleNumberScale = 0.7;
+    public tuningGlyphStringColumnScale = 1.5;
 
     // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
 
     public pictEdgeOfCymbalScale: number = 0.5;
-
-    //
-    // tuning (TODO: fixed values or take others as reference?)
-    public tuningGlyphRowHeight = 15;
-    public tuningGlyphTextPadding = 1;
-    public tuningGlyphStringColumnWidth = 64;
-    public tuningGlyphEndPaddingX = 15;
 
     //
     // triplet feel (TODO: fixed values or take others as reference?)
@@ -768,6 +791,54 @@ export class SmuflMetrics {
                 fermataShortAbove: {
                     bBoxNE: [2.416, 1.364],
                     bBoxSW: [0, 0]
+                },
+                flag128thDown: {
+                    bBoxNE: [1.092, 3.248],
+                    bBoxSW: [0, -2.32]
+                },
+                flag128thUp: {
+                    bBoxNE: [1.044, 2.132],
+                    bBoxSW: [0, -3.248]
+                },
+                flag16thDown: {
+                    bBoxNE: [1.1635806326044895, 3.2480256],
+                    bBoxSW: [0, -0.036]
+                },
+                flag16thUp: {
+                    bBoxNE: [1.116, 0.008],
+                    bBoxSW: [0, -3.252]
+                },
+                flag256thDown: {
+                    bBoxNE: [1.196, 3.252],
+                    bBoxSW: [0, -3.004]
+                },
+                flag256thUp: {
+                    bBoxNE: [1.056, 2.816],
+                    bBoxSW: [0, -3.248]
+                },
+                flag32ndDown: {
+                    bBoxNE: [1.092, 3.248],
+                    bBoxSW: [0, -0.688]
+                },
+                flag32ndUp: {
+                    bBoxNE: [1.044, 0.596],
+                    bBoxSW: [0, -3.248]
+                },
+                flag64thDown: {
+                    bBoxNE: [1.092, 3.248],
+                    bBoxSW: [0, -1.504]
+                },
+                flag64thUp: {
+                    bBoxNE: [1.044, 1.388],
+                    bBoxSW: [0, -3.248]
+                },
+                flag8thDown: {
+                    bBoxNE: [1.224, 3.232896633157715],
+                    bBoxSW: [0, -0.056]
+                },
+                flag8thUp: {
+                    bBoxNE: [1.056, 0.036],
+                    bBoxSW: [0, -3.240768470618394]
                 },
                 fretboardO: {
                     bBoxNE: [0.564, 0.564],
@@ -1542,6 +1613,46 @@ export class SmuflMetrics {
                 },
                 dynamicSforzatoPiano: {
                     opticalCenter: [1.848, 0]
+                },
+                flag128thDown: {
+                    stemDownSW: [0, -2.076]
+                },
+                flag128thUp: {
+                    stemUpNW: [0, 1.9]
+                },
+                flag16thDown: {
+                    stemDownSW: [0, 0.128]
+                },
+                flag16thUp: {
+                    stemUpNW: [0, -0.088]
+                },
+                flag256thDown: {
+                    stemDownSW: [0, -2.812]
+                },
+                flag256thUp: {
+                    stemUpNW: [0, 2.592]
+                },
+                flag32ndDown: {
+                    stemDownSW: [0, -0.448]
+                },
+                flag32ndUp: {
+                    stemUpNW: [0, 0.376]
+                },
+                flag64thDown: {
+                    stemDownSW: [0, -1.244]
+                },
+                flag64thUp: {
+                    stemUpNW: [0, 1.172]
+                },
+                flag8thDown: {
+                    graceNoteSlashNW: [-0.596, 2.168],
+                    graceNoteSlashSE: [1.328, 0.628],
+                    stemDownSW: [0, 0.132]
+                },
+                flag8thUp: {
+                    graceNoteSlashNE: [1.284, -0.796],
+                    graceNoteSlashSW: [-0.644, -2.456],
+                    stemUpNW: [0, -0.04]
                 },
                 guitarVibratoStroke: {
                     repeatOffset: [0.608, 0]

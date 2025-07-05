@@ -160,9 +160,7 @@ export class SmuflMetricsSerializer {
         o.set("tupletsize", obj.tupletSize);
         o.set("graceflagsizex", obj.graceFlagSizeX);
         o.set("graceflagsizey", obj.graceFlagSizeY);
-        o.set("flagstemsize", obj.flagStemSize);
         o.set("brokenbaroffset", obj.brokenBarOffset);
-        o.set("scorebarrendererbeammaxdistance", obj.scoreBarRendererBeamMaxDistance);
         o.set("accidentalheight", obj.accidentalHeight);
         o.set("beatpaddingflageighthandabove", obj.beatPaddingFlagEighthAndAbove);
         o.set("beatpaddingonehundredandabove", obj.beatPaddingOneHundredAndAbove);
@@ -187,10 +185,11 @@ export class SmuflMetricsSerializer {
         o.set("tieheight", obj.tieHeight);
         o.set("bendslurheight", obj.bendSlurHeight);
         o.set("timesignaturenumberheight", obj.timeSignatureNumberHeight);
+        o.set("standardstemlength", obj.standardStemLength);
         {
             const m = new Map<string, unknown>();
-            o.set("barstemsizes", m);
-            for (const [k, v] of obj.barStemSizes!) {
+            o.set("stemflagoffsets", m);
+            for (const [k, v] of obj.stemFlagOffsets!) {
                 m.set(k.toString(), v);
             }
         }
@@ -231,11 +230,8 @@ export class SmuflMetricsSerializer {
         o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
         o.set("temponotescale", obj.tempoNoteScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
+        o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
         o.set("pictedgeofcymbalscale", obj.pictEdgeOfCymbalScale);
-        o.set("tuningglyphrowheight", obj.tuningGlyphRowHeight);
-        o.set("tuningglyphtextpadding", obj.tuningGlyphTextPadding);
-        o.set("tuningglyphstringcolumnwidth", obj.tuningGlyphStringColumnWidth);
-        o.set("tuningglyphendpaddingx", obj.tuningGlyphEndPaddingX);
         o.set("tripletfeelnotescale", obj.tripletFeelNoteScale);
         o.set("tripletfeeltupletscale", obj.tripletFeelTupletScale);
         o.set("tripletfeelheight", obj.tripletFeelHeight);
@@ -587,14 +583,8 @@ export class SmuflMetricsSerializer {
             case "graceflagsizey":
                 obj.graceFlagSizeY = v! as number;
                 return true;
-            case "flagstemsize":
-                obj.flagStemSize = v! as number;
-                return true;
             case "brokenbaroffset":
                 obj.brokenBarOffset = v! as number;
-                return true;
-            case "scorebarrendererbeammaxdistance":
-                obj.scoreBarRendererBeamMaxDistance = v! as number;
                 return true;
             case "accidentalheight":
                 obj.accidentalHeight = v! as number;
@@ -668,10 +658,13 @@ export class SmuflMetricsSerializer {
             case "timesignaturenumberheight":
                 obj.timeSignatureNumberHeight = v! as number;
                 return true;
-            case "barstemsizes":
-                obj.barStemSizes = new Map<Duration, number>();
+            case "standardstemlength":
+                obj.standardStemLength = v! as number;
+                return true;
+            case "stemflagoffsets":
+                obj.stemFlagOffsets = new Map<Duration, number>();
                 JsonHelper.forEach(v, (v, k) => {
-                    obj.barStemSizes.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
+                    obj.stemFlagOffsets.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
                 });
                 return true;
             case "glyphtop":
@@ -725,20 +718,11 @@ export class SmuflMetricsSerializer {
             case "tuningglyphcirclenumberscale":
                 obj.tuningGlyphCircleNumberScale = v! as number;
                 return true;
+            case "tuningglyphstringcolumnscale":
+                obj.tuningGlyphStringColumnScale = v! as number;
+                return true;
             case "pictedgeofcymbalscale":
                 obj.pictEdgeOfCymbalScale = v! as number;
-                return true;
-            case "tuningglyphrowheight":
-                obj.tuningGlyphRowHeight = v! as number;
-                return true;
-            case "tuningglyphtextpadding":
-                obj.tuningGlyphTextPadding = v! as number;
-                return true;
-            case "tuningglyphstringcolumnwidth":
-                obj.tuningGlyphStringColumnWidth = v! as number;
-                return true;
-            case "tuningglyphendpaddingx":
-                obj.tuningGlyphEndPaddingX = v! as number;
                 return true;
             case "tripletfeelnotescale":
                 obj.tripletFeelNoteScale = v! as number;

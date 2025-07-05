@@ -76,7 +76,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public override doLayout(): void {
         this.initLineBasedSizes();
         this.updateFirstLineY();
-        // TODO SmufL
         this.tupletSize =
             this.smuflMetrics.tupletSize +
             this.resources.effectFont.size * this.smuflMetrics.lineBarRendererTupletFontSiteToPadding;
@@ -411,8 +410,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         beamsElement: BeatSubElement
     ): void {
         canvas.color = h.voice!.index === 0 ? this.resources.mainGlyphColor : this.resources.secondaryGlyphColor;
-        // TODO: draw stem at least at the center of the score staff.
-        // check if we need to paint simple footer
         if (!h.isRestBeamHelper) {
             if (this.drawBeamHelperAsFlags(h)) {
                 this.paintFlag(cx, cy, canvas, h, flagsElement);
@@ -463,22 +460,18 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             const isGrace: boolean = beat.graceType !== GraceType.None;
-            const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
             //
             // draw line
             //
-            const stemSize: number = this.getFlagStemSize(h.shortestDuration);
             const beatLineX: number = h.getBeatLineX(beat);
             const direction: BeamDirection = this.getBeamDirection(h);
-            let topY: number = this.getFlagTopY(beat, direction);
-            let bottomY: number = this.getFlagBottomY(beat, direction);
-            let beamY: number = 0;
+            const topY: number = cy + this.y + this.getFlagTopY(beat, direction);
+            const bottomY: number = cy + this.y + this.getFlagBottomY(beat, direction);
+            let flagY: number = 0;
             if (direction === BeamDirection.Down) {
-                bottomY += stemSize * scaleMod;
-                beamY = bottomY;
+                flagY = bottomY;
             } else {
-                topY -= stemSize * scaleMod;
-                beamY = topY;
+                flagY = topY;
             }
 
             if (!h.hasLine(true, beat)) {
@@ -489,8 +482,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 beat,
                 cy + this.y,
                 cx + this.x + beatLineX,
-                cy + this.y + topY,
-                cy + this.y + bottomY,
+                topY,
+                bottomY,
                 canvas
             );
 
@@ -514,10 +507,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // Draw flag
             //
             if (h.hasFlag(true, beat)) {
-                const glyph: FlagGlyph = new FlagGlyph(beatLineX, beamY, beat.duration, direction, isGrace);
+                const glyph: FlagGlyph = new FlagGlyph(cx + this.x + beatLineX, flagY, beat.duration, direction, isGrace);
                 glyph.renderer = this;
                 glyph.doLayout();
-                glyph.paint(cx + this.x, cy + this.y, canvas);
+                glyph.paint(0, 0, canvas);
             }
         }
     }
@@ -533,6 +526,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
         let size: number = 0;
+
         switch (duration) {
             case Duration.QuadrupleWhole:
             case Duration.Half:
@@ -543,13 +537,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
             case Duration.SixtyFourth:
             case Duration.OneHundredTwentyEighth:
             case Duration.TwoHundredFiftySixth:
-                size = this.smuflMetrics.flagStemSize;
+                size = this.smuflMetrics.standardStemLength + this.smuflMetrics.stemFlagOffsets.get(duration)!;
                 break;
             default:
-                size = forceMinStem ? this.smuflMetrics.flagStemSize : 0;
+                size = forceMinStem ? this.smuflMetrics.standardStemLength : 0;
                 break;
         }
-        return this.getLineHeight(size);
+        return size;
     }
 
     protected override recreatePreBeatGlyphs(): void {

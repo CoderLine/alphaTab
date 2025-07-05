@@ -16,36 +16,36 @@ export class FlagGlyph extends MusicFontGlyph {
         if (direction === BeamDirection.Up) {
             switch (duration) {
                 case Duration.Eighth:
-                    return MusicFontSymbol.FlagEighthUp;
+                    return MusicFontSymbol.Flag8thUp;
                 case Duration.Sixteenth:
-                    return MusicFontSymbol.FlagSixteenthUp;
+                    return MusicFontSymbol.Flag16thUp;
                 case Duration.ThirtySecond:
-                    return MusicFontSymbol.FlagThirtySecondUp;
+                    return MusicFontSymbol.Flag32ndUp;
                 case Duration.SixtyFourth:
-                    return MusicFontSymbol.FlagSixtyFourthUp;
+                    return MusicFontSymbol.Flag64thUp;
                 case Duration.OneHundredTwentyEighth:
-                    return MusicFontSymbol.FlagOneHundredTwentyEighthUp;
+                    return MusicFontSymbol.Flag128thUp;
                 case Duration.TwoHundredFiftySixth:
-                    return MusicFontSymbol.FlagTwoHundredFiftySixthUp;
+                    return MusicFontSymbol.Flag256thUp;
                 default:
-                    return MusicFontSymbol.FlagEighthUp;
+                    return MusicFontSymbol.Flag8thUp;
             }
         }
         switch (duration) {
             case Duration.Eighth:
-                return MusicFontSymbol.FlagEighthDown;
+                return MusicFontSymbol.Flag8thDown;
             case Duration.Sixteenth:
-                return MusicFontSymbol.FlagSixteenthDown;
+                return MusicFontSymbol.Flag16thDown;
             case Duration.ThirtySecond:
-                return MusicFontSymbol.FlagThirtySecondDown;
+                return MusicFontSymbol.Flag32ndDown;
             case Duration.SixtyFourth:
-                return MusicFontSymbol.FlagSixtyFourthDown;
+                return MusicFontSymbol.Flag64thDown;
             case Duration.OneHundredTwentyEighth:
-                return MusicFontSymbol.FlagOneHundredTwentyEighthDown;
+                return MusicFontSymbol.Flag128thDown;
             case Duration.TwoHundredFiftySixth:
-                return MusicFontSymbol.FlagOneHundredTwentyEighthDown;
+                return MusicFontSymbol.Flag128thDown;
             default:
-                return MusicFontSymbol.FlagEighthDown;
+                return MusicFontSymbol.Flag8thDown;
         }
     }
 }
