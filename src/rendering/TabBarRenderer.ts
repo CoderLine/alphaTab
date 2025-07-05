@@ -102,7 +102,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
-        const padding: number = this.smuflMetrics.tabNumberSpacePadding;
+        const padding: number = this.smuflMetrics.staffLineThickness;
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -114,7 +114,7 @@ export class TabBarRenderer extends LineBarRenderer {
                             if (!noteNumber.isEmpty) {
                                 spaces[this.bar.staff.tuning.length - str].push(
                                     new Float32Array([
-                                        vc.x + bg.x + notes.x + noteNumbers!.x,
+                                        vc.x + bg.x + notes.x + noteNumbers!.x - padding,
                                         noteNumbers!.width + padding
                                     ])
                                 );
@@ -156,7 +156,8 @@ export class TabBarRenderer extends LineBarRenderer {
         // Clef
         if (this.isFirstOfLine) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
-            this.addPreBeatGlyph(new TabClefGlyph(this.smuflMetrics.tabClefLeftPadding, this.getTabY(center)));
+            this.createStartSpacing();
+            this.addPreBeatGlyph(new TabClefGlyph(0, this.getTabY(center)));
         }
         // Time Signature
         if (

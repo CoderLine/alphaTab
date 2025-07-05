@@ -40,12 +40,9 @@ export class SmuflMetricsSerializer {
         o.set("thinbarlinethickness", obj.thinBarlineThickness);
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
         o.set("effectbandseparation", obj.effectBandSeparation);
-        o.set("tabnumberspacepadding", obj.tabNumberSpacePadding);
         o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
         o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
-        o.set("directionscontainerpadding", obj.directionsContainerPadding);
-        o.set("lefthandtappingpadding", obj.leftHandTappingPadding);
         o.set("multibarrestpadding", obj.multiBarRestPadding);
         o.set("trilltextpadding", obj.trillTextPadding);
         o.set("rowcontainerpadding", obj.rowContainerPadding);
@@ -56,7 +53,6 @@ export class SmuflMetricsSerializer {
         o.set("scorehelpernotesendpadding2", obj.scoreHelperNotesEndPadding2);
         o.set("scorenotebeloweffectspacing", obj.scoreNoteBelowEffectSpacing);
         o.set("tuplettextmargin", obj.tupletTextMargin);
-        o.set("tabclefleftpadding", obj.tabClefLeftPadding);
         o.set("alternateendingspaddingx", obj.alternateEndingsPaddingX);
         o.set("alternateendingspaddingy", obj.alternateEndingsPaddingY);
         o.set("alternateendingscloselinepadding", obj.alternateEndingsCloseLinePadding);
@@ -94,7 +90,6 @@ export class SmuflMetricsSerializer {
         o.set("numberedbeatnoteytoppadding", obj.numberedBeatNoteYTopPadding);
         o.set("slashbeatnoteytoppadding", obj.slashBeatNoteYTopPadding);
         o.set("tupletoffset", obj.tupletOffset);
-        o.set("tabclefoffsetx", obj.tabClefOffsetX);
         o.set("tabnoteytopoffset", obj.tabNoteYTopOffset);
         o.set("accentuationpadding", obj.accentuationPadding);
         o.set("articstaccatoabovepaddingx", obj.articStaccatoAbovePaddingX);
@@ -235,8 +230,8 @@ export class SmuflMetricsSerializer {
         o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
         o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
         o.set("temponotescale", obj.tempoNoteScale);
-        o.set("pictedgeofcymbalscale", obj.pictEdgeOfCymbalScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
+        o.set("pictedgeofcymbalscale", obj.pictEdgeOfCymbalScale);
         o.set("tuningglyphrowheight", obj.tuningGlyphRowHeight);
         o.set("tuningglyphtextpadding", obj.tuningGlyphTextPadding);
         o.set("tuningglyphstringcolumnwidth", obj.tuningGlyphStringColumnWidth);
@@ -318,9 +313,6 @@ export class SmuflMetricsSerializer {
             case "effectbandseparation":
                 obj.effectBandSeparation = v! as number;
                 return true;
-            case "tabnumberspacepadding":
-                obj.tabNumberSpacePadding = v! as number;
-                return true;
             case "numberedbarrendererbarsize":
                 obj.numberedBarRendererBarSize = v! as number;
                 return true;
@@ -329,12 +321,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "prenoteeffectpadding":
                 obj.preNoteEffectPadding = v! as number;
-                return true;
-            case "directionscontainerpadding":
-                obj.directionsContainerPadding = v! as number;
-                return true;
-            case "lefthandtappingpadding":
-                obj.leftHandTappingPadding = v! as number;
                 return true;
             case "multibarrestpadding":
                 obj.multiBarRestPadding = v! as number;
@@ -365,9 +351,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tuplettextmargin":
                 obj.tupletTextMargin = v! as number;
-                return true;
-            case "tabclefleftpadding":
-                obj.tabClefLeftPadding = v! as number;
                 return true;
             case "alternateendingspaddingx":
                 obj.alternateEndingsPaddingX = v! as number;
@@ -479,9 +462,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tupletoffset":
                 obj.tupletOffset = v! as number;
-                return true;
-            case "tabclefoffsetx":
-                obj.tabClefOffsetX = v! as number;
                 return true;
             case "tabnoteytopoffset":
                 obj.tabNoteYTopOffset = v! as number;
@@ -742,11 +722,11 @@ export class SmuflMetricsSerializer {
             case "temponotescale":
                 obj.tempoNoteScale = v! as number;
                 return true;
-            case "pictedgeofcymbalscale":
-                obj.pictEdgeOfCymbalScale = v! as number;
-                return true;
             case "tuningglyphcirclenumberscale":
                 obj.tuningGlyphCircleNumberScale = v! as number;
+                return true;
+            case "pictedgeofcymbalscale":
+                obj.pictEdgeOfCymbalScale = v! as number;
                 return true;
             case "tuningglyphrowheight":
                 obj.tuningGlyphRowHeight = v! as number;

@@ -81,17 +81,19 @@ export class TuningGlyph extends GlyphGroup {
             const circleScale = this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
             const circleHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
+
+
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
             let currentY: number = this.height;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
-                this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 2.5, circleScale, symbol));
+                this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight, circleScale, symbol));
 
-                const str: string = `= ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
+                const str: string = ` = ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
                 this.addGlyph(
-                    new TextGlyph(currentX + circleHeight + 1, currentY, str, res.effectFont, TextAlign.Left)
+                    new TextGlyph(currentX + circleHeight, currentY + circleHeight / 2, str, res.effectFont, TextAlign.Left, TextBaseline.Middle)
                 );
                 currentY += rowHeight;
                 if (i === stringsPerColumn - 1) {

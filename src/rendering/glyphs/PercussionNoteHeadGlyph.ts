@@ -1,9 +1,9 @@
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { Duration } from '@src/model/Duration';
-import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { TechniqueSymbolPlacement, type InstrumentArticulation } from '@src/model/InstrumentArticulation';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
@@ -32,7 +32,7 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
 
         if (
             this._articulation.techniqueSymbol !== MusicFontSymbol.None &&
-            this._articulation.techniqueSymbolPlacement === TextBaseline.Middle
+            this._articulation.techniqueSymbolPlacement === TechniqueSymbolPlacement.Inside
         ) {
             canvas.fillMusicFontSymbol(
                 cx + this.x,

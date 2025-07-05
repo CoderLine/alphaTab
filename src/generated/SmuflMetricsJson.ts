@@ -37,12 +37,9 @@ export interface SmuflMetricsJson {
     thinBarlineThickness?: number;
     thinThickBarlineSeparation?: number;
     effectBandSeparation?: number;
-    tabNumberSpacePadding?: number;
     numberedBarRendererBarSize?: number;
     numberedBarRendererBarSpacing?: number;
     preNoteEffectPadding?: number;
-    directionsContainerPadding?: number;
-    leftHandTappingPadding?: number;
     multiBarRestPadding?: number;
     trillTextPadding?: number;
     rowContainerPadding?: number;
@@ -53,7 +50,6 @@ export interface SmuflMetricsJson {
     scoreHelperNotesEndPadding2?: number;
     scoreNoteBelowEffectSpacing?: number;
     tupletTextMargin?: number;
-    tabClefLeftPadding?: number;
     alternateEndingsPaddingX?: number;
     alternateEndingsPaddingY?: number;
     alternateEndingsCloseLinePadding?: number;
@@ -91,7 +87,6 @@ export interface SmuflMetricsJson {
     numberedBeatNoteYTopPadding?: number;
     slashBeatNoteYTopPadding?: number;
     tupletOffset?: number;
-    tabClefOffsetX?: number;
     tabNoteYTopOffset?: number;
     accentuationPadding?: number;
     articStaccatoAbovePaddingX?: number;
@@ -172,8 +167,8 @@ export interface SmuflMetricsJson {
     chordDiagramNutHeight?: number;
     chordDiagramFretHeight?: number;
     tempoNoteScale?: number;
-    pictEdgeOfCymbalScale?: number;
     tuningGlyphCircleNumberScale?: number;
+    pictEdgeOfCymbalScale?: number;
     tuningGlyphRowHeight?: number;
     tuningGlyphTextPadding?: number;
     tuningGlyphStringColumnWidth?: number;

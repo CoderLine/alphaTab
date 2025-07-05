@@ -619,7 +619,8 @@ export class StaffSystem {
                                 firstLineBarRenderer.bar
                             );
                             const h = Math.ceil(thisTop - previousBottom);
-                            canvas.fillRect(accoladeX, cy + previousBottom, 1, h);
+                            canvas.fillRect(accoladeX, cy + previousBottom, 
+                                res.smuflMetrics.thinBarlineThickness, h);
                         }
 
                         previousStaffInBracket = s;

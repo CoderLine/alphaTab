@@ -307,5 +307,7 @@ export enum MusicFontSymbol {
     WiggleSawtooth = 0xeabb,
 
     OctaveBaselineM = 0xec95,
-    OctaveBaselineB = 0xec93
+    OctaveBaselineB = 0xec93,
+
+    GuitarLeftHandTapping = 0xE840,
 }

@@ -22,7 +22,7 @@ import { PercussionNoteHeadGlyph } from '@src/rendering/glyphs/PercussionNoteHea
 import { Logger } from '@src/Logger';
 import { ArticStaccatoAboveGlyph } from '@src/rendering/glyphs/ArticStaccatoAboveGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import type { ICanvas } from '@src/platform/ICanvas';
 import { PictEdgeOfCymbalGlyph } from '@src/rendering/glyphs/PictEdgeOfCymbalGlyph';
 import { PickStrokeGlyph } from '@src/rendering/glyphs/PickStrokeGlyph';
 import { PickStroke } from '@src/model/PickStroke';
@@ -33,6 +33,7 @@ import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 import { BeatSubElement } from '@src/model/Beat';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
+import { TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
@@ -325,9 +326,9 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);
-            if (articulation && articulation.techniqueSymbolPlacement !== TextBaseline.Middle) {
+            if (articulation && articulation.techniqueSymbolPlacement !== TechniqueSymbolPlacement.Inside) {
                 const effectContainer =
-                    articulation.techniqueSymbolPlacement === TextBaseline.Top
+                    articulation.techniqueSymbolPlacement === TechniqueSymbolPlacement.Above
                         ? this.noteHeads!.aboveBeatEffects
                         : this.noteHeads!.belowBeatEffects;
 

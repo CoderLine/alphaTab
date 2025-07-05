@@ -1,20 +1,18 @@
-import type { ICanvas } from '@src/platform/ICanvas';
-import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { BarSubElement } from '@src/model/Bar';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
-export class TabClefGlyph extends Glyph {
-    public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.SixStringTabClef)!;
+export class TabClefGlyph extends MusicFontGlyph {
+    constructor(x: number, y: number) {
+        super(x, y, 1, MusicFontSymbol.SixStringTabClef);
     }
-
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        using _ = ElementStyleHelper.bar(canvas, BarSubElement.GuitarTabsClef, this.renderer.bar);
-
-        const [symbol, scale] = this.renderer.smuflMetrics.stringsToTabClefSymbolAndScale(
-            this.renderer.bar.staff.tuning.length
-        );
-        canvas.fillMusicFontSymbol(cx + this.x + this.renderer.smuflMetrics.tabClefOffsetX, cy + this.y, scale, symbol, false);
+    public override doLayout(): void {
+        this.symbol =
+            this.renderer.bar.staff.tuning.length <= 4
+                ? MusicFontSymbol.FourStringTabClef
+                : MusicFontSymbol.SixStringTabClef;
+        this.center = true;
+        super.doLayout();
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GClef)!;
+        this.offsetX = this.width / 2;
     }
 }

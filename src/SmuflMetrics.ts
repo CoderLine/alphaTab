@@ -127,7 +127,7 @@ export class SmuflMetrics {
      */
     public musicFontSize = 36;
     public oneStaffSpace: number = this.musicFontSize / 4;
-    public tabLineSpacing: number = this.oneStaffSpace * 1.2;
+    public tabLineSpacing: number = this.oneStaffSpace * 1.5;
 
     // engraving defaults (TODO: reuse SmuflEngravingDefaults when all are supported)
     public barlineSeparation: number = 0;
@@ -159,7 +159,7 @@ export class SmuflMetrics {
 
         // TODO arrowShaftThickness
         this.barlineSeparation = smufl.engravingDefaults.barlineSeparation * this.oneStaffSpace;
-        this.beamSpacing = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
+        this.beamSpacing = smufl.engravingDefaults.beamSpacing * this.oneStaffSpace;
         this.beamThickness = smufl.engravingDefaults.beamThickness * this.oneStaffSpace;
         // TODO bracketThickness
         this.dashedBarlineDashLength = smufl.engravingDefaults.dashedBarlineDashLength * this.oneStaffSpace;
@@ -239,11 +239,7 @@ export class SmuflMetrics {
         }
     }
 
-    public tabNumberSpacePadding: number = 1;
-
-    //
-    // combined sizes
-
+    // sizes
     // NOTE: SMuFL has no numbered notation yet
     public numberedBarRendererBarSize = 0;
     public numberedBarRendererBarSpacing = 0;
@@ -253,8 +249,6 @@ export class SmuflMetrics {
     public preNoteEffectPadding: number = 0;
 
     //  (TODO: try to eliminate custom paddings)
-    public directionsContainerPadding: number = 3;
-    public leftHandTappingPadding: number = 6;
     public multiBarRestPadding: number = 10;
     public trillTextPadding: number = 3;
 
@@ -270,7 +264,6 @@ export class SmuflMetrics {
     public scoreNoteBelowEffectSpacing: number = 1;
 
     public tupletTextMargin = 3;
-    public tabClefLeftPadding: number = 5;
 
     public alternateEndingsPaddingX: number = 3;
     public alternateEndingsPaddingY: number = 5;
@@ -330,7 +323,6 @@ export class SmuflMetrics {
 
     public tupletOffset = 10;
 
-    public tabClefOffsetX: number = 5;
     public tabNoteYTopOffset: number = 2;
 
     public accentuationPadding: number = 2;
@@ -472,22 +464,14 @@ export class SmuflMetrics {
     //
     // glyph scales
     public tempoNoteScale = 0.7;
+    public tuningGlyphCircleNumberScale = 0.7;
 
     // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
 
     public pictEdgeOfCymbalScale: number = 0.5;
 
-    public stringsToTabClefSymbolAndScale(strings: number): [MusicFontSymbol, number] {
-        if (strings <= 4) {
-            return [MusicFontSymbol.FourStringTabClef, strings / 4.5];
-        }
-
-        return [MusicFontSymbol.SixStringTabClef, strings / 6.5];
-    }
-
     //
     // tuning (TODO: fixed values or take others as reference?)
-    public tuningGlyphCircleNumberScale = 0.7;
     public tuningGlyphRowHeight = 15;
     public tuningGlyphTextPadding = 1;
     public tuningGlyphStringColumnWidth = 64;
@@ -572,6 +556,14 @@ export class SmuflMetrics {
                 accidentalSharp: {
                     bBoxNE: [0.996, 1.4],
                     bBoxSW: [0, -1.392]
+                },
+                arrowheadBlackDown: {
+                    bBoxNE: [0.912, 1.196],
+                    bBoxSW: [0, 0]
+                },
+                arrowheadBlackUp: {
+                    bBoxNE: [0.912, 1.196],
+                    bBoxSW: [0, 0]
                 },
                 articAccentAbove: {
                     bBoxNE: [1.356, 0.98],
@@ -820,6 +812,10 @@ export class SmuflMetrics {
                 guitarGolpe: {
                     bBoxNE: [1.08, 1.128],
                     bBoxSW: [0.004, 0]
+                },
+                guitarLeftHandTapping: {
+                    bBoxNE: [1.588, 1.364],
+                    bBoxSW: [0, -0.224]
                 },
                 guitarOpenPedal: {
                     bBoxNE: [1.144, 1.144],

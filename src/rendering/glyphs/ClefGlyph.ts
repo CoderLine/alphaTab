@@ -16,6 +16,13 @@ export class ClefGlyph extends MusicFontGlyph {
         this._clefOttava = clefOttava;
     }
 
+    public override doLayout(): void {
+        this.center = true;
+        super.doLayout();
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GClef)!;
+        this.offsetX = this.width / 2;
+    }
+
     private static getSymbol(clef: Clef, clefOttava: Ottavia): MusicFontSymbol {
         switch (clef) {
             case Clef.Neutral:
@@ -64,10 +71,11 @@ export class ClefGlyph extends MusicFontGlyph {
 
         super.paint(cx, cy, canvas);
 
-        switch(this._clef){
+        cx += this.offsetX;
+        switch (this._clef) {
             case Clef.C3:
             case Clef.C4:
-                switch(this._clefOttava){
+                switch (this._clefOttava) {
                     case Ottavia._8vb:
                         return;
                 }

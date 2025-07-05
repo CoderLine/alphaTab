@@ -133,7 +133,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         const lineWidth = Math.ceil(this.width);
 
         // we want the lines to be exactly virtually aligned with the respective Y-position
-        // for note heads to align correctly 
+        // for note heads to align correctly
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
 
         for (let i: number = 0; i < this.drawnLineCount; i++) {
@@ -546,7 +546,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 size = this.smuflMetrics.flagStemSize;
                 break;
             default:
-                size = forceMinStem ?  this.smuflMetrics.flagStemSize : 0;
+                size = forceMinStem ? this.smuflMetrics.flagStemSize : 0;
                 break;
         }
         return this.getLineHeight(size);
@@ -605,14 +605,11 @@ export abstract class LineBarRenderer extends BarRendererBase {
             const y1: number = cy + this.y + this.getBarLineStart(beat, direction);
             const y2: number = cy + this.y + this.calculateBeamY(h, beatLineX);
 
-            // canvas.lineWidth = BarRendererBase.StemWidth;
-            // canvas.beginPath();
-            // canvas.moveTo(cx + this.x + beatLineX, y1);
-            // canvas.lineTo(cx + this.x + beatLineX, y2);
-            // canvas.stroke();
-            // canvas.lineWidth = 1;
-
-            this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
+            if (y1 < y2) {
+                this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
+            } else {
+                this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y2, y1, canvas);
+            }
 
             using _ = ElementStyleHelper.beat(canvas, beamsElement, beat);
 
