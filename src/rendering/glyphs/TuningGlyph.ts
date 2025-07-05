@@ -36,8 +36,6 @@ export class TuningGlyph extends GlyphGroup {
             canvas.color = this.colorOverride!;
         }
         super.paint(cx, cy, canvas);
-        canvas.color = Color.random();
-        canvas.fillRect(cx + this.x, cy + this.y, this.width, this.height);
         canvas.color = c;
     }
 

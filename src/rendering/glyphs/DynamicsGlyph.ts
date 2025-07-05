@@ -1,16 +1,21 @@
 import { DynamicValue } from '@src/model/DynamicValue';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { ICanvas } from '@src/platform/ICanvas';
+import { Color } from '@src/model/Color';
 
 export class DynamicsGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, dynamics: DynamicValue) {
         super(x, y, 1, DynamicsGlyph.getSymbol(dynamics));
-        this.center = true; // TODO: use opticalCenter or advanceWidth/2 if available
     }
 
     public override doLayout(): void {
         super.doLayout();
-        this.y += this.height / 2;
+        this.center = true;
+        // align all to baseline of Forte
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.DynamicForte)!;
+        const forteBaseLine = this.renderer.smuflMetrics.glyphTop.get(MusicFontSymbol.DynamicForte)!
+        this.offsetY = forteBaseLine;
     }
 
     private static getSymbol(dynamics: DynamicValue): MusicFontSymbol {
