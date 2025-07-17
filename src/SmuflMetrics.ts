@@ -141,6 +141,7 @@ export class SmuflMetrics {
     public hairpinThickness: number = 0;
     public legerLineThickness = 0;
     public legerLineExtension = 0;
+    public pedalLineThickness = 0;
     public repeatBarlineDotSeparation: number = 0;
     public repeatEndingLineThickness: number = 0;
     public staffLineThickness: number = 0;
@@ -174,7 +175,7 @@ export class SmuflMetrics {
         this.legerLineThickness = smufl.engravingDefaults.legerLineThickness * this.oneStaffSpace;
         // TODO lyricLineThickness
         // TODO octaveLineThickness
-        // TODO pedalLineThickness
+        this.pedalLineThickness = smufl.engravingDefaults.pedalLineThickness * this.oneStaffSpace;
         this.repeatBarlineDotSeparation = smufl.engravingDefaults.repeatBarlineDotSeparation * this.oneStaffSpace;
         this.repeatEndingLineThickness = smufl.engravingDefaults.repeatEndingLineThickness * this.oneStaffSpace; // TODO which line is this exactly?
         // TODO slurEndpointThickness
@@ -196,6 +197,8 @@ export class SmuflMetrics {
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
         this.tabBendArrowSize = 1 * this.oneStaffSpace;
+        this.lineRangedGlyphDashGap = 1 * this.oneStaffSpace;
+        this.lineRangedGlyphDashSize = 1 * this.oneStaffSpace;
 
         const standardStemLength = 3 * this.oneStaffSpace;
         this.standardStemLength = standardStemLength;
@@ -283,18 +286,23 @@ export class SmuflMetrics {
         }
     }
 
+    //
     // sizes
-    // NOTE: SMuFL has no numbered notation yet
+
+    // Numbered Notation: SMuFL has no numbered notation yet
     public numberedBarRendererBarSize = 0;
     public numberedBarRendererBarSpacing = 0;
 
-    //
+    // Line Ranged Glyphs: smufl doesn's have any good reference for dashed lines on effects    
+    public lineRangedGlyphDashGap: number = 0;
+    public lineRangedGlyphDashSize: number = 0;
+
     // paddings/margins between elements
     public preNoteEffectPadding: number = 0;
 
+
     //  (TODO: try to eliminate custom paddings)
     public multiBarRestPadding: number = 10;
-    public trillTextPadding: number = 3;
 
     public rowContainerPadding: number = 3;
 
@@ -317,8 +325,6 @@ export class SmuflMetrics {
 
     public bendNoteHeadElementPadding: number = 2;
 
-    public circleGlyphPadding: number = 3;
-
     public scoreSlideLineEndPadding = 2;
     public scoreSlideLineOffsetX = 2;
     public scoreSlideLineOffsetY = 2;
@@ -334,13 +340,6 @@ export class SmuflMetrics {
 
     //
     // range glyphs (TODO: check for SMuFL spec)
-    public lineRangedGlyphSpacing: number = 3;
-    public lineRangedGlyphTopPadding: number = 4;
-    public lineRangedGlyphTopOffset: number = 5;
-    public lineRangedGlyphSize: number = 8;
-    public ottavaLineSize: number = 8;
-    public ottavaLineSpacing: number = 3;
-    public ottavaPaddingY: number = 2;
 
     public numberedDashGlyphPadding = 3;
     public stringNumberCirclePadding = 3;
@@ -439,8 +438,6 @@ export class SmuflMetrics {
     public slashTieEmptyHeight = 15;
     public slashTieEmptyWidth = 20;
 
-    public sustainPedalLineWidth = 1;
-
     public tabBendArrowSize: number = 0;
     public tabBendDashSize: number = 3;
     public tabBendBendValueHeight: number = 6;
@@ -517,7 +514,6 @@ export class SmuflMetrics {
     //
     // font size > height factors (TODO: use proper measuring?)
     public scoreWhammyFontSizeToOverflow = 1.5;
-    public chordDiagramFontToRow: number = 1.5;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata

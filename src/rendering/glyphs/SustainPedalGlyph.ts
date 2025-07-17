@@ -60,12 +60,12 @@ export class SustainPedalGlyph extends EffectGlyph {
 
                         const startX = markerX + linePadding;
                         if (nextX > startX) {
-                            canvas.fillRect(startX, y + h - this.renderer.smuflMetrics.sustainPedalLineWidth, nextX - startX, this.renderer.smuflMetrics.sustainPedalLineWidth);
+                            canvas.fillRect(startX, y + h - this.renderer.smuflMetrics.pedalLineThickness, nextX - startX, this.renderer.smuflMetrics.pedalLineThickness);
                         }
                     } else {
                         const nextX = cx + this.x + this.width;
                         const startX = markerX + linePadding;
-                        canvas.fillRect(startX, y + h - this.renderer.smuflMetrics.sustainPedalLineWidth, nextX - startX, this.renderer.smuflMetrics.sustainPedalLineWidth);
+                        canvas.fillRect(startX, y + h - this.renderer.smuflMetrics.pedalLineThickness, nextX - startX, this.renderer.smuflMetrics.pedalLineThickness);
                     }
                 }
 
@@ -73,7 +73,7 @@ export class SustainPedalGlyph extends EffectGlyph {
                 if (markerIndex === 0 && marker.previousPedalMarker) {
                     const startX = cx + this.x;
                     const endX = markerX - linePadding;
-                    canvas.fillRect(startX, y + h - this.renderer.smuflMetrics.sustainPedalLineWidth, endX - startX, this.renderer.smuflMetrics.sustainPedalLineWidth);
+                    canvas.fillRect(startX, y + h - this.renderer.smuflMetrics.pedalLineThickness, endX - startX, this.renderer.smuflMetrics.pedalLineThickness);
                 }
 
                 markerIndex++;

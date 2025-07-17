@@ -79,10 +79,12 @@ export class NoteNumberGlyph extends Glyph {
         this.isEmpty = !this._noteString;
         if (!this.isEmpty) {
             this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.tablatureFont;
-            this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(this._noteString).width;
+            const hasTrill: boolean = !!this._trillNoteString;
+            this.noteStringWidth = this.renderer.scoreRenderer.canvas!.measureText(
+                this._noteString + (hasTrill ? ' ' : '')
+            ).width;
             this.width = this.noteStringWidth;
             this.height = this.renderer.scoreRenderer.canvas!.font.size;
-            const hasTrill: boolean = !!this._trillNoteString;
             if (hasTrill) {
                 this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
                 this._trillNoteStringWidth =
@@ -108,7 +110,11 @@ export class NoteNumberGlyph extends Glyph {
         using _ = ElementStyleHelper.note(canvas, NoteSubElement.GuitarTabFretNumber, this._note);
         const prevFont: Font = this.renderer.scoreRenderer.canvas!.font;
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.graceFont;
-        canvas.fillText(this._trillNoteString!, x + this.noteStringWidth + this.renderer.smuflMetrics.trillTextPadding, cy + this.y);
+        canvas.fillText(
+            this._trillNoteString!,
+            x + this.noteStringWidth,
+            cy + this.y
+        );
         this.renderer.scoreRenderer.canvas!.font = prevFont;
     }
 

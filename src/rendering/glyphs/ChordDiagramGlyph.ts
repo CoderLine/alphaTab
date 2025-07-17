@@ -20,8 +20,8 @@ export class ChordDiagramGlyph extends EffectGlyph {
     public override doLayout(): void {
         super.doLayout();
         const res: RenderingResources = this.renderer.resources;
-        this._textRow = res.effectFont.size * this.renderer.smuflMetrics.chordDiagramFontToRow;
-        this._fretRow = res.effectFont.size * this.renderer.smuflMetrics.chordDiagramFontToRow;
+        this._textRow = res.effectFont.size * 1.5;
+        this._fretRow = res.effectFont.size * 1.5;
         if (this._chord.firstFret > 1) {
             this._firstFretSpacing = this.renderer.smuflMetrics.chordDiagramFretSpacing;
         } else {

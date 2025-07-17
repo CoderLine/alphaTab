@@ -32,6 +32,7 @@ export interface SmuflMetricsJson {
     hairpinThickness?: number;
     legerLineThickness?: number;
     legerLineExtension?: number;
+    pedalLineThickness?: number;
     repeatBarlineDotSeparation?: number;
     repeatEndingLineThickness?: number;
     staffLineThickness?: number;
@@ -45,7 +46,6 @@ export interface SmuflMetricsJson {
     numberedBarRendererBarSpacing?: number;
     preNoteEffectPadding?: number;
     multiBarRestPadding?: number;
-    trillTextPadding?: number;
     rowContainerPadding?: number;
     scoreBendEndPadding?: number;
     scoreBendHoldOffset?: number;
@@ -60,7 +60,6 @@ export interface SmuflMetricsJson {
     beatTimerPaddingY?: number;
     beatTimerMarginY?: number;
     bendNoteHeadElementPadding?: number;
-    circleGlyphPadding?: number;
     scoreSlideLineEndPadding?: number;
     scoreSlideLineOffsetX?: number;
     scoreSlideLineOffsetY?: number;
@@ -130,7 +129,6 @@ export interface SmuflMetricsJson {
     scoreSlideLineSizeX?: number;
     slashTieEmptyHeight?: number;
     slashTieEmptyWidth?: number;
-    sustainPedalLineWidth?: number;
     tabBendArrowSize?: number;
     tabBendDashSize?: number;
     tabBendBendValueHeight?: number;
@@ -184,5 +182,4 @@ export interface SmuflMetricsJson {
     tripletFeelAugmentationOffsetX?: number;
     tripletFeelCloseParenthesisOffsetX?: number;
     scoreWhammyFontSizeToOverflow?: number;
-    chordDiagramFontToRow?: number;
 }

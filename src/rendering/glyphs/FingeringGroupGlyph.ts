@@ -66,6 +66,8 @@ export class FingeringGroupGlyph extends GlyphGroup {
     public override doLayout(): void {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
 
+        // TODO https://w3c.github.io/smufl/latest/tables/fingering.html    
+        // https://w3c.github.io/smufl/latest/tables/fingering-supplement.html
         for (const [_, info] of this._infos) {
             const g = new TextGlyph(
                 0,

@@ -35,6 +35,7 @@ export class SmuflMetricsSerializer {
         o.set("hairpinthickness", obj.hairpinThickness);
         o.set("legerlinethickness", obj.legerLineThickness);
         o.set("legerlineextension", obj.legerLineExtension);
+        o.set("pedallinethickness", obj.pedalLineThickness);
         o.set("repeatbarlinedotseparation", obj.repeatBarlineDotSeparation);
         o.set("repeatendinglinethickness", obj.repeatEndingLineThickness);
         o.set("stafflinethickness", obj.staffLineThickness);
@@ -48,7 +49,6 @@ export class SmuflMetricsSerializer {
         o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
         o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
         o.set("multibarrestpadding", obj.multiBarRestPadding);
-        o.set("trilltextpadding", obj.trillTextPadding);
         o.set("rowcontainerpadding", obj.rowContainerPadding);
         o.set("scorebendendpadding", obj.scoreBendEndPadding);
         o.set("scorebendholdoffset", obj.scoreBendHoldOffset);
@@ -63,7 +63,6 @@ export class SmuflMetricsSerializer {
         o.set("beattimerpaddingy", obj.beatTimerPaddingY);
         o.set("beattimermarginy", obj.beatTimerMarginY);
         o.set("bendnoteheadelementpadding", obj.bendNoteHeadElementPadding);
-        o.set("circleglyphpadding", obj.circleGlyphPadding);
         o.set("scoreslidelineendpadding", obj.scoreSlideLineEndPadding);
         o.set("scoreslidelineoffsetx", obj.scoreSlideLineOffsetX);
         o.set("scoreslidelineoffsety", obj.scoreSlideLineOffsetY);
@@ -73,10 +72,10 @@ export class SmuflMetricsSerializer {
         o.set("tabnotechordeffectspacing", obj.tabNoteChordEffectSpacing);
         o.set("tabwhammysimpledippadding", obj.tabWhammySimpleDipPadding);
         o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
-        o.set("linerangedglyphspacing", obj.lineRangedGlyphSpacing);
+        o.set("linerangedglyphspacing", obj.lineRangedGlyphDashGap);
         o.set("linerangedglyphtoppadding", obj.lineRangedGlyphTopPadding);
         o.set("linerangedglyphtopoffset", obj.lineRangedGlyphTopOffset);
-        o.set("linerangedglyphsize", obj.lineRangedGlyphSize);
+        o.set("linerangedglyphsize", obj.lineRangedGlyphDashSize);
         o.set("ottavalinesize", obj.ottavaLineSize);
         o.set("ottavalinespacing", obj.ottavaLineSpacing);
         o.set("ottavapaddingy", obj.ottavaPaddingY);
@@ -169,7 +168,6 @@ export class SmuflMetricsSerializer {
         o.set("scoreslidelinesizex", obj.scoreSlideLineSizeX);
         o.set("slashtieemptyheight", obj.slashTieEmptyHeight);
         o.set("slashtieemptywidth", obj.slashTieEmptyWidth);
-        o.set("sustainpedallinewidth", obj.sustainPedalLineWidth);
         o.set("tabbendarrowsize", obj.tabBendArrowSize);
         o.set("tabbenddashsize", obj.tabBendDashSize);
         o.set("tabbendbendvalueheight", obj.tabBendBendValueHeight);
@@ -247,7 +245,6 @@ export class SmuflMetricsSerializer {
         o.set("tripletfeelaugmentationoffsetx", obj.tripletFeelAugmentationOffsetX);
         o.set("tripletfeelcloseparenthesisoffsetx", obj.tripletFeelCloseParenthesisOffsetX);
         o.set("scorewhammyfontsizetooverflow", obj.scoreWhammyFontSizeToOverflow);
-        o.set("chorddiagramfonttorow", obj.chordDiagramFontToRow);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -294,6 +291,9 @@ export class SmuflMetricsSerializer {
             case "legerlineextension":
                 obj.legerLineExtension = v! as number;
                 return true;
+            case "pedallinethickness":
+                obj.pedalLineThickness = v! as number;
+                return true;
             case "repeatbarlinedotseparation":
                 obj.repeatBarlineDotSeparation = v! as number;
                 return true;
@@ -332,9 +332,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "multibarrestpadding":
                 obj.multiBarRestPadding = v! as number;
-                return true;
-            case "trilltextpadding":
-                obj.trillTextPadding = v! as number;
                 return true;
             case "rowcontainerpadding":
                 obj.rowContainerPadding = v! as number;
@@ -378,9 +375,6 @@ export class SmuflMetricsSerializer {
             case "bendnoteheadelementpadding":
                 obj.bendNoteHeadElementPadding = v! as number;
                 return true;
-            case "circleglyphpadding":
-                obj.circleGlyphPadding = v! as number;
-                return true;
             case "scoreslidelineendpadding":
                 obj.scoreSlideLineEndPadding = v! as number;
                 return true;
@@ -409,7 +403,7 @@ export class SmuflMetricsSerializer {
                 obj.tabWhammyTextPadding = v! as number;
                 return true;
             case "linerangedglyphspacing":
-                obj.lineRangedGlyphSpacing = v! as number;
+                obj.lineRangedGlyphDashGap = v! as number;
                 return true;
             case "linerangedglyphtoppadding":
                 obj.lineRangedGlyphTopPadding = v! as number;
@@ -418,7 +412,7 @@ export class SmuflMetricsSerializer {
                 obj.lineRangedGlyphTopOffset = v! as number;
                 return true;
             case "linerangedglyphsize":
-                obj.lineRangedGlyphSize = v! as number;
+                obj.lineRangedGlyphDashSize = v! as number;
                 return true;
             case "ottavalinesize":
                 obj.ottavaLineSize = v! as number;
@@ -610,9 +604,6 @@ export class SmuflMetricsSerializer {
             case "slashtieemptywidth":
                 obj.slashTieEmptyWidth = v! as number;
                 return true;
-            case "sustainpedallinewidth":
-                obj.sustainPedalLineWidth = v! as number;
-                return true;
             case "tabbendarrowsize":
                 obj.tabBendArrowSize = v! as number;
                 return true;
@@ -768,9 +759,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "scorewhammyfontsizetooverflow":
                 obj.scoreWhammyFontSizeToOverflow = v! as number;
-                return true;
-            case "chorddiagramfonttorow":
-                obj.chordDiagramFontToRow = v! as number;
                 return true;
         }
         return false;

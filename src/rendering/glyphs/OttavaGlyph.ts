@@ -78,11 +78,12 @@ export class OttavaGlyph extends GroupedEffectGlyph {
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {
         const size: number = this.paintOttava(cx, cy, canvas);
-        const lineSpacing: number = this.renderer.smuflMetrics.ottavaLineSpacing;
+        const lineSpacing: number = this.renderer.smuflMetrics.lineRangedGlyphDashGap;
         const startX: number = cx + this.x + size + lineSpacing;
         let lineY: number = cy + this.y;
-        lineY += this._aboveStaff ? this.renderer.smuflMetrics.ottavaPaddingY : this.height - this.renderer.smuflMetrics.ottavaPaddingY;
-        const lineSize: number = this.renderer.smuflMetrics.ottavaLineSize;
+        const padding = this.height * 0.5;
+        lineY += this._aboveStaff ? 0 : this.height;
+        const lineSize: number = this.renderer.smuflMetrics.lineRangedGlyphDashSize;
         if (endX > startX) {
             let lineX: number = startX;
             while (lineX < endX) {
@@ -95,10 +96,10 @@ export class OttavaGlyph extends GroupedEffectGlyph {
             canvas.beginPath();
             if (this._aboveStaff) {
                 canvas.moveTo(endX, lineY);
-                canvas.lineTo(endX, cy + this.y + this.height);
+                canvas.lineTo(endX, lineY + padding);
             } else {
                 canvas.moveTo(endX, lineY);
-                canvas.lineTo(endX, cy + this.y);
+                canvas.lineTo(endX, lineY - padding );
             }
             canvas.stroke();
         }
