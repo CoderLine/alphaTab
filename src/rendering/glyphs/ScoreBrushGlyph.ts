@@ -43,7 +43,7 @@ export class ScoreBrushGlyph extends Glyph {
                 const lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + this.renderer.smuflMetrics.arpeggioXOffset, lineEndY, -90);
+                canvas.beginRotate(cx + this.x, lineEndY, -90);
                 glyph.paint(0, waveOffset, canvas);
                 canvas.endRotate();
 
@@ -58,7 +58,7 @@ export class ScoreBrushGlyph extends Glyph {
                 const lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + this.renderer.smuflMetrics.arpeggioXOffset, lineStartY, 90);
+                canvas.beginRotate(cx + this.x, lineStartY, 90);
                 glyph.paint(0, waveOffset, canvas);
                 canvas.endRotate();
 

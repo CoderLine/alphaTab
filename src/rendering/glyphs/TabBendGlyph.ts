@@ -13,6 +13,7 @@ import type { RenderingResources } from '@src/RenderingResources';
 import { BendPoint } from '@src/model/BendPoint';
 import { VibratoType } from '@src/model/VibratoType';
 import { NoteVibratoGlyph } from '@src/rendering/glyphs/NoteVibratoGlyph';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class TabBendGlyph extends Glyph {
     private _notes: Note[] = [];
@@ -254,6 +255,7 @@ export class TabBendGlyph extends Glyph {
             let startX: number = 0;
             let endX: number = 0;
             const topY: number = cy + startNoteRenderer.y;
+            const tabBendArrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
             startX = cx + startNoteRenderer.x;
             if (renderPoints[0].value > 0 || note.isContinuedBend) {
                 startX += startNoteRenderer.getBeatX(note.beat, BeatXPosition.MiddleNotes);
@@ -270,7 +272,7 @@ export class TabBendGlyph extends Glyph {
                 endX = cx + endNoteRenderer!.x + endNoteRenderer!.getBeatX(endBeat.nextBeat, BeatXPosition.PreNotes);
             }
             if (!isMultiBeatBend) {
-                endX -= this.renderer.smuflMetrics.tabBendArrowSize;
+                endX -= tabBendArrowSize;
             }
             // we need some pixels for the arrow. otherwise we might draw into the next
             // note
@@ -299,7 +301,7 @@ export class TabBendGlyph extends Glyph {
             }
 
             if (endNote.vibrato !== VibratoType.None) {
-                const vibratoStartX = endX - cx + this.renderer.smuflMetrics.tabBendArrowSize - endNoteRenderer.x;
+                const vibratoStartX = endX - cx + tabBendArrowSize - endNoteRenderer.x;
                 const vibratoStartY: number =
                     topY -
                     cy -
@@ -350,7 +352,7 @@ export class TabBendGlyph extends Glyph {
         }
         // what type of arrow? (up/down)
         let arrowOffset: number = 0;
-        const arrowSize: number = this.renderer.smuflMetrics.tabBendArrowSize;
+        const arrowSize = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArrowheadBlackDown)!;
         if (secondPt.value > firstPt.value) {
             if (y2 + arrowSize > y1) {
                 y2 = y1 - arrowSize;

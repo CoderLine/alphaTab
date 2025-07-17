@@ -58,7 +58,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     if (whammyMode === NotationMode.SongBook) {
                         const res: RenderingResources = this.renderer.resources;
                         (this.renderer as ScoreBarRenderer).simpleWhammyOverflow =
-                            res.tablatureFont.size * this.renderer.smuflMetrics.scoreWhammyFontSizeToOverflow +
+                            res.tablatureFont.size +
                             this.renderer.smuflMetrics.scoreWhammySimpleDipHeight +
                             this.renderer.smuflMetrics.scoreWhammySimpleDipPadding;
                     } else {
@@ -204,8 +204,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             beatDirection === BeamDirection.Down,
-                            this.renderer.smuflMetrics.scoreBendHoldOffset,
-                            this.renderer.smuflMetrics.scoreBendHoldSize
+                            this.renderer.smuflMetrics.tieHeight,
+                            this.renderer.smuflMetrics.slurMidpointThickness
                         );
                     }
                     break;
@@ -240,8 +240,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             beatDirection === BeamDirection.Down,
-                            this.renderer.smuflMetrics.scoreBendHoldOffset,
-                            this.renderer.smuflMetrics.scoreBendHoldSize
+                            this.renderer.smuflMetrics.tieHeight,
+                            this.renderer.smuflMetrics.slurMidpointThickness
                         );
                     }
                     break;
@@ -288,8 +288,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 endX,
                                 endY,
                                 beatDirection === BeamDirection.Down,
-                                this.renderer.smuflMetrics.scoreBendHoldOffset,                                
-                                this.renderer.smuflMetrics.scoreBendHoldSize
+                                this.renderer.smuflMetrics.tieHeight,                                
+                                this.renderer.smuflMetrics.slurMidpointThickness
                             );
                         }
                     } else {

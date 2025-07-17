@@ -40,7 +40,7 @@ export class TabBrushGlyph extends Glyph {
                 const lineEndY: number = endY - arrowSize;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + this.renderer.smuflMetrics.tabBrushArpeggioOffset, lineEndY, -90);
+                canvas.beginRotate(cx + this.x, lineEndY, -90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             } else if (this._beat.brushType === BrushType.ArpeggioDown) {
@@ -52,7 +52,7 @@ export class TabBrushGlyph extends Glyph {
                 const lineEndY: number = endY;
                 glyph.width = Math.abs(lineEndY - lineStartY);
 
-                canvas.beginRotate(cx + this.x + this.renderer.smuflMetrics.tabBrushArpeggioOffset, lineStartY, 90);
+                canvas.beginRotate(cx + this.x, lineStartY, 90);
                 glyph.paint(0, -glyph.height / 2, canvas);
                 canvas.endRotate();
             }

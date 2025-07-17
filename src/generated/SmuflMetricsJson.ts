@@ -3,9 +3,9 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { Duration } from "@src/model/Duration";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { SmuflStemInfoJson } from "@src/generated/SmuflStemInfoJson";
+import { Duration } from "@src/model/Duration";
 /**
  * This class holds all SMuFL metrics we use in alphaTab like sizes,
  * spacings etc.
@@ -35,31 +35,30 @@ export interface SmuflMetricsJson {
     pedalLineThickness?: number;
     repeatBarlineDotSeparation?: number;
     repeatEndingLineThickness?: number;
+    slurMidpointThickness?: number;
     staffLineThickness?: number;
     stemThickness?: number;
     thickBarlineThickness?: number;
     thinBarlineThickness?: number;
     thinThickBarlineSeparation?: number;
+    tieMidpointThickness?: number;
     tupletBracketThickness?: number;
     effectBandSeparation?: number;
     numberedBarRendererBarSize?: number;
     numberedBarRendererBarSpacing?: number;
+    numberedDashGlyphPadding?: number;
+    lineRangedGlyphDashGap?: number;
+    lineRangedGlyphDashSize?: number;
     preNoteEffectPadding?: number;
-    multiBarRestPadding?: number;
+    stringNumberCirclePadding?: number;
     rowContainerPadding?: number;
-    scoreBendEndPadding?: number;
-    scoreBendHoldOffset?: number;
-    scoreBendHoldSize?: number;
-    scoreHelperNotesEndPadding?: number;
-    scoreHelperNotesEndPadding2?: number;
-    scoreNoteBelowEffectSpacing?: number;
-    alternateEndingsPaddingX?: number;
-    alternateEndingsPaddingY?: number;
-    alternateEndingsCloseLinePadding?: number;
-    beatTimerPaddingX?: number;
-    beatTimerPaddingY?: number;
-    beatTimerMarginY?: number;
+    scoreChordEffectSpacing?: number;
+    alternateEndingsPadding?: number;
+    sustainPedalLinePadding?: number;
+    tieHeight?: number;
+    beatTimerPadding?: number;
     bendNoteHeadElementPadding?: number;
+    ghostParenthesisWidth?: number;
     scoreSlideLineEndPadding?: number;
     scoreSlideLineOffsetX?: number;
     scoreSlideLineOffsetY?: number;
@@ -69,37 +68,6 @@ export interface SmuflMetricsJson {
     tabNoteChordEffectSpacing?: number;
     tabWhammySimpleDipPadding?: number;
     tabWhammyTextPadding?: number;
-    lineRangedGlyphSpacing?: number;
-    lineRangedGlyphTopPadding?: number;
-    lineRangedGlyphTopOffset?: number;
-    lineRangedGlyphSize?: number;
-    ottavaLineSize?: number;
-    ottavaLineSpacing?: number;
-    ottavaPaddingY?: number;
-    numberedDashGlyphPadding?: number;
-    stringNumberCirclePadding?: number;
-    sustainPedalTextLinePadding?: number;
-    sustainPedalStarLinePadding?: number;
-    timeSignatureGhostParenthesisLeftPadding?: number;
-    timeSignatureGhostParenthesisRightPadding?: number;
-    tabBrushArpeggioOffset?: number;
-    pictEdgeOfCymbalOffsetX?: number;
-    arpeggioXOffset?: number;
-    noteOrnamentBottomOffset?: number;
-    numberedBeatNoteYTopPadding?: number;
-    slashBeatNoteYTopPadding?: number;
-    tabNoteYTopOffset?: number;
-    accentuationPadding?: number;
-    articStaccatoAbovePaddingX?: number;
-    articStaccatoAbovePaddingY?: number;
-    graceBeatPadding?: number;
-    graceBeatPostBeatStretch?: number;
-    scoreTremoloOffsetUp?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
-    scoreTremoloOffsetUpOther?: number;
-    scoreTremoloOffsetDown?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
-    scoreTremoloOffsetDownOther?: number;
-    tabTremoloOffsetX?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
-    tabTremoloXDefault?: number;
     tabPreBendPadding?: number;
     tabSlideOffsetX?: number;
     stemUp?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
@@ -107,9 +75,7 @@ export interface SmuflMetricsJson {
     repeatOffsetX?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
     deadSlappedLineWidth?: number;
     flagWidth?: number;
-    ghostParenthesisSize?: number;
     leftHandTappingCircleScale?: number;
-    multiBarRestWidth?: number;
     numberedNoteHeadWidth?: number;
     numberedNoteHeadHeight?: number;
     numberedTieEmptySize?: number;
@@ -129,7 +95,6 @@ export interface SmuflMetricsJson {
     scoreSlideLineSizeX?: number;
     slashTieEmptyHeight?: number;
     slashTieEmptyWidth?: number;
-    tabBendArrowSize?: number;
     tabBendDashSize?: number;
     tabBendBendValueHeight?: number;
     tabBrushWidth?: number;
@@ -141,9 +106,6 @@ export interface SmuflMetricsJson {
     tabTieEmptyWidth?: number;
     tabWhammyPerHalfSize?: number;
     tabWhammyDashSize?: number;
-    tieSize?: number;
-    tieHeight?: number;
-    bendSlurHeight?: number;
     timeSignatureNumberHeight?: number;
     standardStemLength?: number;
     stemFlagOffsets?: Map<Duration | keyof typeof Duration | Lowercase<keyof typeof Duration>, number>;
@@ -167,7 +129,6 @@ export interface SmuflMetricsJson {
     tempoNoteScale?: number;
     tuningGlyphCircleNumberScale?: number;
     tuningGlyphStringColumnScale?: number;
-    pictEdgeOfCymbalScale?: number;
     tripletFeelNoteScale?: number;
     tripletFeelTupletScale?: number;
     tripletFeelHeight?: number;
@@ -181,5 +142,4 @@ export interface SmuflMetricsJson {
     tripletFeelEqualsOffsetY?: number;
     tripletFeelAugmentationOffsetX?: number;
     tripletFeelCloseParenthesisOffsetX?: number;
-    scoreWhammyFontSizeToOverflow?: number;
 }

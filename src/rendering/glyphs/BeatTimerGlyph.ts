@@ -21,17 +21,17 @@ export class BeatTimerGlyph extends EffectGlyph {
 
         const size = c.measureText(this._text);
 
-        this._textHeight = c.font.size + this.renderer.smuflMetrics.beatTimerPaddingY * 2;
-        this._textWidth = size.width + this.renderer.smuflMetrics.beatTimerPaddingX * 2;
+        this._textHeight = c.font.size + this.renderer.smuflMetrics.beatTimerPadding * 2;
+        this._textWidth = size.width + this.renderer.smuflMetrics.beatTimerPadding * 2;
 
-        this.height = this._textHeight + this.renderer.smuflMetrics.beatTimerMarginY * 2;
+        this.height = this._textHeight + this.renderer.smuflMetrics.beatTimerPadding * 2;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const halfWidth = (this._textWidth / 2) | 0;
         canvas.strokeRect(
             cx + this.x - halfWidth,
-            cy + this.y + this.renderer.smuflMetrics.beatTimerMarginY,
+            cy + this.y + this.renderer.smuflMetrics.beatTimerPadding,
             this._textWidth,
             this._textHeight
         );

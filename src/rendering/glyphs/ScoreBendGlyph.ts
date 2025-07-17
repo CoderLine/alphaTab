@@ -126,7 +126,11 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         } else {
             endBeatX += startNoteRenderer.getBeatX(this._beat.nextBeat!, BeatXPosition.PreNotes);
         }
-        endBeatX -= this.renderer.smuflMetrics.scoreBendEndPadding;
+
+        if (this._endNoteGlyph) {
+            endBeatX -= this._endNoteGlyph.width;
+        }
+
         const middleX: number = (startX + endBeatX) / 2;
         if (this._middleNoteGlyph) {
             this._middleNoteGlyph.x = middleX - this._middleNoteGlyph.noteHeadOffset;
@@ -188,8 +192,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.renderer.smuflMetrics.scoreBendHoldOffset,
-                            this.renderer.smuflMetrics.scoreBendHoldSize
+                            this.renderer.smuflMetrics.tieHeight,
+                            this.renderer.smuflMetrics.slurMidpointThickness
                         );
                     } else {
                         this.drawBendSlur(
@@ -219,8 +223,8 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
                             endX,
                             endY,
                             direction === BeamDirection.Down,
-                            this.renderer.smuflMetrics.scoreBendHoldOffset,
-                            this.renderer.smuflMetrics.scoreBendHoldSize
+                            this.renderer.smuflMetrics.tieHeight,
+                            this.renderer.smuflMetrics.slurMidpointThickness
                         );
                     } else {
                         this.drawBendSlur(

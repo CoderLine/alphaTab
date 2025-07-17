@@ -159,7 +159,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= g.height / 2 + this.renderer.smuflMetrics.numberedBeatNoteYTopPadding;
+                    pos -= g.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;

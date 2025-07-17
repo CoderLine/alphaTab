@@ -720,4 +720,16 @@ export class ScoreBarRenderer extends LineBarRenderer {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
         canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
     }
+
+    protected override paintStemEffects(
+        beat: Beat,
+        cy: number,
+        x: number,
+        topY: number,
+        bottomY: number,
+        canvas: ICanvas
+    ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationEffects, beat);
+        super.paintStemEffects(beat, cy, x, topY, bottomY, canvas);
+    }
 }

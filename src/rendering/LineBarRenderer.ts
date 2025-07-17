@@ -72,7 +72,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected updateFirstLineY() {
         const fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
         const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
-        this.firstLineY = this.topPadding + (fullLineHeight - actualLineHeight) / 2;
+        const blurCorrection = this.smuflMetrics.staffLineThickness / 2;
+        this.firstLineY = this.topPadding + (fullLineHeight - actualLineHeight) / 2 + blurCorrection;
     }
 
     public override doLayout(): void {
@@ -129,7 +130,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // during system fitting it can happen that we have fraction widths
         // but to have lines until the full end-pixel we round up.
         // this way we avoid holes
-        const lineWidth = Math.ceil(this.width);
+        const lineWidth = this.width;
 
         // we want the lines to be exactly virtually aligned with the respective Y-position
         // for note heads to align correctly
@@ -509,6 +510,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, topY, bottomY, canvas);
+            this.paintStemEffects(beat, cy + this.y, cx + this.x + beatLineX, topY, bottomY, canvas);
 
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
@@ -552,6 +554,32 @@ export abstract class LineBarRenderer extends BarRendererBase {
         bottomY: number,
         canvas: ICanvas
     ): void;
+
+    protected paintStemEffects(
+        beat: Beat,
+        _cy: number,
+        x: number,
+        topY: number,
+        bottomY: number,
+        canvas: ICanvas
+    ): void {
+        if (beat.isTremolo && !beat.deadSlapped) {
+            let tremoloGlyph = MusicFontSymbol.None;
+            switch (beat.tremoloSpeed!) {
+                case Duration.ThirtySecond:
+                    tremoloGlyph = MusicFontSymbol.Tremolo3;
+                    break;
+                case Duration.Sixteenth:
+                    tremoloGlyph = MusicFontSymbol.Tremolo2;
+                    break;
+                case Duration.Eighth:
+                    tremoloGlyph = MusicFontSymbol.Tremolo1;
+                    break;
+            }
+
+            canvas.fillMusicFontSymbol(x, (topY + bottomY) / 2, 1, tremoloGlyph, false);
+        }
+    }
 
     protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
         let size: number = 0;
@@ -612,6 +640,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
     public abstract get staffLineBarSubElement(): BarSubElement;
 
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, beamsElement: BeatSubElement): void {
+        const direction: BeamDirection = this.getBeamDirection(h);
+
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             const beat: Beat = h.beats[i];
             if (!h.hasBeatLineX(beat) || beat.deadSlapped) {
@@ -620,13 +650,13 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             const isGrace: boolean = beat.graceType !== GraceType.None;
             const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
-            //
-            // draw line
-            //
+
             const beatLineX: number = h.getBeatLineX(beat);
-            const direction: BeamDirection = this.getBeamDirection(h);
             const y1: number = cy + this.y + this.getBarLineStart(beat, direction);
-            const y2: number = cy + this.y + this.calculateBeamY(h, beatLineX);
+
+            // ensure we are pixel aligned on the end of the stem to avoid anti-aliasing artifacts
+            // when combining stems and beams on sub-pixel level
+            const y2: number = (cy + this.y + this.calculateBeamY(h, beatLineX)) | 0;
 
             if (y1 < y2) {
                 this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, y1, y2, canvas);
@@ -647,6 +677,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             let barSize: number = this.smuflMetrics.beamThickness * scaleMod;
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;
+
             if (direction === BeamDirection.Down) {
                 barSpacing = -barSpacing;
                 barSize = -barSize;
@@ -657,6 +688,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 let barStartY: number = 0;
                 let barEndY: number = 0;
                 const barY: number = barStart + barIndex * barSpacing;
+
                 //
                 // Bar to Next?
                 //
@@ -709,6 +741,14 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         }
                         barStartY = barY + this.calculateBeamY(h, barStartX);
                         barEndY = barY + this.calculateBeamY(h, barEndX);
+
+                        // ensure we are pixel aligned on the end of the stem to avoid anti-aliasing artifacts
+                        // when combining stems and beams on sub-pixel level
+                        if (barIndex === 0) {
+                            barStartY = barStartY | 0;
+                            barEndY = barEndY | 0;
+                        }
+
                         LineBarRenderer.paintSingleBar(
                             canvas,
                             cx + this.x + barStartX,
@@ -720,6 +760,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     }
                 } else if (i > 0 && !BeamingHelper.isFullBarJoin(beat, h.beats[i - 1], barIndex)) {
                     barStartX = beatLineX - brokenBarOffset;
+                    barEndX = beatLineX;
                     barEndX = beatLineX;
                     barStartY = barY + this.calculateBeamY(h, barStartX);
                     barEndY = barY + this.calculateBeamY(h, barEndX);

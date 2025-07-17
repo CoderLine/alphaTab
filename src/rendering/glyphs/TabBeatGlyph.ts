@@ -1,4 +1,3 @@
-import { Duration } from '@src/model/Duration';
 import { GraceType } from '@src/model/GraceType';
 import { type Note, NoteSubElement } from '@src/model/Note';
 import { TabRhythmMode } from '@src/NotationSettings';
@@ -9,7 +8,6 @@ import { NoteNumberGlyph } from '@src/rendering/glyphs/NoteNumberGlyph';
 import { TabNoteChordGlyph } from '@src/rendering/glyphs/TabNoteChordGlyph';
 import { TabRestGlyph } from '@src/rendering/glyphs/TabRestGlyph';
 import { TabWhammyBarGlyph } from '@src/rendering/glyphs/TabWhammyBarGlyph';
-import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import type { TabBarRenderer } from '@src/rendering/TabBarRenderer';
 import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
@@ -88,22 +86,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 whammy.renderer = this.renderer;
                 whammy.doLayout();
                 this.container.ties.push(whammy);
-            }
-            //
-            // Tremolo Picking
-            if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
-                let offset: number = 0;
-                const speed = this.container.beat.tremoloSpeed!;
-                let tremoloX = this.renderer.smuflMetrics.tabTremoloXDefault;
-                if(this.renderer.smuflMetrics.tabTremoloOffsetX.has(speed)){
-                    offset = this.renderer.smuflMetrics.tabTremoloOffsetX.get(speed)!;
-                }
-
-                if (this.container.beat.duration < Duration.Half) {
-                    tremoloX = 0;
-                }
-
-                beatEffects.set('tremolo', new TremoloPickingGlyph(tremoloX, offset, speed));
             }
             //
             // Note dots

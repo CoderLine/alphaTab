@@ -61,7 +61,7 @@ export class TabNoteChordGlyph extends Glyph {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= n.height / 2 + this.renderer.smuflMetrics.tabNoteYTopOffset;
+                    pos -= n.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;

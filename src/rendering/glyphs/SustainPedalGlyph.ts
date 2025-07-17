@@ -35,16 +35,16 @@ export class SustainPedalGlyph extends EffectGlyph {
                 let linePadding = 0;
                 if (marker.pedalType === SustainPedalMarkerType.Down) {
                     canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalPed, true);
-                    linePadding = textWidth / 2 + this.renderer.smuflMetrics.sustainPedalTextLinePadding;
+                    linePadding = textWidth / 2 + this.renderer.smuflMetrics.sustainPedalLinePadding;
                 } else if (marker.pedalType === SustainPedalMarkerType.Up) {
                     canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
-                    linePadding = starSize / 2 + this.renderer.smuflMetrics.sustainPedalStarLinePadding;
+                    linePadding = starSize / 2 + this.renderer.smuflMetrics.sustainPedalLinePadding;
                 }
 
                 // line to next marker or end-of-bar
                 if (marker.nextPedalMarker) {
                     if (marker.nextPedalMarker.bar === marker.bar) {
-                        let nextX = cx + this.renderer.getRatioPositionX(marker.nextPedalMarker.ratioPosition);
+                        let nextX = cx + this.renderer.getRatioPositionX(marker.nextPedalMarker.ratioPosition) - this.renderer.smuflMetrics.sustainPedalLinePadding;
 
                         switch (marker.nextPedalMarker.pedalType) {
                             case SustainPedalMarkerType.Down:

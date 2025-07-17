@@ -42,7 +42,12 @@ export class AlternateEndingsEffectInfo extends EffectBarRendererInfo {
             closeLine = false;
         }
 
-        return new AlternateEndingsGlyph(0, 0, masterBar.alternateEndings, openLine, closeLine);
+        const indent =
+            masterBar.previousMasterBar !== null &&
+            masterBar.alternateEndings !== masterBar.previousMasterBar!.alternateEndings &&
+            masterBar.previousMasterBar!.alternateEndings > 0;
+
+        return new AlternateEndingsGlyph(0, 0, masterBar.alternateEndings, openLine, closeLine, indent);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

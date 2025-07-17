@@ -59,8 +59,7 @@ export class VoiceContainerGlyph extends GlyphGroup {
                             currentBeatGlyph.beat.graceGroup!.beats[currentBeatGlyph.beat.graceGroup!.beats.length - 1]
                                 .nextBeat;
                         const preBeatStretch = afterGraceBeat
-                            ? this.renderer.layoutingInfo.getPreBeatSize(afterGraceBeat) +
-                              this.renderer.smuflMetrics.graceBeatPadding
+                            ? this.renderer.layoutingInfo.getPreBeatSize(afterGraceBeat)
                             : 0;
 
                         // move right in front to the note

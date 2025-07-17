@@ -306,4 +306,17 @@ export class TabBarRenderer extends LineBarRenderer {
             }
         }
     }
+
+    
+    protected override paintStemEffects(
+        beat: Beat,
+        cy: number,
+        x: number,
+        topY: number,
+        bottomY: number,
+        canvas: ICanvas
+    ): void {
+        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabEffects, beat);
+        super.paintStemEffects(beat, cy, x, topY, bottomY, canvas);
+    }
 }

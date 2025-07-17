@@ -1,12 +1,9 @@
 import { type Beat, BeatSubElement } from '@src/model/Beat';
-import { Duration } from '@src/model/Duration';
 import type { Note } from '@src/model/Note';
 import type { ICanvas } from '@src/platform/ICanvas';
 import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ScoreNoteChordGlyphBase } from '@src/rendering/glyphs/ScoreNoteChordGlyphBase';
-import type { ScoreNoteGlyphInfo } from '@src/rendering/glyphs/ScoreNoteGlyphInfo';
-import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
@@ -149,7 +146,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         const direction: BeamDirection = this.direction;
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
-        let belowEffectSpacing = this.renderer.smuflMetrics.scoreNoteBelowEffectSpacing;
+        let belowEffectSpacing = this.renderer.smuflMetrics.scoreChordEffectSpacing;
         let aboveEffectSpacing = -belowEffectSpacing;
 
         let belowEffectSpacingShiftBefore = false;
@@ -224,31 +221,18 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             scoreRenderer.registerBeatEffectOverflows(minEffectY, maxEffectY ?? 0);
         }
 
-        if (this.beat.isTremolo && !this.beat.deadSlapped) {
-            let offset: number = 0;
-            const baseNote: ScoreNoteGlyphInfo = direction === BeamDirection.Up ? this.minNote! : this.maxNote!;
-            let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
-            const speed: Duration = this.beat.tremoloSpeed!;
-            const scoreTremoloOffsetLookup =
-                direction === BeamDirection.Up
-                    ? this.renderer.smuflMetrics.scoreTremoloOffsetUp
-                    : this.renderer.smuflMetrics.scoreTremoloOffsetDown;
-            if (scoreTremoloOffsetLookup.has(speed)) {
-                offset = scoreTremoloOffsetLookup.get(speed)!;
-            } else if (direction === BeamDirection.Up) {
-                offset = this.renderer.smuflMetrics.scoreTremoloOffsetUpOther;
-            } else {
-                offset = this.renderer.smuflMetrics.scoreTremoloOffsetDownOther;
-            }
+        // if (this.beat.isTremolo && !this.beat.deadSlapped) {
+        //     let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
+        //     const speed: Duration = this.beat.tremoloSpeed!;
 
-            if (this.beat.duration < Duration.Half) {
-                tremoloX = this.width / 2;
-            }
+        //     if (this.beat.duration < Duration.Half) {
+        //         tremoloX = this.width / 2;
+        //     }
 
-            this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y + offset, speed);
-            this._tremoloPicking.renderer = this.renderer;
-            this._tremoloPicking.doLayout();
-        }
+        //     this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y, speed);
+        //     this._tremoloPicking.renderer = this.renderer;
+        //     this._tremoloPicking.doLayout();
+        // }
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {

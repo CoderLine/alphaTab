@@ -117,13 +117,6 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
 
             if (!ghost.isEmpty) {
                 this.addEffect(ghost);
-                this.addNormal(
-                    new SpacingGlyph(
-                        0,
-                        0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
-                    )
-                );
             }
             if (!accidentals.isEmpty) {
                 this.accidentals = accidentals;

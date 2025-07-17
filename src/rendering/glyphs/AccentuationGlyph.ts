@@ -36,8 +36,7 @@ export class AccentuationGlyph extends EffectGlyph {
         const dir = this.renderer.getBeatDirection(this._note.beat);
         const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir === BeamDirection.Down);
 
-        const padding = this.renderer.smuflMetrics.accentuationPadding;
-        const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
-        canvas.fillMusicFontSymbol(cx + this.x - padding, y, 1, symbol, false);
+        const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height;
+        canvas.fillMusicFontSymbol(cx + this.x, y, 1, symbol, false);
     }
 }

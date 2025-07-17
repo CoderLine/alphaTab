@@ -6,9 +6,9 @@
 import { SmuflMetrics } from "@src/SmuflMetrics";
 import { JsonHelper } from "@src/io/JsonHelper";
 import { SmuflStemInfoSerializer } from "@src/generated/SmuflStemInfoSerializer";
-import { Duration } from "@src/model/Duration";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
 import { SmuflStemInfo } from "@src/SmuflMetrics";
+import { Duration } from "@src/model/Duration";
 export class SmuflMetricsSerializer {
     public static fromJson(obj: SmuflMetrics, m: unknown): void {
         if (!m) {
@@ -38,31 +38,30 @@ export class SmuflMetricsSerializer {
         o.set("pedallinethickness", obj.pedalLineThickness);
         o.set("repeatbarlinedotseparation", obj.repeatBarlineDotSeparation);
         o.set("repeatendinglinethickness", obj.repeatEndingLineThickness);
+        o.set("slurmidpointthickness", obj.slurMidpointThickness);
         o.set("stafflinethickness", obj.staffLineThickness);
         o.set("stemthickness", obj.stemThickness);
         o.set("thickbarlinethickness", obj.thickBarlineThickness);
         o.set("thinbarlinethickness", obj.thinBarlineThickness);
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
+        o.set("tiemidpointthickness", obj.tieMidpointThickness);
         o.set("tupletbracketthickness", obj.tupletBracketThickness);
         o.set("effectbandseparation", obj.effectBandSeparation);
         o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
+        o.set("numbereddashglyphpadding", obj.numberedDashGlyphPadding);
+        o.set("linerangedglyphdashgap", obj.lineRangedGlyphDashGap);
+        o.set("linerangedglyphdashsize", obj.lineRangedGlyphDashSize);
         o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
-        o.set("multibarrestpadding", obj.multiBarRestPadding);
+        o.set("stringnumbercirclepadding", obj.stringNumberCirclePadding);
         o.set("rowcontainerpadding", obj.rowContainerPadding);
-        o.set("scorebendendpadding", obj.scoreBendEndPadding);
-        o.set("scorebendholdoffset", obj.scoreBendHoldOffset);
-        o.set("scorebendholdsize", obj.scoreBendHoldSize);
-        o.set("scorehelpernotesendpadding", obj.scoreHelperNotesEndPadding);
-        o.set("scorehelpernotesendpadding2", obj.scoreHelperNotesEndPadding2);
-        o.set("scorenotebeloweffectspacing", obj.scoreNoteBelowEffectSpacing);
-        o.set("alternateendingspaddingx", obj.alternateEndingsPaddingX);
-        o.set("alternateendingspaddingy", obj.alternateEndingsPaddingY);
-        o.set("alternateendingscloselinepadding", obj.alternateEndingsCloseLinePadding);
-        o.set("beattimerpaddingx", obj.beatTimerPaddingX);
-        o.set("beattimerpaddingy", obj.beatTimerPaddingY);
-        o.set("beattimermarginy", obj.beatTimerMarginY);
+        o.set("scorechordeffectspacing", obj.scoreChordEffectSpacing);
+        o.set("alternateendingspadding", obj.alternateEndingsPadding);
+        o.set("sustainpedallinepadding", obj.sustainPedalLinePadding);
+        o.set("tieheight", obj.tieHeight);
+        o.set("beattimerpadding", obj.beatTimerPadding);
         o.set("bendnoteheadelementpadding", obj.bendNoteHeadElementPadding);
+        o.set("ghostparenthesiswidth", obj.ghostParenthesisWidth);
         o.set("scoreslidelineendpadding", obj.scoreSlideLineEndPadding);
         o.set("scoreslidelineoffsetx", obj.scoreSlideLineOffsetX);
         o.set("scoreslidelineoffsety", obj.scoreSlideLineOffsetY);
@@ -72,55 +71,6 @@ export class SmuflMetricsSerializer {
         o.set("tabnotechordeffectspacing", obj.tabNoteChordEffectSpacing);
         o.set("tabwhammysimpledippadding", obj.tabWhammySimpleDipPadding);
         o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
-        o.set("linerangedglyphspacing", obj.lineRangedGlyphDashGap);
-        o.set("linerangedglyphtoppadding", obj.lineRangedGlyphTopPadding);
-        o.set("linerangedglyphtopoffset", obj.lineRangedGlyphTopOffset);
-        o.set("linerangedglyphsize", obj.lineRangedGlyphDashSize);
-        o.set("ottavalinesize", obj.ottavaLineSize);
-        o.set("ottavalinespacing", obj.ottavaLineSpacing);
-        o.set("ottavapaddingy", obj.ottavaPaddingY);
-        o.set("numbereddashglyphpadding", obj.numberedDashGlyphPadding);
-        o.set("stringnumbercirclepadding", obj.stringNumberCirclePadding);
-        o.set("sustainpedaltextlinepadding", obj.sustainPedalTextLinePadding);
-        o.set("sustainpedalstarlinepadding", obj.sustainPedalStarLinePadding);
-        o.set("timesignatureghostparenthesisleftpadding", obj.timeSignatureGhostParenthesisLeftPadding);
-        o.set("timesignatureghostparenthesisrightpadding", obj.timeSignatureGhostParenthesisRightPadding);
-        o.set("tabbrusharpeggiooffset", obj.tabBrushArpeggioOffset);
-        o.set("pictedgeofcymbaloffsetx", obj.pictEdgeOfCymbalOffsetX);
-        o.set("arpeggioxoffset", obj.arpeggioXOffset);
-        o.set("noteornamentbottomoffset", obj.noteOrnamentBottomOffset);
-        o.set("numberedbeatnoteytoppadding", obj.numberedBeatNoteYTopPadding);
-        o.set("slashbeatnoteytoppadding", obj.slashBeatNoteYTopPadding);
-        o.set("tabnoteytopoffset", obj.tabNoteYTopOffset);
-        o.set("accentuationpadding", obj.accentuationPadding);
-        o.set("articstaccatoabovepaddingx", obj.articStaccatoAbovePaddingX);
-        o.set("articstaccatoabovepaddingy", obj.articStaccatoAbovePaddingY);
-        o.set("gracebeatpadding", obj.graceBeatPadding);
-        o.set("gracebeatpostbeatstretch", obj.graceBeatPostBeatStretch);
-        {
-            const m = new Map<string, unknown>();
-            o.set("scoretremolooffsetup", m);
-            for (const [k, v] of obj.scoreTremoloOffsetUp!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("scoretremolooffsetupother", obj.scoreTremoloOffsetUpOther);
-        {
-            const m = new Map<string, unknown>();
-            o.set("scoretremolooffsetdown", m);
-            for (const [k, v] of obj.scoreTremoloOffsetDown!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("scoretremolooffsetdownother", obj.scoreTremoloOffsetDownOther);
-        {
-            const m = new Map<string, unknown>();
-            o.set("tabtremolooffsetx", m);
-            for (const [k, v] of obj.tabTremoloOffsetX!) {
-                m.set(k.toString(), v);
-            }
-        }
-        o.set("tabtremoloxdefault", obj.tabTremoloXDefault);
         o.set("tabprebendpadding", obj.tabPreBendPadding);
         o.set("tabslideoffsetx", obj.tabSlideOffsetX);
         {
@@ -146,9 +96,7 @@ export class SmuflMetricsSerializer {
         }
         o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
         o.set("flagwidth", obj.flagWidth);
-        o.set("ghostparenthesissize", obj.ghostParenthesisSize);
         o.set("lefthandtappingcirclescale", obj.leftHandTappingCircleScale);
-        o.set("multibarrestwidth", obj.multiBarRestWidth);
         o.set("numberednoteheadwidth", obj.numberedNoteHeadWidth);
         o.set("numberednoteheadheight", obj.numberedNoteHeadHeight);
         o.set("numberedtieemptysize", obj.numberedTieEmptySize);
@@ -168,7 +116,6 @@ export class SmuflMetricsSerializer {
         o.set("scoreslidelinesizex", obj.scoreSlideLineSizeX);
         o.set("slashtieemptyheight", obj.slashTieEmptyHeight);
         o.set("slashtieemptywidth", obj.slashTieEmptyWidth);
-        o.set("tabbendarrowsize", obj.tabBendArrowSize);
         o.set("tabbenddashsize", obj.tabBendDashSize);
         o.set("tabbendbendvalueheight", obj.tabBendBendValueHeight);
         o.set("tabbrushwidth", obj.tabBrushWidth);
@@ -180,9 +127,6 @@ export class SmuflMetricsSerializer {
         o.set("tabtieemptywidth", obj.tabTieEmptyWidth);
         o.set("tabwhammyperhalfsize", obj.tabWhammyPerHalfSize);
         o.set("tabwhammydashsize", obj.tabWhammyDashSize);
-        o.set("tiesize", obj.tieSize);
-        o.set("tieheight", obj.tieHeight);
-        o.set("bendslurheight", obj.bendSlurHeight);
         o.set("timesignaturenumberheight", obj.timeSignatureNumberHeight);
         o.set("standardstemlength", obj.standardStemLength);
         {
@@ -230,7 +174,6 @@ export class SmuflMetricsSerializer {
         o.set("temponotescale", obj.tempoNoteScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
-        o.set("pictedgeofcymbalscale", obj.pictEdgeOfCymbalScale);
         o.set("tripletfeelnotescale", obj.tripletFeelNoteScale);
         o.set("tripletfeeltupletscale", obj.tripletFeelTupletScale);
         o.set("tripletfeelheight", obj.tripletFeelHeight);
@@ -244,7 +187,6 @@ export class SmuflMetricsSerializer {
         o.set("tripletfeelequalsoffsety", obj.tripletFeelEqualsOffsetY);
         o.set("tripletfeelaugmentationoffsetx", obj.tripletFeelAugmentationOffsetX);
         o.set("tripletfeelcloseparenthesisoffsetx", obj.tripletFeelCloseParenthesisOffsetX);
-        o.set("scorewhammyfontsizetooverflow", obj.scoreWhammyFontSizeToOverflow);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -300,6 +242,9 @@ export class SmuflMetricsSerializer {
             case "repeatendinglinethickness":
                 obj.repeatEndingLineThickness = v! as number;
                 return true;
+            case "slurmidpointthickness":
+                obj.slurMidpointThickness = v! as number;
+                return true;
             case "stafflinethickness":
                 obj.staffLineThickness = v! as number;
                 return true;
@@ -315,6 +260,9 @@ export class SmuflMetricsSerializer {
             case "thinthickbarlineseparation":
                 obj.thinThickBarlineSeparation = v! as number;
                 return true;
+            case "tiemidpointthickness":
+                obj.tieMidpointThickness = v! as number;
+                return true;
             case "tupletbracketthickness":
                 obj.tupletBracketThickness = v! as number;
                 return true;
@@ -327,53 +275,44 @@ export class SmuflMetricsSerializer {
             case "numberedbarrendererbarspacing":
                 obj.numberedBarRendererBarSpacing = v! as number;
                 return true;
+            case "numbereddashglyphpadding":
+                obj.numberedDashGlyphPadding = v! as number;
+                return true;
+            case "linerangedglyphdashgap":
+                obj.lineRangedGlyphDashGap = v! as number;
+                return true;
+            case "linerangedglyphdashsize":
+                obj.lineRangedGlyphDashSize = v! as number;
+                return true;
             case "prenoteeffectpadding":
                 obj.preNoteEffectPadding = v! as number;
                 return true;
-            case "multibarrestpadding":
-                obj.multiBarRestPadding = v! as number;
+            case "stringnumbercirclepadding":
+                obj.stringNumberCirclePadding = v! as number;
                 return true;
             case "rowcontainerpadding":
                 obj.rowContainerPadding = v! as number;
                 return true;
-            case "scorebendendpadding":
-                obj.scoreBendEndPadding = v! as number;
+            case "scorechordeffectspacing":
+                obj.scoreChordEffectSpacing = v! as number;
                 return true;
-            case "scorebendholdoffset":
-                obj.scoreBendHoldOffset = v! as number;
+            case "alternateendingspadding":
+                obj.alternateEndingsPadding = v! as number;
                 return true;
-            case "scorebendholdsize":
-                obj.scoreBendHoldSize = v! as number;
+            case "sustainpedallinepadding":
+                obj.sustainPedalLinePadding = v! as number;
                 return true;
-            case "scorehelpernotesendpadding":
-                obj.scoreHelperNotesEndPadding = v! as number;
+            case "tieheight":
+                obj.tieHeight = v! as number;
                 return true;
-            case "scorehelpernotesendpadding2":
-                obj.scoreHelperNotesEndPadding2 = v! as number;
-                return true;
-            case "scorenotebeloweffectspacing":
-                obj.scoreNoteBelowEffectSpacing = v! as number;
-                return true;
-            case "alternateendingspaddingx":
-                obj.alternateEndingsPaddingX = v! as number;
-                return true;
-            case "alternateendingspaddingy":
-                obj.alternateEndingsPaddingY = v! as number;
-                return true;
-            case "alternateendingscloselinepadding":
-                obj.alternateEndingsCloseLinePadding = v! as number;
-                return true;
-            case "beattimerpaddingx":
-                obj.beatTimerPaddingX = v! as number;
-                return true;
-            case "beattimerpaddingy":
-                obj.beatTimerPaddingY = v! as number;
-                return true;
-            case "beattimermarginy":
-                obj.beatTimerMarginY = v! as number;
+            case "beattimerpadding":
+                obj.beatTimerPadding = v! as number;
                 return true;
             case "bendnoteheadelementpadding":
                 obj.bendNoteHeadElementPadding = v! as number;
+                return true;
+            case "ghostparenthesiswidth":
+                obj.ghostParenthesisWidth = v! as number;
                 return true;
             case "scoreslidelineendpadding":
                 obj.scoreSlideLineEndPadding = v! as number;
@@ -401,108 +340,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tabwhammytextpadding":
                 obj.tabWhammyTextPadding = v! as number;
-                return true;
-            case "linerangedglyphspacing":
-                obj.lineRangedGlyphDashGap = v! as number;
-                return true;
-            case "linerangedglyphtoppadding":
-                obj.lineRangedGlyphTopPadding = v! as number;
-                return true;
-            case "linerangedglyphtopoffset":
-                obj.lineRangedGlyphTopOffset = v! as number;
-                return true;
-            case "linerangedglyphsize":
-                obj.lineRangedGlyphDashSize = v! as number;
-                return true;
-            case "ottavalinesize":
-                obj.ottavaLineSize = v! as number;
-                return true;
-            case "ottavalinespacing":
-                obj.ottavaLineSpacing = v! as number;
-                return true;
-            case "ottavapaddingy":
-                obj.ottavaPaddingY = v! as number;
-                return true;
-            case "numbereddashglyphpadding":
-                obj.numberedDashGlyphPadding = v! as number;
-                return true;
-            case "stringnumbercirclepadding":
-                obj.stringNumberCirclePadding = v! as number;
-                return true;
-            case "sustainpedaltextlinepadding":
-                obj.sustainPedalTextLinePadding = v! as number;
-                return true;
-            case "sustainpedalstarlinepadding":
-                obj.sustainPedalStarLinePadding = v! as number;
-                return true;
-            case "timesignatureghostparenthesisleftpadding":
-                obj.timeSignatureGhostParenthesisLeftPadding = v! as number;
-                return true;
-            case "timesignatureghostparenthesisrightpadding":
-                obj.timeSignatureGhostParenthesisRightPadding = v! as number;
-                return true;
-            case "tabbrusharpeggiooffset":
-                obj.tabBrushArpeggioOffset = v! as number;
-                return true;
-            case "pictedgeofcymbaloffsetx":
-                obj.pictEdgeOfCymbalOffsetX = v! as number;
-                return true;
-            case "arpeggioxoffset":
-                obj.arpeggioXOffset = v! as number;
-                return true;
-            case "noteornamentbottomoffset":
-                obj.noteOrnamentBottomOffset = v! as number;
-                return true;
-            case "numberedbeatnoteytoppadding":
-                obj.numberedBeatNoteYTopPadding = v! as number;
-                return true;
-            case "slashbeatnoteytoppadding":
-                obj.slashBeatNoteYTopPadding = v! as number;
-                return true;
-            case "tabnoteytopoffset":
-                obj.tabNoteYTopOffset = v! as number;
-                return true;
-            case "accentuationpadding":
-                obj.accentuationPadding = v! as number;
-                return true;
-            case "articstaccatoabovepaddingx":
-                obj.articStaccatoAbovePaddingX = v! as number;
-                return true;
-            case "articstaccatoabovepaddingy":
-                obj.articStaccatoAbovePaddingY = v! as number;
-                return true;
-            case "gracebeatpadding":
-                obj.graceBeatPadding = v! as number;
-                return true;
-            case "gracebeatpostbeatstretch":
-                obj.graceBeatPostBeatStretch = v! as number;
-                return true;
-            case "scoretremolooffsetup":
-                obj.scoreTremoloOffsetUp = new Map<Duration, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.scoreTremoloOffsetUp.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
-                });
-                return true;
-            case "scoretremolooffsetupother":
-                obj.scoreTremoloOffsetUpOther = v! as number;
-                return true;
-            case "scoretremolooffsetdown":
-                obj.scoreTremoloOffsetDown = new Map<Duration, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.scoreTremoloOffsetDown.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
-                });
-                return true;
-            case "scoretremolooffsetdownother":
-                obj.scoreTremoloOffsetDownOther = v! as number;
-                return true;
-            case "tabtremolooffsetx":
-                obj.tabTremoloOffsetX = new Map<Duration, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.tabTremoloOffsetX.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
-                });
-                return true;
-            case "tabtremoloxdefault":
-                obj.tabTremoloXDefault = v! as number;
                 return true;
             case "tabprebendpadding":
                 obj.tabPreBendPadding = v! as number;
@@ -538,14 +375,8 @@ export class SmuflMetricsSerializer {
             case "flagwidth":
                 obj.flagWidth = v! as number;
                 return true;
-            case "ghostparenthesissize":
-                obj.ghostParenthesisSize = v! as number;
-                return true;
             case "lefthandtappingcirclescale":
                 obj.leftHandTappingCircleScale = v! as number;
-                return true;
-            case "multibarrestwidth":
-                obj.multiBarRestWidth = v! as number;
                 return true;
             case "numberednoteheadwidth":
                 obj.numberedNoteHeadWidth = v! as number;
@@ -604,9 +435,6 @@ export class SmuflMetricsSerializer {
             case "slashtieemptywidth":
                 obj.slashTieEmptyWidth = v! as number;
                 return true;
-            case "tabbendarrowsize":
-                obj.tabBendArrowSize = v! as number;
-                return true;
             case "tabbenddashsize":
                 obj.tabBendDashSize = v! as number;
                 return true;
@@ -639,15 +467,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tabwhammydashsize":
                 obj.tabWhammyDashSize = v! as number;
-                return true;
-            case "tiesize":
-                obj.tieSize = v! as number;
-                return true;
-            case "tieheight":
-                obj.tieHeight = v! as number;
-                return true;
-            case "bendslurheight":
-                obj.bendSlurHeight = v! as number;
                 return true;
             case "timesignaturenumberheight":
                 obj.timeSignatureNumberHeight = v! as number;
@@ -715,9 +534,6 @@ export class SmuflMetricsSerializer {
             case "tuningglyphstringcolumnscale":
                 obj.tuningGlyphStringColumnScale = v! as number;
                 return true;
-            case "pictedgeofcymbalscale":
-                obj.pictEdgeOfCymbalScale = v! as number;
-                return true;
             case "tripletfeelnotescale":
                 obj.tripletFeelNoteScale = v! as number;
                 return true;
@@ -756,9 +572,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tripletfeelcloseparenthesisoffsetx":
                 obj.tripletFeelCloseParenthesisOffsetX = v! as number;
-                return true;
-            case "scorewhammyfontsizetooverflow":
-                obj.scoreWhammyFontSizeToOverflow = v! as number;
                 return true;
         }
         return false;

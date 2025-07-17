@@ -15,7 +15,7 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.width = this.renderer.smuflMetrics.ghostParenthesisSize;
+        this.width = this.renderer.smuflMetrics.ghostParenthesisWidth * 2;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -32,8 +32,8 @@ export class GhostParenthesisGlyph extends Glyph {
                 cx + this.x + this.width,
                 cy + this.y,
                 false,
-                this.renderer.smuflMetrics.ghostParenthesisSize,
-                this.renderer.smuflMetrics.ghostParenthesisSize / 2
+                this.renderer.smuflMetrics.ghostParenthesisWidth,
+                this.renderer.smuflMetrics.tieMidpointThickness
             );
         } else {
             TieGlyph.paintTie(
@@ -44,8 +44,8 @@ export class GhostParenthesisGlyph extends Glyph {
                 cx + this.x,
                 cy + this.y + this.height,
                 false,
-                this.renderer.smuflMetrics.ghostParenthesisSize,
-                this.renderer.smuflMetrics.ghostParenthesisSize / 2
+                this.renderer.smuflMetrics.ghostParenthesisWidth,
+                this.renderer.smuflMetrics.tieMidpointThickness
             );
         }
         canvas.color = c;

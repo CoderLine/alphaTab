@@ -187,4 +187,7 @@ export class SlashBarRenderer extends LineBarRenderer {
         canvas.stroke();
         canvas.lineWidth = lineWidth;
     }
+
+    protected override paintStemEffects(beat: Beat, cy: number, x: number, topY: number, bottomY: number, canvas: ICanvas): void {
+    }
 }

@@ -144,11 +144,13 @@ export class SmuflMetrics {
     public pedalLineThickness = 0;
     public repeatBarlineDotSeparation: number = 0;
     public repeatEndingLineThickness: number = 0;
+    public slurMidpointThickness: number = 0;
     public staffLineThickness: number = 0;
     public stemThickness: number = 0;
     public thickBarlineThickness: number = 0;
     public thinBarlineThickness: number = 0;
     public thinThickBarlineSeparation: number = 0;
+    public tieMidpointThickness: number = 0;
     public tupletBracketThickness: number = 0;
 
     public effectBandSeparation: number = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
@@ -179,7 +181,7 @@ export class SmuflMetrics {
         this.repeatBarlineDotSeparation = smufl.engravingDefaults.repeatBarlineDotSeparation * this.oneStaffSpace;
         this.repeatEndingLineThickness = smufl.engravingDefaults.repeatEndingLineThickness * this.oneStaffSpace; // TODO which line is this exactly?
         // TODO slurEndpointThickness
-        // TODO slurMidpointThickness
+        this.slurMidpointThickness = smufl.engravingDefaults.slurMidpointThickness * this.oneStaffSpace;
         this.staffLineThickness = smufl.engravingDefaults.staffLineThickness * this.oneStaffSpace;
         this.stemThickness = smufl.engravingDefaults.stemThickness * this.oneStaffSpace;
         // TODO subBracketThickness
@@ -188,17 +190,8 @@ export class SmuflMetrics {
         this.thinBarlineThickness = smufl.engravingDefaults.thinBarlineThickness * this.oneStaffSpace;
         this.thinThickBarlineSeparation = smufl.engravingDefaults.thinThickBarlineSeparation * this.oneStaffSpace;
         // TODO tieEndpointThickness
-        // TODO tieMidpointThickness
+        this.tieMidpointThickness = smufl.engravingDefaults.tieMidpointThickness * this.oneStaffSpace;
         this.tupletBracketThickness = smufl.engravingDefaults.tupletBracketThickness * this.oneStaffSpace;
-
-        // custom alphatab
-        this.effectBandSeparation = 0.25 * this.oneStaffSpace;
-        this.numberedBarRendererBarSize = this.staffLineThickness * 2;
-        this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
-        this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
-        this.tabBendArrowSize = 1 * this.oneStaffSpace;
-        this.lineRangedGlyphDashGap = 1 * this.oneStaffSpace;
-        this.lineRangedGlyphDashSize = 1 * this.oneStaffSpace;
 
         const standardStemLength = 3 * this.oneStaffSpace;
         this.standardStemLength = standardStemLength;
@@ -284,6 +277,25 @@ export class SmuflMetrics {
                 this.glyphHeights.set(symbol, (v.bBoxNE[1] - v.bBoxSW[1]) * this.oneStaffSpace);
             }
         }
+
+        // custom alphatab
+        this.effectBandSeparation = 0.25 * this.oneStaffSpace;
+        this.numberedBarRendererBarSize = this.staffLineThickness * 2;
+        this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
+        this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
+        this.lineRangedGlyphDashGap = 1 * this.oneStaffSpace;
+        this.lineRangedGlyphDashSize = 1 * this.oneStaffSpace;
+        this.numberedDashGlyphPadding = 0.3 * this.oneStaffSpace;
+        this.stringNumberCirclePadding = 0.3 * this.oneStaffSpace;
+        this.rowContainerPadding = 0.3 * this.oneStaffSpace;
+        this.scoreChordEffectSpacing = 0.1 * this.oneStaffSpace;
+        this.alternateEndingsPadding = 0.3 * this.oneStaffSpace;
+        this.sustainPedalLinePadding = 0.5 * this.oneStaffSpace;
+
+        this.tieHeight = 1.2 * this.oneStaffSpace;
+        this.beatTimerPadding = 0.22 * this.oneStaffSpace;
+        this.bendNoteHeadElementPadding = 0.22 * this.oneStaffSpace;
+        this.ghostParenthesisWidth = 0.3 * this.oneStaffSpace;
     }
 
     //
@@ -292,38 +304,28 @@ export class SmuflMetrics {
     // Numbered Notation: SMuFL has no numbered notation yet
     public numberedBarRendererBarSize = 0;
     public numberedBarRendererBarSpacing = 0;
+    public numberedDashGlyphPadding = 0;
 
-    // Line Ranged Glyphs: smufl doesn's have any good reference for dashed lines on effects    
+    // Line Ranged Glyphs: smufl doesn's have any good reference for dashed lines on effects
     public lineRangedGlyphDashGap: number = 0;
     public lineRangedGlyphDashSize: number = 0;
 
     // paddings/margins between elements
     public preNoteEffectPadding: number = 0;
+    public stringNumberCirclePadding = 0;
+    public rowContainerPadding: number = 0;
+    public scoreChordEffectSpacing: number = 0;
 
+    public alternateEndingsPadding: number = 0;
+    public sustainPedalLinePadding = 0;
 
+    public tieHeight = 0;
+    public beatTimerPadding: number = 0;
+    public bendNoteHeadElementPadding: number = 0;
+    public ghostParenthesisWidth: number = 0;
+
+    //
     //  (TODO: try to eliminate custom paddings)
-    public multiBarRestPadding: number = 10;
-
-    public rowContainerPadding: number = 3;
-
-    public scoreBendEndPadding: number = 8;
-    public scoreBendHoldOffset: number = 22;
-    public scoreBendHoldSize: number = 4;
-
-    public scoreHelperNotesEndPadding: number = ((10 / 2) | 0) + 3;
-    public scoreHelperNotesEndPadding2: number = 10;
-
-    public scoreNoteBelowEffectSpacing: number = 1;
-
-    public alternateEndingsPaddingX: number = 3;
-    public alternateEndingsPaddingY: number = 5;
-    public alternateEndingsCloseLinePadding: number = 4;
-
-    public beatTimerPaddingX: number = 2;
-    public beatTimerPaddingY: number = 2;
-    public beatTimerMarginY: number = 2;
-
-    public bendNoteHeadElementPadding: number = 2;
 
     public scoreSlideLineEndPadding = 2;
     public scoreSlideLineOffsetX = 2;
@@ -339,57 +341,8 @@ export class SmuflMetrics {
     public tabWhammyTextPadding = 2;
 
     //
-    // range glyphs (TODO: check for SMuFL spec)
-
-    public numberedDashGlyphPadding = 3;
-    public stringNumberCirclePadding = 3;
-    public sustainPedalTextLinePadding = 3;
-    public sustainPedalStarLinePadding = 3;
-
-    public timeSignatureGhostParenthesisLeftPadding = 10;
-    public timeSignatureGhostParenthesisRightPadding = 13;
-
-    //
-    // repeated glyph advance
-    public tabBrushArpeggioOffset: number = 4;
-
-    //
     // glyph positioning/alignment offsets (TODO: try to eliminate or calculate from bounding box)
-    public pictEdgeOfCymbalOffsetX: number = 3;
-    public arpeggioXOffset: number = 5;
-    public noteOrnamentBottomOffset: number = 4;
 
-    public numberedBeatNoteYTopPadding: number = 2;
-    public slashBeatNoteYTopPadding: number = 2;
-
-    public tabNoteYTopOffset: number = 2;
-
-    public accentuationPadding: number = 2;
-
-    public articStaccatoAbovePaddingX: number = 3;
-    public articStaccatoAbovePaddingY: number = 5;
-
-    public graceBeatPadding: number = 3;
-    public graceBeatPostBeatStretch: number = 7;
-
-    public scoreTremoloOffsetUp = new Map<Duration, number>([
-        [Duration.ThirtySecond, -15],
-        [Duration.Sixteenth, -12],
-        [Duration.Eighth, -10]
-    ]);
-    public scoreTremoloOffsetUpOther = -10;
-    public scoreTremoloOffsetDown = new Map<Duration, number>([
-        [Duration.ThirtySecond, 15],
-        [Duration.Sixteenth, 15],
-        [Duration.Eighth, 10]
-    ]);
-    public scoreTremoloOffsetDownOther = 15;
-    public tabTremoloOffsetX = new Map<Duration, number>([
-        [Duration.ThirtySecond, 10],
-        [Duration.Sixteenth, 5],
-        [Duration.Eighth, 0]
-    ]);
-    public tabTremoloXDefault = 5;
     public tabPreBendPadding: number = 2;
     public tabSlideOffsetX: number = 2;
 
@@ -402,9 +355,7 @@ export class SmuflMetrics {
 
     public deadSlappedLineWidth: number = 2;
     public flagWidth: number = 11;
-    public ghostParenthesisSize: number = 6;
     public leftHandTappingCircleScale: number = 0.625;
-    public multiBarRestWidth: number = 60;
     public numberedNoteHeadWidth: number = 12;
     public numberedNoteHeadHeight: number = 17;
     public numberedTieEmptySize: number = 20;
@@ -438,7 +389,6 @@ export class SmuflMetrics {
     public slashTieEmptyHeight = 15;
     public slashTieEmptyWidth = 20;
 
-    public tabBendArrowSize: number = 0;
     public tabBendDashSize: number = 3;
     public tabBendBendValueHeight: number = 6;
 
@@ -453,10 +403,6 @@ export class SmuflMetrics {
 
     public tabWhammyPerHalfSize = 6;
     public tabWhammyDashSize = 3;
-
-    public tieSize = 4;
-    public tieHeight = 22;
-    public bendSlurHeight = 11;
 
     public timeSignatureNumberHeight = 18;
 
@@ -493,8 +439,6 @@ export class SmuflMetrics {
 
     // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
 
-    public pictEdgeOfCymbalScale: number = 0.5;
-
     //
     // triplet feel (TODO: fixed values or take others as reference?)
     public tripletFeelNoteScale = 0.5;
@@ -510,10 +454,6 @@ export class SmuflMetrics {
     public tripletFeelEqualsOffsetY = 5;
     public tripletFeelAugmentationOffsetX = 7;
     public tripletFeelCloseParenthesisOffsetX = 65;
-
-    //
-    // font size > height factors (TODO: use proper measuring?)
-    public scoreWhammyFontSizeToOverflow = 1.5;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata

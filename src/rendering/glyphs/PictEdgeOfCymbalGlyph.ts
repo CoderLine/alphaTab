@@ -7,11 +7,7 @@ export class PictEdgeOfCymbalGlyph extends MusicFontGlyph {
         super(x, y, 1, MusicFontSymbol.PictEdgeOfCymbal);
     }
 
-    public override doLayout(): void {
-        this.glyphScale = this.renderer.smuflMetrics.pictEdgeOfCymbalScale;
-    }
-
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx - this.renderer.smuflMetrics.pictEdgeOfCymbalOffsetX, cy + this.height, canvas);
+        super.paint(cx, cy + this.height, canvas);
     }
 }

@@ -49,18 +49,10 @@ export class BeatContainerGlyph extends Glyph {
         // make space for flag
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
         if (this.beat.graceType !== GraceType.None) {
-            // flagged grace
-            if (this.beat.graceGroup!.beats.length === 1) {
-                postBeatStretch += this.renderer.smuflMetrics.flagWidth * NoteHeadGlyph.GraceScale;
-            }
-            // grace with bars, some space for bar unless last
-            else if (this.beat.graceIndex < this.beat.graceGroup!.beats.length - 1) {
-                postBeatStretch += this.renderer.smuflMetrics.graceBeatPostBeatStretch;
-            } else {
-                postBeatStretch += this.renderer.smuflMetrics.graceBeatPadding;
-            }
+            // always use flag size as spacing on grace notes
+            postBeatStretch += this.renderer.smuflMetrics.flagWidth * NoteHeadGlyph.GraceScale;
         } else if (helper && this.drawBeamHelperAsFlags(helper)) {
-            postBeatStretch += this.renderer.smuflMetrics.flagWidth;
+            postBeatStretch += this.renderer.smuflMetrics.flagWidth * NoteHeadGlyph.GraceScale;
         }
         for (const tie of this.ties) {
             postBeatStretch += tie.width;
@@ -232,7 +224,8 @@ export class BeatContainerGlyph extends Glyph {
             const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
             if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
                 beatBoundings.visualBounds.w +=
-                    this.renderer.smuflMetrics.flagWidth * (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
+                    this.renderer.smuflMetrics.flagWidth *
+                    (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
             }
 
             beatBoundings.visualBounds.y = barBounds.visualBounds.y;

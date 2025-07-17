@@ -102,7 +102,7 @@ export class TieGlyph extends Glyph {
                     this._endY,
                     this.tieDirection === BeamDirection.Down,
                     this._tieHeight,
-                    this.renderer.smuflMetrics.tieSize
+                    this.renderer.smuflMetrics.tieMidpointThickness
                 );
 
                 this.height = tieBoundingBox.h;
@@ -131,7 +131,7 @@ export class TieGlyph extends Glyph {
                     cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
                     1,
-                    this.renderer.smuflMetrics.bendSlurHeight
+                    this.renderer.smuflMetrics.tieHeight
                 );
             } else {
                 TieGlyph.paintTie(
@@ -143,7 +143,7 @@ export class TieGlyph extends Glyph {
                     cy + this._endY,
                     this.tieDirection === BeamDirection.Down,
                     this._tieHeight,
-                    this.renderer.smuflMetrics.tieSize
+                    this.renderer.smuflMetrics.tieMidpointThickness
                 );
             }
         }
@@ -265,28 +265,59 @@ export class TieGlyph extends Glyph {
         //
         offset *= scale;
         size *= scale;
-        // normal vector
-        let normalVectorX: number = y2 - y1;
-        let normalVectorY: number = x2 - x1;
-        const length: number = Math.sqrt(normalVectorX * normalVectorX + normalVectorY * normalVectorY);
-        if (down) {
-            normalVectorX *= -1;
-        } else {
-            normalVectorY *= -1;
-        }
-        // make to unit vector
-        normalVectorX /= length;
-        normalVectorY /= length;
-        // center of connection
-        const centerX: number = (x2 + x1) / 2;
-        const centerY: number = (y2 + y1) / 2;
-        // control points
-        const cp1X: number = centerX + offset * normalVectorX;
-        const cp1Y: number = centerY + offset * normalVectorY;
-        const cp2X: number = centerX + (offset - size) * normalVectorX;
-        const cp2Y: number = centerY + (offset - size) * normalVectorY;
 
-        return [x1, y1, cp1X, cp1Y, cp2X, cp2Y, x2, y2];
+        if(down) {
+            offset *= -1;
+            size *= -1;
+        }
+
+        if (scale >= 1) {
+            size *= 1.2;
+        }
+
+        // calculate control points on horizontal axis then rotate:
+        /*
+              cp1x/cpy1                  cp2x/cpy2
+                      *----------------*
+                     /                  \
+                    /                    \
+            x1/y1  *                      * x2/y2
+
+            cp3 and cp4 are simply with lower height
+         */
+
+        const dY = y2 - y1;
+        const dX = x2 - x1;
+        const length = Math.sqrt(dX * dX + dY * dY);
+
+        let cp1x = x1 + length * 0.25;
+        let cp1y = y1 - offset;
+
+        let cp2x = x1 + length * 0.75;
+        let cp2y = y1 - offset;
+
+        let cp3x = x1 + length * 0.75;
+        let cp3y = y1 - offset - size;
+
+        let cp4x = x1 + length * 0.25;
+        let cp4y = y1 - offset - size;
+
+        const angle = Math.atan2(dY, dX);
+
+        [cp1x, cp1y] = TieGlyph.rotate(cp1x, cp1y, x1, y1, angle);
+        [cp2x, cp2y] = TieGlyph.rotate(cp2x, cp2y, x1, y1, angle);
+        [cp3x, cp3y] = TieGlyph.rotate(cp3x, cp3y, x1, y1, angle);
+        [cp4x, cp4y] = TieGlyph.rotate(cp4x, cp4y, x1, y1, angle);
+
+        return [x1, y1, cp1x, cp1y, cp2x, cp2y, x2, y2, cp3x, cp3y, cp4x, cp4y, x1, y1];
+    }
+
+    private static rotate(x: number, y: number, rotateX: number, rotateY: number, angle: number): [number, number] {
+        const dx = x - rotateX;
+        const dy = y - rotateY;
+        const rx = dx * Math.cos(angle) - dy * Math.sin(angle);
+        const ry = dx * Math.sin(angle) + dy * Math.cos(angle);
+        return [rotateX + rx, rotateY + ry];
     }
 
     public static paintTie(
@@ -304,8 +335,8 @@ export class TieGlyph extends Glyph {
 
         canvas.beginPath();
         canvas.moveTo(cps[0], cps[1]);
-        canvas.quadraticCurveTo(cps[2], cps[3], cps[6], cps[7]);
-        canvas.quadraticCurveTo(cps[4], cps[5], cps[0], cps[1]);
+        canvas.bezierCurveTo(cps[2], cps[3], cps[4], cps[5], cps[6], cps[7]);
+        canvas.bezierCurveTo(cps[8], cps[9], cps[10], cps[11], cps[12], cps[13]);
         canvas.closePath();
         canvas.fill();
 
@@ -333,8 +364,8 @@ export class TieGlyph extends Glyph {
         y2: number,
         down: boolean,
         scale: number,
-        bendSlurHeight:number,
-        slurText?: string,
+        bendSlurHeight: number,
+        slurText?: string
     ): void {
         let normalVectorX: number = y2 - y1;
         let normalVectorY: number = x2 - x1;

@@ -8,17 +8,19 @@ export class AlternateEndingsGlyph extends EffectGlyph {
     private _endingsString: string = '';
     private _openLine: boolean;
     private _closeLine: boolean;
+    private _indent: boolean;
 
-    public constructor(x: number, y: number, alternateEndings: number, openLine: boolean, closeLine: boolean) {
+    public constructor(x: number, y: number, alternateEndings: number, openLine: boolean, closeLine: boolean, indent:boolean) {
         super(x, y);
         this._endings = ModelUtils.getAlternateEndingsList(alternateEndings);
         this._openLine = openLine;
         this._closeLine = closeLine;
+        this._indent = indent;
     }
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.resources.wordsFont.size + this.renderer.smuflMetrics.alternateEndingsPaddingY;
+        this.height = this.renderer.resources.wordsFont.size + this.renderer.smuflMetrics.alternateEndingsPadding * 2;
         let endingsStrings: string = '';
         for (let i: number = 0, j: number = this._endings.length; i < j; i++) {
             endingsStrings += this._endings[i] + 1;
@@ -28,12 +30,17 @@ export class AlternateEndingsGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        const width = this._closeLine
-            ? this.width - this.renderer.smuflMetrics.alternateEndingsCloseLinePadding
+        let width = this._closeLine
+            ? this.width - canvas.lineWidth
             : this.width;
 
         cx = (cx | 0) + (canvas.lineWidth / 2);
         cy = (cy | 0) + (canvas.lineWidth / 2);
+
+        if(this._indent) {
+            cx += this.renderer.smuflMetrics.alternateEndingsPadding
+            width -= this.renderer.smuflMetrics.alternateEndingsPadding
+        }
 
         if (this._openLine) {
             canvas.moveTo(cx + this.x, cy + this.y + this.height);
@@ -57,8 +64,8 @@ export class AlternateEndingsGlyph extends EffectGlyph {
             canvas.font = res.wordsFont;
             canvas.fillText(
                 this._endingsString,
-                cx + this.x + this.renderer.smuflMetrics.alternateEndingsPaddingX,
-                cy + this.y
+                cx + this.x + this.renderer.smuflMetrics.alternateEndingsPadding,
+                cy + this.y + this.renderer.smuflMetrics.alternateEndingsPadding
             );
             canvas.textBaseline = baseline;
         }

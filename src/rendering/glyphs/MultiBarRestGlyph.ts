@@ -5,13 +5,21 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
 
 export class MultiBarRestGlyph extends Glyph {
+    private static readonly RestSymbols = [
+        MusicFontSymbol.RestHBarLeft,
+        MusicFontSymbol.RestHBarMiddle,
+        MusicFontSymbol.RestHBarMiddle,
+        MusicFontSymbol.RestHBarMiddle,
+        MusicFontSymbol.RestHBarRight
+    ];
+
     private _numberGlyph: MusicFontSymbol[] = [];
     constructor() {
         super(0, 0);
     }
 
     public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.multiBarRestWidth + this.renderer.smuflMetrics.multiBarRestPadding;
+        this.width = MultiBarRestGlyph.RestSymbols.reduce((p, c) => p + this.renderer.smuflMetrics.glyphWidths.get(c)!, 0);
         this.renderer.registerOverflowTop((this.renderer as LineBarRenderer).getLineHeight(1));
         const i: number = this.renderer.additionalMultiRestBars!.length + 1;
         this._numberGlyph = NumberGlyph.getSymbols(i);
@@ -29,7 +37,7 @@ export class MultiBarRestGlyph extends Glyph {
         const numberTop = (this.renderer as LineBarRenderer).getLineY(-1.5);
 
         canvas.fillMusicFontSymbols(
-            cx + this.x + this.renderer.smuflMetrics.multiBarRestWidth / 2,
+            cx + this.x,
             (cy + this.y + numberTop) | 0,
             1,
             this._numberGlyph,

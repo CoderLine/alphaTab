@@ -350,4 +350,13 @@ export class NumberedBarRenderer extends LineBarRenderer {
         bottomY: number,
         canvas: ICanvas
     ): void {}
+
+    protected override paintStemEffects(
+        beat: Beat,
+        cy: number,
+        x: number,
+        topY: number,
+        bottomY: number,
+        canvas: ICanvas
+    ): void {}
 }
