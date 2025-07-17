@@ -47,6 +47,7 @@ export interface SmuflMetricsJson {
     numberedBarRendererBarSize?: number;
     numberedBarRendererBarSpacing?: number;
     numberedDashGlyphPadding?: number;
+    numberedDashGlyphWidth?: number;
     lineRangedGlyphDashGap?: number;
     lineRangedGlyphDashSize?: number;
     preNoteEffectPadding?: number;
@@ -62,8 +63,15 @@ export interface SmuflMetricsJson {
     ghostParenthesisWidth?: number;
     brokenBeamWidth?: number;
     tabWhammyTextPadding?: number;
-    tabWhammyPerHalfSize?: number;
+    tabWhammyPerHalfHeight?: number;
     tabWhammyDashSize?: number;
+    songBookWhammyDipHeight?: number;
+    deadSlappedLineWidth?: number;
+    leftHandTabTieWidth?: number;
+    tabBendDashSize?: number;
+    tabBendPerValueHeight?: number;
+    simpleSlideWidth?: number;
+    simpleSlideHeight?: number;
     stemUp?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     stemDown?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     repeatOffsetX?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
@@ -96,22 +104,4 @@ export interface SmuflMetricsJson {
     chordDiagramFretSpacing?: number;
     chordDiagramNutHeight?: number;
     chordDiagramFretHeight?: number;
-    scoreWhammySimpleDipPadding?: number;
-    scoreWhammySongBookPadding?: number;
-    deadSlappedLineWidth?: number;
-    numberedTieEmptySize?: number;
-    numberedDashGlyphWidth?: number;
-    beatPaddingFlagEighthAndAbove?: number;
-    beatPaddingOneHundredAndAbove?: number;
-    barNumberMarginPaddingRight?: number;
-    scoreSlideLineSizeX?: number;
-    slashTieEmptyHeight?: number;
-    slashTieEmptyWidth?: number;
-    tabBendDashSize?: number;
-    tabBendBendValueHeight?: number;
-    tabRestInvisibleWidth?: number;
-    tabSlideSizeX?: number;
-    tabSlideSizeY?: number;
-    tabTieEmptyHeight?: number;
-    tabTieEmptyWidth?: number;
 }

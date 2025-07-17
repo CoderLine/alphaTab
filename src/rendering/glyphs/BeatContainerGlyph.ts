@@ -14,6 +14,7 @@ import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { FlagGlyph } from '@src/rendering/glyphs/FlagGlyph';
 
 export class BeatContainerGlyph extends Glyph {
     public voiceContainer: VoiceContainerGlyph;
@@ -90,15 +91,11 @@ export class BeatContainerGlyph extends Glyph {
             if (this.onNotes.beamingHelper.beats.length === 1) {
                 // make space for flag
                 if (this.beat.duration >= Duration.Eighth) {
-                    this.minWidth += this.renderer.smuflMetrics.beatPaddingFlagEighthAndAbove;
-                }
-            } else {
-                // ensure some space for small notes
-                switch (this.beat.duration) {
-                    case Duration.OneHundredTwentyEighth:
-                    case Duration.TwoHundredFiftySixth:
-                        this.minWidth += this.renderer.smuflMetrics.beatPaddingOneHundredAndAbove;
-                        break;
+                    const symbol = FlagGlyph.getSymbol(this.beat.duration,
+                        this.onNotes.beamingHelper.direction,
+                        this.beat.graceType !== GraceType.None
+                    )
+                    this.minWidth += this.renderer.smuflMetrics.glyphWidths.get(symbol)!;
                 }
             }
         }

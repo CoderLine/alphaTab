@@ -114,8 +114,8 @@ export class TabWhammyBarGlyph extends Glyph {
             return 0;
         }
         let offset: number =
-            this.renderer.smuflMetrics.tabWhammyPerHalfSize +
-            Math.log2(Math.abs(value) / 2) * this.renderer.smuflMetrics.tabWhammyPerHalfSize;
+            this.renderer.smuflMetrics.tabWhammyPerHalfHeight +
+            Math.log2(Math.abs(value) / 2) * this.renderer.smuflMetrics.tabWhammyPerHalfHeight;
         if (value < 0) {
             offset = -offset;
         }

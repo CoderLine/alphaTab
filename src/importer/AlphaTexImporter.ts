@@ -2206,6 +2206,9 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'ds') {
             beat.deadSlapped = true;
             this._sy = this.newSy();
+            if(beat.notes.length === 1 && beat.notes[0].isDead) {
+                beat.removeNote(beat.notes[0]);
+            }
             return true;
         } else if (syData === 'glpf') {
             this._sy = this.newSy();

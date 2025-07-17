@@ -123,7 +123,7 @@ export class TabBendGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendBendValueHeight;
+        const bendHeight: number = this._maxBendValue * this.renderer.smuflMetrics.tabBendPerValueHeight;
         this.renderer.registerOverflowTop(bendHeight);
         let value: number = 0;
         for (const note of this._notes) {
@@ -289,7 +289,7 @@ export class TabBendGlyph extends Glyph {
                 }
                 if (note.bendType !== BendType.Prebend) {
                     if (i === 0) {
-                        startX += this.renderer.smuflMetrics.tabPreBendPadding;
+                        startX += this.renderer.smuflMetrics.postNoteEffectPadding;
                     }
                     this.paintBend(note, firstPt, secondPt, startX, topY, dX, slurText, canvas);
                 } else if (note.isTieOrigin && note.tieDestination!.hasBend) {
@@ -305,7 +305,7 @@ export class TabBendGlyph extends Glyph {
                 const vibratoStartY: number =
                     topY -
                     cy -
-                    this.renderer.smuflMetrics.tabBendBendValueHeight * renderPoints[renderPoints.length - 1].lineValue;
+                    this.renderer.smuflMetrics.tabBendPerValueHeight * renderPoints[renderPoints.length - 1].lineValue;
 
                 const vibrato = new NoteVibratoGlyph(vibratoStartX, vibratoStartY, endNote.vibrato);
                 vibrato.beat = endNote.beat;
@@ -332,7 +332,7 @@ export class TabBendGlyph extends Glyph {
         const res: RenderingResources = this.renderer.resources;
         const overflowOffset: number = r.lineOffset / 2;
         const x1: number = cx + dX * firstPt.offset;
-        const bendValueHeight: number = this.renderer.smuflMetrics.tabBendBendValueHeight;
+        const bendValueHeight: number = this.renderer.smuflMetrics.tabBendPerValueHeight;
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {

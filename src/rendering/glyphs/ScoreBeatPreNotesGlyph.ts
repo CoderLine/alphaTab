@@ -17,6 +17,7 @@ import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { FingeringGroupGlyph } from '@src/rendering/glyphs/FingeringGroupGlyph';
 import { BeatSubElement } from '@src/model/Beat';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { SlideInType } from '@src/model/SlideInType';
 
 export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
     private _prebends: BendNoteHeadGroupGlyph | null = null;
@@ -44,6 +45,9 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
             const preBends = new BendNoteHeadGroupGlyph(this.container.beat, true);
             this._prebends = preBends;
             preBends.renderer = this.renderer;
+
+            let hasSimpleSlideIn = false;
+
             for (const note of this.container.beat.notes) {
                 const color = ElementStyleHelper.noteColor(
                     this.renderer.resources,
@@ -78,21 +82,48 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     this.createAccidentalGlyph(note, accidentals);
                     ghost.addParenthesis(note);
                     fingering.addFingers(note);
+
+                    switch (note.slideInType) {
+                        case SlideInType.IntoFromBelow:
+                        case SlideInType.IntoFromAbove:
+                            hasSimpleSlideIn = true;
+                            break;
+                    }
                 }
             }
+
+            if (hasSimpleSlideIn) {
+                this.addNormal(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        this.renderer.smuflMetrics.simpleSlideWidth *
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                    )
+                );
+            }
+
             if (!preBends.isEmpty) {
                 this.addEffect(preBends);
                 this.addNormal(
                     new SpacingGlyph(
                         0,
                         0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        this.renderer.smuflMetrics.preNoteEffectPadding *
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
             if (this.container.beat.brushType !== BrushType.None) {
                 this.addEffect(new ScoreBrushGlyph(this.container.beat));
-                this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)));
+                this.addNormal(
+                    new SpacingGlyph(
+                        0,
+                        0,
+                        this.renderer.smuflMetrics.preNoteEffectPadding *
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                    )
+                );
             }
             if (!fingering.isEmpty) {
                 if (!this.isEmpty) {
@@ -100,7 +131,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         new SpacingGlyph(
                             0,
                             0,
-                            this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            this.renderer.smuflMetrics.preNoteEffectPadding *
+                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                         )
                     );
                 }
@@ -110,7 +142,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     new SpacingGlyph(
                         0,
                         0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        this.renderer.smuflMetrics.preNoteEffectPadding *
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }
@@ -125,7 +158,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                         new SpacingGlyph(
                             0,
                             0,
-                            this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                            this.renderer.smuflMetrics.preNoteEffectPadding *
+                                (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                         )
                     );
                 }
@@ -135,7 +169,8 @@ export class ScoreBeatPreNotesGlyph extends BeatGlyphBase {
                     new SpacingGlyph(
                         0,
                         0,
-                        this.renderer.smuflMetrics.preNoteEffectPadding * (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
+                        this.renderer.smuflMetrics.preNoteEffectPadding *
+                            (this.container.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1)
                     )
                 );
             }

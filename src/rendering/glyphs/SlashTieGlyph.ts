@@ -14,9 +14,13 @@ export class SlashTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
+    private get isLeftHandTap() {
+        return this.startNote === this.endNote;
+    }
+
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
-        if (this.startNote === this.endNote) {
-            return this.startNoteRenderer!.smuflMetrics.slashTieEmptyHeight;
+        if (this.isLeftHandTap) {
+            return this.startNoteRenderer!.smuflMetrics.tieHeight;
         }
         return super.getTieHeight(startX, startY, endX, endY);
     }
@@ -38,8 +42,8 @@ export class SlashTieGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
-        if (this.startNote === this.endNote) {
-            return this.getEndX() - this.renderer.smuflMetrics.slashTieEmptyWidth;
+        if (this.isLeftHandTap) {
+            return this.getEndX() - this.renderer.smuflMetrics.leftHandTabTieWidth;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Right);
     }

@@ -35,8 +35,8 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        const sizeX: number = this.renderer.smuflMetrics.tabSlideSizeX;
-        const sizeY: number =  this.renderer.smuflMetrics.tabSlideSizeY;
+        const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
+        const sizeY: number =  this.renderer.smuflMetrics.simpleSlideHeight;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -49,7 +49,7 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
                     offsetX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 startX = endX - sizeX;
                 startY =
                     cy +
@@ -63,7 +63,7 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
                     offsetX;
-                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 startX = endX - sizeX;
                 startY =
                     cy +
@@ -79,8 +79,8 @@ export class TabSlideLineGlyph extends Glyph {
 
     private paintSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
-        const sizeX: number = this.renderer.smuflMetrics.tabSlideSizeX;
-        const sizeY: number =  this.renderer.smuflMetrics.tabSlideSizeY;
+        const sizeX: number = this.renderer.smuflMetrics.simpleSlideWidth;
+        const sizeY: number =  this.renderer.smuflMetrics.simpleSlideHeight;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -137,7 +137,7 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
                     offsetX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) + sizeY;
                 endX = startX + sizeX;
                 endY =
                     cy +
@@ -151,7 +151,7 @@ export class TabSlideLineGlyph extends Glyph {
                     startNoteRenderer.x +
                     startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Right) +
                     offsetX;
-                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
+                startY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center) - sizeY;
                 endX = startX + sizeX;
                 endY =
                     cy +

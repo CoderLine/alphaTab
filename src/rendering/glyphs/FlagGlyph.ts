@@ -9,7 +9,7 @@ export class FlagGlyph extends MusicFontGlyph {
         super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, FlagGlyph.getSymbol(duration, direction, isGrace));
     }
 
-    private static getSymbol(duration: Duration, direction: BeamDirection, isGrace: boolean): MusicFontSymbol {
+    public static getSymbol(duration: Duration, direction: BeamDirection, isGrace: boolean): MusicFontSymbol {
         if (isGrace) {
             duration = Duration.Eighth;
         }

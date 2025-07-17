@@ -14,6 +14,10 @@ export class NumberedTieGlyph extends TieGlyph {
         this.endNote = endNote;
     }
 
+    private get isLeftHandTap() {
+        return this.startNote === this.endNote;
+    }
+
     protected override shouldDrawBendSlur() {
         return (
             this.renderer.settings.notation.extendBendArrowsOnTiedNotes &&
@@ -39,14 +43,14 @@ export class NumberedTieGlyph extends TieGlyph {
     }
 
     protected override getStartX(): number {
-        if (this.startNote === this.endNote) {
-            return this.getEndX() - this.startNoteRenderer!.smuflMetrics.numberedTieEmptySize;
+        if (this.isLeftHandTap) {
+            return this.getEndX() - this.startNoteRenderer!.smuflMetrics.leftHandTabTieWidth;
         }
         return this.startNoteRenderer!.getNoteX(this.startNote, NoteXPosition.Center);
     }
 
     protected override getEndX(): number {
-        if (this.startNote === this.endNote) {
+        if (this.isLeftHandTap) {
             return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Left);
         }
         return this.endNoteRenderer!.getNoteX(this.endNote, NoteXPosition.Center);

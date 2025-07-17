@@ -61,8 +61,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         const res: RenderingResources = this.renderer.resources;
                         (this.renderer as ScoreBarRenderer).simpleWhammyOverflow =
                             res.tablatureFont.size +
-                            this.renderer.smuflMetrics.scoreWhammySimpleDipHeight +
-                            this.renderer.smuflMetrics.scoreWhammySimpleDipPadding;
+                            this.renderer.smuflMetrics.songBookWhammyDipHeight;
                     } else {
                         const middleGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         middleGlyphs.renderer = this.renderer;
@@ -260,13 +259,11 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             const simpleStartX: number =
                                 cx +
                                 startNoteRenderer.x +
-                                startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes) -
-                                this.renderer.smuflMetrics.scoreWhammySongBookPadding;
+                                startNoteRenderer.getBeatX(this._beat, BeatXPosition.OnNotes);
                             const simpleEndX: number =
                                 cx +
                                 startNoteRenderer.x +
-                                startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes) +
-                                this.renderer.smuflMetrics.scoreWhammySongBookPadding;
+                                startNoteRenderer.getBeatX(this._beat, BeatXPosition.PostNotes);
                             const middleX: number = (simpleStartX + simpleEndX) / 2;
                             const text: string = (
                                 ((this._beat.whammyBarPoints![1].value - this._beat.whammyBarPoints![0].value) / 4) |
@@ -275,9 +272,9 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             canvas.font = this.renderer.resources.tablatureFont;
                             canvas.fillText(text, middleX, cy + this.y);
                             const simpleStartY: number =
-                                cy + this.y + canvas.font.size + this.renderer.smuflMetrics.scoreWhammySongBookPadding;
+                                cy + this.y + canvas.font.size;
                             const simpleEndY: number =
-                                simpleStartY + this.renderer.smuflMetrics.scoreWhammySimpleDipHeight;
+                                simpleStartY + this.renderer.smuflMetrics.songBookWhammyDipHeight;
                             if (this._beat.whammyBarPoints![1].value > this._beat.whammyBarPoints![0].value) {
                                 canvas.moveTo(simpleStartX, simpleEndY);
                                 canvas.lineTo(middleX, simpleStartY);

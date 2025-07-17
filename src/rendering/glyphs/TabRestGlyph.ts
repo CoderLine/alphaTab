@@ -17,9 +17,6 @@ export class TabRestGlyph extends MusicFontGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        if (!this._isVisibleRest) {
-            this.width = this.renderer.smuflMetrics.tabRestInvisibleWidth;
-        }
     }
 
     public updateBeamingHelper(cx: number): void {

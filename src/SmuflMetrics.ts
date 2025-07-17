@@ -300,14 +300,26 @@ export class SmuflMetrics {
 
         this.brokenBeamWidth = 1 * this.oneStaffSpace;
         this.tabWhammyTextPadding = 0.4 * this.oneStaffSpace;
-        this.tabWhammyPerHalfSize = 0.3 * this.oneStaffSpace;
         this.tabWhammyDashSize = 0.4 * this.oneStaffSpace;
+        this.tabBendDashSize = 0.4 * this.oneStaffSpace;
+
+        this.songBookWhammyDipHeight = 0.6 * this.oneStaffSpace;
+        this.tabWhammyPerHalfHeight = 0.3 * this.oneStaffSpace;
+        this.tabBendPerValueHeight = 0.6 * this.oneStaffSpace;
+
+        this.leftHandTabTieWidth = 2.2 * this.oneStaffSpace;
+        this.numberedDashGlyphWidth = 1.5 * this.oneStaffSpace;
+        this.deadSlappedLineWidth = 0.25 * this.oneStaffSpace;
+
+        this.simpleSlideWidth = 1.3 * this.oneStaffSpace;
+        this.simpleSlideHeight = 0.3 * this.oneStaffSpace;
     }
 
     // Numbered Notation: SMuFL has no numbered notation yet
     public numberedBarRendererBarSize = 0;
     public numberedBarRendererBarSpacing = 0;
     public numberedDashGlyphPadding = 0;
+    public numberedDashGlyphWidth = 0;
 
     // Line Ranged Glyphs: smufl doesn's have any good reference for dashed lines on effects
     public lineRangedGlyphDashGap = 0;
@@ -329,8 +341,19 @@ export class SmuflMetrics {
     public brokenBeamWidth = 0;
 
     public tabWhammyTextPadding = 0;
-    public tabWhammyPerHalfSize = 0;
+    public tabWhammyPerHalfHeight = 0;
     public tabWhammyDashSize = 0;
+
+    public songBookWhammyDipHeight = 0;
+    public deadSlappedLineWidth = 0;
+
+    public leftHandTabTieWidth = 0;
+
+    public tabBendDashSize = 0;
+    public tabBendPerValueHeight = 0;
+
+    public simpleSlideWidth = 0;
+    public simpleSlideHeight = 0;
 
     public stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
     public stemDown = new Map<MusicFontSymbol, SmuflStemInfo>();
@@ -1823,8 +1846,6 @@ export class SmuflMetrics {
         };
     // end bravura_alphatab_metadata.json
 
-    // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
-
     //
     // triplet feel (TODO: fixed values or take others as reference?)
     public tripletFeelNoteScale = 0.5;
@@ -1850,42 +1871,4 @@ export class SmuflMetrics {
     public chordDiagramFretSpacing: number = 12;
     public chordDiagramNutHeight: number = 2;
     public chordDiagramFretHeight: number = 1;
-
-    //
-    //  (TODO: try to eliminate custom paddings)
-
-    public scoreWhammySimpleDipPadding = 2;
-    public scoreWhammySongBookPadding = 2;
-
-    //
-    // glyph sizes (TODO: move to lookup or check if SmuFL has other constants)
-
-    public deadSlappedLineWidth: number = 2;
-    public numberedTieEmptySize: number = 20;
-
-    public numberedDashGlyphWidth = 14;
-
-    public beatPaddingFlagEighthAndAbove: number = 20;
-    public beatPaddingOneHundredAndAbove: number = 10;
-
-    public barNumberMarginPaddingRight: number = 5;
-
-    public scoreSlideLineSizeX = 12;
-
-    public get scoreWhammySimpleDipHeight() {
-        return this.tabWhammyPerHalfSize * 2;
-    }
-
-    public slashTieEmptyHeight = 15;
-    public slashTieEmptyWidth = 20;
-
-    public tabBendDashSize: number = 3;
-    public tabBendBendValueHeight: number = 6;
-
-    public tabRestInvisibleWidth: number = 10;
-    public tabSlideSizeX: number = 12;
-    public tabSlideSizeY: number = 3;
-
-    public tabTieEmptyHeight: number = 15;
-    public tabTieEmptyWidth: number = 20;
 }

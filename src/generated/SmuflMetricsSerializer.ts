@@ -50,6 +50,7 @@ export class SmuflMetricsSerializer {
         o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
         o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
         o.set("numbereddashglyphpadding", obj.numberedDashGlyphPadding);
+        o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
         o.set("linerangedglyphdashgap", obj.lineRangedGlyphDashGap);
         o.set("linerangedglyphdashsize", obj.lineRangedGlyphDashSize);
         o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
@@ -65,8 +66,15 @@ export class SmuflMetricsSerializer {
         o.set("ghostparenthesiswidth", obj.ghostParenthesisWidth);
         o.set("brokenbeamwidth", obj.brokenBeamWidth);
         o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
-        o.set("tabwhammyperhalfsize", obj.tabWhammyPerHalfSize);
+        o.set("tabwhammyperhalfheight", obj.tabWhammyPerHalfHeight);
         o.set("tabwhammydashsize", obj.tabWhammyDashSize);
+        o.set("songbookwhammydipheight", obj.songBookWhammyDipHeight);
+        o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
+        o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
+        o.set("tabbenddashsize", obj.tabBendDashSize);
+        o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
+        o.set("simpleslidewidth", obj.simpleSlideWidth);
+        o.set("simpleslideheight", obj.simpleSlideHeight);
         {
             const m = new Map<string, unknown>();
             o.set("stemup", m);
@@ -147,24 +155,6 @@ export class SmuflMetricsSerializer {
         o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
         o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
         o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
-        o.set("scorewhammysimpledippadding", obj.scoreWhammySimpleDipPadding);
-        o.set("scorewhammysongbookpadding", obj.scoreWhammySongBookPadding);
-        o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
-        o.set("numberedtieemptysize", obj.numberedTieEmptySize);
-        o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
-        o.set("beatpaddingflageighthandabove", obj.beatPaddingFlagEighthAndAbove);
-        o.set("beatpaddingonehundredandabove", obj.beatPaddingOneHundredAndAbove);
-        o.set("barnumbermarginpaddingright", obj.barNumberMarginPaddingRight);
-        o.set("scoreslidelinesizex", obj.scoreSlideLineSizeX);
-        o.set("slashtieemptyheight", obj.slashTieEmptyHeight);
-        o.set("slashtieemptywidth", obj.slashTieEmptyWidth);
-        o.set("tabbenddashsize", obj.tabBendDashSize);
-        o.set("tabbendbendvalueheight", obj.tabBendBendValueHeight);
-        o.set("tabrestinvisiblewidth", obj.tabRestInvisibleWidth);
-        o.set("tabslidesizex", obj.tabSlideSizeX);
-        o.set("tabslidesizey", obj.tabSlideSizeY);
-        o.set("tabtieemptyheight", obj.tabTieEmptyHeight);
-        o.set("tabtieemptywidth", obj.tabTieEmptyWidth);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -256,6 +246,9 @@ export class SmuflMetricsSerializer {
             case "numbereddashglyphpadding":
                 obj.numberedDashGlyphPadding = v! as number;
                 return true;
+            case "numbereddashglyphwidth":
+                obj.numberedDashGlyphWidth = v! as number;
+                return true;
             case "linerangedglyphdashgap":
                 obj.lineRangedGlyphDashGap = v! as number;
                 return true;
@@ -301,11 +294,32 @@ export class SmuflMetricsSerializer {
             case "tabwhammytextpadding":
                 obj.tabWhammyTextPadding = v! as number;
                 return true;
-            case "tabwhammyperhalfsize":
-                obj.tabWhammyPerHalfSize = v! as number;
+            case "tabwhammyperhalfheight":
+                obj.tabWhammyPerHalfHeight = v! as number;
                 return true;
             case "tabwhammydashsize":
                 obj.tabWhammyDashSize = v! as number;
+                return true;
+            case "songbookwhammydipheight":
+                obj.songBookWhammyDipHeight = v! as number;
+                return true;
+            case "deadslappedlinewidth":
+                obj.deadSlappedLineWidth = v! as number;
+                return true;
+            case "lefthandtabtiewidth":
+                obj.leftHandTabTieWidth = v! as number;
+                return true;
+            case "tabbenddashsize":
+                obj.tabBendDashSize = v! as number;
+                return true;
+            case "tabbendpervalueheight":
+                obj.tabBendPerValueHeight = v! as number;
+                return true;
+            case "simpleslidewidth":
+                obj.simpleSlideWidth = v! as number;
+                return true;
+            case "simpleslideheight":
+                obj.simpleSlideHeight = v! as number;
                 return true;
             case "stemup":
                 obj.stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
@@ -430,60 +444,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "chorddiagramfretheight":
                 obj.chordDiagramFretHeight = v! as number;
-                return true;
-            case "scorewhammysimpledippadding":
-                obj.scoreWhammySimpleDipPadding = v! as number;
-                return true;
-            case "scorewhammysongbookpadding":
-                obj.scoreWhammySongBookPadding = v! as number;
-                return true;
-            case "deadslappedlinewidth":
-                obj.deadSlappedLineWidth = v! as number;
-                return true;
-            case "numberedtieemptysize":
-                obj.numberedTieEmptySize = v! as number;
-                return true;
-            case "numbereddashglyphwidth":
-                obj.numberedDashGlyphWidth = v! as number;
-                return true;
-            case "beatpaddingflageighthandabove":
-                obj.beatPaddingFlagEighthAndAbove = v! as number;
-                return true;
-            case "beatpaddingonehundredandabove":
-                obj.beatPaddingOneHundredAndAbove = v! as number;
-                return true;
-            case "barnumbermarginpaddingright":
-                obj.barNumberMarginPaddingRight = v! as number;
-                return true;
-            case "scoreslidelinesizex":
-                obj.scoreSlideLineSizeX = v! as number;
-                return true;
-            case "slashtieemptyheight":
-                obj.slashTieEmptyHeight = v! as number;
-                return true;
-            case "slashtieemptywidth":
-                obj.slashTieEmptyWidth = v! as number;
-                return true;
-            case "tabbenddashsize":
-                obj.tabBendDashSize = v! as number;
-                return true;
-            case "tabbendbendvalueheight":
-                obj.tabBendBendValueHeight = v! as number;
-                return true;
-            case "tabrestinvisiblewidth":
-                obj.tabRestInvisibleWidth = v! as number;
-                return true;
-            case "tabslidesizex":
-                obj.tabSlideSizeX = v! as number;
-                return true;
-            case "tabslidesizey":
-                obj.tabSlideSizeY = v! as number;
-                return true;
-            case "tabtieemptyheight":
-                obj.tabTieEmptyHeight = v! as number;
-                return true;
-            case "tabtieemptywidth":
-                obj.tabTieEmptyWidth = v! as number;
                 return true;
         }
         return false;
