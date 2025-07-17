@@ -26,6 +26,7 @@ import { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { KeySignatureGlyph } from '@src/rendering/glyphs/KeySignatureGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { Staff } from '@src/model/Staff';
+import { GraceType } from '@src/model/GraceType';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -367,7 +368,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // here we shift accordingly
             const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
             if (barCount > 2) {
-                const scale = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
+                const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
                 const beamSpacing = this.smuflMetrics.beamSpacing * scale;
                 const beamThickness = this.smuflMetrics.beamThickness * scale;
                 const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
@@ -452,7 +453,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 // check if rest shifts bar up or down
                 if (h.minRestLine !== null || h.maxRestLine !== null) {
                     const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
-                    const scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
+                    const scaleMod: number = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
                         barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
                     barSpacing += this.smuflMetrics.beamSpacing;

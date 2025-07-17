@@ -2,6 +2,7 @@ import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import type { RenderingResources } from '@src/RenderingResources';
 import { ModelUtils } from '@src/model/ModelUtils';
+import { BarLineStyle } from '@src/model/Bar';
 
 export class AlternateEndingsGlyph extends EffectGlyph {
     private _endings: number[];
@@ -10,7 +11,14 @@ export class AlternateEndingsGlyph extends EffectGlyph {
     private _closeLine: boolean;
     private _indent: boolean;
 
-    public constructor(x: number, y: number, alternateEndings: number, openLine: boolean, closeLine: boolean, indent:boolean) {
+    public constructor(
+        x: number,
+        y: number,
+        alternateEndings: number,
+        openLine: boolean,
+        closeLine: boolean,
+        indent: boolean
+    ) {
         super(x, y);
         this._endings = ModelUtils.getAlternateEndingsList(alternateEndings);
         this._openLine = openLine;
@@ -30,16 +38,19 @@ export class AlternateEndingsGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        let width = this._closeLine
-            ? this.width - canvas.lineWidth
-            : this.width;
+        let width = this._closeLine ? this.width - canvas.lineWidth : this.width;
 
-        cx = (cx | 0) + (canvas.lineWidth / 2);
-        cy = (cy | 0) + (canvas.lineWidth / 2);
+        const lineBarRight = this.renderer.bar.getActualBarLineRight();
+        if(lineBarRight === BarLineStyle.LightHeavy) {
+            width -= this.renderer.smuflMetrics.thickBarlineThickness + this.renderer.smuflMetrics.barlineSeparation;
+        }
 
-        if(this._indent) {
-            cx += this.renderer.smuflMetrics.alternateEndingsPadding
-            width -= this.renderer.smuflMetrics.alternateEndingsPadding
+        cx = (cx | 0) + canvas.lineWidth / 2;
+        cy = (cy | 0) + canvas.lineWidth / 2;
+
+        if (this._indent) {
+            cx += this.renderer.smuflMetrics.alternateEndingsPadding;
+            width -= this.renderer.smuflMetrics.alternateEndingsPadding;
         }
 
         if (this._openLine) {

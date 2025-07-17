@@ -130,30 +130,30 @@ export class SmuflMetrics {
     public tabLineSpacing: number = this.oneStaffSpace * 1.5;
 
     // engraving defaults (TODO: reuse SmuflEngravingDefaults when all are supported)
-    public arrowShaftThickness: number = 0;
-    public barlineSeparation: number = 0;
-    public beamSpacing: number = 0;
-    public beamThickness: number = 0;
-    public bracketThickness: number = 0;
-    public dashedBarlineDashLength: number = 0;
-    public dashedBarlineGapLength: number = 0;
-    public dashedBarlineThickness: number = 0;
-    public hairpinThickness: number = 0;
+    public arrowShaftThickness = 0;
+    public barlineSeparation = 0;
+    public beamSpacing = 0;
+    public beamThickness = 0;
+    public bracketThickness = 0;
+    public dashedBarlineDashLength = 0;
+    public dashedBarlineGapLength = 0;
+    public dashedBarlineThickness = 0;
+    public hairpinThickness = 0;
     public legerLineThickness = 0;
     public legerLineExtension = 0;
     public pedalLineThickness = 0;
-    public repeatBarlineDotSeparation: number = 0;
-    public repeatEndingLineThickness: number = 0;
-    public slurMidpointThickness: number = 0;
-    public staffLineThickness: number = 0;
-    public stemThickness: number = 0;
-    public thickBarlineThickness: number = 0;
-    public thinBarlineThickness: number = 0;
-    public thinThickBarlineSeparation: number = 0;
-    public tieMidpointThickness: number = 0;
-    public tupletBracketThickness: number = 0;
+    public repeatBarlineDotSeparation = 0;
+    public repeatEndingLineThickness = 0;
+    public slurMidpointThickness = 0;
+    public staffLineThickness = 0;
+    public stemThickness = 0;
+    public thickBarlineThickness = 0;
+    public thinBarlineThickness = 0;
+    public thinThickBarlineSeparation = 0;
+    public tieMidpointThickness = 0;
+    public tupletBracketThickness = 0;
 
-    public effectBandSeparation: number = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
+    public effectBandSeparation = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
 
     public static get bravuraDefaults() {
         const metrics = new SmuflMetrics();
@@ -283,12 +283,13 @@ export class SmuflMetrics {
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
+        this.postNoteEffectPadding = 0.2 * this.oneStaffSpace;
         this.lineRangedGlyphDashGap = 1 * this.oneStaffSpace;
         this.lineRangedGlyphDashSize = 1 * this.oneStaffSpace;
         this.numberedDashGlyphPadding = 0.3 * this.oneStaffSpace;
         this.stringNumberCirclePadding = 0.3 * this.oneStaffSpace;
         this.rowContainerPadding = 0.3 * this.oneStaffSpace;
-        this.scoreChordEffectSpacing = 0.1 * this.oneStaffSpace;
+        this.effectSpacing = 0.2 * this.oneStaffSpace;
         this.alternateEndingsPadding = 0.3 * this.oneStaffSpace;
         this.sustainPedalLinePadding = 0.5 * this.oneStaffSpace;
 
@@ -296,10 +297,12 @@ export class SmuflMetrics {
         this.beatTimerPadding = 0.22 * this.oneStaffSpace;
         this.bendNoteHeadElementPadding = 0.22 * this.oneStaffSpace;
         this.ghostParenthesisWidth = 0.3 * this.oneStaffSpace;
-    }
 
-    //
-    // sizes
+        this.brokenBeamWidth = 1 * this.oneStaffSpace;
+        this.tabWhammyTextPadding = 0.4 * this.oneStaffSpace;
+        this.tabWhammyPerHalfSize = 0.3 * this.oneStaffSpace;
+        this.tabWhammyDashSize = 0.4 * this.oneStaffSpace;
+    }
 
     // Numbered Notation: SMuFL has no numbered notation yet
     public numberedBarRendererBarSize = 0;
@@ -307,153 +310,43 @@ export class SmuflMetrics {
     public numberedDashGlyphPadding = 0;
 
     // Line Ranged Glyphs: smufl doesn's have any good reference for dashed lines on effects
-    public lineRangedGlyphDashGap: number = 0;
-    public lineRangedGlyphDashSize: number = 0;
+    public lineRangedGlyphDashGap = 0;
+    public lineRangedGlyphDashSize = 0;
 
-    // paddings/margins between elements
-    public preNoteEffectPadding: number = 0;
+    public preNoteEffectPadding = 0;
+    public postNoteEffectPadding = 0;
     public stringNumberCirclePadding = 0;
-    public rowContainerPadding: number = 0;
-    public scoreChordEffectSpacing: number = 0;
-
-    public alternateEndingsPadding: number = 0;
+    public rowContainerPadding = 0;
+    public effectSpacing = 0;
+    public alternateEndingsPadding = 0;
     public sustainPedalLinePadding = 0;
 
     public tieHeight = 0;
-    public beatTimerPadding: number = 0;
-    public bendNoteHeadElementPadding: number = 0;
-    public ghostParenthesisWidth: number = 0;
+    public beatTimerPadding = 0;
+    public bendNoteHeadElementPadding = 0;
+    public ghostParenthesisWidth = 0;
 
-    //
-    //  (TODO: try to eliminate custom paddings)
+    public brokenBeamWidth = 0;
 
-    public scoreSlideLineEndPadding = 2;
-    public scoreSlideLineOffsetX = 2;
-    public scoreSlideLineOffsetY = 2;
-
-    public scoreWhammySimpleDipPadding = 2;
-    public scoreWhammySongBookPadding = 2;
-    public slashNoteHeadEffectSpacing = 7;
-
-    public tabNoteChordEffectSpacing: number = 7;
-
-    public tabWhammySimpleDipPadding = 2;
-    public tabWhammyTextPadding = 2;
-
-    //
-    // glyph positioning/alignment offsets (TODO: try to eliminate or calculate from bounding box)
-
-    public tabPreBendPadding: number = 2;
-    public tabSlideOffsetX: number = 2;
+    public tabWhammyTextPadding = 0;
+    public tabWhammyPerHalfSize = 0;
+    public tabWhammyDashSize = 0;
 
     public stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
     public stemDown = new Map<MusicFontSymbol, SmuflStemInfo>();
     public repeatOffsetX = new Map<MusicFontSymbol, number>();
 
-    //
-    // glyph sizes (TODO: move to lookup or check if SmuFL has other constants)
-
-    public deadSlappedLineWidth: number = 2;
-    public flagWidth: number = 11;
-    public leftHandTappingCircleScale: number = 0.625;
-    public numberedNoteHeadWidth: number = 12;
-    public numberedNoteHeadHeight: number = 17;
-    public numberedTieEmptySize: number = 20;
-    public arpeggioWidth: number = 10;
-    public arpeggioArrowSize: number = 8;
-
-    public crescendoHeight = 17;
-
-    public numberedDashGlyphWidth = 14;
-    public simileMarkSimpleWidth = 20;
-    public simileMarkDoubleWidth = 28;
-
-    public graceFlagSizeX = 12;
-    public graceFlagSizeY = 15;
-
-    public brokenBarOffset = 6;
-
-    public accidentalHeight: number = 21;
-
-    public beatPaddingFlagEighthAndAbove: number = 20;
-    public beatPaddingOneHundredAndAbove: number = 10;
-
-    public barNumberMarginPaddingRight: number = 5;
-
-    public scoreSlideLineSizeX = 12;
-
-    public get scoreWhammySimpleDipHeight() {
-        return this.tabWhammyPerHalfSize * 2;
-    }
-
-    public slashTieEmptyHeight = 15;
-    public slashTieEmptyWidth = 20;
-
-    public tabBendDashSize: number = 3;
-    public tabBendBendValueHeight: number = 6;
-
-    public tabBrushWidth: number = 10;
-    public tabBrushArrowSize: number = 8;
-    public tabRestInvisibleWidth: number = 10;
-    public tabSlideSizeX: number = 12;
-    public tabSlideSizeY: number = 3;
-
-    public tabTieEmptyHeight: number = 15;
-    public tabTieEmptyWidth: number = 20;
-
-    public tabWhammyPerHalfSize = 6;
-    public tabWhammyDashSize = 3;
-
-    public timeSignatureNumberHeight = 18;
-
-    public standardStemLength: number = 0;
+    public standardStemLength = 0;
     public stemFlagOffsets: Map<Duration, number> = new Map<Duration, number>();
 
     public glyphTop: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
     public glyphBottom: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-
-    /**
-     * The widths of the bounding box for the respective glyphs.
-     */
     public glyphWidths: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-    /**
-     * The heights of the bounding box for the respective glyphs.
-     */
     public glyphHeights: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
 
-    //
-    // chord diagram (TODO: check if SmuFL has some glyphs we can check)
-    public chordDiagramPaddingX: number = 5;
-    public chordDiagramPaddingY: number = 2;
-    public chordDiagramCircleRadius: number = 2.5;
-    public chordDiagramStringSpacing: number = 10;
-    public chordDiagramFretSpacing: number = 12;
-    public chordDiagramNutHeight: number = 2;
-    public chordDiagramFretHeight: number = 1;
-
-    //
-    // glyph scales
     public tempoNoteScale = 0.7;
     public tuningGlyphCircleNumberScale = 0.7;
     public tuningGlyphStringColumnScale = 1.5;
-
-    // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
-
-    //
-    // triplet feel (TODO: fixed values or take others as reference?)
-    public tripletFeelNoteScale = 0.5;
-    public tripletFeelTupletScale = 0.7;
-    public tripletFeelHeight = 25;
-    public tripletFeelYPadding = 8;
-    public tripletFeelBracketsHeightToY = 0.3;
-    public tripletFeelLeftNoteXPadding = 10;
-    public tripletFeelRightNoteXPadding = 40;
-    public tripletFeelCircleOffset = 9;
-    public tripletFeelCircleSize = 1;
-    public tripletFeelEqualsOffsetX = 32;
-    public tripletFeelEqualsOffsetY = 5;
-    public tripletFeelAugmentationOffsetX = 7;
-    public tripletFeelCloseParenthesisOffsetX = 65;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata
@@ -588,6 +481,10 @@ export class SmuflMetrics {
                 coda: {
                     bBoxNE: [3.82, 3.592],
                     bBoxSW: [-0.016, -0.632]
+                },
+                dynamicCrescendoHairpin: {
+                    bBoxNE: [2.944, 1.424],
+                    bBoxSW: [0.016, 0.372]
                 },
                 dynamicFF: {
                     bBoxNE: [2.44, 1.776],
@@ -800,6 +697,14 @@ export class SmuflMetrics {
                 gClef8vb: {
                     bBoxNE: [2.684, 4.392],
                     bBoxSW: [0, -3.512]
+                },
+                graceNoteSlashStemDown: {
+                    bBoxNE: [2.02, 0],
+                    bBoxSW: [0, -1.604]
+                },
+                graceNoteSlashStemUp: {
+                    bBoxNE: [2.02, 1.604],
+                    bBoxSW: [0, 0]
                 },
                 guitarClosePedal: {
                     bBoxNE: [1.144, 1.14],
@@ -1917,4 +1822,70 @@ export class SmuflMetrics {
             }
         };
     // end bravura_alphatab_metadata.json
+
+    // (TODO: Align with SMuFL where needed, otherwise eliminate to scale 1)
+
+    //
+    // triplet feel (TODO: fixed values or take others as reference?)
+    public tripletFeelNoteScale = 0.5;
+    public tripletFeelTupletScale = 0.7;
+    public tripletFeelHeight = 25;
+    public tripletFeelYPadding = 8;
+    public tripletFeelBracketsHeightToY = 0.3;
+    public tripletFeelLeftNoteXPadding = 10;
+    public tripletFeelRightNoteXPadding = 40;
+    public tripletFeelCircleOffset = 9;
+    public tripletFeelCircleSize = 1;
+    public tripletFeelEqualsOffsetX = 32;
+    public tripletFeelEqualsOffsetY = 5;
+    public tripletFeelAugmentationOffsetX = 7;
+    public tripletFeelCloseParenthesisOffsetX = 65;
+
+    //
+    // chord diagram (TODO: check if SmuFL has some glyphs we can check)
+    public chordDiagramPaddingX: number = 5;
+    public chordDiagramPaddingY: number = 2;
+    public chordDiagramCircleRadius: number = 2.5;
+    public chordDiagramStringSpacing: number = 10;
+    public chordDiagramFretSpacing: number = 12;
+    public chordDiagramNutHeight: number = 2;
+    public chordDiagramFretHeight: number = 1;
+
+    //
+    //  (TODO: try to eliminate custom paddings)
+
+    public scoreWhammySimpleDipPadding = 2;
+    public scoreWhammySongBookPadding = 2;
+
+    //
+    // glyph sizes (TODO: move to lookup or check if SmuFL has other constants)
+
+    public deadSlappedLineWidth: number = 2;
+    public numberedTieEmptySize: number = 20;
+
+    public numberedDashGlyphWidth = 14;
+
+    public beatPaddingFlagEighthAndAbove: number = 20;
+    public beatPaddingOneHundredAndAbove: number = 10;
+
+    public barNumberMarginPaddingRight: number = 5;
+
+    public scoreSlideLineSizeX = 12;
+
+    public get scoreWhammySimpleDipHeight() {
+        return this.tabWhammyPerHalfSize * 2;
+    }
+
+    public slashTieEmptyHeight = 15;
+    public slashTieEmptyWidth = 20;
+
+    public tabBendDashSize: number = 3;
+    public tabBendBendValueHeight: number = 6;
+
+    public tabRestInvisibleWidth: number = 10;
+    public tabSlideSizeX: number = 12;
+    public tabSlideSizeY: number = 3;
+
+    public tabTieEmptyHeight: number = 15;
+    public tabTieEmptyWidth: number = 20;
 }

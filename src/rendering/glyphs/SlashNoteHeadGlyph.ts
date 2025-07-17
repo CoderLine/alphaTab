@@ -49,14 +49,14 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
         this.width = this.renderer.smuflMetrics.glyphWidths.get(this._symbol)! * scale;
         this.height = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)! * scale;
 
-        const effectSpacing: number = this.renderer.smuflMetrics.slashNoteHeadEffectSpacing;
+        const effectSpacing: number = this.renderer.smuflMetrics.effectSpacing;
         let effectY = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;
             g.renderer = this.renderer;
-            effectY += effectSpacing;
             g.doLayout();
+            effectY += g.height + effectSpacing;
         }
     }
 

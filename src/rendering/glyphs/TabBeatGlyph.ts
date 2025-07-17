@@ -46,7 +46,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             const isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
 
-            let beatEffects: Map<string, Glyph>;
 
             if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
@@ -64,7 +63,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 slashNoteHead.beat = this.container.beat;
                 slashNoteHead.beamingHelper = this.beamingHelper;
                 this.addNormal(slashNoteHead);
-                beatEffects = slashNoteHead.beatEffects;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
@@ -76,7 +74,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
                 this.addNormal(tabNoteNumbers);
-                beatEffects = tabNoteNumbers.beatEffects;
             }
 
             //

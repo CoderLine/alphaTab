@@ -514,19 +514,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
-            if (beat.graceType === GraceType.BeforeBeat) {
-                const graceSizeY: number = this.smuflMetrics.graceFlagSizeY;
-                const graceSizeX: number = this.smuflMetrics.graceFlagSizeX;
-                canvas.beginPath();
-                if (direction === BeamDirection.Down) {
-                    canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + bottomY - graceSizeY);
-                    canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + bottomY);
-                } else {
-                    canvas.moveTo(cx + this.x + beatLineX - graceSizeX / 2, cy + this.y + topY + graceSizeY);
-                    canvas.lineTo(cx + this.x + beatLineX + graceSizeX / 2, cy + this.y + topY);
-                }
-                canvas.stroke();
-            }
+            let flagWidth = 0;
 
             //
             // Draw flag
@@ -542,6 +530,29 @@ export abstract class LineBarRenderer extends BarRendererBase {
                 glyph.renderer = this;
                 glyph.doLayout();
                 glyph.paint(0, 0, canvas);
+                flagWidth = glyph.width / 2;
+            }
+
+            if (beat.graceType === GraceType.BeforeBeat) {
+                if (direction === BeamDirection.Down) {
+                    canvas.fillMusicFontSymbol(
+                        cx + this.x + beatLineX + flagWidth / 2,
+                        (topY + bottomY - this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemDown)!) /
+                            2,
+                        NoteHeadGlyph.GraceScale,
+                        MusicFontSymbol.GraceNoteSlashStemDown,
+                        true
+                    );
+                } else {
+                    canvas.fillMusicFontSymbol(
+                        cx + this.x + beatLineX + flagWidth / 2,
+                        (topY + bottomY + this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemUp)!) /
+                            2,
+                        NoteHeadGlyph.GraceScale,
+                        MusicFontSymbol.GraceNoteSlashStemUp,
+                        true
+                    );
+                }
             }
         }
     }
@@ -641,15 +652,20 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
     protected paintBar(cx: number, cy: number, canvas: ICanvas, h: BeamingHelper, beamsElement: BeatSubElement): void {
         const direction: BeamDirection = this.getBeamDirection(h);
+        const isGrace: boolean = h.graceType !== GraceType.None;
+        const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
+        let barSpacing: number = (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
+        let barSize: number = this.smuflMetrics.beamThickness * scaleMod;
+        if (direction === BeamDirection.Down) {
+            barSpacing = -barSpacing;
+            barSize = -barSize;
+        }
 
         for (let i: number = 0, j: number = h.beats.length; i < j; i++) {
             const beat: Beat = h.beats[i];
             if (!h.hasBeatLineX(beat) || beat.deadSlapped) {
                 continue;
             }
-
-            const isGrace: boolean = beat.graceType !== GraceType.None;
-            const scaleMod: number = isGrace ? NoteHeadGlyph.GraceScale : 1;
 
             const beatLineX: number = h.getBeatLineX(beat);
             const y1: number = cy + this.y + this.getBarLineStart(beat, direction);
@@ -672,16 +688,10 @@ export abstract class LineBarRenderer extends BarRendererBase {
             } else if (i !== 0) {
                 fingeringY -= canvas.font.size * 1.5;
             }
-            const brokenBarOffset: number = this.smuflMetrics.brokenBarOffset * scaleMod;
-            let barSpacing: number = (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
-            let barSize: number = this.smuflMetrics.beamThickness * scaleMod;
+            const brokenBarOffset: number = this.smuflMetrics.brokenBeamWidth * scaleMod;
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;
 
-            if (direction === BeamDirection.Down) {
-                barSpacing = -barSpacing;
-                barSize = -barSize;
-            }
             for (let barIndex: number = 0; barIndex < barCount; barIndex++) {
                 let barStartX: number = 0;
                 let barEndX: number = 0;
@@ -773,6 +783,31 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         barSize
                     );
                 }
+            }
+        }
+
+        if (h.graceType === GraceType.BeforeBeat) {
+            const beatLineX: number = h.getBeatLineX(h.beats[0]);
+            const flagWidth = this.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
+            let slashY: number = (cy + this.y + this.calculateBeamY(h, beatLineX)) | 0;
+            slashY += barSize + barSpacing;
+
+            if (direction === BeamDirection.Down) {
+                canvas.fillMusicFontSymbol(
+                    cx + this.x + beatLineX + flagWidth / 2,
+                    slashY,
+                    NoteHeadGlyph.GraceScale,
+                    MusicFontSymbol.GraceNoteSlashStemDown,
+                    true
+                );
+            } else {
+                canvas.fillMusicFontSymbol(
+                    cx + this.x + beatLineX + flagWidth / 2,
+                    slashY,
+                    NoteHeadGlyph.GraceScale,
+                    MusicFontSymbol.GraceNoteSlashStemUp,
+                    true
+                );
             }
         }
     }

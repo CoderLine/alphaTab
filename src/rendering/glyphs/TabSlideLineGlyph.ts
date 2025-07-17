@@ -41,7 +41,7 @@ export class TabSlideLineGlyph extends Glyph {
         let startY: number = 0;
         let endX: number = 0;
         let endY: number = 0;
-        const offsetX = this.renderer.smuflMetrics.tabSlideOffsetX;
+        const offsetX = this.renderer.smuflMetrics.preNoteEffectPadding;
         switch (this._inType) {
             case SlideInType.IntoFromBelow:
                 endX =
@@ -87,7 +87,7 @@ export class TabSlideLineGlyph extends Glyph {
         let endY: number = 0;
         let waves: boolean = false;
 
-        const offsetX =  this.renderer.smuflMetrics.tabSlideOffsetX;
+        const offsetX =  this.renderer.smuflMetrics.postNoteEffectPadding;
 
         switch (this._outType) {
             case SlideOutType.Shift:

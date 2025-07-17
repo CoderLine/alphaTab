@@ -17,7 +17,7 @@ export class CrescendoGlyph extends GroupedEffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.smuflMetrics.crescendoHeight;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.DynamicCrescendoHairpin)!;
     }
 
     protected paintGrouped(cx: number, cy: number, endX: number, canvas: ICanvas): void {

@@ -38,7 +38,7 @@ export class ScoreSlideLineGlyph extends Glyph {
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const sizeX: number = startNoteRenderer.smuflMetrics.scoreSlideLineSizeX;
-        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - startNoteRenderer.smuflMetrics.scoreSlideLineEndPadding;
+        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - startNoteRenderer.smuflMetrics.preNoteEffectPadding;
         const endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
         let startX = endX - sizeX;
         let startY: number = cy + startNoteRenderer.y;
@@ -71,8 +71,7 @@ export class ScoreSlideLineGlyph extends Glyph {
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const sizeX: number = startNoteRenderer.smuflMetrics.scoreSlideLineSizeX;
-        const offsetX: number = startNoteRenderer.smuflMetrics.scoreSlideLineOffsetX;
-        const offsetY: number = startNoteRenderer.smuflMetrics.scoreSlideLineOffsetY;
+        const offsetX: number = startNoteRenderer.smuflMetrics.postNoteEffectPadding;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -106,14 +105,6 @@ export class ScoreSlideLineGlyph extends Glyph {
                             cy +
                             endNoteRenderer.y +
                             endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
-                    }
-
-                    if (this._startNote.slideTarget.realValue > this._startNote.realValue) {
-                        startY += offsetY;
-                        endY -= offsetY;
-                    } else {
-                        startY -= offsetY;
-                        endY += offsetY;
                     }
                 } else {
                     endX = cx + startNoteRenderer.x + this._parent.x;

@@ -77,7 +77,7 @@ export class BeamingHelper {
 
     public invertBeamDirection: boolean = false;
     public preferredBeamDirection: BeamDirection | null = null;
-    public isGrace: boolean = false;
+    public graceType: GraceType = GraceType.None;
 
     public minRestLine: number | null = null;
     public beatOfMinRestLine: Beat | null = null;
@@ -312,7 +312,7 @@ export class BeamingHelper {
             }
 
             if (beat.graceType !== GraceType.None) {
-                this.isGrace = true;
+                this.graceType = beat.graceType;
             }
 
             if (!beat.isRest) {

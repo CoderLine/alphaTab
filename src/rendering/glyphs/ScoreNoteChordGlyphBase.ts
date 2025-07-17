@@ -73,7 +73,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 const stemInfo = smufl.stemUp.get(g.symbol)!;
                 const topX = stemInfo.topX * scale;
                 if (topX > stemUpX) {
-                    stemUpX = topX * scale;
+                    stemUpX = topX;
                 }
             }
 

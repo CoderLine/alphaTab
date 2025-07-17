@@ -1,5 +1,4 @@
 import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
@@ -32,8 +31,12 @@ export class NumberedNoteHeadGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        this.width = this.renderer.smuflMetrics.numberedNoteHeadWidth * scale;
-        this.height = this.renderer.smuflMetrics.numberedNoteHeadHeight * scale;
+        const res = this.renderer.resources;
+        const font = this._isGrace ? res.numberedNotationGraceFont : res.numberedNotationFont;
+        const c = this.renderer.scoreRenderer.canvas!;
+        c.font = font;
+        const size =  c.measureText(`${this._number}`);
+        this.height = size.height;
+        this.width = size.width;
     }
 }

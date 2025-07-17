@@ -587,11 +587,11 @@ export class BarRendererBase {
             case SimileMark.Simple:
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
                 canvas.fillMusicFontSymbol(
-                    cx + this.x + (this.width - this.smuflMetrics.simileMarkSimpleWidth) / 2,
+                    cx + this.x + this.width / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat1Bar,
-                    false
+                    true
                 );
                 canvas.endGroup();
                 break;
@@ -600,11 +600,12 @@ export class BarRendererBase {
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
 
                 canvas.fillMusicFontSymbol(
-                    cx + this.x - this.smuflMetrics.simileMarkDoubleWidth / 2,
+                    cx + this.x,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat2Bars,
-                    false
+                                        true
+
                 );
 
                 canvas.endGroup();

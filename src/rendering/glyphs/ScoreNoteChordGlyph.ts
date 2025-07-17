@@ -143,10 +143,9 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
             this.width = this._deadSlapped.width;
         }
 
-        const direction: BeamDirection = this.direction;
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
-        let belowEffectSpacing = this.renderer.smuflMetrics.scoreChordEffectSpacing;
+        let belowEffectSpacing = this.renderer.smuflMetrics.effectSpacing;
         let aboveEffectSpacing = -belowEffectSpacing;
 
         let belowEffectSpacingShiftBefore = false;
@@ -220,19 +219,6 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         if (minEffectY !== null) {
             scoreRenderer.registerBeatEffectOverflows(minEffectY, maxEffectY ?? 0);
         }
-
-        // if (this.beat.isTremolo && !this.beat.deadSlapped) {
-        //     let tremoloX: number = direction === BeamDirection.Up ? this.upLineX : this.downLineX;
-        //     const speed: Duration = this.beat.tremoloSpeed!;
-
-        //     if (this.beat.duration < Duration.Half) {
-        //         tremoloX = this.width / 2;
-        //     }
-
-        //     this._tremoloPicking = new TremoloPickingGlyph(tremoloX, baseNote.glyph.y, speed);
-        //     this._tremoloPicking.renderer = this.renderer;
-        //     this._tremoloPicking.doLayout();
-        // }
     }
 
     public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {

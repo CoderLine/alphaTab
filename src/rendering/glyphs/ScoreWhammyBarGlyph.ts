@@ -20,6 +20,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
     private _beat: Beat;
+    private _endGlyph: BendNoteHeadGroupGlyph | null = null;
 
     public constructor(beat: Beat) {
         super(0, 0);
@@ -37,6 +38,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             case WhammyType.PrediveDive:
                 {
                     const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
+                    this._endGlyph = endGlyphs;
                     endGlyphs.renderer = this.renderer;
                     const lastWhammyPoint: BendPoint =
                         this._beat.whammyBarPoints![this._beat.whammyBarPoints!.length - 1];
@@ -78,6 +80,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                         this.BendNoteHeads.push(middleGlyphs);
                         const endGlyphs: BendNoteHeadGroupGlyph = new BendNoteHeadGroupGlyph(this._beat, false);
                         endGlyphs.renderer = this.renderer;
+                        this._endGlyph = endGlyphs;
+
                         if (this.renderer.settings.notation.notationMode === NotationMode.GuitarPro) {
                             const lastBendPoint: BendPoint =
                                 this._beat.whammyBarPoints![this._beat.whammyBarPoints!.length - 1];
@@ -138,11 +142,15 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
 
             let endX: number = cx + startNoteRenderer.x;
             if (beat.isLastOfVoice) {
-                endX += startNoteRenderer.width;
+                endX += startNoteRenderer.postBeatGlyphsStart;
             } else {
                 endX += startNoteRenderer.getBeatX(beat, BeatXPosition.EndBeat);
             }
-            endX -= 8;
+
+            if (this._endGlyph) {
+                endX -= this._endGlyph.width;
+            }
+
             const slurText: string = beat.whammyStyle === BendStyle.Gradual && i === 0 ? 'grad.' : '';
             let endNoteRenderer: ScoreBarRenderer | null = null;
             if (note.isTieOrigin) {
@@ -159,6 +167,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                     endNoteRenderer = null;
                 }
             }
+
             let heightOffset: number = noteHeadHeight * NoteHeadGlyph.GraceScale * 0.5;
             if (direction === BeamDirection.Up) {
                 heightOffset = -heightOffset;
@@ -265,7 +274,8 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                             ).toString();
                             canvas.font = this.renderer.resources.tablatureFont;
                             canvas.fillText(text, middleX, cy + this.y);
-                            const simpleStartY: number = cy + this.y + canvas.font.size + this.renderer.smuflMetrics.scoreWhammySongBookPadding;
+                            const simpleStartY: number =
+                                cy + this.y + canvas.font.size + this.renderer.smuflMetrics.scoreWhammySongBookPadding;
                             const simpleEndY: number =
                                 simpleStartY + this.renderer.smuflMetrics.scoreWhammySimpleDipHeight;
                             if (this._beat.whammyBarPoints![1].value > this._beat.whammyBarPoints![0].value) {
@@ -288,7 +298,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
                                 endX,
                                 endY,
                                 beatDirection === BeamDirection.Down,
-                                this.renderer.smuflMetrics.tieHeight,                                
+                                this.renderer.smuflMetrics.tieHeight,
                                 this.renderer.smuflMetrics.slurMidpointThickness
                             );
                         }

@@ -34,7 +34,6 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         // defines the reserved y position of the columns
         const columns: AccidentalColumnInfo[] = [];
         columns.push(new AccidentalColumnInfo());
-        const accidentalHeight: number = this.renderer.smuflMetrics.accidentalHeight;
         for (let i: number = 0, j: number = this.glyphs.length; i < j; i++) {
             const g = this.glyphs[i] as AccidentalGlyph;
             g.renderer = this.renderer;
@@ -52,7 +51,7 @@ export class AccidentalGroupGlyph extends GlyphGroup {
             }
             // temporary save column as X
             g.x = gColumn;
-            columns[gColumn].y = g.y + accidentalHeight;
+            columns[gColumn].y = g.y + g.height;
             if (columns[gColumn].width < g.width) {
                 columns[gColumn].width = g.width;
             }

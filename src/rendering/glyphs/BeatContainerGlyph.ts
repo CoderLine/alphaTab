@@ -13,6 +13,7 @@ import { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { Bounds } from '@src/rendering/utils/Bounds';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class BeatContainerGlyph extends Glyph {
     public voiceContainer: VoiceContainerGlyph;
@@ -50,9 +51,9 @@ export class BeatContainerGlyph extends Glyph {
         const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
         if (this.beat.graceType !== GraceType.None) {
             // always use flag size as spacing on grace notes
-            postBeatStretch += this.renderer.smuflMetrics.flagWidth * NoteHeadGlyph.GraceScale;
+            postBeatStretch += this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
         } else if (helper && this.drawBeamHelperAsFlags(helper)) {
-            postBeatStretch += this.renderer.smuflMetrics.flagWidth * NoteHeadGlyph.GraceScale;
+            postBeatStretch += this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! * NoteHeadGlyph.GraceScale;
         }
         for (const tie of this.ties) {
             postBeatStretch += tie.width;
@@ -224,7 +225,7 @@ export class BeatContainerGlyph extends Glyph {
             const helper = this.renderer.helpers.getBeamingHelperForBeat(this.beat);
             if ((helper && this.drawBeamHelperAsFlags(helper)) || this.beat.graceType !== GraceType.None) {
                 beatBoundings.visualBounds.w +=
-                    this.renderer.smuflMetrics.flagWidth *
+                    this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.Flag8thUp)! *
                     (this.beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1);
             }
 

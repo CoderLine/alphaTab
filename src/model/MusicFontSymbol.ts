@@ -263,6 +263,11 @@ export enum MusicFontSymbol {
     DynamicRinforzando2 = 0xe53d,
     DynamicForzando = 0xe535,
 
+    DynamicCrescendoHairpin = 0xe53e,
+
+    GraceNoteSlashStemUp = 0xE564,
+    GraceNoteSlashStemDown = 0xE565,
+
     OrnamentTrill = 0xe566,
     OrnamentTurn = 0xe567,
     OrnamentTurnInverted = 0xe568,

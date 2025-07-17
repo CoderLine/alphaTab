@@ -39,7 +39,7 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
 
     public override doLayout(): void {
         let x = 0;
-        const numberHeight = this.renderer.smuflMetrics.timeSignatureNumberHeight;
+        const numberHeight = this.renderer.smuflMetrics.oneStaffSpace * 2;
         if (this._isFreeTime) {
             const g = new GhostParenthesisGlyph(true);
             g.renderer = this.renderer;

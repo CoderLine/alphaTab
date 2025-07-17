@@ -2041,10 +2041,10 @@ export class AlphaTexImporter extends ScoreImporter {
                 // set positions
                 if (!exact) {
                     const count: number = beat.whammyBarPoints.length;
-                    const step: number = (60 / count) | 0;
+                    const step: number = (BendPoint.MaxPosition / (count - 1)) | 0;
                     let i: number = 0;
                     while (i < count) {
-                        beat.whammyBarPoints[i].offset = Math.min(60, i * step);
+                        beat.whammyBarPoints[i].offset = Math.min(BendPoint.MaxPosition, i * step);
                         i++;
                     }
                 } else {
