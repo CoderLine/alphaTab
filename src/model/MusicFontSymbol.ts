@@ -149,6 +149,8 @@ export enum MusicFontSymbol {
     NoteEighthUp = 0xe1d7,
 
     MetNoteQuarterUp = 0xeca5,
+    MetNote8thUp = 0xeca7,
+    MetAugmentationDot = 0xecb7,
     ArrowheadBlackUp = 0xeb78,
     ArrowheadBlackDown = 0xeb7c,
 
@@ -265,8 +267,8 @@ export enum MusicFontSymbol {
 
     DynamicCrescendoHairpin = 0xe53e,
 
-    GraceNoteSlashStemUp = 0xE564,
-    GraceNoteSlashStemDown = 0xE565,
+    GraceNoteSlashStemUp = 0xe564,
+    GraceNoteSlashStemDown = 0xe565,
 
     OrnamentTrill = 0xe566,
     OrnamentTurn = 0xe567,
@@ -301,6 +303,7 @@ export enum MusicFontSymbol {
     GuitarFadeOut = 0xe844,
     GuitarVolumeSwell = 0xe845,
 
+    FretboardFilledCircle = 0xe858,
     FretboardX = 0xe859,
     FretboardO = 0xe85a,
 

@@ -32,6 +32,7 @@ export interface SmuflMetricsJson {
     hairpinThickness?: number;
     legerLineThickness?: number;
     legerLineExtension?: number;
+    octaveLineThickness?: number;
     pedalLineThickness?: number;
     repeatBarlineDotSeparation?: number;
     repeatEndingLineThickness?: number;
@@ -72,6 +73,14 @@ export interface SmuflMetricsJson {
     tabBendPerValueHeight?: number;
     simpleSlideWidth?: number;
     simpleSlideHeight?: number;
+    chordDiagramPaddingX?: number;
+    chordDiagramPaddingY?: number;
+    chordDiagramStringSpacing?: number;
+    chordDiagramFretSpacing?: number;
+    chordDiagramNutHeight?: number;
+    chordDiagramFretHeight?: number;
+    chordDiagramLineWidth?: number;
+    tripletFeelTripletPadding?: number;
     stemUp?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     stemDown?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     repeatOffsetX?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;
@@ -84,24 +93,4 @@ export interface SmuflMetricsJson {
     tempoNoteScale?: number;
     tuningGlyphCircleNumberScale?: number;
     tuningGlyphStringColumnScale?: number;
-    tripletFeelNoteScale?: number;
-    tripletFeelTupletScale?: number;
-    tripletFeelHeight?: number;
-    tripletFeelYPadding?: number;
-    tripletFeelBracketsHeightToY?: number;
-    tripletFeelLeftNoteXPadding?: number;
-    tripletFeelRightNoteXPadding?: number;
-    tripletFeelCircleOffset?: number;
-    tripletFeelCircleSize?: number;
-    tripletFeelEqualsOffsetX?: number;
-    tripletFeelEqualsOffsetY?: number;
-    tripletFeelAugmentationOffsetX?: number;
-    tripletFeelCloseParenthesisOffsetX?: number;
-    chordDiagramPaddingX?: number;
-    chordDiagramPaddingY?: number;
-    chordDiagramCircleRadius?: number;
-    chordDiagramStringSpacing?: number;
-    chordDiagramFretSpacing?: number;
-    chordDiagramNutHeight?: number;
-    chordDiagramFretHeight?: number;
 }

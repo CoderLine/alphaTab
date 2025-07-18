@@ -1,17 +1,23 @@
 import { TripletFeel } from '@src/model/TripletFeel';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { TextAlign, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 
-export enum TripletFeelGlyphBarType {
-    Full = 0,
-    PartialLeft = 1,
-    PartialRight = 2
+enum TripletFeelNoteGroup {
+    EighthEighth = 0,
+    SixteenthSixteenth = 1,
+    QuarterTripletEighthTriplet = 2,
+    EighthSixteenthTriplet = 3,
+    EighthDottedSixteenth = 4,
+    SixteenthDottedThirtySecond = 5,
+    SixteenthEighthDotted = 6,
+    ThirtySecondSixteenthDotted = 7
 }
 
 export class TripletFeelGlyph extends EffectGlyph {
     private _tripletFeel: TripletFeel;
+    private _tupletHeight: number = 0;
+    private _tupletPadding: number = 0;
 
     public constructor(tripletFeel: TripletFeel) {
         super(0, 0);
@@ -20,185 +26,237 @@ export class TripletFeelGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = this.renderer.smuflMetrics.tripletFeelHeight;
+        const noteScale = this.renderer.smuflMetrics.tempoNoteScale;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale;
+
+        this._tupletHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tuplet3)! * noteScale;
+        this._tupletPadding = this.renderer.smuflMetrics.tripletFeelTripletPadding;
+        this.height += this._tupletHeight;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         cx += this.x;
         cy += this.y;
-        const noteY: number = cy + this.height * NoteHeadGlyph.GraceScale;
-        const tupletY: number = noteY + this.renderer.smuflMetrics.tripletFeelYPadding;
-        canvas.font = this.renderer.resources.effectFont;
-        canvas.fillText('(', cx, cy + this.height * this.renderer.smuflMetrics.tripletFeelBracketsHeightToY);
 
-        const leftNoteX: number = cx + this.renderer.smuflMetrics.tripletFeelLeftNoteXPadding;
-        const rightNoteX: number = cx + this.renderer.smuflMetrics.tripletFeelRightNoteXPadding;
-
-        let leftNoteSymbols: MusicFontSymbol[] = [];
-        let rightAugmentationSymbols: MusicFontSymbol[] = [];
-        let rightNoteSymbols: MusicFontSymbol[] = [];
-        let rightTupletSymbols: MusicFontSymbol[] = [];
+        let leftNotes = TripletFeelNoteGroup.EighthEighth;
+        let rightNotes = TripletFeelNoteGroup.EighthEighth;
 
         switch (this._tripletFeel) {
             case TripletFeel.NoTripletFeel:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem
-                ];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem
-                ];
-
+                leftNotes = TripletFeelNoteGroup.EighthEighth;
+                rightNotes = TripletFeelNoteGroup.EighthEighth;
                 break;
             case TripletFeel.Triplet8th:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem
-                ];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.Space,
-                    MusicFontSymbol.NoteEighthUp
-                ];
-
-                rightTupletSymbols = [
-                    MusicFontSymbol.TextTupletBracketStartLongStem,
-                    MusicFontSymbol.TextTuplet3LongStem,
-                    MusicFontSymbol.TextTupletBracketEndLongStem
-                ];
+                leftNotes = TripletFeelNoteGroup.EighthEighth;
+                rightNotes = TripletFeelNoteGroup.QuarterTripletEighthTriplet;
                 break;
             case TripletFeel.Triplet16th:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem
-                ];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac16thLongStem
-                ];
-
-                rightTupletSymbols = [
-                    MusicFontSymbol.TextTupletBracketStartLongStem,
-                    MusicFontSymbol.TextTuplet3LongStem,
-                    MusicFontSymbol.TextTupletBracketEndLongStem
-                ];
+                leftNotes = TripletFeelNoteGroup.SixteenthSixteenth;
+                rightNotes = TripletFeelNoteGroup.EighthSixteenthTriplet;
                 break;
             case TripletFeel.Dotted8th:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem
-                ];
-
-                rightAugmentationSymbols = [MusicFontSymbol.TextAugmentationDot];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac16thLongStem
-                ];
+                leftNotes = TripletFeelNoteGroup.EighthEighth;
+                rightNotes = TripletFeelNoteGroup.EighthDottedSixteenth;
                 break;
             case TripletFeel.Dotted16th:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont16thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac16thLongStem
-                ];
-
-                rightAugmentationSymbols = [MusicFontSymbol.TextAugmentationDot];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont16thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac32ndLongStem
-                ];
-                canvas.fillCircle(
-                    rightNoteX + this.renderer.smuflMetrics.tripletFeelCircleOffset,
-                    noteY,
-                    this.renderer.smuflMetrics.tripletFeelCircleSize
-                );
+                leftNotes = TripletFeelNoteGroup.SixteenthSixteenth;
+                rightNotes = TripletFeelNoteGroup.SixteenthDottedThirtySecond;
                 break;
             case TripletFeel.Scottish8th:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont8thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem
-                ];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont16thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac8thLongStem,
-                    MusicFontSymbol.TextAugmentationDot
-                ];
+                leftNotes = TripletFeelNoteGroup.EighthEighth;
+                rightNotes = TripletFeelNoteGroup.SixteenthEighthDotted;
                 break;
             case TripletFeel.Scottish16th:
-                leftNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont16thBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac16thLongStem
-                ];
-
-                rightNoteSymbols = [
-                    MusicFontSymbol.TextBlackNoteLongStem,
-                    MusicFontSymbol.TextCont32ndBeamLongStem,
-                    MusicFontSymbol.TextBlackNoteFrac16thLongStem,
-                    MusicFontSymbol.TextAugmentationDot
-                ];
+                leftNotes = TripletFeelNoteGroup.SixteenthSixteenth;
+                rightNotes = TripletFeelNoteGroup.ThirtySecondSixteenthDotted;
                 break;
         }
 
-        canvas.fillMusicFontSymbols(
-            leftNoteX,
-            noteY,
-            this.renderer.smuflMetrics.tripletFeelNoteScale,
-            leftNoteSymbols,
-            false
-        );
-        canvas.fillText(
-            '=',
-            cx + this.renderer.smuflMetrics.tripletFeelEqualsOffsetX,
-            cy + this.renderer.smuflMetrics.tripletFeelEqualsOffsetY
-        );
-        canvas.fillMusicFontSymbols(
-            rightNoteX,
-            noteY,
-            this.renderer.smuflMetrics.tripletFeelNoteScale,
-            rightNoteSymbols,
-            false
-        );
-        if (rightAugmentationSymbols.length > 0) {
-            canvas.fillMusicFontSymbols(
-                rightNoteX + this.renderer.smuflMetrics.tripletFeelAugmentationOffsetX,
-                noteY,
-                this.renderer.smuflMetrics.tripletFeelNoteScale,
-                rightAugmentationSymbols,
-                false
-            );
-        }
-        if (rightTupletSymbols.length > 0) {
-            canvas.fillMusicFontSymbols(
-                rightNoteX,
-                tupletY,
-                this.renderer.smuflMetrics.tripletFeelTupletScale,
-                rightTupletSymbols,
-                false
-            );
+        const noteScale = this.renderer.smuflMetrics.tempoNoteScale;
+        const noteY: number =
+            cy + this.renderer.smuflMetrics.glyphTop.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale;
+
+        const textY: number = cy + this.height;
+
+        const b = canvas.textBaseline;
+        canvas.textBaseline = TextBaseline.Bottom;
+        canvas.font = this.renderer.resources.effectFont;
+
+        canvas.fillText('(', cx, textY);
+        cx += canvas.measureText('( ').width;
+
+        cx = this.drawGroup(cx, noteY + this._tupletHeight, canvas, leftNotes);
+
+        canvas.fillText(' = ', cx, textY);
+        cx += canvas.measureText(' = ').width;
+
+        cx = this.drawGroup(cx, noteY + this._tupletHeight, canvas, rightNotes);
+
+        canvas.fillText(' )', cx, textY);
+
+        canvas.textBaseline = b;
+    }
+
+    private drawGroup(cx: number, cy: number, canvas: ICanvas, group: TripletFeelNoteGroup) {
+        const noteScale = this.renderer.smuflMetrics.tempoNoteScale;
+        const noteSpacing = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale;
+
+        let leftNote: MusicFontSymbol[] = [];
+        let rightNote: MusicFontSymbol[] = [];
+
+        const beams: TextAlign[] = [];
+
+        let tuplet = MusicFontSymbol.None;
+
+        switch (group) {
+            case TripletFeelNoteGroup.EighthEighth:
+                beams.push(TextAlign.Center);
+                leftNote = [MusicFontSymbol.MetNoteQuarterUp];
+                rightNote = [MusicFontSymbol.MetNoteQuarterUp];
+                break;
+            case TripletFeelNoteGroup.SixteenthSixteenth:
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Center);
+
+                leftNote = [MusicFontSymbol.MetNoteQuarterUp];
+                rightNote = [MusicFontSymbol.MetNoteQuarterUp];
+                break;
+
+            case TripletFeelNoteGroup.QuarterTripletEighthTriplet:
+                leftNote = [MusicFontSymbol.MetNoteQuarterUp];
+                rightNote = [MusicFontSymbol.MetNote8thUp];
+
+                tuplet = MusicFontSymbol.Tuplet3;
+
+                break;
+            case TripletFeelNoteGroup.EighthSixteenthTriplet:
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Right);
+
+                leftNote = [MusicFontSymbol.MetNoteQuarterUp];
+                rightNote = [MusicFontSymbol.MetNoteQuarterUp];
+
+                tuplet = MusicFontSymbol.Tuplet3;
+
+                break;
+            case TripletFeelNoteGroup.EighthDottedSixteenth:
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Right);
+
+                leftNote = [
+                    MusicFontSymbol.MetNoteQuarterUp,
+                    MusicFontSymbol.Space,
+                    MusicFontSymbol.MetAugmentationDot
+                ];
+                rightNote = [MusicFontSymbol.MetNoteQuarterUp];
+
+                break;
+            case TripletFeelNoteGroup.SixteenthDottedThirtySecond:
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Right);
+
+                leftNote = [
+                    MusicFontSymbol.MetNoteQuarterUp,
+                    MusicFontSymbol.Space,
+                    MusicFontSymbol.MetAugmentationDot
+                ];
+                rightNote = [MusicFontSymbol.MetNoteQuarterUp];
+
+                break;
+            case TripletFeelNoteGroup.SixteenthEighthDotted:
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Left);
+
+                leftNote = [MusicFontSymbol.MetNoteQuarterUp];
+                rightNote = [
+                    MusicFontSymbol.MetNoteQuarterUp,
+                    MusicFontSymbol.Space,
+                    MusicFontSymbol.MetAugmentationDot
+                ];
+
+                break;
+            case TripletFeelNoteGroup.ThirtySecondSixteenthDotted:
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Center);
+                beams.push(TextAlign.Left);
+
+                leftNote = [MusicFontSymbol.MetNoteQuarterUp];
+                rightNote = [
+                    MusicFontSymbol.MetNoteQuarterUp,
+                    MusicFontSymbol.Space,
+                    MusicFontSymbol.MetAugmentationDot
+                ];
+
+                break;
         }
 
-        canvas.fillText(
-            ')',
-            cx + this.renderer.smuflMetrics.tripletFeelCloseParenthesisOffsetX,
-            cy + this.height * this.renderer.smuflMetrics.tripletFeelBracketsHeightToY
-        );
+        const beamStartX = cx + noteSpacing - this.renderer.smuflMetrics.stemThickness * noteScale;
+        const beamEndX = beamStartX + noteSpacing * 2 + this.renderer.smuflMetrics.stemThickness * noteScale;
+        const beamHeight = this.renderer.smuflMetrics.tempoNoteScale * this.renderer.smuflMetrics.beamThickness;
+        const beamSpacing = this.renderer.smuflMetrics.tempoNoteScale * this.renderer.smuflMetrics.beamSpacing;
+
+        const brokenBeamWidth = this.renderer.smuflMetrics.brokenBeamWidth * noteScale;
+        let beamY =
+            cy -
+            this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale +
+            beamHeight;
+
+        if (tuplet !== MusicFontSymbol.None) {
+            const tupletLeftX = cx;
+            const tupletRightX = beamEndX;
+            const tupletCenterX = (tupletLeftX + tupletRightX) / 2;
+
+            const tupletY = beamY - this._tupletHeight - this._tupletPadding;
+            const tupletTop = this.renderer.smuflMetrics.glyphTop.get(tuplet)! * noteScale;
+            const tupletWidth = this.renderer.smuflMetrics.glyphWidths.get(tuplet)! * noteScale;
+
+            canvas.fillMusicFontSymbol(tupletCenterX, tupletY + tupletTop, noteScale, tuplet, true);
+
+            const numberLeftX = tupletCenterX - tupletWidth / 2 - this._tupletPadding;
+            const numberRightX = tupletCenterX + tupletWidth / 2 + this._tupletPadding;
+            const halfTuplet = this._tupletHeight / 2;
+            const l = canvas.lineWidth;
+            canvas.beginPath();
+            canvas.moveTo(cx, tupletY + halfTuplet + halfTuplet);
+            canvas.lineTo(cx, tupletY + halfTuplet);
+            canvas.lineTo(numberLeftX, tupletY + halfTuplet);
+
+            canvas.moveTo(numberRightX, tupletY + halfTuplet);
+            canvas.lineTo(beamEndX, tupletY + halfTuplet);
+            canvas.lineTo(beamEndX, tupletY + halfTuplet + halfTuplet);
+
+            canvas.lineWidth = this.renderer.smuflMetrics.tupletBracketThickness * noteScale;
+            canvas.stroke();
+            canvas.lineWidth = l;
+        }
+
+        canvas.fillMusicFontSymbols(cx, cy, noteScale, leftNote, false);
+        cx += noteSpacing;
+
+        cx += noteSpacing;
+
+        canvas.fillMusicFontSymbols(cx, cy, noteScale, rightNote, false);
+        cx += noteSpacing;
+        if (rightNote[rightNote.length - 1] === MusicFontSymbol.MetAugmentationDot) {
+            cx += noteSpacing;
+        }
+
+        for (const b of beams) {
+            switch (b) {
+                case TextAlign.Left:
+                    canvas.fillRect(beamStartX, beamY, brokenBeamWidth, beamHeight);
+                    break;
+                case TextAlign.Center:
+                    canvas.fillRect(beamStartX, beamY, beamEndX - beamStartX, beamHeight);
+                    break;
+                case TextAlign.Right:
+                    canvas.fillRect(beamEndX - brokenBeamWidth, beamY, brokenBeamWidth, beamHeight);
+                    break;
+            }
+            beamY += beamHeight + beamSpacing;
+        }
+
+        return cx;
     }
 }

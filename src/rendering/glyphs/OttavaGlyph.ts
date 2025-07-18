@@ -84,6 +84,8 @@ export class OttavaGlyph extends GroupedEffectGlyph {
         const padding = this.height * 0.5;
         lineY += this._aboveStaff ? 0 : this.height;
         const lineSize: number = this.renderer.smuflMetrics.lineRangedGlyphDashSize;
+        const lw = canvas.lineWidth;
+        canvas.lineWidth = this.renderer.smuflMetrics.octaveLineThickness;
         if (endX > startX) {
             let lineX: number = startX;
             while (lineX < endX) {
@@ -99,9 +101,10 @@ export class OttavaGlyph extends GroupedEffectGlyph {
                 canvas.lineTo(endX, lineY + padding);
             } else {
                 canvas.moveTo(endX, lineY);
-                canvas.lineTo(endX, lineY - padding );
+                canvas.lineTo(endX, lineY - padding);
             }
             canvas.stroke();
         }
+        canvas.lineWidth = lw;
     }
 }

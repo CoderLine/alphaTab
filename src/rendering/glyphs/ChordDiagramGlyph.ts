@@ -44,8 +44,13 @@ export class ChordDiagramGlyph extends EffectGlyph {
         const stringSpacing: number = this.renderer.smuflMetrics.chordDiagramStringSpacing;
         const fretSpacing: number = this.renderer.smuflMetrics.chordDiagramFretSpacing;
         const res: RenderingResources = this.renderer.resources;
-        const circleRadius: number = this.renderer.smuflMetrics.chordDiagramCircleRadius;
-        const w: number = this.width - 2 * this.renderer.smuflMetrics.chordDiagramPaddingX - this._firstFretSpacing;
+        const lineWidth = res.smuflMetrics.chordDiagramLineWidth;
+        const w: number =
+            this.width - 2 * this.renderer.smuflMetrics.chordDiagramPaddingX - this._firstFretSpacing + lineWidth;
+        const circleHeight = res.smuflMetrics.glyphHeights.get(MusicFontSymbol.FretboardFilledCircle)!;
+        const circleTopOffset = res.smuflMetrics.glyphTop.get(MusicFontSymbol.FretboardFilledCircle)!;
+        const xTopOffset = res.smuflMetrics.glyphHeights.get(MusicFontSymbol.FretboardX)! / 2;
+        const oTopOffset = res.smuflMetrics.glyphHeights.get(MusicFontSymbol.FretboardO)! / 2;
 
         const align: TextAlign = canvas.textAlign;
         const baseline: TextBaseline = canvas.textBaseline;
@@ -64,9 +69,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
             const y: number = cy + this._fretRow / 2;
             let fret: number = this._chord.strings[this._chord.strings.length - i - 1];
             if (fret < 0) {
-                canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardX, true);
+                canvas.fillMusicFontSymbol(x, y + xTopOffset, 1, MusicFontSymbol.FretboardX, true);
             } else if (fret === 0) {
-                canvas.fillMusicFontSymbol(x, y, 1, MusicFontSymbol.FretboardO, true);
+                canvas.fillMusicFontSymbol(x, y + oTopOffset, 1, MusicFontSymbol.FretboardO, true);
             } else {
                 fret -= this._chord.firstFret - 1;
                 canvas.fillText(fret.toString(), x, y);
@@ -76,20 +81,22 @@ export class ChordDiagramGlyph extends EffectGlyph {
         cy += this._fretRow;
         for (let i: number = 0; i < this._chord.strings.length; i++) {
             const x: number = cx + i * stringSpacing;
-            canvas.fillRect(x, cy, 1, fretSpacing * ChordDiagramGlyph.Frets + 1);
+            canvas.fillRect(x, cy, lineWidth, fretSpacing * ChordDiagramGlyph.Frets + 1);
         }
 
         if (this._chord.firstFret > 1) {
             canvas.textAlign = TextAlign.Left;
             canvas.fillText(this._chord.firstFret.toString(), cx - this._firstFretSpacing, cy + fretSpacing / 2);
+            canvas.fillRect(cx, cy, w, lineWidth);
+        } else {
+            canvas.fillRect(
+                cx,
+                cy - this.renderer.smuflMetrics.chordDiagramNutHeight / 2,
+                w,
+                this.renderer.smuflMetrics.chordDiagramNutHeight
+            );
         }
 
-        canvas.fillRect(
-            cx,
-            cy - this.renderer.smuflMetrics.chordDiagramNutHeight / 2,
-            w,
-            this.renderer.smuflMetrics.chordDiagramNutHeight
-        );
         for (let i: number = 0; i <= ChordDiagramGlyph.Frets; i++) {
             const y: number = cy + i * fretSpacing;
             canvas.fillRect(cx, y, w, this.renderer.smuflMetrics.chordDiagramFretHeight);
@@ -115,8 +122,14 @@ export class ChordDiagramGlyph extends EffectGlyph {
                     }
                 }
                 const y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
-                const x: number = cx + (this._chord.strings.length - guitarString - 1) * stringSpacing;
-                canvas.fillCircle(x, y, circleRadius);
+                const x: number = cx + (this._chord.strings.length - guitarString - 1) * stringSpacing + lineWidth / 2;
+                canvas.fillMusicFontSymbol(
+                    x,
+                    y + circleTopOffset - circleHeight / 2,
+                    1,
+                    MusicFontSymbol.FretboardFilledCircle,
+                    true
+                );
             }
         }
 
@@ -124,7 +137,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
             const y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
             const xLeft: number = cx + (this._chord.strings.length - strings[1] - 1) * stringSpacing;
             const xRight: number = cx + (this._chord.strings.length - strings[0] - 1) * stringSpacing;
-            canvas.fillRect(xLeft, y - circleRadius, xRight - xLeft, circleRadius * 2);
+            canvas.fillRect(xLeft, y - circleHeight / 2, xRight - xLeft, circleHeight);
         }
 
         canvas.textAlign = align;

@@ -141,6 +141,7 @@ export class SmuflMetrics {
     public hairpinThickness = 0;
     public legerLineThickness = 0;
     public legerLineExtension = 0;
+    public octaveLineThickness = 0;
     public pedalLineThickness = 0;
     public repeatBarlineDotSeparation = 0;
     public repeatEndingLineThickness = 0;
@@ -162,8 +163,8 @@ export class SmuflMetrics {
     }
 
     public initialize(smufl: SmuflMetadata) {
-        // SmuFl spec
-
+        //
+        // SmuFL Spec
         this.arrowShaftThickness = smufl.engravingDefaults.arrowShaftThickness * this.oneStaffSpace;
         this.barlineSeparation = smufl.engravingDefaults.barlineSeparation * this.oneStaffSpace;
         this.beamSpacing = smufl.engravingDefaults.beamSpacing * this.oneStaffSpace;
@@ -175,21 +176,21 @@ export class SmuflMetrics {
         this.hairpinThickness = smufl.engravingDefaults.hairpinThickness * this.oneStaffSpace;
         this.legerLineExtension = smufl.engravingDefaults.legerLineExtension * this.oneStaffSpace;
         this.legerLineThickness = smufl.engravingDefaults.legerLineThickness * this.oneStaffSpace;
-        // TODO lyricLineThickness
-        // TODO octaveLineThickness
+        // unused lyricLineThickness
+        this.octaveLineThickness = smufl.engravingDefaults.octaveLineThickness * this.oneStaffSpace;
         this.pedalLineThickness = smufl.engravingDefaults.pedalLineThickness * this.oneStaffSpace;
         this.repeatBarlineDotSeparation = smufl.engravingDefaults.repeatBarlineDotSeparation * this.oneStaffSpace;
         this.repeatEndingLineThickness = smufl.engravingDefaults.repeatEndingLineThickness * this.oneStaffSpace; // TODO which line is this exactly?
-        // TODO slurEndpointThickness
+        // unused slurEndpointThickness
         this.slurMidpointThickness = smufl.engravingDefaults.slurMidpointThickness * this.oneStaffSpace;
         this.staffLineThickness = smufl.engravingDefaults.staffLineThickness * this.oneStaffSpace;
         this.stemThickness = smufl.engravingDefaults.stemThickness * this.oneStaffSpace;
-        // TODO subBracketThickness
-        // TODO textEnclosureThickness
+        // unused subBracketThickness
+        // unused textEnclosureThickness
         this.thickBarlineThickness = smufl.engravingDefaults.thickBarlineThickness * this.oneStaffSpace;
         this.thinBarlineThickness = smufl.engravingDefaults.thinBarlineThickness * this.oneStaffSpace;
         this.thinThickBarlineSeparation = smufl.engravingDefaults.thinThickBarlineSeparation * this.oneStaffSpace;
-        // TODO tieEndpointThickness
+        // unused tieEndpointThickness
         this.tieMidpointThickness = smufl.engravingDefaults.tieMidpointThickness * this.oneStaffSpace;
         this.tupletBracketThickness = smufl.engravingDefaults.tupletBracketThickness * this.oneStaffSpace;
 
@@ -278,7 +279,8 @@ export class SmuflMetrics {
             }
         }
 
-        // custom alphatab
+        //
+        // custom alphatab sizes
         this.effectBandSeparation = 0.25 * this.oneStaffSpace;
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
@@ -313,6 +315,16 @@ export class SmuflMetrics {
 
         this.simpleSlideWidth = 1.3 * this.oneStaffSpace;
         this.simpleSlideHeight = 0.3 * this.oneStaffSpace;
+
+        this.chordDiagramPaddingX = 0.5 * this.oneStaffSpace;
+        this.chordDiagramPaddingY = 0.2 * this.oneStaffSpace;
+        this.chordDiagramStringSpacing = 1 * this.oneStaffSpace;
+        this.chordDiagramFretSpacing = 1.3 * this.oneStaffSpace;
+        this.chordDiagramNutHeight = 0.33 * this.oneStaffSpace;
+        this.chordDiagramFretHeight = 0.1 * this.oneStaffSpace;
+        this.chordDiagramLineWidth = 0.11 * this.oneStaffSpace;
+
+        this.tripletFeelTripletPadding = 0.2 * this.oneStaffSpace;
     }
 
     // Numbered Notation: SMuFL has no numbered notation yet
@@ -354,6 +366,16 @@ export class SmuflMetrics {
 
     public simpleSlideWidth = 0;
     public simpleSlideHeight = 0;
+
+    public chordDiagramPaddingX = 0;
+    public chordDiagramPaddingY = 0;
+    public chordDiagramStringSpacing = 0;
+    public chordDiagramFretSpacing = 0;
+    public chordDiagramNutHeight = 0;
+    public chordDiagramFretHeight = 0;
+    public chordDiagramLineWidth = 0;
+
+    public tripletFeelTripletPadding = 0;
 
     public stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
     public stemDown = new Map<MusicFontSymbol, SmuflStemInfo>();
@@ -693,6 +715,10 @@ export class SmuflMetrics {
                     bBoxNE: [1.056, 0.036],
                     bBoxSW: [0, -3.240768470618394]
                 },
+                fretboardFilledCircle: {
+                    bBoxNE: [0.564, 0.564],
+                    bBoxSW: [0, 0]
+                },
                 fretboardO: {
                     bBoxNE: [0.564, 0.564],
                     bBoxSW: [0, 0]
@@ -812,6 +838,14 @@ export class SmuflMetrics {
                 keyboardPedalUp: {
                     bBoxNE: [1.8, 1.8],
                     bBoxSW: [0, 0]
+                },
+                metAugmentationDot: {
+                    bBoxNE: [0.4, 0.2],
+                    bBoxSW: [0, -0.2]
+                },
+                metNote8thUp: {
+                    bBoxNE: [2.132, 2.784],
+                    bBoxSW: [0, -0.564]
                 },
                 metNoteQuarterUp: {
                     bBoxNE: [1.328, 2.752],
@@ -1845,30 +1879,4 @@ export class SmuflMetrics {
             }
         };
     // end bravura_alphatab_metadata.json
-
-    //
-    // triplet feel (TODO: fixed values or take others as reference?)
-    public tripletFeelNoteScale = 0.5;
-    public tripletFeelTupletScale = 0.7;
-    public tripletFeelHeight = 25;
-    public tripletFeelYPadding = 8;
-    public tripletFeelBracketsHeightToY = 0.3;
-    public tripletFeelLeftNoteXPadding = 10;
-    public tripletFeelRightNoteXPadding = 40;
-    public tripletFeelCircleOffset = 9;
-    public tripletFeelCircleSize = 1;
-    public tripletFeelEqualsOffsetX = 32;
-    public tripletFeelEqualsOffsetY = 5;
-    public tripletFeelAugmentationOffsetX = 7;
-    public tripletFeelCloseParenthesisOffsetX = 65;
-
-    //
-    // chord diagram (TODO: check if SmuFL has some glyphs we can check)
-    public chordDiagramPaddingX: number = 5;
-    public chordDiagramPaddingY: number = 2;
-    public chordDiagramCircleRadius: number = 2.5;
-    public chordDiagramStringSpacing: number = 10;
-    public chordDiagramFretSpacing: number = 12;
-    public chordDiagramNutHeight: number = 2;
-    public chordDiagramFretHeight: number = 1;
 }

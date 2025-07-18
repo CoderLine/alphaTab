@@ -35,6 +35,7 @@ export class SmuflMetricsSerializer {
         o.set("hairpinthickness", obj.hairpinThickness);
         o.set("legerlinethickness", obj.legerLineThickness);
         o.set("legerlineextension", obj.legerLineExtension);
+        o.set("octavelinethickness", obj.octaveLineThickness);
         o.set("pedallinethickness", obj.pedalLineThickness);
         o.set("repeatbarlinedotseparation", obj.repeatBarlineDotSeparation);
         o.set("repeatendinglinethickness", obj.repeatEndingLineThickness);
@@ -75,6 +76,14 @@ export class SmuflMetricsSerializer {
         o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
         o.set("simpleslidewidth", obj.simpleSlideWidth);
         o.set("simpleslideheight", obj.simpleSlideHeight);
+        o.set("chorddiagrampaddingx", obj.chordDiagramPaddingX);
+        o.set("chorddiagrampaddingy", obj.chordDiagramPaddingY);
+        o.set("chorddiagramstringspacing", obj.chordDiagramStringSpacing);
+        o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
+        o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
+        o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
+        o.set("chorddiagramlinewidth", obj.chordDiagramLineWidth);
+        o.set("tripletfeeltripletpadding", obj.tripletFeelTripletPadding);
         {
             const m = new Map<string, unknown>();
             o.set("stemup", m);
@@ -135,26 +144,6 @@ export class SmuflMetricsSerializer {
         o.set("temponotescale", obj.tempoNoteScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
-        o.set("tripletfeelnotescale", obj.tripletFeelNoteScale);
-        o.set("tripletfeeltupletscale", obj.tripletFeelTupletScale);
-        o.set("tripletfeelheight", obj.tripletFeelHeight);
-        o.set("tripletfeelypadding", obj.tripletFeelYPadding);
-        o.set("tripletfeelbracketsheighttoy", obj.tripletFeelBracketsHeightToY);
-        o.set("tripletfeelleftnotexpadding", obj.tripletFeelLeftNoteXPadding);
-        o.set("tripletfeelrightnotexpadding", obj.tripletFeelRightNoteXPadding);
-        o.set("tripletfeelcircleoffset", obj.tripletFeelCircleOffset);
-        o.set("tripletfeelcirclesize", obj.tripletFeelCircleSize);
-        o.set("tripletfeelequalsoffsetx", obj.tripletFeelEqualsOffsetX);
-        o.set("tripletfeelequalsoffsety", obj.tripletFeelEqualsOffsetY);
-        o.set("tripletfeelaugmentationoffsetx", obj.tripletFeelAugmentationOffsetX);
-        o.set("tripletfeelcloseparenthesisoffsetx", obj.tripletFeelCloseParenthesisOffsetX);
-        o.set("chorddiagrampaddingx", obj.chordDiagramPaddingX);
-        o.set("chorddiagrampaddingy", obj.chordDiagramPaddingY);
-        o.set("chorddiagramcircleradius", obj.chordDiagramCircleRadius);
-        o.set("chorddiagramstringspacing", obj.chordDiagramStringSpacing);
-        o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
-        o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
-        o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -200,6 +189,9 @@ export class SmuflMetricsSerializer {
                 return true;
             case "legerlineextension":
                 obj.legerLineExtension = v! as number;
+                return true;
+            case "octavelinethickness":
+                obj.octaveLineThickness = v! as number;
                 return true;
             case "pedallinethickness":
                 obj.pedalLineThickness = v! as number;
@@ -321,6 +313,30 @@ export class SmuflMetricsSerializer {
             case "simpleslideheight":
                 obj.simpleSlideHeight = v! as number;
                 return true;
+            case "chorddiagrampaddingx":
+                obj.chordDiagramPaddingX = v! as number;
+                return true;
+            case "chorddiagrampaddingy":
+                obj.chordDiagramPaddingY = v! as number;
+                return true;
+            case "chorddiagramstringspacing":
+                obj.chordDiagramStringSpacing = v! as number;
+                return true;
+            case "chorddiagramfretspacing":
+                obj.chordDiagramFretSpacing = v! as number;
+                return true;
+            case "chorddiagramnutheight":
+                obj.chordDiagramNutHeight = v! as number;
+                return true;
+            case "chorddiagramfretheight":
+                obj.chordDiagramFretHeight = v! as number;
+                return true;
+            case "chorddiagramlinewidth":
+                obj.chordDiagramLineWidth = v! as number;
+                return true;
+            case "tripletfeeltripletpadding":
+                obj.tripletFeelTripletPadding = v! as number;
+                return true;
             case "stemup":
                 obj.stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
                 JsonHelper.forEach(v, (v, k) => {
@@ -384,66 +400,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tuningglyphstringcolumnscale":
                 obj.tuningGlyphStringColumnScale = v! as number;
-                return true;
-            case "tripletfeelnotescale":
-                obj.tripletFeelNoteScale = v! as number;
-                return true;
-            case "tripletfeeltupletscale":
-                obj.tripletFeelTupletScale = v! as number;
-                return true;
-            case "tripletfeelheight":
-                obj.tripletFeelHeight = v! as number;
-                return true;
-            case "tripletfeelypadding":
-                obj.tripletFeelYPadding = v! as number;
-                return true;
-            case "tripletfeelbracketsheighttoy":
-                obj.tripletFeelBracketsHeightToY = v! as number;
-                return true;
-            case "tripletfeelleftnotexpadding":
-                obj.tripletFeelLeftNoteXPadding = v! as number;
-                return true;
-            case "tripletfeelrightnotexpadding":
-                obj.tripletFeelRightNoteXPadding = v! as number;
-                return true;
-            case "tripletfeelcircleoffset":
-                obj.tripletFeelCircleOffset = v! as number;
-                return true;
-            case "tripletfeelcirclesize":
-                obj.tripletFeelCircleSize = v! as number;
-                return true;
-            case "tripletfeelequalsoffsetx":
-                obj.tripletFeelEqualsOffsetX = v! as number;
-                return true;
-            case "tripletfeelequalsoffsety":
-                obj.tripletFeelEqualsOffsetY = v! as number;
-                return true;
-            case "tripletfeelaugmentationoffsetx":
-                obj.tripletFeelAugmentationOffsetX = v! as number;
-                return true;
-            case "tripletfeelcloseparenthesisoffsetx":
-                obj.tripletFeelCloseParenthesisOffsetX = v! as number;
-                return true;
-            case "chorddiagrampaddingx":
-                obj.chordDiagramPaddingX = v! as number;
-                return true;
-            case "chorddiagrampaddingy":
-                obj.chordDiagramPaddingY = v! as number;
-                return true;
-            case "chorddiagramcircleradius":
-                obj.chordDiagramCircleRadius = v! as number;
-                return true;
-            case "chorddiagramstringspacing":
-                obj.chordDiagramStringSpacing = v! as number;
-                return true;
-            case "chorddiagramfretspacing":
-                obj.chordDiagramFretSpacing = v! as number;
-                return true;
-            case "chorddiagramnutheight":
-                obj.chordDiagramNutHeight = v! as number;
-                return true;
-            case "chorddiagramfretheight":
-                obj.chordDiagramFretHeight = v! as number;
                 return true;
         }
         return false;
