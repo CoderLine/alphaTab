@@ -1,0 +1,106 @@
+SMuFL
+    Impl:
+    - Fingering (use SmuFL glyphs?)
+
+    Visual Testing
+    - Alternate Endings
+    - Slight Beat Vibrato
+    - Slight Note Vibrato
+    - Wide Beat Vibrato
+    - Wide Note Vibrato
+    - Accentuations (Drum tabs enough?)
+    - Accidental placement
+    - ArticStaccatoAboveGlyph
+    - Beat Dots (Score, Slash, Tab, Numbered)
+    - Bar Lines
+    - Tempo
+    - Grace Notes (Flags and Spacing)
+    - Beat Timer
+    - Ghost Notes 
+    - Accidental paddings
+    - Chord diagrams
+    - Clef + Clef Ottava
+    - Crescendo
+    - Dead Slapped
+    - Directions
+    - Dynamics (Alignment)
+    - Flags (Spacing)
+    - Left Hand Tap
+    - Line Ranged Glyphs
+    - MultiBar Rests
+    - Note Head placement
+    - Ornaments
+    - Numbered Notation 
+        - accidental spacing
+        - tie&slur placement & sizing
+        - dash placement
+        - dot placement
+        - key signature
+        - note sizing
+        - 
+    - Time Signature Placement
+    - Beat Ottavia (placement and line rendering)
+    - Drum Notation
+        - Note heads
+    - Chord Diagrams (arrangement)
+    - Tuning (arrangement)
+    - Standard notation
+        - ghost spacing
+        - dots
+        - slide in
+        - brush spacing
+        - fingering spacing and placement
+        - accidental placement
+        - bends (alignment at end of bar / next beat, ties&slurs, helper notes)
+        - brush (alignment)
+        - chord effect alignment
+        - tremolo picking
+        - stem placement  (displaced notes, accidentals, leger lines, sizing)
+        - slides
+        - slur sizing
+        - whammy (helper notes, alignments, overflows)
+
+    - Slash Notation
+        - stem placement 
+        - dots
+        - note head sizing and alignment
+        - ties & slurs sizting and alignment
+    - Slashed Beats
+    - Sustain Pedal - alignment and lines
+    - Guitar tabs   
+        - tremolo picking,
+        - dots
+        - chord effect alignment
+        - bends (sizing, arrow and label alignment)
+        - brush (alignmnet)
+        - clef sizing
+        - rhythm (beams / flags)
+        - slides
+        - slurs and ties 
+        - whammy (alignmnets, overflows)
+    - trills
+    - triplet feel
+    - score info
+    - Line Bar Renderers
+        - staff Lines
+        - spacing
+        - tuplet rendering
+        - beaming (flags / beams)
+        - before beat grace (slashed)
+        - tremolo
+    - System
+        - Brackets
+        - Divider
+
+    - Multi Voice
+        - Stem orientation and collisions
+
+    - bounds lookup
+
+
+    - Alternative SmuFL font rendering
+
+    Performance
+    - Avoid repeated deep access to smufl metrics (local reference?)
+    - Layout context object gives access to essentials?
+

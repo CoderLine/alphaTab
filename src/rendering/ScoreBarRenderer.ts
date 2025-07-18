@@ -217,7 +217,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         const slashY = this.getLineY(line);
-        // TODO: SmuFL stem offsets
         return slashY;
     }
 
