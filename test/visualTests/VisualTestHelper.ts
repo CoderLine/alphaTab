@@ -315,7 +315,7 @@ export class VisualTestHelper {
         let errorMessage = '';
         const oldActual = actual;
 
-        const tolerancePercent = options.tolerancePercent ?? 1;
+        const tolerancePercent = options.tolerancePercent ?? 0;
 
         if (expected) {
             const sizeMismatch = expected.width !== actual.width || expected.height !== actual.height;

@@ -52,14 +52,14 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
                 0,
                 0,
                 this._numerator,
-                TextBaseline.Bottom,
+                TextBaseline.Top,
                 this.numberScale
             );
             const denominator: NumberGlyph = new NumberGlyph(
                 0,
                 0,
                 this._denominator,
-                TextBaseline.Top,
+                TextBaseline.Bottom,
                 this.numberScale
             );
             this.addGlyph(numerator);

@@ -114,9 +114,6 @@ SMuFL
       chord diagrams are blurry, we should ajust the sizes to have more crisp display.
     - guitar Tuning
       we should make the spacing between strings a bit more condensed
-    - test-data/visual-tests/special-notes/grace-notes-alignment.png
-      test-data/visual-tests/special-notes/grace-notes.png
-      the sem height looks a bit high, are we maybe not downscaling accordingly?
     - test-data/visual-tests/effects-and-annotations/accentuations.png
       staccato dots are not centered
     - test-data/visual-tests/effects-and-annotations/barre.png

@@ -338,7 +338,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     private ensureDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
         if (!h.drawingInfos.has(direction)) {
-            const stemSize = this.smuflMetrics.standardStemLength;
+            const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const stemSize = this.smuflMetrics.standardStemLength * scale;
             const drawingInfo = new BeamingHelperDrawInfo();
             h.drawingInfos.set(direction, drawingInfo);
 
