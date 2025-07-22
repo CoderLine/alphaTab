@@ -10,7 +10,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
-import type { BarRendererBase } from '@src/rendering/BarRendererBase';
+import { NoteYPosition, type BarRendererBase } from '@src/rendering/BarRendererBase';
 
 class BeatLinePositions {
     public staffId: string = '';
@@ -179,21 +179,12 @@ export class BeamingHelper {
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         if (this.highestNoteInHelper && this.lowestNoteInHelper) {
-            const highestBeatContainer = this._renderer.getBeatContainer(this.highestNoteInHelper.beat);
-            const lowestBeatContainer = this._renderer.getBeatContainer(this.lowestNoteInHelper.beat);
+            const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
+            const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
 
-            if (highestBeatContainer && lowestBeatContainer) {
-                const highestNotePosition = highestBeatContainer.onNotes.getHighestNoteY();
-                const lowestNotePosition = lowestBeatContainer.onNotes.getLowestNoteY();
-
-                if (direction === null) {
-                    const avg = (highestNotePosition + lowestNotePosition) / 2;
-                    direction = this.invert(
-                        this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down
-                    );
-                }
-            } else {
-                direction = this.invert(BeamDirection.Up);
+            if (direction === null) {
+                const avg = (highestNotePosition + lowestNotePosition) / 2;
+                direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);                
             }
 
             this._renderer.completeBeamingHelper(this);

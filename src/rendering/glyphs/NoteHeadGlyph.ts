@@ -20,7 +20,7 @@ export class NoteHeadGlyph extends MusicFontGlyph {
         super.paint(cx, cy, canvas);
     }
 
-    private static getSymbol(duration: Duration): MusicFontSymbol {
+    public static getSymbol(duration: Duration): MusicFontSymbol {
         switch (duration) {
             case Duration.QuadrupleWhole:
                 return MusicFontSymbol.NoteheadDoubleWholeSquare;

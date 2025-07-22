@@ -100,16 +100,6 @@ SMuFL
     - Alternative SmuFL font rendering
 
     Test findings:
-    - test-data/visual-tests/music-notation/accidentals.png
-      as we do not support checking overlaps with "cutout boxes" accidentals are unnecessarily extended into more columns. 
-      maybe we can simply reduce the bounding box check with a margin?
-    - music sheets got quite a bit wider again, maybe we can reduce some paddings with the new scaling?
-    - test-data/visual-tests/music-notation/clefs.png
-      wrong ottava 15 on last clef. 
-    - test-data/visual-tests/music-notation/rest-collisions.png
-      rest docs incorrect
-    - test-data/visual-tests/music-notation/notes-rests-beams.png
-      beams not shifted upwards by high note in the middle
     - test-data/visual-tests/notation-elements/chord-diagrams-on.png
       chord diagrams are blurry, we should ajust the sizes to have more crisp display.
     - guitar Tuning

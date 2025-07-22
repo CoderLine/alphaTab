@@ -71,7 +71,6 @@ export class ClefGlyph extends MusicFontGlyph {
 
         super.paint(cx, cy, canvas);
 
-        cx += this.offsetX;
         switch (this._clef) {
             case Clef.C3:
             case Clef.C4:
@@ -85,34 +84,33 @@ export class ClefGlyph extends MusicFontGlyph {
                 return;
         }
 
-        let ottavaGlyph: MusicFontGlyph;
+        let ottavaGlyph: MusicFontSymbol;
         let top: boolean = false;
         switch (this._clefOttava) {
             case Ottavia._15ma:
-                ottavaGlyph = new MusicFontGlyph(0, 0, 1, MusicFontSymbol.Clef15);
+                ottavaGlyph =  MusicFontSymbol.Clef15;
                 top = true;
                 break;
             case Ottavia._8va:
-                ottavaGlyph = new MusicFontGlyph(0, 0, 1, MusicFontSymbol.Clef8);
+                ottavaGlyph = MusicFontSymbol.Clef8;
                 top = true;
                 break;
             case Ottavia._8vb:
-                ottavaGlyph = new MusicFontGlyph(0, 0, 1, MusicFontSymbol.Clef8);
+                ottavaGlyph = MusicFontSymbol.Clef8;
                 break;
             case Ottavia._15mb:
-                ottavaGlyph = new MusicFontGlyph(0, 0, 1, MusicFontSymbol.Clef15);
+                ottavaGlyph =  MusicFontSymbol.Clef15;
                 break;
             default:
                 return;
         }
-        ottavaGlyph.center = true;
-        ottavaGlyph.renderer = this.renderer;
-        ottavaGlyph.doLayout();
         const ottavaX: number = this.width / 2;
         const ottavaY = top
             ? this.renderer.smuflMetrics.glyphTop.get(this.symbol)!
             : this.renderer.smuflMetrics.glyphBottom.get(this.symbol)! -
-              this.renderer.smuflMetrics.glyphHeights.get(ottavaGlyph.symbol)!;
-        ottavaGlyph.paint(cx + this.x + ottavaX, cy + this.y - ottavaY, canvas);
+              this.renderer.smuflMetrics.glyphHeights.get(ottavaGlyph)!;
+        canvas.fillMusicFontSymbol(cx + this.x + ottavaX, cy + this.y - ottavaY, 1, ottavaGlyph, true)
+
+        
     }
 }

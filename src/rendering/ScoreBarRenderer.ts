@@ -304,6 +304,30 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // estimate on the position
             const line = AccidentalHelper.computeLineWithoutAccidentals(this.bar, note);
             y = this.getScoreY(line);
+            const scale = note.beat.graceType === GraceType.None ? 1 : NoteHeadGlyph.GraceScale;
+            const stemHeight = this.smuflMetrics.standardStemLength * scale;
+            const noteHeadHeight =
+                this.smuflMetrics.glyphHeights.get(NoteHeadGlyph.getSymbol(note.beat.duration))! * scale;
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                    y -= stemHeight;
+                    break;
+                case NoteYPosition.Top:
+                    y -= noteHeadHeight / 2;
+                    break;
+                case NoteYPosition.Center:
+                    break;
+                case NoteYPosition.Bottom:
+                    y += noteHeadHeight / 2;
+                    break;
+                case NoteYPosition.BottomWithStem:
+                    y += stemHeight;
+                    break;
+                case NoteYPosition.StemUp:
+                    break;
+                case NoteYPosition.StemDown:
+                    break;
+            }
         }
         return y;
     }
@@ -377,34 +401,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     direction === BeamDirection.Up
                         ? this.getFlagTopY(lastBeat, direction)
                         : this.getFlagBottomY(lastBeat, direction);
-            }
-
-            // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
-            // here we shift accordingly
-            const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
-            if (barCount > 2) {
-                const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
-                const beamSpacing = this.smuflMetrics.beamSpacing * scale;
-                const beamThickness = this.smuflMetrics.beamThickness * scale;
-                const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
-
-                if (direction === BeamDirection.Up) {
-                    const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
-                    const barTopY = bottomBarY - totalBarsHeight;
-                    const diff = drawingInfo.startY - barTopY;
-                    if (diff > 0) {
-                        drawingInfo.startY -= diff;
-                        drawingInfo.endY -= diff;
-                    }
-                } else {
-                    const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
-                    const barBottomY = topBarY + totalBarsHeight;
-                    const diff = barBottomY - drawingInfo.startY;
-                    if (diff > 0) {
-                        drawingInfo.startY += diff;
-                        drawingInfo.endY += diff;
-                    }
-                }
             }
 
             // 2. ensure max slope
@@ -511,6 +507,34 @@ export class ScoreBarRenderer extends LineBarRenderer {
                             drawingInfo.startY += diff;
                             drawingInfo.endY += diff;
                         }
+                    }
+                }
+            }
+
+            // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
+            // here we shift accordingly
+            const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
+            if (barCount > 2 && !isRest) {
+                const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+                const beamSpacing = this.smuflMetrics.beamSpacing * scale;
+                const beamThickness = this.smuflMetrics.beamThickness * scale;
+                const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
+
+                if (direction === BeamDirection.Up) {
+                    const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
+                    const barTopY = bottomBarY - totalBarsHeight;
+                    const diff = drawingInfo.startY - barTopY;
+                    if (diff > 0) {
+                        drawingInfo.startY -= diff;
+                        drawingInfo.endY -= diff;
+                    }
+                } else {
+                    const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
+                    const barBottomY = topBarY + totalBarsHeight;
+                    const diff = barBottomY - drawingInfo.startY;
+                    if (diff > 0) {
+                        drawingInfo.startY += diff;
+                        drawingInfo.endY += diff;
                     }
                 }
             }
