@@ -6,6 +6,7 @@ import path from 'node:path';
 import ts from 'typescript';
 import createEmitter from './EmitterBase';
 import { getTypeWithNullableInfo } from './TypeSchema';
+import { createNodeFromSource } from '../BuilderHelpers';
 
 function removeExtension(fileName: string) {
     return fileName.substring(0, fileName.lastIndexOf('.'));
@@ -55,7 +56,13 @@ function generateClonePropertyStatements(
     program: ts.Program,
     importer: (name: string, module: string) => void
 ): ts.Statement[] {
-    const propertyType = getTypeWithNullableInfo(program, prop.type!, true, !!prop.questionToken, undefined);
+    const propertyType = getTypeWithNullableInfo(
+        program,
+        prop.type ?? program.getTypeChecker().getTypeAtLocation(prop.name),
+        true,
+        !!prop.questionToken,
+        undefined
+    );
 
     const statements: ts.Statement[] = [];
 
@@ -72,8 +79,8 @@ function generateClonePropertyStatements(
         ];
     }
 
-    const arrayItemType = propertyType.arrayItemType;
-    if (arrayItemType) {
+    if (propertyType.isArray) {
+        const arrayItemType = propertyType.arrayItemType!;
         if (arrayItemType.isCloneable) {
             const collectionAddMethod = ts
                 .getJSDocTags(prop)
@@ -204,49 +211,57 @@ function generateClonePropertyStatements(
                 statements.push(...assign(sliceCall));
             }
         }
-    } else {
-        if (propertyType.isCloneable) {
-            importer(`${propertyType.typeAsString}Cloner`, `@src/generated/model/${propertyType.typeAsString}Cloner`);
+    } else if (propertyType.isCloneable) {
+        importer(`${propertyType.typeAsString}Cloner`, `@src/generated/model/${propertyType.typeAsString}Cloner`);
 
-            // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : null
-            // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : undefined
-            const nullOrUndefined = propertyType.isNullable
-                ? ts.factory.createNull()
-                : ts.factory.createIdentifier('undefined');
-            statements.push(
-                ...assign(
-                    ts.factory.createConditionalExpression(
+        // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : null
+        // clone.prop = original.prop ? TypeNameCloner.clone(original.prop) : undefined
+        const nullOrUndefined = propertyType.isNullable
+            ? ts.factory.createNull()
+            : ts.factory.createIdentifier('undefined');
+        statements.push(
+            ...assign(
+                ts.factory.createConditionalExpression(
+                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('original'), propertyName),
+                    ts.factory.createToken(ts.SyntaxKind.QuestionToken),
+                    ts.factory.createCallExpression(
                         ts.factory.createPropertyAccessExpression(
-                            ts.factory.createIdentifier('original'),
-                            propertyName
+                            ts.factory.createIdentifier(`${propertyType.typeAsString}Cloner`),
+                            'clone'
                         ),
-                        ts.factory.createToken(ts.SyntaxKind.QuestionToken),
-                        ts.factory.createCallExpression(
+                        undefined,
+                        [
                             ts.factory.createPropertyAccessExpression(
-                                ts.factory.createIdentifier(`${propertyType.typeAsString}Cloner`),
-                                'clone'
-                            ),
-                            undefined,
-                            [
-                                ts.factory.createPropertyAccessExpression(
-                                    ts.factory.createIdentifier('original'),
-                                    propertyName
-                                )
-                            ]
-                        ),
-                        ts.factory.createToken(ts.SyntaxKind.ColonToken),
-                        nullOrUndefined
-                    )
+                                ts.factory.createIdentifier('original'),
+                                propertyName
+                            )
+                        ]
+                    ),
+                    ts.factory.createToken(ts.SyntaxKind.ColonToken),
+                    nullOrUndefined
                 )
-            );
-        } else {
-            // clone.prop = original.prop
-            statements.push(
-                ...assign(
-                    ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('original'), propertyName)
-                )
-            );
+            )
+        );
+    } else if (propertyType.isMap) {
+        if (propertyType.typeArguments![1].isCloneable) {
+            // just for safety, extend if needed
+            throw new Error('Cannot clone maps with cloneable values yet, extend if needed');
         }
+
+        // clone.prop = new Map(original.prop)
+        statements.push(
+            ...assign(
+                createNodeFromSource<ts.NewExpression>(
+                    `new Map(original.${propertyName})`,
+                    ts.SyntaxKind.NewExpression
+                )
+            )
+        );
+    } else {
+        // clone.prop = original.prop
+        statements.push(
+            ...assign(ts.factory.createPropertyAccessExpression(ts.factory.createIdentifier('original'), propertyName))
+        );
     }
 
     return statements;

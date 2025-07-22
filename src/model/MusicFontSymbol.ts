@@ -146,7 +146,7 @@ export enum MusicFontSymbol {
     NoteShapeTriangleRoundBlack = 0xe1bf,
 
     NoteQuarterUp = 0xe1d5,
-    NoteEighthUp = 0xe1d7,
+    Note8thUp = 0xe1d7,
 
     MetNoteQuarterUp = 0xeca5,
     MetNote8thUp = 0xeca7,

@@ -13,6 +13,7 @@ export class RowGlyphContainer extends GlyphGroup {
     }
 
     public override doLayout(): void {
+        const padding: number = this.renderer.smuflMetrics.rowContainerGap;
         let x: number = 0;
         switch (this._align) {
             case TextAlign.Left:
@@ -27,7 +28,7 @@ export class RowGlyphContainer extends GlyphGroup {
         }
         for (const glyph of this.glyphs!) {
             glyph.x = x;
-            x += glyph.width;
+            x += glyph.width + padding;
         }
     }
 

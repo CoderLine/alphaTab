@@ -8,13 +8,18 @@ export class MusicFontGlyph extends EffectGlyph {
     public symbol: MusicFontSymbol;
     public center: boolean = false;
     public colorOverride?: Color;
-    public offsetX:number = 0;
-    public offsetY:number = 0;
+    public offsetX: number = 0;
+    public offsetY: number = 0;
 
     public constructor(x: number, y: number, glyphScale: number, symbol: MusicFontSymbol) {
         super(x, y);
         this.glyphScale = glyphScale;
         this.symbol = symbol;
+    }
+
+    public override getBoundingBoxTop(): number {
+        const bBoxTop = this.renderer.smuflMetrics.glyphTop.get(this.symbol)!;
+        return this.y - this.offsetY - bBoxTop;
     }
 
     public override doLayout(): void {
@@ -31,7 +36,13 @@ export class MusicFontGlyph extends EffectGlyph {
         if (this.colorOverride) {
             canvas.color = this.colorOverride!;
         }
-        canvas.fillMusicFontSymbol(cx + this.x + this.offsetX, cy + this.y + this.offsetY, this.glyphScale, this.symbol, this.center);
+        canvas.fillMusicFontSymbol(
+            cx + this.x + this.offsetX,
+            cy + this.y + this.offsetY,
+            this.glyphScale,
+            this.symbol,
+            this.center
+        );
         canvas.color = c;
     }
 }

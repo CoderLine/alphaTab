@@ -106,14 +106,14 @@ export class RenderingResources {
      * @defaultValue `13px Arial, sans-serif`
      * @since 0.9.6
      */
-    public tablatureFont: Font = new Font(RenderingResources.sansFont, 13, FontStyle.Plain);
+    public tablatureFont: Font = new Font(RenderingResources.sansFont, 14, FontStyle.Plain);
 
     /**
      * The font to use for grace notation related texts in the music sheet.
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      */
-    public graceFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);
+    public graceFont: Font = new Font(RenderingResources.sansFont, 12, FontStyle.Plain);
 
     /**
      * The color to use for rendering the lines of staves.

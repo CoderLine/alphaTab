@@ -274,7 +274,7 @@ export class Html5Canvas implements ICanvas {
         const baseLine = this._context.textBaseline;
         const font: string = this._context.font;
         this._context.font = this._musicFont!.toCssString(relativeScale);
-        this._context.textBaseline = 'middle';
+        this._context.textBaseline = 'alphabetic';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
         } else {

@@ -23,7 +23,7 @@ export class RowContainerGlyph extends GlyphGroup {
         for (const g of this.glyphs!) {
             if (x + g.width < this.width) {
                 row.addGlyphToRow(g);
-                x += g.width;
+                x += g.width + padding;
             } else {
                 if (!row.isEmpty) {
                     row.doLayout();
@@ -38,6 +38,7 @@ export class RowContainerGlyph extends GlyphGroup {
             }
         }
         if (!row.isEmpty) {
+            row.renderer = this.renderer;
             row.doLayout();
             this._rows.push(row);
             y += row.height + padding;

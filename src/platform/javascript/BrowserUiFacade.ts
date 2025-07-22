@@ -493,7 +493,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     overflow: visible;
                 }
                 .at-surface-svg text {
-                    dominant-baseline: central;
+                    dominant-baseline: alphabetic;
                     white-space:pre;
                 }`;
 

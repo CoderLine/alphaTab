@@ -1,3 +1,4 @@
+import { SmuflMetricsCloner } from '@src/generated/SmuflMetricsCloner';
 import { JsonHelper } from '@src/io/JsonHelper';
 import { Duration } from '@src/model/Duration';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
@@ -103,6 +104,7 @@ export class SmuflStemInfo {
  * spacings etc.
  * @json
  * @json_declaration
+ * @cloneable
  */
 export class SmuflMetrics {
     // SmuFL TODO:
@@ -156,10 +158,17 @@ export class SmuflMetrics {
 
     public effectBandSeparation = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
 
+    private static _bravuraDefaults?: SmuflMetrics;
     public static get bravuraDefaults() {
-        const metrics = new SmuflMetrics();
-        metrics.initialize(SmuflMetrics.bravuraMetadata);
-        return metrics;
+        let bravuraDefaults: SmuflMetrics;
+        if (!SmuflMetrics._bravuraDefaults) {
+            bravuraDefaults = new SmuflMetrics();
+            bravuraDefaults.initialize(SmuflMetrics.bravuraMetadata);
+        } else {
+            bravuraDefaults = SmuflMetrics._bravuraDefaults;
+        }
+
+        return SmuflMetricsCloner.clone(bravuraDefaults);
     }
 
     public initialize(smufl: SmuflMetadata) {
@@ -209,8 +218,7 @@ export class SmuflMetrics {
         this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
-            const name = g.substring(0, 1).toUpperCase() + g.substring(1);
-            const symbol = JsonHelper.parseEnum<MusicFontSymbol>(name, MusicFontSymbol);
+            const symbol = SmuflMetrics.smuflNameToMusicFontSymbol(g);
             if (symbol) {
                 if (v.stemDownNW) {
                     const b = new SmuflStemInfo();
@@ -268,9 +276,9 @@ export class SmuflMetrics {
             }
         }
 
+        // glyphBBoxes is optional, maybe we should rely on a text measuring of all glyphs for these values?
         for (const [g, v] of Object.entries(smufl.glyphBBoxes)) {
-            const name = g.substring(0, 1).toUpperCase() + g.substring(1);
-            const symbol = JsonHelper.parseEnum<MusicFontSymbol>(name, MusicFontSymbol);
+            const symbol = SmuflMetrics.smuflNameToMusicFontSymbol(g);
             if (symbol) {
                 this.glyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
                 this.glyphBottom.set(symbol, v.bBoxSW[1] * this.oneStaffSpace);
@@ -291,6 +299,7 @@ export class SmuflMetrics {
         this.numberedDashGlyphPadding = 0.3 * this.oneStaffSpace;
         this.stringNumberCirclePadding = 0.3 * this.oneStaffSpace;
         this.rowContainerPadding = 0.3 * this.oneStaffSpace;
+        this.rowContainerGap = 1 * this.oneStaffSpace;
         this.effectSpacing = 0.2 * this.oneStaffSpace;
         this.alternateEndingsPadding = 0.3 * this.oneStaffSpace;
         this.sustainPedalLinePadding = 0.5 * this.oneStaffSpace;
@@ -325,6 +334,22 @@ export class SmuflMetrics {
         this.chordDiagramLineWidth = 0.11 * this.oneStaffSpace;
 
         this.tripletFeelTripletPadding = 0.2 * this.oneStaffSpace;
+        this.accidentalPadding = 0.1 * this.oneStaffSpace;
+        this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
+    }
+
+    // some names are different due to technical restrictions (e.g. names beginning with digits)
+    public static smuflNameToGlyphNameMapping: Map<string, string> = new Map<string, string>([
+        ['4stringTabClef', 'FourStringTabClef'],
+        ['6stringTabClef', 'SixStringTabClef']
+    ]);
+
+    private static smuflNameToMusicFontSymbol(g: string): MusicFontSymbol | undefined {
+        const name = SmuflMetrics.smuflNameToGlyphNameMapping.has(g)
+            ? SmuflMetrics.smuflNameToGlyphNameMapping.get(g)!
+            : g.substring(0, 1).toUpperCase() + g.substring(1);
+
+        return JsonHelper.parseEnumExact<MusicFontSymbol>(name, MusicFontSymbol);
     }
 
     // Numbered Notation: SMuFL has no numbered notation yet
@@ -341,6 +366,7 @@ export class SmuflMetrics {
     public postNoteEffectPadding = 0;
     public stringNumberCirclePadding = 0;
     public rowContainerPadding = 0;
+    public rowContainerGap = 0;
     public effectSpacing = 0;
     public alternateEndingsPadding = 0;
     public sustainPedalLinePadding = 0;
@@ -376,6 +402,8 @@ export class SmuflMetrics {
     public chordDiagramLineWidth = 0;
 
     public tripletFeelTripletPadding = 0;
+    public accidentalPadding = 0;
+    public preBeatGlyphSpacing = 0;
 
     public stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
     public stemDown = new Map<MusicFontSymbol, SmuflStemInfo>();
@@ -427,6 +455,14 @@ export class SmuflMetrics {
                 tupletBracketThickness: 0.16
             },
             glyphBBoxes: {
+                FourStringTabClef: {
+                    bBoxNE: [1.088, 2.016],
+                    bBoxSW: [-0.012, -2.032]
+                },
+                SixStringTabClef: {
+                    bBoxNE: [1.632, 3.056],
+                    bBoxSW: [-0.012, -2.992]
+                },
                 accidentalDoubleFlat: {
                     bBoxNE: [1.644, 1.748],
                     bBoxSW: [0, -0.7]
@@ -850,6 +886,10 @@ export class SmuflMetrics {
                 metNoteQuarterUp: {
                     bBoxNE: [1.328, 2.752],
                     bBoxSW: [0, -0.564]
+                },
+                note8thUp: {
+                    bBoxNE: [2.264, 3.492],
+                    bBoxSW: [0, -0.552]
                 },
                 noteQuarterUp: {
                     bBoxNE: [1.328, 3.5],

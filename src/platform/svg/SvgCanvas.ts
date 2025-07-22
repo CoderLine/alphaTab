@@ -192,10 +192,11 @@ export abstract class SvgCanvas implements ICanvas {
             case TextBaseline.Bottom:
                 return 'dominant-baseline: ideographic';
             case TextBaseline.Alphabetic:
-                return 'dominant-baseline: alphabetic';
-            // case TextBaseline.Middle:
+                // alphabetic is set as default on the SVG tag via css
+                return '';
+            case TextBaseline.Middle:
+                return 'dominant-baseline: middle';
             default:
-                // middle is set as default on the SVG tag via css
                 return '';
         }
     }

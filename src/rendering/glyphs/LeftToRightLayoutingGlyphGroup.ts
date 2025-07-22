@@ -2,6 +2,8 @@ import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
 export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
+    public gap: number = 0;
+
     public constructor() {
         super(0, 0);
         this.glyphs = [];
@@ -15,7 +17,7 @@ export class LeftToRightLayoutingGlyphGroup extends GlyphGroup {
         g.x = this.width;
         g.renderer = this.renderer;
         g.doLayout();
-        this.width = g.x + g.width;
+        this.width = g.x + g.width + this.gap;
         super.addGlyph(g);
     }
 }

@@ -113,6 +113,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
+
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             const top: number = this.getScoreY(-2);
             const bottom: number = this.getScoreY(this.heightLineCount * 2);
@@ -554,6 +555,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.createStartSpacing();
 
             this.addPreBeatGlyph(new ClefGlyph(0, this.getScoreY(offset), this.bar.clef, this.bar.clefOttava));
+            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
             hasClef = true;
         }
         // Key signature
@@ -605,6 +607,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         const glyph = new KeySignatureGlyph();
+        glyph.gap = this.smuflMetrics.accidentalPadding;
         glyph.renderer = this;
 
         const newLines: Map<number, boolean> = new Map<number, boolean>();
@@ -652,11 +655,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         this.addPreBeatGlyph(glyph);
+
+        if (!glyph.isEmpty) {
+            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
+        }
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
-
         const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
@@ -668,6 +673,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.isFreeTime
             )
         );
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {

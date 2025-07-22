@@ -11,6 +11,7 @@ import { Duration } from "@src/model/Duration";
  * spacings etc.
  * @json
  * @json_declaration
+ * @cloneable
  * @target web
  */
 export interface SmuflMetricsJson {
@@ -55,6 +56,7 @@ export interface SmuflMetricsJson {
     postNoteEffectPadding?: number;
     stringNumberCirclePadding?: number;
     rowContainerPadding?: number;
+    rowContainerGap?: number;
     effectSpacing?: number;
     alternateEndingsPadding?: number;
     sustainPedalLinePadding?: number;
@@ -81,6 +83,8 @@ export interface SmuflMetricsJson {
     chordDiagramFretHeight?: number;
     chordDiagramLineWidth?: number;
     tripletFeelTripletPadding?: number;
+    accidentalPadding?: number;
+    preBeatGlyphSpacing?: number;
     stemUp?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     stemDown?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, SmuflStemInfoJson>;
     repeatOffsetX?: Map<MusicFontSymbol | keyof typeof MusicFontSymbol | Lowercase<keyof typeof MusicFontSymbol>, number>;

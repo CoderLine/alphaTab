@@ -100,7 +100,138 @@ SMuFL
 
     - Alternative SmuFL font rendering
 
-    Performance
-    - Avoid repeated deep access to smufl metrics (local reference?)
-    - Layout context object gives access to essentials?
-
+    Test findings:
+    - test-data/visual-tests/music-notation/accidentals.png
+      as we do not support checking overlaps with "cutout boxes" accidentals are unnecessarily extended into more columns. 
+      maybe we can simply reduce the bounding box check with a margin?
+    - staff lines are often blurry in the default setup (due to sub-pixel alignments)
+      maybe we can apply a blur correction to get more crisp lines by default
+    - music sheets got quite a bit wider again, maybe we can reduce some paddings with the new scaling?
+    - test-data/visual-tests/music-notation/clefs.png
+      wrong ottava 15 on last clef. 
+    - test-data/visual-tests/general/colors.png
+      bar 5 stem missing
+    - test-data/visual-tests/music-notation/rest-collisions.png
+      rest docs incorrect
+    - test-data/visual-tests/music-notation/notes-rests-beams.png
+      beams not shifted upwards by high note in the middle
+    - test-data/visual-tests/notation-elements/chord-diagrams-on.png
+      chord diagrams are blurry, we should ajust the sizes to have more crisp display.
+    - guitar Tuning
+      we should make the spacing between strings a bit more condensed
+    - bar number
+      we should add a small padding (1 space in bar number font?)
+    - test-data/visual-tests/special-notes/grace-notes-alignment.png
+      test-data/visual-tests/special-notes/grace-notes.png
+      the sem height looks a bit high, are we maybe not downscaling accordingly?
+    - test-data/visual-tests/effects-and-annotations/accentuations.png
+      staccato dots are not centered
+    - test-data/visual-tests/effects-and-annotations/barre.png
+      brackets broken
+    - test-data/visual-tests/effects-and-annotations/beat-slash.png
+      incorrect stem height on slash        
+    - test-data/visual-tests/effects-and-annotations/beat-tempo-change.png 
+      tempo changes appear to be slightly misaligned 
+    - test-data/visual-tests/effects-and-annotations/directions-simple.png
+      test-data/visual-tests/effects-and-annotations/directions-symbols.png
+      directions appear very large, is this really correct?
+      also the alignment should be managed (fixed height and center?)
+    - test-data/visual-tests/effects-and-annotations/fingering-new.png
+      test-data/visual-tests/effects-and-annotations/fingering.png
+      should we use the fingering glyphs contained in the font?
+    - test-data/visual-tests/effects-and-annotations/free-time.png
+      time signature bracket could use some spacing
+    - test-data/visual-tests/effects-and-annotations/golpe-tab.png
+      test-data/visual-tests/effects-and-annotations/golpe.png
+      not properly centered
+    - test-data/visual-tests/effects-and-annotations/let-ring.png
+      smaller dashes?
+    - test-data/visual-tests/effects-and-annotations/ornaments.png
+      ornaments are not vertically aligned
+    - test-data/visual-tests/effects-and-annotations/slides-line-break.png
+      score slide should go upwards
+    - test-data/visual-tests/effects-and-annotations/string-numbers.png
+      (2) not placed above stem
+    - test-data/visual-tests/effects-and-annotations/tremolo-bar.png
+      make whammy higher again?
+    - test-data/visual-tests/effects-and-annotations/tremolo-picking.png
+      not correctly placed close to the end, need the center between last note and stem tip
+    - test-data/visual-tests/effects-and-annotations/trill.png
+      center align tr 
+    - test-data/visual-tests/effects-and-annotations/tuplets-advanced.png
+      numbers feel quite large, missing scaling? 
+    - test-data/visual-tests/special-tracks/drum-tabs.png   
+      dot articulation not centered and too far
+      huge cymbol articulation
+      not centered star articulation
+      articulation overflow not respected
+    - test-data/visual-tests/special-tracks/slash.png
+      tuplet brackets without space
+      rest dots misplaced      
+    - test-data/visual-tests/special-tracks/numbered.png
+      accidentals a bit far away from numbers
+      dots above numbers need some initial spacing
+      alignments of dashes should likely be vertically centered
+      dash lines appear a bit inconsistent in spacing
+      tuplet need some more spacing
+    - test-data/visual-tests/bounds-lookup/real-system.png
+      tie overflow not correct
+    - test-data/visual-tests/notation-legend/arpeggio-default.png
+      test-data/visual-tests/notation-legend/arpeggio-songbook.png
+      notehead not displaced
+    - test-data/visual-tests/notation-legend/bends-default.png
+      prebend padding top on tab
+    - test-data/visual-tests/notation-legend/fingering-songbook.png
+      center fingers above tab
+    - test-data/visual-tests/notation-legend/full-default-large.png
+      bend helper notes placement wrong
+    - test-data/visual-tests/notation-legend/grace-default.png
+      spacing between grace and normal note
+    - test-data/visual-tests/notation-legend/multi-grace-default.png
+      test-data/visual-tests/notation-legend/sweep-default.png
+      pick stroke placement
+    - test-data/visual-tests/notation-legend/multi-grace-songbook.png
+      stem height
+    - test-data/visual-tests/notation-legend/resize-sequence-500.png
+      chord diagram should wrap
+    - test-data/visual-tests/notation-legend/slash-default.png
+      quarter stem missing
+    - test-data/visual-tests/notation-legend/tempo-change-default.png
+      alignment slightly off
+    - test-data/visual-tests/notation-legend/trill-default.png
+      tr alignment
+      maybe increase stem height on trills -> check spec
+    - test-data/visual-tests/notation-legend/trill-songbook.png
+      trill too wide
+    - test-data/visual-tests/notation-legend/triplet-feel-default.png
+      end parenthesis too close  
+    - test-data/visual-tests/notation-legend/whammy-default.png
+      some helper notes too small
+    - test-data/musicxml-samples/SchbAvMaSample.png
+      some lyrics overlap with tuplets
+    - test-data/musicxml-testsuite/02a-Rests-Durations.png
+      rests shift into end 
+    - test-data/musicxml-testsuite/03a-Rhythm-Durations.png
+      note dots padding at end
+      beams overflow not respected
+    - test-data/musicxml-testsuite/03d-Rhythm-DottedDurations-Factors.png
+      clef overflow not correct
+    - test-data/musicxml-testsuite/12a-Clefs.png
+      clef ottava on neutral clef
+    - test-data/musicxml-testsuite/21g-Chords-Tremolos.png
+      displaced note heads
+    - test-data/musicxml-testsuite/22b-Staff-Notestyles.png
+      stem missing
+    - test-data/musicxml-testsuite/22d-Parenthesized-Noteheads.png
+      small padding would be good
+    - test-data/musicxml-testsuite/23d-Tuplets-Nested.png
+      reserve space for tuplet number
+    - test-data/musicxml-testsuite/32a-Notations.png
+      accidentals on quarter bends
+      tenuto alignment
+    - test-data/musicxml-testsuite/32c-MultipleNotationChildren.png
+      staccato alignment
+    - test-data/musicxml-testsuite/34a-Print-Object-Spanners.png
+      tuplet bracket crop
+    - test-data/musicxml-testsuite/43g-MultiStaff-PartSymbol.png
+      check for alternative brace availability

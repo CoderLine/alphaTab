@@ -61,8 +61,9 @@ export class AccidentalGroupGlyph extends GlyphGroup {
         // Place accidentals in columns
         //
         this.width = 0;
+        const padding = this.renderer.smuflMetrics.accidentalPadding;
         for (const column of columns) {
-            this.width += column.width;
+            this.width += column.width + padding;
             column.x = this.width;
         }
 

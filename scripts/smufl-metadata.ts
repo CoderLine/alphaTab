@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import url from 'node:url';
 import path from 'node:path';
 import { MusicFontSymbol } from '../src/model/MusicFontSymbol';
+import { SmuflMetrics } from '../src/SmuflMetrics';
 
 const input = process.argv[2];
 const output = process.argv[3];
@@ -19,15 +20,21 @@ for(const [_,name] of Object.entries(MusicFontSymbol).filter(e => typeof e[1] ==
     alphaTabUsedGlyphs.add(name.toString().toLowerCase());
 }
 
+for(const [k,_] of SmuflMetrics.smuflNameToGlyphNameMapping) {
+    alphaTabUsedGlyphs.add(k.toLowerCase());
+}
+
 for(const name of Object.keys(metadata.glyphBBoxes)) {
     if(alphaTabUsedGlyphs.has(name.toLowerCase())) {
-        outputMetadata.glyphBBoxes[name] = metadata.glyphBBoxes[name];
+        const alphaTabName = SmuflMetrics.smuflNameToGlyphNameMapping.has(name) ? SmuflMetrics.smuflNameToGlyphNameMapping.get(name)! : name;
+        outputMetadata.glyphBBoxes[alphaTabName] = metadata.glyphBBoxes[name];
     }
 }
 
 for(const name of Object.keys(metadata.glyphsWithAnchors)) {
     if(alphaTabUsedGlyphs.has(name.toLowerCase())) {
-        outputMetadata.glyphsWithAnchors[name] = metadata.glyphsWithAnchors[name];
+        const alphaTabName = SmuflMetrics.smuflNameToGlyphNameMapping.has(name) ? SmuflMetrics.smuflNameToGlyphNameMapping.get(name)! : name;
+        outputMetadata.glyphsWithAnchors[alphaTabName] = metadata.glyphsWithAnchors[name];
     }
 }
 

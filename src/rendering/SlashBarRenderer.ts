@@ -92,9 +92,9 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
+    protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
         const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
+        return this.getLineY(0) - noteHeadHeight / 2 - this.getFlagStemSize(beat.duration, true);
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {

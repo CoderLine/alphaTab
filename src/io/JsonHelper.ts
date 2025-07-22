@@ -28,6 +28,17 @@ export class JsonHelper {
      * @target web
      * @partial
      */
+    public static parseEnumExact<T>(s: string, enumType: any): T | undefined {
+        if(s in enumType) {
+            return enumType[s] as T;
+        }
+        return undefined;
+    }
+
+    /**
+     * @target web
+     * @partial
+     */
     public static forEach(s: unknown, func: (v: unknown, k: string) => void): void {
         if (s instanceof Map) {
             (s as Map<string, unknown>).forEach(func);

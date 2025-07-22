@@ -212,7 +212,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
                 dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
                 dotsOffset = dotSpacing * -1;
             } else if (dotCount < 0) {
-                dotsY = barStart + beamY + barCount * barSpacing;
+                dotsY = barStart + beamY + barCount * (barSpacing + barSize);
                 dotsOffset = dotSpacing;
             }
             const dotX: number = this.getBeatX(beat, BeatXPosition.MiddleNotes) - this.beatGlyphsStart;
@@ -231,7 +231,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get tupletOffset(): number {
-        return super.tupletOffset + this.resources.numberedNotationFont.size;
+        return this.smuflMetrics.oneStaffSpace + this.resources.numberedNotationFont.size;
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {

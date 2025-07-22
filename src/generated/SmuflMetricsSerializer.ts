@@ -58,6 +58,7 @@ export class SmuflMetricsSerializer {
         o.set("postnoteeffectpadding", obj.postNoteEffectPadding);
         o.set("stringnumbercirclepadding", obj.stringNumberCirclePadding);
         o.set("rowcontainerpadding", obj.rowContainerPadding);
+        o.set("rowcontainergap", obj.rowContainerGap);
         o.set("effectspacing", obj.effectSpacing);
         o.set("alternateendingspadding", obj.alternateEndingsPadding);
         o.set("sustainpedallinepadding", obj.sustainPedalLinePadding);
@@ -84,6 +85,8 @@ export class SmuflMetricsSerializer {
         o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
         o.set("chorddiagramlinewidth", obj.chordDiagramLineWidth);
         o.set("tripletfeeltripletpadding", obj.tripletFeelTripletPadding);
+        o.set("accidentalpadding", obj.accidentalPadding);
+        o.set("prebeatglyphspacing", obj.preBeatGlyphSpacing);
         {
             const m = new Map<string, unknown>();
             o.set("stemup", m);
@@ -259,6 +262,9 @@ export class SmuflMetricsSerializer {
             case "rowcontainerpadding":
                 obj.rowContainerPadding = v! as number;
                 return true;
+            case "rowcontainergap":
+                obj.rowContainerGap = v! as number;
+                return true;
             case "effectspacing":
                 obj.effectSpacing = v! as number;
                 return true;
@@ -336,6 +342,12 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tripletfeeltripletpadding":
                 obj.tripletFeelTripletPadding = v! as number;
+                return true;
+            case "accidentalpadding":
+                obj.accidentalPadding = v! as number;
+                return true;
+            case "prebeatglyphspacing":
+                obj.preBeatGlyphSpacing = v! as number;
                 return true;
             case "stemup":
                 obj.stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();

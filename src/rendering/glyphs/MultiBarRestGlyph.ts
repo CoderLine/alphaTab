@@ -26,18 +26,14 @@ export class MultiBarRestGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.renderer.height / 2, 1, [
-            MusicFontSymbol.RestHBarLeft,
-            MusicFontSymbol.RestHBarMiddle,
-            MusicFontSymbol.RestHBarMiddle,
-            MusicFontSymbol.RestHBarMiddle,
-            MusicFontSymbol.RestHBarRight
-        ]);
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.renderer.height / 2, 1, 
+            MultiBarRestGlyph.RestSymbols
+        );
 
         const numberTop = (this.renderer as LineBarRenderer).getLineY(-1.5);
 
         canvas.fillMusicFontSymbols(
-            cx + this.x,
+            cx + this.x + this.width / 2,
             (cy + this.y + numberTop) | 0,
             1,
             this._numberGlyph,

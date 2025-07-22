@@ -64,11 +64,11 @@ export class TuningGlyph extends GlyphGroup {
         const circleScale = this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
         const circleHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
+        this.renderer.scoreRenderer.canvas!.font = res.effectFont;
         const stringColumnWidth =
             (circleHeight + this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width) *
             res.smuflMetrics.tuningGlyphStringColumnScale;
 
-        this.renderer.scoreRenderer.canvas!.font = res.effectFont;
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width,
             Math.max(this.renderer.scoreRenderer.canvas!.measureText(tuning.name).width, 2 * stringColumnWidth)
