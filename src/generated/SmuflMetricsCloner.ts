@@ -52,6 +52,7 @@ export class SmuflMetricsCloner {
         clone.beatTimerPadding = original.beatTimerPadding;
         clone.bendNoteHeadElementPadding = original.bendNoteHeadElementPadding;
         clone.ghostParenthesisWidth = original.ghostParenthesisWidth;
+        clone.ghostParenthesisPadding = original.ghostParenthesisPadding;
         clone.brokenBeamWidth = original.brokenBeamWidth;
         clone.tabWhammyTextPadding = original.tabWhammyTextPadding;
         clone.tabWhammyPerHalfHeight = original.tabWhammyPerHalfHeight;
@@ -85,6 +86,7 @@ export class SmuflMetricsCloner {
         clone.tempoNoteScale = original.tempoNoteScale;
         clone.tuningGlyphCircleNumberScale = original.tuningGlyphCircleNumberScale;
         clone.tuningGlyphStringColumnScale = original.tuningGlyphStringColumnScale;
+        clone.tuningGlyphRowPadding = original.tuningGlyphRowPadding;
         return clone;
     }
 }

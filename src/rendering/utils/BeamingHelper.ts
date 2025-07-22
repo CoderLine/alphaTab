@@ -10,7 +10,7 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccidentalHelper } from '@src/rendering/utils/AccidentalHelper';
-import { type BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 
 class BeatLinePositions {
     public staffId: string = '';
@@ -63,11 +63,6 @@ export class BeamingHelper {
     public hasTuplet: boolean = false;
 
     public slashBeats: Beat[] = [];
-
-    private _firstBeatLowestNoteCompareValue: number = -1;
-    private _firstBeatHighestNoteCompareValue: number = -1;
-    private _lastBeatLowestNoteCompareValue: number = -1;
-    private _lastBeatHighestNoteCompareValue: number = -1;
 
     public lowestNoteInHelper: Note | null = null;
     private _lowestNoteCompareValueInHelper: number = -1;
@@ -184,12 +179,21 @@ export class BeamingHelper {
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
         if (this.highestNoteInHelper && this.lowestNoteInHelper) {
-            const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
-            const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
+            const highestBeatContainer = this._renderer.getBeatContainer(this.highestNoteInHelper.beat);
+            const lowestBeatContainer = this._renderer.getBeatContainer(this.lowestNoteInHelper.beat);
 
-            if (direction === null) {
-                const avg = (highestNotePosition + lowestNotePosition) / 2;
-                direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
+            if (highestBeatContainer && lowestBeatContainer) {
+                const highestNotePosition = highestBeatContainer.onNotes.getHighestNoteY();
+                const lowestNotePosition = lowestBeatContainer.onNotes.getLowestNoteY();
+
+                if (direction === null) {
+                    const avg = (highestNotePosition + lowestNotePosition) / 2;
+                    direction = this.invert(
+                        this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down
+                    );
+                }
+            } else {
+                direction = this.invert(BeamDirection.Up);
             }
 
             this._renderer.completeBeamingHelper(this);
@@ -362,32 +366,6 @@ export class BeamingHelper {
             if (note.harmonicType !== HarmonicType.None && note.harmonicType !== HarmonicType.Natural) {
                 highestValueForNote = note.realValue - this._staff.displayTranspositionPitch;
             }
-        }
-
-        if (this.beats.length === 1 && this.beats[0] === note.beat) {
-            if (
-                this._firstBeatLowestNoteCompareValue === -1 ||
-                lowestValueForNote < this._firstBeatLowestNoteCompareValue
-            ) {
-                this._firstBeatLowestNoteCompareValue = lowestValueForNote;
-            }
-            if (
-                this._firstBeatHighestNoteCompareValue === -1 ||
-                highestValueForNote > this._firstBeatHighestNoteCompareValue
-            ) {
-                this._firstBeatHighestNoteCompareValue = highestValueForNote;
-            }
-        }
-
-        if (this._lastBeatLowestNoteCompareValue === -1 || lowestValueForNote < this._lastBeatLowestNoteCompareValue) {
-            this._lastBeatLowestNoteCompareValue = lowestValueForNote;
-        }
-
-        if (
-            this._lastBeatHighestNoteCompareValue === -1 ||
-            highestValueForNote > this._lastBeatHighestNoteCompareValue
-        ) {
-            this._lastBeatHighestNoteCompareValue = highestValueForNote;
         }
 
         if (!this.lowestNoteInHelper || lowestValueForNote < this._lowestNoteCompareValueInHelper) {

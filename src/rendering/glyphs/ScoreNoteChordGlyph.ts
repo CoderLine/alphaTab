@@ -115,10 +115,14 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
         return pos;
     }
 
-    public addNoteGlyph(noteGlyph: MusicFontGlyph, note: Note, noteLine: number): void {
+    public addMainNoteGlyph(noteGlyph: MusicFontGlyph, note: Note, noteLine: number): void {
         super.add(noteGlyph, noteLine);
         this._noteGlyphLookup.set(note.id, noteGlyph);
         this._notes.push(note);
+    }
+
+    public addEffectNoteGlyph(noteGlyph: MusicFontGlyph, noteLine: number): void {
+        super.add(noteGlyph, noteLine);
     }
 
     public updateBeamingHelper(cx: number): void {

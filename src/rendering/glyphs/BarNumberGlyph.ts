@@ -5,16 +5,17 @@ import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 
 export class BarNumberGlyph extends Glyph {
-    private _number: number = 0;
+    private _number: string;
 
     public constructor(x: number, y: number, num: number) {
         super(x, y);
-        this._number = num;
+        this._number = `${num}  `;
     }
 
     public override doLayout(): void {
         this.renderer.scoreRenderer.canvas!.font = this.renderer.resources.barNumberFont;
-        this.width = this.renderer.scoreRenderer.canvas!.measureText(this._number.toString()).width;
+        this.width =
+            this.renderer.scoreRenderer.canvas!.measureText(this._number).width;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -33,7 +34,7 @@ export class BarNumberGlyph extends Glyph {
         const baseline = canvas.textBaseline;
         canvas.textBaseline = TextBaseline.Top;
         canvas.font = res.barNumberFont;
-        canvas.fillText(this._number.toString(), cx + this.x, cy + this.y);
+        canvas.fillText(this._number, cx + this.x, cy + this.y);
         canvas.textBaseline = baseline;
     }
 }

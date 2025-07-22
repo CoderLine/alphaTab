@@ -66,6 +66,7 @@ export class SmuflMetricsSerializer {
         o.set("beattimerpadding", obj.beatTimerPadding);
         o.set("bendnoteheadelementpadding", obj.bendNoteHeadElementPadding);
         o.set("ghostparenthesiswidth", obj.ghostParenthesisWidth);
+        o.set("ghostparenthesispadding", obj.ghostParenthesisPadding);
         o.set("brokenbeamwidth", obj.brokenBeamWidth);
         o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
         o.set("tabwhammyperhalfheight", obj.tabWhammyPerHalfHeight);
@@ -147,6 +148,7 @@ export class SmuflMetricsSerializer {
         o.set("temponotescale", obj.tempoNoteScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
+        o.set("tuningglyphrowpadding", obj.tuningGlyphRowPadding);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -286,6 +288,9 @@ export class SmuflMetricsSerializer {
             case "ghostparenthesiswidth":
                 obj.ghostParenthesisWidth = v! as number;
                 return true;
+            case "ghostparenthesispadding":
+                obj.ghostParenthesisPadding = v! as number;
+                return true;
             case "brokenbeamwidth":
                 obj.brokenBeamWidth = v! as number;
                 return true;
@@ -412,6 +417,9 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tuningglyphstringcolumnscale":
                 obj.tuningGlyphStringColumnScale = v! as number;
+                return true;
+            case "tuningglyphrowpadding":
+                obj.tuningGlyphRowPadding = v! as number;
                 return true;
         }
         return false;

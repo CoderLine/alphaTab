@@ -441,10 +441,10 @@ export class StaffSystem {
     public get height(): number {
         return this._allStaves.length === 0
             ? 0
-            : this._allStaves[this._allStaves.length - 1].y +
+            : Math.ceil(this._allStaves[this._allStaves.length - 1].y +
                   this._allStaves[this._allStaves.length - 1].height +
                   this.topPadding +
-                  this.bottomPadding;
+                  this.bottomPadding);
     }
 
     public scaleToWidth(width: number): void {
@@ -460,9 +460,7 @@ export class StaffSystem {
         // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.height);
         // canvas.color = c;
 
-        cy += this.topPadding;
-
-        this.paintPartial(cx + this.x, cy + this.y, canvas, 0, this.masterBarsRenderers.length);
+        this.paintPartial(cx + this.x, cy + this.y + this.topPadding, canvas, 0, this.masterBarsRenderers.length);
 
         if (this._hasSystemSeparator) {
             using _ = ElementStyleHelper.track(
@@ -471,6 +469,8 @@ export class StaffSystem {
                 this._allStaves[0].modelStaff.track
             );
 
+            // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping
+            
             // NOTE: Prevent cropping of separator if it overlaps
             const smuflMetrics = this.layout.renderer.settings.display.resources.smuflMetrics
             const overlap = Math.min(0, smuflMetrics.glyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);

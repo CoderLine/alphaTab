@@ -31,6 +31,14 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
         return this.noteNumbers ? this.noteNumbers.getNoteY(note, requestedPosition) : 0;
     }
 
+    public override getLowestNoteY(): number {
+        return this.noteNumbers ? this.noteNumbers.getLowestNoteY() : 0;
+    }
+
+    public override getHighestNoteY(): number {
+        return this.noteNumbers ? this.noteNumbers.getHighestNoteY() : 0;
+    }
+
     public override buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
         if (this.noteNumbers) {
             this.noteNumbers.buildBoundingsLookup(beatBounds, cx + this.x, cy + this.y);
@@ -45,7 +53,6 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             // Note numbers
             const isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
-
 
             if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);

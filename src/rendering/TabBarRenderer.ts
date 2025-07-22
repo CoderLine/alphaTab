@@ -115,7 +115,7 @@ export class TabBarRenderer extends LineBarRenderer {
                                 spaces[this.bar.staff.tuning.length - str].push(
                                     new Float32Array([
                                         vc.x + bg.x + notes.x + noteNumbers!.x - padding,
-                                        noteNumbers!.width + padding
+                                        noteNumbers!.width + padding * 2
                                     ])
                                 );
                             }

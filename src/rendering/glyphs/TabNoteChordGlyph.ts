@@ -17,6 +17,7 @@ export class TabNoteChordGlyph extends Glyph {
 
     public beat!: Beat;
     public beamingHelper!: BeamingHelper;
+    public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
     public beatEffects: Map<string, Glyph> = new Map();
     public notesPerString: Map<number, NoteNumberGlyph> = new Map();
@@ -51,6 +52,14 @@ export class TabNoteChordGlyph extends Glyph {
             return pos;
         }
         return 0;
+    }
+
+    public getLowestNoteY(): number {
+        return this.maxStringNote ? this.getNoteY(this.maxStringNote, NoteYPosition.Center) : 0;
+    }
+
+    public getHighestNoteY(): number {
+        return this.minStringNote ? this.getNoteY(this.minStringNote, NoteYPosition.Center) : 0;
     }
 
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
@@ -111,7 +120,7 @@ export class TabNoteChordGlyph extends Glyph {
                 g.y += effectY;
                 g.x += this.width / 2;
                 g.renderer = this.renderer;
-                effectY +=  g.height + effectSpacing;
+                effectY += g.height + effectSpacing;
                 g.doLayout();
             }
         }
@@ -124,6 +133,9 @@ export class TabNoteChordGlyph extends Glyph {
         this.notesPerString.set(note.string, noteGlyph);
         if (!this.minStringNote || note.string < this.minStringNote.string) {
             this.minStringNote = note;
+        }
+        if (!this.maxStringNote || note.string > this.maxStringNote.string) {
+            this.maxStringNote = note;
         }
     }
 

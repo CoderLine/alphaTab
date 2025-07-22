@@ -38,7 +38,6 @@ SMuFL
         - key signature
         - note sizing
         - 
-    - Time Signature Placement
     - Beat Ottavia (placement and line rendering)
     - Drum Notation
         - Note heads
@@ -104,13 +103,9 @@ SMuFL
     - test-data/visual-tests/music-notation/accidentals.png
       as we do not support checking overlaps with "cutout boxes" accidentals are unnecessarily extended into more columns. 
       maybe we can simply reduce the bounding box check with a margin?
-    - staff lines are often blurry in the default setup (due to sub-pixel alignments)
-      maybe we can apply a blur correction to get more crisp lines by default
     - music sheets got quite a bit wider again, maybe we can reduce some paddings with the new scaling?
     - test-data/visual-tests/music-notation/clefs.png
       wrong ottava 15 on last clef. 
-    - test-data/visual-tests/general/colors.png
-      bar 5 stem missing
     - test-data/visual-tests/music-notation/rest-collisions.png
       rest docs incorrect
     - test-data/visual-tests/music-notation/notes-rests-beams.png
@@ -119,8 +114,6 @@ SMuFL
       chord diagrams are blurry, we should ajust the sizes to have more crisp display.
     - guitar Tuning
       we should make the spacing between strings a bit more condensed
-    - bar number
-      we should add a small padding (1 space in bar number font?)
     - test-data/visual-tests/special-notes/grace-notes-alignment.png
       test-data/visual-tests/special-notes/grace-notes.png
       the sem height looks a bit high, are we maybe not downscaling accordingly?

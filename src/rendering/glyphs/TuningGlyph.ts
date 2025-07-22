@@ -78,7 +78,7 @@ export class TuningGlyph extends GlyphGroup {
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
-            const topY = this.height;
+            const topY = this.height + this.renderer.smuflMetrics.tuningGlyphRowPadding;
             let currentY: number = topY;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
@@ -95,7 +95,7 @@ export class TuningGlyph extends GlyphGroup {
                         TextBaseline.Middle
                     )
                 );
-                currentY += circleHeight * 1.5;
+                currentY += circleHeight + this.renderer.smuflMetrics.tuningGlyphRowPadding;
                 const bottomY = currentY;
                 if (this.height < bottomY) {
                     this.height = bottomY;

@@ -109,10 +109,6 @@ export class BarRendererBase {
     public bar: Bar;
     public additionalMultiRestBars: Bar[] | null = null;
 
-    public get smuflMetrics() {
-        return this.settings.display.resources.smuflMetrics;
-    }
-
     public get lastBar(): Bar {
         if (this.additionalMultiRestBars) {
             return this.additionalMultiRestBars[this.additionalMultiRestBars.length - 1];
@@ -164,6 +160,7 @@ export class BarRendererBase {
     }
 
     public registerOverflowTop(topOverflow: number): boolean {
+        //topOverflow = Math.ceil(topOverflow);
         if (topOverflow > this.topOverflow) {
             this.topOverflow = topOverflow;
             return true;
@@ -172,6 +169,7 @@ export class BarRendererBase {
     }
 
     public registerOverflowBottom(bottomOverflow: number): boolean {
+        //bottomOverflow = Math.ceil(bottomOverflow);
         if (bottomOverflow > this.bottomOverflow) {
             this.bottomOverflow = bottomOverflow;
             return true;
@@ -191,6 +189,10 @@ export class BarRendererBase {
 
     public get resources(): RenderingResources {
         return this.settings.display.resources;
+    }
+
+    public get smuflMetrics() {
+        return this.resources.smuflMetrics;
     }
 
     public get settings(): Settings {
@@ -370,6 +372,37 @@ export class BarRendererBase {
         }
 
         this.computedWidth = this.width;
+
+        const rendererBottom = this.height;
+
+        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
+        if (preBeatGlyphs) {
+            for (const g of preBeatGlyphs) {
+                const topY = g.getBoundingBoxTop();
+                if (topY < 0) {
+                    this.registerOverflowTop(topY * -1);
+                }
+
+                const bottomY = topY + g.height;
+                if (bottomY > rendererBottom) {
+                    this.registerOverflowBottom(bottomY - rendererBottom);
+                }
+            }
+        }
+        const postBeatGlyphs = this._postBeatGlyphs.glyphs;
+        if (postBeatGlyphs) {
+            for (const g of postBeatGlyphs) {
+                const topY = g.getBoundingBoxTop();
+                if (topY < 0) {
+                    this.registerOverflowTop(topY * -1);
+                }
+
+                const bottomY = topY + g.height;
+                if (bottomY > rendererBottom) {
+                    this.registerOverflowBottom(bottomY - rendererBottom);
+                }
+            }
+        }
     }
 
     protected hasVoiceContainer(voice: Voice): boolean {
@@ -396,6 +429,7 @@ export class BarRendererBase {
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
         this.height += this.layoutingInfo.height;
+        this.height = Math.ceil(this.height);
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -604,8 +638,7 @@ export class BarRendererBase {
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat2Bars,
-                                        true
-
+                    true
                 );
 
                 canvas.endGroup();

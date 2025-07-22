@@ -145,7 +145,19 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
+    public override getLowestNoteY(): number {
+        return this.internalGetNoteY(NoteYPosition.Center);
+    }
+
+    public override getHighestNoteY(): number {
+        return this.internalGetNoteY(NoteYPosition.Center);
+    }
+
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+        return this.internalGetNoteY(requestedPosition);
+    }
+
+    private internalGetNoteY(requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
             g = this.noteHeads;

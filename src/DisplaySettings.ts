@@ -211,7 +211,7 @@ export class DisplaySettings {
      * @category Display
      * @defaultValue `20`
      */
-    public systemPaddingBottom: number = 20;
+    public systemPaddingBottom: number = 10;
 
     /**
      * The bottom padding applied to the last system.

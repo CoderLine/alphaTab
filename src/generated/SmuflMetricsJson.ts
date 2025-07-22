@@ -64,6 +64,7 @@ export interface SmuflMetricsJson {
     beatTimerPadding?: number;
     bendNoteHeadElementPadding?: number;
     ghostParenthesisWidth?: number;
+    ghostParenthesisPadding?: number;
     brokenBeamWidth?: number;
     tabWhammyTextPadding?: number;
     tabWhammyPerHalfHeight?: number;
@@ -97,4 +98,5 @@ export interface SmuflMetricsJson {
     tempoNoteScale?: number;
     tuningGlyphCircleNumberScale?: number;
     tuningGlyphStringColumnScale?: number;
+    tuningGlyphRowPadding?: number;
 }

@@ -233,7 +233,15 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown
             );
         }
-        return this.getScoreY(this.accidentalHelper.getMinLine(beat));
+
+        let y = this.getScoreY(this.accidentalHelper.getMinLine(beat));
+
+        if (direction === BeamDirection.Up) {
+            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            y -= this.smuflMetrics.standardStemLength * scale;
+        }
+
+        return y;
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
@@ -248,7 +256,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem
             );
         }
-        return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+
+        let y = this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+        if (direction === BeamDirection.Down) {
+            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            y += this.smuflMetrics.standardStemLength * scale;
+        }
+        return y;
     }
 
     protected override getBeamDirection(helper: BeamingHelper): BeamDirection {

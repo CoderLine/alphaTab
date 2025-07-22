@@ -58,7 +58,7 @@ export abstract class SvgCanvas implements ICanvas {
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = (this.lineWidth * this.scale) % 2 === 0 ? 0 : 0.5;
-        this.buffer += `<rect x="${(x * this.scale) + blurOffset}" y="${(y * this.scale) + blurOffset}" width="${
+        this.buffer += `<rect x="${x * this.scale + blurOffset}" y="${y * this.scale + blurOffset}" width="${
             w * this.scale
         }" height="${h * this.scale}" stroke="${this.color.rgba}"`;
         if (this.lineWidth !== 1) {
@@ -151,8 +151,8 @@ export abstract class SvgCanvas implements ICanvas {
         if (text === '') {
             return;
         }
-        let s: string = `<text x="${(x * this.scale) | 0}" y="${
-            (y * this.scale) | 0
+        let s: string = `<text x="${x * this.scale}" y="${
+            y * this.scale
         }" style='stroke: none; font:${this.font.toCssString(this.settings.display.scale)}; ${this.getSvgBaseLine()}'`;
         if (this.color.rgba !== '#000000') {
             s += ` fill="${this.color.rgba}"`;
@@ -195,6 +195,8 @@ export abstract class SvgCanvas implements ICanvas {
                 // alphabetic is set as default on the SVG tag via css
                 return '';
             case TextBaseline.Middle:
+                // central would maybe look slightly better, but its not available on HTML5 canvas, or Skia
+                // hence, we rather stay consistent
                 return 'dominant-baseline: middle';
             default:
                 return '';

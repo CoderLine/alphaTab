@@ -61,6 +61,14 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             beatBounds.addNote(noteBounds);
         }
     }
+        
+    public override getLowestNoteY(): number {
+        return this.noteHeads ? this.noteHeads.y : 0;
+    }
+
+    public override getHighestNoteY(): number {
+        return this.noteHeads ? this.noteHeads.y : 0;
+    }
 
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;

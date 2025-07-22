@@ -262,8 +262,8 @@ export class SkiaCanvas implements ICanvas {
             text,
             this._textStyle!,
             this._font.size * this._scale,
-            (x * this._scale) | 0,
-            (y * this._scale) | 0,
+            (x * this._scale),
+            (y * this._scale),
             textAlign,
             textBaseline
         );

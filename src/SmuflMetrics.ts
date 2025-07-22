@@ -129,7 +129,11 @@ export class SmuflMetrics {
      */
     public musicFontSize = 36;
     public oneStaffSpace: number = this.musicFontSize / 4;
-    public tabLineSpacing: number = this.oneStaffSpace * 1.5;
+
+    // The industry practice is to give tab staves 1.5 of standard staff spacing
+    // With 1sp==9px we have 1.5sp==13.5px which always leads to some lines being 
+    // blurry. Hence we round down to get a clean 13px. (condensed is better than a lot of white space)
+    public tabLineSpacing: number = Math.floor(this.oneStaffSpace * 1.5);
 
     // engraving defaults (TODO: reuse SmuflEngravingDefaults when all are supported)
     public arrowShaftThickness = 0;
@@ -307,7 +311,8 @@ export class SmuflMetrics {
         this.tieHeight = 1.2 * this.oneStaffSpace;
         this.beatTimerPadding = 0.22 * this.oneStaffSpace;
         this.bendNoteHeadElementPadding = 0.22 * this.oneStaffSpace;
-        this.ghostParenthesisWidth = 0.3 * this.oneStaffSpace;
+        this.ghostParenthesisWidth = 0.6 * this.oneStaffSpace;
+        this.ghostParenthesisPadding = 0.3 * this.oneStaffSpace;
 
         this.brokenBeamWidth = 1 * this.oneStaffSpace;
         this.tabWhammyTextPadding = 0.4 * this.oneStaffSpace;
@@ -336,6 +341,8 @@ export class SmuflMetrics {
         this.tripletFeelTripletPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
         this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
+
+        this.tuningGlyphRowPadding = 0.2 * this.oneStaffSpace;
     }
 
     // some names are different due to technical restrictions (e.g. names beginning with digits)
@@ -375,6 +382,7 @@ export class SmuflMetrics {
     public beatTimerPadding = 0;
     public bendNoteHeadElementPadding = 0;
     public ghostParenthesisWidth = 0;
+    public ghostParenthesisPadding = 0;
 
     public brokenBeamWidth = 0;
 
@@ -420,6 +428,7 @@ export class SmuflMetrics {
     public tempoNoteScale = 0.7;
     public tuningGlyphCircleNumberScale = 0.7;
     public tuningGlyphStringColumnScale = 1.5;
+    public tuningGlyphRowPadding = 0;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata

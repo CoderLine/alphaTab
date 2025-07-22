@@ -72,8 +72,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected updateFirstLineY() {
         const fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
         const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
-        const blurCorrection = this.smuflMetrics.staffLineThickness / 2;
-        this.firstLineY = this.topPadding + (fullLineHeight - actualLineHeight) / 2 + blurCorrection;
+        this.firstLineY = ((this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0);
     }
 
     public override doLayout(): void {
@@ -131,7 +130,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // but to have lines until the full end-pixel we round up.
         // this way we avoid holes
         const lineWidth = this.width;
-
+        
         // we want the lines to be exactly virtually aligned with the respective Y-position
         // for note heads to align correctly
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
@@ -395,7 +394,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     cx + this.x + (endX + offset2X) / 2,
                     cy + this.y + offset2Y,
                     cx + this.x + endX,
-                    cy + this.y + endY
+                    cy + this.y + angleEndY
                 );
             } else {
                 canvas.lineTo(cx + this.x + endX, cy + this.y + endY);

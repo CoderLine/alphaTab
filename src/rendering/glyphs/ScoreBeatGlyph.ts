@@ -57,6 +57,14 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
+    public override getLowestNoteY(): number {
+        return this.noteHeads ? this.noteHeads.getLowestNoteY() : 0;
+    }
+
+    public override getHighestNoteY(): number {
+        return this.noteHeads ? this.noteHeads.getHighestNoteY() : 0;
+    }
+
     public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return this.noteHeads ? this.noteHeads.getNoteY(note, requestedPosition) : 0;
     }
@@ -283,7 +291,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         // calculate y position
         let line: number = sr.getNoteLine(n);
         noteHeadGlyph.y = sr.getScoreY(line);
-        this.noteHeads!.addNoteGlyph(noteHeadGlyph, n, line);
+        this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, line);
         if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
             const harmonicFret: number = n.displayValue + n.harmonicPitch;
@@ -296,7 +304,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             harmonicsGlyph.colorOverride = noteHeadGlyph.colorOverride;
             line = sr.accidentalHelper.getNoteLineForValue(harmonicFret, false);
             harmonicsGlyph.y = sr.getScoreY(line);
-            this.noteHeads!.addNoteGlyph(harmonicsGlyph, n, line);
+            this.noteHeads!.addEffectNoteGlyph(harmonicsGlyph, line);
         }
 
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;

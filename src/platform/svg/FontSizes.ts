@@ -11,15 +11,15 @@ export class FontSizeDefinition {
      * The widths of each character starting with the ascii code 0x20 at index 0.
      */
     public characterWidths: Uint8Array;
-    /**
-     * A factor to translate a given font size to an actual text height.
-     * This is not precise but just an estimation for reserving spaces.
-     */
-    public fontSizeToHeight: number;
 
-    public constructor(characterWidths: Uint8Array, fontSizeToHeight: number) {
+    /**
+     * The heights of each character starting with the ascii code 0x20 at index 0.
+     */
+    public characterHeights: Uint8Array;
+
+    public constructor(characterWidths: Uint8Array, characterHeights: Uint8Array) {
         this.characterWidths = characterWidths;
-        this.fontSizeToHeight = fontSizeToHeight;
+        this.characterHeights = characterHeights;
     }
 }
 
@@ -47,24 +47,22 @@ export class FontSizes {
             const measureSize = 11;
             measureContext.font = `${measureSize}px ${family}`;
             const widths: number[] = [];
+            const heights: number[] = [];
             let fullTxt = '';
             for (let i: number = FontSizes.ControlChars; i < 255; i++) {
                 const s: string = String.fromCharCode(i);
                 fullTxt += s;
                 const metrics = measureContext.measureText(s);
                 widths.push(metrics.width);
+
+                const height = metrics.actualBoundingBoxDescent + metrics.actualBoundingBoxAscent;
+                heights.push(height);
             }
 
-            const heightMetrics = measureContext.measureText(`${fullTxt}ÄÖÜÁÈ`);
-
-            const top = 0 - Math.abs(heightMetrics.fontBoundingBoxAscent);
-            const bottom = 0 + Math.abs(heightMetrics.fontBoundingBoxDescent);
-            const height = bottom - top;
-
-            const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array(widths), height / measureSize);
+            const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array(widths), new Uint8Array(heights));
             FontSizes.FontSizeLookupTables.set(family, data);
         } else {
-            const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array([8]), 1.2);
+            const data: FontSizeDefinition = new FontSizeDefinition(new Uint8Array([8]), new Uint8Array([10]));
             FontSizes.FontSizeLookupTables.set(family, data);
         }
     }
@@ -101,10 +99,12 @@ export class FontSizes {
         }
 
         let stringSize: number = 0;
+        let stringHeight: number = 0;
         for (let i: number = 0; i < s.length; i++) {
             const code: number = Math.min(data.characterWidths.length - 1, s.charCodeAt(i) - FontSizes.ControlChars);
             if (code >= 0) {
                 stringSize += (data.characterWidths[code] * size) / dataSize;
+                stringHeight = Math.max(stringHeight, (data.characterHeights[code] * size) / dataSize)
             }
         }
 
@@ -112,6 +112,6 @@ export class FontSizes {
         // we really need to improve the width calculation, maybe by using offscreencanvas?
         factor *= 1.07;
 
-        return new MeasuredText(stringSize * factor, size * data.fontSizeToHeight);
+        return new MeasuredText(stringSize * factor, stringHeight);
     }
 }

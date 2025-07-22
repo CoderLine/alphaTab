@@ -24,6 +24,14 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public abstract get direction(): BeamDirection;
     public abstract get scale(): number;
 
+    public getLowestNoteY(): number {
+        return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
+    }
+
+    public getHighestNoteY(): number {
+        return this.maxNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.maxNote.steps) : 0;
+    }
+
     protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
         const info: ScoreNoteGlyphInfo = new ScoreNoteGlyphInfo(noteGlyph, noteLine);
         this._infos.push(info);
@@ -79,7 +87,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
             if (smufl.stemDown.has(g.symbol)) {
                 const stemInfo = smufl.stemDown.get(g.symbol)!;
-                const topX= stemInfo.topX * scale;
+                const topX = stemInfo.topX * scale;
                 if (topX > stemDownX) {
                     const diff = topX - stemDownX;
                     stemDownX = topX;
@@ -140,8 +148,6 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             g.glyph.paint(cx, cy, canvas);
         }
     }
-
-
 
     private paintLedgerLines(cx: number, cy: number, canvas: ICanvas) {
         if (!this.minNote) {
