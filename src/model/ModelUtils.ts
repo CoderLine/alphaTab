@@ -12,6 +12,7 @@ import { SynthConstants } from '@src/synth/SynthConstants';
 import { Bar } from '@src/model/Bar';
 import { Voice } from '@src/model/Voice';
 import { Automation, AutomationType } from '@src/model/Automation';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -34,6 +35,7 @@ export class TuningParseResultTone {
 
 /**
  * This public class contains some utilities for working with model public classes
+ * @partial
  */
 export class ModelUtils {
     public static getIndex(duration: Duration): number {
@@ -419,7 +421,8 @@ export class ModelUtils {
                 }
 
                 // check if masterbar breaks multibar rests, it must be fully empty with no annotations
-                if (masterBar.alternateEndings ||
+                if (
+                    masterBar.alternateEndings ||
                     (masterBar.isRepeatStart && masterBar.index !== currentGroupStartIndex) ||
                     masterBar.isFreeTime ||
                     masterBar.isAnacrusis ||
@@ -644,7 +647,7 @@ export class ModelUtils {
             if (masterBar.hasChanges) {
                 return;
             }
-            
+
             for (const track of score.tracks) {
                 for (const staff of track.staves) {
                     if (barIndex < staff.bars.length) {
@@ -672,5 +675,19 @@ export class ModelUtils {
             score.masterBars.pop();
             masterBar.previousMasterBar!.nextMasterBar = null;
         }
+    }
+
+    private static allMusicFontSymbols: MusicFontSymbol[] = [];
+    /**
+     * Gets a list of all music font symbols used in alphaTab.
+     */
+    public static getAllMusicFontSymbols(): MusicFontSymbol[] {
+        if (ModelUtils.allMusicFontSymbols.length === 0) {
+            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol).filter(
+                k => typeof k === 'number'
+            ) as MusicFontSymbol[];
+        }
+
+        return ModelUtils.allMusicFontSymbols;
     }
 }

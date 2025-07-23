@@ -1,7 +1,6 @@
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
 
 export class NoteOrnamentGlyph extends MusicFontGlyph {
     constructor(ornament: NoteOrnament) {
@@ -23,7 +22,10 @@ export class NoteOrnamentGlyph extends MusicFontGlyph {
         return MusicFontSymbol.None;
     }
 
-    public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        super.paint(cx, cy + this.height, canvas);
+    public override doLayout(): void {
+        super.doLayout();
+        // NOTE: fixed height to vertically align the different ornaments
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.OrnamentMordent)!;
+        this.offsetY = this.renderer.smuflMetrics.glyphTop.get(MusicFontSymbol.OrnamentMordent)!;
     }
 }

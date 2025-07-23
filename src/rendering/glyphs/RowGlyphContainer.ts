@@ -14,16 +14,17 @@ export class RowGlyphContainer extends GlyphGroup {
 
     public override doLayout(): void {
         const padding: number = this.renderer.smuflMetrics.rowContainerGap;
+        const glyphWidth = this._glyphWidth - padding;
         let x: number = 0;
         switch (this._align) {
             case TextAlign.Left:
                 x = 0;
                 break;
             case TextAlign.Center:
-                x = (this.width - this._glyphWidth) / 2;
+                x = (this.width - glyphWidth) / 2;
                 break;
             case TextAlign.Right:
-                x = this.width - this._glyphWidth;
+                x = this.width - glyphWidth;
                 break;
         }
         for (const glyph of this.glyphs!) {
@@ -34,7 +35,7 @@ export class RowGlyphContainer extends GlyphGroup {
 
     public addGlyphToRow(glyph: Glyph): void {
         this.glyphs!.push(glyph);
-        this._glyphWidth += glyph.width;
+        this._glyphWidth += glyph.width + this.renderer.smuflMetrics.rowContainerGap;
         if (glyph.height > this.height) {
             this.height = glyph.height;
         }

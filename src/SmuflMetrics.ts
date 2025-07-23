@@ -1,6 +1,7 @@
 import { SmuflMetricsCloner } from '@src/generated/SmuflMetricsCloner';
 import { JsonHelper } from '@src/io/JsonHelper';
 import { Duration } from '@src/model/Duration';
+import { ModelUtils } from '@src/model/ModelUtils';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
@@ -83,7 +84,7 @@ export interface SmuflGlyphWithAnchor {
  */
 export interface SmuflMetadata {
     engravingDefaults: SmuflEngravingDefaults;
-    glyphBBoxes: Record<string, SmuflGlyphBoundingBox>;
+    glyphBBoxes?: Record<string, SmuflGlyphBoundingBox>;
     glyphsWithAnchors: Record<string, SmuflGlyphWithAnchor>;
 }
 
@@ -131,7 +132,7 @@ export class SmuflMetrics {
     public oneStaffSpace: number = this.musicFontSize / 4;
 
     // The industry practice is to give tab staves 1.5 of standard staff spacing
-    // With 1sp==9px we have 1.5sp==13.5px which always leads to some lines being 
+    // With 1sp==9px we have 1.5sp==13.5px which always leads to some lines being
     // blurry. Hence we round down to get a clean 13px. (condensed is better than a lot of white space)
     public tabLineSpacing: number = Math.floor(this.oneStaffSpace * 1.5);
 
@@ -280,14 +281,28 @@ export class SmuflMetrics {
             }
         }
 
+        const handledSymbols = new Set<MusicFontSymbol>();
+        const bBoxes = smufl.glyphBBoxes;
+        if (bBoxes) {
+            for (const [g, v] of Object.entries(bBoxes)) {
+                const symbol = SmuflMetrics.smuflNameToMusicFontSymbol(g);
+                if (symbol) {
+                    handledSymbols.add(symbol);
+                    this.glyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
+                    this.glyphBottom.set(symbol, v.bBoxSW[1] * this.oneStaffSpace);
+                    this.glyphWidths.set(symbol, (v.bBoxNE[0] - v.bBoxSW[0]) * this.oneStaffSpace);
+                    this.glyphHeights.set(symbol, (v.bBoxNE[1] - v.bBoxSW[1]) * this.oneStaffSpace);
+                }
+            }
+        }
+
         // glyphBBoxes is optional, maybe we should rely on a text measuring of all glyphs for these values?
-        for (const [g, v] of Object.entries(smufl.glyphBBoxes)) {
-            const symbol = SmuflMetrics.smuflNameToMusicFontSymbol(g);
-            if (symbol) {
-                this.glyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
-                this.glyphBottom.set(symbol, v.bBoxSW[1] * this.oneStaffSpace);
-                this.glyphWidths.set(symbol, (v.bBoxNE[0] - v.bBoxSW[0]) * this.oneStaffSpace);
-                this.glyphHeights.set(symbol, (v.bBoxNE[1] - v.bBoxSW[1]) * this.oneStaffSpace);
+        for (const symbol of ModelUtils.getAllMusicFontSymbols()) {
+            if (!handledSymbols.has(symbol)) {
+                this.glyphTop.set(symbol, 0);
+                this.glyphBottom.set(symbol, 0);
+                this.glyphWidths.set(symbol, 0);
+                this.glyphHeights.set(symbol, 0);
             }
         }
 
@@ -298,12 +313,13 @@ export class SmuflMetrics {
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
         this.postNoteEffectPadding = 0.2 * this.oneStaffSpace;
-        this.lineRangedGlyphDashGap = 1 * this.oneStaffSpace;
+        this.lineRangedGlyphDashGap = 0.5 * this.oneStaffSpace;
         this.lineRangedGlyphDashSize = 1 * this.oneStaffSpace;
         this.numberedDashGlyphPadding = 0.3 * this.oneStaffSpace;
+        this.numberedDashGlyphPadding = 0.3 * this.oneStaffSpace;
         this.stringNumberCirclePadding = 0.3 * this.oneStaffSpace;
-        this.rowContainerPadding = 0.3 * this.oneStaffSpace;
-        this.rowContainerGap = 1 * this.oneStaffSpace;
+        this.rowContainerPadding = Math.ceil(0.3 * this.oneStaffSpace);
+        this.rowContainerGap = Math.ceil(1 * this.oneStaffSpace);
         this.effectSpacing = 0.2 * this.oneStaffSpace;
         this.alternateEndingsPadding = 0.3 * this.oneStaffSpace;
         this.sustainPedalLinePadding = 0.5 * this.oneStaffSpace;
@@ -320,7 +336,7 @@ export class SmuflMetrics {
         this.tabBendDashSize = 0.4 * this.oneStaffSpace;
 
         this.songBookWhammyDipHeight = 0.6 * this.oneStaffSpace;
-        this.tabWhammyPerHalfHeight = 0.3 * this.oneStaffSpace;
+        this.tabWhammyPerHalfHeight = 0.6 * this.oneStaffSpace;
         this.tabBendPerValueHeight = 0.6 * this.oneStaffSpace;
 
         this.leftHandTabTieWidth = 2.2 * this.oneStaffSpace;
@@ -330,13 +346,13 @@ export class SmuflMetrics {
         this.simpleSlideWidth = 1.3 * this.oneStaffSpace;
         this.simpleSlideHeight = 0.3 * this.oneStaffSpace;
 
-        this.chordDiagramPaddingX = 0.5 * this.oneStaffSpace;
-        this.chordDiagramPaddingY = 0.2 * this.oneStaffSpace;
-        this.chordDiagramStringSpacing = 1 * this.oneStaffSpace;
-        this.chordDiagramFretSpacing = 1.3 * this.oneStaffSpace;
-        this.chordDiagramNutHeight = 0.33 * this.oneStaffSpace;
-        this.chordDiagramFretHeight = 0.1 * this.oneStaffSpace;
-        this.chordDiagramLineWidth = 0.11 * this.oneStaffSpace;
+        this.chordDiagramPaddingX = Math.ceil(0.5 * this.oneStaffSpace);
+        this.chordDiagramPaddingY = Math.ceil(0.2 * this.oneStaffSpace);
+        this.chordDiagramStringSpacing = Math.ceil(1.1 * this.oneStaffSpace);
+        this.chordDiagramFretSpacing = Math.ceil(1.3 * this.oneStaffSpace);
+        this.chordDiagramNutHeight = Math.ceil(0.33 * this.oneStaffSpace);
+        this.chordDiagramFretHeight = Math.ceil(0.1 * this.oneStaffSpace);
+        this.chordDiagramLineWidth = Math.ceil(0.11 * this.oneStaffSpace);
 
         this.tripletFeelTripletPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
@@ -429,6 +445,7 @@ export class SmuflMetrics {
     public tuningGlyphCircleNumberScale = 0.7;
     public tuningGlyphStringColumnScale = 1.5;
     public tuningGlyphRowPadding = 0;
+    public directionsScale = 0.6;
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata
@@ -492,9 +509,17 @@ export class SmuflMetrics {
                     bBoxNE: [0.992, 2.316],
                     bBoxSW: [-0.168, -0.708]
                 },
+                accidentalQuarterToneSharpNaturalArrowUp: {
+                    bBoxNE: [0.848, 2.188],
+                    bBoxSW: [-0.104, -1.36]
+                },
                 accidentalSharp: {
                     bBoxNE: [0.996, 1.4],
                     bBoxSW: [0, -1.392]
+                },
+                accidentalThreeQuarterTonesSharpArrowUp: {
+                    bBoxNE: [1.1, 2.12],
+                    bBoxSW: [0, -1.388]
                 },
                 arrowheadBlackDown: {
                     bBoxNE: [0.912, 1.196],
@@ -1096,9 +1121,9 @@ export class SmuflMetrics {
                     bBoxNE: [1.004, 0.5],
                     bBoxSW: [0, -0.5]
                 },
-                noteheadSlashVerticalEnds: {
-                    bBoxNE: [1.46, 0.996],
-                    bBoxSW: [0, -1.004]
+                noteheadSlashHorizontalEnds: {
+                    bBoxNE: [2.12, 1],
+                    bBoxSW: [0, -1]
                 },
                 noteheadSlashWhiteHalf: {
                     bBoxNE: [3.12, 1],
@@ -1283,6 +1308,30 @@ export class SmuflMetrics {
                 repeatDot: {
                     bBoxNE: [0.4, 0.2],
                     bBoxSW: [0, -0.2]
+                },
+                rest128th: {
+                    bBoxNE: [1.94, 2.756],
+                    bBoxSW: [0, -3]
+                },
+                rest16th: {
+                    bBoxNE: [1.28, 0.716],
+                    bBoxSW: [0, -2]
+                },
+                rest256th: {
+                    bBoxNE: [2.164, 2.784],
+                    bBoxSW: [0, -4]
+                },
+                rest32nd: {
+                    bBoxNE: [1.452, 1.704],
+                    bBoxSW: [0, -2]
+                },
+                rest64th: {
+                    bBoxNE: [1.692, 1.72],
+                    bBoxSW: [0, -3.012]
+                },
+                rest8th: {
+                    bBoxNE: [0.988, 0.696],
+                    bBoxSW: [0, -1.004]
                 },
                 restDoubleWhole: {
                     bBoxNE: [0.5, 1],
@@ -1518,11 +1567,19 @@ export class SmuflMetrics {
                     cutOutNE: [0.604, 0.664],
                     cutOutSE: [0.62, -0.452]
                 },
+                accidentalQuarterToneSharpNaturalArrowUp: {
+                    cutOutSW: [0.616, -0.868]
+                },
                 accidentalSharp: {
                     cutOutNE: [0.84, 0.896],
                     cutOutNW: [0.144, 0.568],
                     cutOutSE: [0.84, -0.596],
                     cutOutSW: [0.144, -0.896]
+                },
+                accidentalThreeQuarterTonesSharpArrowUp: {
+                    cutOutNW: [0.272, 1.304],
+                    cutOutSE: [0.86, -0.584],
+                    cutOutSW: [0.132, -0.888]
                 },
                 dynamicFF: {
                     opticalCenter: [1.852, 0]
@@ -1818,9 +1875,9 @@ export class SmuflMetrics {
                     stemDownNW: [0, 0],
                     stemUpSE: [1.004, 0]
                 },
-                noteheadSlashVerticalEnds: {
-                    stemDownNW: [0, -0.664],
-                    stemUpSE: [1.46, 0.656]
+                noteheadSlashHorizontalEnds: {
+                    stemDownNW: [0, -1],
+                    stemUpSE: [2.12, 1]
                 },
                 noteheadSlashWhiteHalf: {
                     stemDownNW: [0, -1],

@@ -20,6 +20,6 @@ export class NumberedDashGlyph extends Glyph {
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.NumberedDuration, this._beat);
         const padding = this.renderer.smuflMetrics.numberedDashGlyphPadding;
-        canvas.fillRect(cx + this.x, cy + this.y, this.width - padding, this.height);
+        canvas.fillRect(cx + this.x, Math.ceil(cy + this.y - this.height), this.width - padding, this.height);
     }
 }

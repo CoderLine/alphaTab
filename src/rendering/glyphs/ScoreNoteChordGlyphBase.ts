@@ -67,6 +67,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             if (i > 0 && Math.abs(lastStep - this._infos[i].steps) <= 1) {
                 if (!lastDisplaced) {
                     anyDisplaced = true;
+                    lastDisplaced = true;
                     displaced.set(i, true);
                 } else {
                     lastDisplaced = false;
@@ -80,6 +81,11 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
             if (smufl.stemUp.has(g.symbol)) {
                 const stemInfo = smufl.stemUp.get(g.symbol)!;
                 const topX = stemInfo.topX * scale;
+                if (topX > stemUpX) {
+                    stemUpX = topX;
+                }
+            } else {
+                const topX = smufl.glyphWidths.get(g.symbol)! * scale;
                 if (topX > stemUpX) {
                     stemUpX = topX;
                 }

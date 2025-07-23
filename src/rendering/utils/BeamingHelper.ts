@@ -56,6 +56,7 @@ export class BeamingHelper {
     public voice: Voice | null = null;
     public beats: Beat[] = [];
     public shortestDuration: Duration = Duration.QuadrupleWhole;
+    public tremoloDuration?: Duration;
 
     /**
      * an indicator whether any beat has a tuplet on it.
@@ -184,7 +185,7 @@ export class BeamingHelper {
 
             if (direction === null) {
                 const avg = (highestNotePosition + lowestNotePosition) / 2;
-                direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);                
+                direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
             }
 
             this._renderer.completeBeamingHelper(this);
@@ -278,6 +279,7 @@ export class BeamingHelper {
         if (!this.voice) {
             this.voice = beat.voice;
         }
+
         // allow adding if there are no beats yet
         let add: boolean = false;
         if (this.beats.length === 0) {
@@ -304,6 +306,12 @@ export class BeamingHelper {
 
             if (beat.hasTuplet) {
                 this.hasTuplet = true;
+            }
+
+            if (beat.isTremolo) {
+                if (!this.tremoloDuration || this.tremoloDuration < beat.tremoloSpeed!) {
+                    this.tremoloDuration = beat.tremoloSpeed!;
+                }
             }
 
             if (beat.graceType !== GraceType.None) {

@@ -2923,7 +2923,7 @@ export class MusicXmlImporter extends ScoreImporter {
                     MusicFontSymbol.NoteheadSlashWhiteWhole,
                     MusicFontSymbol.NoteheadSlashWhiteWhole,
                     MusicFontSymbol.NoteheadSlashWhiteHalf,
-                    MusicFontSymbol.NoteheadSlashVerticalEnds
+                    MusicFontSymbol.NoteheadSlashHorizontalEnds
                 );
                 break;
             case 'slashed':

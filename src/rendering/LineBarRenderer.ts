@@ -72,7 +72,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected updateFirstLineY() {
         const fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
         const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
-        this.firstLineY = ((this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0);
+        this.firstLineY = (this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0;
     }
 
     public override doLayout(): void {
@@ -130,7 +130,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         // but to have lines until the full end-pixel we round up.
         // this way we avoid holes
         const lineWidth = this.width;
-        
+
         // we want the lines to be exactly virtually aligned with the respective Y-position
         // for note heads to align correctly
         const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
@@ -322,7 +322,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             //
             // Calculate the overall area of the tuplet bracket
-            const firstBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstBeat.index)!;
             const startX: number = this.getBeatX(firstBeat, BeatXPosition.OnNotes) - this.beatGlyphsStart;
             const endX: number = this.getBeatX(lastBeat, BeatXPosition.PostNotes) - this.beatGlyphsStart;
 
@@ -330,7 +329,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             // calculate the y positions for our bracket
             const firstNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(firstNonRestBeat.index)!;
             const lastNonRestBeamingHelper = this.helpers.beamHelperLookup[h.voice.index].get(lastNonRestBeat.index)!;
-            const direction = this.getTupletBeamDirection(firstBeamingHelper);
+            const direction = this.getTupletBeamDirection(firstNonRestBeamingHelper);
             let startY: number = this.calculateBeamYWithDirection(firstNonRestBeamingHelper, startX, direction);
             let endY: number = this.calculateBeamYWithDirection(lastNonRestBeamingHelper, endX, direction);
             if (isRestOnly) {
@@ -374,34 +373,36 @@ export abstract class LineBarRenderer extends BarRendererBase {
             cx += pixelAlignment;
             cy += pixelAlignment;
 
-            canvas.beginPath();
-            canvas.moveTo(cx + this.x + startX, cy + this.y + angleStartY);
-            if (bracketsAsArcs) {
-                canvas.quadraticCurveTo(
-                    cx + this.x + (offset1X + startX) / 2,
-                    cy + this.y + offset1Y,
-                    cx + this.x + offset1X,
-                    cy + this.y + offset1Y
-                );
-            } else {
-                canvas.lineTo(cx + this.x + startX, cy + this.y + startY);
-                canvas.lineTo(cx + this.x + offset1X, cy + this.y + offset1Y);
-            }
+            if (offset1X > startX) {
+                canvas.beginPath();
+                canvas.moveTo(cx + this.x + startX, cy + this.y + angleStartY);
+                if (bracketsAsArcs) {
+                    canvas.quadraticCurveTo(
+                        cx + this.x + (offset1X + startX) / 2,
+                        cy + this.y + offset1Y,
+                        cx + this.x + offset1X,
+                        cy + this.y + offset1Y
+                    );
+                } else {
+                    canvas.lineTo(cx + this.x + startX, cy + this.y + startY);
+                    canvas.lineTo(cx + this.x + offset1X, cy + this.y + offset1Y);
+                }
 
-            canvas.moveTo(cx + this.x + offset2X, cy + this.y + offset2Y);
-            if (bracketsAsArcs) {
-                canvas.quadraticCurveTo(
-                    cx + this.x + (endX + offset2X) / 2,
-                    cy + this.y + offset2Y,
-                    cx + this.x + endX,
-                    cy + this.y + angleEndY
-                );
-            } else {
-                canvas.lineTo(cx + this.x + endX, cy + this.y + endY);
-                canvas.lineTo(cx + this.x + endX, cy + this.y + angleEndY);
-            }
+                canvas.moveTo(cx + this.x + offset2X, cy + this.y + offset2Y);
+                if (bracketsAsArcs) {
+                    canvas.quadraticCurveTo(
+                        cx + this.x + (endX + offset2X) / 2,
+                        cy + this.y + offset2Y,
+                        cx + this.x + endX,
+                        cy + this.y + angleEndY
+                    );
+                } else {
+                    canvas.lineTo(cx + this.x + endX, cy + this.y + endY);
+                    canvas.lineTo(cx + this.x + endX, cy + this.y + angleEndY);
+                }
 
-            canvas.stroke();
+                canvas.stroke();
+            }
 
             //
             // Draw the string
@@ -509,7 +510,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
             }
 
             this.paintBeamingStem(beat, cy + this.y, cx + this.x + beatLineX, topY, bottomY, canvas);
-            this.paintStemEffects(beat, cy + this.y, cx + this.x + beatLineX, topY, bottomY, canvas);
 
             using _ = ElementStyleHelper.beat(canvas, flagsElement, beat);
 
@@ -564,32 +564,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
         bottomY: number,
         canvas: ICanvas
     ): void;
-
-    protected paintStemEffects(
-        beat: Beat,
-        _cy: number,
-        x: number,
-        topY: number,
-        bottomY: number,
-        canvas: ICanvas
-    ): void {
-        if (beat.isTremolo && !beat.deadSlapped) {
-            let tremoloGlyph = MusicFontSymbol.None;
-            switch (beat.tremoloSpeed!) {
-                case Duration.ThirtySecond:
-                    tremoloGlyph = MusicFontSymbol.Tremolo3;
-                    break;
-                case Duration.Sixteenth:
-                    tremoloGlyph = MusicFontSymbol.Tremolo2;
-                    break;
-                case Duration.Eighth:
-                    tremoloGlyph = MusicFontSymbol.Tremolo1;
-                    break;
-            }
-
-            canvas.fillMusicFontSymbol(x, (topY + bottomY) / 2, 1, tremoloGlyph, false);
-        }
-    }
 
     protected getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
         let size: number = 0;

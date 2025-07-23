@@ -4,13 +4,12 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
-import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { NoteSubElement } from '@src/model/Note';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
-export class SlashNoteHeadGlyph extends EffectGlyph {
-    private _isGrace: boolean;
+export class SlashNoteHeadGlyph extends MusicFontGlyph {
 
     public beatEffects: Map<string, Glyph> = new Map();
     public beamingHelper!: BeamingHelper;
@@ -19,8 +18,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     private _symbol: MusicFontSymbol;
 
     public constructor(x: number, y: number, duration: Duration, isGrace: boolean, beat: Beat) {
-        super(x, y);
-        this._isGrace = isGrace;
+        super(x, y, isGrace ? NoteHeadGlyph.GraceScale : 1, SlashNoteHeadGlyph.getSymbol(duration));
         this._symbol = SlashNoteHeadGlyph.getSymbol(duration);
         this.beat = beat;
     }
@@ -30,9 +28,7 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
             this.beat!.notes.length === 0
                 ? undefined
                 : ElementStyleHelper.note(canvas, this.noteHeadElement, this.beat!.notes[0]);
-        const glyphScale = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y, glyphScale, this._symbol, false);
-
+        super.paint(cx, cy, canvas);
         this.paintEffects(cx, cy, canvas);
     }
     private paintEffects(cx: number, cy: number, canvas: ICanvas) {
@@ -43,13 +39,11 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        const scale: number = this._isGrace ? NoteHeadGlyph.GraceScale : 1;
-
-        this.width = this.renderer.smuflMetrics.glyphWidths.get(this._symbol)! * scale;
-        this.height = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)! * scale;
+        super.doLayout();
 
         const effectSpacing: number = this.renderer.smuflMetrics.effectSpacing;
         let effectY = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
+
         for (const g of this.beatEffects.values()) {
             g.y += effectY;
             g.x += this.width / 2;
@@ -68,13 +62,26 @@ export class SlashNoteHeadGlyph extends EffectGlyph {
             case Duration.Half:
                 return MusicFontSymbol.NoteheadSlashWhiteHalf;
             default:
-                return MusicFontSymbol.NoteheadSlashVerticalEnds;
+                return MusicFontSymbol.NoteheadSlashHorizontalEnds;
         }
     }
 
     public updateBeamingHelper(cx: number) {
         if (this.beamingHelper) {
-            this.beamingHelper.registerBeatLineX('slash', this.beat!, cx + this.x + this.width, cx + this.x);
+            const symbol = this._symbol;
+            const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
+                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.topX
+                : 0;
+            const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
+                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topX
+                : 0;
+
+            this.beamingHelper.registerBeatLineX(
+                'slash',
+                this.beat!,
+                cx + this.x + stemInfoUp,
+                cx + this.x + stemInfoDown
+            );
         }
     }
 }

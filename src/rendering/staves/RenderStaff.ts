@@ -269,6 +269,8 @@ export class RenderStaff {
         if (this.height > 0) {
             this.height += this.topSpacing + topOverflow + this.bottomOverflow + this.bottomSpacing;
         }
+
+        this.height = Math.ceil(this.height);
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {

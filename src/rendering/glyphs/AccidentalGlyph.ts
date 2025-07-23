@@ -16,9 +16,9 @@ export class AccidentalGlyph extends MusicFontGlyph {
             case AccidentalType.Flat:
                 return MusicFontSymbol.AccidentalFlat;
             case AccidentalType.NaturalQuarterNoteUp:
-                return MusicFontSymbol.AccidentalQuarterToneNaturalArrowUp;
+                return MusicFontSymbol.AccidentalQuarterToneSharpNaturalArrowUp;
             case AccidentalType.SharpQuarterNoteUp:
-                return MusicFontSymbol.AccidentalQuarterToneSharpArrowUp;
+                return MusicFontSymbol.AccidentalThreeQuarterTonesSharpArrowUp;
             case AccidentalType.FlatQuarterNoteUp:
                 return MusicFontSymbol.AccidentalQuarterToneFlatArrowUp;
             case AccidentalType.DoubleSharp:

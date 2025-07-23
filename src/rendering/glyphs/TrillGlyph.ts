@@ -29,6 +29,6 @@ export class TrillGlyph extends GroupedEffectGlyph {
             symbols.push(MusicFontSymbol.WiggleTrill);
         }
 
-        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, 1, symbols, false);
+        canvas.fillMusicFontSymbols(cx + this.x - trillSize / 2, cy + this.y + this.height, 1, symbols, false);
     }
 }

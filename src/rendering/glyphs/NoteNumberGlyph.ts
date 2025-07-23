@@ -99,7 +99,7 @@ export class NoteNumberGlyph extends Glyph {
             return;
         }
         const textWidth: number = this.noteStringWidth + this._trillNoteStringWidth;
-        const x: number = cx + this.x + (this.width - textWidth) / 2;
+        const x: number = (cx + this.x + (this.width - textWidth) / 2);
 
         this.paintTrill(x, cy, canvas);
 

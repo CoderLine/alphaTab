@@ -11,13 +11,17 @@ export enum TechniqueSymbolPlacement {
      */
     Above = 0,
     /**
-     * Symbol is shown inside
+     * Symbol is shown inside.
      */
     Inside = 1,
     /**
      * Symbol is shown below.
      */
-    Below = 2
+    Below = 2,
+    /**
+     * Symbol is shown outside.
+     */
+    Outside = 3
 }
 
 /**

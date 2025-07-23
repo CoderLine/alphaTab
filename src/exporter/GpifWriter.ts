@@ -1722,6 +1722,9 @@ export class GpifWriter {
                     case TechniqueSymbolPlacement.Below:
                         articulationNode.addElement('TechniquePlacement').innerText = 'below';
                         break;
+                    case TechniqueSymbolPlacement.Outside:
+                        articulationNode.addElement('TechniquePlacement').innerText = 'outside';
+                        break;
                     case TechniqueSymbolPlacement.Inside:
                         articulationNode.addElement('TechniquePlacement').innerText = 'inside';
                         break;

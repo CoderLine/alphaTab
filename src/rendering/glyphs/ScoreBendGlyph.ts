@@ -128,7 +128,7 @@ export class ScoreBendGlyph extends ScoreHelperNotesBaseGlyph {
         }
 
         if (this._endNoteGlyph) {
-            endBeatX -= this._endNoteGlyph.width;
+            endBeatX -= this._endNoteGlyph.upLineX;
         }
 
         const middleX: number = (startX + endBeatX) / 2;

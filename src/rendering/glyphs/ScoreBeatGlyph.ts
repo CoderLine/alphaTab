@@ -29,17 +29,18 @@ import { PickStroke } from '@src/model/PickStroke';
 import { GuitarGolpeGlyph } from '@src/rendering/glyphs/GuitarGolpeGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { StringNumberContainerGlyph } from '@src/rendering/glyphs/StringNumberContainerGlyph';
-import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 import { BeatSubElement } from '@src/model/Beat';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
+import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
+import { BeamDirection } from '@src/rendering/_barrel';
+import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 
 export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
     private _collisionOffset: number = -1000;
     private _skipPaint: boolean = false;
 
-    public slash: SlashNoteHeadGlyph | null = null;
     public noteHeads: ScoreNoteChordGlyph | null = null;
     public restGlyph: ScoreRestGlyph | null = null;
 
@@ -91,8 +92,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                     this._skipPaint = true;
                 }
             }
-        } else if (this.slash) {
-            this.slash.updateBeamingHelper(this.container.x + this.x);
         }
     }
 
@@ -107,43 +106,26 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         if (!this.container.beat.isEmpty) {
             if (!this.container.beat.isRest) {
-                if (this.container.beat.slashed) {
-                    const isGrace = this.container.beat.graceType !== GraceType.None;
-                    const line = (sr.heightLineCount - 1) / 2;
-                    const slashY = sr.getLineY(line);
-                    const slashNoteHead = new SlashNoteHeadGlyph(
-                        0,
-                        slashY,
-                        this.container.beat.duration,
-                        isGrace,
-                        this.container.beat
-                    );
-                    slashNoteHead.noteHeadElement = NoteSubElement.StandardNotationNoteHead;
-                    slashNoteHead.effectElement = BeatSubElement.StandardNotationEffects;
-                    this.slash = slashNoteHead;
-                    slashNoteHead.beat = this.container.beat;
-                    slashNoteHead.beamingHelper = this.beamingHelper;
-                    this.addNormal(slashNoteHead);
-                } else {
-                    //
-                    // Note heads
-                    //
-                    const noteHeads = new ScoreNoteChordGlyph();
-                    this.noteHeads = noteHeads;
-                    noteHeads.beat = this.container.beat;
-                    noteHeads.beamingHelper = this.beamingHelper;
-                    const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
-                    ghost.renderer = this.renderer;
-                    for (const note of this.container.beat.notes) {
-                        if (note.isVisible) {
-                            this.createNoteGlyph(note);
-                            ghost.addParenthesis(note);
-                        }
+                //
+                // Note heads
+                //
+                const noteHeads = new ScoreNoteChordGlyph();
+                this.noteHeads = noteHeads;
+                noteHeads.beat = this.container.beat;
+                noteHeads.beamingHelper = this.beamingHelper;
+                const ghost: GhostNoteContainerGlyph = new GhostNoteContainerGlyph(false);
+                ghost.renderer = this.renderer;
+
+                for (const note of this.container.beat.notes) {
+                    if (note.isVisible && (!note.beat.slashed || note.index === 0)) {
+                        this.createNoteGlyph(note);
+                        ghost.addParenthesis(note);
                     }
-                    this.addNormal(noteHeads);
-                    if (!ghost.isEmpty) {
-                        this.addEffect(ghost);
-                    }
+                }
+
+                this.addNormal(noteHeads);
+                if (!ghost.isEmpty) {
+                    this.addEffect(ghost);
                 }
 
                 //
@@ -227,8 +209,6 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             this.centerX = this.restGlyph!.x + this.restGlyph!.width / 2;
         } else if (this.noteHeads) {
             this.centerX = this.noteHeads!.x + this.noteHeads!.width / 2;
-        } else if (this.slash) {
-            this.centerX = this.slash!.x + this.slash!.width / 2;
         }
     }
 
@@ -263,6 +243,11 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
             }
             Logger.warning('Rendering', `No articulation found for percussion instrument ${n.percussionArticulation}`);
         }
+
+        if (n.beat.slashed) {
+            return new SlashNoteHeadGlyph(0, 0, n.beat.duration, isGrace, n.beat);
+        }
+
         if (n.isDead) {
             return new DeadNoteHeadGlyph(0, 0, isGrace);
         }
@@ -289,10 +274,17 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         );
 
         // calculate y position
-        let line: number = sr.getNoteLine(n);
+        let line: number;
+        if (n.beat.slashed) {
+            line = (sr.heightLineCount - 1);
+        } else {
+            line = sr.getNoteLine(n);
+        }
+
         noteHeadGlyph.y = sr.getScoreY(line);
         this.noteHeads!.addMainNoteGlyph(noteHeadGlyph, n, line);
-        if (n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
+
+        if (!n.beat.slashed && n.harmonicType !== HarmonicType.None && n.harmonicType !== HarmonicType.Natural) {
             // create harmonic note head.
             const harmonicFret: number = n.displayValue + n.harmonicPitch;
             const harmonicsGlyph = new DiamondNoteHeadGlyph(
@@ -309,18 +301,22 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
 
         const belowBeatEffects = this.noteHeads!.belowBeatEffects;
         const aboveBeatEffects = this.noteHeads!.aboveBeatEffects;
+        const outsideBeatEffects: Map<string, EffectGlyph> =
+            this.beamingHelper.direction === BeamDirection.Up
+                ? this.noteHeads!.belowBeatEffects
+                : this.noteHeads!.aboveBeatEffects;
 
         if (n.isStaccato && !belowBeatEffects.has('Staccato')) {
-            belowBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
+            outsideBeatEffects.set('Staccato', new ArticStaccatoAboveGlyph(0, 0));
         }
         if (n.accentuated === AccentuationType.Normal && !belowBeatEffects.has('Accent')) {
-            belowBeatEffects.set('Accent', new AccentuationGlyph(0, 0, n));
+            outsideBeatEffects.set('Accent', new AccentuationGlyph(0, 0, n));
         }
         if (n.accentuated === AccentuationType.Heavy && !belowBeatEffects.has('HAccent')) {
-            belowBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, n));
+            outsideBeatEffects.set('HAccent', new AccentuationGlyph(0, 0, n));
         }
         if (n.accentuated === AccentuationType.Tenuto && !belowBeatEffects.has('Tenuto')) {
-            belowBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
+            outsideBeatEffects.set('Tenuto', new AccentuationGlyph(0, 0, n));
         }
         if (n.showStringNumber && n.isStringed) {
             let container: StringNumberContainerGlyph;
@@ -335,10 +331,21 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
         if (n.isPercussion) {
             const articulation = PercussionMapper.getArticulation(n);
             if (articulation && articulation.techniqueSymbolPlacement !== TechniqueSymbolPlacement.Inside) {
-                const effectContainer =
-                    articulation.techniqueSymbolPlacement === TechniqueSymbolPlacement.Above
-                        ? this.noteHeads!.aboveBeatEffects
-                        : this.noteHeads!.belowBeatEffects;
+                let effectContainer: Map<string, EffectGlyph>;
+
+                switch (articulation.techniqueSymbolPlacement) {
+                    case TechniqueSymbolPlacement.Above:
+                        effectContainer = this.noteHeads!.aboveBeatEffects;
+                        break;
+                    case TechniqueSymbolPlacement.Below:
+                        effectContainer = this.noteHeads!.belowBeatEffects;
+                        break;
+                    case TechniqueSymbolPlacement.Outside:
+                        effectContainer = outsideBeatEffects;
+                        break;
+                    default:
+                        return;
+                }
 
                 switch (articulation.techniqueSymbol) {
                     case MusicFontSymbol.PictEdgeOfCymbal:
@@ -354,7 +361,7 @@ export class ScoreBeatGlyph extends BeatOnNoteGlyphBase {
                         effectContainer.set('StringsDownBow', new PickStrokeGlyph(0, 0, PickStroke.Down));
                         break;
                     case MusicFontSymbol.GuitarGolpe:
-                        effectContainer.set('GuitarGolpe', new GuitarGolpeGlyph(0, 0));
+                        effectContainer.set('GuitarGolpe', new GuitarGolpeGlyph(0, 0, true));
                         break;
                 }
             }

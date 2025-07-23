@@ -92,14 +92,22 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(beat: Beat, _direction: BeamDirection): number {
+    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
         const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        return this.getLineY(0) - noteHeadHeight / 2 - this.getFlagStemSize(beat.duration, true);
+        let y = this.getLineY(0) - noteHeadHeight / 2;
+        if (direction === BeamDirection.Up) {
+            y -= this.getFlagStemSize(beat.duration, true);
+        }
+        return y;
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
+    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
         const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
+        let y = this.getLineY(0) - noteHeadHeight / 2;
+        if (direction === BeamDirection.Down) {
+            y += this.getFlagStemSize(beat.duration, true);
+        }
+        return y;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -186,8 +194,5 @@ export class SlashBarRenderer extends LineBarRenderer {
         canvas.lineTo(x, bottomY);
         canvas.stroke();
         canvas.lineWidth = lineWidth;
-    }
-
-    protected override paintStemEffects(beat: Beat, cy: number, x: number, topY: number, bottomY: number, canvas: ICanvas): void {
     }
 }

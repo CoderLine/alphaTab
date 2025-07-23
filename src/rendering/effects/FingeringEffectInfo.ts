@@ -54,7 +54,7 @@ export class FingeringEffectInfo extends EffectBarRendererInfo {
             finger = note.rightHandFinger;
         }
         const s: string = ModelUtils.fingerToString(renderer.settings, beat, finger, isLeft) ?? '';
-        return new TextGlyph(0, 0, s, renderer.resources.fingeringFont, TextAlign.Left);
+        return new TextGlyph(0, 0, s, renderer.resources.fingeringFont, TextAlign.Center);
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

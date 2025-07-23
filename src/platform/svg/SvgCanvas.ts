@@ -210,7 +210,7 @@ export abstract class SvgCanvas implements ICanvas {
         return FontSizes.measureString(
             text,
             this.font.families,
-            this.font.size * this.scale,
+            this.font.size,
             this.font.style,
             this.font.weight
         );

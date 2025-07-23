@@ -49,7 +49,6 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
             if (endX > startX) {
                 let lineX: number = startX;
                 while (lineX < endX) {
-                    canvas.beginPath();
                     const dashEndX = Math.min(lineX + dashSize, endX);
                     canvas.fillRect(lineX, lineY, dashEndX - lineX, dashThickness);
                     lineX += dashSize + dashGap;
@@ -58,7 +57,8 @@ export class LineRangedGlyph extends GroupedEffectGlyph {
                 canvas.fillRect(endX, lineY - dashSize / 2 + dashThickness / 2, dashThickness, dashSize);
             }
         } else {
-            canvas.fillRect(startX, lineY, dashThickness, dashThickness);
+            canvas.fillRect(startX, lineY, endX - startX, dashThickness);
+            canvas.fillRect(endX - dashThickness, lineY, dashThickness, dashSize / 2);
         }
     }
 }

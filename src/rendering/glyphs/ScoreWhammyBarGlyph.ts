@@ -147,7 +147,7 @@ export class ScoreWhammyBarGlyph extends ScoreHelperNotesBaseGlyph {
             }
 
             if (this._endGlyph) {
-                endX -= this._endGlyph.width;
+                endX -= this._endGlyph.upLineX;
             }
 
             const slurText: string = beat.whammyStyle === BendStyle.Gradual && i === 0 ? 'grad.' : '';

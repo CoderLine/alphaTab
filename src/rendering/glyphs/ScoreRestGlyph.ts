@@ -26,17 +26,17 @@ export class ScoreRestGlyph extends MusicFontGlyph {
             case Duration.Quarter:
                 return MusicFontSymbol.RestQuarter;
             case Duration.Eighth:
-                return MusicFontSymbol.RestEighth;
+                return MusicFontSymbol.Rest8th;
             case Duration.Sixteenth:
-                return MusicFontSymbol.RestSixteenth;
+                return MusicFontSymbol.Rest16th;
             case Duration.ThirtySecond:
-                return MusicFontSymbol.RestThirtySecond;
+                return MusicFontSymbol.Rest32nd;
             case Duration.SixtyFourth:
-                return MusicFontSymbol.RestSixtyFourth;
+                return MusicFontSymbol.Rest64th;
             case Duration.OneHundredTwentyEighth:
-                return MusicFontSymbol.RestOneHundredTwentyEighth;
+                return MusicFontSymbol.Rest128th;
             case Duration.TwoHundredFiftySixth:
-                return MusicFontSymbol.RestTwoHundredFiftySixth;
+                return MusicFontSymbol.Rest256th;
             default:
                 return MusicFontSymbol.None;
         }

@@ -23,12 +23,8 @@ export class MusicFontGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = this.renderer.smuflMetrics.glyphWidths.has(this.symbol)
-            ? this.renderer.smuflMetrics.glyphWidths.get(this.symbol)! * this.glyphScale
-            : 0;
-        this.height = this.renderer.smuflMetrics.glyphHeights.has(this.symbol)
-            ? this.renderer.smuflMetrics.glyphHeights.get(this.symbol)! * this.glyphScale
-            : 0;
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(this.symbol)!* this.glyphScale;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(this.symbol)! * this.glyphScale;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {

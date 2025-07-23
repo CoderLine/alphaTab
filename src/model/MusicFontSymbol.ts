@@ -107,7 +107,7 @@ export enum MusicFontSymbol {
     NoteheadHeavyX = 0xe0f8,
     NoteheadHeavyXHat = 0xe0f9,
 
-    NoteheadSlashVerticalEnds = 0xe100,
+    NoteheadSlashHorizontalEnds = 0xe101,
     NoteheadSlashWhiteWhole = 0xe102,
     NoteheadSlashWhiteHalf = 0xe103,
 
@@ -193,8 +193,8 @@ export enum MusicFontSymbol {
     AccidentalDoubleSharp = 0xe263,
     AccidentalDoubleFlat = 0xe264,
     AccidentalQuarterToneFlatArrowUp = 0xe270,
-    AccidentalQuarterToneSharpArrowUp = 0xe274,
-    AccidentalQuarterToneNaturalArrowUp = 0xe272,
+    AccidentalQuarterToneSharpNaturalArrowUp = 0xe272,
+    AccidentalThreeQuarterTonesSharpArrowUp = 0xe274,
 
     RepeatDot = 0xe044,
     Segno = 0xe047,
@@ -218,12 +218,12 @@ export enum MusicFontSymbol {
     RestWhole = 0xe4e3,
     RestHalf = 0xe4e4,
     RestQuarter = 0xe4e5,
-    RestEighth = 0xe4e6,
-    RestSixteenth = 0xe4e7,
-    RestThirtySecond = 0xe4e8,
-    RestSixtyFourth = 0xe4e9,
-    RestOneHundredTwentyEighth = 0xe4ea,
-    RestTwoHundredFiftySixth = 0xe4eb,
+    Rest8th = 0xe4e6,
+    Rest16th = 0xe4e7,
+    Rest32nd = 0xe4e8,
+    Rest64th = 0xe4e9,
+    Rest128th = 0xe4ea,
+    Rest256th = 0xe4eb,
 
     RestHBarLeft = 0xe4ef,
     RestHBarMiddle = 0xe4f0,

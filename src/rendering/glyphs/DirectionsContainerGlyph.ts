@@ -6,6 +6,7 @@ import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
 
 class TargetDirectionGlyph extends Glyph {
     private _symbols: MusicFontSymbol[];
+    private _scale = 1;
 
     constructor(symbols: MusicFontSymbol[]) {
         super(0, 0);
@@ -14,8 +15,11 @@ class TargetDirectionGlyph extends Glyph {
 
     public override doLayout(): void {
         this.height = 0;
+        // NOTE: It's nowhere documented explicitly in SMuFL but it appears direction symbols need to be scaled down
+        const scale = this.renderer.smuflMetrics.directionsScale;
+        this._scale = scale;
         for (const s of this._symbols) {
-            const h = this.renderer.smuflMetrics.glyphHeights.get(s)!;
+            const h = this.renderer.smuflMetrics.glyphHeights.get(s)! * scale;
             if (h > this.height) {
                 this.height = h;
             }
@@ -23,7 +27,7 @@ class TargetDirectionGlyph extends Glyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, 1, this._symbols, true);
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, this._scale, this._symbols, true);
     }
 }
 

@@ -99,7 +99,6 @@ export class TripletFeelGlyph extends EffectGlyph {
 
     private drawGroup(cx: number, cy: number, canvas: ICanvas, group: TripletFeelNoteGroup) {
         const noteScale = this.renderer.smuflMetrics.tempoNoteScale;
-        const noteSpacing = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale;
 
         let leftNote: MusicFontSymbol[] = [];
         let rightNote: MusicFontSymbol[] = [];
@@ -191,6 +190,7 @@ export class TripletFeelGlyph extends EffectGlyph {
                 break;
         }
 
+        const noteSpacing = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale;
         const beamStartX = cx + noteSpacing - this.renderer.smuflMetrics.stemThickness * noteScale;
         const beamEndX = beamStartX + noteSpacing * 2 + this.renderer.smuflMetrics.stemThickness * noteScale;
         const beamHeight = this.renderer.smuflMetrics.tempoNoteScale * this.renderer.smuflMetrics.beamThickness;
@@ -238,7 +238,9 @@ export class TripletFeelGlyph extends EffectGlyph {
 
         canvas.fillMusicFontSymbols(cx, cy, noteScale, rightNote, false);
         cx += noteSpacing;
-        if (rightNote[rightNote.length - 1] === MusicFontSymbol.MetAugmentationDot) {
+        if (rightNote[rightNote.length - 1] === MusicFontSymbol.MetAugmentationDot ||
+            rightNote[0] === MusicFontSymbol.MetNote8thUp
+        ) {
             cx += noteSpacing;
         }
 

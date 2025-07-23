@@ -756,8 +756,7 @@ export class GpifParser {
                 case 'TechniquePlacement':
                     switch (txt) {
                         case 'outside':
-                            // TODO: outside support
-                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Below;
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Outside;
                             break;
                         case 'inside':
                             articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Inside;

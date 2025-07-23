@@ -77,6 +77,7 @@ export class BeatContainerGlyph extends Glyph {
         this.onNotes.renderer = this.renderer;
         this.onNotes.container = this;
         this.onNotes.doLayout();
+        this.onNotes.updateBeamingHelper();
         let i: number = this.beat.notes.length - 1;
         while (i >= 0) {
             this.createTies(this.beat.notes[i--]);

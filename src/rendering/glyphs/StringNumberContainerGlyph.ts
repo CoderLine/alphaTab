@@ -22,12 +22,11 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         let y = 0;
         const circleHeight =
             this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
-        const noteHeadHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         for (const s of this._strings) {
             const stringValue = tuningLength - s;
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
             canvas.fillMusicFontSymbol(
-                cx + this.x + noteHeadHeight / 2,
+                cx + this.x,
                 cy + this.y + circleHeight + y,
                 this.renderer.smuflMetrics.tuningGlyphCircleNumberScale,
                 symbol,

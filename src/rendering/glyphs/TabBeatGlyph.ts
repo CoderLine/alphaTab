@@ -13,6 +13,7 @@ import type { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBas
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { BeatSubElement } from '@src/model/Beat';
 import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
+import { TremoloPickingGlyph } from '@src/rendering/glyphs/TremoloPickingGlyph';
 
 export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public slash: SlashNoteHeadGlyph | null = null;
@@ -48,11 +49,14 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
     public override doLayout(): void {
         const tabRenderer: TabBarRenderer = this.renderer as TabBarRenderer;
 
+        const centeredEffectGlyphs:Glyph[]=[];
         if (!this.container.beat.isRest) {
             //
             // Note numbers
             const isGrace: boolean =
                 this.renderer.settings.notation.smallGraceTabNotes && this.container.beat.graceType !== GraceType.None;
+
+            let beatEffects: Map<string, Glyph>;
 
             if (this.container.beat.slashed && !this.container.beat.notes.some(x => x.isTieDestination as boolean)) {
                 const line = Math.floor((this.renderer.bar.staff.tuning.length - 1) / 2);
@@ -70,6 +74,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 slashNoteHead.beat = this.container.beat;
                 slashNoteHead.beamingHelper = this.beamingHelper;
                 this.addNormal(slashNoteHead);
+                beatEffects = slashNoteHead.beatEffects;
             } else {
                 const tabNoteNumbers = new TabNoteChordGlyph(0, 0, isGrace);
                 this.noteNumbers = tabNoteNumbers;
@@ -81,6 +86,7 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                     }
                 }
                 this.addNormal(tabNoteNumbers);
+                beatEffects = tabNoteNumbers.beatEffects;
             }
 
             //
@@ -91,6 +97,17 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
                 whammy.doLayout();
                 this.container.ties.push(whammy);
             }
+
+            //
+            // Tremolo Picking
+            if (this.container.beat.isTremolo && !beatEffects.has('tremolo')) {
+                const speed = this.container.beat.tremoloSpeed!;
+                const glyph = new TremoloPickingGlyph(0, 0, speed);
+                glyph.offsetY = this.renderer.smuflMetrics.glyphTop.get(glyph.symbol)!;
+                beatEffects.set('tremolo', glyph);
+                centeredEffectGlyphs.push(glyph);
+            }
+
             //
             // Note dots
             //
@@ -144,6 +161,10 @@ export class TabBeatGlyph extends BeatOnNoteGlyphBase {
             this.centerX = this.noteNumbers!.x + this.noteNumbers!.noteStringWidth / 2;
         } else if (this.slash) {
             this.centerX = this.slash!.x + this.slash!.width / 2;
+        }
+
+        for(const g of centeredEffectGlyphs) {
+            g.x = this.centerX;
         }
     }
 

@@ -192,15 +192,8 @@ export class NumberedBarRenderer extends LineBarRenderer {
                     barEndX = this.getBeatX(h.beats[i + 1], BeatXPosition.PreNotes) - this.beatGlyphsStart;
                 }
 
-                barStartY = (barY + beamY) | 0;
-                LineBarRenderer.paintSingleBar(
-                    canvas,
-                    cx + this.x + barStartX,
-                    barStartY,
-                    cx + this.x + barEndX,
-                    barStartY,
-                    barSize
-                );
+                barStartY = barY + beamY;
+                canvas.fillRect(cx + this.x + barStartX, barStartY, barEndX - barStartX, barSize);
             }
 
             const onNotes = this.getBeatContainer(beat)!.onNotes;
@@ -209,7 +202,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             let dotsY = 0;
             let dotsOffset = 0;
             if (dotCount > 0) {
-                dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size / 1.5;
+                dotsY = barStart + this.getLineY(0) - res.numberedNotationFont.size;
                 dotsOffset = dotSpacing * -1;
             } else if (dotCount < 0) {
                 dotsY = barStart + beamY + barCount * (barSpacing + barSize);
@@ -231,17 +224,18 @@ export class NumberedBarRenderer extends LineBarRenderer {
     }
 
     public override get tupletOffset(): number {
-        return this.smuflMetrics.oneStaffSpace + this.resources.numberedNotationFont.size;
+        // Shift tuplet above the number by: 
+        // * 1 to get back to the center (calculateBeamYWithDirection places the beam below the number)
+        // * 1.5 to get back to the top of the number
+        return super.tupletOffset + this.resources.numberedNotationFont.size * 1.5;
     }
 
     protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
+        return this.getLineY(0) - this.resources.numberedNotationFont.size;
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
+        return this.getLineY(0) - this.resources.numberedNotationFont.size;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -345,15 +339,6 @@ export class NumberedBarRenderer extends LineBarRenderer {
     protected override paintBeamingStem(
         _beat: Beat,
         _cy: number,
-        x: number,
-        topY: number,
-        bottomY: number,
-        canvas: ICanvas
-    ): void {}
-
-    protected override paintStemEffects(
-        beat: Beat,
-        cy: number,
         x: number,
         topY: number,
         bottomY: number,

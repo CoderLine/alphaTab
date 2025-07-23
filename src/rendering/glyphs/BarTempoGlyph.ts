@@ -45,6 +45,9 @@ export class BarTempoGlyph extends EffectGlyph {
                 canvas.fillText(text, x, notePosY);
                 x += size.width;
             }
+            else {
+                x -= res.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! / 2;
+            }
 
             canvas.fillMusicFontSymbol(x, notePosY, res.smuflMetrics.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
             x +=

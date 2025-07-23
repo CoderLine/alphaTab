@@ -21,6 +21,7 @@ import { GraceType } from '@src/model/GraceType';
 import type { ReservedLayoutAreaSlot } from '@src/rendering/utils/BarCollisionHelper';
 import { MultiBarRestBeatContainerGlyph } from '@src/rendering/MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
@@ -128,6 +129,27 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override adjustSizes(): void {
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
+            let shortestTremolo = Duration.Whole;
+            for (const b of this.helpers.beamHelpers) {
+                for (const h of b) {
+                    if (h.tremoloDuration && (!shortestTremolo || shortestTremolo < h.tremoloDuration!)) {
+                        shortestTremolo = h.tremoloDuration!;
+                    }
+                }
+            }
+
+            switch (shortestTremolo) {
+                case Duration.Eighth:
+                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo1)!;
+                    break;
+                case Duration.Sixteenth:
+                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo2)!;
+                    break;
+                case Duration.ThirtySecond:
+                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo3)!;
+                    break;
+            }
+
             this.height += this.settings.notation.rhythmHeight;
             this.bottomPadding += this.settings.notation.rhythmHeight;
         }
@@ -305,18 +327,5 @@ export class TabBarRenderer extends LineBarRenderer {
                 break;
             }
         }
-    }
-
-    
-    protected override paintStemEffects(
-        beat: Beat,
-        cy: number,
-        x: number,
-        topY: number,
-        bottomY: number,
-        canvas: ICanvas
-    ): void {
-        using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabEffects, beat);
-        super.paintStemEffects(beat, cy, x, topY, bottomY, canvas);
     }
 }
