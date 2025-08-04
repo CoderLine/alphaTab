@@ -71,7 +71,7 @@
         "prepack": "node scripts/prepack.mjs"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "^2.1.3",
         "@coderline/alphaskia": "^3.4.135",
         "@coderline/alphaskia-linux": "^3.4.135",
         "@coderline/alphaskia-windows": "^3.4.135",
