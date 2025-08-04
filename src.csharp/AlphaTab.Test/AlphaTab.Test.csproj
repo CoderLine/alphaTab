@@ -12,8 +12,8 @@
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.9.3" />
-        <PackageReference Include="MSTest.TestFramework" Version="3.9.3" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.10.0" />
+        <PackageReference Include="MSTest.TestFramework" Version="3.10.0" />
         <PackageReference Include="AlphaSkia" Version="3.4.135" />
         <PackageReference Include="AlphaSkia.Native.Windows" Version="3.4.135" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />
         <PackageReference Include="AlphaSkia.Native.Linux" Version="3.4.135" Condition="$([MSBuild]::IsOsPlatform('Linux'))" />
