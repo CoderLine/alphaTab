@@ -1,5 +1,5 @@
 import { BarRendererBase } from '@src/rendering/BarRendererBase';
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
@@ -534,7 +534,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             if (beat.graceType === GraceType.BeforeBeat) {
                 if (direction === BeamDirection.Down) {
-                    canvas.fillMusicFontSymbol(
+                    CanvasHelper.fillMusicFontSymbolSafe(canvas,
                         cx + this.x + beatLineX + flagWidth / 2,
                         (topY + bottomY - this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemDown)!) /
                             2,
@@ -543,7 +543,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                         true
                     );
                 } else {
-                    canvas.fillMusicFontSymbol(
+                    CanvasHelper.fillMusicFontSymbolSafe(canvas,
                         cx + this.x + beatLineX + flagWidth / 2,
                         (topY + bottomY + this.smuflMetrics.glyphHeights.get(MusicFontSymbol.GraceNoteSlashStemUp)!) /
                             2,
@@ -766,7 +766,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
             slashY += barSize + barSpacing;
 
             if (direction === BeamDirection.Down) {
-                canvas.fillMusicFontSymbol(
+                CanvasHelper.fillMusicFontSymbolSafe(canvas,
                     cx + this.x + beatLineX + flagWidth / 2,
                     slashY,
                     NoteHeadGlyph.GraceScale,
@@ -774,7 +774,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
                     true
                 );
             } else {
-                canvas.fillMusicFontSymbol(
+                CanvasHelper.fillMusicFontSymbolSafe(canvas,
                     cx + this.x + beatLineX + flagWidth / 2,
                     slashY,
                     NoteHeadGlyph.GraceScale,

@@ -32,7 +32,7 @@ export class SkiaCanvas implements ICanvas {
      */
     private static alphaSkia: AlphaSkiaModule;
 
-    private static musicTextStyle: alphaSkia.AlphaSkiaTextStyle | null = null;
+    private static defaultMusicTextStyle: alphaSkia.AlphaSkiaTextStyle | null = null;
 
     /**
      * @target web
@@ -44,7 +44,7 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public static initializeMusicFont(musicFont: alphaSkia.AlphaSkiaTypeface) {
-        SkiaCanvas.musicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
+        SkiaCanvas.defaultMusicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
             [musicFont.familyName],
             musicFont.weight,
             musicFont.isItalic
@@ -72,6 +72,7 @@ export class SkiaCanvas implements ICanvas {
     private _scale = 1;
     private _textStyles: Map<string, alphaSkia.AlphaSkiaTextStyle> = new Map<string, alphaSkia.AlphaSkiaTextStyle>();
     private _font: Font = new Font('Arial', 10, FontStyle.Plain);
+    private _musicTextStyle: alphaSkia.AlphaSkiaTextStyle | null = null;
 
     public settings!: Settings;
 
@@ -122,6 +123,20 @@ export class SkiaCanvas implements ICanvas {
     public beginRender(width: number, height: number): void {
         this._scale = this.settings.display.scale;
         this._canvas.beginRender(width, height, Environment.HighDpiFactor);
+
+        const customFont = this.settings.display.resources.smuflFontFamilyName;
+        if (
+            customFont &&
+            customFont !== SkiaCanvas.defaultMusicTextStyle!.familyNames[0] &&
+            !this._textStyles.has(customFont!)
+        ) {
+            this._musicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
+                [customFont],
+                SkiaCanvas.defaultMusicTextStyle!.weight,
+                SkiaCanvas.defaultMusicTextStyle!.isItalic
+            );
+            this._textStyles.set(customFont, this._musicTextStyle);
+        }
     }
 
     public endRender(): unknown {
@@ -158,8 +173,8 @@ export class SkiaCanvas implements ICanvas {
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
         this._canvas.strokeRect(
-            (x * this._scale) + blurOffset,
-            (y * this._scale) + blurOffset,
+            x * this._scale + blurOffset,
+            y * this._scale + blurOffset,
             w * this._scale,
             h * this._scale
         );
@@ -262,8 +277,8 @@ export class SkiaCanvas implements ICanvas {
             text,
             this._textStyle!,
             this._font.size * this._scale,
-            (x * this._scale),
-            (y * this._scale),
+            x * this._scale,
+            y * this._scale,
             textAlign,
             textBaseline
         );
@@ -319,7 +334,7 @@ export class SkiaCanvas implements ICanvas {
     ): void {
         this._canvas.fillText(
             symbols,
-            SkiaCanvas.musicTextStyle!,
+            this._musicTextStyle!,
             this.settings.display.resources.smuflMetrics.musicFontSize * this._scale * relativeScale,
             x * this._scale,
             y * this._scale,

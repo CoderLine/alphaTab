@@ -1,5 +1,5 @@
 import { TripletFeel } from '@src/model/TripletFeel';
-import { TextAlign, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, TextAlign, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
@@ -211,7 +211,7 @@ export class TripletFeelGlyph extends EffectGlyph {
             const tupletTop = this.renderer.smuflMetrics.glyphTop.get(tuplet)! * noteScale;
             const tupletWidth = this.renderer.smuflMetrics.glyphWidths.get(tuplet)! * noteScale;
 
-            canvas.fillMusicFontSymbol(tupletCenterX, tupletY + tupletTop, noteScale, tuplet, true);
+            CanvasHelper.fillMusicFontSymbolSafe(canvas, tupletCenterX, tupletY + tupletTop, noteScale, tuplet, true);
 
             const numberLeftX = tupletCenterX - tupletWidth / 2 - this._tupletPadding;
             const numberRightX = tupletCenterX + tupletWidth / 2 + this._tupletPadding;
@@ -238,7 +238,8 @@ export class TripletFeelGlyph extends EffectGlyph {
 
         canvas.fillMusicFontSymbols(cx, cy, noteScale, rightNote, false);
         cx += noteSpacing;
-        if (rightNote[rightNote.length - 1] === MusicFontSymbol.MetAugmentationDot ||
+        if (
+            rightNote[rightNote.length - 1] === MusicFontSymbol.MetAugmentationDot ||
             rightNote[0] === MusicFontSymbol.MetNote8thUp
         ) {
             cx += noteSpacing;

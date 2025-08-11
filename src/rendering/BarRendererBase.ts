@@ -3,7 +3,7 @@ import type { Beat } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
 import { SimileMark } from '@src/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
@@ -620,7 +620,8 @@ export class BarRendererBase {
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
-                canvas.fillMusicFontSymbol(
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x + this.width / 2,
                     cy + this.y + this.height / 2,
                     1,
@@ -633,7 +634,8 @@ export class BarRendererBase {
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
 
-                canvas.fillMusicFontSymbol(
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
                     cx + this.x,
                     cy + this.y + this.height / 2,
                     1,

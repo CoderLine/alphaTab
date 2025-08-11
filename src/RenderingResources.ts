@@ -15,10 +15,9 @@ export class RenderingResources {
     /**
      * The SMuFL Font to use for rendering music symbols.
      * @remarks
-     * This is only meant for internal passing of font family information between components.
-     * Setting this manually can lead to unexpected side effects.
+     * Only specify this if the font is loaded and available in the environment (e.g. web font loaded, or Skia initialized). 
+     * You will also need to fill {@link smuflMetrics} to match this font.
      * @defaultValue `alphaTab`
-     * @internal
      * @since 1.6.0
      */
     public smuflFontFamilyName?: string;

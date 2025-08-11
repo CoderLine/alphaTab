@@ -1,6 +1,6 @@
 import { Clef } from '@src/model/Clef';
 import { Ottavia } from '@src/model/Ottavia';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
@@ -109,7 +109,7 @@ export class ClefGlyph extends MusicFontGlyph {
             ? this.renderer.smuflMetrics.glyphTop.get(this.symbol)!
             : this.renderer.smuflMetrics.glyphBottom.get(this.symbol)! -
               this.renderer.smuflMetrics.glyphHeights.get(ottavaGlyph)!;
-        canvas.fillMusicFontSymbol(cx + this.x + ottavaX, cy + this.y - ottavaY, 1, ottavaGlyph, true)
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x + ottavaX, cy + this.y - ottavaY, 1, ottavaGlyph, true)
 
         
     }

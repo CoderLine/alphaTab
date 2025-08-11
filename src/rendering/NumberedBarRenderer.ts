@@ -2,7 +2,7 @@ import { type Bar, BarSubElement } from '@src/model/Bar';
 import { type Beat, BeatSubElement } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
 import type { Voice } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import type { NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
@@ -213,7 +213,7 @@ export class NumberedBarRenderer extends LineBarRenderer {
             dotCount = Math.abs(dotCount);
 
             for (let d = 0; d < dotCount; d++) {
-                canvas.fillMusicFontSymbol(cx + this.x + dotX, dotsY, 1, MusicFontSymbol.AugmentationDot, true);
+                CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x + dotX, dotsY, 1, MusicFontSymbol.AugmentationDot, true);
                 dotsY += dotsOffset;
             }
         }

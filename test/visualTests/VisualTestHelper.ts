@@ -216,6 +216,7 @@ export class VisualTestHelper {
             'font/noto-serif/NotoSerif-BoldItalic.otf',
             'font/noto-music/NotoMusic-Regular.otf',
             'font/noto-color-emoji/NotoColorEmoji_WindowsCompatible.ttf',
+            'font/petaluma/Petaluma.otf',
         ];
 
         for (const font of fonts) {

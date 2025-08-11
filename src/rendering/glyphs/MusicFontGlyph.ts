@@ -28,6 +28,10 @@ export class MusicFontGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (this.width === 0 && this.height === 0) {
+            return;
+        }
+
         const c = canvas.color;
         if (this.colorOverride) {
             canvas.color = this.colorOverride!;
@@ -84,6 +88,10 @@ export class MusicFontTextGlyph extends EffectGlyph {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        if (this.width === 0 && this.height === 0) {
+            return;
+        }
+
         const c = canvas.color;
         if (this.colorOverride) {
             canvas.color = this.colorOverride!;

@@ -1,3 +1,0 @@
-SMuFL
-    Visual Testing
-    - Alternative SmuFL font rendering

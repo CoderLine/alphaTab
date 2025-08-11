@@ -612,6 +612,7 @@ export class ModelUtils {
     }
 
     private static allMusicFontSymbols: MusicFontSymbol[] = [];
+    
     /**
      * Gets a list of all music font symbols used in alphaTab.
      */

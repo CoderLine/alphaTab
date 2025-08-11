@@ -1,4 +1,4 @@
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BarLineStyle } from '@src/model/Bar';
 import { LeftToRightLayoutingGlyphGroup } from '@src/rendering/glyphs/LeftToRightLayoutingGlyphGroup';
@@ -103,8 +103,8 @@ class BarLineRepeatDotsGlyph extends BarLineGlyphBase {
 
         const dotOffset = dotTop - dotHeight / 2;
 
-        canvas.fillMusicFontSymbol(cx + this.x, exactCenter + dotOffset - lineHeight, 1, MusicFontSymbol.RepeatDot);
-        canvas.fillMusicFontSymbol(cx + this.x, exactCenter + dotOffset + lineHeight, 1, MusicFontSymbol.RepeatDot);
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, exactCenter + dotOffset - lineHeight, 1, MusicFontSymbol.RepeatDot);
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, exactCenter + dotOffset + lineHeight, 1, MusicFontSymbol.RepeatDot);
     }
 }
 class BarLineShortGlyph extends BarLineGlyphBase {

@@ -1,6 +1,6 @@
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 
 export class StringNumberContainerGlyph extends EffectGlyph {
     private _strings: Set<number> = new Set<number>();
@@ -25,7 +25,7 @@ export class StringNumberContainerGlyph extends EffectGlyph {
         for (const s of this._strings) {
             const stringValue = tuningLength - s;
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
-            canvas.fillMusicFontSymbol(
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
                 cy + this.y + circleHeight + y,
                 this.renderer.smuflMetrics.tuningGlyphCircleNumberScale,

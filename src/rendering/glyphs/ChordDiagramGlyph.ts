@@ -1,5 +1,5 @@
 import type { Chord } from '@src/model/Chord';
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { RenderingResources } from '@src/RenderingResources';
@@ -69,9 +69,9 @@ export class ChordDiagramGlyph extends EffectGlyph {
             const y: number = cy + this._fretRow / 2;
             let fret: number = this._chord.strings[this._chord.strings.length - i - 1];
             if (fret < 0) {
-                canvas.fillMusicFontSymbol(x, y + xTopOffset, 1, MusicFontSymbol.FretboardX, true);
+                CanvasHelper.fillMusicFontSymbolSafe(canvas,x, y + xTopOffset, 1, MusicFontSymbol.FretboardX, true);
             } else if (fret === 0) {
-                canvas.fillMusicFontSymbol(x, y + oTopOffset, 1, MusicFontSymbol.FretboardO, true);
+                CanvasHelper.fillMusicFontSymbolSafe(canvas,x, y + oTopOffset, 1, MusicFontSymbol.FretboardO, true);
             } else {
                 fret -= this._chord.firstFret - 1;
                 canvas.fillText(fret.toString(), x, y);
@@ -123,7 +123,7 @@ export class ChordDiagramGlyph extends EffectGlyph {
                 }
                 const y: number = cy + fret * fretSpacing + fretSpacing / 2 + 0.5;
                 const x: number = cx + (this._chord.strings.length - guitarString - 1) * stringSpacing + lineWidth / 2;
-                canvas.fillMusicFontSymbol(
+                CanvasHelper.fillMusicFontSymbolSafe(canvas,
                     x,
                     y + circleTopOffset - circleHeight / 2,
                     1,

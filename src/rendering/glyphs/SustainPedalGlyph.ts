@@ -1,7 +1,7 @@
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { type SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 
 export class SustainPedalGlyph extends EffectGlyph {
 
@@ -34,10 +34,10 @@ export class SustainPedalGlyph extends EffectGlyph {
                 // real own marker
                 let linePadding = 0;
                 if (marker.pedalType === SustainPedalMarkerType.Down) {
-                    canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalPed, true);
+                    CanvasHelper.fillMusicFontSymbolSafe(canvas,markerX, y + h, 1, MusicFontSymbol.KeyboardPedalPed, true);
                     linePadding = textWidth / 2 + this.renderer.smuflMetrics.sustainPedalLinePadding;
                 } else if (marker.pedalType === SustainPedalMarkerType.Up) {
-                    canvas.fillMusicFontSymbol(markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
+                    canvCanvasHelper.fillMusicFontSymbolSafe(canvas,markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
                     linePadding = starSize / 2 + this.renderer.smuflMetrics.sustainPedalLinePadding;
                 }
 

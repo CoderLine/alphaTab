@@ -1,6 +1,6 @@
 import { AccentuationType } from '@src/model/AccentuationType';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import type { Note } from '@src/model/Note';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
@@ -37,6 +37,6 @@ export class AccentuationGlyph extends EffectGlyph {
         const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir === BeamDirection.Down);
 
         const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height;
-        canvas.fillMusicFontSymbol(cx + this.x, y, 1, symbol, true);
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, y, 1, symbol, true);
     }
 }

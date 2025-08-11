@@ -1,5 +1,6 @@
 import { SmuflMetricsCloner } from '@src/generated/SmuflMetricsCloner';
 import { JsonHelper } from '@src/io/JsonHelper';
+import { Logger } from '@src/Logger';
 import { Duration } from '@src/model/Duration';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
@@ -176,6 +177,10 @@ export class SmuflMetrics {
         return SmuflMetricsCloner.clone(bravuraDefaults);
     }
 
+    public hasSymbol(symbol: MusicFontSymbol): boolean {
+        return this.glyphWidths.get(symbol)! > 0 && this.glyphHeights.get(symbol)! > 0;
+    }
+
     public initialize(smufl: SmuflMetadata) {
         //
         // SmuFL Spec
@@ -281,7 +286,11 @@ export class SmuflMetrics {
             }
         }
 
-        const handledSymbols = new Set<MusicFontSymbol>();
+        const handledSymbols = new Set<MusicFontSymbol>([
+            MusicFontSymbol.None,
+            MusicFontSymbol.Space,
+            MusicFontSymbol.NoteheadNull,
+        ]);
         const bBoxes = smufl.glyphBBoxes;
         if (bBoxes) {
             for (const [g, v] of Object.entries(bBoxes)) {
@@ -299,6 +308,7 @@ export class SmuflMetrics {
         // glyphBBoxes is optional, maybe we should rely on a text measuring of all glyphs for these values?
         for (const symbol of ModelUtils.getAllMusicFontSymbols()) {
             if (!handledSymbols.has(symbol)) {
+                Logger.warning('SmuFL', `The provided SmuFL font is missing the glyph ${MusicFontSymbol[symbol]} needed by alphaTab, the music notation might not show all details`);
                 this.glyphTop.set(symbol, 0);
                 this.glyphBottom.set(symbol, 0);
                 this.glyphWidths.set(symbol, 0);

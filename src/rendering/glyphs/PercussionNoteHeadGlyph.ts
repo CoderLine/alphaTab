@@ -1,4 +1,4 @@
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
@@ -28,13 +28,13 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
         }
 
         const offset: number = this._isGrace ? 1 : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
 
         if (
             this._articulation.techniqueSymbol !== MusicFontSymbol.None &&
             this._articulation.techniqueSymbolPlacement === TechniqueSymbolPlacement.Inside
         ) {
-            canvas.fillMusicFontSymbol(
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
                 cy + this.y + offset,
                 this.glyphScale,

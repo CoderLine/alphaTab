@@ -136,3 +136,33 @@ export interface ICanvas {
 
     destroy(): void;
 }
+
+export class CanvasHelper {
+    public static fillMusicFontSymbolSafe(
+        canvas: ICanvas,
+        x: number,
+        y: number,
+        relativeScale: number,
+        symbol: MusicFontSymbol,
+        centerAtPosition?: boolean
+    ): void {
+        if (!canvas.settings.display.resources.smuflMetrics.hasSymbol(symbol)) {
+            return;
+        }
+        canvas.fillMusicFontSymbol(x, y, relativeScale, symbol, centerAtPosition);
+    }
+    public static fillMusicFontSymbolsSafe(
+        canvas: ICanvas,
+        x: number,
+        y: number,
+        relativeScale: number,
+        symbols: MusicFontSymbol[],
+        centerAtPosition?: boolean
+    ): void {
+        const symbolsToDraw = symbols.filter(s => canvas.settings.display.resources.smuflMetrics.hasSymbol(s));
+        if (symbolsToDraw.length === 0) {
+            return;
+        }
+        canvas.fillMusicFontSymbols(x, y, relativeScale, symbolsToDraw, centerAtPosition);
+    }
+}

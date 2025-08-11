@@ -1,7 +1,7 @@
 import type { Bar } from '@src/model/Bar';
 import type { Font } from '@src/model/Font';
 import { type Track, TrackSubElement } from '@src/model/Track';
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
@@ -474,14 +474,14 @@ export class StaffSystem {
             // NOTE: Prevent cropping of separator if it overlaps
             const smuflMetrics = this.layout.renderer.settings.display.resources.smuflMetrics
             const overlap = Math.min(0, smuflMetrics.glyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
-            canvas.fillMusicFontSymbol(
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
                 cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
             );
-            canvas.fillMusicFontSymbol(
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x + this.width - smuflMetrics.glyphWidths.get(MusicFontSymbol.SystemDivider)!,
                 cy + this.y + this.height + overlap,
                 1,
@@ -645,7 +645,7 @@ export class StaffSystem {
                     let accoladeEnd: number = lastEnd;
 
                     if (bracket.drawAsBrace) {
-                        canvas.fillMusicFontSymbol(
+                        CanvasHelper.fillMusicFontSymbolSafe(canvas,
                             barStartX - barOffset - barSize,
                             accoladeEnd,
                             bracket.braceScale,
@@ -663,8 +663,8 @@ export class StaffSystem {
                         );
 
                         const spikeX: number = barStartX - barOffset - barSize;
-                        canvas.fillMusicFontSymbol(spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
-                        canvas.fillMusicFontSymbol(spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
+                        CanvasHelper.fillMusicFontSymbolSafe(canvas,spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
+                        CanvasHelper.fillMusicFontSymbolSafe(canvas,spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
                     }
                 }
             }

@@ -1,6 +1,6 @@
 import type { Automation } from '@src/model/Automation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { TextBaseline, type ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 
 /**
@@ -49,7 +49,7 @@ export class BarTempoGlyph extends EffectGlyph {
                 x -= res.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! / 2;
             }
 
-            canvas.fillMusicFontSymbol(x, notePosY, res.smuflMetrics.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,x, notePosY, res.smuflMetrics.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
             x +=
                 this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! *
                 res.smuflMetrics.tempoNoteScale;
