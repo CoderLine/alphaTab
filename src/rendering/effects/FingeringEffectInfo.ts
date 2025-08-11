@@ -2,14 +2,13 @@ import type { Beat } from '@src/model/Beat';
 import { Fingers } from '@src/model/Fingers';
 import type { Note } from '@src/model/Note';
 import { FingeringMode, NotationElement } from '@src/NotationSettings';
-import { TextAlign } from '@src/platform/ICanvas';
 import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import { EffectBarGlyphSizing } from '@src/rendering/EffectBarGlyphSizing';
 import type { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { EffectBarRendererInfo } from '@src/rendering/EffectBarRendererInfo';
 import type { Settings } from '@src/Settings';
-import { ModelUtils } from '@src/model/ModelUtils';
+import { FingeringGroupGlyph } from '@src/rendering/glyphs/FingeringGroupGlyph';
+import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export class FingeringEffectInfo extends EffectBarRendererInfo {
     public get notationElement(): NotationElement {
@@ -53,8 +52,13 @@ export class FingeringEffectInfo extends EffectBarRendererInfo {
         } else if (note.rightHandFinger !== Fingers.Unknown) {
             finger = note.rightHandFinger;
         }
-        const s: string = ModelUtils.fingerToString(renderer.settings, beat, finger, isLeft) ?? '';
-        return new TextGlyph(0, 0, s, renderer.resources.fingeringFont, TextAlign.Center);
+        const s = FingeringGroupGlyph.fingerToMusicFontSymbol(renderer.settings, beat, finger, isLeft) ?? '';
+        const g = new MusicFontGlyph(0, 0, 1, s);
+        g.center = true;
+        g.renderer = renderer;
+        g.doLayout();
+        g.offsetY = renderer.smuflMetrics.glyphTop.get(g.symbol)!;
+        return g;
     }
 
     public canExpand(from: Beat, to: Beat): boolean {

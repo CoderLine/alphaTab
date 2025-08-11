@@ -36,8 +36,6 @@ function applyFonts(settings: alphaTab.Settings) {
     settings.display.resources.tablatureFont.families = ['Noto Sans'];
     settings.display.resources.graceFont.families = ['Noto Sans'];
     settings.display.resources.barNumberFont.families = ['Noto Sans'];
-    settings.display.resources.fingeringFont.families = ['Noto Serif'];
-    settings.display.resources.inlineFingeringFont.families = ['Noto Serif'];
     settings.display.resources.markerFont.families = ['Noto Serif'];
     settings.display.resources.directionsFont.families = ['Noto Serif'];
     settings.display.resources.numberedNotationFont.families = ['Noto Sans'];

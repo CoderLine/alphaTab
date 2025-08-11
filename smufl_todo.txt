@@ -3,11 +3,9 @@ SMuFL
     - Alternative SmuFL font rendering
 
     Test findings:
-    - test-data/visual-tests/effects-and-annotations/fingering-new.png
-      test-data/visual-tests/effects-and-annotations/fingering.png
-      should we use the fingering glyphs contained in the font?
     - test-data/visual-tests/music-notation/rest-collisions.png
       test-data/visual-tests/notation-legend/multi-voice-default.png
       rests are not shifted down when beam direction is down
     - test-data/musicxml-testsuite/23f-Tuplets-DurationButNoBracket.png
       a lot of space reserved?
+y 

@@ -147,6 +147,7 @@ export class RenderingResources {
      * The font to use for displaying finger information in the music sheet.
      * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
     public fingeringFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
 
@@ -154,6 +155,7 @@ export class RenderingResources {
      * The font to use for displaying finger information when inline into the music sheet.
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
     public inlineFingeringFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
 

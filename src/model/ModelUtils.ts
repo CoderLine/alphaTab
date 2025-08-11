@@ -1,9 +1,6 @@
-import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { Beat } from '@src/model/Beat';
 import type { Duration } from '@src/model/Duration';
-import { Fingers } from '@src/model/Fingers';
 import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
-import { FingeringMode } from '@src/NotationSettings';
 import type { Settings } from '@src/Settings';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { MasterBar } from '@src/model/MasterBar';
@@ -71,69 +68,6 @@ export class ModelUtils {
                     staff.transpositionPitch = -settings.notation.transpositionPitches[i];
                 }
             }
-        }
-    }
-
-    public static fingerToString(settings: Settings, beat: Beat, finger: Fingers, leftHand: boolean): string | null {
-        if (
-            settings.notation.fingeringMode === FingeringMode.ScoreForcePiano ||
-            settings.notation.fingeringMode === FingeringMode.SingleNoteEffectBandForcePiano ||
-            GeneralMidi.isPiano(beat.voice.bar.staff.track.playbackInfo.program)
-        ) {
-            switch (finger) {
-                case Fingers.Unknown:
-                case Fingers.NoOrDead:
-                    return null;
-                case Fingers.Thumb:
-                    return '1';
-                case Fingers.IndexFinger:
-                    return '2';
-                case Fingers.MiddleFinger:
-                    return '3';
-                case Fingers.AnnularFinger:
-                    return '4';
-                case Fingers.LittleFinger:
-                    return '5';
-                default:
-                    return null;
-            }
-        }
-        if (leftHand) {
-            switch (finger) {
-                case Fingers.Unknown:
-                    return null;
-                case Fingers.NoOrDead:
-                    return '0';
-                case Fingers.Thumb:
-                    return 't';
-                case Fingers.IndexFinger:
-                    return '1';
-                case Fingers.MiddleFinger:
-                    return '2';
-                case Fingers.AnnularFinger:
-                    return '3';
-                case Fingers.LittleFinger:
-                    return '4';
-                default:
-                    return null;
-            }
-        }
-        switch (finger) {
-            case Fingers.Unknown:
-            case Fingers.NoOrDead:
-                return null;
-            case Fingers.Thumb:
-                return 'p';
-            case Fingers.IndexFinger:
-                return 'i';
-            case Fingers.MiddleFinger:
-                return 'm';
-            case Fingers.AnnularFinger:
-                return 'a';
-            case Fingers.LittleFinger:
-                return 'c';
-            default:
-                return null;
         }
     }
 

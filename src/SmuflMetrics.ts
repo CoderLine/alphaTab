@@ -739,6 +739,54 @@ export class SmuflMetrics {
                     bBoxNE: [2.416, 1.364],
                     bBoxSW: [0, 0]
                 },
+                fingering0: {
+                    bBoxNE: [0.94, 1.004],
+                    bBoxSW: [0.08, -0.004]
+                },
+                fingering1: {
+                    bBoxNE: [0.548, 1.016],
+                    bBoxSW: [0.08, 0]
+                },
+                fingering2: {
+                    bBoxNE: [0.888, 1.012],
+                    bBoxSW: [0.08, -0.012]
+                },
+                fingering3: {
+                    bBoxNE: [0.82, 1.008],
+                    bBoxSW: [0.08, 0]
+                },
+                fingering4: {
+                    bBoxNE: [0.864, 1.012],
+                    bBoxSW: [0.08, 0.004]
+                },
+                fingering5: {
+                    bBoxNE: [0.82, 1.032],
+                    bBoxSW: [0.08, 0]
+                },
+                fingeringALower: {
+                    bBoxNE: [1.068, 1.032],
+                    bBoxSW: [0, -0.02]
+                },
+                fingeringCLower: {
+                    bBoxNE: [0.888, 1.044],
+                    bBoxSW: [0, -0.028]
+                },
+                fingeringILower: {
+                    bBoxNE: [0.656, 1.54],
+                    bBoxSW: [-0.052, -0.028]
+                },
+                fingeringMLower: {
+                    bBoxNE: [1.66, 1.028],
+                    bBoxSW: [-0.032, -0.016]
+                },
+                fingeringPLower: {
+                    bBoxNE: [1.088, 1.028],
+                    bBoxSW: [-0.216, -0.612]
+                },
+                fingeringTLower: {
+                    bBoxNE: [0.604, 1.484],
+                    bBoxSW: [0, -0.028]
+                },
                 flag128thDown: {
                     bBoxNE: [1.092, 3.248],
                     bBoxSW: [0, -2.32]

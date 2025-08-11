@@ -329,5 +329,19 @@ export enum MusicFontSymbol {
     OctaveBaselineM = 0xec95,
     OctaveBaselineB = 0xec93,
 
-    GuitarLeftHandTapping = 0xe840
+    GuitarLeftHandTapping = 0xe840,
+
+    Fingering0 = 0xed10,
+    Fingering1 = 0xed11,
+    Fingering2 = 0xed12,
+    Fingering3 = 0xed13,
+    Fingering4 = 0xed14,
+    Fingering5 = 0xed15,
+
+    FingeringPLower = 0xed17,
+    FingeringTLower = 0xed18,
+    FingeringILower = 0xed19,
+    FingeringMLower = 0xed1a,
+    FingeringALower = 0xed1b,
+    FingeringCLower = 0xed1c
 }

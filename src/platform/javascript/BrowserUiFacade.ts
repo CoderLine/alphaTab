@@ -209,7 +209,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private setupFontCheckers(settings: Settings): void {
         this.registerFontChecker(settings.display.resources.copyrightFont);
         this.registerFontChecker(settings.display.resources.effectFont);
-        this.registerFontChecker(settings.display.resources.fingeringFont);
         this.registerFontChecker(settings.display.resources.graceFont);
         this.registerFontChecker(settings.display.resources.markerFont);
         this.registerFontChecker(settings.display.resources.tablatureFont);
