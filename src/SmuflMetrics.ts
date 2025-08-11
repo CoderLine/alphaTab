@@ -338,6 +338,7 @@ export class SmuflMetrics {
         this.songBookWhammyDipHeight = 0.6 * this.oneStaffSpace;
         this.tabWhammyPerHalfHeight = 0.6 * this.oneStaffSpace;
         this.tabBendPerValueHeight = 0.6 * this.oneStaffSpace;
+        this.tabBendLabelPadding = 0.3 * this.oneStaffSpace;
 
         this.leftHandTabTieWidth = 2.2 * this.oneStaffSpace;
         this.numberedDashGlyphWidth = 1.5 * this.oneStaffSpace;
@@ -413,6 +414,7 @@ export class SmuflMetrics {
 
     public tabBendDashSize = 0;
     public tabBendPerValueHeight = 0;
+    public tabBendLabelPadding = 0;
 
     public simpleSlideWidth = 0;
     public simpleSlideHeight = 0;

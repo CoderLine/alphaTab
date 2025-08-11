@@ -62,6 +62,7 @@ export class SmuflMetricsCloner {
         clone.leftHandTabTieWidth = original.leftHandTabTieWidth;
         clone.tabBendDashSize = original.tabBendDashSize;
         clone.tabBendPerValueHeight = original.tabBendPerValueHeight;
+        clone.tabBendLabelPadding = original.tabBendLabelPadding;
         clone.simpleSlideWidth = original.simpleSlideWidth;
         clone.simpleSlideHeight = original.simpleSlideHeight;
         clone.chordDiagramPaddingX = original.chordDiagramPaddingX;
@@ -87,6 +88,7 @@ export class SmuflMetricsCloner {
         clone.tuningGlyphCircleNumberScale = original.tuningGlyphCircleNumberScale;
         clone.tuningGlyphStringColumnScale = original.tuningGlyphStringColumnScale;
         clone.tuningGlyphRowPadding = original.tuningGlyphRowPadding;
+        clone.directionsScale = original.directionsScale;
         return clone;
     }
 }

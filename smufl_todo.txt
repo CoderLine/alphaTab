@@ -3,8 +3,6 @@ SMuFL
     - Alternative SmuFL font rendering
 
     Test findings:
-    - test-data/visual-tests/effects-and-annotations/bends.png
-      fine tune text alignment
     - test-data/visual-tests/effects-and-annotations/fingering-new.png
       test-data/visual-tests/effects-and-annotations/fingering.png
       should we use the fingering glyphs contained in the font?

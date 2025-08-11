@@ -74,6 +74,7 @@ export interface SmuflMetricsJson {
     leftHandTabTieWidth?: number;
     tabBendDashSize?: number;
     tabBendPerValueHeight?: number;
+    tabBendLabelPadding?: number;
     simpleSlideWidth?: number;
     simpleSlideHeight?: number;
     chordDiagramPaddingX?: number;
@@ -99,4 +100,5 @@ export interface SmuflMetricsJson {
     tuningGlyphCircleNumberScale?: number;
     tuningGlyphStringColumnScale?: number;
     tuningGlyphRowPadding?: number;
+    directionsScale?: number;
 }

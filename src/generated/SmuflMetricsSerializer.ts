@@ -76,6 +76,7 @@ export class SmuflMetricsSerializer {
         o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
         o.set("tabbenddashsize", obj.tabBendDashSize);
         o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
+        o.set("tabbendlabelpadding", obj.tabBendLabelPadding);
         o.set("simpleslidewidth", obj.simpleSlideWidth);
         o.set("simpleslideheight", obj.simpleSlideHeight);
         o.set("chorddiagrampaddingx", obj.chordDiagramPaddingX);
@@ -149,6 +150,7 @@ export class SmuflMetricsSerializer {
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
         o.set("tuningglyphrowpadding", obj.tuningGlyphRowPadding);
+        o.set("directionsscale", obj.directionsScale);
         return o;
     }
     public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
@@ -318,6 +320,9 @@ export class SmuflMetricsSerializer {
             case "tabbendpervalueheight":
                 obj.tabBendPerValueHeight = v! as number;
                 return true;
+            case "tabbendlabelpadding":
+                obj.tabBendLabelPadding = v! as number;
+                return true;
             case "simpleslidewidth":
                 obj.simpleSlideWidth = v! as number;
                 return true;
@@ -420,6 +425,9 @@ export class SmuflMetricsSerializer {
                 return true;
             case "tuningglyphrowpadding":
                 obj.tuningGlyphRowPadding = v! as number;
+                return true;
+            case "directionsscale":
+                obj.directionsScale = v! as number;
                 return true;
         }
         return false;
