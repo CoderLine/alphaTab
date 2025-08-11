@@ -181,12 +181,14 @@ export default class CSharpAstTransformer {
                         }
                     } else {
                         for (const e of x.exportClause.elements) {
-                            const symbol = this._context.typeChecker.getTypeAtLocation(e.name)?.symbol;
+                            const symbol =
+                                this._context.typeChecker.getTypeAtLocation(e.name)?.symbol ??
+                                this._context.typeChecker.getSymbolAtLocation(e.name);
                             if (symbol) {
                                 this._context.registerSymbolAsExported(symbol);
                             } else {
                                 this._context.addTsNodeDiagnostics(
-                                    x.exportClause!,
+                                    e,
                                     'Exported symbol could not be resolved',
                                     ts.DiagnosticCategory.Error
                                 );
@@ -339,6 +341,8 @@ export default class CSharpAstTransformer {
             this.visitEnumDeclaration(node);
         } else if (ts.isInterfaceDeclaration(node)) {
             this.visitInterfaceDeclaration(node);
+        } else if (ts.isTypeAliasDeclaration(node)) {
+            this.visitTypeAliasDeclaration(node);
         }
 
         return node;
@@ -409,6 +413,49 @@ export default class CSharpAstTransformer {
 
         parent.members.push(csEnumMember);
         this._context.registerSymbol(csEnumMember);
+    }
+
+    protected visitTypeAliasDeclaration(node: ts.TypeAliasDeclaration) {
+        if (!ts.isFunctionTypeNode(node.type)) {
+            return;
+        }
+
+        const signature = this._context.typeChecker.getSignatureFromDeclaration(node.type);
+        const returnType = this._context.typeChecker.getReturnTypeOfSignature(signature!);
+
+        const typeDeclaration: cs.DelegateDeclaration = {
+            visibility: cs.Visibility.Public,
+            name: node.name.text,
+            nodeType: cs.SyntaxKind.DelegateDeclaration,
+            parent: this._csharpFile.namespace,
+            parameters: [],
+            tsNode: node,
+            skipEmit: this.shouldSkip(node, false),
+            partial: false,
+            tsSymbol: this._context.getSymbolForDeclaration(node),
+            hasVirtualMembersOrSubClasses: false,
+            isStatic: false,
+            returnType: this.createUnresolvedTypeNode(null, node.type.type, returnType)
+        };
+
+        if (node.name) {
+            typeDeclaration.documentation = this.visitDocumentation(node.name);
+        }
+
+        if (node.typeParameters) {
+            typeDeclaration.typeParameters = node.typeParameters.map(p =>
+                this.visitTypeParameterDeclaration(typeDeclaration, p)
+            );
+        }
+
+        if (!typeDeclaration.skipEmit) {
+            for (const m of node.type.parameters) {
+                this.visitMethodParameter(typeDeclaration, m);
+            }
+        }
+
+        this._csharpFile.namespace.declarations.push(typeDeclaration);
+        this._context.registerSymbol(typeDeclaration);
     }
 
     protected visitInterfaceDeclaration(node: ts.InterfaceDeclaration) {
@@ -605,9 +652,23 @@ export default class CSharpAstTransformer {
                     params: false,
                     isOptional: false
                 };
+                if (p.questionToken !== undefined) {
+                    csParameter.isOptional = true;
+                    csParameter.initializer = {
+                        parent: csParameter,
+                        nodeType: cs.SyntaxKind.DefaultExpression
+                    } as cs.DefaultExpression;
+                }
+
                 csParameter.type!.parent = csParameter;
                 csConstructor.parameters.push(csParameter);
             }
+
+            csConstructor.parameters.sort((a, b) => {
+                const av = a.isOptional ? 1 : 0;
+                const bv = b.isOptional ? 1 : 0;
+                return av - bv;
+            });
 
             csConstructor.body = {
                 nodeType: cs.SyntaxKind.Block,
@@ -1826,7 +1887,7 @@ export default class CSharpAstTransformer {
         return variableStatement;
     }
 
-    protected visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement) {
+    protected visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement): cs.Statement | null {
         const expressionStatement = {
             nodeType: cs.SyntaxKind.ExpressionStatement,
             parent: parent,
@@ -3397,9 +3458,37 @@ export default class CSharpAstTransformer {
         return csExpr;
     }
 
-    protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression) {
+    protected visitArrayLiteralExpression(parent: cs.Node, expression: ts.ArrayLiteralExpression): cs.Expression {
         const type = this._context.typeChecker.getTypeAtLocation(expression);
         if (this._context.typeChecker.isTupleType(type)) {
+            // deconstruction
+            // [x, y] = expression
+            if (
+                ts.isBinaryExpression(expression.parent) &&
+                expression.parent.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+                expression.parent.left === expression
+            ) {
+                const csExpr = {
+                    parent: parent,
+                    nodeType: cs.SyntaxKind.DeconstructDeclaration,
+                    names: []
+                } as cs.DeconstructDeclaration;
+
+                for (const m of expression.elements) {
+                    if (ts.isIdentifier(m)) {
+                        csExpr.names.push(m.text);
+                    } else {
+                        this._context.addCsNodeDiagnostics(
+                            parent,
+                            'Unsupported tuple destruction',
+                            ts.DiagnosticCategory.Error
+                        );
+                    }
+                }
+
+                return csExpr;
+            }
+
             const csExpr = {
                 parent: parent,
                 tsNode: expression,
@@ -3620,12 +3709,15 @@ export default class CSharpAstTransformer {
         return null;
     }
 
+    private _recordCreation = 0;
     protected visitObjectLiteralExpression(parent: cs.Node, expression: ts.ObjectLiteralExpression) {
         const type = this._context.typeChecker.getContextualType(expression);
-        const isRecord = type?.symbol?.declarations?.some(d =>
-            ts.getJSDocTags(d).some(t => t.tagName.text === 'record')
-        );
+        const isRecord =
+            type?.symbol?.declarations?.some(d => ts.getJSDocTags(d).some(t => t.tagName.text === 'record')) ||
+            this._recordCreation > 0;
         if (isRecord) {
+            this._recordCreation++;
+
             const newObject = {
                 nodeType: cs.SyntaxKind.NewExpression,
                 type: this.createUnresolvedTypeNode(null, expression, type, type!.symbol),
@@ -3647,7 +3739,7 @@ export default class CSharpAstTransformer {
                     newObject.arguments.push(assignment);
                 } else if (ts.isShorthandPropertyAssignment(p)) {
                     assignment.label = p.name.getText();
-                    if(p.objectAssignmentInitializer) {
+                    if (p.objectAssignmentInitializer) {
                         assignment.expression = this.visitExpression(assignment, p.objectAssignmentInitializer)!;
                     } else {
                         assignment.expression = {
@@ -3655,7 +3747,7 @@ export default class CSharpAstTransformer {
                             parent: assignment,
                             tsNode: p.name,
                             text: p.name.getText()
-                        } as cs.Identifier
+                        } as cs.Identifier;
                     }
                     newObject.arguments.push(assignment);
                 } else if (ts.isSpreadAssignment(p)) {
@@ -3680,6 +3772,47 @@ export default class CSharpAstTransformer {
                     );
                 }
             }
+
+            if (type?.aliasSymbol?.name === 'Record' || type?.getNonNullableType()?.aliasSymbol?.name === 'Record') {
+                const exprs = newObject.arguments;
+                newObject.arguments = [];
+                for (const e of exprs) {
+                    const label = e as cs.LabeledExpression;
+
+                    const newTupleExpr = {
+                        parent: parent,
+                        tsNode: expression,
+                        nodeType: cs.SyntaxKind.NewExpression,
+                        type: null!,
+                        arguments: []
+                    } as cs.NewExpression;
+                    newObject.arguments.push(newTupleExpr);
+
+                    newTupleExpr.type = this._context.makeArrayTupleType(newTupleExpr, []);
+                    const csTupleType = newTupleExpr.type as cs.ArrayTupleNode;
+
+                    csTupleType.types.push({
+                        nodeType: cs.SyntaxKind.PrimitiveTypeNode,
+                        type: cs.PrimitiveType.String
+                    } as cs.PrimitiveTypeNode);
+
+                    const typeArgs = type.aliasTypeArguments ?? type?.getNonNullableType()?.aliasTypeArguments;
+
+                    csTupleType.types.push(
+                        this.createUnresolvedTypeNode(csTupleType, expression, typeArgs![1], typeArgs![1]!.symbol)
+                    );
+
+                    newTupleExpr.arguments.push({
+                        nodeType: cs.SyntaxKind.StringLiteral,
+                        text: label.label
+                    } as cs.StringLiteral);
+
+                    newTupleExpr.arguments.push(label.expression);
+                }
+            }
+
+            this._recordCreation--;
+
             return newObject;
         }
 

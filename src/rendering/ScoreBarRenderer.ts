@@ -448,6 +448,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     private ensureDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
         if (!h.drawingInfos.has(direction)) {
             const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
             let stemSize = this.smuflMetrics.standardStemLength * scale;
 
             if (h.tremoloDuration) {
@@ -568,7 +569,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
                 // check if rest shifts bar up or down
                 if (h.minRestLine !== null || h.maxRestLine !== null) {
-                    const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
                     const scaleMod: number = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
                         barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
@@ -615,9 +615,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
             // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
             // here we shift accordingly
-            const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
             if (barCount > 2 && !isRest) {
-                const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
                 const beamSpacing = this.smuflMetrics.beamSpacing * scale;
                 const beamThickness = this.smuflMetrics.beamThickness * scale;
                 const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;

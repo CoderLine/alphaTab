@@ -83,7 +83,8 @@ export enum SyntaxKind {
     SpreadExpression = 73,
     LocalFunction = 74,
     YieldExpression = 75,
-    LabeledExpression = 76
+    LabeledExpression = 76,
+    DelegateDeclaration = 77
 }
 
 export interface Node {
@@ -112,7 +113,7 @@ export interface NamespaceDeclaration extends Node {
     declarations: NamespaceMember[];
 }
 
-export type NamespaceMember = ClassDeclaration | EnumDeclaration | InterfaceDeclaration;
+export type NamespaceMember = ClassDeclaration | EnumDeclaration | InterfaceDeclaration | DelegateDeclaration;
 
 export enum Visibility {
     None = 0,
@@ -182,6 +183,11 @@ export interface InterfaceDeclaration extends NamedTypeDeclaration {
     nodeType: SyntaxKind.InterfaceDeclaration;
     interfaces?: TypeNode[];
     members: InterfaceMember[];
+}
+
+export interface DelegateDeclaration extends NamedTypeDeclaration, MethodDeclarationBase {
+    nodeType: SyntaxKind.DelegateDeclaration;
+    returnType: TypeNode;
 }
 
 export type InterfaceMember = MethodDeclaration | PropertyDeclaration;
@@ -557,7 +563,7 @@ export interface VariableDeclaration extends Node {
     initializer?: Expression;
 }
 
-export interface DeconstructDeclaration extends Node {
+export interface DeconstructDeclaration extends Expression {
     nodeType: SyntaxKind.DeconstructDeclaration;
     names: string[];
 }
@@ -685,6 +691,9 @@ export function isEnumMember(node: Node): node is EnumMember {
 }
 export function isArrayTypeNode(node: Node): node is ArrayTypeNode {
     return node.nodeType === SyntaxKind.ArrayTypeNode;
+}
+export function isArrayTupleNode(node: Node): node is ArrayTupleNode {
+    return node.nodeType === SyntaxKind.ArrayTupleNode;
 }
 export function isMapTypeNode(node: Node): node is MapTypeNode {
     return node.nodeType === SyntaxKind.MapTypeNode;

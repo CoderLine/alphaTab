@@ -618,9 +618,9 @@ export class ModelUtils {
      */
     public static getAllMusicFontSymbols(): MusicFontSymbol[] {
         if (ModelUtils.allMusicFontSymbols.length === 0) {
-            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol).filter(
-                k => typeof k === 'number'
-            ) as MusicFontSymbol[];
+            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol).filter<any>(
+                (k:any) => typeof k === 'number'
+            ).map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
         }
 
         return ModelUtils.allMusicFontSymbols;

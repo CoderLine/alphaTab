@@ -327,7 +327,7 @@ internal sealed class AlphaSkiaTextStyle : IDisposable
         TextStyle.Dispose();
     }
 
-    public string[] FontFamilies
+    public string[] FamilyNames
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => TextStyle.FontFamilies;

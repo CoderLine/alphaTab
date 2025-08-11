@@ -62,6 +62,30 @@ internal open class JsonHelperPartials {
             return null
         }
 
+        public fun <T : Enum<T>> parseEnumExact(value: Int, values: Array<T>): T? {
+            for (e in values) {
+                if (e is alphaTab.core.IAlphaTabEnum && e.value == value) {
+                    return e
+                }
+            }
+            return null
+        }
+
+        @ExperimentalUnsignedTypes
+        @ExperimentalContracts
+        public inline fun <reified T : Enum<T>> parseEnumExact(
+            value: String,
+            @Suppress("UNUSED_PARAMETER") type: KClass<T>
+        ): T? {
+            for (e in enumValues<T>()) {
+                if (value.equals(e.name, true)) {
+                    return e
+                }
+            }
+
+            return null
+        }
+
         @ExperimentalUnsignedTypes
         @ExperimentalContracts
         public inline fun <reified T : Enum<T>> parseEnum(

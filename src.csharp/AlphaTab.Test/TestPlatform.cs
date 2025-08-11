@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AlphaTab;
@@ -33,6 +36,113 @@ static partial class TestPlatform
         await using var ms = new MemoryStream();
         await fs.CopyToAsync(ms);
         return new Uint8Array(ms.ToArray());
+    }
+
+    public static async Task<T> LoadFileAsJson<T>(string path)
+    {
+        await using var fs =
+            new FileStream(Path.Combine(RepositoryRoot.Value, path), FileMode.Open);
+        return (await JsonSerializer.DeserializeAsync<T>(fs, JsonOptions))!;
+    }
+
+    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    {
+        PropertyNameCaseInsensitive = true,
+        Converters = { new ArrayTupleConverterFactory() }
+    };
+
+    private class ArrayTupleConverterFactory  :JsonConverterFactory
+    {
+        public override bool CanConvert(Type typeToConvert)
+        {
+            if (!typeToConvert.IsGenericType)
+            {
+                return false;
+            }
+
+            if (typeToConvert.GetGenericTypeDefinition() != typeof(ArrayTuple<,>))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public override JsonConverter CreateConverter(
+            Type type,
+            JsonSerializerOptions options)
+        {
+            var typeArguments = type.GetGenericArguments();
+            var keyType = typeArguments[0];
+            var valueType = typeArguments[1];
+
+            var converter = (JsonConverter)Activator.CreateInstance(
+                typeof(ArrayTupleConverter<,>).MakeGenericType(keyType, valueType),
+                BindingFlags.Instance | BindingFlags.Public,
+                binder: null,
+                args: new object[]{options},
+                culture: null)!;
+
+            return converter;
+        }
+    }
+
+    private class ArrayTupleConverter<TKey, TValue> : JsonConverter<ArrayTuple<TKey, TValue>>
+    {
+        private readonly JsonConverter<TValue> _valueConverter;
+        private readonly JsonConverter<TKey> _keyConverter;
+        private readonly Type _keyType;
+        private readonly Type _valueType;
+
+        public ArrayTupleConverter(JsonSerializerOptions options)
+        {
+            _valueConverter = (JsonConverter<TValue>)options
+                .GetConverter(typeof(TValue));
+
+            _keyConverter = (JsonConverter<TKey>)options
+                .GetConverter(typeof(TKey));
+
+            _keyType = typeof(TKey);
+            _valueType = typeof(TValue);
+        }
+
+        public override ArrayTuple<TKey, TValue> Read(
+            ref Utf8JsonReader reader,
+            Type typeToConvert,
+            JsonSerializerOptions options)
+        {
+            if (reader.TokenType != JsonTokenType.StartArray)
+            {
+                throw new JsonException();
+            }
+
+            if (!reader.Read())
+            {
+                throw new JsonException();
+            }
+            var v0 = _keyConverter.Read(ref reader, _keyType, options)!;
+
+            if (!reader.Read())
+            {
+                throw new JsonException();
+            }
+
+            var v1 = _valueConverter.Read(ref reader, _valueType, options)!;
+            if (!reader.Read() || reader.TokenType != JsonTokenType.EndArray)
+            {
+                throw new JsonException();
+            }
+
+            return new ArrayTuple<TKey, TValue>(v0, v1);
+        }
+
+        public override void Write(Utf8JsonWriter writer, ArrayTuple<TKey, TValue> value, JsonSerializerOptions options)
+        {
+            writer.WriteStartArray();
+            _keyConverter.Write(writer, value.V0, options);
+            _valueConverter.Write(writer, value.V1, options);
+            writer.WriteEndArray();
+        }
     }
 
     public static Uint8Array LoadFileSync(string path)

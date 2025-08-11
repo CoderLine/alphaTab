@@ -50,7 +50,7 @@ public class MapEntryInternal<TKey, TValue> : MapEntry<TKey, TValue>(),
     }
 }
 
-public class Map<TKey, TValue>:
+public open class Map<TKey, TValue>:
     MapBase<MapEntry<TKey, TValue>, MapEntryInternal<TKey, TValue>> {
     public constructor()
     public constructor(iterable: Iterable<ArrayTuple<TKey, TValue>>) {

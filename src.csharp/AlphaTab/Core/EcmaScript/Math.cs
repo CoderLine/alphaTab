@@ -77,6 +77,10 @@ internal static class Math
     {
         return System.Math.Atan(a);
     }
+    public static double Atan2(double y, double x)
+    {
+        return System.Math.Atan2(y, x);
+    }
 
     public static double Log2(double d)
     {

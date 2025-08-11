@@ -52,7 +52,7 @@ export class FingeringEffectInfo extends EffectBarRendererInfo {
         } else if (note.rightHandFinger !== Fingers.Unknown) {
             finger = note.rightHandFinger;
         }
-        const s = FingeringGroupGlyph.fingerToMusicFontSymbol(renderer.settings, beat, finger, isLeft) ?? '';
+        const s = FingeringGroupGlyph.fingerToMusicFontSymbol(renderer.settings, beat, finger, isLeft);
         const g = new MusicFontGlyph(0, 0, 1, s);
         g.center = true;
         g.renderer = renderer;

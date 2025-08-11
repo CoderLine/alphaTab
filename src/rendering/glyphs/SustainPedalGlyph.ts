@@ -37,7 +37,7 @@ export class SustainPedalGlyph extends EffectGlyph {
                     CanvasHelper.fillMusicFontSymbolSafe(canvas,markerX, y + h, 1, MusicFontSymbol.KeyboardPedalPed, true);
                     linePadding = textWidth / 2 + this.renderer.smuflMetrics.sustainPedalLinePadding;
                 } else if (marker.pedalType === SustainPedalMarkerType.Up) {
-                    canvCanvasHelper.fillMusicFontSymbolSafe(canvas,markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
+                    CanvasHelper.fillMusicFontSymbolSafe(canvas,markerX, y + h, 1, MusicFontSymbol.KeyboardPedalUp, true);
                     linePadding = starSize / 2 + this.renderer.smuflMetrics.sustainPedalLinePadding;
                 }
 

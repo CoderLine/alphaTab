@@ -552,4 +552,77 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             }
         }
     }
+
+    protected visitExpressionStatement(parent: cs.Node, s: ts.ExpressionStatement): cs.Statement | null {
+        // array tuple destruction
+
+        // (x,y) = someCallOrExpression()
+        // becomes
+        // someCallOrExpression.let({ x = it.v0; y = it.v1 })
+
+        if (
+            ts.isBinaryExpression(s.expression) &&
+            ts.isArrayLiteralExpression(s.expression.left) &&
+            s.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken
+        ) {
+            const invoc: cs.InvocationExpression = {
+                nodeType: cs.SyntaxKind.InvocationExpression,
+                parent,
+                expression: null!,
+                tsNode: s,
+                arguments: []
+            };
+            const letAccess: cs.MemberAccessExpression = {
+                nodeType: cs.SyntaxKind.MemberAccessExpression,
+                expression: null!,
+                member: 'let',
+                parent: invoc
+            };
+            letAccess.expression = this.visitExpression(invoc, s.expression.right)!;
+            invoc.expression = letAccess;
+
+            const block: cs.Block = {
+                nodeType: cs.SyntaxKind.Block,
+                parent: invoc,
+                statements: []
+            };
+
+            for (let i = 0; i < s.expression.left.elements.length; i++) {
+                const stmt: cs.ExpressionStatement = {
+                    nodeType: cs.SyntaxKind.ExpressionStatement,
+                    parent: block,
+                    expression: null!
+                };
+                block.statements.push(stmt);
+
+                const assign: cs.BinaryExpression = {
+                    nodeType: cs.SyntaxKind.BinaryExpression,
+                    parent: block,
+                    left: null!,
+                    right: null!,
+                    operator: '='
+                };
+                stmt.expression = assign;
+
+                assign.left = this.visitExpression(assign, s.expression.left.elements[i])!;
+                assign.right = {
+                    nodeType: cs.SyntaxKind.Identifier,
+                    text: `it.v${i}`,
+                    parent: assign
+                } as cs.Identifier;
+            }
+
+            invoc.arguments.push(block);
+
+            const stmt :cs.ExpressionStatement = {
+                nodeType: cs.SyntaxKind.ExpressionStatement,
+                expression: invoc,
+                parent
+            }
+            invoc.parent = stmt;
+            return stmt;
+        }
+
+        return super.visitExpressionStatement(parent, s);
+    }
 }

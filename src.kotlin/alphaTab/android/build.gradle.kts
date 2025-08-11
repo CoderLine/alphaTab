@@ -142,6 +142,7 @@ dependencies {
     testImplementation(libs.alphaskia.linux)
     testImplementation(libs.alphaskia.windows)
     testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.klaxon)
 }
 
 publishing {

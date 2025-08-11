@@ -930,6 +930,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
             case cs.SyntaxKind.EnumDeclaration:
+            case cs.SyntaxKind.DelegateDeclaration:
                 this.write(this._context.getFullName(type as cs.NamedTypeDeclaration));
                 break;
             case cs.SyntaxKind.TypeParameterDeclaration:
@@ -1914,13 +1915,84 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    protected writeDefaultExpression(_: cs.DefaultExpression): void {
-        this.write('null');
+    protected writeDefaultExpression(d: cs.DefaultExpression): void {
+        if (d.parent && cs.isParameterDeclaration(d.parent) && d.parent.type) {
+            if (d.parent.type.isNullable) {
+                this.write('null');
+            } else if (cs.isPrimitiveTypeNode(d.parent.type)) {
+                switch (d.parent.type.type) {
+                    case cs.PrimitiveType.Bool:
+                        this.write('false');
+                        break;
+                    case cs.PrimitiveType.Double:
+                        this.write('0.0');
+                        break;
+                    case cs.PrimitiveType.Int:
+                        this.write('0');
+                        break;
+                    case cs.PrimitiveType.Long:
+                        this.write('0L');
+                        break;
+                    default:
+                        this.write('null');
+                        break;
+                }
+            } else if (cs.isArrayTupleNode(d.parent.type)) {
+                this.writeType(d.parent.type, true);
+                this.write('()');
+            } else {
+                this.write('null');
+            }
+        } else {
+            this.write('null');
+        }
     }
 
     protected override writeLabeledExpression(expr: cs.LabeledExpression) {
         this.write(expr.label);
         this.write(' = ');
         this.writeExpression(expr.expression);
+    }
+
+    protected writeDelegateDeclaration(d: cs.DelegateDeclaration) {
+        this.writeDocumentation(d);
+
+        this.writeLine('@OptIn(kotlin.contracts.ExperimentalContracts::class)');
+        this.writeLine('@kotlin.ExperimentalUnsignedTypes');
+        this.writeVisibility(d.visibility);
+        this.write('typealias ');
+        this.write(d.name);
+        this.write(' = ');
+
+        this.write('(');
+        this.writeCommaSeparated(d.parameters, p => this.writeParameter(p));
+        this.write(') -> ');
+        this.writeType(d.returnType);
+        this.writeLine();
+    }
+
+    protected writeDeconstructDeclaration(expr: cs.DeconstructDeclaration) {
+        this.write('(');
+        expr.names.forEach((v, i) => {
+            if (i > 0) {
+                this.write(', ');
+            }
+            this.write(this.escapeIdentifier(v));
+        });
+        this.write(')');
+    }
+
+    protected writeInvocationExpression(expr: cs.InvocationExpression): void {
+        if (expr.arguments.length === 1 && expr.arguments[0].nodeType === cs.SyntaxKind.Block) {
+            this.writeExpression(expr.expression);
+            if (expr.typeArguments) {
+                this.write('<');
+                this.writeCommaSeparated(expr.typeArguments, t => this.writeType(t));
+                this.write('>');
+            }
+            this.writeBlock(expr.arguments[0] as cs.Block);
+        } else {
+            super.writeInvocationExpression(expr);
+        }
     }
 }

@@ -159,44 +159,39 @@ export class BeamingHelper {
     }
 
     private calculateDirection(): BeamDirection {
-        let direction: BeamDirection | null = null;
-        let checkMiddleKey = true;
+        // no proper voice (should not happen usually)
         if (!this.voice) {
-            // no proper voice (should not happen usually)
-            direction = BeamDirection.Up;
-        } else if (this.preferredBeamDirection !== null) {
-            // we have a preferred direction
-            direction = this.preferredBeamDirection;
-        } else if (this.voice.index > 0) {
-            // on multi-voice setups secondary voices are always down
-            direction = this.invert(BeamDirection.Down);
-            checkMiddleKey = false;
-        } else if (this.voice.bar.isMultiVoice) {
-            // on multi-voice setups primary voices are always up
-            direction = this.invert(BeamDirection.Up);
-            checkMiddleKey = false;
-        } else if (this.beats[0].graceType !== GraceType.None) {
-            // grace notes are always up
-            direction = this.invert(BeamDirection.Up);
-        } else {
-            direction = this.invert(BeamDirection.Up);
+            return BeamDirection.Up;
+        }
+        // we have a preferred direction
+        if (this.preferredBeamDirection !== null) {
+            return this.preferredBeamDirection!;
+        }
+        // on multi-voice setups secondary voices are always down
+        if (this.voice.index > 0) {
+            return this.invert(BeamDirection.Down);
+        }
+        // on multi-voice setups primary voices are always up
+        if (this.voice.bar.isMultiVoice) {
+            return this.invert(BeamDirection.Up);
+        }
+        // grace notes are always up
+        if (this.beats[0].graceType !== GraceType.None) {
+            return this.invert(BeamDirection.Up);
         }
 
         // the average line is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        if (checkMiddleKey && this.highestNoteInHelper && this.lowestNoteInHelper) {
+        if (this.highestNoteInHelper && this.lowestNoteInHelper) {
             const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
             const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
 
-            if (direction === null) {
-                const avg = (highestNotePosition + lowestNotePosition) / 2;
-                direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
-            }
-        } else {
+            const avg = (highestNotePosition + lowestNotePosition) / 2;
+            return this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
         }
 
-        return direction;
+        return this.invert(BeamDirection.Up);
     }
 
     public static computeLineHeightsForRest(duration: Duration): number[] {

@@ -10,7 +10,7 @@ internal class AlphaSkiaTextStyle : AutoCloseable {
         this.textStyle = textStyle
     }
 
-    val fontFamilies: alphaTab.collections.List<String> get() = alphaTab.collections.List(*this.textStyle.fontFamilies)
+    val familyNames: alphaTab.collections.List<String> get() = alphaTab.collections.List(*this.textStyle.fontFamilies)
     val weight: Double get() = this.textStyle.weight.toDouble()
     val isItalic: Boolean get() = this.textStyle.isItalic
 

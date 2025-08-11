@@ -16,7 +16,7 @@ export class BarTempoGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        super.doLayout;
+        super.doLayout();
         const res = this.renderer.resources;
         this.height =
             this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.MetNoteQuarterUp)! *

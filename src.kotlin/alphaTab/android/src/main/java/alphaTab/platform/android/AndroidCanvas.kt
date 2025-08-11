@@ -278,7 +278,7 @@ internal class AndroidCanvas : ICanvas {
                 (-paint.fontMetrics.ascent - paint.fontMetrics.descent) / 2.0f
             }
             TextBaseline.Alphabetic -> {// kAlphabeticTextBaseline
-                0
+                0f
             }
             TextBaseline.Bottom -> {// kBottomTextBaseline
                 -paint.fontMetrics.descent
@@ -330,7 +330,7 @@ internal class AndroidCanvas : ICanvas {
             if (centerAtPosition == true) {
                 paint.textAlign = Paint.Align.CENTER
             }
-            
+
             _canvas!!.drawText(
                 s,
                 x.toFloat(),
