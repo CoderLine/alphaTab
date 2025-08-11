@@ -1,11 +1,3 @@
 SMuFL
     Visual Testing
     - Alternative SmuFL font rendering
-
-    Test findings:
-    - test-data/visual-tests/music-notation/rest-collisions.png
-      test-data/visual-tests/notation-legend/multi-voice-default.png
-      rests are not shifted down when beam direction is down
-    - test-data/musicxml-testsuite/23f-Tuplets-DurationButNoBracket.png
-      a lot of space reserved?
-y 

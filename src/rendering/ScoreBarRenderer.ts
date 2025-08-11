@@ -422,7 +422,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (result && this.bar.isMultiVoice) {
             // consider rest overflows
             const top: number = this.getScoreY(-2);
-            const bottom: number = this.getScoreY(10);
+            const bottom: number = this.getScoreY(this.heightLineCount * 2);
             const minMax = this.helpers.collisionHelper.getBeatMinMaxY();
             if (minMax[0] < top) {
                 this.registerOverflowTop(Math.abs(minMax[0]));

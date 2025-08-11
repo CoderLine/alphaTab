@@ -155,10 +155,12 @@ export class BeamingHelper {
     public direction: BeamDirection = BeamDirection.Up;
     public finish(): void {
         this.direction = this.calculateDirection();
+        this._renderer.completeBeamingHelper(this);
     }
 
     private calculateDirection(): BeamDirection {
         let direction: BeamDirection | null = null;
+        let checkMiddleKey = true;
         if (!this.voice) {
             // no proper voice (should not happen usually)
             direction = BeamDirection.Up;
@@ -168,18 +170,22 @@ export class BeamingHelper {
         } else if (this.voice.index > 0) {
             // on multi-voice setups secondary voices are always down
             direction = this.invert(BeamDirection.Down);
+            checkMiddleKey = false;
         } else if (this.voice.bar.isMultiVoice) {
             // on multi-voice setups primary voices are always up
             direction = this.invert(BeamDirection.Up);
+            checkMiddleKey = false;
         } else if (this.beats[0].graceType !== GraceType.None) {
             // grace notes are always up
+            direction = this.invert(BeamDirection.Up);
+        } else {
             direction = this.invert(BeamDirection.Up);
         }
 
         // the average line is used for determination
         //      key lowerequal than middle line -> up
         //      key higher than middle line -> down
-        if (this.highestNoteInHelper && this.lowestNoteInHelper) {
+        if (checkMiddleKey && this.highestNoteInHelper && this.lowestNoteInHelper) {
             const highestNotePosition = this._renderer.getNoteY(this.highestNoteInHelper, NoteYPosition.Center);
             const lowestNotePosition = this._renderer.getNoteY(this.lowestNoteInHelper, NoteYPosition.Center);
 
@@ -187,11 +193,7 @@ export class BeamingHelper {
                 const avg = (highestNotePosition + lowestNotePosition) / 2;
                 direction = this.invert(this._renderer.middleYPosition < avg ? BeamDirection.Up : BeamDirection.Down);
             }
-
-            this._renderer.completeBeamingHelper(this);
         } else {
-            direction = this.invert(BeamDirection.Up);
-            this._renderer.completeBeamingHelper(this);
         }
 
         return direction;
