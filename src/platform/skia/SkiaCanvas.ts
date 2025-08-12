@@ -125,17 +125,19 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.beginRender(width, height, Environment.HighDpiFactor);
 
         const customFont = this.settings.display.resources.smuflFontFamilyName;
-        if (
-            customFont &&
-            customFont !== SkiaCanvas.defaultMusicTextStyle!.familyNames[0] &&
-            !this._textStyles.has(customFont!)
-        ) {
-            this._musicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
-                [customFont],
-                SkiaCanvas.defaultMusicTextStyle!.weight,
-                SkiaCanvas.defaultMusicTextStyle!.isItalic
-            );
-            this._textStyles.set(customFont, this._musicTextStyle);
+        if (customFont && customFont !== SkiaCanvas.defaultMusicTextStyle!.familyNames[0]) {
+            if (!this._textStyles.has(customFont!)) {
+                this._musicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
+                    [customFont],
+                    SkiaCanvas.defaultMusicTextStyle!.weight,
+                    SkiaCanvas.defaultMusicTextStyle!.isItalic
+                );
+                this._textStyles.set(customFont, this._musicTextStyle);
+            } else {
+                this._musicTextStyle = this._textStyles.get(customFont)!;
+            }
+        } else {
+            this._musicTextStyle = SkiaCanvas.defaultMusicTextStyle;
         }
     }
 

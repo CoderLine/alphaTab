@@ -336,7 +336,7 @@ export class TabBendGlyph extends Glyph {
         let y1: number = cy - bendValueHeight * firstPt.lineValue;
         if (firstPt.value === 0) {
             if (secondPt.offset === firstPt.offset) {
-                y1 += r.getNoteY(note.beat.maxStringNote!, NoteYPosition.Top);
+                y1 += r.getNoteY(note.beat.maxStringNote!, NoteYPosition.Top) - overflowOffset / 2;
             } else {
                 y1 += r.getNoteY(note, NoteYPosition.Center);
             }
@@ -455,7 +455,7 @@ export class TabBendGlyph extends Glyph {
                 // draw label
                 canvas.font = res.tablatureFont;
                 const size = canvas.measureText(s);
-                const y: number = startY - size.height / 2;
+                const y: number = startY - size.height / 1.5;
                 const x: number = x2 - size.width / 2;
                 canvas.fillText(s, x, y - res.smuflMetrics.tabBendLabelPadding);
             }

@@ -252,9 +252,10 @@ export class BarLineGlyph extends LeftToRightLayoutingGlyphGroup {
 
         const lineRenderer = this.renderer as LineBarRenderer;
 
-        const top: number = this.y + this.renderer.topPadding;
+        const lineYOffset = lineRenderer.smuflMetrics.staffLineThickness ;
+        const top: number = this.y + lineRenderer.topPadding - lineYOffset;
         const bottom: number = this.y + this.renderer.height - this.renderer.bottomPadding;
-        const h: number = (bottom - top) + lineRenderer.smuflMetrics.staffLineThickness / 2;
+        const h: number = (bottom - top);
 
         for (const g of this.glyphs!) {
             g.y = top;

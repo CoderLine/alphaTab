@@ -72,7 +72,9 @@ export abstract class LineBarRenderer extends BarRendererBase {
     protected updateFirstLineY() {
         const fullLineHeight = this.lineOffset * (this.heightLineCount - 1);
         const actualLineHeight = (this.drawnLineCount - 1) * this.lineOffset;
-        this.firstLineY = (this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0;
+        const lineYOffset = this.smuflMetrics.staffLineThickness / 2;
+
+        this.firstLineY = ((this.topPadding + (fullLineHeight - actualLineHeight) / 2) | 0) - lineYOffset;
     }
 
     public override doLayout(): void {

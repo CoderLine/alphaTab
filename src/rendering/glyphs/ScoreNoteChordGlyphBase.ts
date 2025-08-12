@@ -25,11 +25,11 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
     public abstract get scale(): number;
 
     public getLowestNoteY(): number {
-        return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
+        return this.maxNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.maxNote.steps) : 0;
     }
 
     public getHighestNoteY(): number {
-        return this.maxNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.maxNote.steps) : 0;
+        return this.minNote ? (this.renderer as ScoreBarRenderer).getScoreY(this.minNote.steps) : 0;
     }
 
     protected add(noteGlyph: MusicFontGlyph, noteLine: number): void {
@@ -174,11 +174,13 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         const minNoteLineY = scoreRenderer.getLineY(this.minNote!.steps / 2);
         const maxNoteLineY = scoreRenderer.getLineY(this.maxNote!.steps / 2);
 
+        const lineYOffset = (this.renderer.smuflMetrics.legerLineThickness * scale) / 2;
+
         let y = firstTopLedgerY;
         while (y >= minNoteLineY) {
             canvas.fillRect(
                 cx - lineExtension + this.noteStartX,
-                cy + y,
+                cy + y - lineYOffset,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale
             );
@@ -189,7 +191,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
         while (y <= maxNoteLineY) {
             canvas.fillRect(
                 cx - lineExtension + this.noteStartX,
-                cy + y,
+                cy + y - lineYOffset,
                 lineWidth,
                 this.renderer.smuflMetrics.legerLineThickness * scale
             );

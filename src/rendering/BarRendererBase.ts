@@ -160,7 +160,7 @@ export class BarRendererBase {
     }
 
     public registerOverflowTop(topOverflow: number): boolean {
-        //topOverflow = Math.ceil(topOverflow);
+        topOverflow = Math.ceil(topOverflow);
         if (topOverflow > this.topOverflow) {
             this.topOverflow = topOverflow;
             return true;
@@ -169,7 +169,7 @@ export class BarRendererBase {
     }
 
     public registerOverflowBottom(bottomOverflow: number): boolean {
-        //bottomOverflow = Math.ceil(bottomOverflow);
+        bottomOverflow = Math.ceil(bottomOverflow);
         if (bottomOverflow > this.bottomOverflow) {
             this.bottomOverflow = bottomOverflow;
             return true;

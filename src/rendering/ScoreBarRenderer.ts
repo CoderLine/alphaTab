@@ -159,8 +159,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
                             }
                         }
                     } else if (h.beats.length === 1) {
-                        // notes with stems/flags
-                        if (h.beats[0].duration >= Duration.Quarter) {
+                        // notes with stems
+                        if (h.beats[0].duration >= Duration.Half) {
                             if (h.direction === BeamDirection.Up) {
                                 let topY = this.getFlagTopY(h.beats[0], h.direction);
                                 if (h.hasTuplet) {
