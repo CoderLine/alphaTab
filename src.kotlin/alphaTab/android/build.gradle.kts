@@ -1,4 +1,5 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -65,11 +66,11 @@ group = libGroup
 version = libVersion
 
 val javaVersion = JavaVersion.VERSION_17;
-var jvmTarget = 17
+var jvmTargetVersion = JvmTarget.JVM_17
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(jvmTarget)
+        jvmTarget.set(jvmTargetVersion)
         freeCompilerArgs.addAll(
             listOf(
                 "-Xno-call-assertions",
@@ -86,7 +87,6 @@ android {
 
     defaultConfig {
         minSdk = 26
-        setProperty("archivesBaseName", "alphaTab-android")
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         aarMetadata {
             minCompileSdk = 34

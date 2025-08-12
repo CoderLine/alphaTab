@@ -47,12 +47,6 @@ internal class FontSizesPartials {
                             }
                         }
 
-                        try {
-
-                        } catch(_) {
-
-                        }
-
                         canvas.endRender().close()
                     }
 
