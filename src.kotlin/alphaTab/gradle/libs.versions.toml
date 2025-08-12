@@ -12,7 +12,7 @@ coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.3.0"
 alphaskia = "3.4.135"
-mavenPublish = "0.33.0"
+mavenPublish = "0.34.0"
 klaxon = "5.5"
 
 
