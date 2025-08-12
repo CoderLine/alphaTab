@@ -72,7 +72,7 @@
         "bravura-smufl": "tsx scripts/smufl-metadata.ts font/bravura/bravura_metadata.json font/bravura/bravura_alphatab_metadata.json true"
     },
     "devDependencies": {
-        "@biomejs/biome": "^1.9.4",
+        "@biomejs/biome": "^2.1.4",
         "@coderline/alphaskia": "^3.4.135",
         "@coderline/alphaskia-linux": "^3.4.135",
         "@coderline/alphaskia-windows": "^3.4.135",
