@@ -887,14 +887,19 @@ export default class CSharpAstPrinter extends AstPrinterBase {
     private _currentCatchClauseIdentifier: string[] = [];
 
     protected writeCatchClause(c: cs.CatchClause): void {
-        this.write('catch (');
-        this.writeType(c.variableDeclaration.type);
-        this.write(' ');
-        this.write(this.escapeIdentifier(c.variableDeclaration.name));
-        this._currentCatchClauseIdentifier.push(c.variableDeclaration.name);
-        this.writeLine(')');
-        this.writeBlock(c.block);
-        this._currentCatchClauseIdentifier.pop();
+        if (c.variableDeclaration) {
+            this.write('catch (');
+            this.writeType(c.variableDeclaration.type);
+            this.write(' ');
+            this.write(this.escapeIdentifier(c.variableDeclaration.name));
+            this._currentCatchClauseIdentifier.push(c.variableDeclaration.name);
+            this.writeLine(')');
+            this.writeBlock(c.block);
+            this._currentCatchClauseIdentifier.pop();
+        } else {
+            this.write('catch');
+            this.writeBlock(c.block);
+        }
     }
 
     protected writeSwitchStatement(s: cs.SwitchStatement) {

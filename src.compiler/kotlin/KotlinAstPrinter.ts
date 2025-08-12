@@ -1386,13 +1386,23 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
+    private _catchVar:number = 0;
     protected writeCatchClause(c: cs.CatchClause): void {
-        this.write('catch (');
-        this.writeIdentifier(c.variableDeclaration.name);
-        this.write(': ');
-        this.writeType(c.variableDeclaration.type);
-        this.writeLine(')');
-        this.writeBlock(c.block);
+        if (c.variableDeclaration) {
+            this.write('catch (');
+            this.writeIdentifier(c.variableDeclaration.name);
+            this.write(': ');
+            this.writeType(c.variableDeclaration.type);
+            this.writeLine(')');
+            this.writeBlock(c.block);
+        } else {
+            this.write('catch (');
+            const varName = `_e${this._catchVar++}`;
+            this.writeIdentifier(varName);
+            this.write(': kotlin.Throwable)');
+            this.writeBlock(c.block);
+            this._catchVar--;
+        }
     }
 
     protected writeSwitchStatement(s: cs.SwitchStatement) {

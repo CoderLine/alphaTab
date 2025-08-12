@@ -247,7 +247,7 @@ export class AlphaTabWebPackPlugin {
                         }
 
                         alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
-                    } catch {
+                    } catch (e) {
                         alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
                     }
                 }
@@ -299,7 +299,7 @@ export class AlphaTabWebPackPlugin {
                             .map(async file => {
                                 // node v20.12.0 has parentPath pointing to the path (not the file)
                                 // see https://github.com/nodejs/node/pull/50976
-                                const sourceFilename = path.join(file.parentPath ?? file.path, file.name);
+                                const sourceFilename = path.join(file.parentPath ?? (file as any).path, file.name);
                                 await fs.promises.copyFile(sourceFilename, path.join(outputPath!, subdir, file.name));
                                 const assetFileName = `${subdir}/${file.name}`;
                                 const existingAsset = compilation.getAsset(assetFileName);

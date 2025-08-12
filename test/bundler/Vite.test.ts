@@ -53,7 +53,7 @@ describe('Vite', () => {
 
         for (const file of dir) {
             if (file.isFile()) {
-                const text = await fs.promises.readFile(path.join(file.parentPath ?? file.path, file.name), 'utf8');
+                const text = await fs.promises.readFile(path.join(file.parentPath, file.name), 'utf8');
 
                 if (file.name.startsWith('index-')) {
                     // ensure new worker has worker import

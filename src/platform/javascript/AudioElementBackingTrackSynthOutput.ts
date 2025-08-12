@@ -59,7 +59,7 @@ export class AudioElementBackingTrackSynthOutput implements IAudioElementBacking
             URL.revokeObjectURL(this.audioElement.src);
         }
 
-        const blob = new Blob([backingTrack.rawAudioFile!]);
+        const blob = new Blob([backingTrack.rawAudioFile! as Uint8Array<ArrayBuffer>]);
         // https://html.spec.whatwg.org/multipage/media.html#loading-the-media-resource
         // Step 8. resets the playbackRate, we need to remember and restore it. 
         const playbackRate = this.audioElement.playbackRate;

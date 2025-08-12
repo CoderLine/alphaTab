@@ -1,5 +1,4 @@
 import com.vanniktech.maven.publish.AndroidSingleVariantLibrary
-import com.vanniktech.maven.publish.SonatypeHost
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -67,6 +66,20 @@ version = libVersion
 
 val javaVersion = JavaVersion.VERSION_17;
 var jvmTarget = 17
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(jvmTarget)
+        freeCompilerArgs.addAll(
+            listOf(
+                "-Xno-call-assertions",
+                "-Xno-receiver-assertions",
+                "-Xno-param-assertions"
+            )
+        )
+    }
+}
+
 android {
     namespace = project.group.toString()
     compileSdk = 34
@@ -89,14 +102,7 @@ android {
         sourceCompatibility = javaVersion
         targetCompatibility = javaVersion
     }
-    kotlinOptions {
-        jvmTarget = javaVersion.toString()
-        freeCompilerArgs += listOf(
-            "-Xno-call-assertions",
-            "-Xno-receiver-assertions",
-            "-Xno-param-assertions"
-        )
-    }
+
 
     sourceSets {
         getByName("main") {
@@ -123,6 +129,7 @@ android {
             "json",
             "txt",
             "md"
+        //noinspection WrongGradleMethod
         ).joinToString(":") { "!*.${it}" }
     }
 }
@@ -146,7 +153,7 @@ dependencies {
 }
 
 publishing {
-    repositories{
+    repositories {
         maven {
             name = "DistPath"
             url = rootProject.projectDir.resolve("dist").toURI()
@@ -154,23 +161,27 @@ publishing {
     }
 }
 
-internal fun Project.findOptionalProperty(propertyName: String) = findProperty(propertyName)?.toString()
+internal fun Project.findOptionalProperty(propertyName: String) =
+    findProperty(propertyName)?.toString()
 
 mavenPublishing {
-    publishToMavenCentral(SonatypeHost.CENTRAL_PORTAL, automaticRelease = true)
+    publishToMavenCentral(automaticRelease = true)
     coordinates(libGroup, libArtifactId, libVersion)
     signAllPublications()
 
-    configure(AndroidSingleVariantLibrary(
-        variant = "release",
-        sourcesJar = true,
-        publishJavadocJar = true
-    ))
+    configure(
+        AndroidSingleVariantLibrary(
+            variant = "release",
+            sourcesJar = true,
+            publishJavadocJar = true
+        )
+    )
 
     val inMemoryKeyFile = project.findOptionalProperty("signingInMemoryKeyFile")
     if (inMemoryKeyFile != null) {
         val inMemoryKeyId = project.findOptionalProperty("signingInMemoryKeyId")
-        val inMemoryKeyPassword = project.findOptionalProperty("signingInMemoryKeyPassword").orEmpty()
+        val inMemoryKeyPassword =
+            project.findOptionalProperty("signingInMemoryKeyPassword").orEmpty()
         val signing = project.extensions.getByType(SigningExtension::class.java)
         val inMemoryKey = File(inMemoryKeyFile).readText()
         signing.useInMemoryPgpKeys(inMemoryKeyId, inMemoryKey, inMemoryKeyPassword)

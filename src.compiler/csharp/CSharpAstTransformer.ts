@@ -2238,11 +2238,12 @@ export default class CSharpAstTransformer {
             nodeType: cs.SyntaxKind.CatchClause,
             parent: parent,
             tsNode: s,
-            variableDeclaration: {} as cs.VariableDeclaration,
             block: {} as cs.Block
         } as cs.CatchClause;
 
-        catchClause.variableDeclaration = this.visitVariableDeclaration(catchClause, s.variableDeclaration!);
+        if (s.variableDeclaration) {
+            catchClause.variableDeclaration = this.visitVariableDeclaration(catchClause, s.variableDeclaration!);
+        }
         catchClause.block = this.visitBlock(catchClause, s.block);
 
         return catchClause;

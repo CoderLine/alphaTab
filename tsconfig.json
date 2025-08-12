@@ -3,11 +3,22 @@
         "moduleResolution": "Bundler",
         "target": "ES2020",
         "module": "ES2020",
-        "lib": ["ES2015", "ES2016", "ES2017", "ES2021", "es2022.regexp", "es2022.error", "ES2024.Promise", "DOM", "DOM.Iterable"],
+        "lib": [
+            "ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2021",
+            "es2022.regexp",
+            "es2022.error",
+            "ES2024.Promise",
+            "DOM",
+            "DOM.Iterable",
+            "ES2017.ArrayBuffer",
+            "ES2024.ArrayBuffer"
+        ],
         "isolatedModules": true,
         "moduleDetection": "force",
         "noEmit": true,
-
         "strict": true,
         "allowSyntheticDefaultImports": true,
         "strictNullChecks": true,
@@ -20,10 +31,17 @@
         "noImplicitOverride": true,
         "baseUrl": ".",
         "paths": {
-            "@src/*": ["src/*"],
-            "@test/*": ["test/*"]
+            "@src/*": [
+                "src/*"
+            ],
+            "@test/*": [
+                "test/*"
+            ]
         },
-        "typeRoots": ["./types/", "./node_modules/@types"]
+        "typeRoots": [
+            "./types/",
+            "./node_modules/@types"
+        ]
     },
     "include": [
         "src",
@@ -36,5 +54,7 @@
         "rollup.plugin.server.ts",
         "rollup.plugin.resolve.ts"
     ],
-    "exclude": ["**/node_modules"]
+    "exclude": [
+        "**/node_modules"
+    ]
 }

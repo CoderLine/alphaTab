@@ -157,7 +157,7 @@ async function showBackingTrack(at: alphaTab.AlphaTabApi) {
     backingTrackScore = at.score;
 
     const audioContext = new AudioContext();
-    const rawData = await audioContext.decodeAudioData(structuredClone(at.score!.backingTrack.rawAudioFile!.buffer));
+    const rawData = await audioContext.decodeAudioData(structuredClone(at.score!.backingTrack.rawAudioFile!.buffer) as ArrayBuffer);
 
     const topChannel = rawData.getChannelData(0);
     const bottomChannel = rawData.numberOfChannels > 1 ? rawData.getChannelData(1) : topChannel;
@@ -464,7 +464,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
         const data = exporter.export(at.score!, at.settings);
         const a = document.createElement('a');
         a.download = at.score!.title.length > 0 ? `${at.score!.title}.gp` : 'song.gp';
-        a.href = URL.createObjectURL(new Blob([data]));
+        a.href = URL.createObjectURL(new Blob([data as Uint8Array<ArrayBuffer>]));
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -564,7 +564,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
                     ? `${at.score!.title}_${exportOptions.sampleRate}_float32.pcm`
                     : `song_${exportOptions.sampleRate}_float32.pcm`;
             a.href = URL.createObjectURL(
-                new Blob([new Uint8Array(generated.buffer, generated.byteOffset, generated.byteLength)])
+                new Blob([new Uint8Array<ArrayBuffer>(generated.buffer as ArrayBuffer, generated.byteOffset, generated.byteLength)])
             );
             document.body.appendChild(a);
             a.click();
