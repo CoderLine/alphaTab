@@ -1,5 +1,6 @@
 package alphaTab.platform.svg
 
+import alphaTab.Logger
 import alphaTab.alphaSkia.AlphaSkiaCanvas
 import alphaTab.alphaSkia.AlphaSkiaTextAlign
 import alphaTab.alphaSkia.AlphaSkiaTextBaseline
@@ -52,6 +53,7 @@ internal class FontSizesPartials {
                     FontSizeDefinition(Uint8Array(widths), Uint8Array(heights))
                 )
             } catch (e: Throwable) {
+                Logger.error("Rendering", "Error while generating font lookup $e ${e.stackTraceToString()}")
                 FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
             }
         }
