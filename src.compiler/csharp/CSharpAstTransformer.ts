@@ -1882,6 +1882,13 @@ export default class CSharpAstTransformer {
                     variableStatement.deconstructNames.push((el.name as ts.Identifier).text);
                 }
             }
+
+            if (s.initializer) {
+                const type = this._context.typeChecker.getTypeAtLocation(s);
+                this._declarationOrAssignmentTypeStack.push(type);
+                variableStatement.initializer = this.visitExpression(variableStatement, s.initializer) ?? undefined;
+                this._declarationOrAssignmentTypeStack.pop();
+            }
         }
 
         return variableStatement;
