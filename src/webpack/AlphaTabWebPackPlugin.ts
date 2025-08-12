@@ -247,7 +247,7 @@ export class AlphaTabWebPackPlugin {
                         }
 
                         alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
-                    } catch (e) {
+                    } catch {
                         alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
                     }
                 }
