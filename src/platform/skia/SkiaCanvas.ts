@@ -5,6 +5,7 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import type { Settings } from '@src/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
+import { Logger } from '@src/Logger';
 
 /**
  * Describes the members of the alphaSkia module.
@@ -120,6 +121,7 @@ export class SkiaCanvas implements ICanvas {
         return null;
     }
 
+    private _initialMeasureDone = false;
     public beginRender(width: number, height: number): void {
         this._scale = this.settings.display.scale;
         this._canvas.beginRender(width, height, Environment.HighDpiFactor);
@@ -295,7 +297,27 @@ export class SkiaCanvas implements ICanvas {
             SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic
         );
 
-        return new MeasuredText(metrics.width, metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
+        const [width, height] = this.getTextWidthAndHeight(metrics, text);
+
+        return new MeasuredText(width, height);
+    }
+
+    private getTextWidthAndHeight(metrics: alphaSkia.AlphaSkiaTextMetrics, text:string): [number, number] {
+        let width = metrics.width;
+
+        // BUG: Skia has some problem of not delivering the correct sizes intiially, asking again seem to work
+        // Need to narrow this down separately.
+        if (text.length > 0 && width < 1) {
+            for (let i = 0; i < 5; i++) {
+                width = metrics.width;
+                if (width > 1) {
+                    break;
+                }
+            }
+        }
+        const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+        return [width, height]
     }
 
     public fillMusicFontSymbol(
