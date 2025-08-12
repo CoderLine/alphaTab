@@ -2,6 +2,7 @@ package alphaTab.platform.svg
 
 import alphaTab.Logger
 import alphaTab.alphaSkia.AlphaSkiaCanvas
+import alphaTab.alphaSkia.AlphaSkiaPlatform
 import alphaTab.alphaSkia.AlphaSkiaTextAlign
 import alphaTab.alphaSkia.AlphaSkiaTextBaseline
 import alphaTab.alphaSkia.AlphaSkiaTextStyle
@@ -24,34 +25,39 @@ internal class FontSizesPartials {
             val heights = DoubleList()
 
             try {
-                AlphaSkiaCanvas().use { canvas ->
-                    canvas.beginRender(10, 10)
+                if(AlphaSkiaPlatform.isNativeLibLoaded()) {
+                    AlphaSkiaCanvas().use { canvas ->
+                        canvas.beginRender(10, 10)
 
-                    AlphaSkiaTextStyle(arrayOf(family), 400, false).use { style ->
-                        for (i in (FontSizes.ControlChars.toInt() until 255)) {
-                            val s = i.toChar().toString()
-                            canvas.measureText(
-                                s,
-                                style,
-                                measureSize,
-                                AlphaSkiaTextAlign.LEFT,
-                                AlphaSkiaTextBaseline.ALPHABETIC
-                            ).use { metrics ->
-                                widths.push(metrics.width.toDouble())
-                                val height =
-                                    metrics.actualBoundingBoxDescent + metrics.actualBoundingBoxAscent
-                                heights.push(height.toDouble())
+                        AlphaSkiaTextStyle(arrayOf(family), 400, false).use { style ->
+                            for (i in (FontSizes.ControlChars.toInt() until 255)) {
+                                val s = i.toChar().toString()
+                                canvas.measureText(
+                                    s,
+                                    style,
+                                    measureSize,
+                                    AlphaSkiaTextAlign.LEFT,
+                                    AlphaSkiaTextBaseline.ALPHABETIC
+                                ).use { metrics ->
+                                    widths.push(metrics.width.toDouble())
+                                    val height =
+                                        metrics.actualBoundingBoxDescent + metrics.actualBoundingBoxAscent
+                                    heights.push(height.toDouble())
+                                }
                             }
                         }
+
+                        canvas.endRender().close()
                     }
 
-                    canvas.endRender().close()
+                    FontSizes.FontSizeLookupTables.set(
+                        family,
+                        FontSizeDefinition(Uint8Array(widths), Uint8Array(heights))
+                    )
+                } else {
+                    Logger.warning("Rendering", "Generating font lookup before alphaSkia init, SVG sizes will be wrong")
+                    FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
                 }
-
-                FontSizes.FontSizeLookupTables.set(
-                    family,
-                    FontSizeDefinition(Uint8Array(widths), Uint8Array(heights))
-                )
             } catch (e: Throwable) {
                 Logger.error("Rendering", "Error while generating font lookup $e ${e.stackTraceToString()}")
                 FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
