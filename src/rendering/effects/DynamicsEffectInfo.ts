@@ -24,7 +24,7 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return this.internalShouldCreateGlyph(beat);
     }
 
@@ -69,11 +69,11 @@ export class DynamicsEffectInfo extends EffectBarRendererInfo {
         return null;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new DynamicsGlyph(0, 0, beat.dynamics);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

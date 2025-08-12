@@ -288,7 +288,7 @@ export class BoundsLookup {
         const staffSystem: StaffSystemBounds = this.staffSystems[staffSystemIndex];
         const bar: MasterBarBounds | null = staffSystem.findBarAtPos(x);
         if (bar) {
-            return bar.findBeatAtPos(x, y);
+            return bar.findBeatAtPos(x);
         }
         return null;
     }

@@ -47,7 +47,6 @@ import {
     WORKER_ASSET_ID,
     WORKER_FILE_ID
 } from '@src/vite/bridge';
-import {} from '@src/vite/bridge';
 import * as path from 'node:path';
 import MagicString from 'magic-string';
 

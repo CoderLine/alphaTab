@@ -20,7 +20,7 @@ export class LeftHandTapEffectInfo extends NoteEffectInfoBase {
         return note.isLeftHandTapped;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new LeftHandTapGlyph();
     }
 }

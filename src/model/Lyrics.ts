@@ -39,7 +39,7 @@ export class Lyrics {
         this.parse(this.text, 0, this.chunks, skipEmptyEntries);
     }
 
-    private parse(str: string, p: number, chunks: string[], skipEmptyEntries: boolean): void {
+    private parse(str: string, p: number, _chunks: string[], skipEmptyEntries: boolean): void {
         if (!str) {
             return;
         }

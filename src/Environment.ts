@@ -146,7 +146,7 @@ export class Environment {
         if (Environment._globalThis === undefined) {
             try {
                 Environment._globalThis = globalThis;
-            } catch (e) {
+            } catch {
                 // globalThis not available
             }
 
@@ -253,7 +253,7 @@ export class Environment {
             if (importUrl && importUrl.indexOf('file://') === -1) {
                 return importUrl;
             }
-        } catch (e) {
+        } catch {
             // ignore potential errors
         }
 
@@ -348,7 +348,7 @@ export class Environment {
             const jquery: any = Environment.globalThis.jQuery;
             const api: JQueryAlphaTab = new JQueryAlphaTab();
             jquery.fn.alphaTab = function (this: any, method: string) {
-                // biome-ignore lint/style/noArguments: Legacy jQuery plugin argument forwarding
+                // biome-ignore lint/complexity/noArguments: Legacy jQuery plugin argument forwarding
                 const args = Array.prototype.slice.call(arguments, 1);
                 // if only a single element is affected, we use this
                 if (this.length === 1) {
@@ -514,7 +514,7 @@ export class Environment {
                 new CrescendoEffectInfo(),
                 new OttaviaEffectInfo(false),
                 new DynamicsEffectInfo(),
-                new GolpeEffectInfo(GolpeType.Thumb, (s, b) => b.voice.bar.staff.showStandardNotation),
+                new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => b.voice.bar.staff.showStandardNotation),
                 new SustainPedalEffectInfo()
             ]),
             // no before-numbered-hideable
@@ -547,13 +547,13 @@ export class Environment {
                     new PickStrokeEffectInfo(),
                     new PickSlideEffectInfo(),
                     new LeftHandTapEffectInfo(),
-                    new GolpeEffectInfo(GolpeType.Finger, (s, b) => !b.voice.bar.staff.showStandardNotation)
+                    new GolpeEffectInfo(GolpeType.Finger, (_s, b) => !b.voice.bar.staff.showStandardNotation)
                 ],
                 (_, staff) => staff.showTablature
             ),
             new TabBarRendererFactory(),
             new EffectBarRendererFactory(Environment.StaffIdBeforeEndAlways, [
-                new GolpeEffectInfo(GolpeType.Thumb, (s, b) => !b.voice.bar.staff.showStandardNotation)
+                new GolpeEffectInfo(GolpeType.Thumb, (_s, b) => !b.voice.bar.staff.showStandardNotation)
             ])
         ];
     }
@@ -714,7 +714,7 @@ export class Environment {
             if (typeof __webpack_require__ === 'function') {
                 return true;
             }
-        } catch (e) {
+        } catch {
             // ignore any errors
         }
         return false;
@@ -729,7 +729,7 @@ export class Environment {
             if (typeof __BASE__ === 'string') {
                 return true;
             }
-        } catch (e) {
+        } catch {
             // ignore any errors
         }
         return false;
@@ -761,7 +761,7 @@ export class Environment {
                 ) {
                     return WebPlatform.NodeJs;
                 }
-            } catch (e) {
+            } catch {
                 // no node.js
             }
         }
@@ -772,7 +772,7 @@ export class Environment {
             if (url && typeof url === 'string' && !url.startsWith('file://')) {
                 return WebPlatform.BrowserModule;
             }
-        } catch (e) {
+        } catch {
             // no browser module
         }
 

@@ -506,7 +506,7 @@ export class NoteBendEvent extends MidiEvent {
         this.value = value;
     }
 
-    public override writeTo(s: IWriteable): void {
+    public override writeTo(_s: IWriteable): void {
         throw new AlphaTabError(AlphaTabErrorType.General, 'Note Bend (Midi2.0) events cannot be exported to SMF1.0');
     }
 }

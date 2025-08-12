@@ -192,7 +192,7 @@ export default abstract class AstPrinterBase {
     protected abstract writeDeconstructDeclaration(expr: cs.DeconstructDeclaration);
 
 
-    protected writeToDoExpression(expr: cs.ToDoExpression) {
+    protected writeToDoExpression(_expr: cs.ToDoExpression) {
         this.write('/* TODO */');
     }
 
@@ -246,7 +246,7 @@ export default abstract class AstPrinterBase {
         this.write(')');
     }
 
-    protected writeNullLiteral(expr: cs.NullLiteral) {
+    protected writeNullLiteral(_expr: cs.NullLiteral) {
         this.write('null');
     }
 
@@ -254,7 +254,7 @@ export default abstract class AstPrinterBase {
         this.write(cs.isTrueLiteral(expr) ? 'true' : 'false');
     }
 
-    protected writeThisLiteral(expr: cs.ThisLiteral) {
+    protected writeThisLiteral(_expr: cs.ThisLiteral) {
         this.write('this');
     }
 

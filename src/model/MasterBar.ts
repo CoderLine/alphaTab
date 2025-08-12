@@ -2,7 +2,6 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import type { Automation } from '@src/model/Automation';
 import type { Beat } from '@src/model/Beat';
 import type { Fermata } from '@src/model/Fermata';
-// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { Bar } from '@src/model/Bar';
 import type { KeySignature } from '@src/model/KeySignature';
 import type { KeySignatureType } from '@src/model/KeySignatureType';

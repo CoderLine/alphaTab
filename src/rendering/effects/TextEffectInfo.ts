@@ -25,7 +25,7 @@ export class TextEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return !!beat.text;
     }
 
@@ -33,7 +33,7 @@ export class TextEffectInfo extends EffectBarRendererInfo {
         return new TextGlyph(0, 0, beat.text!, renderer.resources.effectFont, TextAlign.Left);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

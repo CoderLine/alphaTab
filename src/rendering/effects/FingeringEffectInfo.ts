@@ -61,7 +61,7 @@ export class FingeringEffectInfo extends EffectBarRendererInfo {
         return g;
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

@@ -63,7 +63,7 @@ export class BeatContainerGlyph extends Glyph {
         layoutings.addBeatSpring(this.beat, preBeatStretch, postBeatStretch);
     }
 
-    public applyLayoutingInfo(info: BarLayoutingInfo): void {
+    public applyLayoutingInfo(_info: BarLayoutingInfo): void {
         this.onNotes.updateBeamingHelper();
         this.updateWidth();
     }
@@ -115,7 +115,7 @@ export class BeatContainerGlyph extends Glyph {
         this.width = beatWidth;
     }
 
-    protected createTies(n: Note): void {
+    protected createTies(_n: Note): void {
         // no default ties
     }
 
@@ -179,7 +179,7 @@ export class BeatContainerGlyph extends Glyph {
         canvas.endGroup();
     }
 
-    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, isEmptyBar: boolean) {
+    public buildBoundingsLookup(barBounds: BarBounds, cx: number, cy: number, _isEmptyBar: boolean) {
         const beatBoundings: BeatBounds = new BeatBounds();
         beatBoundings.beat = this.beat;
 

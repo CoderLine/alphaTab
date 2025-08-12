@@ -175,7 +175,7 @@ export abstract class AlphaSynthWebAudioOutputBase implements ISynthOutput {
         }
     }
 
-    public open(bufferTimeInMilliseconds: number): void {
+    public open(_bufferTimeInMilliseconds: number): void {
         this.patchIosSampleRate();
         this._context = WebAudioHelper.createAudioContext();
         const ctx: any = this._context;

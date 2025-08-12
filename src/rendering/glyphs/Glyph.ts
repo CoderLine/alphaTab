@@ -25,7 +25,7 @@ export class Glyph {
         // to be implemented in subclass
     }
 
-    public paint(cx: number, cy: number, canvas: ICanvas): void {
+    public paint(_cx: number, _cy: number, _canvas: ICanvas): void {
         // to be implemented in subclass
     }
 }

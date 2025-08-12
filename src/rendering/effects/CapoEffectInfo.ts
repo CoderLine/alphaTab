@@ -25,7 +25,7 @@ export class CapoEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.index === 0 && beat.voice.bar.index === 0 && beat.voice.bar.staff.capo !== 0;
     }
 
@@ -39,7 +39,7 @@ export class CapoEffectInfo extends EffectBarRendererInfo {
         );
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return false;
     }
 }

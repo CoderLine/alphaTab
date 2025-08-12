@@ -135,10 +135,10 @@ export class ComparisonHelpers {
      * @partial
      */
     public static compareObjects(
-        expected: unknown,
-        actual: unknown,
+        _expected: unknown,
+        _actual: unknown,
         path: string,
-        ignoreKeys: string[] | null
+        _ignoreKeys: string[] | null
     ): boolean {
         assert.fail(`Cannot compare unknown object types on path ${path}`);
         return false;

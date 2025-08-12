@@ -551,7 +551,7 @@ export class Font {
                             } else {
                                 fontSize = 12;
                             }
-                        } catch (e) {
+                        } catch {
                             fontSize = 12;
                         }
                         break;

@@ -665,7 +665,7 @@ export class CapellaParser {
                         if (this._currentVoiceState.voiceStemDir) {
                             chordBeat.preferredBeamDirection = this._currentVoiceState.voiceStemDir;
                         }
-                        this.parseDuration(this._currentBar, chordBeat, c.findChildElement('duration')!);
+                        this.parseDuration(chordBeat, c.findChildElement('duration')!);
                         chordBeat.updateDurations();
                         this._currentVoiceState.currentPosition += chordBeat.playbackDuration;
                         this._currentVoice.addBeat(chordBeat);
@@ -677,7 +677,7 @@ export class CapellaParser {
                         }
                         break;
                     case 'rest':
-                        const restBeat = this.parseRestDurations(this._currentBar, c.findChildElement('duration')!);
+                        const restBeat = this.parseRestDurations(c.findChildElement('duration')!);
                         if (restBeat) {
                             this.initFromPreviousBeat(restBeat, this._currentVoice);
                             restBeat.updateDurations();
@@ -959,12 +959,12 @@ export class CapellaParser {
         }
     }
 
-    private parseRestDurations(bar: Bar, element: XmlNode): Beat | null {
+    private parseRestDurations(element: XmlNode): Beat | null {
         const durationBase = element.getAttribute('base');
         if (durationBase.indexOf('/') !== -1) {
             const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
-            this.parseDuration(bar, restBeat, element);
+            this.parseDuration(restBeat, element);
             return restBeat;
         }
 
@@ -1007,7 +1007,7 @@ export class CapellaParser {
         }
     }
 
-    private parseDuration(bar: Bar, beat: Beat, element: XmlNode) {
+    private parseDuration(beat: Beat, element: XmlNode) {
         const durationBase = element.getAttribute('base');
         beat.duration = this.parseDurationValue(durationBase);
 

@@ -186,7 +186,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
         const fileName: string = !this.score.title ? 'File.mid' : `${this.score.title}.mid`;
         const dlLink: HTMLAnchorElement = document.createElement('a');
         dlLink.download = fileName;
-        const blob: Blob = new Blob([binary], {
+        const blob: Blob = new Blob([binary as Uint8Array<ArrayBuffer>], {
             type: 'audio/midi'
         });
         const url: string = URL.createObjectURL(blob);

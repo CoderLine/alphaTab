@@ -91,7 +91,7 @@ export class AlphaSynthWorkerSynthOutput implements ISynthOutput {
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
         return [];
     }
-    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
+    public async setOutputDevice(_device: ISynthOutputDevice | null): Promise<void> {}
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
         return null;
     }

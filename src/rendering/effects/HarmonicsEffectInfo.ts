@@ -66,7 +66,7 @@ export class HarmonicsEffectInfo extends NoteEffectInfoBase {
         return EffectBarGlyphSizing.GroupedOnBeat;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new LineRangedGlyph(HarmonicsEffectInfo.harmonicToString(this._harmonicType));
     }
 

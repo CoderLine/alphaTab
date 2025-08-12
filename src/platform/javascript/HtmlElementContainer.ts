@@ -78,7 +78,7 @@ export class HtmlElementContainer implements IContainer {
                     this.element.removeEventListener('mousedown', nativeListener, true);
                 };
             },
-            off: (value: any) => {
+            off: (_value: any) => {
                 // not supported due to wrapping
             }
         };
@@ -95,7 +95,7 @@ export class HtmlElementContainer implements IContainer {
                     this.element.removeEventListener('mouseup', nativeListener, true);
                 };
             },
-            off: (value: any) => {
+            off: (_value: any) => {
                 // not supported due to wrapping
             }
         };

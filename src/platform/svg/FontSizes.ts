@@ -48,10 +48,8 @@ export class FontSizes {
             measureContext.font = `${measureSize}px ${family}`;
             const widths: number[] = [];
             const heights: number[] = [];
-            let fullTxt = '';
             for (let i: number = FontSizes.ControlChars; i < 255; i++) {
                 const s: string = String.fromCharCode(i);
-                fullTxt += s;
                 const metrics = measureContext.measureText(s);
                 widths.push(metrics.width);
 

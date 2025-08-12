@@ -572,7 +572,7 @@ export class VorbisFloor0 implements IVorbisFloor {
         return map;
     }
 
-    public unpack(packet: IntBitReader, blockSize: number, channel: number): IVorbisFloorData {
+    public unpack(packet: IntBitReader, _blockSize: number, _channel: number): IVorbisFloorData {
         const data = new VorbisFloorData0(new Float32Array(this._order + 1));
 
         data.amp = packet.readBits(this._ampBits);
@@ -805,7 +805,7 @@ export class VorbisFloor1 implements IVorbisFloor {
         }
     }
 
-    public unpack(packet: IntBitReader, blockSize: number, channel: number): IVorbisFloorData {
+    public unpack(packet: IntBitReader, _blockSize: number, _channel: number): IVorbisFloorData {
         const data = new VorbisFloor1Data();
 
         // hoist ReadPosts to here since that's all we're doing...
@@ -1283,7 +1283,7 @@ export class VorbisResidue2 extends VorbisResidue0 {
         codebook: VorbisCodebook,
         packet: IntBitReader,
         residue: Float32Array[],
-        channel: number,
+        _channel: number,
         offset: number,
         partitionSize: number
     ): boolean {

@@ -627,7 +627,7 @@ export interface TryStatement extends Statement {
 
 export interface CatchClause extends Node {
     nodeType: SyntaxKind.CatchClause;
-    variableDeclaration: VariableDeclaration;
+    variableDeclaration?: VariableDeclaration;
     block: Block;
 }
 

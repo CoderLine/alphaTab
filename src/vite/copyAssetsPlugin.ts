@@ -39,7 +39,7 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
                     }
 
                     alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
-                } catch (e) {
+                } catch {
                     alphaTabSourceDir = path.join(resolvedConfig.root, 'node_modules/@coderline/alphatab/dist/');
                 }
             }
@@ -50,7 +50,7 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
                 try {
                     await fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK);
                     isValidAlphaTabSourceDir = true;
-                } catch (e) {
+                } catch {
                     isValidAlphaTabSourceDir = false;
                 }
             } else {
@@ -86,7 +86,7 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
                         .map(async file => {
                             // node v20.12.0 has parentPath pointing to the path (not the file)
                             // see https://github.com/nodejs/node/pull/50976
-                            const sourceFilename = path.join(file.parentPath ?? file.path, file.name);
+                            const sourceFilename = path.join(file.parentPath ?? (file as any).path, file.name);
                             await fs.promises.copyFile(sourceFilename, path.join(outputPath!, subdir, file.name));
                         })
                 );

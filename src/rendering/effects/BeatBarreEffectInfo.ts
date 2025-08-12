@@ -21,7 +21,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
         return false;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.isBarre;
     }
 
@@ -29,7 +29,7 @@ export class BeatBarreEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.GroupedOnBeat;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         let barre = '';
         switch (beat.barreShape) {
             case BarreShape.None:

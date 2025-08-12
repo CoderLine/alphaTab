@@ -24,11 +24,11 @@ export class AlternateEndingsEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.FullBar;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.voice.index === 0 && beat.index === 0 && beat.voice.bar.masterBar.alternateEndings !== 0;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         const masterBar = beat.voice.bar.masterBar;
         const openLine =
             masterBar.previousMasterBar === null ||
@@ -50,7 +50,7 @@ export class AlternateEndingsEffectInfo extends EffectBarRendererInfo {
         return new AlternateEndingsGlyph(0, 0, masterBar.alternateEndings, openLine, closeLine, indent);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

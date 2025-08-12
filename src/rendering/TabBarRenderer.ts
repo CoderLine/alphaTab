@@ -258,7 +258,7 @@ export class TabBarRenderer extends LineBarRenderer {
         return this.getFlagAndBarPos();
     }
 
-    protected override getFlagStemSize(duration: Duration, forceMinStem: boolean = false): number {
+    protected override getFlagStemSize(_duration: Duration, _forceMinStem: boolean = false): number {
         return 0; // fixed size via getFlagBottomY
     }
 

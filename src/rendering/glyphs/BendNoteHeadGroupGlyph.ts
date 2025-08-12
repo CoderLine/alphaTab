@@ -53,7 +53,7 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
         return 0;
     }
 
-    public addGlyph(noteValue: number, quarterBend: boolean, color: Color | undefined): void {
+    public addGlyph(noteValue: number, quarterBend: boolean, _color: Color | undefined): void {
         const sr: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
         const noteHeadGlyph: NoteHeadGlyph = new NoteHeadGlyph(0, 0, Duration.Quarter, true);
         const accidental: AccidentalType = sr.accidentalHelper.applyAccidentalForValue(

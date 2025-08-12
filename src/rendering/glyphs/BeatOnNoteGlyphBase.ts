@@ -12,14 +12,14 @@ export class BeatOnNoteGlyphBase extends BeatGlyphBase {
         //
     }
 
-    public buildBoundingsLookup(beatBounds: BeatBounds, cx: number, cy: number) {
+    public buildBoundingsLookup(_beatBounds: BeatBounds, _cx: number, _cy: number) {
         // implemented in subclasses
     }
 
-    public getNoteX(note: Note, requestedPosition: NoteXPosition): number {
+    public getNoteX(_note: Note, _requestedPosition: NoteXPosition): number {
         return 0;
     }
-    public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
+    public getNoteY(_note: Note, _requestedPosition: NoteYPosition): number {
         return 0;
     }
 

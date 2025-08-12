@@ -159,7 +159,7 @@ export abstract class LineBarRenderer extends BarRendererBase {
         }
     }
 
-    protected collectSpaces(spaces: Float32Array[][]) {
+    protected collectSpaces(_spaces: Float32Array[][]) {
         // override in subclasses
     }
 
@@ -657,12 +657,6 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             using _ = ElementStyleHelper.beat(canvas, beamsElement, beat);
 
-            let fingeringY: number = y2;
-            if (direction === BeamDirection.Down) {
-                fingeringY += canvas.font.size * 2;
-            } else if (i !== 0) {
-                fingeringY -= canvas.font.size * 1.5;
-            }
             const brokenBarOffset: number = this.smuflMetrics.brokenBeamWidth * scaleMod;
             const barCount: number = ModelUtils.getIndex(beat.duration) - 2;
             const barStart: number = cy + this.y;

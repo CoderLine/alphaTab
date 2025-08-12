@@ -153,11 +153,11 @@ export class TieGlyph extends Glyph {
         return false;
     }
 
-    protected getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+    protected getTieHeight(_startX: number, _startY: number, _endX: number, _endY: number): number {
         return this.renderer.smuflMetrics.tieHeight;
     }
 
-    protected getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
+    protected getBeamDirection(_beat: Beat, _noteRenderer: BarRendererBase): BeamDirection {
         return BeamDirection.Down;
     }
 

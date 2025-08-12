@@ -10,7 +10,7 @@ export class DeprecatedMidiEvent extends MidiEvent {
         super(0, 0, MidiEventType.EndOfTrack);
     }
 
-    public override writeTo(s: IWriteable): void {
+    public override writeTo(_s: IWriteable): void {
         throw new AlphaTabError(AlphaTabErrorType.General, 'Deprecated event, serialization not supported');
     }
 }

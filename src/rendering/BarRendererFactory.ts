@@ -18,7 +18,7 @@ export abstract class BarRendererFactory {
     public abstract getStaffPaddingTop(staff: RenderStaff): number;
     public abstract getStaffPaddingBottom(staff: RenderStaff): number;
 
-    public canCreate(track: Track, staff: Staff): boolean {
+    public canCreate(_track: Track, staff: Staff): boolean {
         return !this.hideOnPercussionTrack || !staff.isPercussion;
     }
 

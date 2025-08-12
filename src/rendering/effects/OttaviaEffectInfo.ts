@@ -36,7 +36,7 @@ export class OttaviaEffectInfo extends EffectBarRendererInfo {
         this._aboveStaff = aboveStaff;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         switch (beat.ottava) {
             case Ottavia._15ma:
                 return this._aboveStaff;
@@ -50,7 +50,7 @@ export class OttaviaEffectInfo extends EffectBarRendererInfo {
         return false;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new OttavaGlyph(beat.ottava, this._aboveStaff);
     }
 

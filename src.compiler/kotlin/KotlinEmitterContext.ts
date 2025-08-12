@@ -65,7 +65,7 @@ export default class KotlinEmitterContext extends CSharpEmitterContext {
         return overriddenItems;
     }
 
-    public override isValueTypeNotNullSmartCast(expression: ts.Expression): boolean | undefined {
+    public override isValueTypeNotNullSmartCast(_expression: ts.Expression): boolean | undefined {
         return undefined;
     }
 

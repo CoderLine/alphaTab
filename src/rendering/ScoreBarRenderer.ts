@@ -368,7 +368,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         return this.getScoreY(0);
     }
 
-    public getStemBottomY(beamingHelper: BeamingHelper): number {
+    public getStemBottomY(_beamingHelper: BeamingHelper): number {
         throw new Error('Method not implemented.');
     }
 
@@ -858,7 +858,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     protected override paintBeamingStem(
         beat: Beat,
-        cy: number,
+        _cy: number,
         x: number,
         topY: number,
         bottomY: number,

@@ -4,44 +4,26 @@ import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 
 import type {
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     MidiEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     TimeSignatureEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     AlphaTabMetronomeEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     AlphaTabRestEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     NoteOnEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     NoteOffEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     ControlChangeEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     ProgramChangeEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     TempoChangeEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     PitchBendEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     NoteBendEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     EndOfTrackEvent
 } from '@src/midi/MidiEvent';
 
 import type {
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     MetaEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     MetaDataEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     MetaNumberEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     Midi20PerNotePitchBendEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     SystemCommonEvent,
-    // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
     SystemExclusiveEvent
 } from '@src/midi/DeprecatedEvents';
 
@@ -94,7 +76,6 @@ import { ActiveBeatsChangedEventArgs } from '@src/synth/ActiveBeatsChangedEventA
 import type { BeatTickLookupItem } from '@src/midi/BeatTickLookup';
 import type { ISynthOutputDevice } from '@src/synth/ISynthOutput';
 
-// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { CoreSettings } from '@src/CoreSettings';
 import { ExternalMediaPlayer } from '@src/synth/ExternalMediaPlayer';
 import { AlphaSynthWrapper } from '@src/synth/AlphaSynthWrapper';

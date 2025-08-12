@@ -210,7 +210,7 @@ export class MusicXmlImporter extends ScoreImporter {
         let entries: ZipEntry[];
         try {
             entries = zip.read();
-        } catch (e) {
+        } catch {
             entries = [];
         }
 
@@ -1131,7 +1131,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseSound(element: XmlNode, masterBar: MasterBar, track: Track) {
+    private parseSound(element: XmlNode, masterBar: MasterBar, _track: Track) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'instrument-change': Ignored
@@ -1258,7 +1258,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private _nextBeatOttavia: Ottavia | null = null;
     private _nextBeatText: string | null = null;
 
-    private parseSoundMidiInstrument(element: XmlNode, masterBar: MasterBar) {
+    private parseSoundMidiInstrument(element: XmlNode, _masterBar: MasterBar) {
         let automation: Automation;
         for (const c of element.childElements()) {
             switch (c.localName) {
@@ -1303,7 +1303,7 @@ export class MusicXmlImporter extends ScoreImporter {
         }
     }
 
-    private parseHarmony(element: XmlNode, track: Track) {
+    private parseHarmony(element: XmlNode, _track: Track) {
         const chord = new Chord();
         let degreeParenthesis = false;
         let degree = '';
@@ -1622,7 +1622,7 @@ export class MusicXmlImporter extends ScoreImporter {
     private _simileMarkAllStaves: SimileMark | null = null;
     private _simileMarkPerStaff: Map<number, SimileMark> | null = null;
     private _isBeatSlash: boolean = false;
-    private parseMeasureStyle(element: XmlNode, track: Track, midBar: boolean) {
+    private parseMeasureStyle(element: XmlNode, _track: Track, midBar: boolean) {
         for (const c of element.childElements()) {
             switch (c.localName) {
                 // case 'multiple-rest': Ignored, when multibar rests are enabled for rendering this info shouldn't matter.
@@ -3714,7 +3714,7 @@ export class MusicXmlImporter extends ScoreImporter {
         return this.musicXmlDivisionsToAlphaTabTicks(Number.parseFloat(element.innerText));
     }
 
-    private parseUnpitched(element: XmlNode, track: Track): Note {
+    private parseUnpitched(element: XmlNode, _track: Track): Note {
         let step: string = '';
         let octave: number = 0;
         for (const c of element.childElements()) {

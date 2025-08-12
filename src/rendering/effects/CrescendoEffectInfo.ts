@@ -25,11 +25,11 @@ export class CrescendoEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.GroupedOnBeatToEnd;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.crescendo !== CrescendoType.None;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new CrescendoGlyph(0, 0, beat.crescendo);
     }
 

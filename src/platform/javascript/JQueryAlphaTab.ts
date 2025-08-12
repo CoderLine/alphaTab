@@ -74,101 +74,101 @@ export class JQueryAlphaTab {
         context.destroy();
     }
 
-    public print(element: jQuery, context: AlphaTabApi, width: string, additionalSettings?: unknown): void {
+    public print(_element: jQuery, context: AlphaTabApi, width: string, additionalSettings?: unknown): void {
         context.print(width, additionalSettings);
     }
 
-    public load(element: jQuery, context: AlphaTabApi, data: unknown, tracks?: number[]): boolean {
+    public load(_element: jQuery, context: AlphaTabApi, data: unknown, tracks?: number[]): boolean {
         return context.load(data, tracks);
     }
 
-    public render(element: jQuery, context: AlphaTabApi): void {
+    public render(_element: jQuery, context: AlphaTabApi): void {
         context.render();
     }
 
-    public renderScore(element: jQuery, context: AlphaTabApi, score: Score, tracks?: number[]): void {
+    public renderScore(_element: jQuery, context: AlphaTabApi, score: Score, tracks?: number[]): void {
         context.renderScore(score, tracks);
     }
 
-    public renderTracks(element: jQuery, context: AlphaTabApi, tracks: Track[]): void {
+    public renderTracks(_element: jQuery, context: AlphaTabApi, tracks: Track[]): void {
         context.renderTracks(tracks);
     }
 
-    public invalidate(element: jQuery, context: AlphaTabApi): void {
+    public invalidate(_element: jQuery, context: AlphaTabApi): void {
         context.render();
     }
 
-    public tex(element: jQuery, context: AlphaTabApi, tex: string, tracks: number[]): void {
+    public tex(_element: jQuery, context: AlphaTabApi, tex: string, tracks: number[]): void {
         context.tex(tex, tracks);
     }
 
-    public muteTrack(element: jQuery, context: AlphaTabApi, tracks: Track[], mute: boolean): void {
+    public muteTrack(_element: jQuery, context: AlphaTabApi, tracks: Track[], mute: boolean): void {
         context.changeTrackMute(tracks, mute);
     }
 
-    public soloTrack(element: jQuery, context: AlphaTabApi, tracks: Track[], solo: boolean): void {
+    public soloTrack(_element: jQuery, context: AlphaTabApi, tracks: Track[], solo: boolean): void {
         context.changeTrackSolo(tracks, solo);
     }
 
-    public trackVolume(element: jQuery, context: AlphaTabApi, tracks: Track[], volume: number): void {
+    public trackVolume(_element: jQuery, context: AlphaTabApi, tracks: Track[], volume: number): void {
         context.changeTrackVolume(tracks, volume);
     }
 
-    public loadSoundFont(element: jQuery, context: AlphaTabApi, value: unknown, append: boolean): void {
+    public loadSoundFont(_element: jQuery, context: AlphaTabApi, value: unknown, append: boolean): void {
         context.loadSoundFont(value, append);
     }
 
-    public resetSoundFonts(element: jQuery, context: AlphaTabApi): void {
+    public resetSoundFonts(_element: jQuery, context: AlphaTabApi): void {
         context.resetSoundFonts();
     }
 
-    public pause(element: jQuery, context: AlphaTabApi): void {
+    public pause(_element: jQuery, context: AlphaTabApi): void {
         context.pause();
     }
 
-    public play(element: jQuery, context: AlphaTabApi): boolean {
+    public play(_element: jQuery, context: AlphaTabApi): boolean {
         return context.play();
     }
 
-    public playPause(element: jQuery, context: AlphaTabApi): void {
+    public playPause(_element: jQuery, context: AlphaTabApi): void {
         context.playPause();
     }
 
-    public stop(element: jQuery, context: AlphaTabApi): void {
+    public stop(_element: jQuery, context: AlphaTabApi): void {
         context.stop();
     }
 
-    public api(element: jQuery, context: AlphaTabApi): AlphaTabApi {
+    public api(_element: jQuery, context: AlphaTabApi): AlphaTabApi {
         return context;
     }
 
-    public player(element: jQuery, context: AlphaTabApi): IAlphaSynth | null {
+    public player(_element: jQuery, context: AlphaTabApi): IAlphaSynth | null {
         return context.player;
     }
 
-    public isReadyForPlayback(element: jQuery, context: AlphaTabApi): boolean {
+    public isReadyForPlayback(_element: jQuery, context: AlphaTabApi): boolean {
         return context.isReadyForPlayback;
     }
 
-    public playerState(element: jQuery, context: AlphaTabApi): PlayerState {
+    public playerState(_element: jQuery, context: AlphaTabApi): PlayerState {
         return context.playerState;
     }
 
-    public masterVolume(element: jQuery, context: AlphaTabApi, masterVolume?: number): number {
+    public masterVolume(_element: jQuery, context: AlphaTabApi, masterVolume?: number): number {
         if (typeof masterVolume === 'number') {
             context.masterVolume = masterVolume;
         }
         return context.masterVolume;
     }
 
-    public metronomeVolume(element: jQuery, context: AlphaTabApi, metronomeVolume?: number): number {
+    public metronomeVolume(_element: jQuery, context: AlphaTabApi, metronomeVolume?: number): number {
         if (typeof metronomeVolume === 'number') {
             context.metronomeVolume = metronomeVolume;
         }
         return context.metronomeVolume;
     }
 
-    public countInVolume(element: jQuery, context: AlphaTabApi, countInVolume?: number): number {
+    public countInVolume(_element: jQuery, context: AlphaTabApi, countInVolume?: number): number {
         if (typeof countInVolume === 'number') {
             context.countInVolume = countInVolume;
         }
@@ -176,7 +176,7 @@ export class JQueryAlphaTab {
     }
 
     public midiEventsPlayedFilter(
-        element: jQuery,
+        _element: jQuery,
         context: AlphaTabApi,
         midiEventsPlayedFilter?: MidiEventType[]
     ): MidiEventType[] {
@@ -186,47 +186,47 @@ export class JQueryAlphaTab {
         return context.midiEventsPlayedFilter;
     }
 
-    public playbackSpeed(element: jQuery, context: AlphaTabApi, playbackSpeed?: number): number {
+    public playbackSpeed(_element: jQuery, context: AlphaTabApi, playbackSpeed?: number): number {
         if (typeof playbackSpeed === 'number') {
             context.playbackSpeed = playbackSpeed;
         }
         return context.playbackSpeed;
     }
 
-    public tickPosition(element: jQuery, context: AlphaTabApi, tickPosition?: number): number {
+    public tickPosition(_element: jQuery, context: AlphaTabApi, tickPosition?: number): number {
         if (typeof tickPosition === 'number') {
             context.tickPosition = tickPosition;
         }
         return context.tickPosition;
     }
 
-    public timePosition(element: jQuery, context: AlphaTabApi, timePosition?: number): number {
+    public timePosition(_element: jQuery, context: AlphaTabApi, timePosition?: number): number {
         if (typeof timePosition === 'number') {
             context.timePosition = timePosition;
         }
         return context.timePosition;
     }
 
-    public loop(element: jQuery, context: AlphaTabApi, loop?: boolean): boolean {
+    public loop(_element: jQuery, context: AlphaTabApi, loop?: boolean): boolean {
         if (typeof loop === 'boolean') {
             context.isLooping = loop;
         }
         return context.isLooping;
     }
 
-    public renderer(element: jQuery, context: AlphaTabApi): IScoreRenderer {
+    public renderer(_element: jQuery, context: AlphaTabApi): IScoreRenderer {
         return context.renderer;
     }
 
-    public score(element: jQuery, context: AlphaTabApi): Score | null {
+    public score(_element: jQuery, context: AlphaTabApi): Score | null {
         return context.score;
     }
 
-    public settings(element: jQuery, context: AlphaTabApi): Settings {
+    public settings(_element: jQuery, context: AlphaTabApi): Settings {
         return context.settings;
     }
 
-    public tracks(element: jQuery, context: AlphaTabApi): Track[] {
+    public tracks(_element: jQuery, context: AlphaTabApi): Track[] {
         return context.tracks;
     }
 

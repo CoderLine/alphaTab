@@ -1155,7 +1155,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
-    public readNoteEffects(track: Track, voice: Voice, beat: Beat, note: Note): void {
+    public readNoteEffects(_track: Track, voice: Voice, beat: Beat, note: Note): void {
         const flags: number = this.data.readByte();
         let flags2: number = 0;
         if (this._versionNumber >= 400) {

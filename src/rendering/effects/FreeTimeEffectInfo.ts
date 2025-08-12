@@ -25,7 +25,7 @@ export class FreeTimeEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SinglePreBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         const masterBar = beat.voice.bar.masterBar;
         const isFirstBeat = beat.voice.bar.staff.index === 0 && beat.voice.index === 0 && beat.index === 0;
         return (
@@ -35,11 +35,11 @@ export class FreeTimeEffectInfo extends EffectBarRendererInfo {
         );
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new TextGlyph(0, 0, 'Free time', renderer.resources.effectFont, TextAlign.Left);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

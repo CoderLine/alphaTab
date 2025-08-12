@@ -29,7 +29,7 @@ export class SlashTieGlyph extends TieGlyph {
         return BeamDirection.Down;
     }
 
-    protected static getBeamDirectionForNote(note: Note): BeamDirection {
+    protected static getBeamDirectionForNote(_note: Note): BeamDirection {
         return BeamDirection.Down;
     }
 
