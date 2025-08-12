@@ -53,7 +53,7 @@ export class EffectBarRenderer extends BarRendererBase {
                 band.y = y;
                 band.height = slot.shared.height;
             }
-            y += slot.shared.height + this.smuflMetrics.effectBandSeparation;
+            y += slot.shared.height + this.settings.display.effectBandPaddingBottom;
         }
         y = Math.ceil(y);
         if (y !== this.height) {

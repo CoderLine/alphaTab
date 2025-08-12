@@ -44,13 +44,13 @@ export class ChordDiagramGlyph extends EffectGlyph {
         const stringSpacing: number = this.renderer.smuflMetrics.chordDiagramStringSpacing;
         const fretSpacing: number = this.renderer.smuflMetrics.chordDiagramFretSpacing;
         const res: RenderingResources = this.renderer.resources;
-        const lineWidth = res.smuflMetrics.chordDiagramLineWidth;
+        const lineWidth = res.engravingSettings.chordDiagramLineWidth;
         const w: number =
             this.width - 2 * this.renderer.smuflMetrics.chordDiagramPaddingX - this._firstFretSpacing + lineWidth;
-        const circleHeight = res.smuflMetrics.glyphHeights.get(MusicFontSymbol.FretboardFilledCircle)!;
-        const circleTopOffset = res.smuflMetrics.glyphTop.get(MusicFontSymbol.FretboardFilledCircle)!;
-        const xTopOffset = res.smuflMetrics.glyphHeights.get(MusicFontSymbol.FretboardX)! / 2;
-        const oTopOffset = res.smuflMetrics.glyphHeights.get(MusicFontSymbol.FretboardO)! / 2;
+        const circleHeight = res.engravingSettings.glyphHeights.get(MusicFontSymbol.FretboardFilledCircle)!;
+        const circleTopOffset = res.engravingSettings.glyphTop.get(MusicFontSymbol.FretboardFilledCircle)!;
+        const xTopOffset = res.engravingSettings.glyphHeights.get(MusicFontSymbol.FretboardX)! / 2;
+        const oTopOffset = res.engravingSettings.glyphHeights.get(MusicFontSymbol.FretboardO)! / 2;
 
         const align: TextAlign = canvas.textAlign;
         const baseline: TextBaseline = canvas.textBaseline;

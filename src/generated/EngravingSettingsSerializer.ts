@@ -3,20 +3,20 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { SmuflMetrics } from "@src/SmuflMetrics";
+import { EngravingSettings } from "@src/EngravingSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { SmuflStemInfoSerializer } from "@src/generated/SmuflStemInfoSerializer";
+import { EngravingStemInfoSerializer } from "@src/generated/EngravingStemInfoSerializer";
 import { MusicFontSymbol } from "@src/model/MusicFontSymbol";
-import { SmuflStemInfo } from "@src/SmuflMetrics";
+import { EngravingStemInfo } from "@src/EngravingSettings";
 import { Duration } from "@src/model/Duration";
-export class SmuflMetricsSerializer {
-    public static fromJson(obj: SmuflMetrics, m: unknown): void {
+export class EngravingSettingsSerializer {
+    public static fromJson(obj: EngravingSettings, m: unknown): void {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SmuflMetricsSerializer.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => EngravingSettingsSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: SmuflMetrics | null): Map<string, unknown> | null {
+    public static toJson(obj: EngravingSettings | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
@@ -47,60 +47,18 @@ export class SmuflMetricsSerializer {
         o.set("thinthickbarlineseparation", obj.thinThickBarlineSeparation);
         o.set("tiemidpointthickness", obj.tieMidpointThickness);
         o.set("tupletbracketthickness", obj.tupletBracketThickness);
-        o.set("effectbandseparation", obj.effectBandSeparation);
-        o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
-        o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
-        o.set("numbereddashglyphpadding", obj.numberedDashGlyphPadding);
-        o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
-        o.set("linerangedglyphdashgap", obj.lineRangedGlyphDashGap);
-        o.set("linerangedglyphdashsize", obj.lineRangedGlyphDashSize);
-        o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
-        o.set("postnoteeffectpadding", obj.postNoteEffectPadding);
-        o.set("stringnumbercirclepadding", obj.stringNumberCirclePadding);
-        o.set("rowcontainerpadding", obj.rowContainerPadding);
-        o.set("rowcontainergap", obj.rowContainerGap);
-        o.set("effectspacing", obj.effectSpacing);
-        o.set("alternateendingspadding", obj.alternateEndingsPadding);
-        o.set("sustainpedallinepadding", obj.sustainPedalLinePadding);
-        o.set("tieheight", obj.tieHeight);
-        o.set("beattimerpadding", obj.beatTimerPadding);
-        o.set("bendnoteheadelementpadding", obj.bendNoteHeadElementPadding);
-        o.set("ghostparenthesiswidth", obj.ghostParenthesisWidth);
-        o.set("ghostparenthesispadding", obj.ghostParenthesisPadding);
-        o.set("brokenbeamwidth", obj.brokenBeamWidth);
-        o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
-        o.set("tabwhammyperhalfheight", obj.tabWhammyPerHalfHeight);
-        o.set("tabwhammydashsize", obj.tabWhammyDashSize);
-        o.set("songbookwhammydipheight", obj.songBookWhammyDipHeight);
-        o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
-        o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
-        o.set("tabbenddashsize", obj.tabBendDashSize);
-        o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
-        o.set("tabbendlabelpadding", obj.tabBendLabelPadding);
-        o.set("simpleslidewidth", obj.simpleSlideWidth);
-        o.set("simpleslideheight", obj.simpleSlideHeight);
-        o.set("chorddiagrampaddingx", obj.chordDiagramPaddingX);
-        o.set("chorddiagrampaddingy", obj.chordDiagramPaddingY);
-        o.set("chorddiagramstringspacing", obj.chordDiagramStringSpacing);
-        o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
-        o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
-        o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
-        o.set("chorddiagramlinewidth", obj.chordDiagramLineWidth);
-        o.set("tripletfeeltripletpadding", obj.tripletFeelTripletPadding);
-        o.set("accidentalpadding", obj.accidentalPadding);
-        o.set("prebeatglyphspacing", obj.preBeatGlyphSpacing);
         {
             const m = new Map<string, unknown>();
             o.set("stemup", m);
             for (const [k, v] of obj.stemUp!) {
-                m.set(k.toString(), SmuflStemInfoSerializer.toJson(v));
+                m.set(k.toString(), EngravingStemInfoSerializer.toJson(v));
             }
         }
         {
             const m = new Map<string, unknown>();
             o.set("stemdown", m);
             for (const [k, v] of obj.stemDown!) {
-                m.set(k.toString(), SmuflStemInfoSerializer.toJson(v));
+                m.set(k.toString(), EngravingStemInfoSerializer.toJson(v));
             }
         }
         {
@@ -146,14 +104,55 @@ export class SmuflMetricsSerializer {
                 m.set(k.toString(), v);
             }
         }
+        o.set("numberedbarrendererbarsize", obj.numberedBarRendererBarSize);
+        o.set("numberedbarrendererbarspacing", obj.numberedBarRendererBarSpacing);
+        o.set("numbereddashglyphpadding", obj.numberedDashGlyphPadding);
+        o.set("numbereddashglyphwidth", obj.numberedDashGlyphWidth);
+        o.set("linerangedglyphdashgap", obj.lineRangedGlyphDashGap);
+        o.set("linerangedglyphdashsize", obj.lineRangedGlyphDashSize);
+        o.set("prenoteeffectpadding", obj.preNoteEffectPadding);
+        o.set("postnoteeffectpadding", obj.postNoteEffectPadding);
+        o.set("onnoteeffectpadding", obj.onNoteEffectPadding);
+        o.set("stringnumbercirclepadding", obj.stringNumberCirclePadding);
+        o.set("rowcontainerpadding", obj.rowContainerPadding);
+        o.set("rowcontainergap", obj.rowContainerGap);
+        o.set("alternateendingspadding", obj.alternateEndingsPadding);
+        o.set("sustainpedallinepadding", obj.sustainPedalLinePadding);
+        o.set("tieheight", obj.tieHeight);
+        o.set("beattimerpadding", obj.beatTimerPadding);
+        o.set("bendnoteheadelementpadding", obj.bendNoteHeadElementPadding);
+        o.set("ghostparenthesiswidth", obj.ghostParenthesisWidth);
+        o.set("ghostparenthesispadding", obj.ghostParenthesisPadding);
+        o.set("brokenbeamwidth", obj.brokenBeamWidth);
+        o.set("tabwhammytextpadding", obj.tabWhammyTextPadding);
+        o.set("tabwhammyperhalfheight", obj.tabWhammyPerHalfHeight);
+        o.set("tabwhammydashsize", obj.tabWhammyDashSize);
+        o.set("songbookwhammydipheight", obj.songBookWhammyDipHeight);
+        o.set("deadslappedlinewidth", obj.deadSlappedLineWidth);
+        o.set("lefthandtabtiewidth", obj.leftHandTabTieWidth);
+        o.set("tabbenddashsize", obj.tabBendDashSize);
+        o.set("tabbendpervalueheight", obj.tabBendPerValueHeight);
+        o.set("tabbendlabelpadding", obj.tabBendLabelPadding);
+        o.set("simpleslidewidth", obj.simpleSlideWidth);
+        o.set("simpleslideheight", obj.simpleSlideHeight);
+        o.set("chorddiagrampaddingx", obj.chordDiagramPaddingX);
+        o.set("chorddiagrampaddingy", obj.chordDiagramPaddingY);
+        o.set("chorddiagramstringspacing", obj.chordDiagramStringSpacing);
+        o.set("chorddiagramfretspacing", obj.chordDiagramFretSpacing);
+        o.set("chorddiagramnutheight", obj.chordDiagramNutHeight);
+        o.set("chorddiagramfretheight", obj.chordDiagramFretHeight);
+        o.set("chorddiagramlinewidth", obj.chordDiagramLineWidth);
+        o.set("tripletfeelbracketpadding", obj.tripletFeelBracketPadding);
+        o.set("accidentalpadding", obj.accidentalPadding);
+        o.set("prebeatglyphspacing", obj.preBeatGlyphSpacing);
         o.set("temponotescale", obj.tempoNoteScale);
         o.set("tuningglyphcirclenumberscale", obj.tuningGlyphCircleNumberScale);
         o.set("tuningglyphstringcolumnscale", obj.tuningGlyphStringColumnScale);
-        o.set("tuningglyphrowpadding", obj.tuningGlyphRowPadding);
+        o.set("tuningglyphstringrowpadding", obj.tuningGlyphStringRowPadding);
         o.set("directionsscale", obj.directionsScale);
         return o;
     }
-    public static setProperty(obj: SmuflMetrics, property: string, v: unknown): boolean {
+    public static setProperty(obj: EngravingSettings, property: string, v: unknown): boolean {
         switch (property) {
             case "musicfontsize":
                 obj.musicFontSize = v! as number;
@@ -233,8 +232,60 @@ export class SmuflMetricsSerializer {
             case "tupletbracketthickness":
                 obj.tupletBracketThickness = v! as number;
                 return true;
-            case "effectbandseparation":
-                obj.effectBandSeparation = v! as number;
+            case "stemup":
+                obj.stemUp = new Map<MusicFontSymbol, EngravingStemInfo>();
+                JsonHelper.forEach(v, (v, k) => {
+                    const i = new EngravingStemInfo();
+                    EngravingStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
+                    obj.stemUp.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
+                });
+                return true;
+            case "stemdown":
+                obj.stemDown = new Map<MusicFontSymbol, EngravingStemInfo>();
+                JsonHelper.forEach(v, (v, k) => {
+                    const i = new EngravingStemInfo();
+                    EngravingStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
+                    obj.stemDown.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
+                });
+                return true;
+            case "repeatoffsetx":
+                obj.repeatOffsetX = new Map<MusicFontSymbol, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.repeatOffsetX.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                });
+                return true;
+            case "standardstemlength":
+                obj.standardStemLength = v! as number;
+                return true;
+            case "stemflagoffsets":
+                obj.stemFlagOffsets = new Map<Duration, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.stemFlagOffsets.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
+                });
+                return true;
+            case "glyphtop":
+                obj.glyphTop = new Map<MusicFontSymbol, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.glyphTop.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                });
+                return true;
+            case "glyphbottom":
+                obj.glyphBottom = new Map<MusicFontSymbol, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.glyphBottom.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                });
+                return true;
+            case "glyphwidths":
+                obj.glyphWidths = new Map<MusicFontSymbol, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.glyphWidths.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                });
+                return true;
+            case "glyphheights":
+                obj.glyphHeights = new Map<MusicFontSymbol, number>();
+                JsonHelper.forEach(v, (v, k) => {
+                    obj.glyphHeights.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
+                });
                 return true;
             case "numberedbarrendererbarsize":
                 obj.numberedBarRendererBarSize = v! as number;
@@ -260,6 +311,9 @@ export class SmuflMetricsSerializer {
             case "postnoteeffectpadding":
                 obj.postNoteEffectPadding = v! as number;
                 return true;
+            case "onnoteeffectpadding":
+                obj.onNoteEffectPadding = v! as number;
+                return true;
             case "stringnumbercirclepadding":
                 obj.stringNumberCirclePadding = v! as number;
                 return true;
@@ -268,9 +322,6 @@ export class SmuflMetricsSerializer {
                 return true;
             case "rowcontainergap":
                 obj.rowContainerGap = v! as number;
-                return true;
-            case "effectspacing":
-                obj.effectSpacing = v! as number;
                 return true;
             case "alternateendingspadding":
                 obj.alternateEndingsPadding = v! as number;
@@ -350,69 +401,14 @@ export class SmuflMetricsSerializer {
             case "chorddiagramlinewidth":
                 obj.chordDiagramLineWidth = v! as number;
                 return true;
-            case "tripletfeeltripletpadding":
-                obj.tripletFeelTripletPadding = v! as number;
+            case "tripletfeelbracketpadding":
+                obj.tripletFeelBracketPadding = v! as number;
                 return true;
             case "accidentalpadding":
                 obj.accidentalPadding = v! as number;
                 return true;
             case "prebeatglyphspacing":
                 obj.preBeatGlyphSpacing = v! as number;
-                return true;
-            case "stemup":
-                obj.stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
-                JsonHelper.forEach(v, (v, k) => {
-                    const i = new SmuflStemInfo();
-                    SmuflStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.stemUp.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
-                });
-                return true;
-            case "stemdown":
-                obj.stemDown = new Map<MusicFontSymbol, SmuflStemInfo>();
-                JsonHelper.forEach(v, (v, k) => {
-                    const i = new SmuflStemInfo();
-                    SmuflStemInfoSerializer.fromJson(i, v as Map<string, unknown>);
-                    obj.stemDown.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, i);
-                });
-                return true;
-            case "repeatoffsetx":
-                obj.repeatOffsetX = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.repeatOffsetX.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
-                return true;
-            case "standardstemlength":
-                obj.standardStemLength = v! as number;
-                return true;
-            case "stemflagoffsets":
-                obj.stemFlagOffsets = new Map<Duration, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.stemFlagOffsets.set(JsonHelper.parseEnum<Duration>(k, Duration)!, v as number);
-                });
-                return true;
-            case "glyphtop":
-                obj.glyphTop = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphTop.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
-                return true;
-            case "glyphbottom":
-                obj.glyphBottom = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphBottom.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
-                return true;
-            case "glyphwidths":
-                obj.glyphWidths = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphWidths.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
-                return true;
-            case "glyphheights":
-                obj.glyphHeights = new Map<MusicFontSymbol, number>();
-                JsonHelper.forEach(v, (v, k) => {
-                    obj.glyphHeights.set(JsonHelper.parseEnum<MusicFontSymbol>(k, MusicFontSymbol)!, v as number);
-                });
                 return true;
             case "temponotescale":
                 obj.tempoNoteScale = v! as number;
@@ -423,8 +419,8 @@ export class SmuflMetricsSerializer {
             case "tuningglyphstringcolumnscale":
                 obj.tuningGlyphStringColumnScale = v! as number;
                 return true;
-            case "tuningglyphrowpadding":
-                obj.tuningGlyphRowPadding = v! as number;
+            case "tuningglyphstringrowpadding":
+                obj.tuningGlyphStringRowPadding = v! as number;
                 return true;
             case "directionsscale":
                 obj.directionsScale = v! as number;

@@ -6,13 +6,13 @@
 export type { CoreSettingsJson } from "@src/generated/CoreSettingsJson";
 export type { RenderingResourcesJson } from "@src/generated/RenderingResourcesJson";
 export type { DisplaySettingsJson } from "@src/generated/DisplaySettingsJson";
+export type { EngravingStemInfoJson } from "@src/generated/EngravingStemInfoJson";
+export type { EngravingSettingsJson } from "@src/generated/EngravingSettingsJson";
 export type { ImporterSettingsJson } from "@src/generated/ImporterSettingsJson";
 export type { NotationSettingsJson } from "@src/generated/NotationSettingsJson";
 export type { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";
 export type { SlidePlaybackSettingsJson } from "@src/generated/SlidePlaybackSettingsJson";
 export type { PlayerSettingsJson } from "@src/generated/PlayerSettingsJson";
-export type { SmuflMetricsJson } from "@src/generated/SmuflMetricsJson";
 export type { FontJson } from "@src/model/Font";
 export type { ColorJson } from "@src/model/Color";
 export type { SettingsJson } from "@src/generated/SettingsJson";
-export type { SmuflStemInfoJson } from "@src/generated/SmuflStemInfoJson";

@@ -351,8 +351,8 @@ export abstract class LineBarRenderer extends BarRendererBase {
 
             //
             // Calculate how many space the text will need
-            const sw: number = s.reduce((acc, sym) => acc + res.smuflMetrics.glyphWidths.get(sym)!, 0);
-            const sp = res.smuflMetrics.oneStaffSpace * 0.5;
+            const sw: number = s.reduce((acc, sym) => acc + res.engravingSettings.glyphWidths.get(sym)!, 0);
+            const sp = res.engravingSettings.oneStaffSpace * 0.5;
 
             //
             // Calculate the offsets where to break the bracket

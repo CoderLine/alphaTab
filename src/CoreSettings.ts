@@ -2,6 +2,8 @@ import { Environment } from '@src/Environment';
 import { LogLevel } from '@src/LogLevel';
 // biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { BoundsLookup } from '@src/rendering/utils/BoundsLookup';
+// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
+import type { EngravingSettings } from '@src/EngravingSettings';
 
 /**
  * Lists the known file formats for font files.
@@ -83,6 +85,11 @@ export class CoreSettings {
      * they are available for rendering the music sheet. The sources can be set to any 
      * CSS compatible URL which can be passed into `url()`.
      * See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
+     * 
+     * If you customize the SmuFL font used in alphaTab, you will also need to provide 
+     * the respective SMuFL Metadata information to alphaTab. 
+     * Set the metadata via {@link EngravingSettings.fillFromSmufl} on the rendering resources.
+     * 
      * @defaultValue Bravura files located at {@link fontDirectory} .
      * @category Core - JavaScript Specific
      * @target web

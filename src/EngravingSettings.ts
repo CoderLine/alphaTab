@@ -1,186 +1,299 @@
-import { SmuflMetricsCloner } from '@src/generated/SmuflMetricsCloner';
+import { EngravingSettingsCloner } from '@src/generated/EngravingSettingsCloner';
 import { JsonHelper } from '@src/io/JsonHelper';
 import { Logger } from '@src/Logger';
 import { Duration } from '@src/model/Duration';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-
-/**
- * https://w3c.github.io/smufl/latest/specification/engravingdefaults.html
- * @record
- */
-export interface SmuflEngravingDefaults {
-    arrowShaftThickness: number;
-    barlineSeparation: number;
-    beamSpacing: number;
-    beamThickness: number;
-    bracketThickness: number;
-    dashedBarlineDashLength: number;
-    dashedBarlineGapLength: number;
-    dashedBarlineThickness: number;
-    hairpinThickness: number;
-    legerLineExtension: number;
-    legerLineThickness: number;
-    lyricLineThickness: number;
-    octaveLineThickness: number;
-    pedalLineThickness: number;
-    repeatBarlineDotSeparation: number;
-    repeatEndingLineThickness: number;
-    slurEndpointThickness: number;
-    slurMidpointThickness: number;
-    staffLineThickness: number;
-    stemThickness: number;
-    subBracketThickness: number;
-    textEnclosureThickness: number;
-    thickBarlineThickness: number;
-    thinBarlineThickness: number;
-    thinThickBarlineSeparation?: number;
-    tieEndpointThickness: number;
-    tieMidpointThickness: number;
-    tupletBracketThickness: number;
-}
-
-/**
- * https://w3c.github.io/smufl/latest/specification/glyphbboxes.html
- * @record
- */
-export interface SmuflGlyphBoundingBox {
-    bBoxNE: [number, number];
-    bBoxSW: [number, number];
-}
-
-/**
- * https://w3c.github.io/smufl/latest/specification/glyphswithanchors.html#glyphswithanchors
- * @record
- */
-export interface SmuflGlyphWithAnchor {
-    splitStemUpSE?: [number, number];
-    splitStemUpSW?: [number, number];
-    splitStemDownNE?: [number, number];
-    splitStemDownNW?: [number, number];
-    stemUpSE?: [number, number];
-    stemDownNW?: [number, number];
-    stemUpNW?: [number, number];
-    stemDownSW?: [number, number];
-    nominalWidth?: [number, number];
-    numeralTop?: [number, number];
-    numeralBottom?: [number, number];
-    cutOutNE?: [number, number];
-    cutOutSE?: [number, number];
-    cutOutSW?: [number, number];
-    cutOutNW?: [number, number];
-    graceNoteSlashSW?: [number, number];
-    graceNoteSlashNE?: [number, number];
-    graceNoteSlashNW?: [number, number];
-    graceNoteSlashSE?: [number, number];
-    repeatOffset?: [number, number];
-    noteheadOrigin?: [number, number];
-    opticalCenter?: [number, number];
-}
-
-/**
- * The SmuFL Metadata object describing the structure needed by alphaTab.
- * https://w3c.github.io/smufl/latest/specification/font-specific-metadata.html
- * @record
- */
-export interface SmuflMetadata {
-    engravingDefaults: SmuflEngravingDefaults;
-    glyphBBoxes?: Record<string, SmuflGlyphBoundingBox>;
-    glyphsWithAnchors: Record<string, SmuflGlyphWithAnchor>;
-}
+import type { SmuflMetadata } from '@src/SmuflMetadata';
 
 /**
  * @json
  * @json_declaration
  */
-export class SmuflStemInfo {
-    // TODO: json serializer record support
+export class EngravingStemInfo {
+    /**
+     * The top Y coordinate where the stem should start/end.
+     */
     public topY = 0;
+    /**
+     * The bottom Y coordinate where the stem should start/end.
+     */
     public bottomY = 0;
-    public topX = 0;
-    public bottomX = 0;
+
+    /**
+     * The x-coordinate of the stem.
+     */
+    public x = 0;
 }
 
 /**
- * This class holds all SMuFL metrics we use in alphaTab like sizes,
- * spacings etc.
+ * This class holds all all spacing, thickness and scaling metrics
+ * related to engraving the music notation.
+ *
+ * @remarks
+ * While general layout settings are configurable via the display settings,
+ * these settings go deeper into how the individual music symbols are scaled and aligned targeting
+ * specification compliance with the Standard Music Font Layout (SMuFL).
+ *
+ * Unless specified differently the settings here are available {@since 1.7.0}
+ *
+ * If properties are marked with a SMuFl tag, it means that the values are part of the SMuFL specification
+ * and should be filled from the respective metadata files shipped with the fonts or aligned generally with the specification.
+ * Other properties are custom to alphaTab.
+ *
+ * In SmuFL Sizes and coordinates are expressed in "staff space" units which is 1/4 of the configured font size. In this data structure
+ * the values are converted to pixels.
+ *
  * @json
  * @json_declaration
  * @cloneable
  */
-export class SmuflMetrics {
-    // SmuFL TODO:
-    // - Spec: "Diving the EM in four provides analogue for a five-line staff."
-    // - Spec: "All Glyphs should be drawn at scale consistent with the key measurement that one staff space = 0.25em"
-    // - If `Environment.MusicFontSize=34` (px), 1 staff space (sp) is 34/4 => 8.5px, but we currently have 1sp as 8px
-    // - Spec: "Unless otherwise stated, all glyphs shall have zero-width side bearings, i.e. no blank space to the left or right of the glyph"
-    // - Spec: "Glyphs for movable notations that apply to some vertical staff position (e.g. note heads, accidentals) shall
-    //          be registered such that the font baseline lies eactly at that position."
-    // - Spec: Letters from dynamics should be scaled such that the caps height is around 0.5em and the x-height is around 0.25em.
-    // - Spec: digits from time signatures should be scaled such that each digit is two staff spaces tal (i.e. 0.5em) and vertically centered on the baseline.
-    // - Spec: Tessellating glyphs (such as wavy lines or the component parts of complex trills and mordents) should have negative side bearings, in order to achieve correct tessellation when set in a single run.
-    // - Generally we should eliminate the custom spaces in this file unless they are for some specialized
-    //   glyphs or annotations which have no strict SmuFL spec (e.g. chord diagrams)
+export class EngravingSettings {
+    private static _bravuraDefaults?: EngravingSettings;
 
-    //
-    // general music sheet and renderer sizes
+    /**
+     * A {@link EngravingSettings} copy filled with the settings of the Bravura font used by default in alphaTab.
+     */
+    public static get bravuraDefaults() {
+        let bravuraDefaults = EngravingSettings._bravuraDefaults;
+        if (!bravuraDefaults) {
+            bravuraDefaults = new EngravingSettings();
+            bravuraDefaults.fillFromSmufl(EngravingSettings.bravuraMetadata);
+            EngravingSettings._bravuraDefaults = bravuraDefaults;
+        }
+
+        return EngravingSettingsCloner.clone(bravuraDefaults);
+    }
 
     /**
      * The font size of the music font in pixel.
-     * @internal
      */
     public musicFontSize = 0;
+
+    /**
+     * The staff space in pixel
+     * @smufl 1.4
+     */
     public oneStaffSpace = 0;
+
+    /**
+     * The staff space in pixel for tablature fonts. This is typically 1.5 of the standard staff space.
+     * @smufl 1.4
+     */
     public tabLineSpacing = 0;
 
-    // engraving defaults (TODO: reuse SmuflEngravingDefaults when all are supported)
+    /**
+     * The thickness of the line used for the shaft of an arrow
+     * @smufl 1.4
+     */
     public arrowShaftThickness = 0;
+
+    /**
+     * The default distance between multiple thin barlines when locked together, e.g. between two thin barlines making a double barline, measured from the right-hand edge of the left barline to the left-hand edge of the right barline.
+     * @smufl 1.4
+     */
     public barlineSeparation = 0;
+
+    /**
+     * The distance between the inner edge of the primary and outer edge of subsequent secondary beams
+     * @smufl 1.4
+     */
     public beamSpacing = 0;
+
+    /**
+     * The thickness of a beam
+     * @smufl 1.4
+     */
     public beamThickness = 0;
+
+    /**
+     * The thickness of the vertical line of a bracket grouping staves together
+     * @smufl 1.4
+     */
     public bracketThickness = 0;
+
+    /**
+     * The length of the dashes to be used in a dashed barline
+     * @smufl 1.4
+     */
     public dashedBarlineDashLength = 0;
+
+    /**
+     * The length of the gap between dashes in a dashed barline
+     */
     public dashedBarlineGapLength = 0;
+
+    /**
+     * The thickness of a dashed barline
+     * @smufl 1.4
+     */
     public dashedBarlineThickness = 0;
+
+    /**
+     * The thickness of a crescendo/diminuendo hairpin
+     * @smufl 1.4
+     */
     public hairpinThickness = 0;
+
+    /**
+     * The thickness of a leger line (normally somewhat thicker than a staff line)
+     * @smufl 1.4
+     */
     public legerLineThickness = 0;
+
+    /**
+     * The amount by which a leger line should extend either side of a notehead, scaled proportionally with the notehead's size, e.g. when scaled down as a grace note
+     * @smufl 1.4
+     */
     public legerLineExtension = 0;
+
+    /**
+     * The thickness of the dashed line used for an octave line
+     * @smufl 1.4
+     */
     public octaveLineThickness = 0;
+
+    /**
+     * The thickness of the line used for piano pedaling
+     * @smufl 1.4
+     */
     public pedalLineThickness = 0;
+
+    /**
+     * The default horizontal distance between the dots and the inner barline of a repeat barline, measured from the edge of the dots to the edge of the barline.
+     * @smufl 1.4
+     */
     public repeatBarlineDotSeparation = 0;
+
+    /**
+     * The thickness of the brackets drawn to indicate repeat endings
+     * @smufl 1.4
+     */
     public repeatEndingLineThickness = 0;
+
+    /**
+     * The thickness of the mid-point of a slur (i.e. its thickest point)
+     * @smufl 1.4
+     */
     public slurMidpointThickness = 0;
+
+    /**
+     * The thickness of each staff line
+     * @smufl 1.4
+     */
     public staffLineThickness = 0;
+
+    /**
+     * The thickness of a stem
+     * @smufl 1.4
+     */
     public stemThickness = 0;
+
+    /**
+     * The thickness of a thick barline, e.g. in a final barline or a repeat barline
+     * @smufl 1.4
+     */
     public thickBarlineThickness = 0;
+
+    /**
+     * The thickness of a dashed barline
+     * @smufl 1.4
+     */
     public thinBarlineThickness = 0;
+
+    /**
+     * The default distance between a pair of thin and thick barlines when locked together, e.g. between the thin and thick barlines making a final barline, or between the thick and thin barlines making a start repeat barline.
+     * @smufl 1.4
+     */
     public thinThickBarlineSeparation = 0;
+
+    /**
+     * The thickness of the mid-point of a tie
+     * @smufl 1.4
+     */
     public tieMidpointThickness = 0;
+
+    /**
+     * The thickness of the brackets drawn either side of tuplet numbers
+     * @smufl 1.4
+     */
     public tupletBracketThickness = 0;
 
-    public effectBandSeparation = 0; // TODO: part of other paddings? or make paddings part of smufl metrics (aka. stylesheet)
+    /**
+     * Holds information about where to place upwards pointing stems on glyphs.
+     * @smufl 1.4
+     */
+    public stemUp = new Map<MusicFontSymbol, EngravingStemInfo>();
 
-    private static _bravuraDefaults?: SmuflMetrics;
-    public static get bravuraDefaults() {
-        let bravuraDefaults = SmuflMetrics._bravuraDefaults;
-        if (!bravuraDefaults) {
-            bravuraDefaults = new SmuflMetrics();
-            bravuraDefaults.initialize(SmuflMetrics.bravuraMetadata);
-            SmuflMetrics._bravuraDefaults = bravuraDefaults;
-        }
+    /**
+     * Holds information about where to place downwards pointing stems on glyphs.
+     * @smufl 1.4
+     */
+    public stemDown = new Map<MusicFontSymbol, EngravingStemInfo>();
 
-        return SmuflMetricsCloner.clone(bravuraDefaults);
-    }
+    /**
+     * Holds the x-coordinate offsets for glyphs which are drawn repeatedly (like vibrato waves).
+     * @smufl 1.4
+     */
+    public repeatOffsetX = new Map<MusicFontSymbol, number>();
 
+    /**
+     * The standard stem length of a quarter note.
+     * @smufl 1.4
+     */
+    public standardStemLength = 0;
+
+    /**
+     * The additional offsets stems need to have enough space for flags.
+     * @smufl 1.4
+     */
+    public stemFlagOffsets: Map<Duration, number> = new Map<Duration, number>();
+
+    /**
+     * A lookup containing the offset from the visual top to the glyph center.
+     * The glyph center is the origin coordinate at which the glyph paths start when drawn on the alphabetic baseline.
+     * @smufl 1.4
+     */
+    public glyphTop: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+
+    /**
+     * A lookup containing the offset from the glyph center to the visual bottom of the glyph.
+     * The glyph center is the origin coordinate at which the glyph paths start when drawn on the alphabetic baseline.
+     * @smufl 1.4
+     */
+    public glyphBottom: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+
+    /**
+     * A lookup for the widths of the visual bounding box for the glyphs.
+     * @smufl 1.4
+     */
+    public glyphWidths: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+    /**
+     * A lookup for the heights of the visual bounding box for the glyphs.
+     * @smufl 1.4
+     */
+    public glyphHeights: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
+
+    /**
+     * Checks whether a certain glyph is registered in the currently loaded engraving settings.
+     * @param symbol The symbol to check
+     * @returns true if the glyph is registered and available for use.
+     * @internal
+     */
     public hasSymbol(symbol: MusicFontSymbol): boolean {
         return this.glyphWidths.get(symbol)! > 0 && this.glyphHeights.get(symbol)! > 0;
     }
 
-    public initialize(smufl: SmuflMetadata) {
+    /**
+     * Fills the engraving settings from the provided smufl metdata.
+     * @param smufl The metadata shipped together with the SMuFL fonts.
+     * @param musicFontSize The font size to configure in alphaTab for the music font.
+     */
+    public fillFromSmufl(smufl: SmuflMetadata, musicFontSize: number = 36) {
         //
         // base values
-        this.musicFontSize = 36;
-        this.oneStaffSpace = this.musicFontSize / 4;
+        this.musicFontSize = musicFontSize;
+        this.oneStaffSpace = musicFontSize / 4;
         // The industry practice is to give tab staves 1.5 of standard staff spacing
         // With 1sp==9px we have 1.5sp==13.5px which always leads to some lines being
         // blurry. Hence we round down to get a clean 13px. (condensed is better than a lot of white space)
@@ -203,7 +316,7 @@ export class SmuflMetrics {
         this.octaveLineThickness = smufl.engravingDefaults.octaveLineThickness * this.oneStaffSpace;
         this.pedalLineThickness = smufl.engravingDefaults.pedalLineThickness * this.oneStaffSpace;
         this.repeatBarlineDotSeparation = smufl.engravingDefaults.repeatBarlineDotSeparation * this.oneStaffSpace;
-        this.repeatEndingLineThickness = smufl.engravingDefaults.repeatEndingLineThickness * this.oneStaffSpace; // TODO which line is this exactly?
+        this.repeatEndingLineThickness = smufl.engravingDefaults.repeatEndingLineThickness * this.oneStaffSpace;
         // unused slurEndpointThickness
         this.slurMidpointThickness = smufl.engravingDefaults.slurMidpointThickness * this.oneStaffSpace;
         this.staffLineThickness = smufl.engravingDefaults.staffLineThickness * this.oneStaffSpace;
@@ -213,7 +326,7 @@ export class SmuflMetrics {
         this.thickBarlineThickness = smufl.engravingDefaults.thickBarlineThickness * this.oneStaffSpace;
         this.thinBarlineThickness = smufl.engravingDefaults.thinBarlineThickness * this.oneStaffSpace;
 
-        if(typeof smufl.engravingDefaults.thinThickBarlineSeparation === 'number') {
+        if (typeof smufl.engravingDefaults.thinThickBarlineSeparation === 'number') {
             this.thinThickBarlineSeparation = smufl.engravingDefaults.thinThickBarlineSeparation! * this.oneStaffSpace;
         } else {
             this.thinThickBarlineSeparation = smufl.engravingDefaults.barlineSeparation * this.oneStaffSpace;
@@ -238,30 +351,28 @@ export class SmuflMetrics {
         this.stemFlagOffsets.set(Duration.TwoHundredFiftySixth, 0);
 
         for (const [g, v] of Object.entries(smufl.glyphsWithAnchors)) {
-            const symbol = SmuflMetrics.smuflNameToMusicFontSymbol(g);
+            const symbol = EngravingSettings.smuflNameToMusicFontSymbol(g);
             if (symbol) {
                 if (v.stemDownNW) {
-                    const b = new SmuflStemInfo();
-                    b.topX = v.stemDownNW[0] * this.oneStaffSpace;
+                    const b = new EngravingStemInfo();
+                    b.x = v.stemDownNW[0] * this.oneStaffSpace;
                     b.topY = v.stemDownNW[1] * this.oneStaffSpace;
                     if (v.stemDownSW) {
-                        b.bottomX = v.stemDownSW[0] * this.oneStaffSpace;
                         b.bottomY = v.stemDownSW[1] * this.oneStaffSpace;
                     } else {
-                        b.bottomX = b.topX + this.stemThickness;
                         b.bottomY = 0;
                     }
                     this.stemDown.set(symbol, b);
                 }
                 if (v.stemUpSE) {
-                    const b = new SmuflStemInfo();
-                    b.bottomX = v.stemUpSE[0] * this.oneStaffSpace;
+                    const b = new EngravingStemInfo();
+                    const bottomX = v.stemUpSE[0] * this.oneStaffSpace;
                     b.bottomY = v.stemUpSE[1] * this.oneStaffSpace;
                     if (v.stemUpNW) {
-                        b.topX = v.stemUpNW[0] * this.oneStaffSpace;
+                        b.x = v.stemUpNW[0] * this.oneStaffSpace;
                         b.topY = v.stemUpNW[1] * this.oneStaffSpace;
                     } else {
-                        b.topX = b.bottomX - this.stemThickness;
+                        b.x = bottomX - this.stemThickness;
                         b.topY = 0;
                     }
                     this.stemUp.set(symbol, b);
@@ -300,7 +411,7 @@ export class SmuflMetrics {
         const bBoxes = smufl.glyphBBoxes;
         if (bBoxes) {
             for (const [g, v] of Object.entries(bBoxes)) {
-                const symbol = SmuflMetrics.smuflNameToMusicFontSymbol(g);
+                const symbol = EngravingSettings.smuflNameToMusicFontSymbol(g);
                 if (symbol) {
                     handledSymbols.add(symbol);
                     this.glyphTop.set(symbol, v.bBoxNE[1] * this.oneStaffSpace);
@@ -335,7 +446,6 @@ export class SmuflMetrics {
 
         //
         // custom alphatab sizes
-        this.effectBandSeparation = 0.25 * this.oneStaffSpace;
         this.numberedBarRendererBarSize = this.staffLineThickness * 2;
         this.numberedBarRendererBarSpacing = this.beamSpacing + this.numberedBarRendererBarSize;
         this.preNoteEffectPadding = 0.4 * this.oneStaffSpace;
@@ -347,7 +457,7 @@ export class SmuflMetrics {
         this.stringNumberCirclePadding = 0.3 * this.oneStaffSpace;
         this.rowContainerPadding = Math.ceil(0.3 * this.oneStaffSpace);
         this.rowContainerGap = Math.ceil(1 * this.oneStaffSpace);
-        this.effectSpacing = 0.2 * this.oneStaffSpace;
+        this.onNoteEffectPadding = 0.2 * this.oneStaffSpace;
         this.alternateEndingsPadding = 0.3 * this.oneStaffSpace;
         this.sustainPedalLinePadding = 0.5 * this.oneStaffSpace;
 
@@ -382,99 +492,260 @@ export class SmuflMetrics {
         this.chordDiagramFretHeight = Math.ceil(0.1 * this.oneStaffSpace);
         this.chordDiagramLineWidth = Math.ceil(0.11 * this.oneStaffSpace);
 
-        this.tripletFeelTripletPadding = 0.2 * this.oneStaffSpace;
+        this.tripletFeelBracketPadding = 0.2 * this.oneStaffSpace;
         this.accidentalPadding = 0.1 * this.oneStaffSpace;
         this.preBeatGlyphSpacing = 0.5 * this.oneStaffSpace;
 
-        this.tuningGlyphRowPadding = 0.2 * this.oneStaffSpace;
+        this.tuningGlyphStringRowPadding = 0.2 * this.oneStaffSpace;
     }
 
     // some names are different due to technical restrictions (e.g. names beginning with digits)
+
+    /**
+     * @internal
+     */
     public static smuflNameToGlyphNameMapping: Map<string, string> = new Map<string, string>([
         ['4stringTabClef', 'FourStringTabClef'],
         ['6stringTabClef', 'SixStringTabClef']
     ]);
 
     private static smuflNameToMusicFontSymbol(g: string): MusicFontSymbol | undefined {
-        const name = SmuflMetrics.smuflNameToGlyphNameMapping.has(g)
-            ? SmuflMetrics.smuflNameToGlyphNameMapping.get(g)!
+        const name = EngravingSettings.smuflNameToGlyphNameMapping.has(g)
+            ? EngravingSettings.smuflNameToGlyphNameMapping.get(g)!
             : g.substring(0, 1).toUpperCase() + g.substring(1);
 
         return JsonHelper.parseEnumExact<MusicFontSymbol>(name, MusicFontSymbol);
     }
 
     // Numbered Notation: SMuFL has no numbered notation yet
+
+    /**
+     * The size of the bars drawn in numbered notation to indicate the durations.
+     */
     public numberedBarRendererBarSize = 0;
+
+    /**
+     * The spacing between the bars drawn in numbered notation to indicate the durations.
+     */
     public numberedBarRendererBarSpacing = 0;
+
+    /**
+     * The size of the dashed drawn in numbered notation to indicate the durations.
+     */
     public numberedDashGlyphPadding = 0;
+
+    /**
+     * The width of the dashed drawn in numbered notation to indicate the durations.
+     */
     public numberedDashGlyphWidth = 0;
 
     // Line Ranged Glyphs: smufl doesn's have any good reference for dashed lines on effects
+
+    /**
+     * The gap between dashes on line ranged glyphs (like let-ring)
+     */
     public lineRangedGlyphDashGap = 0;
+    /**
+     * The size between dashes on line ranged glyphs (like let-ring)
+     */
     public lineRangedGlyphDashSize = 0;
 
+    /**
+     * The padding between effects and glyphs placed before the note heads, e.g. accidentals or brushes 
+     */
     public preNoteEffectPadding = 0;
+
+    /**
+     * The padding between effects and glyphs placed after the note heads, e.g. slides or bends 
+     */
     public postNoteEffectPadding = 0;
+
+    /**
+     * The padding between effects and glyphs placed above/blow the note heads e.g. staccato 
+     */
+    public onNoteEffectPadding = 0;
+
+
+    /**
+     * The padding between the circles around string numbers.
+     */
     public stringNumberCirclePadding = 0;
+
+    /**
+     * The outer padding for glyphs arranged in a grid like fashion, like the tunings and chord diagrams.
+     */
     public rowContainerPadding = 0;
+
+    /**
+     * The innter gap for glyphs arranged in a grid like fashion, like the tunings and chord diagrams.
+     */
     public rowContainerGap = 0;
-    public effectSpacing = 0;
+
+    /**
+     * The padding used for aligning the alternate ending brackets and texts.
+     */
     public alternateEndingsPadding = 0;
+
+    /**
+     * The padding between the sustain pedal glyphs and lines.
+     */
     public sustainPedalLinePadding = 0;
 
+    /**
+     * The height of ties.
+     */
     public tieHeight = 0;
+
+    /**
+     * The padding between the border and text of beat timers. 
+     */
     public beatTimerPadding = 0;
+
+    /**
+     * The additional padding applied to helper note heads shown on bends.
+     */
     public bendNoteHeadElementPadding = 0;
+
+    /**
+     * The width of the parenthesis shown on ghost notes and free time time signatures.
+     */
     public ghostParenthesisWidth = 0;
+
+    /**
+     * The padding between the parenthesis and wrapped elements on ghost notes and free time time signatures
+     */
     public ghostParenthesisPadding = 0;
 
+    /**
+     * The width of broken beams e.g. when combining a 32nd and 16th note
+     */
     public brokenBeamWidth = 0;
 
+    /**
+     * The padding between the text and whammy lines.
+     */
     public tabWhammyTextPadding = 0;
+
+    /**
+     * The height applied per half-note whammy. 
+     */
     public tabWhammyPerHalfHeight = 0;
+
+    /**
+     * The size of the dashes on whammys (e.g. on holds)
+     */
     public tabWhammyDashSize = 0;
 
+    /**
+     * The height of simple dip whammys when using the songbook mode.
+     */
     public songBookWhammyDipHeight = 0;
+
+    /**
+     * The width of the lines drawn for dead slapped beats.
+     */
     public deadSlappedLineWidth = 0;
 
+    /**
+     * The width of ties drawn for left-hand-tapped notes.
+     */
     public leftHandTabTieWidth = 0;
 
+    /**
+     * The size of the dashes on bends (e.g. on holds)
+     */
     public tabBendDashSize = 0;
+    
+    /**
+     * The height applied per quarter-note. 
+     */
     public tabBendPerValueHeight = 0;
+
+    /**
+     * The padding applied between the line and text of bends.
+     */
     public tabBendLabelPadding = 0;
 
+    /**
+     * The width of simple slides like slide out down which do slide to a defined target note.
+     */
     public simpleSlideWidth = 0;
+    /**
+     * The height of simple slides like slide out down which do slide to a defined target note.
+     */
     public simpleSlideHeight = 0;
 
+    /**
+     * The horizontal padding applied to individual chord diagrams.
+     */
     public chordDiagramPaddingX = 0;
+    /**
+     * The vertical padding applied to individual chord diagrams.
+     */
     public chordDiagramPaddingY = 0;
+    /**
+     * The spacing between strings on chord diagrams.
+     */
     public chordDiagramStringSpacing = 0;
+    /**
+     * The spacing between frets on chord diagrams.
+     */
     public chordDiagramFretSpacing = 0;
+    /**
+     * The height of the nut on chord diagrams..
+     */
     public chordDiagramNutHeight = 0;
+    /**
+     * The height of the individual fret lines.
+     */
     public chordDiagramFretHeight = 0;
+    /**
+     * The width of all other lines drawn on chord diagrams.
+     */
     public chordDiagramLineWidth = 0;
 
-    public tripletFeelTripletPadding = 0;
+    /**
+     * The padding between the bracket lines and numbers of tuplets 
+     */
+    public tripletFeelBracketPadding = 0;
+
+    /**
+     * The horizontal padding between individual accidentals when multiple ones are applied.
+     */
     public accidentalPadding = 0;
+
+    /**
+     * The padding between glyphs shown before any beats e.g. clefs and time signatures
+     */
     public preBeatGlyphSpacing = 0;
 
-    public stemUp = new Map<MusicFontSymbol, SmuflStemInfo>();
-    public stemDown = new Map<MusicFontSymbol, SmuflStemInfo>();
-    public repeatOffsetX = new Map<MusicFontSymbol, number>();
-
-    public standardStemLength = 0;
-    public stemFlagOffsets: Map<Duration, number> = new Map<Duration, number>();
-
-    public glyphTop: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-    public glyphBottom: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-    public glyphWidths: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-    public glyphHeights: Map<MusicFontSymbol, number> = new Map<MusicFontSymbol, number>();
-
+    /**
+     * The relative scale of the note drawn on tempo markers
+     */
     public tempoNoteScale = 0.7;
+
+    /**
+     * The scale of string numbers shown on tuning glyphs.
+     */
     public tuningGlyphCircleNumberScale = 0.7;
+
+    /**
+     * The scale factor applied to the width of the columns of string on tuning glyphs.
+     */
     public tuningGlyphStringColumnScale = 1.5;
-    public tuningGlyphRowPadding = 0;
+
+    /**
+     * The padding between rows of strings on tuning glyphs.
+     */
+    public tuningGlyphStringRowPadding = 0;
+
+    /**
+     * The relative scale of any directions glyphs drawn like coda or segno.
+     */
     public directionsScale = 0.6;
+
+    // Idea: maybe we can encode and pack this large metadata into a more compact format (e.g. BSON or a custom binary blob?)
+    // This metadata below is updated automatically from the bravura_metadata.json via npm script
 
     public static readonly bravuraMetadata: SmuflMetadata =
         // begin bravura_alphatab_metadata

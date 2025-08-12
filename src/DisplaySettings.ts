@@ -294,6 +294,14 @@ export class DisplaySettings {
     public staffPaddingLeft: number = 2;
 
     /**
+     * The padding between individual effect bands. 
+     * @since 1.7.0
+     * @category Display
+     * @defaultValue `2`
+     */
+    public effectBandPaddingBottom = 2;
+
+    /**
      * The mode used to arrange staves and systems.
      * @since 1.3.0
      * @category Display

@@ -5,7 +5,7 @@
 // </auto-generated>
 import { RenderingResources } from "@src/RenderingResources";
 import { JsonHelper } from "@src/io/JsonHelper";
-import { SmuflMetricsSerializer } from "@src/generated/SmuflMetricsSerializer";
+import { EngravingSettingsSerializer } from "@src/generated/EngravingSettingsSerializer";
 import { Font } from "@src/model/Font";
 import { Color } from "@src/model/Color";
 export class RenderingResourcesSerializer {
@@ -21,7 +21,7 @@ export class RenderingResourcesSerializer {
         }
         const o = new Map<string, unknown>();
         o.set("smuflfontfamilyname", obj.smuflFontFamilyName);
-        o.set("smuflmetrics", SmuflMetricsSerializer.toJson(obj.smuflMetrics));
+        o.set("engravingsettings", EngravingSettingsSerializer.toJson(obj.engravingSettings));
         o.set("copyrightfont", Font.toJson(obj.copyrightFont)!);
         o.set("titlefont", Font.toJson(obj.titleFont)!);
         o.set("subtitlefont", Font.toJson(obj.subTitleFont)!);
@@ -118,8 +118,8 @@ export class RenderingResourcesSerializer {
                 obj.scoreInfoColor = Color.fromJson(v)!;
                 return true;
         }
-        if (["smuflmetrics"].indexOf(property) >= 0) {
-            SmuflMetricsSerializer.fromJson(obj.smuflMetrics, v as Map<string, unknown>);
+        if (["engravingsettings"].indexOf(property) >= 0) {
+            EngravingSettingsSerializer.fromJson(obj.engravingSettings, v as Map<string, unknown>);
             return true;
         }
         return false;

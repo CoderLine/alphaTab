@@ -80,7 +80,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
             if (smufl.stemUp.has(g.symbol)) {
                 const stemInfo = smufl.stemUp.get(g.symbol)!;
-                const topX = stemInfo.topX * scale;
+                const topX = stemInfo.x * scale;
                 if (topX > stemUpX) {
                     stemUpX = topX;
                 }
@@ -93,7 +93,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
 
             if (smufl.stemDown.has(g.symbol)) {
                 const stemInfo = smufl.stemDown.get(g.symbol)!;
-                const topX = stemInfo.topX * scale;
+                const topX = stemInfo.x * scale;
                 if (topX > stemDownX) {
                     const diff = topX - stemDownX;
                     stemDownX = topX;
@@ -121,7 +121,7 @@ export abstract class ScoreNoteChordGlyphBase extends Glyph {
                 // not displaced: align on left side (where down stem would be for notes)
                 g.x = stemDownX;
                 if (smufl.stemDown.has(g.symbol)) {
-                    g.x -= smufl.stemDown.get(g.symbol)!.topX * scale;
+                    g.x -= smufl.stemDown.get(g.symbol)!.x * scale;
                 }
             }
 

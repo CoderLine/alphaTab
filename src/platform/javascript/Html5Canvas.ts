@@ -40,7 +40,7 @@ export class Html5Canvas implements ICanvas {
     public beginRender(width: number, height: number): void {
         this._musicFont = new Font(
             this.settings.display.resources.smuflFontFamilyName!,
-            this.settings.display.resources.smuflMetrics.musicFontSize,
+            this.settings.display.resources.engravingSettings.musicFontSize,
             FontStyle.Plain,
             FontWeight.Regular
         );

@@ -30,7 +30,7 @@ export class TripletFeelGlyph extends EffectGlyph {
         this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.MetNoteQuarterUp)! * noteScale;
 
         this._tupletHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tuplet3)! * noteScale;
-        this._tupletPadding = this.renderer.smuflMetrics.tripletFeelTripletPadding;
+        this._tupletPadding = this.renderer.smuflMetrics.tripletFeelBracketPadding;
         this.height += this._tupletHeight;
     }
 

@@ -8,9 +8,17 @@
  * @json_declaration
  * @target web
  */
-export interface SmuflStemInfoJson {
+export interface EngravingStemInfoJson {
+    /**
+     * The top Y coordinate where the stem should start/end.
+     */
     topY?: number;
+    /**
+     * The bottom Y coordinate where the stem should start/end.
+     */
     bottomY?: number;
-    topX?: number;
-    bottomX?: number;
+    /**
+     * The x-coordinate of the stem.
+     */
+    x?: number;
 }

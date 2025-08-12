@@ -1,7 +1,7 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { ScoreSubElement } from '@src/model/Score';
-import { SmuflMetrics } from '@src/SmuflMetrics';
+import { EngravingSettings } from '@src/EngravingSettings';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.
@@ -13,22 +13,28 @@ export class RenderingResources {
     private static serifFont: string = 'Georgia, serif';
 
     /**
-     * The SMuFL Font to use for rendering music symbols.
+     * The name of the SMuFL Font to use for rendering music symbols.
+     * 
      * @remarks
-     * Only specify this if the font is loaded and available in the environment (e.g. web font loaded, or Skia initialized). 
-     * You will also need to fill {@link smuflMetrics} to match this font.
-     * @defaultValue `alphaTab`
-     * @since 1.6.0
+     * If this family name is provided, alphaTab will not load any custom font, but expects
+     * this font to be available in your environment (loadad as webfont or registered in alphaSkia).
+     * 
+     * When using alphaTab in a browser environment it is rather recommended to specify the web font
+     * via the `smuflFontSources` on the `CoreSettings`and skipping this setting. 
+     * 
+     * You will also need to fill {@link engravingSettings} to match this font.
+     * 
+     * @since 1.7.0
+     * @internal
      */
     public smuflFontFamilyName?: string;
 
     /**
      * The SMuFL Metrics to use for rendering music symbols.
      * @defaultValue `alphaTab`
-     * @since 1.6.0
+     * @since 1.7.0
      */
-    // TODO: make part of stylesheet and define a default stylesheet on settings? 
-    public smuflMetrics:SmuflMetrics = SmuflMetrics.bravuraDefaults;
+    public engravingSettings: EngravingSettings = EngravingSettings.bravuraDefaults;
 
     /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.

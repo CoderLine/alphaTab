@@ -41,7 +41,7 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
     public override doLayout(): void {
         super.doLayout();
 
-        const effectSpacing: number = this.renderer.smuflMetrics.effectSpacing;
+        const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
         let effectY = this.renderer.smuflMetrics.glyphHeights.get(this._symbol)!;
 
         for (const g of this.beatEffects.values()) {
@@ -70,10 +70,10 @@ export class SlashNoteHeadGlyph extends MusicFontGlyph {
         if (this.beamingHelper) {
             const symbol = this._symbol;
             const stemInfoUp = this.renderer.smuflMetrics.stemUp.has(symbol)
-                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.topX
+                ? this.renderer.smuflMetrics.stemUp.get(symbol)!.x
                 : 0;
             const stemInfoDown = this.renderer.smuflMetrics.stemDown.has(symbol)
-                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topX
+                ? this.renderer.smuflMetrics.stemDown.get(symbol)!.x
                 : 0;
 
             this.beamingHelper.registerBeatLineX(

@@ -403,7 +403,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 line-height: 1;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
-                font-size: ${settings.display.resources.smuflMetrics.musicFontSize}px;
+                font-size: ${settings.display.resources.engravingSettings.musicFontSize}px;
                 overflow: visible !important;
             }`;
 

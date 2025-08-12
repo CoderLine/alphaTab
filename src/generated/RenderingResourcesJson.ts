@@ -3,7 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { SmuflMetricsJson } from "@src/generated/SmuflMetricsJson";
+import { EngravingSettingsJson } from "@src/generated/EngravingSettingsJson";
 import { FontJson } from "@src/model/Font";
 import { ColorJson } from "@src/model/Color";
 /**
@@ -14,20 +14,27 @@ import { ColorJson } from "@src/model/Color";
  */
 export interface RenderingResourcesJson {
     /**
-     * The SMuFL Font to use for rendering music symbols.
+     * The name of the SMuFL Font to use for rendering music symbols.
+     *
      * @remarks
-     * Only specify this if the font is loaded and available in the environment (e.g. web font loaded, or Skia initialized).
-     * You will also need to fill {@link smuflMetrics} to match this font.
-     * @defaultValue `alphaTab`
-     * @since 1.6.0
+     * If this family name is provided, alphaTab will not load any custom font, but expects
+     * this font to be available in your environment (loadad as webfont or registered in alphaSkia).
+     *
+     * When using alphaTab in a browser environment it is rather recommended to specify the web font
+     * via the `smuflFontSources` on the `CoreSettings`and skipping this setting.
+     *
+     * You will also need to fill {@link engravingSettings} to match this font.
+     *
+     * @since 1.7.0
+     * @internal
      */
     smuflFontFamilyName?: string;
     /**
      * The SMuFL Metrics to use for rendering music symbols.
      * @defaultValue `alphaTab`
-     * @since 1.6.0
+     * @since 1.7.0
      */
-    smuflMetrics?: SmuflMetricsJson;
+    engravingSettings?: EngravingSettingsJson;
     /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.
      * @defaultValue `bold 12px Arial, sans-serif`

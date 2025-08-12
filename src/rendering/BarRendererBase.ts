@@ -192,7 +192,7 @@ export class BarRendererBase {
     }
 
     public get smuflMetrics() {
-        return this.resources.smuflMetrics;
+        return this.resources.engravingSettings;
     }
 
     public get settings(): Settings {

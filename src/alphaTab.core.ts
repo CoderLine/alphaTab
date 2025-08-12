@@ -16,14 +16,16 @@ export {
 } from '@src/PlayerSettings';
 export { ProgressEventArgs } from '@src/ProgressEventArgs';
 export { RenderingResources } from '@src/RenderingResources';
+export type {
+    SmuflEngravingDefaults,
+    SmuflGlyphBoundingBox,
+    SmuflGlyphWithAnchor,
+    SmuflMetadata,
+} from '@src/SmuflMetadata';
 export {
-    SmuflMetrics,
-    type SmuflEngravingDefaults,
-    type SmuflGlyphBoundingBox,
-    type SmuflGlyphWithAnchor,
-    type SmuflMetadata,
-    SmuflStemInfo
-} from '@src/SmuflMetrics';
+    EngravingSettings,
+    EngravingStemInfo
+} from '@src/EngravingSettings';
 export { ResizeEventArgs } from '@src/ResizeEventArgs';
 export { Settings } from '@src/Settings';
 export { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';

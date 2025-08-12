@@ -146,7 +146,7 @@ export class DirectionsContainerGlyph extends EffectGlyph {
     private doSideLayout(glyphs: Glyph[]): number {
         let y = 0;
 
-        const padding = this.renderer.smuflMetrics.effectBandSeparation;
+        const padding = this.renderer.settings.display.effectBandPaddingBottom;
 
         for (const g of glyphs) {
             g.y = y;

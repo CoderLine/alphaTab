@@ -48,6 +48,11 @@ export interface CoreSettingsJson {
      * they are available for rendering the music sheet. The sources can be set to any
      * CSS compatible URL which can be passed into `url()`.
      * See https://developer.mozilla.org/en-US/docs/Web/CSS/@font-face/src#url
+     *
+     * If you customize the SmuFL font used in alphaTab, you will also need to provide
+     * the respective SMuFL Metadata information to alphaTab.
+     * Set the metadata via {@link EngravingSettings.fillFromSmufl} on the rendering resources.
+     *
      * @defaultValue Bravura files located at {@link fontDirectory} .
      * @category Core - JavaScript Specific
      * @target web

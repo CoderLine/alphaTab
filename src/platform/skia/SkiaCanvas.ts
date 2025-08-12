@@ -337,7 +337,7 @@ export class SkiaCanvas implements ICanvas {
         this._canvas.fillText(
             symbols,
             this._musicTextStyle!,
-            this.settings.display.resources.smuflMetrics.musicFontSize * this._scale * relativeScale,
+            this.settings.display.resources.engravingSettings.musicFontSize * this._scale * relativeScale,
             x * this._scale,
             y * this._scale,
             centerAtPosition

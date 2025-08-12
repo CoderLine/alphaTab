@@ -67,7 +67,7 @@ export class TuningGlyph extends GlyphGroup {
         this.renderer.scoreRenderer.canvas!.font = res.effectFont;
         const stringColumnWidth =
             (circleHeight + this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width) *
-            res.smuflMetrics.tuningGlyphStringColumnScale;
+            res.engravingSettings.tuningGlyphStringColumnScale;
 
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width,
@@ -78,7 +78,7 @@ export class TuningGlyph extends GlyphGroup {
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
-            const topY = this.height + this.renderer.smuflMetrics.tuningGlyphRowPadding;
+            const topY = this.height + this.renderer.smuflMetrics.tuningGlyphStringRowPadding;
             let currentY: number = topY;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
@@ -95,7 +95,7 @@ export class TuningGlyph extends GlyphGroup {
                         TextBaseline.Middle
                     )
                 );
-                currentY += circleHeight + this.renderer.smuflMetrics.tuningGlyphRowPadding;
+                currentY += circleHeight + this.renderer.smuflMetrics.tuningGlyphStringRowPadding;
                 const bottomY = currentY;
                 if (this.height < bottomY) {
                     this.height = bottomY;

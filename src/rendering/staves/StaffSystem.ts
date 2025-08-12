@@ -17,7 +17,7 @@ import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
-import type { SmuflMetrics } from '@src/SmuflMetrics';
+import type { EngravingSettings } from '@src/EngravingSettings';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -29,7 +29,7 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
-    public finalizeBracket(smuflMetrics:SmuflMetrics) {
+    public finalizeBracket(smuflMetrics:EngravingSettings) {
         // systems with just a single staff do not have a bracket
         if (this.firstStaffInBracket === this.lastStaffInBracket) {
             this.width = 0;
@@ -365,7 +365,7 @@ export class StaffSystem {
 
             let braceWidth = 0;
             for (const b of this._brackets) {
-                b.finalizeBracket(settings.display.resources.smuflMetrics);
+                b.finalizeBracket(settings.display.resources.engravingSettings);
                 braceWidth = Math.max(braceWidth, b.width);
             }
 
@@ -472,7 +472,7 @@ export class StaffSystem {
             // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping
             
             // NOTE: Prevent cropping of separator if it overlaps
-            const smuflMetrics = this.layout.renderer.settings.display.resources.smuflMetrics
+            const smuflMetrics = this.layout.renderer.settings.display.resources.engravingSettings
             const overlap = Math.min(0, smuflMetrics.glyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
             CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
@@ -624,7 +624,7 @@ export class StaffSystem {
                             );
                             const h = Math.ceil(thisTop - previousBottom);
                             canvas.fillRect(accoladeX, cy + previousBottom, 
-                                res.smuflMetrics.thinBarlineThickness, h);
+                                res.engravingSettings.thinBarlineThickness, h);
                         }
 
                         previousStaffInBracket = s;
@@ -684,7 +684,7 @@ export class StaffSystem {
             this.layout.renderer.tracks!.length > 1
         ) {
             // NOTE: Reuse padding to place separato
-            const neededHeight = settings.display.resources.smuflMetrics.glyphHeights.get(MusicFontSymbol.SystemDivider)!;
+            const neededHeight = settings.display.resources.engravingSettings.glyphHeights.get(MusicFontSymbol.SystemDivider)!;
             this.bottomPadding = Math.max(this.bottomPadding, 
                 neededHeight
             );
@@ -700,7 +700,7 @@ export class StaffSystem {
         }
 
         for (const b of this._brackets!) {
-            b.finalizeBracket(settings.display.resources.smuflMetrics);
+            b.finalizeBracket(settings.display.resources.engravingSettings);
         }
     }
 

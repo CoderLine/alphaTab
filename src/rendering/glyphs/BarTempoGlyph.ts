@@ -20,7 +20,7 @@ export class BarTempoGlyph extends EffectGlyph {
         const res = this.renderer.resources;
         this.height =
             this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.MetNoteQuarterUp)! *
-            res.smuflMetrics.tempoNoteScale;
+            res.engravingSettings.tempoNoteScale;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -35,7 +35,7 @@ export class BarTempoGlyph extends EffectGlyph {
                 this.y +
                 this.height +
                 this.renderer.smuflMetrics.glyphBottom.get(MusicFontSymbol.MetNoteQuarterUp)! *
-                    res.smuflMetrics.tempoNoteScale;
+                    res.engravingSettings.tempoNoteScale;
 
             const b = canvas.textBaseline;
             canvas.textBaseline = TextBaseline.Alphabetic;
@@ -46,13 +46,13 @@ export class BarTempoGlyph extends EffectGlyph {
                 x += size.width;
             }
             else {
-                x -= res.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! / 2;
+                x -= res.engravingSettings.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! / 2;
             }
 
-            CanvasHelper.fillMusicFontSymbolSafe(canvas,x, notePosY, res.smuflMetrics.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,x, notePosY, res.engravingSettings.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
             x +=
                 this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! *
-                res.smuflMetrics.tempoNoteScale;
+                res.engravingSettings.tempoNoteScale;
 
             canvas.fillText(` = ${automation.value.toString()}`, x, notePosY);
             canvas.textBaseline = b;

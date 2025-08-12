@@ -4,7 +4,7 @@ import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visual
 import { TestPlatform } from '@test/TestPlatform';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
-import type { SmuflMetadata } from '@src/SmuflMetrics';
+import type { SmuflMetadata } from '@src/SmuflMetadata';
 
 describe('NotationLegend', () => {
     it('full-default', async () => {
@@ -16,7 +16,7 @@ describe('NotationLegend', () => {
     it('full-smufl-petaluma', async () => {
         const settings = new Settings();
         settings.display.resources.smuflFontFamilyName = "Petaluma";
-        settings.display.resources.smuflMetrics.initialize(await TestPlatform.loadFileAsJson<SmuflMetadata>(
+        settings.display.resources.engravingSettings.fillFromSmufl(await TestPlatform.loadFileAsJson<SmuflMetadata>(
             'font/petaluma/petaluma_metadata.json'
         ))
 

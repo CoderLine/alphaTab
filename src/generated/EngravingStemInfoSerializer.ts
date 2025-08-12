@@ -3,27 +3,26 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { SmuflStemInfo } from "@src/SmuflMetrics";
+import { EngravingStemInfo } from "@src/EngravingSettings";
 import { JsonHelper } from "@src/io/JsonHelper";
-export class SmuflStemInfoSerializer {
-    public static fromJson(obj: SmuflStemInfo, m: unknown): void {
+export class EngravingStemInfoSerializer {
+    public static fromJson(obj: EngravingStemInfo, m: unknown): void {
         if (!m) {
             return;
         }
-        JsonHelper.forEach(m, (v, k) => SmuflStemInfoSerializer.setProperty(obj, k.toLowerCase(), v));
+        JsonHelper.forEach(m, (v, k) => EngravingStemInfoSerializer.setProperty(obj, k.toLowerCase(), v));
     }
-    public static toJson(obj: SmuflStemInfo | null): Map<string, unknown> | null {
+    public static toJson(obj: EngravingStemInfo | null): Map<string, unknown> | null {
         if (!obj) {
             return null;
         }
         const o = new Map<string, unknown>();
         o.set("topy", obj.topY);
         o.set("bottomy", obj.bottomY);
-        o.set("topx", obj.topX);
-        o.set("bottomx", obj.bottomX);
+        o.set("x", obj.x);
         return o;
     }
-    public static setProperty(obj: SmuflStemInfo, property: string, v: unknown): boolean {
+    public static setProperty(obj: EngravingStemInfo, property: string, v: unknown): boolean {
         switch (property) {
             case "topy":
                 obj.topY = v! as number;
@@ -31,11 +30,8 @@ export class SmuflStemInfoSerializer {
             case "bottomy":
                 obj.bottomY = v! as number;
                 return true;
-            case "topx":
-                obj.topX = v! as number;
-                return true;
-            case "bottomx":
-                obj.bottomX = v! as number;
+            case "x":
+                obj.x = v! as number;
                 return true;
         }
         return false;

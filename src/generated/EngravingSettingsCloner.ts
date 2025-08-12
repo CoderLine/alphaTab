@@ -3,10 +3,10 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
-import { SmuflMetrics } from "@src/SmuflMetrics";
-export class SmuflMetricsCloner {
-    public static clone(original: SmuflMetrics): SmuflMetrics {
-        const clone = new SmuflMetrics();
+import { EngravingSettings } from "@src/EngravingSettings";
+export class EngravingSettingsCloner {
+    public static clone(original: EngravingSettings): EngravingSettings {
+        const clone = new EngravingSettings();
         clone.musicFontSize = original.musicFontSize;
         clone.oneStaffSpace = original.oneStaffSpace;
         clone.tabLineSpacing = original.tabLineSpacing;
@@ -33,7 +33,15 @@ export class SmuflMetricsCloner {
         clone.thinThickBarlineSeparation = original.thinThickBarlineSeparation;
         clone.tieMidpointThickness = original.tieMidpointThickness;
         clone.tupletBracketThickness = original.tupletBracketThickness;
-        clone.effectBandSeparation = original.effectBandSeparation;
+        clone.stemUp = new Map(original.stemUp);
+        clone.stemDown = new Map(original.stemDown);
+        clone.repeatOffsetX = new Map(original.repeatOffsetX);
+        clone.standardStemLength = original.standardStemLength;
+        clone.stemFlagOffsets = new Map(original.stemFlagOffsets);
+        clone.glyphTop = new Map(original.glyphTop);
+        clone.glyphBottom = new Map(original.glyphBottom);
+        clone.glyphWidths = new Map(original.glyphWidths);
+        clone.glyphHeights = new Map(original.glyphHeights);
         clone.numberedBarRendererBarSize = original.numberedBarRendererBarSize;
         clone.numberedBarRendererBarSpacing = original.numberedBarRendererBarSpacing;
         clone.numberedDashGlyphPadding = original.numberedDashGlyphPadding;
@@ -42,10 +50,10 @@ export class SmuflMetricsCloner {
         clone.lineRangedGlyphDashSize = original.lineRangedGlyphDashSize;
         clone.preNoteEffectPadding = original.preNoteEffectPadding;
         clone.postNoteEffectPadding = original.postNoteEffectPadding;
+        clone.onNoteEffectPadding = original.onNoteEffectPadding;
         clone.stringNumberCirclePadding = original.stringNumberCirclePadding;
         clone.rowContainerPadding = original.rowContainerPadding;
         clone.rowContainerGap = original.rowContainerGap;
-        clone.effectSpacing = original.effectSpacing;
         clone.alternateEndingsPadding = original.alternateEndingsPadding;
         clone.sustainPedalLinePadding = original.sustainPedalLinePadding;
         clone.tieHeight = original.tieHeight;
@@ -72,22 +80,13 @@ export class SmuflMetricsCloner {
         clone.chordDiagramNutHeight = original.chordDiagramNutHeight;
         clone.chordDiagramFretHeight = original.chordDiagramFretHeight;
         clone.chordDiagramLineWidth = original.chordDiagramLineWidth;
-        clone.tripletFeelTripletPadding = original.tripletFeelTripletPadding;
+        clone.tripletFeelBracketPadding = original.tripletFeelBracketPadding;
         clone.accidentalPadding = original.accidentalPadding;
         clone.preBeatGlyphSpacing = original.preBeatGlyphSpacing;
-        clone.stemUp = new Map(original.stemUp);
-        clone.stemDown = new Map(original.stemDown);
-        clone.repeatOffsetX = new Map(original.repeatOffsetX);
-        clone.standardStemLength = original.standardStemLength;
-        clone.stemFlagOffsets = new Map(original.stemFlagOffsets);
-        clone.glyphTop = new Map(original.glyphTop);
-        clone.glyphBottom = new Map(original.glyphBottom);
-        clone.glyphWidths = new Map(original.glyphWidths);
-        clone.glyphHeights = new Map(original.glyphHeights);
         clone.tempoNoteScale = original.tempoNoteScale;
         clone.tuningGlyphCircleNumberScale = original.tuningGlyphCircleNumberScale;
         clone.tuningGlyphStringColumnScale = original.tuningGlyphStringColumnScale;
-        clone.tuningGlyphRowPadding = original.tuningGlyphRowPadding;
+        clone.tuningGlyphStringRowPadding = original.tuningGlyphStringRowPadding;
         clone.directionsScale = original.directionsScale;
         return clone;
     }

@@ -146,7 +146,7 @@ export class CanvasHelper {
         symbol: MusicFontSymbol,
         centerAtPosition?: boolean
     ): void {
-        if (!canvas.settings.display.resources.smuflMetrics.hasSymbol(symbol)) {
+        if (!canvas.settings.display.resources.engravingSettings.hasSymbol(symbol)) {
             return;
         }
         canvas.fillMusicFontSymbol(x, y, relativeScale, symbol, centerAtPosition);
@@ -159,7 +159,7 @@ export class CanvasHelper {
         symbols: MusicFontSymbol[],
         centerAtPosition?: boolean
     ): void {
-        const symbolsToDraw = symbols.filter(s => canvas.settings.display.resources.smuflMetrics.hasSymbol(s));
+        const symbolsToDraw = symbols.filter(s => canvas.settings.display.resources.engravingSettings.hasSymbol(s));
         if (symbolsToDraw.length === 0) {
             return;
         }

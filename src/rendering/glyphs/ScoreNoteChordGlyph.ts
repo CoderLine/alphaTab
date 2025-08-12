@@ -154,7 +154,7 @@ export class ScoreNoteChordGlyph extends ScoreNoteChordGlyphBase {
 
         let aboveBeatEffectsY = 0;
         let belowBeatEffectsY = 0;
-        const effectSpacing = this.renderer.smuflMetrics.effectSpacing;
+        const effectSpacing = this.renderer.smuflMetrics.onNoteEffectPadding;
 
         if (this.beat.deadSlapped) {
             belowBeatEffectsY = scoreRenderer.getScoreY(0);

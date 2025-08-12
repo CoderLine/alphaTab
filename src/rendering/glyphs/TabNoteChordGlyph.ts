@@ -115,7 +115,7 @@ export class TabNoteChordGlyph extends Glyph {
             const tabHeight: number = this.renderer.resources.tablatureFont.size;
             let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
             // TODO: take care of actual glyph height
-            const effectSpacing: number = this.renderer.smuflMetrics.effectSpacing;
+            const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
             for (const g of this.beatEffects.values()) {
                 g.y += effectY;
                 g.x += this.width / 2;

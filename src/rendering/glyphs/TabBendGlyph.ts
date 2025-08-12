@@ -457,7 +457,7 @@ export class TabBendGlyph extends Glyph {
                 const size = canvas.measureText(s);
                 const y: number = startY - size.height / 1.5;
                 const x: number = x2 - size.width / 2;
-                canvas.fillText(s, x, y - res.smuflMetrics.tabBendLabelPadding);
+                canvas.fillText(s, x, y - res.engravingSettings.tabBendLabelPadding);
             }
         }
 
