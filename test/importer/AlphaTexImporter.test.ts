@@ -42,6 +42,7 @@ import { SimileMark } from '@src/model/SimileMark';
 import { VibratoType } from '@src/model/VibratoType';
 import { WhammyType } from '@src/model/WhammyType';
 import { TextAlign } from '@src/platform/ICanvas';
+import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
@@ -245,9 +246,11 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].harmonicType).to.equal(HarmonicType.Semi);
     });
 
-    it('hamonics-rendering-text-issue79', () => {
+    it('hamonics-rendering-text-issue79', async () => {
         const tex: string = ':8 3.3{nh} 3.3{ah} 3.3{th} 3.3{ph} 3.3{sh}';
         const score: Score = parseTex(tex);
+
+        await VisualTestHelper.prepareAlphaSkia();
         const settings: Settings = new Settings();
         settings.core.engine = 'svg';
         settings.core.enableLazyLoading = false;
