@@ -1031,6 +1031,25 @@ export class Beat {
                         points.splice(1, 1);
                     }
                 }
+            } else if (points!.length === 2) {
+                const origin: BendPoint = points[0];
+                const destination: BendPoint = points[1];
+
+                if (origin.value < destination.value || origin.value > destination.value) {
+                    if (origin.value !== 0 && !this.isContinuedWhammy) {
+                        this.whammyBarType = WhammyType.PrediveDive;
+                    } else {
+                        this.whammyBarType = WhammyType.Dive;
+                    }
+                } else if (origin.value > destination.value || origin.value < destination.value) {
+                    this.whammyBarType = WhammyType.Dip;
+                } else if (origin.value === destination.value) {
+                    if (origin.value !== 0 && !this.isContinuedWhammy) {
+                        this.whammyBarType = WhammyType.Predive;
+                    } else {
+                        this.whammyBarType = WhammyType.Hold;
+                    }
+                }
             }
         }
         this.updateDurations();

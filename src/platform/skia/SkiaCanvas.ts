@@ -32,7 +32,7 @@ export class SkiaCanvas implements ICanvas {
      */
     private static alphaSkia: AlphaSkiaModule;
 
-    private static musicTextStyle: alphaSkia.AlphaSkiaTextStyle | null = null;
+    private static defaultMusicTextStyle: alphaSkia.AlphaSkiaTextStyle | null = null;
 
     /**
      * @target web
@@ -44,7 +44,7 @@ export class SkiaCanvas implements ICanvas {
     }
 
     public static initializeMusicFont(musicFont: alphaSkia.AlphaSkiaTypeface) {
-        SkiaCanvas.musicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
+        SkiaCanvas.defaultMusicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
             [musicFont.familyName],
             musicFont.weight,
             musicFont.isItalic
@@ -72,6 +72,7 @@ export class SkiaCanvas implements ICanvas {
     private _scale = 1;
     private _textStyles: Map<string, alphaSkia.AlphaSkiaTextStyle> = new Map<string, alphaSkia.AlphaSkiaTextStyle>();
     private _font: Font = new Font('Arial', 10, FontStyle.Plain);
+    private _musicTextStyle: alphaSkia.AlphaSkiaTextStyle | null = null;
 
     public settings!: Settings;
 
@@ -122,6 +123,22 @@ export class SkiaCanvas implements ICanvas {
     public beginRender(width: number, height: number): void {
         this._scale = this.settings.display.scale;
         this._canvas.beginRender(width, height, Environment.HighDpiFactor);
+
+        const customFont = this.settings.display.resources.smuflFontFamilyName;
+        if (customFont && customFont !== SkiaCanvas.defaultMusicTextStyle!.familyNames[0]) {
+            if (!this._textStyles.has(customFont!)) {
+                this._musicTextStyle = new SkiaCanvas.alphaSkia.AlphaSkiaTextStyle(
+                    [customFont],
+                    SkiaCanvas.defaultMusicTextStyle!.weight,
+                    SkiaCanvas.defaultMusicTextStyle!.isItalic
+                );
+                this._textStyles.set(customFont, this._musicTextStyle);
+            } else {
+                this._musicTextStyle = this._textStyles.get(customFont)!;
+            }
+        } else {
+            this._musicTextStyle = SkiaCanvas.defaultMusicTextStyle;
+        }
     }
 
     public endRender(): unknown {
@@ -151,15 +168,15 @@ export class SkiaCanvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._canvas.fillRect((x * this._scale) | 0, (y * this._scale) | 0, w * this._scale, h * this._scale);
+            this._canvas.fillRect(x * this._scale, y * this._scale, w * this._scale, h * this._scale);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
         this._canvas.strokeRect(
-            ((x * this._scale) | 0) + blurOffset,
-            ((y * this._scale) | 0) + blurOffset,
+            x * this._scale + blurOffset,
+            y * this._scale + blurOffset,
             w * this._scale,
             h * this._scale
         );
@@ -252,6 +269,9 @@ export class SkiaCanvas implements ICanvas {
             case TextBaseline.Bottom:
                 textBaseline = SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Bottom;
                 break;
+            case TextBaseline.Alphabetic:
+                textBaseline = SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic;
+                break;
         }
 
         // NOTE: Avoiding sub-pixel text positions as they can lead to strange artifacts.
@@ -259,8 +279,8 @@ export class SkiaCanvas implements ICanvas {
             text,
             this._textStyle!,
             this._font.size * this._scale,
-            (x * this._scale) | 0,
-            (y * this._scale) | 0,
+            x * this._scale,
+            y * this._scale,
             textAlign,
             textBaseline
         );
@@ -275,7 +295,27 @@ export class SkiaCanvas implements ICanvas {
             SkiaCanvas.alphaSkia.AlphaSkiaTextBaseline.Alphabetic
         );
 
-        return new MeasuredText(metrics.width, metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent);
+        const [width, height] = this.getTextWidthAndHeight(metrics, text);
+
+        return new MeasuredText(width, height);
+    }
+
+    private getTextWidthAndHeight(metrics: alphaSkia.AlphaSkiaTextMetrics, text:string): [number, number] {
+        let width = metrics.width;
+
+        // BUG: Skia has some problem of not delivering the correct sizes intiially, asking again seem to work
+        // Need to narrow this down separately.
+        if (text.length > 0 && width < 1) {
+            for (let i = 0; i < 5; i++) {
+                width = metrics.width;
+                if (width > 1) {
+                    break;
+                }
+            }
+        }
+        const height = metrics.actualBoundingBoxAscent + metrics.actualBoundingBoxDescent;
+
+        return [width, height]
     }
 
     public fillMusicFontSymbol(
@@ -316,8 +356,8 @@ export class SkiaCanvas implements ICanvas {
     ): void {
         this._canvas.fillText(
             symbols,
-            SkiaCanvas.musicTextStyle!,
-            Environment.MusicFontSize * this._scale * relativeScale,
+            this._musicTextStyle!,
+            this.settings.display.resources.engravingSettings.musicFontSize * this._scale * relativeScale,
             x * this._scale,
             y * this._scale,
             centerAtPosition

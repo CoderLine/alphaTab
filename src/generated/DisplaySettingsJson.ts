@@ -259,6 +259,13 @@ export interface DisplaySettingsJson {
      */
     staffPaddingLeft?: number;
     /**
+     * The padding between individual effect bands.
+     * @since 1.7.0
+     * @category Display
+     * @defaultValue `2`
+     */
+    effectBandPaddingBottom?: number;
+    /**
      * The mode used to arrange staves and systems.
      * @since 1.3.0
      * @category Display

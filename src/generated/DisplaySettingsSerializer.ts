@@ -45,6 +45,7 @@ export class DisplaySettingsSerializer {
         o.set("effectstaffpaddingbottom", obj.effectStaffPaddingBottom);
         o.set("firststaffpaddingleft", obj.firstStaffPaddingLeft);
         o.set("staffpaddingleft", obj.staffPaddingLeft);
+        o.set("effectbandpaddingbottom", obj.effectBandPaddingBottom);
         o.set("systemslayoutmode", obj.systemsLayoutMode as number);
         return o;
     }
@@ -118,6 +119,9 @@ export class DisplaySettingsSerializer {
                 return true;
             case "staffpaddingleft":
                 obj.staffPaddingLeft = v! as number;
+                return true;
+            case "effectbandpaddingbottom":
+                obj.effectBandPaddingBottom = v! as number;
                 return true;
             case "systemslayoutmode":
                 obj.systemsLayoutMode = JsonHelper.parseEnum<SystemsLayoutMode>(v, SystemsLayoutMode)!;

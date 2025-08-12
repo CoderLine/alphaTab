@@ -86,6 +86,7 @@ export default abstract class AstPrinterBase {
     protected abstract writeClassDeclaration(d: cs.ClassDeclaration);
     protected abstract writeEnumDeclaration(d: cs.EnumDeclaration);
     protected abstract writeInterfaceDeclaration(d: cs.InterfaceDeclaration);
+    protected abstract writeDelegateDeclaration(d: cs.DelegateDeclaration);
     protected abstract writeParameter(p: cs.ParameterDeclaration);
 
     protected writeParameters(parameters: cs.ParameterDeclaration[]) {
@@ -136,6 +137,9 @@ export default abstract class AstPrinterBase {
             case cs.SyntaxKind.InterfaceDeclaration:
                 this.writeInterfaceDeclaration(member as cs.InterfaceDeclaration);
                 break;
+            case cs.SyntaxKind.DelegateDeclaration:
+                this.writeDelegateDeclaration(member as cs.DelegateDeclaration);
+                break;
         }
         this.writeLine();
     }
@@ -184,7 +188,8 @@ export default abstract class AstPrinterBase {
     protected abstract writeCastExpression(expr: cs.CastExpression);
     protected abstract writeNonNullExpression(expr: cs.NonNullExpression);
     protected abstract writeYieldExpression(expr: cs.YieldExpression);
-    protected abstract writeLabeledExpression(expr: cs.LabeledExpression) 
+    protected abstract writeLabeledExpression(expr: cs.LabeledExpression);
+    protected abstract writeDeconstructDeclaration(expr: cs.DeconstructDeclaration);
 
 
     protected writeToDoExpression(expr: cs.ToDoExpression) {
@@ -407,6 +412,9 @@ export default abstract class AstPrinterBase {
                 break;
             case cs.SyntaxKind.LabeledExpression:
                 this.writeLabeledExpression(expr as cs.LabeledExpression);
+                break;
+            case cs.SyntaxKind.DeconstructDeclaration:
+                this.writeDeconstructDeclaration(expr as cs.DeconstructDeclaration);
                 break;
             default:
                 throw new Error(`Unhandled expression type: ${cs.SyntaxKind[expr.nodeType]}`);

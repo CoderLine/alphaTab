@@ -1,8 +1,7 @@
 import { GraceType } from '@src/model/GraceType';
 import type { Note } from '@src/model/Note';
 import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
-import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
-import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
+import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
 import { NoteXPosition, NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { BeatBounds } from '@src/rendering/utils/BeatBounds';
 import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
@@ -13,6 +12,7 @@ import { SlashRestGlyph } from '@src/rendering/glyphs/SlashRestGlyph';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { BeatSubElement } from '@src/model/Beat';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
     public noteHeads: SlashNoteHeadGlyph | null = null;
@@ -61,11 +61,21 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             beatBounds.addNote(noteBounds);
         }
     }
+        
+    public override getLowestNoteY(): number {
+        return this.noteHeads ? this.noteHeads.y : 0;
+    }
 
-    public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+    public override getHighestNoteY(): number {
+        return this.noteHeads ? this.noteHeads.y : 0;
+    }
+
+    public override getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
+        let symbol: MusicFontSymbol = MusicFontSymbol.None;
         if (this.noteHeads) {
             g = this.noteHeads;
+            symbol = SlashNoteHeadGlyph.getSymbol(note.beat.duration);
         } else if (this.deadSlapped) {
             g = this.deadSlapped;
         }
@@ -76,13 +86,24 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= g.height / 2 + 2;
+                    pos -= g.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
                 case NoteYPosition.BottomWithStem:
                     pos += g.height / 2;
+                    break;
+
+                case NoteYPosition.StemUp:
+                    pos -= this.renderer.smuflMetrics.stemUp.has(symbol)
+                        ? this.renderer.smuflMetrics.stemUp.get(symbol)!.bottomY
+                        : 0;
+                    break;
+                case NoteYPosition.StemDown:
+                    pos -= this.renderer.smuflMetrics.stemDown.has(symbol)
+                        ? this.renderer.smuflMetrics.stemDown.get(symbol)!.topY
+                        : 0;
                     break;
             }
 
@@ -151,9 +172,13 @@ export class SlashBeatGlyph extends BeatOnNoteGlyphBase {
         // Note dots
         //
         if (this.container.beat.dots > 0) {
-            this.addNormal(new SpacingGlyph(0, 0, 5));
             for (let i: number = 0; i < this.container.beat.dots; i++) {
-                this.addEffect(new CircleGlyph(0, sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5), 1.5));
+                this.addEffect(
+                    new AugmentationDotGlyph(
+                        0,
+                        sr.getLineY(sr.getNoteLine()) - sr.getLineHeight(0.5)
+                    )
+                );
             }
         }
 

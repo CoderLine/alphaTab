@@ -13,7 +13,6 @@ import type { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 
 export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
-    private static readonly ElementPadding: number = 2;
 
     private _beat: Beat;
     private _showParenthesis: boolean = false;
@@ -22,6 +21,10 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
     private _preNoteParenthesis: GhostNoteContainerGlyph | null = null;
     private _postNoteParenthesis: GhostNoteContainerGlyph | null = null;
     public isEmpty: boolean = true;
+
+    public override get scale(): number {
+        return NoteHeadGlyph.GraceScale;
+    }
 
     public get direction(): BeamDirection {
         return BeamDirection.Up;
@@ -84,30 +87,27 @@ export class BendNoteHeadGroupGlyph extends ScoreNoteChordGlyphBase {
             this._preNoteParenthesis!.x = x;
             this._preNoteParenthesis!.renderer = this.renderer;
             this._preNoteParenthesis!.doLayout();
-            x += this._preNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding;
+            x += this._preNoteParenthesis!.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
         if (!this._accidentals.isEmpty) {
-            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding;
+            x += this._accidentals.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
             this._accidentals.x = x;
             this._accidentals.renderer = this.renderer;
             this._accidentals.doLayout();
-            x += this._accidentals.width + BendNoteHeadGroupGlyph.ElementPadding;
+            x += this._accidentals.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
         this.noteStartX = x;
         super.doLayout();
         this.noteHeadOffset = this.noteStartX + (this.width - this.noteStartX) / 2;
         if (this._showParenthesis) {
-            this._postNoteParenthesis!.x = this.width + BendNoteHeadGroupGlyph.ElementPadding;
+            this._postNoteParenthesis!.x = this.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
             this._postNoteParenthesis!.renderer = this.renderer;
             this._postNoteParenthesis!.doLayout();
-            this.width += this._postNoteParenthesis!.width + BendNoteHeadGroupGlyph.ElementPadding;
+            this.width += this._postNoteParenthesis!.width + this.renderer.smuflMetrics.bendNoteHeadElementPadding;
         }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        // canvas.Color = Color.Random();
-        // canvas.FillRect(cx + X, cy + Y, Width, 10);
-        // canvas.Color = Renderer.Resources.MainGlyphColor;
         if (!this._accidentals.isEmpty) {
             this._accidentals.paint(cx + this.x, cy + this.y, canvas);
         }

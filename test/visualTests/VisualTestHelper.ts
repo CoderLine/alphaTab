@@ -216,6 +216,7 @@ export class VisualTestHelper {
             'font/noto-serif/NotoSerif-BoldItalic.otf',
             'font/noto-music/NotoMusic-Regular.otf',
             'font/noto-color-emoji/NotoColorEmoji_WindowsCompatible.ttf',
+            'font/petaluma/Petaluma.otf',
         ];
 
         for (const font of fonts) {
@@ -249,8 +250,6 @@ export class VisualTestHelper {
         settings.display.resources.tablatureFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.graceFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.barNumberFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.fingeringFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
-        settings.display.resources.inlineFingeringFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.markerFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.directionsFont.families = ['Noto Serif', 'Noto Music', 'Noto Color Emoji'];
         settings.display.resources.numberedNotationFont.families = ['Noto Sans', 'Noto Music', 'Noto Color Emoji'];

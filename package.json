@@ -68,7 +68,8 @@
         "test-kotlin": "node scripts/gradlew.mjs testReleaseUnitTest --info",
         "test-accept-reference": "tsx scripts/accept-new-reference-files.ts",
         "typecheck": "tsc --noEmit",
-        "prepack": "node scripts/prepack.mjs"
+        "prepack": "node scripts/prepack.mjs",
+        "bravura-smufl": "tsx scripts/smufl-metadata.ts font/bravura/bravura_metadata.json font/bravura/bravura_alphatab_metadata.json true"
     },
     "devDependencies": {
         "@biomejs/biome": "^1.9.4",

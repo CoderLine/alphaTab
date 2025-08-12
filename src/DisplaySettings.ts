@@ -211,7 +211,7 @@ export class DisplaySettings {
      * @category Display
      * @defaultValue `20`
      */
-    public systemPaddingBottom: number = 20;
+    public systemPaddingBottom: number = 10;
 
     /**
      * The bottom padding applied to the last system.
@@ -292,6 +292,14 @@ export class DisplaySettings {
      * @defaultValue `2`
      */
     public staffPaddingLeft: number = 2;
+
+    /**
+     * The padding between individual effect bands. 
+     * @since 1.7.0
+     * @category Display
+     * @defaultValue `2`
+     */
+    public effectBandPaddingBottom = 2;
 
     /**
      * The mode used to arrange staves and systems.

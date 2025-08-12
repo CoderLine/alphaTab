@@ -97,7 +97,7 @@ export class PageViewLayout extends ScoreLayout {
 
         const res: RenderingResources = this.renderer.settings.display.resources;
         this.tuningGlyph.x = this.pagePadding![0];
-        this.tuningGlyph.width = this.scaledWidth;
+        this.tuningGlyph.width = this.scaledWidth - this.pagePadding![0] - this.pagePadding![2];
         this.tuningGlyph.doLayout();
 
         const tuningHeight = Math.round(this.tuningGlyph.height);
@@ -124,7 +124,8 @@ export class PageViewLayout extends ScoreLayout {
             return y;
         }
         const res: RenderingResources = this.renderer.settings.display.resources;
-        this.chordDiagrams.width = this.scaledWidth;
+        this.chordDiagrams.x = this.pagePadding![0];
+        this.chordDiagrams.width = this.scaledWidth - this.pagePadding![0] - this.pagePadding![2];
         this.chordDiagrams.doLayout();
 
         const diagramHeight = Math.round(this.chordDiagrams.height);

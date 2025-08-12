@@ -3,7 +3,6 @@ import { RowGlyphContainer } from '@src/rendering/glyphs/RowGlyphContainer';
 import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 
 export class RowContainerGlyph extends GlyphGroup {
-    private static readonly Padding: number = 3;
     private _rows: RowGlyphContainer[] = [];
     private _align: TextAlign;
 
@@ -17,31 +16,34 @@ export class RowContainerGlyph extends GlyphGroup {
     public override doLayout(): void {
         let x: number = 0;
         let y: number = 0;
-        const padding: number = RowContainerGlyph.Padding;
+        const gap: number = this.renderer.smuflMetrics.rowContainerGap;
         this._rows = [];
         let row: RowGlyphContainer = new RowGlyphContainer(x, y, this._align);
+        row.renderer = this.renderer;
         row.width = this.width;
         for (const g of this.glyphs!) {
-            if (x + g.width < this.width) {
+            const endX = x + g.width + gap;
+            if (endX < this.width) {
                 row.addGlyphToRow(g);
-                x += g.width;
+                x = Math.ceil(endX);
             } else {
                 if (!row.isEmpty) {
                     row.doLayout();
                     this._rows.push(row);
-                    y += row.height + padding;
+                    y += row.height + gap;
                 }
                 x = 0;
                 row = new RowGlyphContainer(x, y, this._align);
+                row.renderer = this.renderer;
                 row.width = this.width;
                 row.addGlyphToRow(g);
-                x += g.width;
+                x += Math.ceil(g.width + gap);
             }
         }
         if (!row.isEmpty) {
             row.doLayout();
             this._rows.push(row);
-            y += row.height + padding;
+            y += Math.ceil(row.height + this.renderer.smuflMetrics.rowContainerPadding);
         }
         this.height = y;
     }

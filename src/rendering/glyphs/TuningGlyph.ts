@@ -5,7 +5,6 @@ import { GlyphGroup } from '@src/rendering/glyphs/GlyphGroup';
 import { TextGlyph } from '@src/rendering/glyphs/TextGlyph';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import type { Color } from '@src/model/Color';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class TuningGlyph extends GlyphGroup {
     private _tuning: Tuning;
@@ -32,7 +31,6 @@ export class TuningGlyph extends GlyphGroup {
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.textBaseline = TextBaseline.Middle;
         const c = canvas.color;
         if (this.colorOverride) {
             canvas.color = this.colorOverride!;
@@ -41,69 +39,73 @@ export class TuningGlyph extends GlyphGroup {
         canvas.color = c;
     }
 
-    public static readonly CircleNumberScale: number = 0.7;
-
     private createGlyphs(tuning: Tuning): void {
         const res = this.renderer.resources;
         this.height = 0;
 
-        const rowHeight = 15;
-        const textPadding = 1;
-
         // Track name
         if (this._trackLabel.length > 0) {
-            this.height += textPadding;
-
             const trackName = new TextGlyph(0, this.height, this._trackLabel, res.effectFont, TextAlign.Left);
             trackName.renderer = this.renderer;
             trackName.doLayout();
-            this.height += trackName.height + textPadding;
-            trackName.y += trackName.height / 2;
+            this.height += trackName.height;
             this.addGlyph(trackName);
         }
 
         // Name
-        const tuningName = new TextGlyph(0, this.height, tuning.name, res.effectFont, TextAlign.Left);
-        tuningName.renderer = this.renderer;
-        tuningName.doLayout();
-        this.height += tuningName.height;
-        tuningName.y += tuningName.height / 2;
-        this.addGlyph(tuningName);
+        if (tuning.name.length > 0) {
+            const tuningName = new TextGlyph(0, this.height, tuning.name, res.effectFont, TextAlign.Left);
+            tuningName.renderer = this.renderer;
+            tuningName.doLayout();
+            this.height += tuningName.height;
+            this.addGlyph(tuningName);
+        }
 
-        const stringColumnWidth = 64;
+        const circleScale = this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
+        const circleHeight = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.GuitarString0)! * circleScale;
 
         this.renderer.scoreRenderer.canvas!.font = res.effectFont;
+        const stringColumnWidth =
+            (circleHeight + this.renderer.scoreRenderer.canvas!.measureText(' = Gb').width) *
+            res.engravingSettings.tuningGlyphStringColumnScale;
+
         this.width = Math.max(
             this.renderer.scoreRenderer.canvas!.measureText(this._trackLabel).width,
             Math.max(this.renderer.scoreRenderer.canvas!.measureText(tuning.name).width, 2 * stringColumnWidth)
         );
 
         if (!tuning.isStandard) {
-            this.height += rowHeight;
-            const circleScale = TuningGlyph.CircleNumberScale;
-            const circleHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.GuitarString0)! * circleScale;
-
             // Strings
             const stringsPerColumn: number = Math.ceil(tuning.tunings.length / 2.0) | 0;
             let currentX: number = 0;
-            let currentY: number = this.height;
+            const topY = this.height + this.renderer.smuflMetrics.tuningGlyphStringRowPadding;
+            let currentY: number = topY;
             for (let i: number = 0, j: number = tuning.tunings.length; i < j; i++) {
                 const symbol = ((MusicFontSymbol.GuitarString0 as number) + (i + 1)) as MusicFontSymbol;
-                this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight / 2.5, circleScale, symbol));
+                this.addGlyph(new MusicFontGlyph(currentX, currentY + circleHeight, circleScale, symbol));
 
-                const str: string = `= ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
+                const str: string = ` = ${Tuning.getTextForTuning(tuning.tunings[i], false)}`;
                 this.addGlyph(
-                    new TextGlyph(currentX + circleHeight + 1, currentY, str, res.effectFont, TextAlign.Left)
+                    new TextGlyph(
+                        currentX + circleHeight,
+                        currentY + circleHeight / 2,
+                        str,
+                        res.effectFont,
+                        TextAlign.Left,
+                        TextBaseline.Middle
+                    )
                 );
-                currentY += rowHeight;
+                currentY += circleHeight + this.renderer.smuflMetrics.tuningGlyphStringRowPadding;
+                const bottomY = currentY;
+                if (this.height < bottomY) {
+                    this.height = bottomY;
+                }
+
                 if (i === stringsPerColumn - 1) {
-                    currentY = this.height;
+                    currentY = topY;
                     currentX += stringColumnWidth;
                 }
             }
-            this.height += stringsPerColumn * rowHeight;
         }
-
-        this.width += 15;
     }
 }

@@ -7,7 +7,8 @@
             "node_modules",
             "test-data",
             "src/generated/**"
-        ]
+        ],
+        "maxSize": 5242880
     },
     "formatter": {
         "include": [

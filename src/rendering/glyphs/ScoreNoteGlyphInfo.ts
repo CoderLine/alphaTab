@@ -1,10 +1,10 @@
-import type { Glyph } from '@src/rendering/glyphs/Glyph';
+import type { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 
 export class ScoreNoteGlyphInfo {
-    public glyph: Glyph;
+    public glyph: MusicFontGlyph;
     public steps: number = 0;
 
-    public constructor(glyph: Glyph, line: number) {
+    public constructor(glyph: MusicFontGlyph, line: number) {
         this.glyph = glyph;
         this.steps = line;
     }

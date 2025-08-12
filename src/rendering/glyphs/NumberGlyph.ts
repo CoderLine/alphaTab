@@ -1,19 +1,18 @@
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 
 export class NumberGlyph extends Glyph {
-    public static readonly numberHeight: number = 18;
-
     private _scale: number = 0;
+    private _baseline: TextBaseline;
 
     private _symbols: MusicFontSymbol[] = [];
 
-    public constructor(x: number, y: number, num: number, scale: number = 1.0) {
+    public constructor(x: number, y: number, num: number, baseline: TextBaseline, scale: number = 1.0) {
         super(x, y);
         this._symbols = NumberGlyph.getSymbols(num);
         this._scale = scale;
+        this._baseline = baseline;
     }
 
     public static getSymbols(number: number): MusicFontSymbol[] {
@@ -56,12 +55,21 @@ export class NumberGlyph extends Glyph {
     public override doLayout(): void {
         let w = 0;
         for (const d of this._symbols) {
-            w += MusicFontSymbolSizes.Widths.get(d)!;
+            w += this.renderer.smuflMetrics.glyphWidths.get(d)!;
         }
         this.width = w;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
+        switch (this._baseline) {
+            case TextBaseline.Top:
+                cy += this.renderer.smuflMetrics.glyphBottom.get(this._symbols[0])!;
+                break;
+            case TextBaseline.Bottom:
+                cy += this.renderer.smuflMetrics.glyphTop.get(this._symbols[0])!;
+                break;
+        }
+
         canvas.fillMusicFontSymbols(cx + this.x, cy + this.y, this._scale, this._symbols);
     }
 }

@@ -230,7 +230,7 @@ export class RenderStaff {
         this.height = this.barRenderers.length > 0 ? this.barRenderers[0].height : 0;
 
         if (this.height > 0) {
-            this.height += this.topSpacing + this.topOverflow + this.bottomOverflow + this.bottomSpacing;
+            this.height += Math.ceil(this.topSpacing + this.topOverflow + this.bottomOverflow + this.bottomSpacing);
         }
     }
 
@@ -269,6 +269,8 @@ export class RenderStaff {
         if (this.height > 0) {
             this.height += this.topSpacing + topOverflow + this.bottomOverflow + this.bottomSpacing;
         }
+
+        this.height = Math.ceil(this.height);
     }
 
     public paint(cx: number, cy: number, canvas: ICanvas, startIndex: number, count: number): void {

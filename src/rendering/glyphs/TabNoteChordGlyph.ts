@@ -17,6 +17,7 @@ export class TabNoteChordGlyph extends Glyph {
 
     public beat!: Beat;
     public beamingHelper!: BeamingHelper;
+    public maxStringNote: Note | null = null;
     public minStringNote: Note | null = null;
     public beatEffects: Map<string, Glyph> = new Map();
     public notesPerString: Map<number, NoteNumberGlyph> = new Map();
@@ -53,6 +54,14 @@ export class TabNoteChordGlyph extends Glyph {
         return 0;
     }
 
+    public getLowestNoteY(): number {
+        return this.maxStringNote ? this.getNoteY(this.maxStringNote, NoteYPosition.Center) : 0;
+    }
+
+    public getHighestNoteY(): number {
+        return this.minStringNote ? this.getNoteY(this.minStringNote, NoteYPosition.Center) : 0;
+    }
+
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         if (this.notesPerString.has(note.string)) {
             const n = this.notesPerString.get(note.string)!;
@@ -61,13 +70,17 @@ export class TabNoteChordGlyph extends Glyph {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= n.height / 2 + 2;
+                    pos -= n.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
                 case NoteYPosition.BottomWithStem:
                     pos += n.height / 2;
+                    break;
+
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
                     break;
             }
 
@@ -102,12 +115,12 @@ export class TabNoteChordGlyph extends Glyph {
             const tabHeight: number = this.renderer.resources.tablatureFont.size;
             let effectY: number = this.getNoteY(this.minStringNote!, NoteYPosition.Center) + tabHeight / 2;
             // TODO: take care of actual glyph height
-            const effectSpacing: number = 7;
+            const effectSpacing: number = this.renderer.smuflMetrics.onNoteEffectPadding;
             for (const g of this.beatEffects.values()) {
                 g.y += effectY;
                 g.x += this.width / 2;
                 g.renderer = this.renderer;
-                effectY += effectSpacing;
+                effectY += g.height + effectSpacing;
                 g.doLayout();
             }
         }
@@ -120,6 +133,9 @@ export class TabNoteChordGlyph extends Glyph {
         this.notesPerString.set(note.string, noteGlyph);
         if (!this.minStringNote || note.string < this.minStringNote.string) {
             this.minStringNote = note;
+        }
+        if (!this.maxStringNote || note.string > this.maxStringNote.string) {
+            this.maxStringNote = note;
         }
     }
 

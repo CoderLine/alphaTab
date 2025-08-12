@@ -74,6 +74,12 @@ public class List<T> : Iterable<T> {
         return List(_data.filter(predicate))
     }
 
+    internal inline fun <reified TCast> filter(predicate: (T) -> Boolean): List<TCast> {
+        return List(_data.filter(predicate).map {
+            it as TCast
+        })
+    }
+
     public fun some(predicate: (T) -> Boolean): Boolean {
         return _data.any(predicate)
     }
@@ -118,6 +124,13 @@ public class List<T> : Iterable<T> {
             mapped[index] = transform(item).toDouble()
         }
         return mapped
+    }
+
+
+    internal fun reduce(operation: (acc: Double, v: T) -> Double, initial:Double): Double {
+        var accumulator = initial
+        for (element in _data) accumulator = operation(accumulator, element)
+        return accumulator
     }
 
     public fun reverse(): List<T> {

@@ -1,8 +1,7 @@
 import type { Automation } from '@src/model/Automation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, TextBaseline, type ICanvas } from '@src/platform/ICanvas';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 /**
  * This glyph renders tempo annotations for tempo automations
@@ -18,7 +17,10 @@ export class BarTempoGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.height = 25;
+        const res = this.renderer.resources;
+        this.height =
+            this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.MetNoteQuarterUp)! *
+            res.engravingSettings.tempoNoteScale;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -28,18 +30,34 @@ export class BarTempoGlyph extends EffectGlyph {
             const res = this.renderer.resources;
             canvas.font = res.markerFont;
 
-            canvas.textBaseline = TextBaseline.Top;
+            const notePosY =
+                cy +
+                this.y +
+                this.height +
+                this.renderer.smuflMetrics.glyphBottom.get(MusicFontSymbol.MetNoteQuarterUp)! *
+                    res.engravingSettings.tempoNoteScale;
+
+            const b = canvas.textBaseline;
+            canvas.textBaseline = TextBaseline.Alphabetic;
             if (automation.text) {
-                const size = canvas.measureText(automation.text);
-                canvas.fillText(automation.text, x, cy + this.y + canvas.font.size / 2);
-                x += size.width + canvas.font.size * 0.7;
+                const text = `${automation.text} `; // additional space
+                const size = canvas.measureText(text);
+                canvas.fillText(text, x, notePosY);
+                x += size.width;
             }
-            canvas.fillMusicFontSymbol(x, cy + this.y + this.height * 0.8, 0.5, MusicFontSymbol.NoteQuarterUp, true);
-            canvas.fillText(
-                `= ${automation.value.toString()}`,
-                x + MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteQuarterUp)! * 0.5 + 3,
-                cy + this.y + canvas.font.size / 2
-            );
+            else {
+                x -= res.engravingSettings.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! / 2;
+            }
+
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,x, notePosY, res.engravingSettings.tempoNoteScale, MusicFontSymbol.MetNoteQuarterUp);
+            x +=
+                this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.MetNoteQuarterUp)! *
+                res.engravingSettings.tempoNoteScale;
+
+            canvas.fillText(` = ${automation.value.toString()}`, x, notePosY);
+            canvas.textBaseline = b;
+
+            x += canvas.measureText(` = ${automation.value.toString()}`).width;
         }
     }
 }

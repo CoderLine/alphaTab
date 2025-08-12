@@ -1,3 +1,4 @@
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { ICanvas } from '@src/platform/ICanvas';
 import { Glyph } from '@src/rendering/glyphs/Glyph';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
@@ -8,7 +9,7 @@ export class DeadSlappedBeatGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.width = 26;
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -22,7 +23,7 @@ export class DeadSlappedBeatGlyph extends Glyph {
         const centerY = staffTop + staffHeight / 2 - crossHeight / 2;
 
         const lw = canvas.lineWidth;
-        canvas.lineWidth = 2;
+        canvas.lineWidth = this.renderer.smuflMetrics.deadSlappedLineWidth;
         canvas.moveTo(cx + this.x, cy + centerY);
         canvas.lineTo(cx + this.x + this.width, cy + centerY + crossHeight);
 

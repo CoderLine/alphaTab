@@ -6,6 +6,7 @@ import { type ICanvas, TextBaseline, TextAlign } from '@src/platform/ICanvas';
 
 class TargetDirectionGlyph extends Glyph {
     private _symbols: MusicFontSymbol[];
+    private _scale = 1;
 
     constructor(symbols: MusicFontSymbol[]) {
         super(0, 0);
@@ -13,11 +14,20 @@ class TargetDirectionGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.height = 27 /* glyph */;
+        this.height = 0;
+        // NOTE: It's nowhere documented explicitly in SMuFL but it appears direction symbols need to be scaled down
+        const scale = this.renderer.smuflMetrics.directionsScale;
+        this._scale = scale;
+        for (const s of this._symbols) {
+            const h = this.renderer.smuflMetrics.glyphHeights.get(s)! * scale;
+            if (h > this.height) {
+                this.height = h;
+            }
+        }
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
-        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, 0.8, this._symbols, true);
+        canvas.fillMusicFontSymbols(cx + this.x, cy + this.y + this.height, this._scale, this._symbols, true);
     }
 }
 
@@ -30,7 +40,9 @@ class JumpDirectionGlyph extends Glyph {
     }
 
     public override doLayout(): void {
-        this.height = this.renderer.resources.directionsFont.size * 1.5;
+        const c = this.renderer.scoreRenderer.canvas!;
+        c.font = this.renderer.resources.directionsFont;
+        this.height = c.measureText(this._text).height;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -134,7 +146,7 @@ export class DirectionsContainerGlyph extends EffectGlyph {
     private doSideLayout(glyphs: Glyph[]): number {
         let y = 0;
 
-        const padding = 3;
+        const padding = this.renderer.settings.display.effectBandPaddingBottom;
 
         for (const g of glyphs) {
             g.y = y;

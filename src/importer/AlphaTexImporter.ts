@@ -178,8 +178,10 @@ export class AlphaTexImporter extends ScoreImporter {
     private _currentDynamics: DynamicValue = DynamicValue.PPP;
     private _currentTuplet: number = 0;
     private _lyrics!: Map<number, Lyrics[]>;
+    private _ignoredInitialVoice = false;
 
     private _staffHasExplicitDisplayTransposition: boolean = false;
+    private _staffDisplayTranspositionApplied: boolean = false;
     private _staffHasExplicitTuning: boolean = false;
     private _staffTuningApplied: boolean = false;
     private _percussionArticulationNames = new Map<string, number>();
@@ -1465,6 +1467,8 @@ export class AlphaTexImporter extends ScoreImporter {
             this._staffHasExplicitDisplayTransposition = false;
             this._staffHasExplicitTuning = false;
             this._staffTuningApplied = false;
+            this._staffDisplayTranspositionApplied = false;
+            this._ignoredInitialVoice = false;
 
             this._sy = this.newSy();
             // new track starting? - if no masterbars it's the \track of the initial track.
@@ -1488,6 +1492,8 @@ export class AlphaTexImporter extends ScoreImporter {
             this._staffHasExplicitDisplayTransposition = false;
             this._staffHasExplicitTuning = false;
             this._staffTuningApplied = false;
+            this._staffDisplayTranspositionApplied = false;
+            this._ignoredInitialVoice = false;
 
             this._sy = this.newSy();
             if (this._currentTrack.staves[0].bars.length > 0) {
@@ -1518,10 +1524,11 @@ export class AlphaTexImporter extends ScoreImporter {
         if (
             this._voiceIndex === 0 &&
             (this._currentStaff.bars.length === 0 ||
-                (this._currentStaff.bars.length === 1 && this._currentStaff.bars[0].isEmpty))
+                (this._currentStaff.bars.length === 1 && this._currentStaff.bars[0].isEmpty && !this._ignoredInitialVoice))
         ) {
             // voice marker on the begining of the first voice without any bar yet?
             // -> ignore
+            this._ignoredInitialVoice = true;
             return false;
         }
         // create directly a new empty voice for all bars
@@ -1739,7 +1746,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
 
         // display transposition
-        if (!this._staffHasExplicitDisplayTransposition) {
+        if (!this._staffDisplayTranspositionApplied && !this._staffHasExplicitDisplayTransposition) {
             if (
                 (program >= 24 && program <= 31) || // Guitar
                 (program >= 32 && program <= 39) || // Bass
@@ -1750,6 +1757,7 @@ export class AlphaTexImporter extends ScoreImporter {
             } else {
                 this._currentStaff.displayTranspositionPitch = 0;
             }
+            this._staffDisplayTranspositionApplied = true;
         }
 
         let anyBeatData = false;
@@ -2041,10 +2049,10 @@ export class AlphaTexImporter extends ScoreImporter {
                 // set positions
                 if (!exact) {
                     const count: number = beat.whammyBarPoints.length;
-                    const step: number = (60 / count) | 0;
+                    const step: number = (BendPoint.MaxPosition / (count - 1)) | 0;
                     let i: number = 0;
                     while (i < count) {
-                        beat.whammyBarPoints[i].offset = Math.min(60, i * step);
+                        beat.whammyBarPoints[i].offset = Math.min(BendPoint.MaxPosition, i * step);
                         i++;
                     }
                 } else {
@@ -2206,6 +2214,9 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'ds') {
             beat.deadSlapped = true;
             this._sy = this.newSy();
+            if(beat.notes.length === 1 && beat.notes[0].isDead) {
+                beat.removeNote(beat.notes[0]);
+            }
             return true;
         } else if (syData === 'glpf') {
             this._sy = this.newSy();

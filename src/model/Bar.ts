@@ -388,7 +388,6 @@ export class Bar {
 
     /**
      * The bar line to draw on the right side of the bar with an "automatic" type resolved to the actual one.
-     * @param isFirstOfSystem  Whether the bar is the first one in the system.
      */
     public getActualBarLineRight(): BarLineStyle {
         return Bar.actualBarLine(this, true, false /* not relevant */);

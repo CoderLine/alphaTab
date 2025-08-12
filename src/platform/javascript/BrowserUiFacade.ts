@@ -3,7 +3,7 @@ import type { IAlphaSynth } from '@src/synth/IAlphaSynth';
 import { Environment } from '@src/Environment';
 import { EventEmitter, type IEventEmitter } from '@src/EventEmitter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { Font, FontStyle, FontWeight } from '@src/model/Font';
+import type { Font } from '@src/model/Font';
 import { Score } from '@src/model/Score';
 import { NotationMode } from '@src/NotationSettings';
 import type { IContainer } from '@src/platform/IContainer';
@@ -209,7 +209,6 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
     private setupFontCheckers(settings: Settings): void {
         this.registerFontChecker(settings.display.resources.copyrightFont);
         this.registerFontChecker(settings.display.resources.effectFont);
-        this.registerFontChecker(settings.display.resources.fingeringFont);
         this.registerFontChecker(settings.display.resources.graceFont);
         this.registerFontChecker(settings.display.resources.markerFont);
         this.registerFontChecker(settings.display.resources.tablatureFont);
@@ -404,7 +403,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 line-height: 1;
                 -webkit-font-smoothing: antialiased;
                 -moz-osx-font-smoothing: grayscale;
-                font-size: ${Environment.MusicFontSize}px;
+                font-size: ${settings.display.resources.engravingSettings.musicFontSize}px;
                 overflow: visible !important;
             }`;
 
@@ -417,12 +416,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
         this._fontCheckers.set(familyName, checker);
         checker.checkForFontAvailability();
 
-        settings.display.resources.smuflFont = new Font(
-            familyName,
-            Environment.MusicFontSize,
-            FontStyle.Plain,
-            FontWeight.Regular
-        );
+        settings.display.resources.smuflFontFamilyName = familyName;
 
         const webFont: RegisteredWebFont = {
             hash,
@@ -498,7 +492,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     overflow: visible;
                 }
                 .at-surface-svg text {
-                    dominant-baseline: central;
+                    dominant-baseline: alphabetic;
                     white-space:pre;
                 }`;
 

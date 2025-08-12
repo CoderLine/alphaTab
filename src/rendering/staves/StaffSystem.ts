@@ -1,7 +1,7 @@
 import type { Bar } from '@src/model/Bar';
 import type { Font } from '@src/model/Font';
 import { type Track, TrackSubElement } from '@src/model/Track';
-import { type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas, TextAlign, TextBaseline } from '@src/platform/ICanvas';
 import type { BarRendererBase } from '@src/rendering/BarRendererBase';
 import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
 import { BarLayoutingInfo } from '@src/rendering/staves/BarLayoutingInfo';
@@ -16,8 +16,8 @@ import { NotationElement } from '@src/NotationSettings';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import type { LineBarRenderer } from '@src/rendering/LineBarRenderer';
+import type { EngravingSettings } from '@src/EngravingSettings';
 
 export abstract class SystemBracket {
     public firstStaffInBracket: RenderStaff | null = null;
@@ -29,7 +29,7 @@ export abstract class SystemBracket {
 
     public abstract includesStaff(s: RenderStaff): boolean;
 
-    public finalizeBracket() {
+    public finalizeBracket(smuflMetrics:EngravingSettings) {
         // systems with just a single staff do not have a bracket
         if (this.firstStaffInBracket === this.lastStaffInBracket) {
             this.width = 0;
@@ -37,11 +37,15 @@ export abstract class SystemBracket {
         }
 
         // SMUFL: The brace glyph should have a height of 1em, i.e. the height of a single five-line stave, and should be scaled proportionally
-        const bravuraBraceHeightAtMusicFontSize = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.Brace)!;
-        const bravuraBraceWidthAtMusicFontSize = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceHeightAtMusicFontSize = smuflMetrics.glyphHeights.get(MusicFontSymbol.Brace)!;
+        const bravuraBraceWidthAtMusicFontSize = smuflMetrics.glyphWidths.get(MusicFontSymbol.Brace)!;
 
         // normal bracket width
-        this.width = bravuraBraceWidthAtMusicFontSize;
+        if(this.drawAsBrace) {
+            this.width = bravuraBraceWidthAtMusicFontSize;
+        } else {
+            this.width = smuflMetrics.bracketThickness;
+        }
         if (!this.drawAsBrace || !this.firstStaffInBracket || !this.lastStaffInBracket) {
             return;
         }
@@ -361,7 +365,7 @@ export class StaffSystem {
 
             let braceWidth = 0;
             for (const b of this._brackets) {
-                b.finalizeBracket();
+                b.finalizeBracket(settings.display.resources.engravingSettings);
                 braceWidth = Math.max(braceWidth, b.width);
             }
 
@@ -437,10 +441,10 @@ export class StaffSystem {
     public get height(): number {
         return this._allStaves.length === 0
             ? 0
-            : this._allStaves[this._allStaves.length - 1].y +
+            : Math.ceil(this._allStaves[this._allStaves.length - 1].y +
                   this._allStaves[this._allStaves.length - 1].height +
                   this.topPadding +
-                  this.bottomPadding;
+                  this.bottomPadding);
     }
 
     public scaleToWidth(width: number): void {
@@ -456,9 +460,7 @@ export class StaffSystem {
         // canvas.strokeRect(cx + this.x, cy + this.y, this.width, this.height);
         // canvas.color = c;
 
-        cy += this.topPadding;
-
-        this.paintPartial(cx + this.x, cy + this.y, canvas, 0, this.masterBarsRenderers.length);
+        this.paintPartial(cx + this.x, cy + this.y + this.topPadding, canvas, 0, this.masterBarsRenderers.length);
 
         if (this._hasSystemSeparator) {
             using _ = ElementStyleHelper.track(
@@ -467,16 +469,21 @@ export class StaffSystem {
                 this._allStaves[0].modelStaff.track
             );
 
-            canvas.fillMusicFontSymbol(
+            // NOTE: the divider is currently not "nicely" centered between the systems as this would lead to cropping
+            
+            // NOTE: Prevent cropping of separator if it overlaps
+            const smuflMetrics = this.layout.renderer.settings.display.resources.engravingSettings
+            const overlap = Math.min(0, smuflMetrics.glyphBottom.get(MusicFontSymbol.SystemDivider) ?? 0);
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
-                cy + this.y + this.height - 10,
+                cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
             );
-            canvas.fillMusicFontSymbol(
-                cx + this.x + this.width - StaffSystem.SystemSignSeparatorWidth,
-                cy + this.y + this.height - StaffSystem.SystemSignSeparatorPadding,
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                cx + this.x + this.width - smuflMetrics.glyphWidths.get(MusicFontSymbol.SystemDivider)!,
+                cy + this.y + this.height + overlap,
                 1,
                 MusicFontSymbol.SystemDivider,
                 false
@@ -616,7 +623,8 @@ export class StaffSystem {
                                 firstLineBarRenderer.bar
                             );
                             const h = Math.ceil(thisTop - previousBottom);
-                            canvas.fillRect(accoladeX, cy + previousBottom, 1, h);
+                            canvas.fillRect(accoladeX, cy + previousBottom, 
+                                res.engravingSettings.thinBarlineThickness, h);
                         }
 
                         previousStaffInBracket = s;
@@ -637,7 +645,7 @@ export class StaffSystem {
                     let accoladeEnd: number = lastEnd;
 
                     if (bracket.drawAsBrace) {
-                        canvas.fillMusicFontSymbol(
+                        CanvasHelper.fillMusicFontSymbolSafe(canvas,
                             barStartX - barOffset - barSize,
                             accoladeEnd,
                             bracket.braceScale,
@@ -654,18 +662,14 @@ export class StaffSystem {
                             Math.ceil(accoladeEnd - accoladeStart)
                         );
 
-                        const spikeX: number = barStartX - barOffset - barSize - 0.5;
-                        canvas.fillMusicFontSymbol(spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
-                        canvas.fillMusicFontSymbol(spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
+                        const spikeX: number = barStartX - barOffset - barSize;
+                        CanvasHelper.fillMusicFontSymbolSafe(canvas,spikeX, accoladeStart, 1, MusicFontSymbol.BracketTop);
+                        CanvasHelper.fillMusicFontSymbolSafe(canvas,spikeX, Math.floor(accoladeEnd), 1, MusicFontSymbol.BracketBottom);
                     }
                 }
             }
         }
     }
-
-    private static readonly SystemSignSeparatorHeight = 40;
-    private static readonly SystemSignSeparatorPadding = 10;
-    private static readonly SystemSignSeparatorWidth = 36;
 
     public finalizeSystem(): void {
         const settings = this.layout.renderer.settings;
@@ -679,7 +683,11 @@ export class StaffSystem {
             this.layout.renderer.score!.stylesheet.useSystemSignSeparator &&
             this.layout.renderer.tracks!.length > 1
         ) {
-            this.bottomPadding += StaffSystem.SystemSignSeparatorHeight;
+            // NOTE: Reuse padding to place separato
+            const neededHeight = settings.display.resources.engravingSettings.glyphHeights.get(MusicFontSymbol.SystemDivider)!;
+            this.bottomPadding = Math.max(this.bottomPadding, 
+                neededHeight
+            );
             this._hasSystemSeparator = true;
         }
 
@@ -692,7 +700,7 @@ export class StaffSystem {
         }
 
         for (const b of this._brackets!) {
-            b.finalizeBracket();
+            b.finalizeBracket(settings.display.resources.engravingSettings);
         }
     }
 

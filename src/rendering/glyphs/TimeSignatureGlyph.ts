@@ -5,7 +5,7 @@ import { NumberGlyph } from '@src/rendering/glyphs/NumberGlyph';
 import { GhostParenthesisGlyph } from '@src/rendering/glyphs/GhostParenthesisGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { BarSubElement } from '@src/model/Bar';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { TextBaseline, type ICanvas } from '@src/platform/ICanvas';
 
 export abstract class TimeSignatureGlyph extends GlyphGroup {
     private _numerator: number = 0;
@@ -38,47 +38,67 @@ export abstract class TimeSignatureGlyph extends GlyphGroup {
     }
 
     public override doLayout(): void {
-        let x = 0;
-        const numberHeight = NumberGlyph.numberHeight;
-        if (this._isFreeTime) {
-            const g = new GhostParenthesisGlyph(true);
-            g.renderer = this.renderer;
-            g.y = -numberHeight;
-            g.height = numberHeight * 2;
-            g.doLayout();
-            this.addGlyph(g);
-            x += g.width + 10 * 1;
-        }
-
         if (this._isCommon && this._numerator === 2 && this._denominator === 2) {
-            const common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
+            const common: MusicFontGlyph = new MusicFontGlyph(0, 0, this.commonScale, MusicFontSymbol.TimeSigCutCommon);
             this.addGlyph(common);
             super.doLayout();
         } else if (this._isCommon && this._numerator === 4 && this._denominator === 4) {
-            const common: MusicFontGlyph = new MusicFontGlyph(x, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
+            const common: MusicFontGlyph = new MusicFontGlyph(0, 0, this.commonScale, MusicFontSymbol.TimeSigCommon);
             this.addGlyph(common);
             super.doLayout();
         } else {
-            const numerator: NumberGlyph = new NumberGlyph(x, -numberHeight / 2, this._numerator, this.numberScale);
-            const denominator: NumberGlyph = new NumberGlyph(x, numberHeight / 2, this._denominator, this.numberScale);
+            // TODO: ensure we align them exactly so they meet in the staff center (use glyphTop and glyphBottom accordingly)
+            const numerator: NumberGlyph = new NumberGlyph(
+                0,
+                0,
+                this._numerator,
+                TextBaseline.Top,
+                this.numberScale
+            );
+            const denominator: NumberGlyph = new NumberGlyph(
+                0,
+                0,
+                this._denominator,
+                TextBaseline.Bottom,
+                this.numberScale
+            );
             this.addGlyph(numerator);
             this.addGlyph(denominator);
             super.doLayout();
 
-            const glyphSpace = this.width - x;
-            numerator.x = x + (glyphSpace - numerator.width) / 2;
-            denominator.x = x + (glyphSpace - denominator.width) / 2;
+            const glyphSpace = this.width;
+            numerator.x = (glyphSpace - numerator.width) / 2;
+            denominator.x = (glyphSpace - denominator.width) / 2;
+
+            this.width = Math.max(
+                numerator.x + numerator.width,
+                denominator.x + denominator.width
+            )
         }
 
         if (this._isFreeTime) {
-            const g = new GhostParenthesisGlyph(false);
-            g.renderer = this.renderer;
-            g.x = this.width + 13;
-            g.y = -numberHeight;
-            g.height = numberHeight * 2;
-            g.doLayout();
-            this.addGlyph(g);
-            this.width = g.x + g.width;
+            const numberHeight = this.renderer.smuflMetrics.oneStaffSpace * 2;
+            const openParenthesis = new GhostParenthesisGlyph(true);
+            openParenthesis.renderer = this.renderer;
+            openParenthesis.y = -numberHeight;
+            openParenthesis.height = numberHeight * 2;
+            openParenthesis.doLayout();
+
+            for(const g of this.glyphs!) {
+                g.x += openParenthesis.width;
+            }
+            this.width += openParenthesis.width;
+
+            this.addGlyph(openParenthesis);
+
+            const closeParenthesis = new GhostParenthesisGlyph(false);
+            closeParenthesis.renderer = this.renderer;
+            closeParenthesis.x = this.width;
+            closeParenthesis.y = -numberHeight;
+            closeParenthesis.height = numberHeight * 2;
+            closeParenthesis.doLayout();
+            this.addGlyph(closeParenthesis);
+            this.width += closeParenthesis.width;
         }
     }
 }

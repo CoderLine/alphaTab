@@ -14,7 +14,7 @@ import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { ModelUtils } from '@src/model/ModelUtils';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
-import { CircleGlyph } from '@src/rendering/glyphs/CircleGlyph';
+import { AugmentationDotGlyph } from '@src/rendering/glyphs/AugmentationDotGlyph';
 import { NumberedDashGlyph } from '@src/rendering/glyphs/NumberedDashGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
 import { DeadSlappedBeatGlyph } from '@src/rendering/glyphs/DeadSlappedBeatGlyph';
@@ -89,7 +89,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
                     g.renderer = this.renderer;
                     accidentals.addGlyph(g);
                     this.addNormal(accidentals);
-                    this.addNormal(new SpacingGlyph(0, 0, 4));
+                    this.addNormal(new SpacingGlyph(0, 0, this.renderer.smuflMetrics.preNoteEffectPadding));
                 }
             }
         }
@@ -145,7 +145,19 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
         }
     }
 
+    public override getLowestNoteY(): number {
+        return this.internalGetNoteY(NoteYPosition.Center);
+    }
+
+    public override getHighestNoteY(): number {
+        return this.internalGetNoteY(NoteYPosition.Center);
+    }
+
     public override getNoteY(_note: Note, requestedPosition: NoteYPosition): number {
+        return this.internalGetNoteY(requestedPosition);
+    }
+
+    private internalGetNoteY(requestedPosition: NoteYPosition): number {
         let g: Glyph | null = null;
         if (this.noteHeads) {
             g = this.noteHeads;
@@ -159,13 +171,17 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             switch (requestedPosition) {
                 case NoteYPosition.Top:
                 case NoteYPosition.TopWithStem:
-                    pos -= g.height / 2 + 2;
+                    pos -= g.height / 2;
                     break;
                 case NoteYPosition.Center:
                     break;
                 case NoteYPosition.Bottom:
                 case NoteYPosition.BottomWithStem:
                     pos += g.height / 2;
+                    break;
+
+                case NoteYPosition.StemUp:
+                case NoteYPosition.StemDown:
                     break;
             }
 
@@ -297,9 +313,8 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
             //
             // Note dots
             if (this.container.beat.dots > 0 && this.container.beat.duration >= Duration.Quarter) {
-                this.addNormal(new SpacingGlyph(0, 0, 5));
                 for (let i: number = 0; i < this.container.beat.dots; i++) {
-                    const dot = new CircleGlyph(0, sr.getLineY(0), 1.5);
+                    const dot = new AugmentationDotGlyph(0, sr.getLineY(0));
                     dot.renderer = this.renderer;
                     this.addEffect(dot);
                 }

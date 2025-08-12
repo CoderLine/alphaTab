@@ -4,7 +4,7 @@ import { Duration } from '@src/model/Duration';
 import type { Voice } from '@src/model/Voice';
 import { TabRhythmMode } from '@src/NotationSettings';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { TabBeatContainerGlyph } from '@src/rendering/glyphs/TabBeatContainerGlyph';
 import { TabBeatGlyph } from '@src/rendering/glyphs/TabBeatGlyph';
@@ -21,13 +21,13 @@ import { GraceType } from '@src/model/GraceType';
 import type { ReservedLayoutAreaSlot } from '@src/rendering/utils/BarCollisionHelper';
 import { MultiBarRestBeatContainerGlyph } from '@src/rendering/MultiBarRestBeatContainerGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
  * This BarRenderer renders a bar using guitar tablature notation
  */
 export class TabBarRenderer extends LineBarRenderer {
     public static readonly StaffId: string = 'tab';
-    public static readonly TabLineSpacing: number = 10;
 
     private _hasTuplets = false;
 
@@ -69,7 +69,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return TabBarRenderer.TabLineSpacing;
+        return this.smuflMetrics.tabLineSpacing;
     }
 
     public override get heightLineCount(): number {
@@ -103,7 +103,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override collectSpaces(spaces: Float32Array[][]): void {
-        const padding: number = 1;
+        const padding: number = this.smuflMetrics.staffLineThickness;
         for (const voice of this.bar.voices) {
             if (this.hasVoiceContainer(voice)) {
                 const vc: VoiceContainerGlyph = this.getVoiceContainer(voice)!;
@@ -115,8 +115,8 @@ export class TabBarRenderer extends LineBarRenderer {
                             if (!noteNumber.isEmpty) {
                                 spaces[this.bar.staff.tuning.length - str].push(
                                     new Float32Array([
-                                        vc.x + bg.x + notes.x + noteNumbers!.x,
-                                        noteNumbers!.width + padding
+                                        vc.x + bg.x + notes.x + noteNumbers!.x - padding,
+                                        noteNumbers!.width + padding * 2
                                     ])
                                 );
                             }
@@ -129,6 +129,27 @@ export class TabBarRenderer extends LineBarRenderer {
 
     protected override adjustSizes(): void {
         if (this.rhythmMode !== TabRhythmMode.Hidden) {
+            let shortestTremolo = Duration.Whole;
+            for (const b of this.helpers.beamHelpers) {
+                for (const h of b) {
+                    if (h.tremoloDuration && (!shortestTremolo || shortestTremolo < h.tremoloDuration!)) {
+                        shortestTremolo = h.tremoloDuration!;
+                    }
+                }
+            }
+
+            switch (shortestTremolo) {
+                case Duration.Eighth:
+                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo1)!;
+                    break;
+                case Duration.Sixteenth:
+                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo2)!;
+                    break;
+                case Duration.ThirtySecond:
+                    this.height += this.smuflMetrics.glyphHeights.get(MusicFontSymbol.Tremolo3)!;
+                    break;
+            }
+
             this.height += this.settings.notation.rhythmHeight;
             this.bottomPadding += this.settings.notation.rhythmHeight;
         }
@@ -157,7 +178,8 @@ export class TabBarRenderer extends LineBarRenderer {
         // Clef
         if (this.isFirstOfLine) {
             const center: number = (this.bar.staff.tuning.length - 1) / 2;
-            this.addPreBeatGlyph(new TabClefGlyph(5, this.getTabY(center)));
+            this.createStartSpacing();
+            this.addPreBeatGlyph(new TabClefGlyph(0, this.getTabY(center)));
         }
         // Time Signature
         if (
@@ -179,7 +201,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const lines = (this.bar.staff.tuning.length + 1) / 2 - 1;
         this.addPreBeatGlyph(
@@ -226,7 +248,10 @@ export class TabBarRenderer extends LineBarRenderer {
         if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
             return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
         }
-        return startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom);
+        return (
+            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
+            this.smuflMetrics.staffLineThickness
+        );
     }
 
     protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
@@ -238,14 +263,7 @@ export class TabBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
-        const startGlyph: TabBeatGlyph = this.getOnNotesGlyphForBeat(beat) as TabBeatGlyph;
-        if (!startGlyph.noteNumbers || beat.duration === Duration.Half) {
-            return this.height - this.settings.notation.rhythmHeight - this.tupletSize;
-        }
-        return (
-            startGlyph.noteNumbers.getNoteY(startGlyph.noteNumbers.minStringNote!, NoteYPosition.Bottom) +
-            this.lineOffset / 2
-        );
+        return this.getFlagTopY(beat, direction);
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -289,9 +307,6 @@ export class TabBarRenderer extends LineBarRenderer {
 
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.GuitarTabStem, beat);
 
-        canvas.lineWidth = BarRendererBase.StemWidth;
-        canvas.beginPath();
-
         let holes: ReservedLayoutAreaSlot[] = [];
         if (this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.has(beat.displayStart)) {
             holes = this.helpers.collisionHelper.reservedLayoutAreasByDisplayTime.get(beat.displayStart)!.slots.slice();
@@ -300,22 +315,17 @@ export class TabBarRenderer extends LineBarRenderer {
 
         let y = bottomY;
         while (y > topY) {
-            canvas.moveTo(x, y);
-
             let lineY = topY;
             // draw until next hole (if hole reaches into line)
             if (holes.length > 0 && holes[holes.length - 1].bottomY > lineY) {
                 const bottomHole = holes.pop()!;
                 lineY = cy + bottomHole.bottomY;
-                canvas.lineTo(x, lineY);
+                canvas.fillRect(x, lineY, this.smuflMetrics.stemThickness, y - lineY);
                 y = cy + bottomHole.topY;
             } else {
-                canvas.lineTo(x, lineY);
+                canvas.fillRect(x, lineY, this.smuflMetrics.stemThickness, y - lineY);
                 break;
             }
         }
-        canvas.stroke();
-
-        canvas.lineWidth = 1;
     }
 }

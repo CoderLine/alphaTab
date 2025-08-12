@@ -17,6 +17,10 @@ export class Glyph {
         this.y = y;
     }
 
+    public getBoundingBoxTop() {
+        return this.y;
+    }
+
     public doLayout(): void {
         // to be implemented in subclass
     }

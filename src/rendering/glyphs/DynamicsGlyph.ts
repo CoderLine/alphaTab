@@ -4,13 +4,16 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 export class DynamicsGlyph extends MusicFontGlyph {
     public constructor(x: number, y: number, dynamics: DynamicValue) {
-        super(x, y, 0.6, DynamicsGlyph.getSymbol(dynamics));
-        this.center = true;
+        super(x, y, 1, DynamicsGlyph.getSymbol(dynamics));
     }
 
     public override doLayout(): void {
         super.doLayout();
-        this.y += this.height / 2;
+        this.center = true;
+        // align all to baseline of Forte
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.DynamicForte)!;
+        const forteBaseLine = this.renderer.smuflMetrics.glyphTop.get(MusicFontSymbol.DynamicForte)!
+        this.offsetY = forteBaseLine;
     }
 
     private static getSymbol(dynamics: DynamicValue): MusicFontSymbol {

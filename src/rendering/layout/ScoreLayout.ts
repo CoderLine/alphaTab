@@ -429,7 +429,7 @@ export abstract class ScoreLayout {
                 const glyph: TextGlyph = this.footerGlyphs.get(scoreElement)!;
                 glyph.y = infoHeight;
                 this.alignScoreInfoGlyph(glyph);
-                infoHeight += glyph.font.size * 1.2;
+                infoHeight += glyph.height;
                 scoreInfoGlyphs.push(glyph);
                 width = Math.max(width, Math.round(glyph.x + glyph.width));
             }

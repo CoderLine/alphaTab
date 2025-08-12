@@ -37,8 +37,12 @@ export class ScoreSlideLineGlyph extends Glyph {
 
     private paintSlideIn(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const sizeX: number = 12;
-        let endX = cx + startNoteRenderer.x + startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) - 2;
+        const sizeX: number = startNoteRenderer.smuflMetrics.simpleSlideWidth;
+        let endX =
+            cx +
+            startNoteRenderer.x +
+            startNoteRenderer.getNoteX(this._startNote, NoteXPosition.Left) -
+            startNoteRenderer.smuflMetrics.preNoteEffectPadding;
         const endY = cy + startNoteRenderer.y + startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Center);
         let startX = endX - sizeX;
         let startY: number = cy + startNoteRenderer.y;
@@ -70,9 +74,8 @@ export class ScoreSlideLineGlyph extends Glyph {
 
     private drawSlideOut(cx: number, cy: number, canvas: ICanvas): void {
         const startNoteRenderer: ScoreBarRenderer = this.renderer as ScoreBarRenderer;
-        const sizeX: number = 12;
-        const offsetX: number = 2;
-        const offsetY: number = 2;
+        const sizeX: number = startNoteRenderer.smuflMetrics.simpleSlideWidth;
+        const offsetX: number = startNoteRenderer.smuflMetrics.postNoteEffectPadding;
         let startX: number = 0;
         let startY: number = 0;
         let endX: number = 0;
@@ -95,7 +98,17 @@ export class ScoreSlideLineGlyph extends Glyph {
                         );
                     if (!endNoteRenderer || endNoteRenderer.staff !== startNoteRenderer.staff) {
                         endX = cx + startNoteRenderer.x + startNoteRenderer.width;
-                        endY = startY;
+                        if (this._startNote.slideTarget.realValue > this._startNote.realValue) {
+                            endY =
+                                cy +
+                                startNoteRenderer.y +
+                                startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Top);
+                        } else {
+                            endY =
+                                cy +
+                                startNoteRenderer.y +
+                                startNoteRenderer.getNoteY(this._startNote, NoteYPosition.Bottom);
+                        }
                     } else {
                         endX =
                             cx +
@@ -106,14 +119,6 @@ export class ScoreSlideLineGlyph extends Glyph {
                             cy +
                             endNoteRenderer.y +
                             endNoteRenderer.getNoteY(this._startNote.slideTarget, NoteYPosition.Center);
-                    }
-
-                    if (this._startNote.slideTarget.realValue > this._startNote.realValue) {
-                        startY += offsetY;
-                        endY -= offsetY;
-                    } else {
-                        startY -= offsetY;
-                        endY += offsetY;
                     }
                 } else {
                     endX = cx + startNoteRenderer.x + this._parent.x;
@@ -195,7 +200,7 @@ export class ScoreSlideLineGlyph extends Glyph {
         endY: number
     ): void {
         if (waves) {
-            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight, 1.2);
+            const glyph: NoteVibratoGlyph = new NoteVibratoGlyph(0, 0, VibratoType.Slight);
             glyph.renderer = this.renderer;
             glyph.doLayout();
 

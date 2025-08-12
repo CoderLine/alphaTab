@@ -52,6 +52,11 @@ public class ObjectDoubleMapEntryInternal<TKey> : ObjectDoubleMapEntry<TKey>(),
 public class ObjectDoubleMap<TKey> :
     MapBase<ObjectDoubleMapEntry<TKey>, ObjectDoubleMapEntryInternal<TKey>> {
     public constructor()
+    public constructor(other: ObjectDoubleMap<TKey>) {
+        for(it in other) {
+            set(it.key, it.value)
+        }
+    }
     public constructor(iterable: Iterable<ObjectDoubleArrayTuple<TKey>>) {
         for (it in iterable) {
             set(it.v0, it.v1)

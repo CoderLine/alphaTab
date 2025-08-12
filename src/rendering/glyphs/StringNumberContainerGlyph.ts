@@ -1,8 +1,6 @@
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
-import { TuningGlyph } from '@src/rendering/glyphs/TuningGlyph';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 
 export class StringNumberContainerGlyph extends EffectGlyph {
     private _strings: Set<number> = new Set<number>();
@@ -13,8 +11,8 @@ export class StringNumberContainerGlyph extends EffectGlyph {
 
     public override doLayout(): void {
         const circleHeight =
-            MusicFontSymbolSizes.Widths.get(MusicFontSymbol.GuitarString0)! * TuningGlyph.CircleNumberScale;
-        this.height = (circleHeight + 3) * this._strings.size;
+            this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
+        this.height = (circleHeight + this.renderer.smuflMetrics.stringNumberCirclePadding) * this._strings.size;
         this.width = circleHeight;
     }
 
@@ -23,19 +21,18 @@ export class StringNumberContainerGlyph extends EffectGlyph {
 
         let y = 0;
         const circleHeight =
-            MusicFontSymbolSizes.Widths.get(MusicFontSymbol.GuitarString0)! * TuningGlyph.CircleNumberScale;
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+            this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.GuitarString0)! * this.renderer.smuflMetrics.tuningGlyphCircleNumberScale;
         for (const s of this._strings) {
             const stringValue = tuningLength - s;
             const symbol = ((MusicFontSymbol.GuitarString1 as number) + stringValue) as MusicFontSymbol;
-            canvas.fillMusicFontSymbol(
-                cx + this.x + noteHeadHeight / 2,
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
+                cx + this.x,
                 cy + this.y + circleHeight + y,
-                TuningGlyph.CircleNumberScale,
+                this.renderer.smuflMetrics.tuningGlyphCircleNumberScale,
                 symbol,
                 true
             );
-            y += circleHeight + 3;
+            y += circleHeight + this.renderer.smuflMetrics.stringNumberCirclePadding;
         }
     }
 }

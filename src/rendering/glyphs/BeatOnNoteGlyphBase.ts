@@ -22,4 +22,12 @@ export class BeatOnNoteGlyphBase extends BeatGlyphBase {
     public getNoteY(note: Note, requestedPosition: NoteYPosition): number {
         return 0;
     }
+
+    public getHighestNoteY(): number {
+        return 0;
+    }
+
+    public getLowestNoteY(): number {
+        return 0;
+    }
 }

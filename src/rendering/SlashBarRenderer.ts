@@ -3,7 +3,7 @@ import { type Beat, BeatSubElement } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
 import type { Voice } from '@src/model/Voice';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, type NoteYPosition } from '@src/rendering/BarRendererBase';
+import type { NoteYPosition } from '@src/rendering/BarRendererBase';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import type { BeamingHelper } from '@src/rendering/utils/BeamingHelper';
@@ -15,7 +15,6 @@ import { BeatOnNoteGlyphBase } from '@src/rendering/glyphs/BeatOnNoteGlyphBase';
 import { SpacingGlyph } from '@src/rendering/glyphs/SpacingGlyph';
 import { ScoreTimeSignatureGlyph } from '@src/rendering/glyphs/ScoreTimeSignatureGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 
 /**
@@ -51,7 +50,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return BarRendererBase.RawLineSpacing;
+        return this.smuflMetrics.oneStaffSpace;
     }
 
     public override get heightLineCount(): number {
@@ -93,14 +92,22 @@ export class SlashBarRenderer extends LineBarRenderer {
         return 0;
     }
 
-    protected override getFlagTopY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
+    protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        let y = this.getLineY(0) - noteHeadHeight / 2;
+        if (direction === BeamDirection.Up) {
+            y -= this.getFlagStemSize(beat.duration, true);
+        }
+        return y;
     }
 
-    protected override getFlagBottomY(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
-        return this.getLineY(0) - noteHeadHeight / 2;
+    protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        let y = this.getLineY(0) - noteHeadHeight / 2;
+        if (direction === BeamDirection.Down) {
+            y += this.getFlagStemSize(beat.duration, true);
+        }
+        return y;
     }
 
     protected override getBeamDirection(_helper: BeamingHelper): BeamDirection {
@@ -120,7 +127,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     protected override getBarLineStart(_beat: Beat, _direction: BeamDirection): number {
-        const noteHeadHeight = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
+        const noteHeadHeight = this.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadSlashWhiteHalf)!;
         return this.getLineY(0) - noteHeadHeight / 2;
     }
 
@@ -145,7 +152,7 @@ export class SlashBarRenderer extends LineBarRenderer {
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.oneStaffSpace));
 
         const masterBar = this.bar.masterBar;
         const g = new ScoreTimeSignatureGlyph(
@@ -180,11 +187,12 @@ export class SlashBarRenderer extends LineBarRenderer {
         canvas: ICanvas
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.SlashStem, beat);
-        canvas.lineWidth = BarRendererBase.StemWidth;
+        const lineWidth = canvas.lineWidth;
+        canvas.lineWidth = this.smuflMetrics.stemThickness;
         canvas.beginPath();
         canvas.moveTo(x, topY);
         canvas.lineTo(x, bottomY);
         canvas.stroke();
-        canvas.lineWidth = 1;
+        canvas.lineWidth = lineWidth;
     }
 }

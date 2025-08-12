@@ -1,6 +1,7 @@
 import { Color } from '@src/model/Color';
 import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { ScoreSubElement } from '@src/model/Score';
+import { EngravingSettings } from '@src/EngravingSettings';
 
 /**
  * This public class contains central definitions for controlling the visual appearance.
@@ -12,15 +13,28 @@ export class RenderingResources {
     private static serifFont: string = 'Georgia, serif';
 
     /**
-     * The SMuFL Font to use for rendering music symbols.
+     * The name of the SMuFL Font to use for rendering music symbols.
+     * 
      * @remarks
-     * This is only meant for internal passing of font family information between components.
-     * Setting this manually can lead to unexpected side effects.
-     * @defaultValue `alphaTab`
-     * @since 0.9.6
+     * If this family name is provided, alphaTab will not load any custom font, but expects
+     * this font to be available in your environment (loadad as webfont or registered in alphaSkia).
+     * 
+     * When using alphaTab in a browser environment it is rather recommended to specify the web font
+     * via the `smuflFontSources` on the `CoreSettings`and skipping this setting. 
+     * 
+     * You will also need to fill {@link engravingSettings} to match this font.
+     * 
+     * @since 1.7.0
      * @internal
      */
-    public smuflFont?: Font;
+    public smuflFontFamilyName?: string;
+
+    /**
+     * The SMuFL Metrics to use for rendering music symbols.
+     * @defaultValue `alphaTab`
+     * @since 1.7.0
+     */
+    public engravingSettings: EngravingSettings = EngravingSettings.bravuraDefaults;
 
     /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.
@@ -97,14 +111,14 @@ export class RenderingResources {
      * @defaultValue `13px Arial, sans-serif`
      * @since 0.9.6
      */
-    public tablatureFont: Font = new Font(RenderingResources.sansFont, 13, FontStyle.Plain);
+    public tablatureFont: Font = new Font(RenderingResources.sansFont, 14, FontStyle.Plain);
 
     /**
      * The font to use for grace notation related texts in the music sheet.
      * @defaultValue `11px Arial, sans-serif`
      * @since 0.9.6
      */
-    public graceFont: Font = new Font(RenderingResources.sansFont, 11, FontStyle.Plain);
+    public graceFont: Font = new Font(RenderingResources.sansFont, 12, FontStyle.Plain);
 
     /**
      * The color to use for rendering the lines of staves.
@@ -138,6 +152,7 @@ export class RenderingResources {
      * The font to use for displaying finger information in the music sheet.
      * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
     public fingeringFont: Font = new Font(RenderingResources.serifFont, 14, FontStyle.Plain);
 
@@ -145,6 +160,7 @@ export class RenderingResources {
      * The font to use for displaying finger information when inline into the music sheet.
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
     public inlineFingeringFont: Font = new Font(RenderingResources.serifFont, 12, FontStyle.Plain);
 

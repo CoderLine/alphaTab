@@ -3,6 +3,7 @@
 // Changes to this file may cause incorrect behavior and will be lost if
 // the code is regenerated.
 // </auto-generated>
+import { EngravingSettingsJson } from "@src/generated/EngravingSettingsJson";
 import { FontJson } from "@src/model/Font";
 import { ColorJson } from "@src/model/Color";
 /**
@@ -13,15 +14,27 @@ import { ColorJson } from "@src/model/Color";
  */
 export interface RenderingResourcesJson {
     /**
-     * The SMuFL Font to use for rendering music symbols.
+     * The name of the SMuFL Font to use for rendering music symbols.
+     *
      * @remarks
-     * This is only meant for internal passing of font family information between components.
-     * Setting this manually can lead to unexpected side effects.
-     * @defaultValue `alphaTab`
-     * @since 0.9.6
+     * If this family name is provided, alphaTab will not load any custom font, but expects
+     * this font to be available in your environment (loadad as webfont or registered in alphaSkia).
+     *
+     * When using alphaTab in a browser environment it is rather recommended to specify the web font
+     * via the `smuflFontSources` on the `CoreSettings`and skipping this setting.
+     *
+     * You will also need to fill {@link engravingSettings} to match this font.
+     *
+     * @since 1.7.0
      * @internal
      */
-    smuflFont?: FontJson;
+    smuflFontFamilyName?: string;
+    /**
+     * The SMuFL Metrics to use for rendering music symbols.
+     * @defaultValue `alphaTab`
+     * @since 1.7.0
+     */
+    engravingSettings?: EngravingSettingsJson;
     /**
      * The font to use for displaying the songs copyright information in the header of the music sheet.
      * @defaultValue `bold 12px Arial, sans-serif`
@@ -122,12 +135,14 @@ export interface RenderingResourcesJson {
      * The font to use for displaying finger information in the music sheet.
      * @defaultValue `14px Georgia, serif`
      * @since 0.9.6
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
     fingeringFont?: FontJson;
     /**
      * The font to use for displaying finger information when inline into the music sheet.
      * @defaultValue `12px Georgia, serif`
      * @since 1.4.0
+     * @deprecated Since 1.7.0 alphaTab uses the glyphs contained in the SMuFL font
      */
     inlineFingeringFont?: FontJson;
     /**

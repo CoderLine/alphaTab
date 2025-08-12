@@ -1,10 +1,9 @@
 import { AccentuationType } from '@src/model/AccentuationType';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import type { Note } from '@src/model/Note';
 import { EffectGlyph } from '@src/rendering/glyphs/EffectGlyph';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
 
 export class AccentuationGlyph extends EffectGlyph {
     private _note: Note;
@@ -29,16 +28,15 @@ export class AccentuationGlyph extends EffectGlyph {
     }
 
     public override doLayout(): void {
-        this.width = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.ArticAccentAbove)!;
-        this.height = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.ArticAccentAbove)!;
+        this.width = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.ArticAccentAbove)!;
+        this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.ArticAccentAbove)!;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
         const dir = this.renderer.getBeatDirection(this._note.beat);
         const symbol = AccentuationGlyph.getSymbol(this._note.accentuated, dir === BeamDirection.Down);
 
-        const padding = 2;
-        const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height - padding;
-        canvas.fillMusicFontSymbol(cx + this.x - 2, y, 1, symbol, false);
+        const y = dir === BeamDirection.Up ? cy + this.y : cy + this.y + this.height;
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, y, 1, symbol, true);
     }
 }

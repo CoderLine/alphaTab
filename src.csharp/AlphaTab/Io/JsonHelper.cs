@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using AlphaTab.Model;
 
 namespace AlphaTab.Io;
 
@@ -65,5 +66,15 @@ internal static partial class JsonHelper
         }
 
         // ignore
+    }
+
+    public static T? ParseEnumExact<T>(string name, Type enumType) where T : struct
+    {
+        if (Enum.TryParse(name, true, out T value))
+        {
+            return value;
+        }
+
+        return null;
     }
 }

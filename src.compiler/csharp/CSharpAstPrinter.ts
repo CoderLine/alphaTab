@@ -161,6 +161,20 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         }
     }
 
+    protected writeDelegateDeclaration(d: cs.DelegateDeclaration) {
+        this.writeDocumentation(d);
+        this.writeVisibility(d.visibility);
+
+        this.write('delegate ');
+        this.writeType(d.returnType);
+        this.write(` ${d.name}`);
+        this.writeTypeParameters(d.typeParameters);
+        this.writeParameters(d.parameters);
+        this.writeTypeParameterConstraints(d.typeParameters);
+
+        this.writeSemicolon();
+    }
+
     protected writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeDocumentation(d);
         this.writeVisibility(d.visibility);
@@ -688,6 +702,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
             case cs.SyntaxKind.ClassDeclaration:
             case cs.SyntaxKind.InterfaceDeclaration:
             case cs.SyntaxKind.EnumDeclaration:
+            case cs.SyntaxKind.DelegateDeclaration:
                 this.write(this._context.getFullName(type as cs.NamedTypeDeclaration));
                 break;
             case cs.SyntaxKind.TypeParameterDeclaration:
@@ -869,13 +884,17 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         }
     }
 
+    private _currentCatchClauseIdentifier: string[] = [];
+
     protected writeCatchClause(c: cs.CatchClause): void {
         this.write('catch (');
         this.writeType(c.variableDeclaration.type);
         this.write(' ');
         this.write(this.escapeIdentifier(c.variableDeclaration.name));
+        this._currentCatchClauseIdentifier.push(c.variableDeclaration.name);
         this.writeLine(')');
         this.writeBlock(c.block);
+        this._currentCatchClauseIdentifier.pop();
     }
 
     protected writeSwitchStatement(s: cs.SwitchStatement) {
@@ -1013,6 +1032,17 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         });
     }
 
+    protected override writeDeconstructDeclaration(expr: cs.DeconstructDeclaration) {
+        this.write('(');
+        expr.names.forEach((v, i) => {
+            if (i > 0) {
+                this.write(', ');
+            }
+            this.write(this.escapeIdentifier(v));
+        });
+        this.write(')');
+    }
+
     protected writeBlock(b: cs.Block) {
         this.beginBlock();
         for (const s of b.statements) {
@@ -1046,5 +1076,15 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.write(expr.label);
         this.write(': ');
         this.writeExpression(expr.expression);
+    }
+
+    protected override writeThrowStatement(s: cs.ThrowStatement) {
+        this.write('throw');
+        const currentException = this._currentCatchClauseIdentifier.at(-1);
+        if (s.expression && (!cs.isIdentifier(s.expression) || s.expression.text !== currentException)) {
+            this.write(' ');
+            this.writeExpression(s.expression);
+        }
+        this.writeSemicolon();
     }
 }

@@ -4,7 +4,7 @@ import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
 import { AccidentalType } from '@src/model/AccidentalType';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { KeySignature } from '@src/model/KeySignature';
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas, TextBaseline } from '@src/platform/ICanvas';
 import { BarSubElement } from '@src/model/Bar';
 
 export class NumberedKeySignatureGlyph extends Glyph {
@@ -173,10 +173,10 @@ export class NumberedKeySignatureGlyph extends Glyph {
         canvas.fillText(this._text, cx + this.x, cy + this.y);
 
         if (this._accidental !== AccidentalType.None) {
-            canvas.fillMusicFontSymbol(
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x + this._accidentalOffset,
                 cy + this.y,
-                0.7,
+                1,
                 AccidentalGlyph.getMusicSymbol(this._accidental),
                 false
             );

@@ -25,10 +25,10 @@ data class DoubleObjectArrayTuple<T>(override val v0: Double, override val v1: T
     IDoubleObjectArrayTuple<T>
 
 interface IDoubleDoubleArrayTuple : IArrayTuple<Double, Double>
-data class DoubleDoubleArrayTuple(override val v0: Double, override val v1: Double) :
+data class DoubleDoubleArrayTuple(override val v0: Double = 0.0, override val v1: Double = 0.0) :
     IDoubleDoubleArrayTuple
 
 interface IDoubleBooleanArrayTuple : IArrayTuple<Double, Boolean>
-data class DoubleBooleanArrayTuple(override val v0: Double, override val v1: Boolean) :
+data class DoubleBooleanArrayTuple(override val v0: Double = 0.0, override val v1: Boolean = false) :
     IDoubleBooleanArrayTuple
 

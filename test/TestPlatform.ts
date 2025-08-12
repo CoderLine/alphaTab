@@ -48,6 +48,15 @@ export class TestPlatform {
         return await fs.promises.readdir(path);
     }
 
+    /**
+     * @target web
+     * @partial
+     */
+    public static async loadFileAsJson<T>(path: string): Promise<T> {
+        const data = await TestPlatform.loadFile(path);
+        return JSON.parse(IOHelper.toString(data, 'UTF-8'));
+    }
+
     public static async loadFileAsString(path: string): Promise<string> {
         const data = await TestPlatform.loadFile(path);
         return IOHelper.toString(data, 'UTF-8');
@@ -98,7 +107,6 @@ export class TestPlatform {
         return array as Iterable<unknown>;
     }
 
-    
     /**
      * @target web
      * @partial

@@ -16,7 +16,7 @@ export class TabSlurGlyph extends TabTieGlyph {
     }
 
     protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
-        return Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight;
+        return Math.log(endX - startX + 1) * this.renderer.settings.notation.slurHeight / 2;
     }
 
     public tryExpand(startNote: Note, endNote: Note, forSlide: boolean, forEnd: boolean): boolean {

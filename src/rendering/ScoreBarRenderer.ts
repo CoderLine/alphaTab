@@ -6,7 +6,7 @@ import { Duration } from '@src/model/Duration';
 import type { Note } from '@src/model/Note';
 import type { Voice } from '@src/model/Voice';
 import type { ICanvas } from '@src/platform/ICanvas';
-import { BarRendererBase, NoteYPosition } from '@src/rendering/BarRendererBase';
+import { NoteYPosition } from '@src/rendering/BarRendererBase';
 import { AccidentalGlyph } from '@src/rendering/glyphs/AccidentalGlyph';
 import { ClefGlyph } from '@src/rendering/glyphs/ClefGlyph';
 import type { Glyph } from '@src/rendering/glyphs/Glyph';
@@ -25,6 +25,9 @@ import { KeySignature } from '@src/model/KeySignature';
 import { LineBarRenderer } from '@src/rendering/LineBarRenderer';
 import { KeySignatureGlyph } from '@src/rendering/glyphs/KeySignatureGlyph';
 import { ElementStyleHelper } from '@src/rendering/utils/ElementStyleHelper';
+import { Staff } from '@src/model/Staff';
+import { GraceType } from '@src/model/GraceType';
+import { SlashNoteHeadGlyph } from '@src/rendering/glyphs/SlashNoteHeadGlyph';
 
 /**
  * This BarRenderer renders a bar using standard music notation.
@@ -67,7 +70,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     public override get lineSpacing(): number {
-        return BarRendererBase.RawLineSpacing;
+        return this.smuflMetrics.oneStaffSpace;
     }
 
     public override get heightLineCount(): number {
@@ -111,9 +114,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
     public override doLayout(): void {
         super.doLayout();
+
         if (!this.bar.isEmpty && this.accidentalHelper.maxLineBeat) {
             const top: number = this.getScoreY(-2);
-            const bottom: number = this.getScoreY(10);
+            const bottom: number = this.getScoreY(this.heightLineCount * 2);
             const whammyOffset: number = this.simpleWhammyOverflow;
 
             const beatEffectsMinY = this.beatEffectsMinY;
@@ -134,29 +138,126 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
             this.registerOverflowTop(whammyOffset);
 
-            let maxNoteY: number = this.getScoreY(this.accidentalHelper.maxLine);
-            const maxNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.maxLineBeat
-            );
-            if (maxNoteHelper.direction === BeamDirection.Up) {
-                maxNoteY -= this.getStemSize(maxNoteHelper);
-                if (maxNoteHelper.hasTuplet) {
-                    maxNoteY -= this.tupletSize;
+            const noteOverflowPadding = this.getScoreHeight(1);
+
+            let maxNoteY = 0;
+            let minNoteY = 0;
+
+            for (const v of this.helpers.beamHelpers) {
+                for (const h of v) {
+                    if (h.isRestBeamHelper) {
+                        if (h.minRestLine) {
+                            const topY = this.getScoreY(h.maxRestLine!) - noteOverflowPadding;
+                            if (topY < maxNoteY) {
+                                maxNoteY = topY;
+                            }
+                        }
+                        if (h.maxRestLine) {
+                            const bottomY = this.getScoreY(h.maxRestLine!) + noteOverflowPadding;
+                            if (bottomY < maxNoteY) {
+                                maxNoteY = bottomY;
+                            }
+                        }
+                    } else if (h.beats.length === 1) {
+                        // notes with stems
+                        if (h.beats[0].duration >= Duration.Half) {
+                            if (h.direction === BeamDirection.Up) {
+                                let topY = this.getFlagTopY(h.beats[0], h.direction);
+                                if (h.hasTuplet) {
+                                    topY -= this.tupletSize + this.tupletOffset;
+                                }
+
+                                if (topY < maxNoteY) {
+                                    maxNoteY = topY;
+                                }
+
+                                const bottomY = this.getFlagBottomY(h.beats[0], h.direction) + noteOverflowPadding;
+                                if (bottomY > minNoteY) {
+                                    minNoteY = bottomY;
+                                }
+                            } else {
+                                let bottomY = this.getFlagBottomY(h.beats[0], h.direction);
+                                if (h.hasTuplet) {
+                                    bottomY += this.tupletSize + this.tupletOffset;
+                                }
+
+                                if (bottomY > minNoteY) {
+                                    minNoteY = bottomY;
+                                }
+
+                                const topY = this.getFlagTopY(h.beats[0], h.direction) - noteOverflowPadding;
+                                if (topY < maxNoteY) {
+                                    maxNoteY = topY;
+                                }
+                            }
+                        }
+                        // standalone notes without stems
+                        else {
+                            const beatContainer = this.getBeatContainer(h.beats[0]);
+                            if (beatContainer) {
+                                let topY = beatContainer.onNotes.getHighestNoteY() - noteOverflowPadding;
+                                let bottomY = beatContainer.onNotes.getLowestNoteY() + noteOverflowPadding;
+                                if (h.direction === BeamDirection.Up) {
+                                    if (h.hasTuplet) {
+                                        topY -= this.tupletSize + this.tupletOffset;
+                                    }
+                                } else {
+                                    if (h.hasTuplet) {
+                                        bottomY += this.tupletSize + this.tupletOffset;
+                                    }
+                                }
+
+                                if (bottomY > minNoteY) {
+                                    minNoteY = bottomY;
+                                }
+                                if (topY < maxNoteY) {
+                                    maxNoteY = topY;
+                                }
+                            }
+                        }
+                    }
+                    // beamed notes
+                    else {
+                        this.ensureDrawingInfo(h, h.direction);
+                        const drawingInfo = h.drawingInfos.get(h.direction)!;
+
+                        if (h.direction === BeamDirection.Up) {
+                            let topY = Math.min(drawingInfo.startY, drawingInfo.endY);
+                            if (h.hasTuplet) {
+                                topY -= this.tupletSize + this.tupletOffset;
+                            }
+
+                            if (topY < maxNoteY) {
+                                maxNoteY = topY;
+                            }
+
+                            const bottomY: number = this.getBarLineStart(h.beatOfLowestNote, h.direction) + noteOverflowPadding;
+                            if (bottomY > minNoteY) {
+                                minNoteY = bottomY;
+                            }
+                        } else {
+                            let bottomY = Math.max(drawingInfo.startY, drawingInfo.endY);
+
+                            if (h.hasTuplet) {
+                                bottomY += this.tupletSize + this.tupletOffset;
+                            }
+
+                            if (bottomY > minNoteY) {
+                                minNoteY = bottomY;
+                            }
+
+                            const topY: number = this.getBarLineStart(h.beatOfHighestNote, h.direction) - noteOverflowPadding;
+                            if (topY < maxNoteY) {
+                                maxNoteY = topY;
+                            }
+                        }
+                    }
                 }
             }
             if (maxNoteY < top) {
                 this.registerOverflowTop(Math.abs(maxNoteY) + whammyOffset);
             }
-            let minNoteY: number = this.getScoreY(this.accidentalHelper.minLine);
-            const minNoteHelper: BeamingHelper = this.helpers.getBeamingHelperForBeat(
-                this.accidentalHelper.minLineBeat!
-            );
-            if (minNoteHelper.direction === BeamDirection.Down) {
-                minNoteY += this.getStemSize(minNoteHelper);
-                if (minNoteHelper.hasTuplet) {
-                    minNoteY += this.tupletSize;
-                }
-            }
+
             if (minNoteY > bottom) {
                 this.registerOverflowBottom(Math.abs(minNoteY) - bottom);
             }
@@ -169,86 +270,106 @@ export class ScoreBarRenderer extends LineBarRenderer {
         this.paintTuplets(cx, cy, canvas, BeatSubElement.StandardNotationTuplet);
     }
 
-    private getSlashFlagY(duration: Duration, direction: BeamDirection) {
-        let line = (this.heightLineCount - 1) / 2;
-        let offset = 0;
-        switch (duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.DoubleWhole:
-            case Duration.Whole:
-                offset += 2;
-                break;
-            default:
-                offset += 1;
-                break;
-        }
-
-        if (direction === BeamDirection.Down) {
-            line += offset;
-        } else {
-            line -= offset;
-        }
-
+    private getSlashFlagY() {
+        const line = (this.heightLineCount - 1) / 2;
         const slashY = this.getLineY(line);
         return slashY;
     }
 
     protected override getFlagTopY(beat: Beat, direction: BeamDirection): number {
         if (beat.slashed) {
-            return this.getSlashFlagY(beat.duration, direction);
+            let slashY = this.getSlashFlagY();
+            const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
+            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+
+            if (direction === BeamDirection.Down) {
+                slashY -= this.smuflMetrics.stemDown.has(symbol)
+                    ? this.smuflMetrics.stemDown.get(symbol)!.topY * scale
+                    : 0;
+            } else {
+                slashY -= this.smuflMetrics.stemUp.has(symbol)
+                    ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale
+                    : 0;
+                slashY -= this.smuflMetrics.standardStemLength + scale;
+            }
+
+            return slashY;
         }
-        return this.getScoreY(this.accidentalHelper.getMinLine(beat));
+
+        const minNote = this.accidentalHelper.getMinLineNote(beat);
+        if (minNote) {
+            return this.getBeatContainer(beat)!.onNotes.getNoteY(
+                minNote,
+                direction === BeamDirection.Up ? NoteYPosition.TopWithStem : NoteYPosition.StemDown
+            );
+        }
+
+        let y = this.getScoreY(this.accidentalHelper.getMinLine(beat));
+
+        if (direction === BeamDirection.Up) {
+            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            y -= this.smuflMetrics.standardStemLength * scale;
+        }
+
+        return y;
     }
 
     protected override getFlagBottomY(beat: Beat, direction: BeamDirection): number {
         if (beat.slashed) {
-            return this.getSlashFlagY(beat.duration, direction);
+            let slashY = this.getSlashFlagY();
+            const symbol = SlashNoteHeadGlyph.getSymbol(beat.duration);
+            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+
+            if (direction === BeamDirection.Down) {
+                slashY -= this.smuflMetrics.stemDown.has(symbol)
+                    ? this.smuflMetrics.stemDown.get(symbol)!.topY * scale
+                    : 0;
+                slashY += this.smuflMetrics.standardStemLength + scale;
+            } else {
+                slashY -= this.smuflMetrics.stemUp.has(symbol)
+                    ? this.smuflMetrics.stemUp.get(symbol)!.bottomY * scale
+                    : 0;
+            }
+
+            return slashY;
         }
-        return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+
+        const maxNote = this.accidentalHelper.getMaxLineNote(beat);
+        if (maxNote) {
+            return this.getBeatContainer(beat)!.onNotes.getNoteY(
+                maxNote,
+                direction === BeamDirection.Up ? NoteYPosition.StemUp : NoteYPosition.BottomWithStem
+            );
+        }
+
+        let y = this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+        if (direction === BeamDirection.Down) {
+            const scale = beat.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            y += this.smuflMetrics.standardStemLength * scale;
+        }
+        return y;
     }
 
     protected override getBeamDirection(helper: BeamingHelper): BeamDirection {
         return helper.direction;
     }
 
-    public getStemSize(helper: BeamingHelper, forceMinStem: boolean = false): number {
-        let size: number =
-            helper.beats.length === 1
-                ? this.getFlagStemSize(helper.shortestDuration, forceMinStem)
-                : this.getBarStemSize(helper.shortestDuration);
-        if (helper.isGrace) {
-            size = size * NoteHeadGlyph.GraceScale;
+    public centerStaffStemY(helper: BeamingHelper) {
+        const isStandardFive = this.bar.staff.standardNotationLineCount === Staff.DefaultStandardNotationLineCount;
+        if (isStandardFive) {
+            // center on the middle line for a standard 5-line staff
+            return this.getScoreY(this.bar.staff.standardNotationLineCount - 1);
         }
-        return size;
+
+        // for other staff line counts, we align the stem either on the top or bottom line
+        if (helper.direction === BeamDirection.Up) {
+            return this.getScoreY(this.bar.staff.standardNotationLineCount * 2);
+        }
+        return this.getScoreY(0);
     }
 
-    private getBarStemSize(duration: Duration): number {
-        let size: number = 0;
-        switch (duration) {
-            case Duration.QuadrupleWhole:
-            case Duration.Half:
-            case Duration.Quarter:
-            case Duration.Eighth:
-            case Duration.Sixteenth:
-                size = 6;
-                break;
-            case Duration.ThirtySecond:
-                size = 8;
-                break;
-            case Duration.SixtyFourth:
-                size = 9;
-                break;
-            case Duration.OneHundredTwentyEighth:
-                size = 9;
-                break;
-            case Duration.TwoHundredFiftySixth:
-                size = 10;
-                break;
-            default:
-                size = 0;
-                break;
-        }
-        return this.getScoreHeight(size);
+    public getStemBottomY(beamingHelper: BeamingHelper): number {
+        throw new Error('Method not implemented.');
     }
 
     public override get middleYPosition(): number {
@@ -268,6 +389,30 @@ export class ScoreBarRenderer extends LineBarRenderer {
             // estimate on the position
             const line = AccidentalHelper.computeLineWithoutAccidentals(this.bar, note);
             y = this.getScoreY(line);
+            const scale = note.beat.graceType === GraceType.None ? 1 : NoteHeadGlyph.GraceScale;
+            const stemHeight = this.smuflMetrics.standardStemLength * scale;
+            const noteHeadHeight =
+                this.smuflMetrics.glyphHeights.get(NoteHeadGlyph.getSymbol(note.beat.duration))! * scale;
+            switch (requestedPosition) {
+                case NoteYPosition.TopWithStem:
+                    y -= stemHeight;
+                    break;
+                case NoteYPosition.Top:
+                    y -= noteHeadHeight / 2;
+                    break;
+                case NoteYPosition.Center:
+                    break;
+                case NoteYPosition.Bottom:
+                    y += noteHeadHeight / 2;
+                    break;
+                case NoteYPosition.BottomWithStem:
+                    y += stemHeight;
+                    break;
+                case NoteYPosition.StemUp:
+                    break;
+                case NoteYPosition.StemDown:
+                    break;
+            }
         }
         return y;
     }
@@ -277,7 +422,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         if (result && this.bar.isMultiVoice) {
             // consider rest overflows
             const top: number = this.getScoreY(-2);
-            const bottom: number = this.getScoreY(10);
+            const bottom: number = this.getScoreY(this.heightLineCount * 2);
             const minMax = this.helpers.collisionHelper.getBeatMinMaxY();
             if (minMax[0] < top) {
                 this.registerOverflowTop(Math.abs(minMax[0]));
@@ -290,9 +435,41 @@ export class ScoreBarRenderer extends LineBarRenderer {
     }
 
     protected override calculateBeamYWithDirection(h: BeamingHelper, x: number, direction: BeamDirection): number {
-        const stemSize: number = this.getStemSize(h);
+        if (h.beats.length === 0) {
+            return direction === BeamDirection.Up
+                ? this.getFlagTopY(h.beats[0], direction)
+                : this.getFlagBottomY(h.beats[0], direction);
+        }
 
+        this.ensureDrawingInfo(h, direction);
+        return h.drawingInfos.get(direction)!.calcY(x);
+    }
+
+    private ensureDrawingInfo(h: BeamingHelper, direction: BeamDirection) {
         if (!h.drawingInfos.has(direction)) {
+            const scale = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
+            const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
+            let stemSize = this.smuflMetrics.standardStemLength * scale;
+
+            if (h.tremoloDuration) {
+                // for 16th and shorter beats we need more space for all tremolos
+                // for 8th beats we need only more space for 32nd tremolos
+
+                // the logic here is not perfect but there is no SMuFL guideline
+                // on how tremolos need to extend stems
+
+                const oneBeamSize = (this.smuflMetrics.beamThickness + this.smuflMetrics.beamSpacing) * scale;
+                if (h.shortestDuration > Duration.Eighth) {
+                    if (h.tremoloDuration === Duration.Eighth) {
+                        stemSize += oneBeamSize;
+                    } else {
+                        stemSize += oneBeamSize * 1.5;
+                    }
+                } else if (h.tremoloDuration === Duration.ThirtySecond) {
+                    stemSize += oneBeamSize * 1.5;
+                }
+            }
+
             const drawingInfo = new BeamingHelperDrawInfo();
             h.drawingInfos.set(direction, drawingInfo);
 
@@ -316,8 +493,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             } else {
                 drawingInfo.startY =
                     direction === BeamDirection.Up
-                        ? this.getFlagTopY(firstBeat, direction) - stemSize
-                        : this.getFlagBottomY(firstBeat, direction) + stemSize;
+                        ? this.getFlagTopY(firstBeat, direction)
+                        : this.getFlagBottomY(firstBeat, direction);
             }
 
             drawingInfo.endBeat = lastBeat;
@@ -328,40 +505,41 @@ export class ScoreBarRenderer extends LineBarRenderer {
             } else {
                 drawingInfo.endY =
                     direction === BeamDirection.Up
-                        ? this.getFlagTopY(lastBeat, direction) - stemSize
-                        : this.getFlagBottomY(lastBeat, direction) + stemSize;
+                        ? this.getFlagTopY(lastBeat, direction)
+                        : this.getFlagBottomY(lastBeat, direction);
             }
-            // 2. ensure max height
+
+            // 2. ensure max slope
             // we use the min/max notes to place the beam along their real position
             // we only want a maximum of 10 offset for their gradient
-            const maxDistance: number = 10;
+            const maxSlope: number = this.smuflMetrics.oneStaffSpace;
             if (
                 direction === BeamDirection.Down &&
                 drawingInfo.startY > drawingInfo.endY &&
-                drawingInfo.startY - drawingInfo.endY > maxDistance
+                drawingInfo.startY - drawingInfo.endY > maxSlope
             ) {
-                drawingInfo.endY = drawingInfo.startY - maxDistance;
+                drawingInfo.endY = drawingInfo.startY - maxSlope;
             }
             if (
                 direction === BeamDirection.Down &&
                 drawingInfo.endY > drawingInfo.startY &&
-                drawingInfo.endY - drawingInfo.startY > maxDistance
+                drawingInfo.endY - drawingInfo.startY > maxSlope
             ) {
-                drawingInfo.startY = drawingInfo.endY - maxDistance;
+                drawingInfo.startY = drawingInfo.endY - maxSlope;
             }
             if (
                 direction === BeamDirection.Up &&
                 drawingInfo.startY < drawingInfo.endY &&
-                drawingInfo.endY - drawingInfo.startY > maxDistance
+                drawingInfo.endY - drawingInfo.startY > maxSlope
             ) {
-                drawingInfo.endY = drawingInfo.startY + maxDistance;
+                drawingInfo.endY = drawingInfo.startY + maxSlope;
             }
             if (
                 direction === BeamDirection.Up &&
                 drawingInfo.endY < drawingInfo.startY &&
-                drawingInfo.startY - drawingInfo.endY > maxDistance
+                drawingInfo.startY - drawingInfo.endY > maxSlope
             ) {
-                drawingInfo.startY = drawingInfo.endY + maxDistance;
+                drawingInfo.startY = drawingInfo.endY + maxSlope;
             }
 
             // 3. let middle elements shift up/down
@@ -391,11 +569,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
 
                 // check if rest shifts bar up or down
                 if (h.minRestLine !== null || h.maxRestLine !== null) {
-                    const barCount: number = ModelUtils.getIndex(h.shortestDuration) - 2;
-                    const scaleMod: number = h.isGrace ? NoteHeadGlyph.GraceScale : 1;
+                    const scaleMod: number = h.graceType !== GraceType.None ? NoteHeadGlyph.GraceScale : 1;
                     let barSpacing: number =
-                        barCount * (BarRendererBase.BeamSpacing + BarRendererBase.BeamThickness) * scaleMod;
-                    barSpacing += BarRendererBase.BeamSpacing;
+                        barCount * (this.smuflMetrics.beamSpacing + this.smuflMetrics.beamThickness) * scaleMod;
+                    barSpacing += this.smuflMetrics.beamSpacing;
 
                     if (direction === BeamDirection.Up && h.minRestLine !== null) {
                         const yNeededForRest = this.getScoreY(h.minRestLine!) - barSpacing;
@@ -422,13 +599,10 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 if (h.slashBeats.length > 0) {
                     for (const b of h.slashBeats) {
                         const yGivenByCurrentValues = drawingInfo.calcY(h.getBeatLineX(b));
-                        let yNeededForSlash = this.getSlashFlagY(b.duration, direction);
-
-                        if (direction === BeamDirection.Up) {
-                            yNeededForSlash -= stemSize;
-                        } else if (direction === BeamDirection.Down) {
-                            yNeededForSlash += stemSize;
-                        }
+                        const yNeededForSlash =
+                            h.direction === BeamDirection.Up
+                                ? this.getFlagTopY(b, h.direction)
+                                : this.getFlagBottomY(b, h.direction);
 
                         const diff = yNeededForSlash - yGivenByCurrentValues;
                         if (diff > 0) {
@@ -438,19 +612,55 @@ export class ScoreBarRenderer extends LineBarRenderer {
                     }
                 }
             }
-        }
 
-        return h.drawingInfos.get(direction)!.calcY(x);
+            // we can only draw up to 2 beams towards the noteheads, then we have to grow to the other side
+            // here we shift accordingly
+            if (barCount > 2 && !isRest) {
+                const beamSpacing = this.smuflMetrics.beamSpacing * scale;
+                const beamThickness = this.smuflMetrics.beamThickness * scale;
+                const totalBarsHeight = barCount * beamThickness + (barCount - 1) * beamSpacing;
+
+                if (direction === BeamDirection.Up) {
+                    const bottomBarY = drawingInfo.startY + 2 * beamThickness + beamSpacing;
+                    const barTopY = bottomBarY - totalBarsHeight;
+                    const diff = drawingInfo.startY - barTopY;
+                    if (diff > 0) {
+                        drawingInfo.startY -= diff;
+                        drawingInfo.endY -= diff;
+                    }
+                } else {
+                    const topBarY = drawingInfo.startY - 2 * beamThickness + beamSpacing;
+                    const barBottomY = topBarY + totalBarsHeight;
+                    const diff = barBottomY - drawingInfo.startY;
+                    if (diff > 0) {
+                        drawingInfo.startY += diff;
+                        drawingInfo.endY += diff;
+                    }
+                }
+            }
+        }
     }
 
     protected override getBarLineStart(beat: Beat, direction: BeamDirection): number {
         if (beat.slashed) {
-            return this.getSlashFlagY(beat.duration, direction);
+            return direction === BeamDirection.Down
+                ? this.getFlagTopY(beat, direction)
+                : this.getFlagBottomY(beat, direction);
         }
 
-        return direction === BeamDirection.Up
-            ? this.getScoreY(this.accidentalHelper.getMaxLine(beat))
-            : this.getScoreY(this.accidentalHelper.getMinLine(beat));
+        if (direction === BeamDirection.Up) {
+            const maxNote = this.accidentalHelper.getMaxLineNote(beat);
+            if (maxNote) {
+                return this.getBeatContainer(beat)!.onNotes.getNoteY(maxNote, NoteYPosition.StemUp);
+            }
+            return this.getScoreY(this.accidentalHelper.getMaxLine(beat));
+        }
+
+        const minNote = this.accidentalHelper.getMinLineNote(beat);
+        if (minNote) {
+            return this.getBeatContainer(beat)!.onNotes.getNoteY(minNote, NoteYPosition.StemDown);
+        }
+        return this.getScoreY(this.accidentalHelper.getMinLine(beat));
     }
 
     protected override createLinePreBeatGlyphs(): void {
@@ -461,7 +671,11 @@ export class ScoreBarRenderer extends LineBarRenderer {
             this.bar.clef !== this.bar.previousBar!.clef ||
             this.bar.clefOttava !== this.bar.previousBar!.clefOttava
         ) {
-            let offset: number = 0;
+            // SMUFL: Clefs should be positioned such that the pitch the clef refers to is on the baseline
+            // (e.g. the F clef is placed such that the upper dot is above and the lower dot below the baseline).
+            // If a clef does not refer specifically to a pitch, its y=0 should coincide with the center staff line on a five-line staff, or the visual center for staves with more or fewer than five lines (e.g. tablature staves).
+
+            let offset = 0;
             switch (this.bar.clef) {
                 case Clef.Neutral:
                     offset = this.bar.staff.standardNotationLineCount - 1;
@@ -481,14 +695,8 @@ export class ScoreBarRenderer extends LineBarRenderer {
             }
             this.createStartSpacing();
 
-            this.addPreBeatGlyph(
-                new ClefGlyph(
-                    0,
-                    this.getScoreY(offset) + 0.5 * BarRendererBase.StaffLineThickness,
-                    this.bar.clef,
-                    this.bar.clefOttava
-                )
-            );
+            this.addPreBeatGlyph(new ClefGlyph(0, this.getScoreY(offset), this.bar.clef, this.bar.clefOttava));
+            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
             hasClef = true;
         }
         // Key signature
@@ -540,6 +748,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         const glyph = new KeySignatureGlyph();
+        glyph.gap = this.smuflMetrics.accidentalPadding;
         glyph.renderer = this;
 
         const newLines: Map<number, boolean> = new Map<number, boolean>();
@@ -587,11 +796,13 @@ export class ScoreBarRenderer extends LineBarRenderer {
         }
 
         this.addPreBeatGlyph(glyph);
+
+        if (!glyph.isEmpty) {
+            this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
+        }
     }
 
     private createTimeSignatureGlyphs(): void {
-        this.addPreBeatGlyph(new SpacingGlyph(0, 0, 5));
-
         const lines = this.bar.staff.standardNotationLineCount - 1;
         this.addPreBeatGlyph(
             new ScoreTimeSignatureGlyph(
@@ -603,6 +814,7 @@ export class ScoreBarRenderer extends LineBarRenderer {
                 this.bar.masterBar.isFreeTime
             )
         );
+        this.addPreBeatGlyph(new SpacingGlyph(0, 0, this.smuflMetrics.preBeatGlyphSpacing));
     }
 
     protected override createVoiceGlyphs(v: Voice): void {
@@ -622,18 +834,20 @@ export class ScoreBarRenderer extends LineBarRenderer {
         // for multi-voice bars we need to register the positions
         // for multi-voice rest displacement to avoid collisions
         if (this.bar.isMultiVoice && helper.highestNoteInHelper && helper.lowestNoteInHelper) {
-            let highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Center);
-            let lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Center);
+            let highestNotePosition = 0;
+            let lowestNotePosition = 0;
 
-            let offset = this.getStemSize(helper);
+            let offset = 0;
             if (helper.hasTuplet) {
                 offset += this.resources.effectFont.size * 2;
             }
 
             if (helper.direction === BeamDirection.Up) {
-                highestNotePosition -= offset;
+                highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.TopWithStem) - offset;
+                lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.Bottom);
             } else {
-                lowestNotePosition += offset;
+                highestNotePosition = this.getNoteY(helper.highestNoteInHelper, NoteYPosition.Top);
+                lowestNotePosition = this.getNoteY(helper.lowestNoteInHelper, NoteYPosition.BottomWithStem) + offset;
             }
 
             for (const beat of helper.beats) {
@@ -651,11 +865,6 @@ export class ScoreBarRenderer extends LineBarRenderer {
         canvas: ICanvas
     ): void {
         using _ = ElementStyleHelper.beat(canvas, BeatSubElement.StandardNotationStem, beat);
-        canvas.lineWidth = BarRendererBase.StemWidth;
-        canvas.beginPath();
-        canvas.moveTo(x, topY);
-        canvas.lineTo(x, bottomY);
-        canvas.stroke();
-        canvas.lineWidth = 1;
+        canvas.fillRect(x, topY, this.smuflMetrics.stemThickness, bottomY - topY);
     }
 }

@@ -1,10 +1,9 @@
-import { type ICanvas, TextBaseline } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import { MusicFontGlyph } from '@src/rendering/glyphs/MusicFontGlyph';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { NoteHeadGlyph } from '@src/rendering/glyphs/NoteHeadGlyph';
 import type { Duration } from '@src/model/Duration';
-import type { InstrumentArticulation } from '@src/model/InstrumentArticulation';
-import { MusicFontSymbolSizes } from '@src/rendering/utils/MusicFontSymbolSizes';
+import { TechniqueSymbolPlacement, type InstrumentArticulation } from '@src/model/InstrumentArticulation';
 
 export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     private _isGrace: boolean;
@@ -29,13 +28,13 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
         }
 
         const offset: number = this._isGrace ? 1 : 0;
-        canvas.fillMusicFontSymbol(cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
+        CanvasHelper.fillMusicFontSymbolSafe(canvas,cx + this.x, cy + this.y + offset, this.glyphScale, this.symbol, false);
 
         if (
             this._articulation.techniqueSymbol !== MusicFontSymbol.None &&
-            this._articulation.techniqueSymbolPlacement === TextBaseline.Middle
+            this._articulation.techniqueSymbolPlacement === TechniqueSymbolPlacement.Inside
         ) {
-            canvas.fillMusicFontSymbol(
+            CanvasHelper.fillMusicFontSymbolSafe(canvas,
                 cx + this.x,
                 cy + this.y + offset,
                 this.glyphScale,
@@ -49,10 +48,10 @@ export class PercussionNoteHeadGlyph extends MusicFontGlyph {
     public override doLayout(): void {
         super.doLayout();
         if (this.width === 0) {
-            this.height = MusicFontSymbolSizes.Widths.get(MusicFontSymbol.NoteheadBlack)!;
+            this.height = this.renderer.smuflMetrics.glyphWidths.get(MusicFontSymbol.NoteheadBlack)!;
         }
         if (this.height === 0) {
-            this.height = MusicFontSymbolSizes.Heights.get(MusicFontSymbol.NoteheadBlack)!;
+            this.height = this.renderer.smuflMetrics.glyphHeights.get(MusicFontSymbol.NoteheadBlack)!;
         }
     }
 }

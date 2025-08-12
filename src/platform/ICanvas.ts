@@ -32,9 +32,13 @@ export enum TextBaseline {
      */
     Middle = 1,
     /**
-     * Text is aligend on the bottom.
+     * Text is aligned on the bottom.
      */
-    Bottom = 2
+    Bottom = 2,
+    /**
+     * Text is aligned on the alphabetic baseline.
+     */
+    Alphabetic = 3
 }
 
 /**
@@ -131,4 +135,34 @@ export interface ICanvas {
     quadraticCurveTo(cpx: number, cpy: number, x: number, y: number): void;
 
     destroy(): void;
+}
+
+export class CanvasHelper {
+    public static fillMusicFontSymbolSafe(
+        canvas: ICanvas,
+        x: number,
+        y: number,
+        relativeScale: number,
+        symbol: MusicFontSymbol,
+        centerAtPosition?: boolean
+    ): void {
+        if (!canvas.settings.display.resources.engravingSettings.hasSymbol(symbol)) {
+            return;
+        }
+        canvas.fillMusicFontSymbol(x, y, relativeScale, symbol, centerAtPosition);
+    }
+    public static fillMusicFontSymbolsSafe(
+        canvas: ICanvas,
+        x: number,
+        y: number,
+        relativeScale: number,
+        symbols: MusicFontSymbol[],
+        centerAtPosition?: boolean
+    ): void {
+        const symbolsToDraw = symbols.filter(s => canvas.settings.display.resources.engravingSettings.hasSymbol(s));
+        if (symbolsToDraw.length === 0) {
+            return;
+        }
+        canvas.fillMusicFontSymbols(x, y, relativeScale, symbolsToDraw, centerAtPosition);
+    }
 }

@@ -1,6 +1,6 @@
 import { Environment } from '@src/Environment';
 import { Color } from '@src/model/Color';
-import { Font, FontStyle } from '@src/model/Font';
+import { Font, FontStyle, FontWeight } from '@src/model/Font';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import type { Settings } from '@src/Settings';
@@ -38,7 +38,13 @@ export class Html5Canvas implements ICanvas {
     }
 
     public beginRender(width: number, height: number): void {
-        this._musicFont = this.settings.display.resources.smuflFont;
+        this._musicFont = new Font(
+            this.settings.display.resources.smuflFontFamilyName!,
+            this.settings.display.resources.engravingSettings.musicFontSize,
+            FontStyle.Plain,
+            FontWeight.Regular
+        );
+
 
         const scale = this.settings.display.scale;
 
@@ -85,13 +91,13 @@ export class Html5Canvas implements ICanvas {
 
     public fillRect(x: number, y: number, w: number, h: number): void {
         if (w > 0) {
-            this._context.fillRect(x | 0, y | 0, w, h);
+            this._context.fillRect(x, y, w, h);
         }
     }
 
     public strokeRect(x: number, y: number, w: number, h: number): void {
         const blurOffset = this.lineWidth % 2 === 0 ? 0 : 0.5;
-        this._context.strokeRect((x | 0) + blurOffset, (y | 0) + blurOffset, w, h);
+        this._context.strokeRect(x + blurOffset, y + blurOffset, w, h);
     }
 
     public beginPath(): void {
@@ -187,6 +193,8 @@ export class Html5Canvas implements ICanvas {
                 return TextBaseline.Middle;
             case 'bottom':
                 return TextBaseline.Bottom;
+            case 'alphabetic':
+                return TextBaseline.Alphabetic;
             default:
                 return TextBaseline.Top;
         }
@@ -202,6 +210,9 @@ export class Html5Canvas implements ICanvas {
                 break;
             case TextBaseline.Bottom:
                 this._context.textBaseline = 'bottom';
+                break;
+            case TextBaseline.Alphabetic:
+                this._context.textBaseline = 'alphabetic';
                 break;
         }
     }
@@ -263,7 +274,7 @@ export class Html5Canvas implements ICanvas {
         const baseLine = this._context.textBaseline;
         const font: string = this._context.font;
         this._context.font = this._musicFont!.toCssString(relativeScale);
-        this._context.textBaseline = 'middle';
+        this._context.textBaseline = 'alphabetic';
         if (centerAtPosition) {
             this._context.textAlign = 'center';
         } else {

@@ -13,11 +13,22 @@ export enum MusicFontSymbol {
     SystemDivider = 0xe007,
 
     GClef = 0xe050,
+    GClef15mb = 0xe051,
+    GClef8vb = 0xe052,
+    GClef8va = 0xe053,
+    GClef15ma = 0xe054,
     CClef = 0xe05c,
+    CClef8vb = 0xe05d,
     FClef = 0xe062,
+    FClef15mb = 0xe063,
+    FClef8vb = 0xe064,
+    FClef8va = 0xe065,
+    FClef15ma = 0xe066,
     UnpitchedPercussionClef1 = 0xe069,
     SixStringTabClef = 0xe06d,
     FourStringTabClef = 0xe06e,
+    Clef8 = 0xe07d,
+    Clef15 = 0xe07e,
 
     TimeSig0 = 0xe080,
     TimeSig1 = 0xe081,
@@ -96,7 +107,7 @@ export enum MusicFontSymbol {
     NoteheadHeavyX = 0xe0f8,
     NoteheadHeavyXHat = 0xe0f9,
 
-    NoteheadSlashVerticalEnds = 0xe100,
+    NoteheadSlashHorizontalEnds = 0xe101,
     NoteheadSlashWhiteWhole = 0xe102,
     NoteheadSlashWhiteHalf = 0xe103,
 
@@ -135,7 +146,15 @@ export enum MusicFontSymbol {
     NoteShapeTriangleRoundBlack = 0xe1bf,
 
     NoteQuarterUp = 0xe1d5,
-    NoteEighthUp = 0xe1d7,
+    Note8thUp = 0xe1d7,
+
+    MetNoteQuarterUp = 0xeca5,
+    MetNote8thUp = 0xeca7,
+    MetAugmentationDot = 0xecb7,
+    ArrowheadBlackUp = 0xeb78,
+    ArrowheadBlackDown = 0xeb7c,
+
+    AugmentationDot = 0xe1e7,
 
     TextBlackNoteLongStem = 0xe1f1,
     TextBlackNoteFrac8thLongStem = 0xe1f3,
@@ -155,18 +174,18 @@ export enum MusicFontSymbol {
     Tremolo2 = 0xe221,
     Tremolo1 = 0xe220,
 
-    FlagEighthUp = 0xe240,
-    FlagEighthDown = 0xe241,
-    FlagSixteenthUp = 0xe242,
-    FlagSixteenthDown = 0xe243,
-    FlagThirtySecondUp = 0xe244,
-    FlagThirtySecondDown = 0xe245,
-    FlagSixtyFourthUp = 0xe246,
-    FlagSixtyFourthDown = 0xe247,
-    FlagOneHundredTwentyEighthUp = 0xe248,
-    FlagOneHundredTwentyEighthDown = 0xe249,
-    FlagTwoHundredFiftySixthUp = 0xe24a,
-    FlagTwoHundredFiftySixthDown = 0xe24b,
+    Flag8thUp = 0xe240,
+    Flag8thDown = 0xe241,
+    Flag16thUp = 0xe242,
+    Flag16thDown = 0xe243,
+    Flag32ndUp = 0xe244,
+    Flag32ndDown = 0xe245,
+    Flag64thUp = 0xe246,
+    Flag64thDown = 0xe247,
+    Flag128thUp = 0xe248,
+    Flag128thDown = 0xe249,
+    Flag256thUp = 0xe24a,
+    Flag256thDown = 0xe24b,
 
     AccidentalFlat = 0xe260,
     AccidentalNatural = 0xe261,
@@ -174,9 +193,10 @@ export enum MusicFontSymbol {
     AccidentalDoubleSharp = 0xe263,
     AccidentalDoubleFlat = 0xe264,
     AccidentalQuarterToneFlatArrowUp = 0xe270,
-    AccidentalQuarterToneSharpArrowUp = 0xe274,
-    AccidentalQuarterToneNaturalArrowUp = 0xe272,
+    AccidentalQuarterToneSharpNaturalArrowUp = 0xe272,
+    AccidentalThreeQuarterTonesSharpArrowUp = 0xe274,
 
+    RepeatDot = 0xe044,
     Segno = 0xe047,
     Coda = 0xe048,
 
@@ -198,12 +218,12 @@ export enum MusicFontSymbol {
     RestWhole = 0xe4e3,
     RestHalf = 0xe4e4,
     RestQuarter = 0xe4e5,
-    RestEighth = 0xe4e6,
-    RestSixteenth = 0xe4e7,
-    RestThirtySecond = 0xe4e8,
-    RestSixtyFourth = 0xe4e9,
-    RestOneHundredTwentyEighth = 0xe4ea,
-    RestTwoHundredFiftySixth = 0xe4eb,
+    Rest8th = 0xe4e6,
+    Rest16th = 0xe4e7,
+    Rest32nd = 0xe4e8,
+    Rest64th = 0xe4e9,
+    Rest128th = 0xe4ea,
+    Rest256th = 0xe4eb,
 
     RestHBarLeft = 0xe4ef,
     RestHBarMiddle = 0xe4f0,
@@ -245,6 +265,11 @@ export enum MusicFontSymbol {
     DynamicRinforzando2 = 0xe53d,
     DynamicForzando = 0xe535,
 
+    DynamicCrescendoHairpin = 0xe53e,
+
+    GraceNoteSlashStemUp = 0xe564,
+    GraceNoteSlashStemDown = 0xe565,
+
     OrnamentTrill = 0xe566,
     OrnamentTurn = 0xe567,
     OrnamentTurnInverted = 0xe568,
@@ -278,12 +303,45 @@ export enum MusicFontSymbol {
     GuitarFadeOut = 0xe844,
     GuitarVolumeSwell = 0xe845,
 
+    FretboardFilledCircle = 0xe858,
     FretboardX = 0xe859,
     FretboardO = 0xe85a,
 
+    Tuplet0 = 0xe880,
+    Tuplet1 = 0xe881,
+    Tuplet2 = 0xe882,
+    Tuplet3 = 0xe883,
+    Tuplet4 = 0xe884,
+    Tuplet5 = 0xe885,
+    Tuplet6 = 0xe886,
+    Tuplet7 = 0xe887,
+    Tuplet8 = 0xe888,
+    Tuplet9 = 0xe889,
+    TupletColon = 0xe88a,
+
     WiggleTrill = 0xeaa4,
+    GuitarVibratoStroke = 0xeab2,
+    GuitarWideVibratoStroke = 0xeab3,
     WiggleVibratoMediumFast = 0xeade,
+    WiggleSawtoothNarrow = 0xeaba,
+    WiggleSawtooth = 0xeabb,
 
     OctaveBaselineM = 0xec95,
-    OctaveBaselineB = 0xec93
+    OctaveBaselineB = 0xec93,
+
+    GuitarLeftHandTapping = 0xe840,
+
+    Fingering0 = 0xed10,
+    Fingering1 = 0xed11,
+    Fingering2 = 0xed12,
+    Fingering3 = 0xed13,
+    Fingering4 = 0xed14,
+    Fingering5 = 0xed15,
+
+    FingeringPLower = 0xed17,
+    FingeringTLower = 0xed18,
+    FingeringILower = 0xed19,
+    FingeringMLower = 0xed1a,
+    FingeringALower = 0xed1b,
+    FingeringCLower = 0xed1c
 }

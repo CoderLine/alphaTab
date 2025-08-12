@@ -3,7 +3,7 @@ import type { Beat } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
 import { SimileMark } from '@src/model/SimileMark';
 import { type Voice, VoiceSubElement } from '@src/model/Voice';
-import type { ICanvas } from '@src/platform/ICanvas';
+import { CanvasHelper, type ICanvas } from '@src/platform/ICanvas';
 import { BeatXPosition } from '@src/rendering/BeatXPosition';
 import { BeatContainerGlyph } from '@src/rendering/glyphs/BeatContainerGlyph';
 import type { BeatGlyphBase } from '@src/rendering/glyphs/BeatGlyphBase';
@@ -50,7 +50,15 @@ export enum NoteYPosition {
     /**
      * Gets the note y-position on the bottom of the note stem or tab number.
      */
-    BottomWithStem = 4
+    BottomWithStem = 4,
+    /**
+     * The position where the upwards stem should be placed.
+     */
+    StemUp = 5,
+    /**
+     * The position where the downwards stem should be placed.
+     */
+    StemDown = 6
 }
 
 /**
@@ -75,13 +83,6 @@ export enum NoteXPosition {
  * This is the base public class for creating blocks which can render bars.
  */
 export class BarRendererBase {
-    protected static readonly RawLineSpacing: number = 8;
-    public static readonly StemWidth: number = 0.12 /*bravura stemThickness */ * BarRendererBase.RawLineSpacing;
-    public static readonly StaffLineThickness: number =
-        0.13 /*bravura staffLineThickness */ * BarRendererBase.RawLineSpacing;
-    public static readonly BeamThickness: number = 0.5 /*bravura beamThickness */ * BarRendererBase.RawLineSpacing;
-    public static readonly BeamSpacing: number = 0.25 /*bravura beamSpacing */ * BarRendererBase.RawLineSpacing;
-
     private _preBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
     private _voiceContainers: Map<number, VoiceContainerGlyph> = new Map();
     private _postBeatGlyphs: LeftToRightLayoutingGlyphGroup = new LeftToRightLayoutingGlyphGroup();
@@ -159,6 +160,7 @@ export class BarRendererBase {
     }
 
     public registerOverflowTop(topOverflow: number): boolean {
+        topOverflow = Math.ceil(topOverflow);
         if (topOverflow > this.topOverflow) {
             this.topOverflow = topOverflow;
             return true;
@@ -167,6 +169,7 @@ export class BarRendererBase {
     }
 
     public registerOverflowBottom(bottomOverflow: number): boolean {
+        bottomOverflow = Math.ceil(bottomOverflow);
         if (bottomOverflow > this.bottomOverflow) {
             this.bottomOverflow = bottomOverflow;
             return true;
@@ -186,6 +189,10 @@ export class BarRendererBase {
 
     public get resources(): RenderingResources {
         return this.settings.display.resources;
+    }
+
+    public get smuflMetrics() {
+        return this.resources.engravingSettings;
     }
 
     public get settings(): Settings {
@@ -365,6 +372,37 @@ export class BarRendererBase {
         }
 
         this.computedWidth = this.width;
+
+        const rendererBottom = this.height;
+
+        const preBeatGlyphs = this._preBeatGlyphs.glyphs;
+        if (preBeatGlyphs) {
+            for (const g of preBeatGlyphs) {
+                const topY = g.getBoundingBoxTop();
+                if (topY < 0) {
+                    this.registerOverflowTop(topY * -1);
+                }
+
+                const bottomY = topY + g.height;
+                if (bottomY > rendererBottom) {
+                    this.registerOverflowBottom(bottomY - rendererBottom);
+                }
+            }
+        }
+        const postBeatGlyphs = this._postBeatGlyphs.glyphs;
+        if (postBeatGlyphs) {
+            for (const g of postBeatGlyphs) {
+                const topY = g.getBoundingBoxTop();
+                if (topY < 0) {
+                    this.registerOverflowTop(topY * -1);
+                }
+
+                const bottomY = topY + g.height;
+                if (bottomY > rendererBottom) {
+                    this.registerOverflowBottom(bottomY - rendererBottom);
+                }
+            }
+        }
     }
 
     protected hasVoiceContainer(voice: Voice): boolean {
@@ -391,6 +429,7 @@ export class BarRendererBase {
         this._postBeatGlyphs.x = Math.floor(postBeatStart);
         this.width = Math.ceil(this._postBeatGlyphs.x + this._postBeatGlyphs.width);
         this.height += this.layoutingInfo.height;
+        this.height = Math.ceil(this.height);
     }
 
     protected addPreBeatGlyph(g: Glyph): void {
@@ -581,12 +620,13 @@ export class BarRendererBase {
         switch (this.bar.simileMark) {
             case SimileMark.Simple:
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
-                canvas.fillMusicFontSymbol(
-                    cx + this.x + (this.width - 20) / 2,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
+                    cx + this.x + this.width / 2,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat1Bar,
-                    false
+                    true
                 );
                 canvas.endGroup();
                 break;
@@ -594,12 +634,13 @@ export class BarRendererBase {
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.voices[0].beats[0]));
                 canvas.beginGroup(BeatContainerGlyph.getGroupId(this.bar.previousBar!.voices[0].beats[0]));
 
-                canvas.fillMusicFontSymbol(
-                    cx + this.x - 28 / 2,
+                CanvasHelper.fillMusicFontSymbolSafe(
+                    canvas,
+                    cx + this.x,
                     cy + this.y + this.height / 2,
                     1,
                     MusicFontSymbol.Repeat2Bars,
-                    false
+                    true
                 );
 
                 canvas.endGroup();

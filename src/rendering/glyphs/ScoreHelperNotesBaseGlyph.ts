@@ -7,7 +7,6 @@ import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
 export class ScoreHelperNotesBaseGlyph extends Glyph {
-    public static readonly EndPadding: number = ((10 / 2) | 0) + 3;
     protected BendNoteHeads: BendNoteHeadGroupGlyph[] = [];
 
     protected drawBendSlur(
@@ -20,7 +19,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         scale: number,
         slurText?: string
     ): void {
-        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, scale, slurText);
+        TieGlyph.drawBendSlur(canvas, x1, y1, x2, y2, down, scale, this.renderer.smuflMetrics.tieHeight, slurText);
     }
 
     public override doLayout(): void {
@@ -28,7 +27,7 @@ export class ScoreHelperNotesBaseGlyph extends Glyph {
         this.width = 0;
         for (const noteHeads of this.BendNoteHeads) {
             noteHeads.doLayout();
-            this.width += noteHeads.width + 10;
+            this.width += noteHeads.width;
         }
     }
 

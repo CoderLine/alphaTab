@@ -4,7 +4,6 @@ import { Glyph } from '@src/rendering/glyphs/Glyph';
 import { TieGlyph } from '@src/rendering/glyphs/TieGlyph';
 
 export class GhostParenthesisGlyph extends Glyph {
-    private static readonly Size: number = 6;
     private _isOpen: boolean;
 
     public colorOverride?: Color;
@@ -16,7 +15,8 @@ export class GhostParenthesisGlyph extends Glyph {
 
     public override doLayout(): void {
         super.doLayout();
-        this.width = GhostParenthesisGlyph.Size;
+        this.width =
+            this.renderer.smuflMetrics.ghostParenthesisWidth + this.renderer.smuflMetrics.ghostParenthesisPadding;
     }
 
     public override paint(cx: number, cy: number, canvas: ICanvas): void {
@@ -24,20 +24,31 @@ export class GhostParenthesisGlyph extends Glyph {
         if (this.colorOverride) {
             canvas.color = this.colorOverride;
         }
+
         if (this._isOpen) {
             TieGlyph.paintTie(
                 canvas,
                 1,
-                cx + this.x + this.width,
+                cx + this.x + this.renderer.smuflMetrics.ghostParenthesisWidth,
                 cy + this.y + this.height,
-                cx + this.x + this.width,
+                cx + this.x + this.renderer.smuflMetrics.ghostParenthesisWidth,
                 cy + this.y,
                 false,
-                6,
-                3
+                this.renderer.smuflMetrics.ghostParenthesisWidth / 2,
+                this.renderer.smuflMetrics.tieMidpointThickness
             );
         } else {
-            TieGlyph.paintTie(canvas, 1, cx + this.x, cy + this.y, cx + this.x, cy + this.y + this.height, false, 6, 3);
+            TieGlyph.paintTie(
+                canvas,
+                1,
+                cx + this.x + this.renderer.smuflMetrics.ghostParenthesisPadding,
+                cy + this.y,
+                cx + this.x + this.renderer.smuflMetrics.ghostParenthesisPadding,
+                cy + this.y + this.height,
+                false,
+                this.renderer.smuflMetrics.ghostParenthesisWidth / 2,
+                this.renderer.smuflMetrics.tieMidpointThickness
+            );
         }
         canvas.color = c;
     }

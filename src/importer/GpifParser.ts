@@ -40,9 +40,8 @@ import { MidiUtils } from '@src/midi/MidiUtils';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { PercussionMapper } from '@src/model/PercussionMapper';
-import { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+import { InstrumentArticulation, TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
-import { TextBaseline } from '@src/platform/ICanvas';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import { NoteCloner } from '@src/generated/model/NoteCloner';
 import { Logger } from '@src/Logger';
@@ -757,16 +756,16 @@ export class GpifParser {
                 case 'TechniquePlacement':
                     switch (txt) {
                         case 'outside':
-                            articulation.techniqueSymbolPlacement = TextBaseline.Bottom;
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Outside;
                             break;
                         case 'inside':
-                            articulation.techniqueSymbolPlacement = TextBaseline.Middle;
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Inside;
                             break;
                         case 'above':
-                            articulation.techniqueSymbolPlacement = TextBaseline.Bottom;
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Above;
                             break;
                         case 'below':
-                            articulation.techniqueSymbolPlacement = TextBaseline.Top;
+                            articulation.techniqueSymbolPlacement = TechniqueSymbolPlacement.Below;
                             break;
                     }
                     break;
