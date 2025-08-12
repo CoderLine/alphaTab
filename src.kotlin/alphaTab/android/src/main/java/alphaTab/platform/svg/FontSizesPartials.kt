@@ -22,24 +22,38 @@ internal class FontSizesPartials {
             val widths = DoubleList()
             val heights = DoubleList()
 
-            AlphaSkiaCanvas().use { canvas ->
-                canvas.beginRender(10,10)
+            try {
+                AlphaSkiaCanvas().use { canvas ->
+                    canvas.beginRender(10, 10)
 
-                AlphaSkiaTextStyle(arrayOf(family), 400, false).use { style ->
-                    for(i in (FontSizes.ControlChars.toInt() until 255)) {
-                        val s = i.toChar().toString()
-                        canvas.measureText(s, style, measureSize, AlphaSkiaTextAlign.LEFT, AlphaSkiaTextBaseline.ALPHABETIC).use{metrics ->
-                            widths.push(metrics.width.toDouble())
-                            val height = metrics.actualBoundingBoxDescent + metrics.actualBoundingBoxAscent
-                            heights.push(height.toDouble())
+                    AlphaSkiaTextStyle(arrayOf(family), 400, false).use { style ->
+                        for (i in (FontSizes.ControlChars.toInt() until 255)) {
+                            val s = i.toChar().toString()
+                            canvas.measureText(
+                                s,
+                                style,
+                                measureSize,
+                                AlphaSkiaTextAlign.LEFT,
+                                AlphaSkiaTextBaseline.ALPHABETIC
+                            ).use { metrics ->
+                                widths.push(metrics.width.toDouble())
+                                val height =
+                                    metrics.actualBoundingBoxDescent + metrics.actualBoundingBoxAscent
+                                heights.push(height.toDouble())
+                            }
                         }
                     }
+
+                    canvas.endRender().close()
                 }
 
-                canvas.endRender().close()
+                FontSizes.FontSizeLookupTables.set(
+                    family,
+                    FontSizeDefinition(Uint8Array(widths), Uint8Array(heights))
+                )
+            } catch (e: Throwable) {
+                FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(ubyteArrayOf((8).toUByte())), Uint8Array(ubyteArrayOf((10).toUByte()))))
             }
-
-            FontSizes.FontSizeLookupTables.set(family, FontSizeDefinition(Uint8Array(widths), Uint8Array(heights)))
         }
     }
 }

@@ -5,7 +5,6 @@ import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import { type ICanvas, TextAlign, TextBaseline, MeasuredText } from '@src/platform/ICanvas';
 import type { Settings } from '@src/Settings';
 import type * as alphaSkia from '@coderline/alphaskia';
-import { Logger } from '@src/Logger';
 
 /**
  * Describes the members of the alphaSkia module.
@@ -121,7 +120,6 @@ export class SkiaCanvas implements ICanvas {
         return null;
     }
 
-    private _initialMeasureDone = false;
     public beginRender(width: number, height: number): void {
         this._scale = this.settings.display.scale;
         this._canvas.beginRender(width, height, Environment.HighDpiFactor);
