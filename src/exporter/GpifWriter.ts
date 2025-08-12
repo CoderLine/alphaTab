@@ -1194,7 +1194,7 @@ export class GpifWriter {
         }
     }
 
-    private writeAudioTracksNode(parent: XmlNode, score: Score) {
+    private writeAudioTracksNode(parent: XmlNode, _score: Score) {
         parent.addElement('AudioTracks');
     }
 

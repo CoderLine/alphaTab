@@ -85,7 +85,7 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
         this.fakeSynthesize();
     }
 
-    private processMidiMessage(e: MidiEvent): void {}
+    private processMidiMessage(_e: MidiEvent): void {}
 
     public dispatchEvent(synthEvent: SynthEvent): void {
         this._midiEventQueue.enqueue(synthEvent);
@@ -109,28 +109,28 @@ class BackingTrackAudioSynthesizer implements IAudioSampleSynthesizer {
         return processedEvents;
     }
 
-    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
+    public applyTranspositionPitches(_transpositionPitches: Map<number, number>): void {
         // not supported, ignore
     }
-    public setChannelTranspositionPitch(channel: number, semitones: number): void {
+    public setChannelTranspositionPitch(_channel: number, _semitones: number): void {
         // not supported, ignore
     }
-    public channelSetMute(channel: number, mute: boolean): void {
+    public channelSetMute(_channel: number, _mute: boolean): void {
         // not supported, ignore
     }
-    public channelSetSolo(channel: number, solo: boolean): void {
+    public channelSetSolo(_channel: number, _solo: boolean): void {
         // not supported, ignore
     }
     public resetChannelStates(): void {
         // not supported, ignore
     }
-    public channelSetMixVolume(channel: number, volume: number): void {
+    public channelSetMixVolume(_channel: number, _volume: number): void {
         // not supported, ignore
     }
-    public hasSamplesForProgram(program: number): boolean {
+    public hasSamplesForProgram(_program: number): boolean {
         return true;
     }
-    public hasSamplesForPercussion(key: number): boolean {
+    public hasSamplesForPercussion(_key: number): boolean {
         return true;
     }
 }

@@ -196,7 +196,7 @@ export default class CSharpEmitterContext {
         return '';
     }
 
-    protected getClassName(type: cs.NamedTypeDeclaration, expr?: cs.Node) {
+    protected getClassName(type: cs.NamedTypeDeclaration, _expr?: cs.Node) {
         return type.name;
     }
 
@@ -632,7 +632,7 @@ export default class CSharpEmitterContext {
         return 'AlphaTab.Platform.Skia.AlphaSkiaBridge';
     }
 
-    protected createArrayListType(tsSymbol: ts.Symbol, node: cs.Node, arrayElementType: cs.TypeNode): cs.TypeNode {
+    protected createArrayListType(_tsSymbol: ts.Symbol, node: cs.Node, arrayElementType: cs.TypeNode): cs.TypeNode {
         return {
             nodeType: cs.SyntaxKind.ArrayTypeNode,
             parent: node.parent,
@@ -642,7 +642,7 @@ export default class CSharpEmitterContext {
     }
 
     protected createMapType(
-        symbol: ts.Symbol,
+        _symbol: ts.Symbol,
         node: cs.Node,
         mapKeyType: cs.TypeNode | null,
         mapValueType: cs.TypeNode | null

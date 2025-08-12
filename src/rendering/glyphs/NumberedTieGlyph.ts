@@ -30,7 +30,7 @@ export class NumberedTieGlyph extends TieGlyph {
         super.doLayout();
     }
 
-    protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
+    protected override getBeamDirection(_beat: Beat, _noteRenderer: BarRendererBase): BeamDirection {
         return BeamDirection.Up;
     }
 

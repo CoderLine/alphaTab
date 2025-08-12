@@ -26,7 +26,7 @@ export class TapEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.slap || beat.pop || beat.tap;
     }
 
@@ -41,7 +41,7 @@ export class TapEffectInfo extends EffectBarRendererInfo {
         return new TextGlyph(0, 0, 'T', res.effectFont, TextAlign.Left);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

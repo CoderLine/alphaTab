@@ -25,15 +25,15 @@ export class NoteOrnamentEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SingleOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.notes.some(n => n.ornament !== NoteOrnament.None);
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new NoteOrnamentGlyph(beat.notes.find(n => n.ornament !== NoteOrnament.None)!.ornament);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return false;
     }
 }

@@ -513,7 +513,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     return [-1];
                 }
                 tracksData = JSON.parse(tracksData);
-            } catch (e) {
+            } catch {
                 tracksData = [0];
             }
         }
@@ -552,7 +552,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 try {
                     const stringValue: string = value as string;
                     value = JSON.parse(stringValue);
-                } catch (e) {
+                } catch {
                     if (value === '') {
                         value = null;
                     }
@@ -572,7 +572,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                     let value: unknown = attr.nodeValue;
                     try {
                         value = JSON.parse(value as string);
-                    } catch (e) {
+                    } catch {
                         if (value === '') {
                             value = null;
                         }

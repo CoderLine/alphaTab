@@ -101,7 +101,7 @@ export class VisualTestHelper {
         for (const run of runs) {
             try {
                 referenceFileData.push(await TestPlatform.loadFile(run.referenceFileName));
-            } catch (e) {
+            } catch {
                 referenceFileData.push(new Uint8Array(0));
             }
         }

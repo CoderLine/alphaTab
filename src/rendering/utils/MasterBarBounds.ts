@@ -63,10 +63,9 @@ export class MasterBarBounds {
     /**
      * Tries to find a beat at the given location.
      * @param x The absolute X position where the beat spans across.
-     * @param y The absolute Y position where the beat spans across.
      * @returns The beat that spans across the given point, or null if none of the contained bars had a beat at this position.
      */
-    public findBeatAtPos(x: number, y: number): Beat | null {
+    public findBeatAtPos(x: number): Beat | null {
         let beat: BeatBounds | null = null;
         const distance = 10000000;
         for (const bar of this.bars) {

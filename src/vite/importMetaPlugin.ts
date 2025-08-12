@@ -97,7 +97,7 @@ function getWorkerType(code: string, match: RegExpExecArray): AlphaTabWorkerType
     let workerOptions: string | null | { type: string } = code.slice(startOfOptions, endOfOptions + 1);
     try {
         workerOptions = evalValue(workerOptions);
-    } catch (e) {
+    } catch {
         return AlphaTabWorkerTypes.WorkerClassic;
     }
 
@@ -142,7 +142,7 @@ export function importMetaUrlPlugin(options: AlphaTabVitePluginOptions): Plugin 
 
             const alphaTabWorkerPattern =
                 // @ts-expect-error For the Vite plugin we expect newer node than for alphaTab itself (-> migrate to monorepo)
-                /\b(alphaTabWorker|alphaTabWorklet\.addModule)\s*\(\s*(new\s+[^ (]+alphaTabUrl\s*\(\s*(\'[^\']+\'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
+                /\b(alphaTabWorker|alphaTabWorklet\.addModule)\s*\(\s*(new\s+[^ (]+alphaTabUrl\s*\(\s*('[^']+'|"[^"]+"|`[^`]+`)\s*,\s*import\.meta\.url\s*\))/dg;
 
             let match: RegExpExecArray | null = alphaTabWorkerPattern.exec(code);
             while (match) {

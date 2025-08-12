@@ -528,7 +528,7 @@ export class BarRendererBase {
         }
     }
 
-    protected createVoiceGlyphs(v: Voice): void {
+    protected createVoiceGlyphs(_v: Voice): void {
         // filled in subclasses
     }
 
@@ -650,7 +650,7 @@ export class BarRendererBase {
         }
     }
 
-    public completeBeamingHelper(helper: BeamingHelper) {
+    public completeBeamingHelper(_helper: BeamingHelper) {
         // nothing by default
     }
 

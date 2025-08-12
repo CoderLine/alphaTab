@@ -1059,8 +1059,8 @@ export default class CSharpAstTransformer {
 
     protected visitClassDeclaration(
         node: ts.ClassDeclaration,
-        additionalNestedExportDeclarations?: ts.Declaration[],
-        additionalNestedNonExportsDeclarations?: ts.Declaration[],
+        _additionalNestedExportDeclarations?: ts.Declaration[],
+        _additionalNestedNonExportsDeclarations?: ts.Declaration[],
         globalStatements?: ts.Statement[]
     ) {
         let extendsClause: ts.ExpressionWithTypeArguments | null = null;
@@ -1773,7 +1773,7 @@ export default class CSharpAstTransformer {
             tsNode: s
         } as cs.EmptyStatement;
     }
-    protected visitDebuggerStatement(parent: cs.Node, s: ts.DebuggerStatement) {
+    protected visitDebuggerStatement(_parent: cs.Node, _s: ts.DebuggerStatement) {
         return {} as cs.ThrowStatement;
 
         // {
@@ -4475,7 +4475,7 @@ export default class CSharpAstTransformer {
         return this.wrapToSmartCast(parent, identifier, expression);
     }
 
-    protected getIdentifierName(identifier: cs.Identifier, expression: ts.Identifier): string {
+    protected getIdentifierName(_identifier: cs.Identifier, expression: ts.Identifier): string {
         return expression.text;
     }
 
@@ -4483,7 +4483,7 @@ export default class CSharpAstTransformer {
         parent: cs.Node,
         node: cs.Node,
         expression: ts.Expression,
-        forceCast: boolean = false
+        _forceCast: boolean = false
     ): cs.Expression {
         if (node.tsSymbol) {
             if (

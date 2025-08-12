@@ -39,11 +39,11 @@ export class GolpeEffectInfo extends EffectBarRendererInfo {
         return beat.golpe === this._type && (!shouldCreate || shouldCreate(settings, beat));
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new GuitarGolpeGlyph(0, 0, true);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return false;
     }
 }

@@ -10,7 +10,7 @@ export class TestOutput implements ISynthOutput {
         return 44100;
     }
 
-    public open(bufferTimeInMilliseconds: number): void {
+    public open(_bufferTimeInMilliseconds: number): void {
         this.samples = [];
         (this.ready as EventEmitter).trigger();
     }
@@ -63,7 +63,7 @@ export class TestOutput implements ISynthOutput {
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
         return [] as ISynthOutputDevice[];
     }
-    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
+    public async setOutputDevice(_device: ISynthOutputDevice | null): Promise<void> {}
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
         return null;
     }

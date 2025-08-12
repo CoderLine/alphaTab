@@ -25,7 +25,7 @@ export class TabTieGlyph extends TieGlyph {
         return super.getTieHeight(startX, startY, endX, endY);
     }
 
-    protected override getBeamDirection(beat: Beat, noteRenderer: BarRendererBase): BeamDirection {
+    protected override getBeamDirection(_beat: Beat, _noteRenderer: BarRendererBase): BeamDirection {
         if (this.isLeftHandTap) {
             return BeamDirection.Up;
         }

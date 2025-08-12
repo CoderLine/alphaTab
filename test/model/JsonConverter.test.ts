@@ -18,7 +18,7 @@ describe('JsonConverterTest', () => {
         try {
             const data = await TestPlatform.loadFile(`test-data/${name}`);
             return ScoreLoader.loadScoreFromBytes(data);
-        } catch (e) {
+        } catch {
             return null;
         }
     }

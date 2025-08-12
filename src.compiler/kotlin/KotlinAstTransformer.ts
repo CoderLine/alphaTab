@@ -532,7 +532,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         super.visitTestClass(d);
     }
 
-    protected override convertPropertyToInvocation(parentSymbol: ts.Symbol, symbol: ts.Symbol): boolean {
+    protected override convertPropertyToInvocation(parentSymbol: ts.Symbol, _symbol: ts.Symbol): boolean {
         switch (parentSymbol.name) {
             // chai assertions
             case 'Assertion':

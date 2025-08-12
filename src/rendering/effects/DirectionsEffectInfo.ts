@@ -24,7 +24,7 @@ export class DirectionsEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.FullBar;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return (
             beat.voice.index === 0 &&
             beat.index === 0 &&
@@ -33,11 +33,11 @@ export class DirectionsEffectInfo extends EffectBarRendererInfo {
         );
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new DirectionsContainerGlyph(0, 0, beat.voice.bar.masterBar.directions!);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

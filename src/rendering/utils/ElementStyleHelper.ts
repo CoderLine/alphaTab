@@ -38,7 +38,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static scoreDefaultColor(res: RenderingResources, element: ScoreSubElement) {
+    private static scoreDefaultColor(res: RenderingResources, _element: ScoreSubElement) {
         const defaultColor: Color = res.mainGlyphColor;
 
         return defaultColor;
@@ -163,7 +163,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static beatDefaultColor(res: RenderingResources, element: BeatSubElement, beat: Beat) {
+    private static beatDefaultColor(res: RenderingResources, _element: BeatSubElement, beat: Beat) {
         const defaultColor: Color = beat.voice.index === 0 ? res.mainGlyphColor : res.secondaryGlyphColor;
 
         return defaultColor;
@@ -193,7 +193,7 @@ export class ElementStyleHelper {
         return undefined;
     }
 
-    private static noteDefaultColor(res: RenderingResources, element: NoteSubElement, note: Note) {
+    private static noteDefaultColor(res: RenderingResources, _element: NoteSubElement, note: Note) {
         const defaultColor: Color = note.beat.voice.index === 0 ? res.mainGlyphColor : res.secondaryGlyphColor;
 
         return defaultColor;

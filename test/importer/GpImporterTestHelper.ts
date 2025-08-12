@@ -376,7 +376,7 @@ export class GpImporterTestHelper {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[0].notes[0].isLetRing).to.be.equal(true);
     }
 
-    public static checkEffects(score: Score): void {
+    public static checkEffects(_score: Score): void {
         // just check if reading works
         expect(true).to.be.equal(true);
     }

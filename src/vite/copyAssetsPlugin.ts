@@ -39,7 +39,7 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
                     }
 
                     alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
-                } catch (e) {
+                } catch {
                     alphaTabSourceDir = path.join(resolvedConfig.root, 'node_modules/@coderline/alphatab/dist/');
                 }
             }
@@ -50,7 +50,7 @@ export function copyAssetsPlugin(options: AlphaTabVitePluginOptions): Plugin {
                 try {
                     await fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK);
                     isValidAlphaTabSourceDir = true;
-                } catch (e) {
+                } catch {
                     isValidAlphaTabSourceDir = false;
                 }
             } else {

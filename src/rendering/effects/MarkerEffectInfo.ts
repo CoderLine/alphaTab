@@ -25,7 +25,7 @@ export class MarkerEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SinglePreBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return (
             beat.voice.bar.staff.index === 0 &&
             beat.voice.index === 0 &&
@@ -46,7 +46,7 @@ export class MarkerEffectInfo extends EffectBarRendererInfo {
         );
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

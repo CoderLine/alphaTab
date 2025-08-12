@@ -94,7 +94,7 @@ if (alphaTab.Environment.isRunningInWorker) {
                     type: 'application/javascript'
                 });
                 return new Worker(URL.createObjectURL(blob));
-            } catch (e) {
+            } catch {
                 alphaTab.Logger.warning('Rendering', 'Could not create inline worker, fallback to normal worker');
                 return new Worker(settings.core.scriptFile!);
             }

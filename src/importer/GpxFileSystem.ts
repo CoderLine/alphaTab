@@ -38,7 +38,7 @@ export class GpxFileSystem {
      */
     public constructor() {
         this.files = [];
-        this.fileFilter = s => {
+        this.fileFilter = _ => {
             return true;
         };
     }

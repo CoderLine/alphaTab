@@ -16,19 +16,6 @@ function toImportPath(fileName: string) {
     return `@${removeExtension(fileName).split('\\').join('/')}`;
 }
 
-function isClonable(type: ts.Type): boolean {
-    if (!type.symbol) {
-        return false;
-    }
-
-    const declaration = type.symbol.valueDeclaration;
-    if (declaration) {
-        return !!ts.getJSDocTags(declaration).find(t => t.tagName.text === 'cloneable');
-    }
-
-    return false;
-}
-
 function isCloneMember(propertyDeclaration: ts.PropertyDeclaration) {
     if (propertyDeclaration.modifiers) {
         if (
@@ -279,7 +266,7 @@ function generateCloneBody(
     const bodyStatements = propertiesToSerialize.reduce((stmts, prop) => {
         stmts.push(...generateClonePropertyStatements(prop, program, importer));
         return stmts;
-    }, new Array<ts.Statement>());
+    }, [] as ts.Statement[]);
 
     return ts.factory.createBlock(
         [

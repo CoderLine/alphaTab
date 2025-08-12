@@ -1001,7 +1001,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         }
     }
 
-    protected writeBaseLiteralExpression(expr: cs.BaseLiteralExpression) {
+    protected writeBaseLiteralExpression(_expr: cs.BaseLiteralExpression) {
         this.write('super');
     }
 
@@ -1639,7 +1639,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                     }
                     break;
                 case cs.SyntaxKind.PostfixUnaryExpression:
-                    const postOp = (s.incrementor as cs.PostfixUnaryExpression).operand;
                     switch ((s.incrementor as cs.PostfixUnaryExpression).operator) {
                         case '++':
                             this.write('it + 1');

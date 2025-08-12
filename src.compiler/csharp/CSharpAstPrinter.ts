@@ -737,7 +737,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         this.writeExpression(expr.operand);
     }
 
-    protected writeBaseLiteralExpression(expr: cs.BaseLiteralExpression) {
+    protected writeBaseLiteralExpression(_expr: cs.BaseLiteralExpression) {
         this.write('base');
     }
 

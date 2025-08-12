@@ -512,7 +512,7 @@ export class ScoreSerializerPlugin implements PrettyFormatNewPlugin {
      * @target web
      * @partial
      */
-    private static isPlatformTypeEqual(v: unknown, dv: unknown): boolean {
+    private static isPlatformTypeEqual(v: unknown, _dv: unknown): boolean {
         // we should not have any other types in our JSONs, if we extend it, this will catch it
         throw new Error(`Unexpected value in serialized json${String(v)}`);
     }

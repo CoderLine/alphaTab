@@ -1041,8 +1041,6 @@ export class Beat {
                     } else {
                         this.whammyBarType = WhammyType.Dive;
                     }
-                } else if (origin.value > destination.value || origin.value < destination.value) {
-                    this.whammyBarType = WhammyType.Dip;
                 } else if (origin.value === destination.value) {
                     if (origin.value !== 0 && !this.isContinuedWhammy) {
                         this.whammyBarType = WhammyType.Predive;

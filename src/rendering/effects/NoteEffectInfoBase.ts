@@ -6,7 +6,7 @@ import type { Settings } from '@src/Settings';
 export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
     protected lastCreateInfo: Note[] | null = null;
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         this.lastCreateInfo = [];
         for (let i: number = 0, j: number = beat.notes.length; i < j; i++) {
             const n: Note = beat.notes[i];
@@ -27,7 +27,7 @@ export abstract class NoteEffectInfoBase extends EffectBarRendererInfo {
         return true;
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

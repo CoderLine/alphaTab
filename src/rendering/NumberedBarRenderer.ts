@@ -339,9 +339,9 @@ export class NumberedBarRenderer extends LineBarRenderer {
     protected override paintBeamingStem(
         _beat: Beat,
         _cy: number,
-        x: number,
-        topY: number,
-        bottomY: number,
-        canvas: ICanvas
+        _x: number,
+        _topY: number,
+        _bottomY: number,
+        _canvas: ICanvas
     ): void {}
 }

@@ -8,7 +8,6 @@ import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { Voice } from '@src/model/Voice';
 import { Note } from '@src/model/Note';
-// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { NotationSettings } from '@src/NotationSettings';
 import { TextAlign } from '@src/platform/ICanvas';
 import type { BackingTrack } from '@src/model/BackingTrack';

@@ -16,7 +16,7 @@ export class ScoreSlurGlyph extends ScoreLegatoGlyph {
         this._endNote = endNote;
     }
 
-    protected override getTieHeight(startX: number, startY: number, endX: number, endY: number): number {
+    protected override getTieHeight(startX: number, _startY: number, endX: number, _endY: number): number {
         return Math.log2(endX - startX + 1) * this.renderer.settings.notation.slurHeight / 2;
     }
 

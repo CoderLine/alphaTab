@@ -247,7 +247,7 @@ export class AlphaTabWebPackPlugin {
                         }
 
                         alphaTabSourceDir = path.resolve(alphaTabSourceDir, '..');
-                    } catch (e) {
+                    } catch {
                         alphaTabSourceDir = compilation.getPath('node_modules/@coderline/alphatab/dist/');
                     }
                 }
@@ -258,7 +258,7 @@ export class AlphaTabWebPackPlugin {
                     try {
                         await fs.promises.access(path.join(alphaTabSourceDir, 'alphaTab.mjs'), fs.constants.F_OK);
                         isValidAlphaTabSourceDir = true;
-                    } catch (e) {
+                    } catch {
                         isValidAlphaTabSourceDir = false;
                     }
                 } else {

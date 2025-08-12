@@ -24,15 +24,15 @@ export class WhammyBarEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.GroupedOnBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.hasWhammyBar;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new LineRangedGlyph('w/bar');
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

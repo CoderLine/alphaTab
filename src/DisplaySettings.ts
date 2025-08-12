@@ -1,7 +1,6 @@
 import { RenderingResources } from '@src/RenderingResources';
 import { LayoutMode } from '@src/LayoutMode';
 import { StaveProfile } from '@src/StaveProfile';
-// biome-ignore lint/correctness/noUnusedImports: https://github.com/biomejs/biome/issues/4677
 import type { Staff } from '@src/model/Staff';
 
 /**

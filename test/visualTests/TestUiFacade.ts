@@ -140,10 +140,10 @@ export class TestUiFacade implements IUiFacade<unknown> {
     }
 
     public triggerEvent(
-        container: IContainer,
-        eventName: string,
-        details: unknown,
-        originalEvent?: IMouseEventArgs
+        _container: IContainer,
+        _eventName: string,
+        _details: unknown,
+        _originalEvent?: IMouseEventArgs
     ): void {
         // nothing to do
     }
@@ -202,7 +202,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
         throw new Error('Not supported');
     }
 
-    public createWorkerAudioExporter(synth: IAlphaSynth | null): IAudioExporterWorker {
+    public createWorkerAudioExporter(_synth: IAlphaSynth | null): IAudioExporterWorker {
         throw new Error('Not supported');
     }
 
@@ -222,7 +222,7 @@ export class TestUiFacade implements IUiFacade<unknown> {
 
     public removeHighlights(): void {}
 
-    public highlightElements(groupId: string, masterBarIndex: number): void {}
+    public highlightElements(_groupId: string, _masterBarIndex: number): void {}
 
     public createSelectionElement(): IContainer | null {
         return null;
@@ -252,11 +252,11 @@ export class TestUiFacade implements IUiFacade<unknown> {
         return b;
     }
 
-    public scrollToY(scrollElement: IContainer, offset: number, speed: number): void {
+    public scrollToY(scrollElement: IContainer, offset: number, _speed: number): void {
         scrollElement.scrollTop = offset;
     }
 
-    public scrollToX(scrollElement: IContainer, offset: number, speed: number): void {
+    public scrollToX(scrollElement: IContainer, offset: number, _speed: number): void {
         scrollElement.scrollLeft = offset;
     }
 

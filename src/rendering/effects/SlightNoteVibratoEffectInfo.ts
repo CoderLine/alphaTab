@@ -31,7 +31,7 @@ export class SlightNoteVibratoEffectInfo extends NoteEffectInfoBase {
         return EffectBarGlyphSizing.GroupedOnBeatToEnd;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new NoteVibratoGlyph(0, 0, VibratoType.Slight);
     }
 

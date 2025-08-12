@@ -531,7 +531,7 @@ export class MidiFileGenerator {
         previousMasterBar: MasterBar | null,
         currentTick: number,
         currentTempo: number,
-        barOccurence: number
+        _barOccurence: number
     ): void {
         // time signature
         if (

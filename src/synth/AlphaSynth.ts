@@ -21,7 +21,6 @@ import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEv
 import { ModelUtils } from '@src/model/ModelUtils';
 import type { Score } from '@src/model/Score';
 import type { IAudioSampleSynthesizer } from '@src/synth/IAudioSampleSynthesizer';
-// biome-ignore lint/correctness/noUnusedImports: used in tsdoc
 import { AudioExportChunk, type IAudioExporter, type AudioExportOptions } from '@src/synth/IAudioExporter';
 import type { Preset } from '@src/synth/synthesis/Preset';
 import { MidiUtils } from '@src/midi/MidiUtils';
@@ -824,7 +823,6 @@ export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
 
         let bufferPos: number = 0;
         let subBufferTime = this._generatedAudioCurrentTime;
-        let alphaTabGeneratedMillis = 0;
         for (let i = 0; i < microBufferCount; i++) {
             // if we're applying sync points, we calculate the needed tempo and set the playback speed
             if (syncPoints.length > 0) {
@@ -841,7 +839,6 @@ export class AlphaSynthAudioExporter implements IAlphaSynthAudioExporter {
 
             bufferPos += SynthConstants.MicroBufferSize * SynthConstants.AudioChannels;
             subBufferTime += oneMicroBufferMillis;
-            alphaTabGeneratedMillis += oneMicroBufferMillis * this._sequencer.playbackSpeed;
 
             if (this._sequencer.isFinished) {
                 break;

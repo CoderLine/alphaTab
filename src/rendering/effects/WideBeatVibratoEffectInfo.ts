@@ -25,15 +25,15 @@ export class WideBeatVibratoEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.GroupedOnBeatToEnd;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return beat.vibrato === VibratoType.Wide;
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, _beat: Beat): EffectGlyph {
         return new BeatVibratoGlyph(0, 0, VibratoType.Wide);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }

@@ -1,12 +1,6 @@
 import { type XmlNode, XmlNodeType } from '@src/xml/XmlNode';
 
 export class XmlWriter {
-    public static write(xml: XmlNode, indention: string, xmlHeader: boolean): string {
-        const writer = new XmlWriter(indention, xmlHeader);
-        writer.writeNode(xml);
-        return writer.toString();
-    }
-
     // NOTE: we use the string.join variant rather than the
     // string concatenation for IE performnace concerns
     private _result: string[] = [];
@@ -121,6 +115,12 @@ export class XmlWriter {
         }
     }
 
+    public static write(xml: XmlNode, indention: string, xmlHeader: boolean): string {
+        const writer = new XmlWriter(indention, xmlHeader);
+        writer.writeNode(xml);
+        return writer.toString();
+    }
+    
     private write(s: string) {
         if (this._isStartOfLine) {
             this._result.push(this._currentIndention);

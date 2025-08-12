@@ -394,7 +394,7 @@ class TestBackingTrackOutput implements IBackingTrackSynthOutput {
     public async enumerateOutputDevices(): Promise<ISynthOutputDevice[]> {
         return [] as ISynthOutputDevice[];
     }
-    public async setOutputDevice(device: ISynthOutputDevice | null): Promise<void> {}
+    public async setOutputDevice(_device: ISynthOutputDevice | null): Promise<void> {}
     public async getOutputDevice(): Promise<ISynthOutputDevice | null> {
         return null;
     }
@@ -439,31 +439,31 @@ class EmptyAudioSynthesizer implements IAudioSampleSynthesizer {
     public timeSignatureNumerator: number = 4;
     public timeSignatureDenominator: number = 4;
     public activeVoiceCount: number = 0;
-    public noteOffAll(immediate: boolean): void {}
+    public noteOffAll(_immediate: boolean): void {}
     public resetSoft(): void {}
     public resetPresets(): void {}
     public loadPresets(
-        hydra: Hydra,
-        instrumentPrograms: Set<number>,
-        percussionKeys: Set<number>,
-        append: boolean
+        _hydra: Hydra,
+        _instrumentPrograms: Set<number>,
+        _percussionKeys: Set<number>,
+        _append: boolean
     ): void {}
-    public setupMetronomeChannel(metronomeVolume: number): void {}
-    public synthesizeSilent(sampleCount: number): void {}
-    public dispatchEvent(synthEvent: SynthEvent): void {}
-    public synthesize(buffer: Float32Array, bufferPos: number, sampleCount: number): SynthEvent[] {
+    public setupMetronomeChannel(_metronomeVolume: number): void {}
+    public synthesizeSilent(_sampleCount: number): void {}
+    public dispatchEvent(_synthEvent: SynthEvent): void {}
+    public synthesize(_buffer: Float32Array, _bufferPos: number, _ampleCount: number): SynthEvent[] {
         return [];
     }
-    public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {}
-    public setChannelTranspositionPitch(channel: number, semitones: number): void {}
-    public channelSetMute(channel: number, mute: boolean): void {}
-    public channelSetSolo(channel: number, solo: boolean): void {}
+    public applyTranspositionPitches(_transpositionPitches: Map<number, number>): void {}
+    public setChannelTranspositionPitch(_channel: number, _semitones: number): void {}
+    public channelSetMute(_channel: number, _mute: boolean): void {}
+    public channelSetSolo(_channel: number, _solo: boolean): void {}
     public resetChannelStates(): void {}
-    public channelSetMixVolume(channel: number, volume: number): void {}
-    public hasSamplesForProgram(program: number): boolean {
+    public channelSetMixVolume(_channel: number, _volume: number): void {}
+    public hasSamplesForProgram(_program: number): boolean {
         return true;
     }
-    public hasSamplesForPercussion(key: number): boolean {
+    public hasSamplesForPercussion(_key: number): boolean {
         return true;
     }
 }

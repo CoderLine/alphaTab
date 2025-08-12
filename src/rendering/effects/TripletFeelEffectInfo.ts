@@ -25,7 +25,7 @@ export class TripletFeelEffectInfo extends EffectBarRendererInfo {
         return EffectBarGlyphSizing.SinglePreBeat;
     }
 
-    public shouldCreateGlyph(settings: Settings, beat: Beat): boolean {
+    public shouldCreateGlyph(_settings: Settings, beat: Beat): boolean {
         return (
             beat.index === 0 &&
             ((beat.voice.bar.masterBar.index === 0 &&
@@ -35,11 +35,11 @@ export class TripletFeelEffectInfo extends EffectBarRendererInfo {
         );
     }
 
-    public createNewGlyph(renderer: BarRendererBase, beat: Beat): EffectGlyph {
+    public createNewGlyph(_renderer: BarRendererBase, beat: Beat): EffectGlyph {
         return new TripletFeelGlyph(beat.voice.bar.masterBar.tripletFeel);
     }
 
-    public canExpand(from: Beat, to: Beat): boolean {
+    public canExpand(_from: Beat, _to: Beat): boolean {
         return true;
     }
 }
