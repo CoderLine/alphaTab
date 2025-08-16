@@ -2141,7 +2141,7 @@ describe('AlphaTexImporterTest', () => {
         score.tracks = [];
 
         expect(score).toMatchSnapshot();
-        
+
         score.tracks = tracks;
         testExportRoundtrip(score);
     });
@@ -2284,5 +2284,20 @@ describe('AlphaTexImporterTest', () => {
 
         parseNumberOrNameTest('1.1\\test', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'MetaCommand(test)']);
         parseNumberOrNameTest('1.1\\test', true, ['Number(1.1)', 'MetaCommand(test)']);
+    });
+
+    it('unicode-escape', () => {
+        const score = parseTex(`
+            \\title "\\uD83D\\uDE38"
+            .
+        `);
+
+        expect(score.title).to.equal('😸');
+    });
+
+    it('utf16', () => {
+        const score = parseTex(`\\title "🤘🏻" .`);
+
+        expect(score.title).to.equal("🤘🏻");
     });
 });

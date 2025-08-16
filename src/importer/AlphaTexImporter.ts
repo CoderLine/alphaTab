@@ -151,12 +151,12 @@ enum AlphaTexAccidentalMode {
 export class AlphaTexLexer {
     private static readonly Eof: number = 0;
 
-    private _curChPos: number = 0;
+    private _position: number = 0;
     private _line: number = 1;
     private _col: number = 0;
 
-    private _input: string = '';
-    private _ch: number = AlphaTexLexer.Eof;
+    private _codepoints: number[];
+    private _codepoint: number = AlphaTexLexer.Eof;
 
     public sy: AlphaTexSymbols = AlphaTexSymbols.No;
     public syData: unknown = '';
@@ -167,16 +167,16 @@ export class AlphaTexLexer {
     public logErrors: boolean = true;
 
     public constructor(input: string) {
-        this._input = input;
+        this._codepoints = [...IOHelper.iterateCodepoints(input)];
     }
 
     public init(allowFloats: boolean = false) {
-        this._curChPos = 0;
+        this._position = 0;
         this._line = 1;
         this._col = 0;
         this.saveValidSpot();
 
-        this._ch = this.nextChar();
+        this._codepoint = this.nextCodepoint();
         this.sy = this.newSy(allowFloats);
     }
 
@@ -185,26 +185,26 @@ export class AlphaTexLexer {
      * All parsed data until this point is assumed to be valid.
      */
     private saveValidSpot(): void {
-        this.lastValidSpot = [this._curChPos, this._line, this._col];
+        this.lastValidSpot = [this._position, this._line, this._col];
     }
 
     /**
      * Reads, saves, and returns the next character of the source stream.
      */
-    private nextChar(): number {
-        if (this._curChPos < this._input.length) {
-            this._ch = this._input.charCodeAt(this._curChPos++);
+    private nextCodepoint(): number {
+        if (this._position < this._codepoints.length) {
+            this._codepoint = this._codepoints[this._position++];
             // line/col countingF
-            if (this._ch === 0x0a /* \n */) {
+            if (this._codepoint === 0x0a /* \n */) {
                 this._line++;
                 this._col = 0;
             } else {
                 this._col++;
             }
         } else {
-            this._ch = AlphaTexLexer.Eof;
+            this._codepoint = AlphaTexLexer.Eof;
         }
-        return this._ch;
+        return this._codepoint;
     }
 
     /**
@@ -218,118 +218,165 @@ export class AlphaTexLexer {
         while (this.sy === AlphaTexSymbols.No) {
             this.syData = null;
 
-            if (this._ch === AlphaTexLexer.Eof) {
+            if (this._codepoint === AlphaTexLexer.Eof) {
                 this.sy = AlphaTexSymbols.Eof;
-            } else if (AlphaTexLexer.isWhiteSpace(this._ch)) {
+            } else if (AlphaTexLexer.isWhiteSpace(this._codepoint)) {
                 // skip whitespaces
-                this._ch = this.nextChar();
+                this._codepoint = this.nextCodepoint();
                 this.saveValidSpot();
-            } else if (this._ch === 0x2f /* / */) {
-                this._ch = this.nextChar();
-                if (this._ch === 0x2f /* / */) {
+            } else if (this._codepoint === 0x2f /* / */) {
+                this._codepoint = this.nextCodepoint();
+                if (this._codepoint === 0x2f /* / */) {
                     // single line comment
-                    while (this._ch !== 0x0d /* \r */ && this._ch !== 0x0a /* \n */ && this._ch !== AlphaTexLexer.Eof) {
-                        this._ch = this.nextChar();
+                    while (
+                        this._codepoint !== 0x0d /* \r */ &&
+                        this._codepoint !== 0x0a /* \n */ &&
+                        this._codepoint !== AlphaTexLexer.Eof
+                    ) {
+                        this._codepoint = this.nextCodepoint();
                     }
-                } else if (this._ch === 0x2a /* * */) {
+                } else if (this._codepoint === 0x2a /* * */) {
                     // multiline comment
-                    while (this._ch !== AlphaTexLexer.Eof) {
-                        if (this._ch === 0x2a /* * */) {
-                            this._ch = this.nextChar();
-                            if (this._ch === 0x2f /* / */) {
-                                this._ch = this.nextChar();
+                    while (this._codepoint !== AlphaTexLexer.Eof) {
+                        if (this._codepoint === 0x2a /* * */) {
+                            this._codepoint = this.nextCodepoint();
+                            if (this._codepoint === 0x2f /* / */) {
+                                this._codepoint = this.nextCodepoint();
                                 break;
                             }
                         } else {
-                            this._ch = this.nextChar();
+                            this._codepoint = this.nextCodepoint();
                         }
                     }
                 } else {
-                    this.errorMessage(`Unexpected character ${String.fromCharCode(this._ch)}`);
+                    this.errorMessage(`Unexpected character ${String.fromCodePoint(this._codepoint)}`);
                 }
                 this.saveValidSpot();
-            } else if (this._ch === 0x22 /* " */ || this._ch === 0x27 /* ' */) {
-                const startChar: number = this._ch;
-                this._ch = this.nextChar();
+            } else if (this._codepoint === 0x22 /* " */ || this._codepoint === 0x27 /* ' */) {
+                const startChar: number = this._codepoint;
+                this._codepoint = this.nextCodepoint();
                 let s: string = '';
                 this.sy = AlphaTexSymbols.String;
-                while (this._ch !== startChar && this._ch !== AlphaTexLexer.Eof) {
+
+                let previousCodepoint: number = -1;
+
+                while (this._codepoint !== startChar && this._codepoint !== AlphaTexLexer.Eof) {
                     // escape sequences
-                    if (this._ch === 0x5c /* \ */) {
-                        this._ch = this.nextChar();
-                        if (this._ch === 0x5c /* \\ */) {
-                            s += '\\';
-                        } else if (this._ch === startChar /* \<startchar> */) {
-                            s += String.fromCharCode(this._ch);
-                        } else if (this._ch === 0x52 /* \R */ || this._ch === 0x72 /* \r */) {
-                            s += '\r';
-                        } else if (this._ch === 0x4e /* \N */ || this._ch === 0x6e /* \n */) {
-                            s += '\n';
-                        } else if (this._ch === 0x54 /* \T */ || this._ch === 0x74 /* \t */) {
-                            s += '\t';
+                    let codepoint = -1;
+
+                    if (this._codepoint === 0x5c /* \ */) {
+                        this._codepoint = this.nextCodepoint();
+                        if (this._codepoint === 0x5c /* \\ */) {
+                            codepoint = 0x5c;
+                        } else if (this._codepoint === startChar /* \<startchar> */) {
+                            s += startChar;
+                        } else if (this._codepoint === 0x52 /* \R */ || this._codepoint === 0x72 /* \r */) {
+                            s += 0x0d;
+                        } else if (this._codepoint === 0x4e /* \N */ || this._codepoint === 0x6e /* \n */) {
+                            s += 0x0a;
+                        } else if (this._codepoint === 0x54 /* \T */ || this._codepoint === 0x74 /* \t */) {
+                            s += 0x09;
+                        } else if (this._codepoint === 0x75 /* \u */) {
+                            // \uXXXX
+                            let hex = '';
+
+                            for (let i = 0; i < 4; i++) {
+                                this._codepoint = this.nextCodepoint();
+                                if (this._codepoint === AlphaTexLexer.Eof) {
+                                    this.errorMessage('Unexpected end of escape sequence');
+                                }
+                                hex += String.fromCodePoint(this._codepoint);
+                            }
+
+                            codepoint = Number.parseInt(hex, 16);
+                            if (Number.isNaN(codepoint)) {
+                                this.errorMessage(`Invalid unicode value ${hex}`);
+                            }
                         } else {
                             this.errorMessage('Unsupported escape sequence');
                         }
                     } else {
-                        s += String.fromCharCode(this._ch);
+                        codepoint = this._codepoint;
                     }
-                    this._ch = this.nextChar();
+
+                    // unicode handling
+
+                    // https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-string-type
+                    if (
+                        IOHelper.isLeadingSurrogate(previousCodepoint) &&
+                        IOHelper.isTrailingSurrogate(codepoint)
+                    ) {
+                        codepoint = (previousCodepoint - 0xd800) * 0x400 + (codepoint - 0xdc00) + 0x10000;
+                        s += String.fromCodePoint(codepoint);
+                    } else if (IOHelper.isLeadingSurrogate(codepoint)) {
+                        // only remember for next character to form a surrogate pair
+                    } else {
+                        // standalone leading surrogate from previous char
+                        if (IOHelper.isLeadingSurrogate(previousCodepoint)) {
+                            s += String.fromCodePoint(previousCodepoint);
+                        }
+
+                        s += String.fromCodePoint(codepoint);
+                    }
+
+                    previousCodepoint = codepoint;
+                    this._codepoint = this.nextCodepoint();
                 }
-                if (this._ch === AlphaTexLexer.Eof) {
+                if (this._codepoint === AlphaTexLexer.Eof) {
                     this.errorMessage('String opened but never closed');
                 }
                 this.syData = s;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x2d /* - */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x2d /* - */) {
                 this.readNumberOrName(allowFloats);
-            } else if (this._ch === 0x2e /* . */) {
+            } else if (this._codepoint === 0x2e /* . */) {
                 this.sy = AlphaTexSymbols.Dot;
                 this.syData = '.';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x3a /* : */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x3a /* : */) {
                 this.sy = AlphaTexSymbols.DoubleDot;
                 this.syData = ':';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x28 /* ( */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x28 /* ( */) {
                 this.sy = AlphaTexSymbols.LParensis;
-                this._ch = this.nextChar();
+                this._codepoint = this.nextCodepoint();
                 this.syData = '(';
-            } else if (this._ch === 0x5c /* \ */) {
-                this._ch = this.nextChar();
+            } else if (this._codepoint === 0x5c /* \ */) {
+                this._codepoint = this.nextCodepoint();
                 this.sy = AlphaTexSymbols.MetaCommand;
                 // allow double backslash (easier to test when copying from escaped Strings)
-                if (this._ch === 0x5c /* \ */) {
-                    this._ch = this.nextChar();
+                if (this._codepoint === 0x5c /* \ */) {
+                    this._codepoint = this.nextCodepoint();
                 }
 
                 this.syData = this.readName();
-            } else if (this._ch === 0x29 /* ) */) {
+            } else if (this._codepoint === 0x29 /* ) */) {
                 this.sy = AlphaTexSymbols.RParensis;
                 this.syData = ')';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x7b /* { */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x7b /* { */) {
                 this.sy = AlphaTexSymbols.LBrace;
                 this.syData = '{';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x7d /* } */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x7d /* } */) {
                 this.sy = AlphaTexSymbols.RBrace;
                 this.syData = '}';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x7c /* | */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x7c /* | */) {
                 this.sy = AlphaTexSymbols.Pipe;
                 this.syData = '|';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x2a /* * */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x2a /* * */) {
                 this.sy = AlphaTexSymbols.Multiply;
                 this.syData = '*';
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x3c /* < */) {
+                this._codepoint = this.nextCodepoint();
+            } else if (this._codepoint === 0x3c /* < */) {
                 this.sy = AlphaTexSymbols.LowerThan;
                 this.syData = '<';
-                this._ch = this.nextChar();
-            } else if (AlphaTexLexer.isDigit(this._ch)) {
+                this._codepoint = this.nextCodepoint();
+            } else if (AlphaTexLexer.isDigit(this._codepoint)) {
                 this.readNumberOrName(allowFloats);
-            } else if (AlphaTexLexer.isNameLetter(this._ch)) {
+            } else if (AlphaTexLexer.isNameLetter(this._codepoint)) {
                 const name: string = this.readName();
                 const tuning: TuningParseResult | null = this.allowTuning ? ModelUtils.parseTuning(name) : null;
                 if (tuning) {
@@ -340,7 +387,7 @@ export class AlphaTexLexer {
                     this.syData = name;
                 }
             } else {
-                this.errorMessage(`Unexpected character ${String.fromCharCode(this._ch)}`);
+                this.errorMessage(`Unexpected character ${String.fromCodePoint(this._codepoint)}`);
             }
         }
         return this.sy;
@@ -366,12 +413,12 @@ export class AlphaTexLexer {
         this.sy = AlphaTexSymbols.Number;
 
         // negative start or dash
-        if (this._ch === 0x2d) {
-            str += String.fromCharCode(this._ch);
-            this._ch = this.nextChar();
+        if (this._codepoint === 0x2d) {
+            str += String.fromCodePoint(this._codepoint);
+            this._codepoint = this.nextCodepoint();
 
             // need a number afterwards otherwise we have a string(-)
-            if (!AlphaTexLexer.isDigit(this._ch)) {
+            if (!AlphaTexLexer.isDigit(this._codepoint)) {
                 this.sy = AlphaTexSymbols.String;
             }
         }
@@ -383,28 +430,28 @@ export class AlphaTexLexer {
             switch (this.sy) {
                 case AlphaTexSymbols.Number:
                     // adding digits to the number
-                    if (AlphaTexLexer.isDigit(this._ch)) {
-                        str += String.fromCharCode(this._ch);
-                        this._ch = this.nextChar();
+                    if (AlphaTexLexer.isDigit(this._codepoint)) {
+                        str += String.fromCodePoint(this._codepoint);
+                        this._codepoint = this.nextCodepoint();
                         keepReading = true;
                     }
                     // adding a dot to the number (expecting digit after dot)
                     else if (
                         allowFloat &&
                         !hasDot &&
-                        this._ch === 0x2e /* . */ &&
-                        AlphaTexLexer.isDigit(this._input.charCodeAt(this._curChPos))
+                        this._codepoint === 0x2e /* . */ &&
+                        AlphaTexLexer.isDigit(this._codepoints[this._position])
                     ) {
-                        str += String.fromCharCode(this._ch);
-                        this._ch = this.nextChar();
+                        str += String.fromCodePoint(this._codepoint);
+                        this._codepoint = this.nextCodepoint();
                         keepReading = true;
                         hasDot = true;
                     }
                     // letter in number -> fallback to name reading
-                    else if (AlphaTexLexer.isNameLetter(this._ch)) {
+                    else if (AlphaTexLexer.isNameLetter(this._codepoint)) {
                         this.sy = AlphaTexSymbols.String;
-                        str += String.fromCharCode(this._ch);
-                        this._ch = this.nextChar();
+                        str += String.fromCodePoint(this._codepoint);
+                        this._codepoint = this.nextCodepoint();
                         keepReading = true;
                     }
                     // general unknown character -> end reading
@@ -413,9 +460,9 @@ export class AlphaTexLexer {
                     }
                     break;
                 case AlphaTexSymbols.String:
-                    if (AlphaTexLexer.isNameLetter(this._ch)) {
-                        str += String.fromCharCode(this._ch);
-                        this._ch = this.nextChar();
+                    if (AlphaTexLexer.isNameLetter(this._codepoint)) {
+                        str += String.fromCodePoint(this._codepoint);
+                        this._codepoint = this.nextCodepoint();
                         keepReading = true;
                     } else {
                         keepReading = false;
@@ -446,9 +493,13 @@ export class AlphaTexLexer {
     private readName(): string {
         let str: string = '';
         do {
-            str += String.fromCharCode(this._ch);
-            this._ch = this.nextChar();
-        } while (AlphaTexLexer.isNameLetter(this._ch) || AlphaTexLexer.isDigit(this._ch) || this._ch === 0x2d /*-*/);
+            str += String.fromCodePoint(this._codepoint);
+            this._codepoint = this.nextCodepoint();
+        } while (
+            AlphaTexLexer.isNameLetter(this._codepoint) ||
+            AlphaTexLexer.isDigit(this._codepoint) ||
+            this._codepoint === 0x2d /*-*/
+        );
         return str;
     }
 
