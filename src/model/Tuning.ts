@@ -173,10 +173,11 @@ export class Tuning {
     public finish() {
         const knownTuning = Tuning.findTuning(this.tunings);
         if (knownTuning) {
-            this.name = knownTuning.name;
+            if (this.name.length === 0) {
+                this.name = knownTuning.name;
+            }
             this.isStandard = knownTuning.isStandard;
         }
-        this.name = this.name.trim();
     }
 }
 

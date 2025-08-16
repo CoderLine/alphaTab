@@ -1,76 +1,76 @@
-import { LayoutMode } from '@src/LayoutMode';
-import { StaveProfile } from '@src/StaveProfile';
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { VersionInfo } from '@src/generated/VersionInfo';
 import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { CapellaImporter } from '@src/importer/CapellaImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { GpxImporter } from '@src/importer/GpxImporter';
 import { MusicXmlImporter } from '@src/importer/MusicXmlImporter';
 import type { ScoreImporter } from '@src/importer/ScoreImporter';
+import { LayoutMode } from '@src/LayoutMode';
+import { Logger } from '@src/Logger';
+import type { Font } from '@src/model/Font';
+import { GolpeType } from '@src/model/GolpeType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import type { ICanvas } from '@src/platform/ICanvas';
+import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
 import { AlphaSynthWebWorker } from '@src/platform/javascript/AlphaSynthWebWorker';
 import { AlphaTabWebWorker } from '@src/platform/javascript/AlphaTabWebWorker';
 import { Html5Canvas } from '@src/platform/javascript/Html5Canvas';
 import { JQueryAlphaTab } from '@src/platform/javascript/JQueryAlphaTab';
+import { WebPlatform } from '@src/platform/javascript/WebPlatform';
+import { SkiaCanvas } from '@src/platform/skia/SkiaCanvas';
 import { CssFontSvgCanvas } from '@src/platform/svg/CssFontSvgCanvas';
 import type { BarRendererFactory } from '@src/rendering/BarRendererFactory';
 import { EffectBarRendererFactory } from '@src/rendering/EffectBarRendererFactory';
 import { AlternateEndingsEffectInfo } from '@src/rendering/effects/AlternateEndingsEffectInfo';
+import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
+import { BeatTimerEffectInfo } from '@src/rendering/effects/BeatTimerEffectInfo';
 import { CapoEffectInfo } from '@src/rendering/effects/CapoEffectInfo';
 import { ChordsEffectInfo } from '@src/rendering/effects/ChordsEffectInfo';
 import { CrescendoEffectInfo } from '@src/rendering/effects/CrescendoEffectInfo';
+import { DirectionsEffectInfo } from '@src/rendering/effects/DirectionsEffectInfo';
 import { DynamicsEffectInfo } from '@src/rendering/effects/DynamicsEffectInfo';
 import { FadeEffectInfo } from '@src/rendering/effects/FadeEffectInfo';
 import { FermataEffectInfo } from '@src/rendering/effects/FermataEffectInfo';
 import { FingeringEffectInfo } from '@src/rendering/effects/FingeringEffectInfo';
+import { FreeTimeEffectInfo } from '@src/rendering/effects/FreeTimeEffectInfo';
+import { GolpeEffectInfo } from '@src/rendering/effects/GolpeEffectInfo';
 import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo';
+import { LeftHandTapEffectInfo } from '@src/rendering/effects/LeftHandTapEffectInfo';
 import { LetRingEffectInfo } from '@src/rendering/effects/LetRingEffectInfo';
 import { LyricsEffectInfo } from '@src/rendering/effects/LyricsEffectInfo';
 import { MarkerEffectInfo } from '@src/rendering/effects/MarkerEffectInfo';
+import { NoteOrnamentEffectInfo } from '@src/rendering/effects/NoteOrnamentEffectInfo';
 import { OttaviaEffectInfo } from '@src/rendering/effects/OttaviaEffectInfo';
 import { PalmMuteEffectInfo } from '@src/rendering/effects/PalmMuteEffectInfo';
 import { PickSlideEffectInfo } from '@src/rendering/effects/PickSlideEffectInfo';
 import { PickStrokeEffectInfo } from '@src/rendering/effects/PickStrokeEffectInfo';
+import { RasgueadoEffectInfo } from '@src/rendering/effects/RasgueadoEffectInfo';
 import { SlightBeatVibratoEffectInfo } from '@src/rendering/effects/SlightBeatVibratoEffectInfo';
 import { SlightNoteVibratoEffectInfo } from '@src/rendering/effects/SlightNoteVibratoEffectInfo';
+import { SustainPedalEffectInfo } from '@src/rendering/effects/SustainPedalEffectInfo';
 import { TapEffectInfo } from '@src/rendering/effects/TapEffectInfo';
 import { TempoEffectInfo } from '@src/rendering/effects/TempoEffectInfo';
 import { TextEffectInfo } from '@src/rendering/effects/TextEffectInfo';
 import { TrillEffectInfo } from '@src/rendering/effects/TrillEffectInfo';
 import { TripletFeelEffectInfo } from '@src/rendering/effects/TripletFeelEffectInfo';
+import { WahPedalEffectInfo } from '@src/rendering/effects/WahPedalEffectInfo';
 import { WhammyBarEffectInfo } from '@src/rendering/effects/WhammyBarEffectInfo';
 import { WideBeatVibratoEffectInfo } from '@src/rendering/effects/WideBeatVibratoEffectInfo';
 import { WideNoteVibratoEffectInfo } from '@src/rendering/effects/WideNoteVibratoEffectInfo';
 import { HorizontalScreenLayout } from '@src/rendering/layout/HorizontalScreenLayout';
 import { PageViewLayout } from '@src/rendering/layout/PageViewLayout';
 import type { ScoreLayout } from '@src/rendering/layout/ScoreLayout';
+import { NumberedBarRendererFactory } from '@src/rendering/NumberedBarRendererFactory';
+import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { ScoreBarRendererFactory } from '@src/rendering/ScoreBarRendererFactory';
 import type { ScoreRenderer } from '@src/rendering/ScoreRenderer';
-import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
-import { Logger } from '@src/Logger';
-import { LeftHandTapEffectInfo } from '@src/rendering/effects/LeftHandTapEffectInfo';
-import { CapellaImporter } from '@src/importer/CapellaImporter';
-import { WebPlatform } from '@src/platform/javascript/WebPlatform';
-import { AlphaSynthWebWorklet } from '@src/platform/javascript/AlphaSynthAudioWorkletOutput';
-import { SkiaCanvas } from '@src/platform/skia/SkiaCanvas';
-import type { Font } from '@src/model/Font';
-import type { Settings } from '@src/Settings';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { SlashBarRendererFactory } from '@src/rendering/SlashBarRendererFactory';
-import { NumberedBarRendererFactory } from '@src/rendering/NumberedBarRendererFactory';
-import { FreeTimeEffectInfo } from '@src/rendering/effects/FreeTimeEffectInfo';
-import { ScoreBarRenderer } from '@src/rendering/ScoreBarRenderer';
 import { TabBarRenderer } from '@src/rendering/TabBarRenderer';
-import { SustainPedalEffectInfo } from '@src/rendering/effects/SustainPedalEffectInfo';
-import { GolpeEffectInfo } from '@src/rendering/effects/GolpeEffectInfo';
-import { GolpeType } from '@src/model/GolpeType';
-import { WahPedalEffectInfo } from '@src/rendering/effects/WahPedalEffectInfo';
-import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
-import { NoteOrnamentEffectInfo } from '@src/rendering/effects/NoteOrnamentEffectInfo';
-import { RasgueadoEffectInfo } from '@src/rendering/effects/RasgueadoEffectInfo';
-import { DirectionsEffectInfo } from '@src/rendering/effects/DirectionsEffectInfo';
-import { BeatTimerEffectInfo } from '@src/rendering/effects/BeatTimerEffectInfo';
-import { VersionInfo } from '@src/generated/VersionInfo';
+import { TabBarRendererFactory } from '@src/rendering/TabBarRendererFactory';
+import type { Settings } from '@src/Settings';
+import { StaveProfile } from '@src/StaveProfile';
 
 /**
  * A factory for custom layout engines.
@@ -837,5 +837,14 @@ export class Environment {
         // alternative for users is to replace this method during runtime.
 
         return object;
+    }
+
+    /**
+     * @internal
+     * @partial
+     * @target web
+     */
+    public static quoteString(text: string) {
+        return JSON.stringify(text);
     }
 }

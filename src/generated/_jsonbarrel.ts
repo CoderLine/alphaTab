@@ -8,6 +8,7 @@ export type { RenderingResourcesJson } from "@src/generated/RenderingResourcesJs
 export type { DisplaySettingsJson } from "@src/generated/DisplaySettingsJson";
 export type { EngravingStemInfoJson } from "@src/generated/EngravingStemInfoJson";
 export type { EngravingSettingsJson } from "@src/generated/EngravingSettingsJson";
+export type { ExporterSettingsJson } from "@src/generated/ExporterSettingsJson";
 export type { ImporterSettingsJson } from "@src/generated/ImporterSettingsJson";
 export type { NotationSettingsJson } from "@src/generated/NotationSettingsJson";
 export type { VibratoPlaybackSettingsJson } from "@src/generated/VibratoPlaybackSettingsJson";

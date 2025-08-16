@@ -148,11 +148,357 @@ enum AlphaTexAccidentalMode {
     Explicit = 1
 }
 
+export class AlphaTexLexer {
+    private static readonly Eof: number = 0;
+
+    private _curChPos: number = 0;
+    private _line: number = 1;
+    private _col: number = 0;
+
+    private _input: string = '';
+    private _ch: number = AlphaTexLexer.Eof;
+
+    public sy: AlphaTexSymbols = AlphaTexSymbols.No;
+    public syData: unknown = '';
+
+    public lastValidSpot: number[] = [0, 1, 0];
+
+    public allowTuning: boolean = false;
+    public logErrors: boolean = true;
+
+    public constructor(input: string) {
+        this._input = input;
+    }
+
+    public init(allowFloats: boolean = false) {
+        this._curChPos = 0;
+        this._line = 1;
+        this._col = 0;
+        this.saveValidSpot();
+
+        this._ch = this.nextChar();
+        this.sy = this.newSy(allowFloats);
+    }
+
+    /**
+     * Saves the current position, line, and column.
+     * All parsed data until this point is assumed to be valid.
+     */
+    private saveValidSpot(): void {
+        this.lastValidSpot = [this._curChPos, this._line, this._col];
+    }
+
+    /**
+     * Reads, saves, and returns the next character of the source stream.
+     */
+    private nextChar(): number {
+        if (this._curChPos < this._input.length) {
+            this._ch = this._input.charCodeAt(this._curChPos++);
+            // line/col countingF
+            if (this._ch === 0x0a /* \n */) {
+                this._line++;
+                this._col = 0;
+            } else {
+                this._col++;
+            }
+        } else {
+            this._ch = AlphaTexLexer.Eof;
+        }
+        return this._ch;
+    }
+
+    /**
+     * Reads, saves, and returns the next terminal symbol.
+     */
+    public newSy(allowFloats: boolean = false): AlphaTexSymbols {
+        // When a new symbol is read, the previous one is assumed to be valid.
+        // The valid spot is also moved forward when reading past whitespace or comments.
+        this.saveValidSpot();
+        this.sy = AlphaTexSymbols.No;
+        while (this.sy === AlphaTexSymbols.No) {
+            this.syData = null;
+
+            if (this._ch === AlphaTexLexer.Eof) {
+                this.sy = AlphaTexSymbols.Eof;
+            } else if (AlphaTexLexer.isWhiteSpace(this._ch)) {
+                // skip whitespaces
+                this._ch = this.nextChar();
+                this.saveValidSpot();
+            } else if (this._ch === 0x2f /* / */) {
+                this._ch = this.nextChar();
+                if (this._ch === 0x2f /* / */) {
+                    // single line comment
+                    while (this._ch !== 0x0d /* \r */ && this._ch !== 0x0a /* \n */ && this._ch !== AlphaTexLexer.Eof) {
+                        this._ch = this.nextChar();
+                    }
+                } else if (this._ch === 0x2a /* * */) {
+                    // multiline comment
+                    while (this._ch !== AlphaTexLexer.Eof) {
+                        if (this._ch === 0x2a /* * */) {
+                            this._ch = this.nextChar();
+                            if (this._ch === 0x2f /* / */) {
+                                this._ch = this.nextChar();
+                                break;
+                            }
+                        } else {
+                            this._ch = this.nextChar();
+                        }
+                    }
+                } else {
+                    this.errorMessage(`Unexpected character ${String.fromCharCode(this._ch)}`);
+                }
+                this.saveValidSpot();
+            } else if (this._ch === 0x22 /* " */ || this._ch === 0x27 /* ' */) {
+                const startChar: number = this._ch;
+                this._ch = this.nextChar();
+                let s: string = '';
+                this.sy = AlphaTexSymbols.String;
+                while (this._ch !== startChar && this._ch !== AlphaTexLexer.Eof) {
+                    // escape sequences
+                    if (this._ch === 0x5c /* \ */) {
+                        this._ch = this.nextChar();
+                        if (this._ch === 0x5c /* \\ */) {
+                            s += '\\';
+                        } else if (this._ch === startChar /* \<startchar> */) {
+                            s += String.fromCharCode(this._ch);
+                        } else if (this._ch === 0x52 /* \R */ || this._ch === 0x72 /* \r */) {
+                            s += '\r';
+                        } else if (this._ch === 0x4e /* \N */ || this._ch === 0x6e /* \n */) {
+                            s += '\n';
+                        } else if (this._ch === 0x54 /* \T */ || this._ch === 0x74 /* \t */) {
+                            s += '\t';
+                        } else {
+                            this.errorMessage('Unsupported escape sequence');
+                        }
+                    } else {
+                        s += String.fromCharCode(this._ch);
+                    }
+                    this._ch = this.nextChar();
+                }
+                if (this._ch === AlphaTexLexer.Eof) {
+                    this.errorMessage('String opened but never closed');
+                }
+                this.syData = s;
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x2d /* - */) {
+                this.readNumberOrName(allowFloats);
+            } else if (this._ch === 0x2e /* . */) {
+                this.sy = AlphaTexSymbols.Dot;
+                this.syData = '.';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x3a /* : */) {
+                this.sy = AlphaTexSymbols.DoubleDot;
+                this.syData = ':';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x28 /* ( */) {
+                this.sy = AlphaTexSymbols.LParensis;
+                this._ch = this.nextChar();
+                this.syData = '(';
+            } else if (this._ch === 0x5c /* \ */) {
+                this._ch = this.nextChar();
+                this.sy = AlphaTexSymbols.MetaCommand;
+                // allow double backslash (easier to test when copying from escaped Strings)
+                if (this._ch === 0x5c /* \ */) {
+                    this._ch = this.nextChar();
+                }
+
+                this.syData = this.readName();
+            } else if (this._ch === 0x29 /* ) */) {
+                this.sy = AlphaTexSymbols.RParensis;
+                this.syData = ')';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x7b /* { */) {
+                this.sy = AlphaTexSymbols.LBrace;
+                this.syData = '{';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x7d /* } */) {
+                this.sy = AlphaTexSymbols.RBrace;
+                this.syData = '}';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x7c /* | */) {
+                this.sy = AlphaTexSymbols.Pipe;
+                this.syData = '|';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x2a /* * */) {
+                this.sy = AlphaTexSymbols.Multiply;
+                this.syData = '*';
+                this._ch = this.nextChar();
+            } else if (this._ch === 0x3c /* < */) {
+                this.sy = AlphaTexSymbols.LowerThan;
+                this.syData = '<';
+                this._ch = this.nextChar();
+            } else if (AlphaTexLexer.isDigit(this._ch)) {
+                this.readNumberOrName(allowFloats);
+            } else if (AlphaTexLexer.isNameLetter(this._ch)) {
+                const name: string = this.readName();
+                const tuning: TuningParseResult | null = this.allowTuning ? ModelUtils.parseTuning(name) : null;
+                if (tuning) {
+                    this.sy = AlphaTexSymbols.Tuning;
+                    this.syData = tuning;
+                } else {
+                    this.sy = AlphaTexSymbols.String;
+                    this.syData = name;
+                }
+            } else {
+                this.errorMessage(`Unexpected character ${String.fromCharCode(this._ch)}`);
+            }
+        }
+        return this.sy;
+    }
+
+    private errorMessage(message: string): void {
+        const e: AlphaTexError = AlphaTexError.errorMessage(
+            message,
+            this.lastValidSpot[0],
+            this.lastValidSpot[1],
+            this.lastValidSpot[2]
+        );
+        if (this.logErrors) {
+            Logger.error('AlphaTex', e.message!);
+        }
+        throw e;
+    }
+
+    private readNumberOrName(allowFloat: boolean) {
+        let str: string = '';
+
+        // assume number at start
+        this.sy = AlphaTexSymbols.Number;
+
+        // negative start or dash
+        if (this._ch === 0x2d) {
+            str += String.fromCharCode(this._ch);
+            this._ch = this.nextChar();
+
+            // need a number afterwards otherwise we have a string(-)
+            if (!AlphaTexLexer.isDigit(this._ch)) {
+                this.sy = AlphaTexSymbols.String;
+            }
+        }
+
+        let keepReading = true;
+
+        let hasDot = false;
+        do {
+            switch (this.sy) {
+                case AlphaTexSymbols.Number:
+                    // adding digits to the number
+                    if (AlphaTexLexer.isDigit(this._ch)) {
+                        str += String.fromCharCode(this._ch);
+                        this._ch = this.nextChar();
+                        keepReading = true;
+                    }
+                    // adding a dot to the number (expecting digit after dot)
+                    else if (
+                        allowFloat &&
+                        !hasDot &&
+                        this._ch === 0x2e /* . */ &&
+                        AlphaTexLexer.isDigit(this._input.charCodeAt(this._curChPos))
+                    ) {
+                        str += String.fromCharCode(this._ch);
+                        this._ch = this.nextChar();
+                        keepReading = true;
+                        hasDot = true;
+                    }
+                    // letter in number -> fallback to name reading
+                    else if (AlphaTexLexer.isNameLetter(this._ch)) {
+                        this.sy = AlphaTexSymbols.String;
+                        str += String.fromCharCode(this._ch);
+                        this._ch = this.nextChar();
+                        keepReading = true;
+                    }
+                    // general unknown character -> end reading
+                    else {
+                        keepReading = false;
+                    }
+                    break;
+                case AlphaTexSymbols.String:
+                    if (AlphaTexLexer.isNameLetter(this._ch)) {
+                        str += String.fromCharCode(this._ch);
+                        this._ch = this.nextChar();
+                        keepReading = true;
+                    } else {
+                        keepReading = false;
+                    }
+                    break;
+                default:
+                    keepReading = false; // should never happen
+                    break;
+            }
+        } while (keepReading);
+
+        if (str.length === 0) {
+            this.errorMessage('number was empty');
+        }
+
+        if (this.sy === AlphaTexSymbols.String) {
+            this.syData = str;
+        } else {
+            this.syData = allowFloat ? Number.parseFloat(str) : Number.parseInt(str);
+        }
+        return;
+    }
+
+    /**
+     * Reads a string from the stream.
+     * @returns the read string.
+     */
+    private readName(): string {
+        let str: string = '';
+        do {
+            str += String.fromCharCode(this._ch);
+            this._ch = this.nextChar();
+        } while (AlphaTexLexer.isNameLetter(this._ch) || AlphaTexLexer.isDigit(this._ch) || this._ch === 0x2d /*-*/);
+        return str;
+    }
+
+    /**
+     * Checks if the given character is a valid letter for a name.
+     * (no control characters, whitespaces, numbers or dots)
+     */
+    private static isNameLetter(ch: number): boolean {
+        return (
+            !AlphaTexLexer.isTerminal(ch) && // no control characters, whitespaces, numbers or dots
+            ((0x21 <= ch && ch <= 0x2f) || (0x3a <= ch && ch <= 0x7e) || 0x80 <= ch) // Unicode Symbols
+        );
+    }
+
+    private static isTerminal(ch: number): boolean {
+        return (
+            ch === 0x2e /* . */ ||
+            ch === 0x7b /* { */ ||
+            ch === 0x7d /* } */ ||
+            ch === 0x5b /* [ */ ||
+            ch === 0x5d /* ] */ ||
+            ch === 0x28 /* ( */ ||
+            ch === 0x29 /* ) */ ||
+            ch === 0x7c /* | */ ||
+            ch === 0x27 /* ' */ ||
+            ch === 0x22 /* " */ ||
+            ch === 0x2a /* * */ ||
+            ch === 0x5c /* \ */
+        );
+    }
+
+    private static isWhiteSpace(ch: number): boolean {
+        return (
+            ch === 0x09 /* \t */ ||
+            ch === 0x0a /* \n */ ||
+            ch === 0x0b /* \v */ ||
+            ch === 0x0d /* \r */ ||
+            ch === 0x20 /* space */
+        );
+    }
+
+    private static isDigit(ch: number): boolean {
+        return ch >= 0x30 && ch <= 0x39 /* 0-9 */;
+    }
+}
+
 /**
  * This importer can parse alphaTex markup into a score structure.
  */
 export class AlphaTexImporter extends ScoreImporter {
-    private static readonly Eof: number = 0;
     private _trackChannel: number = 0;
     private _score!: Score;
     private _currentTrack!: Track;
@@ -161,19 +507,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _barIndex: number = 0;
     private _voiceIndex: number = 0;
 
-    private _input: string = '';
-    private _ch: number = AlphaTexImporter.Eof;
-    // Keeps track of where in input string we are
-    private _curChPos: number = 0;
-    private _line: number = 1;
-    private _col: number = 0;
     // Last known position that had valid syntax/symbols
-    private _lastValidSpot: number[] = [0, 1, 0];
-    private _sy: AlphaTexSymbols = AlphaTexSymbols.No;
-    private _syData: unknown = '';
-    private _allowNegatives: boolean = false;
-    private _allowFloat: boolean = false;
-    private _allowTuning: boolean = false;
     private _currentDuration: Duration = Duration.QuadrupleWhole;
     private _currentDynamics: DynamicValue = DynamicValue.PPP;
     private _currentTuplet: number = 0;
@@ -191,10 +525,12 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private _articulationValueToIndex = new Map<number, number>();
 
+    private _lexer!: AlphaTexLexer;
+
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
     private _syncPoints: FlatSyncPoint[] = [];
 
-    public logErrors: boolean = false;
+    public logErrors: boolean = true;
 
     public get name(): string {
         return 'AlphaTex';
@@ -202,31 +538,47 @@ export class AlphaTexImporter extends ScoreImporter {
 
     public initFromString(tex: string, settings: Settings) {
         this.data = ByteBuffer.empty();
-        this._input = tex;
+        this._lexer = new AlphaTexLexer(tex);
         this.settings = settings;
         // when beginning reading a new score we reset the IDs.
         Score.resetIds();
     }
 
+    private get _sy() {
+        return this._lexer.sy;
+    }
+
+    private get _syData() {
+        return this._lexer.syData;
+    }
+
+    private set _sy(v: AlphaTexSymbols) {
+        this._lexer.sy = v;
+    }
+
+    private newSy(allowFloat: boolean = false) {
+        return this._lexer.newSy(allowFloat);
+    }
+
     public readScore(): Score {
         try {
             if (this.data.length > 0) {
-                this._input = IOHelper.toString(this.data.readAll(), this.settings.importer.encoding);
+                this._lexer = new AlphaTexLexer(
+                    IOHelper.toString(this.data.readAll(), this.settings.importer.encoding)
+                );
             }
-            this._allowTuning = true;
+            this._lexer.logErrors = this.logErrors;
+
+            this._lexer.allowTuning = true;
             this._lyrics = new Map<number, Lyrics[]>();
             this._sustainPedalToBeat = new Map<SustainPedalMarker, Beat>();
 
+            this._lexer.init();
+
             this.createDefaultScore();
-            this._curChPos = 0;
-            this._line = 1;
-            this._col = 0;
-            this.saveValidSpot();
             this._currentDuration = Duration.Quarter;
             this._currentDynamics = DynamicValue.F;
             this._currentTuplet = 1;
-            this._ch = this.nextChar();
-            this._sy = this.newSy();
             if (this._sy === AlphaTexSymbols.LowerThan) {
                 // potential XML, stop parsing (alphaTex never starts with <)
                 throw new UnsupportedFormatError("Unknown start sign '<' (meant to import as XML?)");
@@ -298,9 +650,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         const millisecondOffset = this._syData as number;
 
-        this._allowFloat = true;
-        this._sy = this.newSy();
-        this._allowFloat = false;
+        this._sy = this.newSy(true);
         let barPosition = 0;
         if (this._sy === AlphaTexSymbols.Number) {
             barPosition = this._syData as number;
@@ -332,11 +682,12 @@ export class AlphaTexImporter extends ScoreImporter {
             }
         } else {
             receivedSymbol = expected;
+            showSyData = true;
         }
         const e = AlphaTexError.symbolError(
-            this._lastValidSpot[0],
-            this._lastValidSpot[1],
-            this._lastValidSpot[2],
+            this._lexer.lastValidSpot[0],
+            this._lexer.lastValidSpot[1],
+            this._lexer.lastValidSpot[2],
             nonterm,
             expected,
             receivedSymbol,
@@ -351,9 +702,9 @@ export class AlphaTexImporter extends ScoreImporter {
     private errorMessage(message: string): void {
         const e: AlphaTexError = AlphaTexError.errorMessage(
             message,
-            this._lastValidSpot[0],
-            this._lastValidSpot[1],
-            this._lastValidSpot[2]
+            this._lexer.lastValidSpot[0],
+            this._lexer.lastValidSpot[1],
+            this._lexer.lastValidSpot[2]
         );
         if (this.logErrors) {
             Logger.error(this.name, e.message!);
@@ -442,24 +793,31 @@ export class AlphaTexImporter extends ScoreImporter {
         switch (str.toLowerCase()) {
             case 'no':
             case 'none':
+            case 'notripletfeel':
                 return TripletFeel.NoTripletFeel;
             case 't16':
             case 'triplet-16th':
+            case 'triplet16th':
                 return TripletFeel.Triplet16th;
             case 't8':
             case 'triplet-8th':
+            case 'triplet8th':
                 return TripletFeel.Triplet8th;
             case 'd16':
             case 'dotted-16th':
+            case 'dotted16th':
                 return TripletFeel.Dotted16th;
             case 'd8':
             case 'dotted-8th':
+            case 'dotted8th':
                 return TripletFeel.Dotted8th;
             case 's16':
             case 'scottish-16th':
+            case 'scottish16th':
                 return TripletFeel.Scottish16th;
             case 's8':
             case 'scottish-8th':
+            case 'scottish8th':
                 return TripletFeel.Scottish8th;
             default:
                 return TripletFeel.NoTripletFeel;
@@ -567,253 +925,6 @@ export class AlphaTexImporter extends ScoreImporter {
         return KeySignatureType.Major;
     }
 
-    /**
-     * Reads, saves, and returns the next character of the source stream.
-     */
-    private nextChar(): number {
-        if (this._curChPos < this._input.length) {
-            this._ch = this._input.charCodeAt(this._curChPos++);
-            // line/col countingF
-            if (this._ch === 0x0a /* \n */) {
-                this._line++;
-                this._col = 0;
-            } else {
-                this._col++;
-            }
-        } else {
-            this._ch = AlphaTexImporter.Eof;
-        }
-        return this._ch;
-    }
-
-    /**
-     * Saves the current position, line, and column.
-     * All parsed data until this point is assumed to be valid.
-     */
-    private saveValidSpot(): void {
-        this._lastValidSpot = [this._curChPos, this._line, this._col];
-    }
-
-    /**
-     * Reads, saves, and returns the next terminal symbol.
-     */
-    private newSy(): AlphaTexSymbols {
-        // When a new symbol is read, the previous one is assumed to be valid.
-        // The valid spot is also moved forward when reading past whitespace or comments.
-        this.saveValidSpot();
-        this._sy = AlphaTexSymbols.No;
-        while (this._sy === AlphaTexSymbols.No) {
-            if (this._ch === AlphaTexImporter.Eof) {
-                this._sy = AlphaTexSymbols.Eof;
-            } else if (AlphaTexImporter.isWhiteSpace(this._ch)) {
-                // skip whitespaces
-                this._ch = this.nextChar();
-                this.saveValidSpot();
-            } else if (this._ch === 0x2f /* / */) {
-                this._ch = this.nextChar();
-                if (this._ch === 0x2f /* / */) {
-                    // single line comment
-                    while (
-                        this._ch !== 0x0d /* \r */ &&
-                        this._ch !== 0x0a /* \n */ &&
-                        this._ch !== AlphaTexImporter.Eof
-                    ) {
-                        this._ch = this.nextChar();
-                    }
-                } else if (this._ch === 0x2a /* * */) {
-                    // multiline comment
-                    while (this._ch !== AlphaTexImporter.Eof) {
-                        if (this._ch === 0x2a /* * */) {
-                            this._ch = this.nextChar();
-                            if (this._ch === 0x2f /* / */) {
-                                this._ch = this.nextChar();
-                                break;
-                            }
-                        } else {
-                            this._ch = this.nextChar();
-                        }
-                    }
-                } else {
-                    this.error('comment', AlphaTexSymbols.String, false);
-                }
-                this.saveValidSpot();
-            } else if (this._ch === 0x22 /* " */ || this._ch === 0x27 /* ' */) {
-                const startChar: number = this._ch;
-                this._ch = this.nextChar();
-                let s: string = '';
-                this._sy = AlphaTexSymbols.String;
-                while (this._ch !== startChar && this._ch !== AlphaTexImporter.Eof) {
-                    // escape sequences
-                    if (this._ch === 0x5c /* \ */) {
-                        this._ch = this.nextChar();
-                        if (this._ch === 0x5c /* \\ */) {
-                            s += '\\';
-                        } else if (this._ch === startChar /* \<startchar> */) {
-                            s += String.fromCharCode(this._ch);
-                        } else if (this._ch === 0x52 /* \R */ || this._ch === 0x72 /* \r */) {
-                            s += '\r';
-                        } else if (this._ch === 0x4e /* \N */ || this._ch === 0x6e /* \n */) {
-                            s += '\n';
-                        } else if (this._ch === 0x54 /* \T */ || this._ch === 0x74 /* \t */) {
-                            s += '\t';
-                        } else {
-                            this.errorMessage('Unsupported escape sequence');
-                        }
-                    } else {
-                        s += String.fromCharCode(this._ch);
-                    }
-                    this._ch = this.nextChar();
-                }
-                if (this._ch === AlphaTexImporter.Eof) {
-                    this.errorMessage('String opened but never closed');
-                }
-                this._syData = s;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x2d /* - */) {
-                // negative number
-                // is number?
-                if (this._allowNegatives) {
-                    this.readNumberOrName();
-                } else {
-                    this._sy = AlphaTexSymbols.String;
-                    this._syData = this.readName();
-                }
-            } else if (this._ch === 0x2e /* . */) {
-                this._sy = AlphaTexSymbols.Dot;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x3a /* : */) {
-                this._sy = AlphaTexSymbols.DoubleDot;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x28 /* ( */) {
-                this._sy = AlphaTexSymbols.LParensis;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x5c /* \ */) {
-                this._ch = this.nextChar();
-                this._sy = AlphaTexSymbols.MetaCommand;
-                // allow double backslash (easier to test when copying from escaped Strings)
-                if (this._ch === 0x5c /* \ */) {
-                    this._ch = this.nextChar();
-                }
-
-                this._syData = this.readName();
-            } else if (this._ch === 0x29 /* ) */) {
-                this._sy = AlphaTexSymbols.RParensis;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x7b /* { */) {
-                this._sy = AlphaTexSymbols.LBrace;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x7d /* } */) {
-                this._sy = AlphaTexSymbols.RBrace;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x7c /* | */) {
-                this._sy = AlphaTexSymbols.Pipe;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x2a /* * */) {
-                this._sy = AlphaTexSymbols.Multiply;
-                this._ch = this.nextChar();
-            } else if (this._ch === 0x3c /* < */) {
-                this._sy = AlphaTexSymbols.LowerThan;
-                this._ch = this.nextChar();
-            } else if (this.isDigit(this._ch)) {
-                this.readNumberOrName();
-            } else if (AlphaTexImporter.isNameLetter(this._ch)) {
-                const name: string = this.readName();
-                const tuning: TuningParseResult | null = this._allowTuning ? ModelUtils.parseTuning(name) : null;
-                if (tuning) {
-                    this._sy = AlphaTexSymbols.Tuning;
-                    this._syData = tuning;
-                } else {
-                    this._sy = AlphaTexSymbols.String;
-                    this._syData = name;
-                }
-            } else {
-                this.error('symbol', AlphaTexSymbols.String, false);
-            }
-        }
-        return this._sy;
-    }
-
-    private readNumberOrName() {
-        let str: string = '';
-        let isNumber = true;
-
-        do {
-            str += String.fromCharCode(this._ch);
-            if (!this.isDigit(this._ch)) {
-                isNumber = false;
-            }
-
-            this._ch = this.nextChar();
-        } while (this.isDigit(this._ch) || AlphaTexImporter.isNameLetter(this._ch));
-
-        if (isNumber) {
-            this._sy = AlphaTexSymbols.Number;
-            this._syData = this._allowFloat ? Number.parseFloat(str) : Number.parseInt(str);
-        } else {
-            this._sy = AlphaTexSymbols.String;
-            this._syData = str;
-        }
-    }
-
-    /**
-     * Checks if the given character is a valid letter for a name.
-     * (no control characters, whitespaces, numbers or dots)
-     */
-    private static isNameLetter(ch: number): boolean {
-        return (
-            !AlphaTexImporter.isTerminal(ch) && // no control characters, whitespaces, numbers or dots
-            ((0x21 <= ch && ch <= 0x2f) || (0x3a <= ch && ch <= 0x7e) || 0x80 <= ch) // Unicode Symbols
-        );
-    }
-
-    private static isTerminal(ch: number): boolean {
-        return (
-            ch === 0x2e /* . */ ||
-            ch === 0x7b /* { */ ||
-            ch === 0x7d /* } */ ||
-            ch === 0x5b /* [ */ ||
-            ch === 0x5d /* ] */ ||
-            ch === 0x28 /* ( */ ||
-            ch === 0x29 /* ) */ ||
-            ch === 0x7c /* | */ ||
-            ch === 0x27 /* ' */ ||
-            ch === 0x22 /* " */ ||
-            ch === 0x2a /* * */ ||
-            ch === 0x5c /* \ */
-        );
-    }
-
-    private static isWhiteSpace(ch: number): boolean {
-        return (
-            ch === 0x09 /* \t */ ||
-            ch === 0x0a /* \n */ ||
-            ch === 0x0b /* \v */ ||
-            ch === 0x0d /* \r */ ||
-            ch === 0x20 /* space */
-        );
-    }
-
-    private isDigit(ch: number): boolean {
-        return (
-            (ch >= 0x30 && ch <= 0x39) /* 0-9 */ ||
-            (this._allowNegatives && ch === 0x2d) /* - */ || // allow minus sign if negatives
-            (this._allowFloat && ch === 0x2e) /* . */ // allow dot if float
-        );
-    }
-
-    /**
-     * Reads a string from the stream.
-     * @returns the read string.
-     */
-    private readName(): string {
-        let str: string = '';
-        do {
-            str += String.fromCharCode(this._ch);
-            this._ch = this.nextChar();
-        } while (AlphaTexImporter.isNameLetter(this._ch) || this.isDigit(this._ch));
-        return str;
-    }
-
     private metaData(): boolean {
         let anyTopLevelMeta = false;
         let anyOtherMeta = false;
@@ -908,9 +1019,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     anyTopLevelMeta = true;
                     break;
                 case 'tempo':
-                    this._allowFloat = true;
-                    this._sy = this.newSy();
-                    this._allowFloat = false;
+                    this._sy = this.newSy(true);
                     if (this._sy === AlphaTexSymbols.Number) {
                         this._score.tempo = this._syData as number;
                     } else {
@@ -1169,12 +1278,22 @@ export class AlphaTexImporter extends ScoreImporter {
                         break;
                 }
 
-                if (this._sy === AlphaTexSymbols.String && (this._syData as string).toLowerCase() === 'hide') {
-                    if (!this._score.stylesheet.perTrackDisplayTuning) {
-                        this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
+                if (this._sy === AlphaTexSymbols.String) {
+                    if ((this._syData as string).toLowerCase() === 'hide') {
+                        if (!this._score.stylesheet.perTrackDisplayTuning) {
+                            this._score.stylesheet.perTrackDisplayTuning = new Map<number, boolean>();
+                        }
+                        this._score.stylesheet.perTrackDisplayTuning!.set(this._currentTrack.index, false);
+                        this._sy = this.newSy();
+
+                        if (this._sy === AlphaTexSymbols.String) {
+                            this._currentStaff.stringTuning.name = this._syData as string;
+                            this._sy = this.newSy();
+                        }
+                    } else {
+                        this._currentStaff.stringTuning.name = this._syData as string;
+                        this._sy = this.newSy();
                     }
-                    this._score.stylesheet.perTrackDisplayTuning!.set(this._currentTrack.index, false);
-                    this._sy = this.newSy();
                 }
 
                 if (strings !== this._currentStaff.tuning.length && (this._currentStaff.chords?.size ?? 0) > 0) {
@@ -1286,7 +1405,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 this.handleAccidentalMode();
                 return StaffMetaResult.KnownStaffMeta;
             case 'displaytranspose':
-                this._allowNegatives = true;
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
                     this._currentStaff.displayTranspositionPitch = (this._syData as number) * -1;
@@ -1294,18 +1412,15 @@ export class AlphaTexImporter extends ScoreImporter {
                 } else {
                     this.error('displaytranspose', AlphaTexSymbols.Number, true);
                 }
-                this._allowNegatives = false;
                 this._sy = this.newSy();
                 return StaffMetaResult.KnownStaffMeta;
             case 'transpose':
-                this._allowNegatives = true;
                 this._sy = this.newSy();
                 if (this._sy === AlphaTexSymbols.Number) {
                     this._currentStaff.transpositionPitch = (this._syData as number) * -1;
                 } else {
                     this.error('transpose', AlphaTexSymbols.Number, true);
                 }
-                this._allowNegatives = false;
                 this._sy = this.newSy();
                 return StaffMetaResult.KnownStaffMeta;
             case 'track':
@@ -1359,6 +1474,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private applyPercussionStaff(staff: Staff) {
         staff.isPercussion = true;
         staff.showTablature = false;
+        staff.track.playbackInfo.program = 0;
     }
 
     private chordProperties(chord: Chord): void {
@@ -1524,7 +1640,9 @@ export class AlphaTexImporter extends ScoreImporter {
         if (
             this._voiceIndex === 0 &&
             (this._currentStaff.bars.length === 0 ||
-                (this._currentStaff.bars.length === 1 && this._currentStaff.bars[0].isEmpty && !this._ignoredInitialVoice))
+                (this._currentStaff.bars.length === 1 &&
+                    this._currentStaff.bars[0].isEmpty &&
+                    !this._ignoredInitialVoice))
         ) {
             // voice marker on the begining of the first voice without any bar yet?
             // -> ignore
@@ -1747,13 +1865,9 @@ export class AlphaTexImporter extends ScoreImporter {
 
         // display transposition
         if (!this._staffDisplayTranspositionApplied && !this._staffHasExplicitDisplayTransposition) {
-            if (
-                (program >= 24 && program <= 31) || // Guitar
-                (program >= 32 && program <= 39) || // Bass
-                program === 43 // Contrabass
-            ) {
+            if (ModelUtils.displayTranspositionPitches.has(program)) {
                 // guitar E4 B3 G3 D3 A2 E2
-                this._currentStaff.displayTranspositionPitch = -12;
+                this._currentStaff.displayTranspositionPitch = ModelUtils.displayTranspositionPitches.get(program)!;
             } else {
                 this._currentStaff.displayTranspositionPitch = 0;
             }
@@ -1808,6 +1922,10 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         this._barIndex++;
 
+        if (newBar.index > 0) {
+            newBar.clef = newBar.previousBar!.clef;
+        }
+
         for (let i = 0; i < voiceCount; i++) {
             const voice: Voice = new Voice();
             newBar.addVoice(voice);
@@ -1823,14 +1941,14 @@ export class AlphaTexImporter extends ScoreImporter {
         const beat: Beat = new Beat();
         voice.addBeat(beat);
 
-        this._allowTuning = !this._currentStaff.isPercussion;
+        this._lexer.allowTuning = !this._currentStaff.isPercussion;
 
         // notes
         if (this._sy === AlphaTexSymbols.LParensis) {
             this._sy = this.newSy();
             this.note(beat);
             while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
-                this._allowTuning = !this._currentStaff.isPercussion;
+                this._lexer.allowTuning = !this._currentStaff.isPercussion;
                 if (!this.note(beat)) {
                     break;
                 }
@@ -1850,9 +1968,7 @@ export class AlphaTexImporter extends ScoreImporter {
         }
         // new duration
         if (this._sy === AlphaTexSymbols.Dot) {
-            this._allowNegatives = true;
             this._sy = this.newSy();
-            this._allowNegatives = false;
             if (this._sy !== AlphaTexSymbols.Number) {
                 this.error('duration', AlphaTexSymbols.Number, true);
             }
@@ -1887,9 +2003,7 @@ export class AlphaTexImporter extends ScoreImporter {
         if (this._sy !== AlphaTexSymbols.DoubleDot) {
             return;
         }
-        this._allowNegatives = true;
         this._sy = this.newSy();
-        this._allowNegatives = false;
         if (this._sy !== AlphaTexSymbols.Number) {
             this.error('duration', AlphaTexSymbols.Number, true);
         }
@@ -2016,9 +2130,7 @@ export class AlphaTexImporter extends ScoreImporter {
             if (this._sy !== AlphaTexSymbols.LParensis) {
                 this.error('tremolobar-effect', AlphaTexSymbols.LParensis, true);
             }
-            this._allowNegatives = true;
-            this._allowFloat = true;
-            this._sy = this.newSy();
+            this._sy = this.newSy(true);
             while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
                 let offset: number = 0;
                 let value: number = 0;
@@ -2027,7 +2139,7 @@ export class AlphaTexImporter extends ScoreImporter {
                         this.error('tremolobar-effect', AlphaTexSymbols.Number, true);
                     }
                     offset = this._syData as number;
-                    this._sy = this.newSy();
+                    this._sy = this.newSy(true);
                     if (this._sy !== AlphaTexSymbols.Number) {
                         this.error('tremolobar-effect', AlphaTexSymbols.Number, true);
                     }
@@ -2040,7 +2152,7 @@ export class AlphaTexImporter extends ScoreImporter {
                     value = this._syData as number;
                 }
                 beat.addWhammyBarPoint(new BendPoint(offset, value));
-                this._sy = this.newSy();
+                this._sy = this.newSy(true);
             }
             if (beat.whammyBarPoints != null) {
                 while (beat.whammyBarPoints.length > 60) {
@@ -2059,8 +2171,6 @@ export class AlphaTexImporter extends ScoreImporter {
                     beat.whammyBarPoints.sort((a, b) => a.offset - b.offset);
                 }
             }
-            this._allowNegatives = false;
-            this._allowFloat = false;
             if (this._sy !== AlphaTexSymbols.RParensis) {
                 this.error('tremolobar-effect', AlphaTexSymbols.RParensis, true);
             }
@@ -2086,7 +2196,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 this._sy = this.newSy();
                 return true;
             }
-            // default to calcuated duration
+            // default to calculated duration
             beat.updateDurations();
             if (syData === 'bu' || syData === 'bd') {
                 beat.brushDuration = beat.playbackDuration / 4 / beat.notes.length;
@@ -2157,9 +2267,37 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.crescendo = CrescendoType.Decrescendo;
         } else if (syData === 'tempo') {
             // NOTE: playbackRatio is calculated on score finish when playback positions are known
-            const tempoAutomation = this.readTempoAutomation();
+            const tempoAutomation = this.readTempoAutomation(false);
             beat.automations.push(tempoAutomation);
             beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
+            return true;
+        } else if (syData === 'volume') {
+            // NOTE: playbackRatio is calculated on score finish when playback positions are known
+            this._sy = this.newSy();
+            if (this._sy !== AlphaTexSymbols.Number) {
+                this.error('volume', AlphaTexSymbols.Number, true);
+            }
+            const volumeAutomation: Automation = new Automation();
+            volumeAutomation.isLinear = true;
+            volumeAutomation.type = AutomationType.Volume;
+            volumeAutomation.value = this._syData as number;
+            this._sy = this.newSy();
+
+            beat.automations.push(volumeAutomation);
+            return true;
+        } else if (syData === 'balance') {
+            // NOTE: playbackRatio is calculated on score finish when playback positions are known
+            this._sy = this.newSy();
+            if (this._sy !== AlphaTexSymbols.Number) {
+                this.error('balance', AlphaTexSymbols.Number, true);
+            }
+            const balanceAutomation: Automation = new Automation();
+            balanceAutomation.isLinear = true;
+            balanceAutomation.type = AutomationType.Balance;
+            balanceAutomation.value = ModelUtils.clamp(this._syData as number, 0, 16);
+            this._sy = this.newSy();
+
+            beat.automations.push(balanceAutomation);
             return true;
         } else if (syData === 'tp') {
             this._sy = this.newSy();
@@ -2191,6 +2329,15 @@ export class AlphaTexImporter extends ScoreImporter {
             beat.voice.bar.sustainPedals.push(sustainPedal);
             this._sy = this.newSy();
             return true;
+        } else if (syData === 'sph') {
+            const sustainPedal = new SustainPedalMarker();
+            sustainPedal.pedalType = SustainPedalMarkerType.Hold;
+            // exact ratio position will be applied after .finish() when times are known
+            sustainPedal.ratioPosition = beat.voice.bar.sustainPedals.length;
+            this._sustainPedalToBeat.set(sustainPedal, beat);
+            beat.voice.bar.sustainPedals.push(sustainPedal);
+            this._sy = this.newSy();
+            return true;
         } else if (syData === 'spu') {
             const sustainPedal = new SustainPedalMarker();
             sustainPedal.pedalType = SustainPedalMarkerType.Up;
@@ -2214,7 +2361,7 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'ds') {
             beat.deadSlapped = true;
             this._sy = this.newSy();
-            if(beat.notes.length === 1 && beat.notes[0].isDead) {
+            if (beat.notes.length === 1 && beat.notes[0].isDead) {
                 beat.removeNote(beat.notes[0]);
             }
             return true;
@@ -2361,13 +2508,11 @@ export class AlphaTexImporter extends ScoreImporter {
             const fermata = new Fermata();
             fermata.type = this.parseFermataFromString(this._syData as string);
 
-            this._allowFloat = true;
-            this._sy = this.newSy();
+            this._sy = this.newSy(true);
             if (this._sy === AlphaTexSymbols.Number) {
                 fermata.length = this._syData as number;
-                this._sy = this.newSy();
+                this._sy = this.newSy(true);
             }
-            this._allowFloat = false;
 
             beat.fermata = fermata;
 
@@ -2644,7 +2789,13 @@ export class AlphaTexImporter extends ScoreImporter {
                 if (this._sy !== AlphaTexSymbols.LParensis) {
                     this.error('bend-effect', AlphaTexSymbols.LParensis, true);
                 }
-                this._sy = this.newSy();
+
+                if (exact) {
+                    // float on position
+                    this._sy = this.newSy(true);
+                } else {
+                    this._sy = this.newSy();
+                }
 
                 while (this._sy !== AlphaTexSymbols.RParensis && this._sy !== AlphaTexSymbols.Eof) {
                     let offset: number = 0;
@@ -2666,7 +2817,13 @@ export class AlphaTexImporter extends ScoreImporter {
                         value = this._syData as number;
                     }
                     note.addBendPoint(new BendPoint(offset, value));
-                    this._sy = this.newSy();
+
+                    if (exact) {
+                        // float on position
+                        this._sy = this.newSy(true);
+                    } else {
+                        this._sy = this.newSy();
+                    }
                 }
                 const points = note.bendPoints;
                 if (points != null) {
@@ -2743,6 +2900,9 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'v') {
                 this._sy = this.newSy();
                 note.vibrato = VibratoType.Slight;
+            } else if (syData === 'vw') {
+                this._sy = this.newSy();
+                note.vibrato = VibratoType.Wide;
             } else if (syData === 'sl') {
                 this._sy = this.newSy();
                 note.slideOutType = SlideOutType.Legato;
@@ -2796,7 +2956,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 note.isLetRing = true;
             } else if (syData === 'x') {
                 this._sy = this.newSy();
-                note.fret = 0;
                 note.isDead = true;
             } else if (syData === '-' || syData === 't') {
                 this._sy = this.newSy();
@@ -2875,15 +3034,11 @@ export class AlphaTexImporter extends ScoreImporter {
     }
 
     private harmonicValue(harmonicValue: number): number {
-        this._allowNegatives = true;
-        this._allowFloat = true;
-        this._sy = this.newSy();
+        this._sy = this.newSy(true);
         if (this._sy === AlphaTexSymbols.Number) {
             harmonicValue = this._syData as number;
-            this._sy = this.newSy();
+            this._sy = this.newSy(true);
         }
-        this._allowNegatives = false;
-        this._allowFloat = false;
         return harmonicValue;
     }
 
@@ -3062,7 +3217,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 this._sy = this.newSy();
             } else if (syData === 'tempo') {
-                const tempoAutomation = this.readTempoAutomation();
+                const tempoAutomation = this.readTempoAutomation(true);
+
                 master.tempoAutomations.push(tempoAutomation);
             } else if (syData === 'section') {
                 this._sy = this.newSy();
@@ -3082,9 +3238,9 @@ export class AlphaTexImporter extends ScoreImporter {
                 section.text = text;
                 master.section = section;
             } else if (syData === 'tf') {
-                this._allowTuning = false;
+                this._lexer.allowTuning = false;
                 this._sy = this.newSy();
-                this._allowTuning = true;
+                this._lexer.allowTuning = true;
                 switch (this._sy) {
                     case AlphaTexSymbols.String:
                         master.tripletFeel = this.parseTripletFeelFromString(this._syData as string);
@@ -3143,9 +3299,7 @@ export class AlphaTexImporter extends ScoreImporter {
                 bar.simileMark = this.parseSimileMarkFromString(this._syData as string);
                 this._sy = this.newSy();
             } else if (syData === 'scale') {
-                this._allowFloat = true;
-                this._sy = this.newSy();
-                this._allowFloat = false;
+                this._sy = this.newSy(true);
 
                 if (this._sy !== AlphaTexSymbols.Number) {
                     this.error('scale', AlphaTexSymbols.Number, true);
@@ -3163,6 +3317,39 @@ export class AlphaTexImporter extends ScoreImporter {
 
                 master.displayWidth = this._syData as number;
                 bar.displayWidth = this._syData as number;
+                this._sy = this.newSy();
+            } else if (syData === 'spd') {
+                const sustainPedal = new SustainPedalMarker();
+                sustainPedal.pedalType = SustainPedalMarkerType.Down;
+
+                this._sy = this.newSy(true);
+                if (this._sy !== AlphaTexSymbols.Number) {
+                    this.error('spd', AlphaTexSymbols.Number, true);
+                }
+                sustainPedal.ratioPosition = this._syData as number;
+                bar.sustainPedals.push(sustainPedal);
+                this._sy = this.newSy();
+            } else if (syData === 'spu') {
+                const sustainPedal = new SustainPedalMarker();
+                sustainPedal.pedalType = SustainPedalMarkerType.Up;
+
+                this._sy = this.newSy(true);
+                if (this._sy !== AlphaTexSymbols.Number) {
+                    this.error('spu', AlphaTexSymbols.Number, true);
+                }
+                sustainPedal.ratioPosition = this._syData as number;
+                bar.sustainPedals.push(sustainPedal);
+                this._sy = this.newSy();
+            } else if (syData === 'sph') {
+                const sustainPedal = new SustainPedalMarker();
+                sustainPedal.pedalType = SustainPedalMarkerType.Hold;
+
+                this._sy = this.newSy(true);
+                if (this._sy !== AlphaTexSymbols.Number) {
+                    this.error('sph', AlphaTexSymbols.Number, true);
+                }
+                sustainPedal.ratioPosition = this._syData as number;
+                bar.sustainPedals.push(sustainPedal);
                 this._sy = this.newSy();
             } else {
                 if (bar.index === 0) {
@@ -3323,22 +3510,48 @@ export class AlphaTexImporter extends ScoreImporter {
         this._sy = this.newSy();
     }
 
-    private readTempoAutomation() {
-        this._allowFloat = true;
-        this._sy = this.newSy();
-        this._allowFloat = false;
-        if (this._sy !== AlphaTexSymbols.Number) {
-            this.error('tempo', AlphaTexSymbols.Number, true);
-        }
+    private readTempoAutomation(withPosition: boolean) {
+        this._sy = this.newSy(true);
+
         const tempoAutomation: Automation = new Automation();
         tempoAutomation.isLinear = false;
         tempoAutomation.type = AutomationType.Tempo;
-        tempoAutomation.value = this._syData as number;
-        this._sy = this.newSy();
 
-        if (this._sy === AlphaTexSymbols.String) {
-            tempoAutomation.text = this._syData as string;
+        if (this._sy === AlphaTexSymbols.LBrace && withPosition) {
+            this._sy = this.newSy(true);
+            if (this._sy !== AlphaTexSymbols.Number) {
+                this.error('tempo', AlphaTexSymbols.Number, true);
+            }
+
+            tempoAutomation.value = this._syData as number;
+            this._sy = this.newSy(true);
+
+            if (this._sy === AlphaTexSymbols.String) {
+                tempoAutomation.text = this._syData as string;
+                this._sy = this.newSy(true);
+            }
+
+            if (this._sy !== AlphaTexSymbols.Number) {
+                this.error('tempo', AlphaTexSymbols.Number, true);
+            }
+            tempoAutomation.ratioPosition = this._syData as number;
             this._sy = this.newSy();
+
+            if (this._sy !== AlphaTexSymbols.RBrace) {
+                this.error('tempo', AlphaTexSymbols.RBrace, true);
+            }
+            this._sy = this.newSy();
+        } else if (this._sy === AlphaTexSymbols.Number) {
+            tempoAutomation.value = this._syData as number;
+
+            this._sy = this.newSy();
+
+            if (this._sy === AlphaTexSymbols.String && (this._syData as string) !== 'r') {
+                tempoAutomation.text = this._syData as string;
+                this._sy = this.newSy();
+            }
+        } else {
+            this.error('tempo', AlphaTexSymbols.Number, true);
         }
 
         return tempoAutomation;

@@ -155,8 +155,11 @@ export class Track {
                 this.shortName = this.shortName.substr(0, Track.ShortNameMaxLength);
             }
         }
-        for (let i: number = 0, j: number = this.staves.length; i < j; i++) {
-            this.staves[i].finish(settings, sharedDataBag);
+        for(const s of this.staves){
+            s.finish(settings, sharedDataBag);
+            if(s.isPercussion){
+                this.playbackInfo.program = 0;
+            }
         }
     }
 

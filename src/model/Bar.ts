@@ -281,11 +281,23 @@ export class Bar {
      */
     public simileMark: SimileMark = SimileMark.None;
 
+    private _filledVoices:Set<number> = new Set<number>([0]);
+
     /**
      * Gets a value indicating whether this bar contains multiple voices with notes.
      * @json_ignore
      */
-    public isMultiVoice: boolean = false;
+    public get isMultiVoice(): boolean {
+        return this._filledVoices.size > 1;
+    }
+
+    /**
+     * Gets the number of voices which have content within this stuff.
+     * @json_ignore
+     */
+    public get filledVoices():Set<number> {
+        return this._filledVoices;
+    }
 
     /**
      * A relative scale for the size of the bar when displayed. The scale is relative
@@ -447,25 +459,23 @@ export class Bar {
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
-        this.isMultiVoice = false;
+        this._filledVoices.clear();
+        this._filledVoices.add(0);
         this._isEmpty = true;
         this._isRestOnly = true;
         for (let i: number = 0, j: number = this.voices.length; i < j; i++) {
             const voice: Voice = this.voices[i];
             voice.finish(settings, sharedDataBag);
-            if (i > 0 && !voice.isEmpty) {
-                this.isMultiVoice = true;
-            }
-
             if (!voice.isEmpty) {
                 this._isEmpty = false;
+                this._filledVoices.add(i);
             }
 
             if (!voice.isRestOnly) {
                 this._isRestOnly = false;
             }
         }
-
+        
         // chain sustain pedal markers (and merge overlaps)
         const sustainPedals = this.sustainPedals;
         if (sustainPedals.length > 0) {
