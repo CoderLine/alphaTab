@@ -74,6 +74,10 @@ internal class Math {
             return kotlin.math.max(kotlin.math.max(a, b), c);
         }
 
+        public fun max(vararg v: Double): Double {
+            return v.max()
+        }
+
         public fun random(): Double {
             return kotlin.random.Random.nextDouble()
         }

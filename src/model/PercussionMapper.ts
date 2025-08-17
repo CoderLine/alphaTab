@@ -1189,6 +1189,8 @@ export class PercussionMapper {
         ['Ride (edge)', 59],
         ['Hand (hit)', 60],
         ['Hand (hit)', 61],
+        ['Bongo high (hit)', 60],
+        ['Bongo low (hit)', 61],
         ['Conga high (mute)', 62],
         ['Conga high (hit)', 63],
         ['Conga low (hit)', 64],
@@ -1253,6 +1255,23 @@ export class PercussionMapper {
         ['Ride (middle) 2', 126],
         ['Ride (bell) 2', 127]
     ]);
+
+    public static getArticulationName(n: Note): string {
+        const articulation = PercussionMapper.getArticulation(n);
+        let input = n.percussionArticulation;
+        if (articulation) {
+            input = articulation.outputMidiNumber;
+        }
+
+        // no efficient lookup for now, mainly used by exporter
+        for (const [name, value] of PercussionMapper.instrumentArticulationNames) {
+            if (value === input) {
+                return name;
+            }
+        }
+
+        return 'unknown';
+    }
 
     public static getArticulation(n: Note): InstrumentArticulation | null {
         const articulationIndex = n.percussionArticulation;

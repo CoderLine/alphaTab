@@ -114,9 +114,9 @@ describe('Gp3ImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].hasChord).to.be.equal(true);
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[0].chord!.name).to.equal('C');
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].text).to.equal('Text');
-        expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo)).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[4].masterBar.tempoAutomations.length).to.equal(1);
         expect(
-            score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Tempo)!.value
+            score.tracks[0].staves[0].bars[4].masterBar.tempoAutomations[0]!.value
         ).to.equal(120);
         expect(score.tracks[0].staves[0].bars[4].voices[0].beats[0].getAutomation(AutomationType.Instrument)).to.be.ok;
         expect(

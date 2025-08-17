@@ -69,7 +69,7 @@ export class MasterBar {
             this.isFreeTime ||
             this.isSectionStart ||
             this.tempoAutomations.length > 0 ||
-            this.syncPoints && this.syncPoints!.length > 0 ||
+            (this.syncPoints && this.syncPoints!.length > 0) ||
             (this.fermata !== null && this.fermata!.size > 0) ||
             (this.directions !== null && this.directions!.size > 0) ||
             this.isAnacrusis
@@ -179,7 +179,7 @@ export class MasterBar {
     /**
      * Gets or sets all tempo automation for this bar.
      */
-    public tempoAutomations: Automation[] = [];
+    public tempoAutomations: Automation[] = [];  
 
     /**
      * The sync points for this master bar to synchronize the alphaTab time axis with the
@@ -283,6 +283,9 @@ export class MasterBar {
         }
         if (fermataMap.has(beat.playbackStart)) {
             return fermataMap.get(beat.playbackStart)!;
+        }
+        if (beat.index === 0 && fermataMap.has(0)) {
+            return fermataMap.get(0)!;
         }
         return null;
     }

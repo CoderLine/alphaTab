@@ -141,6 +141,15 @@ export class GeneralMidi {
         return GeneralMidi._values.has(name) ? GeneralMidi._values.get(name)! : 0;
     }
 
+    public static getName(input: number): string {
+        for (const [name, program] of GeneralMidi._values) {
+            if (program === input) {
+                return name;
+            }
+        }
+        return input.toString();
+    }
+
     public static isPiano(program: number): boolean {
         return program <= 7 || (program >= 16 && program <= 23);
     }

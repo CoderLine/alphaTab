@@ -1063,7 +1063,14 @@ export class Gp3To5Importer extends ScoreImporter {
             tempoAutomation.type = AutomationType.Tempo;
             tempoAutomation.value = tableChange.tempo;
             beat.automations.push(tempoAutomation);
-            beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
+
+            if (
+                !beat.voice.bar.masterBar.tempoAutomations.some(
+                    a => a.ratioPosition === tempoAutomation.ratioPosition && a.value === tempoAutomation.value
+                )
+            ) {
+                beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
+            }
         }
     }
 

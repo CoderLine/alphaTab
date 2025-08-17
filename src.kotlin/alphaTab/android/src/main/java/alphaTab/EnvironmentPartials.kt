@@ -1,5 +1,6 @@
 package alphaTab
 
+import alphaTab.platform.Json
 import alphaTab.platform.android.AndroidCanvas
 import alphaTab.platform.android.AndroidEnvironment
 import android.os.Build
@@ -48,5 +49,8 @@ internal class EnvironmentPartials {
                 }
             }
         }
+
+        @Suppress("NOTHING_TO_INLINE")
+        internal inline fun quoteJsonString(string: String) = Json.quoteJsonString(string)
     }
 }

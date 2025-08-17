@@ -54,7 +54,7 @@ describe('Gp7ExporterTest', () => {
         const files: string[] = await TestPlatform.listDirectory(`test-data/${name}`);
         const ignoredFilesLookup = new Set<string>(ignoredFiles);
         for (const file of files) {
-            if (!ignoredFilesLookup.has(file)) {
+            if (!ignoredFilesLookup.has(file) && !file.endsWith('.png')) {
                 await testRoundTripEqual(`${name}/${file}`, ignoreKeys);
             }
         }

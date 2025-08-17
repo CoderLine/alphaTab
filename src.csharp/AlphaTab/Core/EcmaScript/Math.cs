@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AlphaTab.Core.EcmaScript;
@@ -19,6 +20,11 @@ internal static class Math
     }
 
     public static double Max(params double[] items)
+    {
+        return items.Max();
+    }
+
+    public static double Max(IEnumerable<double> items)
     {
         return items.Max();
     }

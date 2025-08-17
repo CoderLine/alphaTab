@@ -44,14 +44,23 @@ public class DoubleDoubleMapEntryInternal : DoubleDoubleMapEntry(), IMapEntryInt
     }
 }
 
-public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntryInternal>() {
+public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntryInternal> {
+    public constructor()
+    public constructor(items: Iterable<alphaTab.core.DoubleDoubleArrayTuple>) {
+        for ((k, v) in items) {
+            set(k, v)
+        }
+    }
+
     public fun has(key: Double): Boolean {
-        return findEntryInternal(key,
+        return findEntryInternal(
+            key,
             { entry, k -> entry.key == k }) >= 0
     }
 
     public fun get(key: Double): Double? {
-        val i = findEntryInternal(key,
+        val i = findEntryInternal(
+            key,
             { entry, k -> entry.key == k })
         if (i >= 0) {
             return entries[i].value
@@ -64,7 +73,8 @@ public class DoubleDoubleMap : MapBase<DoubleDoubleMapEntry, DoubleDoubleMapEntr
     }
 
     private fun insert(key: Double, value: Double) {
-        insertInternal(key, value,
+        insertInternal(
+            key, value,
             { entry, k -> entry.key = k },
             { entry, v -> entry.value = v },
             { entry, k -> entry.key == k }

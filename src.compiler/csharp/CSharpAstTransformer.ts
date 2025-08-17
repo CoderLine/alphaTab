@@ -2347,6 +2347,10 @@ export default class CSharpAstTransformer {
         };
         csParameter.type!.parent = csParameter;
 
+        if (p.questionToken) {
+            (csParameter.type! as cs.UnresolvedTypeNode).isNullable = true;
+        }
+
         if (p.initializer) {
             csParameter.initializer = this.visitExpression(csParameter, p.initializer) ?? undefined;
             if (csParameter.initializer && cs.isNullLiteral(csParameter.initializer)) {
@@ -3952,9 +3956,9 @@ export default class CSharpAstTransformer {
         // Enum[enumValue] => value.toString()
         // Enum[string] => TypeHelper.parseEnum<Type>(value, Type)
         if (this.isEnumFromOrToString(expression)) {
-            const elementType = this._context.typeChecker.getTypeAtLocation(expression.argumentExpression);
+            const elementType = this._context.typeChecker.getTypeAtLocation(expression);
 
-            if (this._context.isEnum(elementType)) {
+            if (elementType === this._context.typeChecker.getStringType()) {
                 const callExpr = {
                     parent: parent,
                     arguments: [],

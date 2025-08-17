@@ -35,6 +35,28 @@ namespace AlphaTab.Core
             }
         }
 
+        public static void Add<T>(this IList<T> list, params T[] newItems)
+        {
+            if (list is List<T> l)
+            {
+                l.AddRange(newItems);
+            }
+            else
+            {
+                foreach (var i in newItems)
+                {
+                    list.Add(i);
+                }
+            }
+        }
+        public static void Add<T>(this IList<T> list, IEnumerator<T> newItems)
+        {
+            foreach (var i in newItems)
+            {
+                list.Add(i);
+            }
+        }
+
         public static T Find<T>(this IList<T> list, Func<T, bool> predicate)
         {
             return list.FirstOrDefault(predicate);
@@ -322,7 +344,7 @@ namespace AlphaTab.Core
         {
             if (radix == 16)
             {
-                return ((int)num).ToString("X");
+                return ((int)num).ToString("x");
             }
 
             return num.ToString(CultureInfo.InvariantCulture);
@@ -357,7 +379,8 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string Replace(this string input, RegExp pattern, Func<string, string, string> replacer)
+        public static string Replace(this string input, RegExp pattern,
+            Func<string, string, string> replacer)
         {
             return pattern.Replace(input, replacer);
         }
@@ -407,7 +430,8 @@ namespace AlphaTab.Core
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IList<TResult> Map<TKey, TValue, TResult>(this IEnumerable<AlphaTab.Collections.MapEntry<TKey, TValue>> source,
+        public static IList<TResult> Map<TKey, TValue, TResult>(
+            this IEnumerable<AlphaTab.Collections.MapEntry<TKey, TValue>> source,
             Func<ArrayTuple<TKey, TValue>, TResult> func)
         {
             return source.Select(i => func(new ArrayTuple<TKey, TValue>(i.Key, i.Value))).ToList();
@@ -474,6 +498,7 @@ namespace AlphaTab.Core
             return value switch
             {
                 bool b => b.ToTemplate(),
+                double b => b.ToTemplate(),
                 Enum e => e.ToTemplate(),
                 _ => value
             };
@@ -489,6 +514,12 @@ namespace AlphaTab.Core
         public static object ToTemplate(this bool value)
         {
             return value ? "true" : "false";
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static object ToTemplate(this double value)
+        {
+            return value.ToInvariantString();
         }
 
         public static string TypeOf(object? actual)
@@ -545,7 +576,7 @@ namespace AlphaTab.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static string ToFixed(this double value, int decimals)
         {
-            return value.ToString("F" + decimals);
+            return value.ToString("F" + decimals, CultureInfo.InvariantCulture);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -607,6 +638,34 @@ namespace AlphaTab.Core
         public static IEnumerator<T> GetEnumerator<T>(this IEnumerator<T> enumerator)
         {
             return enumerator;
+        }
+
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static uint GetScalarFromUtf16SurrogatePair(char highSurrogateCodePoint,
+            char lowSurrogateCodePoint)
+        {
+            return (((uint)highSurrogateCodePoint << 10) + lowSurrogateCodePoint -
+                          ((0xD800U << 10) + 0xDC00U - (1 << 16)));
+        }
+
+        public static double? CodePointAt(this string s, double position)
+        {
+            if (position < 0 || position >= s.Length)
+            {
+                return null;
+            }
+
+            var i = (int)position;
+            if (char.IsHighSurrogate(s, i) && i + 1 < s.Length &&
+                char.IsLowSurrogate(s, i + 1))
+            {
+                return GetScalarFromUtf16SurrogatePair(
+                    s[i], s[i + 1]
+                );
+            }
+
+            return s[i];
         }
     }
 }

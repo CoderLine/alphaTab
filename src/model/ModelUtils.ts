@@ -612,17 +612,44 @@ export class ModelUtils {
     }
 
     private static allMusicFontSymbols: MusicFontSymbol[] = [];
-    
+
     /**
      * Gets a list of all music font symbols used in alphaTab.
      */
     public static getAllMusicFontSymbols(): MusicFontSymbol[] {
         if (ModelUtils.allMusicFontSymbols.length === 0) {
-            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol).filter<any>(
-                (k:any) => typeof k === 'number'
-            ).map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
+            ModelUtils.allMusicFontSymbols = Object.values(MusicFontSymbol)
+                .filter<any>((k: any) => typeof k === 'number')
+                .map(v => v as number as MusicFontSymbol) as MusicFontSymbol[];
         }
 
         return ModelUtils.allMusicFontSymbols;
     }
+
+    /**
+     * Lists the display transpositions for some known midi instruments. 
+     * It is a common practice to transpose the standard notation for instruments like guitars.
+     */
+    public static readonly displayTranspositionPitches = new Map<number, number>([
+        // guitar
+        [24, -12],
+        [25, -12],
+        [26, -12],
+        [27, -12],
+        [28, -12],
+        [29, -12],
+        [30, -12],
+        [31, -12],
+        // bass
+        [32, -12],
+        [33, -12],
+        [34, -12],
+        [35, -12],
+        [36, -12],
+        [37, -12],
+        [38, -12],
+        [39, -12],
+        // Contrabass
+        [43, -12]
+    ]);
 }

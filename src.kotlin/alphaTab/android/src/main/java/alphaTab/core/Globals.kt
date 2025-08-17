@@ -7,6 +7,7 @@ import alphaTab.collections.List
 import alphaTab.collections.MapEntry
 import alphaTab.core.ecmaScript.ArrayBuffer
 import alphaTab.core.ecmaScript.RegExp
+import alphaTab.core.ecmaScript.Set
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -181,8 +182,11 @@ internal inline fun Double?.toTemplate(): String {
     return this?.toInvariantString() ?: ""
 }
 
-internal inline fun Any?.toTemplate(): Any? {
-    return this
+internal fun Any?.toTemplate(): String = when(this) {
+    null -> ""
+    is IAlphaTabEnum -> this.toInvariantString()
+    is Double -> this.toTemplate()
+    else -> this.toString()
 }
 
 internal fun Any?.toDouble(): Double {
@@ -313,8 +317,43 @@ internal inline fun <reified T> List<T>.spread(): Array<T> {
     return _data.toTypedArray();
 }
 
-internal inline fun <reified TKey, reified TValue, reified TResult> List<MapEntry<TKey, TValue>>.map(func: (v: ArrayTuple<TKey, TValue>) -> TResult): List<TResult> {
-    return List(_data.map { func(ArrayTuple(it.key, it.value)) }.toCollection(
-        ArrayListWithRemoveRange()
-    ))
+internal inline fun <reified TKey, reified TValue, reified TResult> List<MapEntry<TKey, TValue>>.map(
+    func: (v: ArrayTuple<TKey, TValue>) -> TResult
+): List<TResult> {
+    return List(
+        _data.map { func(ArrayTuple(it.key, it.value)) }.toCollection(
+            ArrayListWithRemoveRange()
+        )
+    )
+}
+
+internal inline fun Set<Double>.spread(): DoubleArray {
+    val empty = DoubleArray(this.size.toInt())
+    for ((i, v) in this.withIndex()) {
+        empty[i] = v
+    }
+    return empty
+}
+
+internal inline fun <reified T> Set<T>.spread(): kotlin.Array<T> {
+    val empty = arrayOfNulls<T>(this.size.toInt())
+    for ((i, v) in this.withIndex()) {
+        empty[i] = v
+    }
+    @Suppress("UNCHECKED_CAST")
+    return empty as kotlin.Array<T>
+}
+
+internal class IteratorIterable<T>(private val iterator: Iterator<T>) : Iterable<T> {
+    override fun iterator(): Iterator<T> {
+        return iterator
+    }
+}
+
+internal inline fun Iterator<Double>.spread(): DoubleArray {
+    return IteratorIterable(this).toList().toDoubleArray()
+}
+
+internal inline fun <reified T> Iterator<T>.spread(): kotlin.Array<T> {
+    return IteratorIterable(this).toList().toTypedArray()
 }

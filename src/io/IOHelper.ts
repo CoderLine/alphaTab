@@ -209,4 +209,28 @@ export class IOHelper {
         const b = TypeConversions.float32BEToBytes(v);
         o.write(b, 0, b.length);
     }
+
+    public static *iterateCodepoints(input: string) {
+        let i = 0;
+        while (i < input.length) {
+            let c = input.charCodeAt(i);
+            if (IOHelper.isLeadingSurrogate(c) && i + 1 < input.length) {
+                i++;
+                c = (c - 0xd800) * 0x400 + (input.charCodeAt(i) - 0xdc00) + 0x10000;
+            }
+
+            i++;
+            yield c;
+        }
+    }
+
+    // https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#leading-surrogate
+    public static isLeadingSurrogate(charCode: number): boolean {
+        return charCode >= 0xd800 && charCode <= 0xdbff;
+    }
+
+    // https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#trailing-surrogate
+    public static isTrailingSurrogate(charCode: number): boolean {
+        return charCode >= 0xdc00 && charCode <= 0xdfff;
+    }
 }

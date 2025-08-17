@@ -1,5 +1,5 @@
 import { StaveProfile } from '@src/StaveProfile';
-import { AlphaTexError, AlphaTexImporter, AlphaTexSymbols } from '@src/importer/AlphaTexImporter';
+import { AlphaTexError, AlphaTexImporter, AlphaTexLexer, AlphaTexSymbols } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
@@ -43,12 +43,25 @@ import { VibratoType } from '@src/model/VibratoType';
 import { WhammyType } from '@src/model/WhammyType';
 import { TextAlign } from '@src/platform/ICanvas';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
+import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
+import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
         const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
         return importer.readScore();
+    }
+
+    // as we often add tests here for new alphaTex features, this helper
+    // directly allows testing the exporter via a roundtrip comparison
+    function testExportRoundtrip(expected: Score) {
+        ComparisonHelpers.alphaTexExportRoundtripPrepare(expected);
+
+        const exported = new AlphaTexExporter().exportToString(expected);
+        const actual = parseTex(exported);
+
+        ComparisonHelpers.alphaTexExportRoundtripEqual('export-roundtrip', actual, expected);
     }
 
     it('ensure-metadata-parsing-issue73', () => {
@@ -138,7 +151,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks.length).to.equal(1);
         expect(score.masterBars.length).to.equal(1);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(1);
-        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(0);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].fret).to.equal(3);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isDead).to.equal(true);
     });
 
@@ -227,6 +240,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].isRest).to.equal(true);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushType).to.equal(BrushType.None);
         expect(score.tracks[0].staves[0].bars[2].voices[0].beats[4].brushDuration).to.equal(0);
+        testExportRoundtrip(score);
     });
 
     it('hamonics-issue79', () => {
@@ -292,6 +306,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].graceType).to.equal(GraceType.BeforeBeat);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].graceType).to.equal(GraceType.OnBeat);
+        testExportRoundtrip(score);
     });
 
     it('left-hand-finger-single-note', () => {
@@ -313,6 +328,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].leftHandFinger).to.equal(
             Fingers.LittleFinger
         );
+        testExportRoundtrip(score);
     });
 
     it('right-hand-finger-single-note', () => {
@@ -334,6 +350,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[4].notes[0].rightHandFinger).to.equal(
             Fingers.LittleFinger
         );
+        testExportRoundtrip(score);
     });
 
     it('left-hand-finger-chord', () => {
@@ -356,6 +373,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[4].leftHandFinger).to.equal(
             Fingers.LittleFinger
         );
+        testExportRoundtrip(score);
     });
 
     it('right-hand-finger-chord', () => {
@@ -378,6 +396,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[4].rightHandFinger).to.equal(
             Fingers.LittleFinger
         );
+        testExportRoundtrip(score);
     });
 
     it('unstringed', () => {
@@ -403,6 +422,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[2].notes[0].realValue).to.equal(62);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].isPiano).to.equal(true);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[3].notes[0].realValue).to.equal(63);
+        testExportRoundtrip(score);
     });
 
     it('multi-staff-default-settings', () => {
@@ -418,6 +438,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[1].showStandardNotation).to.be.equal(true);
         expect(score.tracks[0].staves[1].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('multi-staff-default-settings-braces', () => {
@@ -433,6 +454,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[1].showStandardNotation).to.be.equal(true);
         expect(score.tracks[0].staves[1].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('single-staff-with-setting', () => {
@@ -444,6 +466,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
         expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('single-staff-with-slash', () => {
@@ -456,6 +479,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
         expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(false);
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('single-staff-with-score-and-slash', () => {
@@ -468,6 +492,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].showTablature).to.be.equal(false);
         expect(score.tracks[0].staves[0].showStandardNotation).to.be.equal(true);
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('multi-staff-with-settings', () => {
@@ -489,6 +514,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[2].showStandardNotation).to.be.equal(true);
         expect(score.tracks[0].staves[2].bars.length).to.equal(2);
         expect(score.tracks[0].staves[2].tuning.length).to.equal(7);
+        testExportRoundtrip(score);
     });
 
     it('multi-track', () => {
@@ -510,6 +536,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[1].staves[0].showTablature).to.be.equal(true);
         expect(score.tracks[1].staves[0].showStandardNotation).to.be.equal(true);
         expect(score.tracks[1].staves[0].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('multi-track-names', () => {
@@ -542,6 +569,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[2].staves[0].showTablature).to.be.equal(true);
         expect(score.tracks[2].staves[0].showStandardNotation).to.be.equal(true);
         expect(score.tracks[2].staves[0].bars.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('multi-track-multi-staff', () => {
@@ -618,6 +646,7 @@ describe('AlphaTexImporterTest', () => {
                 expect(staff1.bars[0].clef).to.equal(Clef.G2);
             }
         }
+        testExportRoundtrip(score);
     });
 
     it('multi-track-multi-staff-inconsistent-bars', () => {
@@ -707,6 +736,7 @@ describe('AlphaTexImporterTest', () => {
                 expect(staff1.bars[0].clef).to.equal(Clef.G2);
             }
         }
+        testExportRoundtrip(score);
     });
 
     it('slides', () => {
@@ -740,6 +770,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[3].voices[0].beats[1].notes[0].slideOutType).to.equal(
             SlideOutType.PickSlideUp
         );
+        testExportRoundtrip(score);
     });
 
     it('section', () => {
@@ -757,6 +788,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[3].isSectionStart).to.be.equal(true);
         expect(score.masterBars[3].section!.text).to.equal('Solo');
         expect(score.masterBars[3].section!.marker).to.equal('S');
+        testExportRoundtrip(score);
     });
 
     it('key-signature', () => {
@@ -789,6 +821,7 @@ describe('AlphaTexImporterTest', () => {
             expect(bars[i].keySignature).to.equal(expected[i][0]);
             expect(bars[i].keySignatureType).to.equal(expected[i][1]);
         }
+        testExportRoundtrip(score);
     });
 
     it('key-signature-multi-staff', () => {
@@ -836,6 +869,7 @@ describe('AlphaTexImporterTest', () => {
             expect(bars[i].keySignature).to.equal(expected[i][0], `at ${i}`);
             expect(bars[i].keySignatureType).to.equal(expected[i][1], `at ${i}`);
         }
+        testExportRoundtrip(score);
     });
 
     it('pop-slap-tap', () => {
@@ -844,6 +878,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].pop).to.be.equal(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].slap).to.be.equal(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].tap).to.be.equal(true);
+        testExportRoundtrip(score);
     });
 
     it('triplet-feel-numeric', () => {
@@ -856,6 +891,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Dotted8th);
         expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Scottish16th);
         expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.Scottish8th);
+        testExportRoundtrip(score);
     });
 
     it('triplet-feel-long-names', () => {
@@ -869,6 +905,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Dotted8th);
         expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Scottish16th);
         expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.Scottish8th);
+        testExportRoundtrip(score);
     });
 
     it('triplet-feel-short-names', () => {
@@ -881,6 +918,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[4].tripletFeel).to.equal(TripletFeel.Dotted8th);
         expect(score.masterBars[5].tripletFeel).to.equal(TripletFeel.Scottish16th);
         expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.Scottish8th);
+        testExportRoundtrip(score);
     });
 
     it('triplet-feel-multi-bar', () => {
@@ -895,6 +933,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[6].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
         expect(score.masterBars[7].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
         expect(score.masterBars[8].tripletFeel).to.equal(TripletFeel.NoTripletFeel);
+        testExportRoundtrip(score);
     });
 
     it('tuplet-repeat', () => {
@@ -915,6 +954,7 @@ describe('AlphaTexImporterTest', () => {
             i++;
         }
         expect(i).to.equal(durations.length);
+        testExportRoundtrip(score);
     });
 
     it('tuplet-custom', () => {
@@ -931,6 +971,7 @@ describe('AlphaTexImporterTest', () => {
             b = b.nextBeat;
             i++;
         }
+        testExportRoundtrip(score);
     });
 
     it('simple-anacrusis', () => {
@@ -939,6 +980,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].isAnacrusis).to.be.equal(true);
         expect(score.masterBars[0].calculateDuration()).to.equal(1920);
         expect(score.masterBars[1].calculateDuration()).to.equal(3840);
+        testExportRoundtrip(score);
     });
 
     it('multi-bar-anacrusis', () => {
@@ -949,6 +991,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].calculateDuration()).to.equal(1920);
         expect(score.masterBars[1].calculateDuration()).to.equal(1920);
         expect(score.masterBars[2].calculateDuration()).to.equal(3840);
+        testExportRoundtrip(score);
     });
 
     it('random-anacrusis', () => {
@@ -962,6 +1005,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[1].calculateDuration()).to.equal(3840);
         expect(score.masterBars[2].calculateDuration()).to.equal(1920);
         expect(score.masterBars[3].calculateDuration()).to.equal(3840);
+        testExportRoundtrip(score);
     });
 
     it('repeat', () => {
@@ -976,6 +1020,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[1].repeatCount).to.equal(0);
         expect(score.masterBars[2].repeatCount).to.equal(2);
         expect(score.masterBars[3].repeatCount).to.equal(3);
+        testExportRoundtrip(score);
     });
 
     it('alternate-endings', () => {
@@ -990,6 +1035,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].alternateEndings).to.equal(0b0000);
         expect(score.masterBars[1].alternateEndings).to.equal(0b0111);
         expect(score.masterBars[2].alternateEndings).to.equal(0b1000);
+        testExportRoundtrip(score);
     });
 
     it('random-alternate-endings', () => {
@@ -1019,6 +1065,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[7].alternateEndings).to.equal(0b000);
         expect(score.masterBars[8].alternateEndings).to.equal(0b101);
         expect(score.masterBars[9].alternateEndings).to.equal(0b010);
+        testExportRoundtrip(score);
     });
 
     it('default-transposition-on-instruments', () => {
@@ -1040,6 +1087,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[1].displayTranspositionPitch).to.equal(0);
         expect(score.tracks[1].staves[0].transpositionPitch).to.equal(0);
         expect(score.tracks[1].staves[0].displayTranspositionPitch).to.equal(-12);
+        testExportRoundtrip(score);
     });
 
     it('dynamics', () => {
@@ -1053,6 +1101,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[5].dynamics).to.equal(DynamicValue.F);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[6].dynamics).to.equal(DynamicValue.FF);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[7].dynamics).to.equal(DynamicValue.FFF);
+        testExportRoundtrip(score);
     });
 
     it('dynamics-auto', () => {
@@ -1062,6 +1111,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PPP);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].dynamics).to.equal(DynamicValue.MP);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].dynamics).to.equal(DynamicValue.MP);
+        testExportRoundtrip(score);
     });
 
     it('dynamics-auto-reset-on-track', () => {
@@ -1070,6 +1120,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.PPP);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PPP);
         expect(score.tracks[1].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.F);
+        testExportRoundtrip(score);
     });
 
     it('dynamics-auto-reset-on-staff', () => {
@@ -1078,6 +1129,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.PPP);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].dynamics).to.equal(DynamicValue.PPP);
         expect(score.tracks[0].staves[1].bars[0].voices[0].beats[0].dynamics).to.equal(DynamicValue.F);
+        testExportRoundtrip(score);
     });
 
     it('crescendo', () => {
@@ -1087,6 +1139,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].crescendo).to.equal(CrescendoType.Decrescendo);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].crescendo).to.equal(CrescendoType.Crescendo);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].crescendo).to.equal(CrescendoType.Crescendo);
+        testExportRoundtrip(score);
     });
 
     it('left-hand-tapping', () => {
@@ -1096,6 +1149,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isLeftHandTapped).to.equal(false);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].notes[0].isLeftHandTapped).to.equal(true);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].isLeftHandTapped).to.equal(false);
+        testExportRoundtrip(score);
     });
 
     it('expect-invalid-format-xml', () => {
@@ -1135,6 +1189,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.title).to.equal(multiByteChars);
         expect(score.tracks[0].name).to.equal('🎸');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.equal('🤘');
+        testExportRoundtrip(score);
     });
 
     it('does-not-hang-on-backslash', () => {
@@ -1253,12 +1308,14 @@ describe('AlphaTexImporterTest', () => {
     it('tempo-as-float', () => {
         const score = parseTex('\\tempo 112.5 .');
         expect(score.tempo).to.equal(112.5);
+        testExportRoundtrip(score);
     });
 
     it('tempo-as-float-in-bar', () => {
         const score = parseTex('\\tempo 112 . 3.3.1 | \\tempo 333.3 3.3');
         expect(score.tempo).to.equal(112);
         expect(score.tracks[0].staves[0].bars[1].masterBar.tempoAutomations[0]?.value).to.equal(333.3);
+        testExportRoundtrip(score);
     });
 
     it('percussion-numbers', () => {
@@ -1277,6 +1334,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        testExportRoundtrip(score);
     });
 
     it('percussion-custom-articulation', () => {
@@ -1299,6 +1357,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        testExportRoundtrip(score);
     });
 
     it('percussion-default-articulations', () => {
@@ -1318,6 +1377,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        testExportRoundtrip(score);
     });
 
     it('percussion-default-articulations-short', () => {
@@ -1337,6 +1397,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].percussionArticulations[2].outputMidiNumber).to.equal(37);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].percussionArticulation).to.equal(3);
         expect(score.tracks[0].percussionArticulations[3].outputMidiNumber).to.equal(38);
+        testExportRoundtrip(score);
     });
 
     it('beat-tempo-change', () => {
@@ -1348,6 +1409,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].tempoAutomations[0].ratioPosition).to.equal(0);
         expect(score.masterBars[0].tempoAutomations[1].value).to.equal(60);
         expect(score.masterBars[0].tempoAutomations[1].ratioPosition).to.equal(0.5);
+        testExportRoundtrip(score);
     });
 
     it('note-accidentals', () => {
@@ -1369,6 +1431,7 @@ describe('AlphaTexImporterTest', () => {
         }
 
         expect(actualAccidentalModes.join(',')).to.equal(expectedAccidentalModes.join(','));
+        testExportRoundtrip(score);
     });
 
     it('accidental-mode', () => {
@@ -1404,18 +1467,21 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].notes[0].accidentalMode).to.equal(
             NoteAccidentalMode.Default
         );
+        testExportRoundtrip(score);
     });
 
     it('dead-slap', () => {
         const score = parseTex('r { ds }');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isRest).to.be.false;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('golpe', () => {
         const score = parseTex('3.3 { glpf } 3.3 { glpt }');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].golpe).to.equal(GolpeType.Finger);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].golpe).to.equal(GolpeType.Thumb);
+        testExportRoundtrip(score);
     });
 
     it('fade', () => {
@@ -1423,6 +1489,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].fade).to.equal(FadeType.FadeIn);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].fade).to.equal(FadeType.FadeOut);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fade).to.equal(FadeType.VolumeSwell);
+        testExportRoundtrip(score);
     });
 
     it('barre', () => {
@@ -1432,6 +1499,8 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreFret).to.equal(14);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].barreShape).to.equal(BarreShape.Half);
+        testExportRoundtrip(score);
+        testExportRoundtrip(score);
     });
 
     it('ornaments', () => {
@@ -1446,6 +1515,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].notes[0].ornament).to.equal(
             NoteOrnament.LowerMordent
         );
+        testExportRoundtrip(score);
     });
 
     it('rasgueado', () => {
@@ -1456,6 +1526,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].hasRasgueado).to.be.true;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].rasgueado).to.equal(Rasgueado.AmiAnapaest);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].hasRasgueado).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('directions', () => {
@@ -1469,6 +1540,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[2].directions).to.contain(Direction.JumpDaCapoAlCoda);
         expect(score.masterBars[2].directions).to.contain(Direction.TargetCoda);
         expect(score.masterBars[2].directions).to.contain(Direction.TargetSegnoSegno);
+        testExportRoundtrip(score);
     });
 
     it('multi-voice-full', () => {
@@ -1486,6 +1558,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[0].voices.length).to.equal(2);
         expect(score.tracks[0].staves[0].bars[1].voices.length).to.equal(2);
+        testExportRoundtrip(score);
     });
 
     it('multi-voice-simple-all-voices', () => {
@@ -1501,6 +1574,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        testExportRoundtrip(score);
     });
 
     it('multi-voice-simple-skip-initial', () => {
@@ -1515,6 +1589,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[0].voices).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[1].voices).to.have.length(2);
+        testExportRoundtrip(score);
     });
 
     it('standard-notation-line-count', () => {
@@ -1522,6 +1597,7 @@ describe('AlphaTexImporterTest', () => {
             \\staff { score 3 }
         `);
         expect(score.tracks[0].staves[0].standardNotationLineCount).to.equal(3);
+        testExportRoundtrip(score);
     });
 
     it('song-metadata', () => {
@@ -1532,6 +1608,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.title).to.equal('Title\tTitle');
         expect(score.instructions).to.equal('Line1\nLine2');
+        testExportRoundtrip(score);
     });
 
     it('tempo-label', () => {
@@ -1541,6 +1618,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tempo).to.equal(80);
         expect(score.tempoLabel).to.equal('Label');
+        testExportRoundtrip(score);
     });
 
     it('transpose', () => {
@@ -1552,6 +1630,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(-12);
         expect(score.tracks[0].staves[0].transpositionPitch).to.equal(-6);
+        testExportRoundtrip(score);
     });
 
     it('beat-vibrato', () => {
@@ -1560,6 +1639,16 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].vibrato).to.equal(VibratoType.Slight);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].vibrato).to.equal(VibratoType.Wide);
+        testExportRoundtrip(score);
+    });
+
+    it('note-vibrato', () => {
+        const score = parseTex(`
+            3.3{v}.4 3.3{vw}.4
+        `);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].vibrato).to.equal(VibratoType.Slight);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].vibrato).to.equal(VibratoType.Wide);
+        testExportRoundtrip(score);
     });
 
     it('whammy', () => {
@@ -1577,6 +1666,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints).to.have.length(2);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![0].value).to.equal(0);
         expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].whammyBarPoints![1].value).to.equal(-12.5);
+        testExportRoundtrip(score);
     });
 
     it('beat-ottava', () => {
@@ -1585,6 +1675,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._15ma);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
+        testExportRoundtrip(score);
     });
 
     it('beat-text', () => {
@@ -1593,6 +1684,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].text).to.equal('Hello World');
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].text).to.equal('Hello');
+        testExportRoundtrip(score);
     });
 
     it('legato-origin', () => {
@@ -1601,6 +1693,7 @@ describe('AlphaTexImporterTest', () => {
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].isLegatoOrigin).to.be.true;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].isLegatoDestination).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('instrument-change', () => {
@@ -1614,6 +1707,7 @@ describe('AlphaTexImporterTest', () => {
             AutomationType.Instrument
         );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(1);
+        testExportRoundtrip(score);
     });
 
     it('beat-fermata', () => {
@@ -1623,6 +1717,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata).to.be.ok;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.type).to.equal(FermataType.Medium);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].fermata!.length).to.equal(4);
+        testExportRoundtrip(score);
     });
 
     it('bend-type', () => {
@@ -1632,6 +1727,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendType).to.equal(BendType.Bend);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendStyle).to.equal(BendStyle.Gradual);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].bendPoints).to.have.length(2);
+        testExportRoundtrip(score);
     });
 
     it('harmonic-values', () => {
@@ -1680,6 +1776,7 @@ describe('AlphaTexImporterTest', () => {
             HarmonicType.Feedback
         );
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[10].notes[0].harmonicValue).to.equal(7);
+        testExportRoundtrip(score);
     });
 
     it('time-signature-commons', () => {
@@ -1689,6 +1786,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[0].timeSignatureNumerator).to.equal(4);
         expect(score.masterBars[0].timeSignatureDenominator).to.equal(4);
         expect(score.masterBars[0].timeSignatureCommon).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('clef-ottava', () => {
@@ -1696,6 +1794,7 @@ describe('AlphaTexImporterTest', () => {
         \\ottava 15ma
         `);
         expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._15ma);
+        testExportRoundtrip(score);
     });
 
     it('simile-mark', () => {
@@ -1703,6 +1802,7 @@ describe('AlphaTexImporterTest', () => {
         \\simile simple
         `);
         expect(score.tracks[0].staves[0].bars[0].simileMark).to.equal(SimileMark.Simple);
+        testExportRoundtrip(score);
     });
 
     it('tempo-automation-text', () => {
@@ -1717,12 +1817,14 @@ describe('AlphaTexImporterTest', () => {
         expect(score.masterBars[1].tempoAutomations).to.have.length(1);
         expect(score.masterBars[1].tempoAutomations[0].value).to.equal(80);
         expect(score.masterBars[1].tempoAutomations[0].text).to.equal('T2');
+        testExportRoundtrip(score);
     });
 
     it('double-bar', () => {
         const tex: string = '3.3 3.3 3.3 3.3 | \\db 1.1 2.1 3.1 4.1';
         const score: Score = parseTex(tex);
         expect(score.masterBars[1].isDoubleBar).to.be.equal(true);
+        testExportRoundtrip(score);
     });
 
     it('score-options', () => {
@@ -1755,6 +1857,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.otherSystemsTrackNameMode).to.equal(TrackNameMode.FullName);
         expect(score.stylesheet.firstSystemTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
         expect(score.stylesheet.otherSystemsTrackNameOrientation).to.equal(TrackNameOrientation.Horizontal);
+        testExportRoundtrip(score);
     });
 
     it('bar-sizing', () => {
@@ -1764,6 +1867,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.masterBars[1].displayScale).to.equal(0.5);
         expect(score.masterBars[2].displayWidth).to.equal(300);
+        testExportRoundtrip(score);
     });
 
     it('track-properties', () => {
@@ -1789,6 +1893,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].playbackInfo.balance).to.equal(3);
         expect(score.tracks[0].playbackInfo.isMute).to.be.true;
         expect(score.tracks[0].playbackInfo.isSolo).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('beat-beam', () => {
@@ -1813,6 +1918,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[5].voices[0].beats[0].beamingMode).to.equal(
             BeatBeamingMode.ForceMergeWithNext
         );
+        testExportRoundtrip(score);
     });
 
     it('note-show-string', () => {
@@ -1821,6 +1927,7 @@ describe('AlphaTexImporterTest', () => {
         `);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('note-hide', () => {
@@ -1838,6 +1945,7 @@ describe('AlphaTexImporterTest', () => {
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isSlurOrigin).to.be.true;
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].notes[0].isSlurDestination).to.be.true;
+        testExportRoundtrip(score);
     });
 
     it('hide-tuning', () => {
@@ -1852,6 +1960,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.perTrackDisplayTuning).to.be.ok;
         expect(score.stylesheet.perTrackDisplayTuning!.has(1)).to.be.true;
         expect(score.stylesheet.perTrackDisplayTuning!.get(1)).to.be.false;
+        testExportRoundtrip(score);
     });
 
     it('clefs', () => {
@@ -1862,6 +1971,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._15ma);
         expect(score.tracks[0].staves[0].bars[1].clef).to.equal(Clef.C4);
         expect(score.tracks[0].staves[0].bars[1].clefOttava).to.equal(Ottavia._15ma);
+        testExportRoundtrip(score);
     });
 
     it('multibar-rest', () => {
@@ -1878,6 +1988,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.stylesheet.perTrackMultiBarRest).to.be.ok;
         expect(score.stylesheet.perTrackMultiBarRest!.has(0)).to.be.true;
         expect(score.stylesheet.perTrackMultiBarRest!.has(1)).to.be.false;
+        testExportRoundtrip(score);
     });
 
     it('header-footer', async () => {
@@ -1954,6 +2065,7 @@ describe('AlphaTexImporterTest', () => {
         expect(score.style!.headerAndFooter.get(ScoreSubElement.CopyrightSecondLine)!.textAlign).to.equal(
             TextAlign.Right
         );
+        testExportRoundtrip(score);
     });
 
     it('barlines', () => {
@@ -1995,9 +2107,13 @@ describe('AlphaTexImporterTest', () => {
             `);
 
         // simplify snapshot
+        const tracks = score.tracks;
         score.tracks = [];
 
         expect(score).toMatchSnapshot();
+
+        score.tracks = tracks;
+        testExportRoundtrip(score);
     });
 
     it('sync-expect-dot', () => {
@@ -2021,8 +2137,167 @@ describe('AlphaTexImporterTest', () => {
         `);
 
         // simplify snapshot
+        const tracks = score.tracks;
         score.tracks = [];
 
         expect(score).toMatchSnapshot();
+
+        score.tracks = tracks;
+        testExportRoundtrip(score);
+    });
+
+    it('tuning-name', () => {
+        const score = parseTex(`
+            \\tuning E4 B3 G3 D3 A2 E2 "Default"
+        `);
+
+        expect(score.tracks[0].staves[0].stringTuning.tunings.join(',')).to.equal(
+            Tuning.getDefaultTuningFor(6)!.tunings.join(',')
+        );
+        expect(score.tracks[0].staves[0].stringTuning.name).to.equal('Default');
+        testExportRoundtrip(score);
+    });
+
+    it('volume-change', () => {
+        const score = parseTex(`
+            \\track "T1" { 
+                volume 7
+            }
+            G4 G4 { volume 8 } G4 { volume 9 }
+        `);
+
+        expect(score.tracks[0].playbackInfo.volume).to.equal(7);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
+            AutomationType.Volume
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
+            AutomationType.Volume
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(9);
+        testExportRoundtrip(score);
+    });
+
+    it('balance-change', () => {
+        const score = parseTex(`
+            \\track "T1" { 
+                balance 7
+            }
+            G4 G4 { balance 8 } G4 { balance 9 }
+        `);
+
+        expect(score.tracks[0].playbackInfo.balance).to.equal(7);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].type).to.equal(
+            AutomationType.Balance
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].automations[0].value).to.equal(8);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations).to.have.length(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].type).to.equal(
+            AutomationType.Balance
+        );
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].automations[0].value).to.equal(9);
+        testExportRoundtrip(score);
+    });
+
+    it('beat-barre', () => {
+        const score = parseTex(`
+            3.3.4 { barre 5 half }
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreFret).to.equal(5);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].barreShape).to.equal(BarreShape.Half);
+        testExportRoundtrip(score);
+    });
+
+    it('beat-dead-slapped', () => {
+        const score = parseTex(`
+            ().16 {ds}
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].deadSlapped).to.be.true;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes).to.have.length(0);
+        testExportRoundtrip(score);
+    });
+
+    function parseNumberOrNameTest(tex: string, allowFloats: boolean, expectedSymbols: string[]) {
+        const lexer = new AlphaTexLexer(tex);
+        lexer.init(allowFloats);
+
+        const actualSymbols: string[] = [];
+        do {
+            actualSymbols.push(`${AlphaTexSymbols[lexer.sy]}(${lexer.syData})`);
+            lexer.sy = lexer.newSy(allowFloats);
+        } while (lexer.sy !== AlphaTexSymbols.Eof);
+
+        expect(actualSymbols.join(',')).to.equal(expectedSymbols.join(','));
+    }
+
+    it('parses-numbers-and-names', () => {
+        parseNumberOrNameTest('1', false, ['Number(1)']);
+        parseNumberOrNameTest('1', true, ['Number(1)']);
+
+        parseNumberOrNameTest('1.1', false, ['Number(1)', 'Dot(.)', 'Number(1)']);
+        parseNumberOrNameTest('1.1', true, ['Number(1.1)']);
+
+        parseNumberOrNameTest('1.1.4', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'Dot(.)', 'Number(4)']);
+        parseNumberOrNameTest('1.1.4', true, ['Number(1.1)', 'Dot(.)', 'Number(4)']);
+
+        parseNumberOrNameTest('1.1 .4', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'Dot(.)', 'Number(4)']);
+        parseNumberOrNameTest('1.1 .4', true, ['Number(1.1)', 'Dot(.)', 'Number(4)']);
+
+        parseNumberOrNameTest('1 .1.4', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'Dot(.)', 'Number(4)']);
+        parseNumberOrNameTest('1 .1.4', true, ['Number(1)', 'Dot(.)', 'Number(1.4)']);
+
+        parseNumberOrNameTest('-1', false, ['Number(-1)']);
+        parseNumberOrNameTest('-1', true, ['Number(-1)']);
+
+        parseNumberOrNameTest('-1.1', false, ['Number(-1)', 'Dot(.)', 'Number(1)']);
+        parseNumberOrNameTest('-1.1', true, ['Number(-1.1)']);
+
+        parseNumberOrNameTest('-1.-1', false, ['Number(-1)', 'Dot(.)', 'Number(-1)']);
+        parseNumberOrNameTest('-1.-1', true, ['Number(-1)', 'Dot(.)', 'Number(-1)']);
+
+        parseNumberOrNameTest('-.1', false, ['String(-)', 'Dot(.)', 'Number(1)']);
+        parseNumberOrNameTest('-.1', true, ['String(-)', 'Dot(.)', 'Number(1)']);
+
+        parseNumberOrNameTest('1.1(', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'LParensis(()']);
+        parseNumberOrNameTest('1.1(', true, ['Number(1.1)', 'LParensis(()']);
+
+        parseNumberOrNameTest('1.1{', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'LBrace({)']);
+        parseNumberOrNameTest('1.1{', true, ['Number(1.1)', 'LBrace({)']);
+
+        parseNumberOrNameTest('1.1|', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'Pipe(|)']);
+        parseNumberOrNameTest('1.1|', true, ['Number(1.1)', 'Pipe(|)']);
+
+        parseNumberOrNameTest('1.1a', false, ['Number(1)', 'Dot(.)', 'String(1a)']);
+        parseNumberOrNameTest('1.1a', true, ['String(1.1a)']); //  ['Number(1.1a)', 'Dot(.)', 'String(1a)'] would be better but its good enough what we have
+
+        parseNumberOrNameTest('1a.1', false, ['String(1a)', 'Dot(.)', 'Number(1)']);
+        parseNumberOrNameTest('1a.1', true, ['String(1a)', 'Dot(.)', 'Number(1)']);
+
+        parseNumberOrNameTest('1.1\\test', false, ['Number(1)', 'Dot(.)', 'Number(1)', 'MetaCommand(test)']);
+        parseNumberOrNameTest('1.1\\test', true, ['Number(1.1)', 'MetaCommand(test)']);
+    });
+
+    it('unicode-escape', () => {
+        const score = parseTex(`
+            \\title "\\uD83D\\uDE38"
+            .
+        `);
+
+        expect(score.title).to.equal('😸');
+    });
+
+    it('utf16', () => {
+        const score = parseTex(`\\title "🤘🏻" .`);
+
+        expect(score.title).to.equal("🤘🏻");
     });
 });

@@ -5,6 +5,7 @@ export { DisplaySettings, SystemsLayoutMode } from '@src/DisplaySettings';
 export { LayoutMode } from '@src/LayoutMode';
 export { StaveProfile } from '@src/StaveProfile';
 export { ImporterSettings } from '@src/ImporterSettings';
+export { ExporterSettings } from '@src/ExporterSettings';
 export { FingeringMode, NotationMode, NotationSettings, TabRhythmMode, NotationElement } from '@src/NotationSettings';
 export {
     PlayerSettings,

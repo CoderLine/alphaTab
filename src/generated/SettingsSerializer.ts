@@ -10,6 +10,7 @@ import { DisplaySettingsSerializer } from "@src/generated/DisplaySettingsSeriali
 import { NotationSettingsSerializer } from "@src/generated/NotationSettingsSerializer";
 import { ImporterSettingsSerializer } from "@src/generated/ImporterSettingsSerializer";
 import { PlayerSettingsSerializer } from "@src/generated/PlayerSettingsSerializer";
+import { ExporterSettingsSerializer } from "@src/generated/ExporterSettingsSerializer";
 export class SettingsSerializer {
     public static fromJson(obj: Settings, m: unknown): void {
         if (!m) {
@@ -27,6 +28,7 @@ export class SettingsSerializer {
         o.set("notation", NotationSettingsSerializer.toJson(obj.notation));
         o.set("importer", ImporterSettingsSerializer.toJson(obj.importer));
         o.set("player", PlayerSettingsSerializer.toJson(obj.player));
+        o.set("exporter", ExporterSettingsSerializer.toJson(obj.exporter));
         return o;
     }
     public static setProperty(obj: Settings, property: string, v: unknown): boolean {
@@ -81,6 +83,17 @@ export class SettingsSerializer {
         for (const c of ["player"]) {
             if (property.indexOf(c) === 0) {
                 if (PlayerSettingsSerializer.setProperty(obj.player, property.substring(c.length), v)) {
+                    return true;
+                }
+            }
+        }
+        if (["exporter"].indexOf(property) >= 0) {
+            ExporterSettingsSerializer.fromJson(obj.exporter, v as Map<string, unknown>);
+            return true;
+        }
+        for (const c of ["exporter"]) {
+            if (property.indexOf(c) === 0) {
+                if (ExporterSettingsSerializer.setProperty(obj.exporter, property.substring(c.length), v)) {
                     return true;
                 }
             }

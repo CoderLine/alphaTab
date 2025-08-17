@@ -8,6 +8,7 @@ import { DisplaySettingsJson } from "@src/generated/DisplaySettingsJson";
 import { NotationSettingsJson } from "@src/generated/NotationSettingsJson";
 import { ImporterSettingsJson } from "@src/generated/ImporterSettingsJson";
 import { PlayerSettingsJson } from "@src/generated/PlayerSettingsJson";
+import { ExporterSettingsJson } from "@src/generated/ExporterSettingsJson";
 /**
  * This public class contains instance specific settings for alphaTab
  * @json
@@ -44,4 +45,9 @@ export interface SettingsJson {
      * @json_partial_names
      */
     player?: PlayerSettingsJson;
+    /**
+     * All settings related to exporter that export file formats.
+     * @json_partial_names
+     */
+    exporter?: ExporterSettingsJson;
 }

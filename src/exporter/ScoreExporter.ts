@@ -1,7 +1,7 @@
-import { Settings } from '@src/Settings';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import type { IWriteable } from '@src/io/IWriteable';
 import type { Score } from '@src/model/Score';
+import { Settings } from '@src/Settings';
 
 /**
  * This is the base class for creating new song exporters which

@@ -250,16 +250,16 @@ export class Voice {
                 beat.displayStart = currentDisplayTick;
                 beat.playbackStart = currentPlaybackTick;
 
-                if (beat.fermata) {
-                    this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
-                } else {
-                    beat.fermata = this.bar.masterBar.getFermata(beat);
-                }
-
                 this._beatLookup.set(beat.playbackStart, beat);
             } else {
                 beat.displayStart = currentDisplayTick;
                 beat.playbackStart = currentPlaybackTick;
+            }
+
+            if (beat.fermata) {
+                this.bar.masterBar.addFermata(beat.playbackStart, beat.fermata);
+            } else {
+                beat.fermata = this.bar.masterBar.getFermata(beat);
             }
 
             beat.finishTuplet();

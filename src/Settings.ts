@@ -5,6 +5,7 @@ import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '
 import { PlayerSettings } from '@src/PlayerSettings';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import type { SettingsJson } from '@src/generated/SettingsJson';
+import { ExporterSettings } from '@src/ExporterSettings';
 
 /**
  * This public class contains instance specific settings for alphaTab
@@ -45,6 +46,12 @@ export class Settings {
      * @json_partial_names
      */
     public readonly player: PlayerSettings = new PlayerSettings();
+
+    /**
+     * All settings related to exporter that export file formats.
+     * @json_partial_names
+     */
+    public readonly exporter: ExporterSettings = new ExporterSettings();
 
     public setSongBookModeSettings(): void {
         this.notation.notationMode = NotationMode.SongBook;

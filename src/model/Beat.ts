@@ -340,7 +340,7 @@ export class Beat {
     public isLetRing: boolean = false;
 
     /**
-     * Gets or sets whether any note in this beat has a palm-mute paplied.
+     * Gets or sets whether any note in this beat has a palm-mute applied.
      * @json_ignore
      */
     public isPalmMute: boolean = false;
@@ -831,21 +831,19 @@ export class Beat {
             this.tupletGroup = currentTupletGroup;
         }
 
-        if (this.index > 0) {
-            const barDuration = this.voice.bar.masterBar.calculateDuration();
-            const validBeatAutomations: Automation[] = [];
-            for (const automation of this.automations) {
-                if (automation.ratioPosition === 0) {
-                    automation.ratioPosition = this.playbackStart / barDuration;
-                }
-
-                // we store tempo automations only on masterbar level
-                if (automation.type !== AutomationType.Volume) {
-                    validBeatAutomations.push(automation);
-                }
+        const barDuration = this.voice.bar.masterBar.calculateDuration(false);
+        const validBeatAutomations: Automation[] = [];
+        for (const automation of this.automations) {
+            if (automation.ratioPosition === 0) {
+                automation.ratioPosition = this.playbackStart / barDuration;
             }
-            this.automations = validBeatAutomations;
+
+            // we store tempo automations only on masterbar level
+            if (automation.type !== AutomationType.Tempo) {
+                validBeatAutomations.push(automation);
+            }
         }
+        this.automations = validBeatAutomations;
     }
 
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
@@ -874,6 +872,10 @@ export class Beat {
                     this.duration = Duration.ThirtySecond;
                 }
                 break;
+        }
+
+        if (this.brushType === BrushType.None) {
+            this.brushDuration = 0;
         }
 
         const displayMode: NotationMode = !settings ? NotationMode.GuitarPro : settings.notation.notationMode;

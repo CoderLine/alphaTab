@@ -102,7 +102,7 @@ export class Staff {
     /**
      * Gets or sets whether the staff contains percussion notation
      */
-    public isPercussion: boolean = false;
+    public isPercussion: boolean = false; // alphaTab2.0: should be on track level
 
     /**
      * The number of lines shown for the standard notation.
@@ -110,10 +110,27 @@ export class Staff {
      */
     public standardNotationLineCount: number = Staff.DefaultStandardNotationLineCount;
 
+    private _filledVoices:Set<number> = new Set<number>([0]);
+
+    /**
+     * The indexes of the non-empty voices in this staff..
+     * @json_ignore
+     */
+    public get filledVoices():Set<number> {
+        return this._filledVoices;
+    }
+
     public finish(settings: Settings, sharedDataBag: Map<string, unknown> | null = null): void {
+        if (this.isPercussion) {
+            this.stringTuning.tunings = [];
+            this.showTablature = false;
+        }
         this.stringTuning.finish();
         for (let i: number = 0, j: number = this.bars.length; i < j; i++) {
             this.bars[i].finish(settings, sharedDataBag);
+            for(const v of this.bars[i].filledVoices) {
+                this._filledVoices.add(v);
+            }
         }
     }
 
