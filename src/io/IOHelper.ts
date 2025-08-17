@@ -210,7 +210,7 @@ export class IOHelper {
         o.write(b, 0, b.length);
     }
 
-    public static *iterateCodepoints(input: string): Iterable<number> {
+    public static *iterateCodepoints(input: string) {
         let i = 0;
         while (i < input.length) {
             let c = input.charCodeAt(i);

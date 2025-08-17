@@ -1,8 +1,10 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using AlphaTab.Collections;
+using AlphaTab.Platform;
 using AlphaTab.Platform.CSharp;
 
 namespace AlphaTab;
@@ -10,9 +12,9 @@ namespace AlphaTab;
 partial class Environment
 {
     public const bool SupportsTextDecoder = true;
+
     public static void PlatformInit()
     {
-
     }
 
     private static void PrintPlatformInfo(System.Action<string> print)
@@ -40,7 +42,8 @@ partial class Environment
         };
     }
 
-    private static void CreatePlatformSpecificRenderEngines(IMap<string, RenderEngineFactory> renderEngines)
+    private static void CreatePlatformSpecificRenderEngines(
+        IMap<string, RenderEngineFactory> renderEngines)
     {
         renderEngines.Set(
             "gdi",
@@ -49,5 +52,9 @@ partial class Environment
         renderEngines.Set("default", renderEngines.Get("skia")!);
     }
 
-
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static string QuoteJsonString(string value)
+    {
+        return Json.QuoteJsonString(value);
+    }
 }

@@ -7,7 +7,7 @@ import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { TestPlatform } from '@test/TestPlatform';
 import { assert, expect } from 'chai';
 
-describe('AlphaTexExporter', () => {
+describe('AlphaTexExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         const data = await TestPlatform.loadFile('test-data/' + name);
         try {
@@ -48,8 +48,10 @@ describe('AlphaTexExporter', () => {
 
             const error = e as Error;
             if (error.cause instanceof AlphaTexError) {
+                const alphaTexError = error.cause as AlphaTexError;
+
                 const lines = exported.split('\n');
-                errorLine = `Error Line: ${lines[error.cause.line - 1]}\n`;
+                errorLine = `Error Line: ${lines[alphaTexError.line - 1]}\n`;
             }
 
             assert.fail(`<${fileName}>${e}\n${errorLine}${error.stack}\n Tex:\n${exported}`);

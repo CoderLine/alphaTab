@@ -841,10 +841,10 @@ export class Environment {
 
     /**
      * @internal
-     * @partial
      * @target web
+     * @partial
      */
-    public static quoteString(text: string) {
+    public static quoteJsonString(text: string) {
         return JSON.stringify(text);
     }
 }

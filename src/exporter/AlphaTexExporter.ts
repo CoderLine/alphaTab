@@ -149,7 +149,7 @@ class AlphaTexWriter {
         }
     }
 
-    public write(text: any) {
+    public write(text: string) {
         this.preWrite();
         this.tex += text;
         this.isStartOfLine = false;
@@ -175,7 +175,7 @@ class AlphaTexWriter {
 
     public writeString(text: string) {
         this.preWrite();
-        this.tex += Environment.quoteString(text);
+        this.tex += Environment.quoteJsonString(text);
         this.tex += ' ';
     }
 
@@ -186,14 +186,14 @@ class AlphaTexWriter {
 
         this.preWrite();
         this.tex += `\\${tag} `;
-        this.tex += Environment.quoteString(value);
+        this.tex += Environment.quoteJsonString(value);
         this.writeLine();
     }
 
-    public writeMeta(tag: string, value?: any) {
+    public writeMeta(tag: string, value?: string) {
         this.preWrite();
         this.tex += `\\${tag} `;
-        if (value !== undefined) {
+        if (value) {
             this.tex += value;
         }
         this.writeLine();
@@ -264,7 +264,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.writeLine();
 
         if (score.defaultSystemsLayout !== AlphaTexExporter.DefaultScore.defaultSystemsLayout) {
-            writer.writeMeta('defaultSystemsLayout', score.defaultSystemsLayout);
+            writer.writeMeta('defaultSystemsLayout', `${score.defaultSystemsLayout}`);
         }
         if (score.systemsLayout.length > 0) {
             writer.writeMeta('systemsLayout', score.systemsLayout.join(' '));
@@ -483,7 +483,7 @@ export class AlphaTexExporter extends ScoreExporter {
         writer.writeSingleLineComment(`Staff ${staff.index + 1} Metadata`);
 
         if (staff.capo !== 0) {
-            writer.writeMeta('capo', staff.capo);
+            writer.writeMeta('capo', `${staff.capo}`);
         }
         if (staff.isPercussion) {
             writer.writeMeta('articulation', 'defaults');
@@ -509,14 +509,14 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         if (staff.transpositionPitch !== 0) {
-            writer.writeMeta('transpose', -staff.transpositionPitch);
+            writer.writeMeta('transpose', `${-staff.transpositionPitch}`);
         }
 
         const defaultTransposition = ModelUtils.displayTranspositionPitches.has(staff.track.playbackInfo.program)
             ? ModelUtils.displayTranspositionPitches.get(staff.track.playbackInfo.program)!
             : 0;
         if (staff.displayTranspositionPitch !== defaultTransposition) {
-            writer.writeMeta('displaytranspose', -staff.displayTranspositionPitch);
+            writer.writeMeta('displaytranspose', `${-staff.displayTranspositionPitch}`);
         }
 
         if (staff.chords != null) {
@@ -569,7 +569,7 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         if (masterBar.isRepeatEnd) {
-            writer.writeMeta('rc', masterBar.repeatCount);
+            writer.writeMeta('rc', `${masterBar.repeatCount}`);
         }
 
         if (
@@ -612,7 +612,7 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         if (masterBar.displayWidth > 0) {
-            writer.writeMeta('width', masterBar.displayWidth);
+            writer.writeMeta('width', `${masterBar.displayWidth}`);
         }
 
         if (masterBar.directions) {
@@ -663,20 +663,20 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         if (bar.displayWidth > 0) {
-            writer.writeMeta('width', bar.displayWidth);
+            writer.writeMeta('width', `${bar.displayWidth}`);
         }
 
         // sustainPedals are on beat level
         for (const sp of bar.sustainPedals) {
             switch (sp.pedalType) {
                 case SustainPedalMarkerType.Down:
-                    writer.writeMeta('spd', sp.ratioPosition);
+                    writer.writeMeta('spd', `${sp.ratioPosition}`);
                     break;
                 case SustainPedalMarkerType.Hold:
-                    writer.writeMeta('sph', sp.ratioPosition);
+                    writer.writeMeta('sph', `${sp.ratioPosition}`);
                     break;
                 case SustainPedalMarkerType.Up:
-                    writer.writeMeta('spu', sp.ratioPosition);
+                    writer.writeMeta('spu', `${sp.ratioPosition}`);
                     break;
             }
         }
@@ -1077,7 +1077,7 @@ export class AlphaTexExporter extends ScoreExporter {
         } else if (note.isPiano) {
             writer.write(Tuning.getTextForTuning(note.realValueWithoutHarmonic, true));
         } else if (note.isStringed) {
-            writer.write(note.fret);
+            writer.write(`${note.fret}`);
             const stringNumber = note.beat.voice.bar.staff.tuning.length - note.string + 1;
             writer.write(`.${stringNumber}`);
         } else {

@@ -9,17 +9,16 @@ public class Set<T> : Iterable<T> {
         _storage = ObjectBooleanMap()
     }
 
-    public val size : Double
+    public val size: Double
         get() = _storage.size.toDouble()
 
     public constructor(values: Iterable<T>?) {
         _storage = ObjectBooleanMap()
-        if(values != null){
-            for(v in values) {
+        if (values != null) {
+            for (v in values) {
                 add(v)
             }
         }
-
     }
 
     public fun add(item: T) {

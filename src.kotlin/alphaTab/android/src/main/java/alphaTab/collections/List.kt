@@ -1,12 +1,14 @@
 package alphaTab.collections
 
+import alphaTab.core.toTemplate
+
 internal class ArrayListWithRemoveRange<T> : ArrayList<T> {
 
     constructor() : super()
     constructor(c: Collection<T>) : super(c)
 
 
-    public override fun removeRange(startIndex:Int, endIndex:Int) {
+    public override fun removeRange(startIndex: Int, endIndex: Int) {
         super.removeRange(startIndex, endIndex);
     }
 }
@@ -127,7 +129,7 @@ public class List<T> : Iterable<T> {
     }
 
 
-    internal fun reduce(operation: (acc: Double, v: T) -> Double, initial:Double): Double {
+    internal fun reduce(operation: (acc: Double, v: T) -> Double, initial: Double): Double {
         var accumulator = initial
         for (element in _data) accumulator = operation(accumulator, element)
         return accumulator
@@ -161,10 +163,10 @@ public class List<T> : Iterable<T> {
     }
 
     public fun join(separator: String): String {
-        return _data.joinToString(separator)
+        return _data.map { it.toTemplate() }.joinToString(separator)
     }
 }
 
-internal inline fun <reified T> List<T>.toArray(): Array<T>  {
+internal inline fun <reified T> List<T>.toArray(): Array<T> {
     return this._data.toTypedArray()
 }
