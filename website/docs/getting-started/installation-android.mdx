@@ -10,8 +10,8 @@ The Kotlin for Android version of alphaTab can be used to render music notation 
 
 We provide Maven packages based on the latest development version via Maven Central and Sonatype OSSRH.
 
-* Pre-Release Snapshots: https://s01.oss.sonatype.org/content/repositories/snapshots/net/alphatab/ 
-* Release Versions: https://central.sonatype.com/artifact/net.alphatab/alphaTab-android
+* Pre-Release Snapshots: https://central.sonatype.com/repository/maven-snapshots/ 
+* Release Versions: https://central.sonatype.com/artifact/net.alphatab/alphaTab
 
 Install packages like usual by adding it as a dependency to your build System
 
@@ -32,12 +32,12 @@ import TabItem from '@theme/TabItem';
 repositories {
     google()
     mavenCentral() // release versions
-    // pre-release snapshots: maven("https://s01.oss.sonatype.org/content/repositories/snapshots/") 
+    // pre-release snapshots: maven("https://central.sonatype.com/repository/maven-snapshots/") 
 }
 
 dependencies {
-    implementation("net.alphatab:alphaTab-android:1.3.0")
-    // pre-release snapshots: implementation("net.alphatab:alphaTab-android:1.3.0-SNAPSHOT") 
+    implementation("net.alphatab:alphaTab:1.6.1")
+    // pre-release snapshots: implementation("net.alphatab:alphaTab:1.7.0-SNAPSHOT") 
 }
 ```
 
@@ -50,13 +50,13 @@ repositories {
     mavenCentral() // release versions
     // pre-release snapshots: 
     // maven {
-    //     url = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
+    //     url = "https://central.sonatype.com/repository/maven-snapshots/"
     // }
 }
 
 dependencies {
-    implementation "net.alphatab:alphaTab-android:1.3.0"
-    // pre-release snapshots: implementation "net.alphatab:alphaTab-android:1.3.0-SNAPSHOT"
+    implementation "net.alphatab:alphaTab:1.6.1"
+    // pre-release snapshots: implementation "net.alphatab:alphaTab:1.7.0-SNAPSHOT"
 }
 ```
 
@@ -69,10 +69,10 @@ dependencies {
     <dependencies>
         <dependency>
         <groupId>net.alphatab</groupId>
-        <artifactId>alphaTab-android</artifactId>
-        <version>1.3.0</version>
+        <artifactId>alphaTab</artifactId>
+        <version>1.6.1<>
         <!--  pre-release snapshots -->
-        <!--  <version>1.3.0-SNAPSHOT</version> -->
+        <!--  <version>1.7.0-SNAPSHOT</version> -->
         <scope>runtime</scope>
         </dependency>
     </dependencies>
