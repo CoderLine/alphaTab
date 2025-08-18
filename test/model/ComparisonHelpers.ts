@@ -81,31 +81,21 @@ export class ComparisonHelpers {
 
         ignoreKeys = ignoreKeys ?? [];
         ignoreKeys.push(
-            // score level
-            'stylesheet',
-
-            // track level
-            'color',
-
             // staff level
             'chords', // ids differ
             'percussionarticulations', // unsupported
 
             // playback info
             'port',
-            'volume',
             'primarychannel',
             'secondarychannel',
             'balance',
 
             // beat level
             'chordid', // ids differ
-            'lyrics', // missing feature
-            'preferredbeamdirection',
             'timer', // value will be calculated, only showTimer is important here
 
             // note level
-            'accidentalmode',
             'ratioposition',
             'percussionarticulation',
 
@@ -115,6 +105,16 @@ export class ComparisonHelpers {
             'tempoautomations',
 
             'isvisibleonmultitrack',
+
+            // stylesheet level
+            'globaldisplaychorddiagramsontop',
+            'pertrackchorddiagramsontop',
+            'globaldisplaytuning',
+            'globaldisplaytuning',
+            'pertrackdisplaytuning',
+            'pertrackchorddiagramsontop',
+            'pertrackmultibarrest',
+
 
             // masterbar
             'isdoublebar', // deprecated

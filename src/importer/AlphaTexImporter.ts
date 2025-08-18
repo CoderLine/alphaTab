@@ -302,10 +302,7 @@ export class AlphaTexLexer {
                     // unicode handling
 
                     // https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#sec-ecmascript-language-types-string-type
-                    if (
-                        IOHelper.isLeadingSurrogate(previousCodepoint) &&
-                        IOHelper.isTrailingSurrogate(codepoint)
-                    ) {
+                    if (IOHelper.isLeadingSurrogate(previousCodepoint) && IOHelper.isTrailingSurrogate(codepoint)) {
                         codepoint = (previousCodepoint - 0xd800) * 0x400 + (codepoint - 0xdc00) + 0x10000;
                         s += String.fromCodePoint(codepoint);
                     } else if (IOHelper.isLeadingSurrogate(codepoint)) {
@@ -316,7 +313,7 @@ export class AlphaTexLexer {
                             s += String.fromCodePoint(previousCodepoint);
                         }
 
-                        if(codepoint > 0){
+                        if (codepoint > 0) {
                             s += String.fromCodePoint(codepoint);
                         }
                     }
@@ -2132,6 +2129,29 @@ export class AlphaTexImporter extends ScoreImporter {
                 return false;
             }
             beat.text = this.syData as string;
+        } else if (syData === 'lyrics') {
+            this.sy = this.newSy();
+
+            let lyricsLine = 0;
+            if (this.sy === AlphaTexSymbols.Number) {
+                lyricsLine = this.syData as number;
+                this.sy = this.newSy();
+            }
+
+            if (this.sy !== AlphaTexSymbols.String) {
+                this.error('lyrics', AlphaTexSymbols.String, true);
+                return false;
+            }
+
+            if (!beat.lyrics) {
+                beat.lyrics = [];
+            }
+
+            while (beat.lyrics!.length <= lyricsLine) {
+                beat.lyrics.push('');
+            }
+
+            beat.lyrics[lyricsLine] = this.syData as string;
         } else if (syData === 'dd') {
             beat.dots = 2;
         } else if (syData === 'd') {

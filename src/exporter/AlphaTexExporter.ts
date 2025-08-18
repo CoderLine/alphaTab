@@ -32,7 +32,13 @@ import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
 import { Rasgueado } from '@src/model/Rasgueado';
-import { BracketExtendMode, type RenderStylesheet } from '@src/model/RenderStylesheet';
+import {
+    BracketExtendMode,
+    type RenderStylesheet,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@src/model/RenderStylesheet';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
@@ -305,6 +311,55 @@ export class AlphaTexExporter extends ScoreExporter {
         if (stylesheet.useSystemSignSeparator) {
             writer.writeMeta('useSystemSignSeparator');
         }
+        if (stylesheet.multiTrackMultiBarRest) {
+            writer.writeMeta('multiBarRest');
+        }
+        if (
+            stylesheet.singleTrackTrackNamePolicy !==
+            AlphaTexExporter.DefaultScore.stylesheet.singleTrackTrackNamePolicy
+        ) {
+            writer.writeMeta('singleTrackTrackNamePolicy', TrackNamePolicy[stylesheet.singleTrackTrackNamePolicy]);
+        }
+        if (
+            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporter.DefaultScore.stylesheet.multiTrackTrackNamePolicy
+        ) {
+            writer.writeMeta('multiTrackTrackNamePolicy', TrackNamePolicy[stylesheet.multiTrackTrackNamePolicy]);
+        }
+        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporter.DefaultScore.stylesheet.firstSystemTrackNameMode) {
+            writer.writeMeta('firstSystemTrackNameMode', TrackNameMode[stylesheet.firstSystemTrackNameMode]);
+        }
+        if (
+            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporter.DefaultScore.stylesheet.otherSystemsTrackNameMode
+        ) {
+            writer.writeMeta('otherSystemsTrackNameMode', TrackNameMode[stylesheet.otherSystemsTrackNameMode]);
+        }
+        if (
+            stylesheet.firstSystemTrackNameOrientation !==
+            AlphaTexExporter.DefaultScore.stylesheet.firstSystemTrackNameOrientation
+        ) {
+            writer.writeMeta(
+                'firstSystemTrackNameOrientation',
+                TrackNameOrientation[stylesheet.firstSystemTrackNameOrientation]
+            );
+        }
+        if (
+            stylesheet.otherSystemsTrackNameOrientation !==
+            AlphaTexExporter.DefaultScore.stylesheet.otherSystemsTrackNameOrientation
+        ) {
+            writer.writeMeta(
+                'otherSystemsTrackNameOrientation',
+                TrackNameOrientation[stylesheet.otherSystemsTrackNameOrientation]
+            );
+        }
+
+        // Unsupported:
+        // 'globaldisplaychorddiagramsontop',
+        // 'pertrackchorddiagramsontop',
+        // 'globaldisplaytuning',
+        // 'globaldisplaytuning',
+        // 'pertrackdisplaytuning',
+        // 'pertrackchorddiagramsontop',
+        // 'pertrackmultibarrest',
     }
 
     private writeTrackTo(writer: AlphaTexWriter, track: Track) {
@@ -519,13 +574,13 @@ export class AlphaTexExporter extends ScoreExporter {
             writer.writeMeta('displaytranspose', `${-staff.displayTranspositionPitch}`);
         }
 
+        writer.writeMeta('accidentals', 'auto');
+
         if (staff.chords != null) {
             for (const [_, chord] of staff.chords!) {
                 this.writeChordTo(writer, chord);
             }
         }
-
-        // TODO: lyrics
     }
 
     private writeChordTo(writer: AlphaTexWriter, c: Chord) {
@@ -947,6 +1002,18 @@ export class AlphaTexExporter extends ScoreExporter {
         if (beat.text != null) {
             writer.writeGroupItem('txt ');
             writer.writeString(beat.text);
+        }
+
+        if (beat.lyrics != null && beat.lyrics!.length > 0) {
+            if (beat.lyrics.length > 1) {
+                for (let i = 0; i < beat.lyrics.length; i++) {
+                    writer.writeGroupItem(`lyrics ${i} `);
+                    writer.writeString(beat.lyrics[i]);
+                }
+            } else {
+                writer.writeGroupItem('lyrics ');
+                writer.writeString(beat.lyrics[0]);
+            }
         }
 
         switch (beat.graceType) {

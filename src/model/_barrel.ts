@@ -23,7 +23,7 @@ export { GraceType } from '@src/model/GraceType';
 export { GraceGroup } from '@src/model/GraceGroup';
 export { GolpeType } from '@src/model/GolpeType';
 export { HarmonicType } from '@src/model/HarmonicType';
-export { InstrumentArticulation } from '@src/model/InstrumentArticulation';
+export { InstrumentArticulation, TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
 export { JsonConverter } from '@src/model/JsonConverter';
 export { KeySignature } from '@src/model/KeySignature';
 export { KeySignatureType } from '@src/model/KeySignatureType';
