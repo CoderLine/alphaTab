@@ -8,6 +8,7 @@ import {
 } from "@docusaurus/plugin-content-docs";
 import { useDocById } from "@docusaurus/plugin-content-docs/client";
 import { MarkdownString } from "../MarkdownString";
+import { useLocation } from "@docusaurus/router";
 
 function buildPropertyUrl(property: Page) {
   let url = "";
@@ -24,12 +25,12 @@ type ReferenceRowProps = { property: Page; showJson: boolean };
 const ReferenceRow: React.FC<ReferenceRowProps> = ({ property, showJson }) => {
   const { mainName, javaScriptOnly } =
     buildNames(property);
-    
+
   return (
     <tr>
       <td>
         <a href={buildPropertyUrl(property)}>
-          <CodeBadge name={mainName} type={javaScriptOnly ? 'js' : 'all' }  />
+          <CodeBadge name={mainName} type={javaScriptOnly ? 'js' : 'all'} />
         </a>
       </td>
       <td><MarkdownString content={property.prop("description", "")} /></td>
@@ -70,7 +71,7 @@ const ReferenceCategory: React.FC<ReferenceCategoryProps> = ({
   return (
     <>
       <tr>
-        <th colSpan={4}>{name}</th>
+        <th colSpan={4} id={name}>{name}</th>
       </tr>
       {rows}
     </>
@@ -103,7 +104,7 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
   const existingKeys = new Map<string, Page[]>();
   const pages: { key: string; items: Page[] }[] = [];
   for (const page of allPages) {
-    if(page.type === "link"  && page.docId?.startsWith('_') === true) {
+    if (page.type === "link" && page.docId?.startsWith('_') === true) {
       continue;
     }
 
@@ -130,6 +131,20 @@ export const ReferenceTable: React.FC<ReferenceTableProps> = ({
       showJson={showJson}
     />
   ));
+
+  const { hash } = useLocation();
+  useEffect(() => {
+    const id = hash.replace('#', '');
+    const element = document.getElementById(id);
+    if (element) {
+      setTimeout(() => {
+        element.scrollIntoView({
+          behavior: 'auto',
+          block: 'center',
+        });
+      }, 100);
+    }
+  }, []);
 
   return (
     <table className="table table-striped table-condensed reference-table">
