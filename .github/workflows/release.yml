@@ -9,7 +9,7 @@ jobs:
     name: Web
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
       - uses: actions/setup-node@v4
@@ -32,7 +32,7 @@ jobs:
     name: C#
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true
       - uses: actions/setup-node@v4
@@ -59,7 +59,7 @@ jobs:
       ORG_GRADLE_PROJECT_signingInMemoryKeyPassword: ${{secrets.SONATYPE_SIGNING_PASSWORD}}
       ORG_GRADLE_PROJECT_signingInMemoryKey: ${{secrets.SONATYPE_SIGNING_KEY}}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           lfs: true      
       - uses: actions/setup-node@v4
