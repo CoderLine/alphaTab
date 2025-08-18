@@ -81,33 +81,22 @@ export class ComparisonHelpers {
 
         ignoreKeys = ignoreKeys ?? [];
         ignoreKeys.push(
-            // score level
-            'stylesheet',
-
-            // track level
-            'color',
-
             // staff level
             'chords', // ids differ
             'percussionarticulations', // unsupported
 
             // playback info
             'port',
-            'volume',
             'primarychannel',
             'secondarychannel',
             'balance',
 
             // beat level
             'chordid', // ids differ
-            'lyrics', // missing feature
-            'preferredbeamdirection',
             'timer', // value will be calculated, only showTimer is important here
 
             // note level
-            'accidentalmode',
             'ratioposition',
-            'percussionarticulation',
 
             // for now ignore the automations as they get reorganized from beat to masterbar level
             // which messes with the 1:1 validation

@@ -524,8 +524,6 @@ export class AlphaTexExporter extends ScoreExporter {
                 this.writeChordTo(writer, chord);
             }
         }
-
-        // TODO: lyrics
     }
 
     private writeChordTo(writer: AlphaTexWriter, c: Chord) {
@@ -947,6 +945,18 @@ export class AlphaTexExporter extends ScoreExporter {
         if (beat.text != null) {
             writer.writeGroupItem('txt ');
             writer.writeString(beat.text);
+        }
+
+        if (beat.lyrics != null && beat.lyrics!.length > 0) {
+            if (beat.lyrics.length > 1) {
+                for (let i = 0; i < beat.lyrics.length; i++) {
+                    writer.writeGroupItem(`lyrics ${i} `);
+                    writer.writeString(beat.lyrics[i]);
+                }
+            } else {
+                writer.writeGroupItem('lyrics ');
+                writer.writeString(beat.lyrics[0]);
+            }
         }
 
         switch (beat.graceType) {

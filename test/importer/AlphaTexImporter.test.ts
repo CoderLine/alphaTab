@@ -2298,6 +2298,34 @@ describe('AlphaTexImporterTest', () => {
     it('utf16', () => {
         const score = parseTex(`\\title "🤘🏻" .`);
 
-        expect(score.title).to.equal("🤘🏻");
+        expect(score.title).to.equal('🤘🏻');
+    });
+
+    it('beat-lyrics', () => {
+        const score = parseTex(`
+            .
+            3.3.3 
+            3.3.3 {lyrics "A"} 
+            3.3.3 {lyrics 0 "B C D"} 
+            3.3.3 {lyrics 0 "E" lyrics 1 "F" lyrics 2 "G"} 
+        `);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics).to.not.be.ok;
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics!.length).to.equal(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].lyrics![0]).to.equal('A');
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics!.length).to.equal(1);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[2].lyrics![0]).to.equal('B C D');
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics).to.be.ok;
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics!.length).to.equal(3);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![0]).to.equal('E');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![1]).to.equal('F');
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[3].lyrics![2]).to.equal('G');
+
+        testExportRoundtrip(score);
     });
 });
