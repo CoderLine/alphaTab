@@ -805,10 +805,10 @@ export class AlphaTexImporter extends ScoreImporter {
             case 'bass':
                 return Clef.F4;
             case 'c3':
-            case 'tenor':
+            case 'alto':
                 return Clef.C3;
             case 'c4':
-            case 'alto':
+            case 'tenor':
                 return Clef.C4;
             case 'n':
             case 'neutral':
@@ -826,6 +826,8 @@ export class AlphaTexImporter extends ScoreImporter {
      */
     private parseClefFromInt(i: number): Clef {
         switch (i) {
+            case 0:
+                return Clef.Neutral;
             case 43:
                 return Clef.G2;
             case 65:

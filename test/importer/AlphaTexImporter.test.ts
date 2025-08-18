@@ -1965,12 +1965,27 @@ describe('AlphaTexImporterTest', () => {
 
     it('clefs', () => {
         const score = parseTex(`
-        \\clef C4 \\ottava 15ma C4 | C4
+        \\clef C4 \\ottava 15ma C4 | C4 |
+        \\clef 0 | \\clef 48 | \\clef 60 | \\clef 65 | \\clef 43 |
+        \\clef Neutral | \\clef C3 | \\clef C4 | \\clef F4 | \\clef G2 | 
+        \\clef "Neutral" | \\clef "C3" | \\clef "C4" | \\clef "F4" | \\clef "G2" | 
+        \\clef n | \\clef alto | \\clef tenor | \\clef bass | \\clef treble | 
+        \\clef "n" | \\clef "alto" | \\clef "tenor" | \\clef "bass" | \\clef "treble"
         `);
-        expect(score.tracks[0].staves[0].bars[0].clef).to.equal(Clef.C4);
-        expect(score.tracks[0].staves[0].bars[0].clefOttava).to.equal(Ottavia._15ma);
-        expect(score.tracks[0].staves[0].bars[1].clef).to.equal(Clef.C4);
-        expect(score.tracks[0].staves[0].bars[1].clefOttava).to.equal(Ottavia._15ma);
+        let barIndex = 0;
+        expect(score.tracks[0].staves[0].bars[barIndex].clef).to.equal(Clef.C4);
+        expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).to.equal(Ottavia._15ma);
+        expect(score.tracks[0].staves[0].bars[barIndex].clef).to.equal(Clef.C4);
+        expect(score.tracks[0].staves[0].bars[barIndex++].clefOttava).to.equal(Ottavia._15ma);
+
+        for (let i = 0; i < 5; i++) {
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.Neutral, `Invalid clef at index ${barIndex - 1}`);
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.C3, `Invalid clef at index ${barIndex - 1}`);
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.C4, `Invalid clef at index ${barIndex - 1}`);
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.F4, `Invalid clef at index ${barIndex - 1}`);
+            expect(score.tracks[0].staves[0].bars[barIndex++].clef).to.equal(Clef.G2, `Invalid clef at index ${barIndex - 1}`);
+        }
+
         testExportRoundtrip(score);
     });
 
