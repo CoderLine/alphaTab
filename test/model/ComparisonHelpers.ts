@@ -97,6 +97,7 @@ export class ComparisonHelpers {
 
             // note level
             'ratioposition',
+            'percussionarticulation',
 
             // for now ignore the automations as they get reorganized from beat to masterbar level
             // which messes with the 1:1 validation
@@ -104,6 +105,16 @@ export class ComparisonHelpers {
             'tempoautomations',
 
             'isvisibleonmultitrack',
+
+            // stylesheet level
+            'globaldisplaychorddiagramsontop',
+            'pertrackchorddiagramsontop',
+            'globaldisplaytuning',
+            'globaldisplaytuning',
+            'pertrackdisplaytuning',
+            'pertrackchorddiagramsontop',
+            'pertrackmultibarrest',
+
 
             // masterbar
             'isdoublebar', // deprecated

@@ -32,7 +32,13 @@ import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
 import { Rasgueado } from '@src/model/Rasgueado';
-import { BracketExtendMode, type RenderStylesheet } from '@src/model/RenderStylesheet';
+import {
+    BracketExtendMode,
+    type RenderStylesheet,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@src/model/RenderStylesheet';
 import { Score } from '@src/model/Score';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
@@ -305,6 +311,55 @@ export class AlphaTexExporter extends ScoreExporter {
         if (stylesheet.useSystemSignSeparator) {
             writer.writeMeta('useSystemSignSeparator');
         }
+        if (stylesheet.multiTrackMultiBarRest) {
+            writer.writeMeta('multiBarRest');
+        }
+        if (
+            stylesheet.singleTrackTrackNamePolicy !==
+            AlphaTexExporter.DefaultScore.stylesheet.singleTrackTrackNamePolicy
+        ) {
+            writer.writeMeta('singleTrackTrackNamePolicy', TrackNamePolicy[stylesheet.singleTrackTrackNamePolicy]);
+        }
+        if (
+            stylesheet.multiTrackTrackNamePolicy !== AlphaTexExporter.DefaultScore.stylesheet.multiTrackTrackNamePolicy
+        ) {
+            writer.writeMeta('multiTrackTrackNamePolicy', TrackNamePolicy[stylesheet.multiTrackTrackNamePolicy]);
+        }
+        if (stylesheet.firstSystemTrackNameMode !== AlphaTexExporter.DefaultScore.stylesheet.firstSystemTrackNameMode) {
+            writer.writeMeta('firstSystemTrackNameMode', TrackNameMode[stylesheet.firstSystemTrackNameMode]);
+        }
+        if (
+            stylesheet.otherSystemsTrackNameMode !== AlphaTexExporter.DefaultScore.stylesheet.otherSystemsTrackNameMode
+        ) {
+            writer.writeMeta('otherSystemsTrackNameMode', TrackNameMode[stylesheet.otherSystemsTrackNameMode]);
+        }
+        if (
+            stylesheet.firstSystemTrackNameOrientation !==
+            AlphaTexExporter.DefaultScore.stylesheet.firstSystemTrackNameOrientation
+        ) {
+            writer.writeMeta(
+                'firstSystemTrackNameOrientation',
+                TrackNameOrientation[stylesheet.firstSystemTrackNameOrientation]
+            );
+        }
+        if (
+            stylesheet.otherSystemsTrackNameOrientation !==
+            AlphaTexExporter.DefaultScore.stylesheet.otherSystemsTrackNameOrientation
+        ) {
+            writer.writeMeta(
+                'otherSystemsTrackNameOrientation',
+                TrackNameOrientation[stylesheet.otherSystemsTrackNameOrientation]
+            );
+        }
+
+        // Unsupported:
+        // 'globaldisplaychorddiagramsontop',
+        // 'pertrackchorddiagramsontop',
+        // 'globaldisplaytuning',
+        // 'globaldisplaytuning',
+        // 'pertrackdisplaytuning',
+        // 'pertrackchorddiagramsontop',
+        // 'pertrackmultibarrest',
     }
 
     private writeTrackTo(writer: AlphaTexWriter, track: Track) {
@@ -518,6 +573,8 @@ export class AlphaTexExporter extends ScoreExporter {
         if (staff.displayTranspositionPitch !== defaultTransposition) {
             writer.writeMeta('displaytranspose', `${-staff.displayTranspositionPitch}`);
         }
+
+        writer.writeMeta('accidentals', 'auto');
 
         if (staff.chords != null) {
             for (const [_, chord] of staff.chords!) {
