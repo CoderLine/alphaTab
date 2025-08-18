@@ -454,11 +454,11 @@ function tryGetSettingsUrl(
           .name!.getText()
           .toLowerCase()}/${symbol.name.toLowerCase()}`;
       } else {
-        cconsole.warn(
-          "Could not find a property of type ",
-          parentSymbol.name,
-          " in Settings"
-        );
+        // cconsole.warn(
+        //   "Could not find a property of type ",
+        //   parentSymbol.name,
+        //   " in Settings"
+        // );
         return undefined;
       }
     }
