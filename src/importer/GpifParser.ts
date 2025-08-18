@@ -96,10 +96,9 @@ export class GpifParser {
     private static readonly BendPointValueFactor: number = 1 / 25.0;
 
     // tests have shown that Guitar Pro seem to always work with 44100hz for the frame offsets,
-    // they are NOT using the sample rate of the input file. 
+    // they are NOT using the sample rate of the input file.
     // Downsampling a 44100hz ogg to 8000hz and using it in as audio track resulted in the same frame offset when placing sync points.
     private static readonly SampleRate = 44100;
-
 
     public score!: Score;
     private _backingTrackAssetId: string | undefined;
@@ -126,7 +125,7 @@ export class GpifParser {
     private _hasAnacrusis: boolean = false;
     private _articulationByName!: Map<string, InstrumentArticulation>;
     private _skipApplyLyrics: boolean = false;
-    private _backingTrackPadding:number = 0;
+    private _backingTrackPadding: number = 0;
 
     private _doubleBars: Set<MasterBar> = new Set<MasterBar>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
@@ -377,7 +376,8 @@ export class GpifParser {
                     assetId = c.innerText;
                     break;
                 case 'FramePadding':
-                    this._backingTrackPadding = GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate * 1000;
+                    this._backingTrackPadding =
+                        (GpifParser.parseIntSafe(c.innerText, 0) / GpifParser.SampleRate) * 1000;
                     break;
             }
         }
@@ -644,7 +644,7 @@ export class GpifParser {
                     this.parseStaves(track, c);
                     break;
                 case 'Transpose':
-                    this.parseTranspose(track, c);
+                    this.parseTranspose(trackId, track, c);
                     break;
                 case 'RSE':
                     this.parseRSE(track, c);
@@ -1219,7 +1219,9 @@ export class GpifParser {
         }
     }
 
-    private parseTranspose(track: Track, node: XmlNode): void {
+    private _transposeKeySignaturePerTrack: Map<string, number> = new Map<string, number>();
+
+    private parseTranspose(trackId: string, track: Track, node: XmlNode): void {
         let octave: number = 0;
         let chromatic: number = 0;
         for (const c of node.childElements()) {
@@ -1232,9 +1234,20 @@ export class GpifParser {
                     break;
             }
         }
+
+        const pitch = octave * 12 + chromatic;
         for (const staff of track.staves) {
-            staff.displayTranspositionPitch = octave * 12 + chromatic;
+            staff.displayTranspositionPitch = pitch;
         }
+
+        // the chromatic transpose also causes an alternative key signature to be adjusted
+        // In Guitar Pro this feature is hidden in the track properties (more -> Transposition tonality -> 'C played as:' ).
+        const transposeIndex = GpifParser.flooredDivision(pitch, 12);
+        this._transposeKeySignaturePerTrack.set(trackId, transposeIndex);
+    }
+
+    private static flooredDivision(a: number, b: number): number {
+        return a - b * Math.floor(a / b);
     }
 
     private parseRSE(track: Track, node: XmlNode): void {
@@ -2254,6 +2267,7 @@ export class GpifParser {
         // GP6 had percussion as element+variation
         let element: number = -1;
         let variation: number = -1;
+        let hasTransposedPitch = false;
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Property':
@@ -2334,7 +2348,15 @@ export class GpifParser {
                             note.tone = GpifParser.parseIntSafe(c.findChildElement('Step')?.innerText, 0);
                             break;
                         case 'ConcertPitch':
+                            if (!hasTransposedPitch) {
+                                this.parseConcertPitch(c, note);
+                            }
+                            break;
+                        case 'TransposedPitch':
+                            // clear potential value from concert pitch
+                            note.accidentalMode = NoteAccidentalMode.Default;
                             this.parseConcertPitch(c, note);
+                            hasTransposedPitch = true;
                             break;
                         case 'Bended':
                             isBended = true;
@@ -2570,22 +2592,36 @@ export class GpifParser {
         }
 
         // add tracks to score
+        const trackIndexToTrackId: string[] = [];
         for (const trackId of this._tracksMapping) {
             if (!trackId) {
                 continue;
             }
             const track: Track = this._tracksById.get(trackId)!;
             this.score.addTrack(track);
+            trackIndexToTrackId.push(trackId);
         }
         // process all masterbars
         let keySignature: [KeySignature, KeySignatureType];
 
         for (const barIds of this._barsOfMasterBar) {
             // add all bars of masterbar vertically to all tracks
-            let staffIndex: number = 0;
+            let staffIndex = 0;
+            let trackIndex = 0;
+
             keySignature = [KeySignature.C, KeySignatureType.Major];
+            if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[0])) {
+                keySignature = [
+                    GpifParser.transposeKey(
+                        keySignature[0],
+                        this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[0])!
+                    ),
+                    keySignature[1]
+                ];
+            }
+
             for (
-                let barIndex: number = 0, trackIndex: number = 0;
+                let barIndex: number = 0;
                 barIndex < barIds.length && trackIndex < this.score.tracks.length;
                 barIndex++
             ) {
@@ -2599,6 +2635,15 @@ export class GpifParser {
                     const masterBarIndex = staff.bars.length - 1;
                     if (this._keySignatures.has(masterBarIndex)) {
                         keySignature = this._keySignatures.get(masterBarIndex)!;
+                        if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])) {
+                            keySignature = [
+                                GpifParser.transposeKey(
+                                    keySignature[0],
+                                    this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[trackIndex])!
+                                ),
+                                keySignature[1]
+                            ];
+                        }
                     }
 
                     bar.keySignature = keySignature[0];
@@ -2666,10 +2711,19 @@ export class GpifParser {
                     if (staffIndex === track.staves.length - 1) {
                         trackIndex++;
                         staffIndex = 0;
-                        keySignature = [KeySignature.C, KeySignatureType.Major];
                     } else {
                         staffIndex++;
-                        keySignature = [KeySignature.C, KeySignatureType.Major];
+                    }
+
+                    keySignature = [KeySignature.C, KeySignatureType.Major];
+                    if (this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])) {
+                        keySignature = [
+                            GpifParser.transposeKey(
+                                keySignature[0],
+                                this._transposeKeySignaturePerTrack.get(trackIndexToTrackId[trackIndex])!
+                            ),
+                            keySignature[1]
+                        ];
                     }
                 } else {
                     // no bar for track
@@ -2749,5 +2803,56 @@ export class GpifParser {
                 }
             }
         }
+    }
+
+    private static transposeKey(keySignature: KeySignature, transpose: number): KeySignature {
+        return GpifParser.keyTransposeTable[transpose][keySignature + 7];
+    }
+
+    // NOTE: haven't figured out yet what exact formula is applied when transposing key signatures
+    // this table is simply created by checking the Guitar Pro behavior,
+
+    // The table is organized as [<transpose>][<key signature>] to match the table above
+    // it's also easier to read as we list every key signature per row, transposed by the same value
+    // this gives typically just a shifted list according to the transpose (with some special treatments)
+
+    private static readonly keyTransposeTable: KeySignature[][] = GpifParser.translateKeyTransposeTable([
+        /*              Cb    Gb    Db    Ab    Eb    Bb    F     C     G     D     A     E     B     F     C# */
+        /* C	 0 */ ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#'],
+        /* Db	 1 */ ['2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b', '0#'],
+        /* D	 2 */ ['3#', '4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#'],
+        /* Eb	 3 */ ['4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b'],
+        /* E	 4 */ ['1#', '2#', '3#', '4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#'],
+        /* F	 5 */ ['6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b'],
+        /* Gb	 6 */ ['1b', '0#', '1#', '2#', '3#', '4#', '7b', '6#', '7#', '4b', '3b', '2b', '1b', '0#', '1#'],
+        /* G	 7 */ ['4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#'],
+        /* Ab	 8 */ ['3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b'],
+        /* A	 9 */ ['2#', '3#', '4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#'],
+        /* Bb	10 */ ['5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b'],
+        /* B	11 */ ['0#', '1#', '2#', '3#', '4#', '7b', '6b', '6#', '4b', '3b', '2b', '1b', '0#', '1#', '2#']
+    ]);
+
+    /**
+     * Converts the key transpose table to actual key signatures.
+     * @param texts An array where every item indicates the number of accidentals and which accidental
+     * placed for the key signature.
+     *
+     * e.g. 3# is 3-sharps -> KeySignature.A
+     */
+    static translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
+        const keySignatures: KeySignature[][] = [];
+        for (const transpose of texts) {
+            const transposeValues: KeySignature[] = [];
+            keySignatures.push(transposeValues);
+            for (const keySignatureText of transpose) {
+                transposeValues.push(
+                    // digit
+                    parseInt(keySignatureText.charAt(0)) *
+                        // b -> negative, # positive
+                        (keySignatureText.charAt(1) === 'b' ? -1 : 1)
+                );
+            }
+        }
+        return keySignatures;
     }
 }
