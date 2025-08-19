@@ -40,13 +40,13 @@ import { Voice } from '@src/model/Voice';
 import { Logger } from '@src/Logger';
 import { ModelUtils } from '@src/model/ModelUtils';
 import type { IWriteable } from '@src/io/IWriteable';
-import { Tuning } from '@src/model/Tuning';
 import { FadeType } from '@src/model/FadeType';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { Direction } from '@src/model/Direction';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { Ottavia } from '@src/model/Ottavia';
 import { WahPedal } from '@src/model/WahPedal';
+import { AccidentalType } from '@src/model/AccidentalType';
 
 export class Gp3To5Importer extends ScoreImporter {
     private static readonly VersionString: string = 'FICHIER GUITAR PRO ';
@@ -1128,10 +1128,16 @@ export class Gp3To5Importer extends ScoreImporter {
             newNote.fret = -1;
         }
         if (swapAccidentals) {
-            const accidental = Tuning.defaultAccidentals[newNote.realValueWithoutHarmonic % 12];
-            if (accidental === '#') {
+            const accidental = ModelUtils.computeAccidental(
+                bar.keySignature,
+                NoteAccidentalMode.Default,
+                newNote.realValueWithoutHarmonic,
+                false
+            );
+
+            if (accidental === AccidentalType.Sharp) {
                 newNote.accidentalMode = NoteAccidentalMode.ForceFlat;
-            } else if (accidental === 'b') {
+            } else if (accidental === AccidentalType.Flat) {
                 newNote.accidentalMode = NoteAccidentalMode.ForceSharp;
             }
             // Note: forcing no sign to sharp not supported
