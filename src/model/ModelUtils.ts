@@ -10,6 +10,8 @@ import { Bar } from '@src/model/Bar';
 import { Voice } from '@src/model/Voice';
 import { Automation, AutomationType } from '@src/model/Automation';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import type { KeySignature } from '@src/model/KeySignature';
+import { AccidentalType } from '@src/model/AccidentalType';
 
 export class TuningParseResult {
     public note: string | null = null;
@@ -627,7 +629,7 @@ export class ModelUtils {
     }
 
     /**
-     * Lists the display transpositions for some known midi instruments. 
+     * Lists the display transpositions for some known midi instruments.
      * It is a common practice to transpose the standard notation for instruments like guitars.
      */
     public static readonly displayTranspositionPitches = new Map<number, number>([
@@ -652,4 +654,227 @@ export class ModelUtils {
         // Contrabass
         [43, -12]
     ]);
+
+    /**
+     * @internal
+     */
+    public static flooredDivision(a: number, b: number): number {
+        return a - b * Math.floor(a / b);
+    }
+
+    // NOTE: haven't figured out yet what exact formula is applied when transposing key signatures
+    // this table is simply created by checking the Guitar Pro behavior,
+
+    // The table is organized as [<transpose>][<key signature>] to match the table above
+    // it's also easier to read as we list every key signature per row, transposed by the same value
+    // this gives typically just a shifted list according to the transpose (with some special treatments)
+
+    /**
+     * Converts the key transpose table to actual key signatures.
+     * @param texts An array where every item indicates the number of accidentals and which accidental
+     * placed for the key signature.
+     *
+     * e.g. 3# is 3-sharps -> KeySignature.A
+     */
+    private static translateKeyTransposeTable(texts: string[][]): KeySignature[][] {
+        const keySignatures: KeySignature[][] = [];
+        for (const transpose of texts) {
+            const transposeValues: KeySignature[] = [];
+            keySignatures.push(transposeValues);
+            for (const keySignatureText of transpose) {
+                const keySignature =
+                    // digit
+                    (Number.parseInt(keySignatureText.charAt(0)) *
+                        // b -> negative, # positive
+                        (keySignatureText.charAt(1) === 'b' ? -1 : 1)) as KeySignature;
+                transposeValues.push(keySignature);
+            }
+        }
+        return keySignatures;
+    }
+
+    /**
+     * @internal
+     */
+    private static readonly keyTransposeTable: KeySignature[][] = ModelUtils.translateKeyTransposeTable([
+        /*              Cb    Gb    Db    Ab    Eb    Bb    F     C     G     D     A     E     B     F     C# */
+        /* C	 0 */ ['7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#'],
+        /* Db	 1 */ ['2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b', '0#'],
+        /* D	 2 */ ['3#', '4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#'],
+        /* Eb	 3 */ ['4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b'],
+        /* E	 4 */ ['1#', '2#', '3#', '4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#'],
+        /* F	 5 */ ['6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b'],
+        /* Gb	 6 */ ['1b', '0#', '1#', '2#', '3#', '4#', '7b', '6#', '7#', '4b', '3b', '2b', '1b', '0#', '1#'],
+        /* G	 7 */ ['4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#'],
+        /* Ab	 8 */ ['3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b', '2b', '1b'],
+        /* A	 9 */ ['2#', '3#', '4#', '7b', '6b', '5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#'],
+        /* Bb	10 */ ['5b', '4b', '3b', '2b', '1b', '0#', '1#', '2#', '3#', '4#', '5#', '6#', '7#', '4b', '3b'],
+        /* B	11 */ ['0#', '1#', '2#', '3#', '4#', '7b', '6b', '6#', '4b', '3b', '2b', '1b', '0#', '1#', '2#']
+    ]);
+
+    /**
+     * Transposes the given key signature.
+     * @internal
+     * @param keySignature The key signature to transpose
+     * @param transpose The number of semitones to transpose (+/- 0-11)
+     * @returns
+     */
+    public static transposeKey(keySignature: KeySignature, transpose: number): KeySignature {
+        if (transpose === 0) {
+            return keySignature;
+        }
+
+        if (transpose < 0) {
+            const lookup = ModelUtils.keyTransposeTable[-transpose];
+            const keySignatureIndex = lookup.indexOf(keySignature);
+            if (keySignatureIndex === -1) {
+                return keySignature;
+            }
+
+            return (keySignatureIndex - 7) as KeySignature;
+        } else {
+            return ModelUtils.keyTransposeTable[transpose][keySignature + 7];
+        }
+    }
+
+    /**
+     * a lookup list containing an info whether the notes within an octave
+     * need an accidental rendered. the accidental symbol is determined based on the type of key signature.
+     */
+    private static KeySignatureLookup: Array<boolean[]> = [
+        // Flats (where the value is true, a flat accidental is required for the notes)
+        [true, true, true, true, true, true, true, true, true, true, true, true],
+        [true, true, true, true, true, false, true, true, true, true, true, true],
+        [false, true, true, true, true, false, true, true, true, true, true, true],
+        [false, true, true, true, true, false, false, false, true, true, true, true],
+        [false, false, false, true, true, false, false, false, true, true, true, true],
+        [false, false, false, true, true, false, false, false, false, false, true, true],
+        [false, false, false, false, false, false, false, false, false, false, true, true],
+        // natural
+        [false, false, false, false, false, false, false, false, false, false, false, false],
+        // sharps  (where the value is true, a flat accidental is required for the notes)
+        [false, false, false, false, false, true, true, false, false, false, false, false],
+        [true, true, false, false, false, true, true, false, false, false, false, false],
+        [true, true, false, false, false, true, true, true, true, false, false, false],
+        [true, true, true, true, false, true, true, true, true, false, false, false],
+        [true, true, true, true, false, true, true, true, true, true, true, false],
+        [true, true, true, true, true, true, true, true, true, true, true, false],
+        [true, true, true, true, true, true, true, true, true, true, true, true]
+    ];
+
+    /**
+     * Contains the list of notes within an octave have accidentals set.
+     * @internal
+     */
+    public static AccidentalNotes: boolean[] = [
+        false,
+        true,
+        false,
+        true,
+        false,
+        false,
+        true,
+        false,
+        true,
+        false,
+        true,
+        false
+    ];
+
+    /**
+     * @internal
+     */
+    public static computeAccidental(
+        keySignature: KeySignature,
+        accidentalMode: NoteAccidentalMode,
+        noteValue: number,
+        quarterBend: boolean,
+        currentAccidental: AccidentalType | null = null
+    ) {
+        const ks: number = keySignature;
+        const ksi: number = ks + 7;
+        const index: number = noteValue % 12;
+
+        const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
+        const hasKeySignatureAccidentalSetForNote: boolean = ModelUtils.KeySignatureLookup[ksi][index];
+        const hasNoteAccidentalWithinOctave: boolean = ModelUtils.AccidentalNotes[index];
+
+        // the general logic is like this:
+        // - we check if the key signature has an accidental defined
+        // - we calculate which accidental a note needs according to its index in the octave
+        // - if the accidental is already placed at this line, nothing needs to be done, otherwise we place it
+        // - if there should not be an accidental, but there is one in the key signature, we clear it.
+
+        // the exceptions are:
+        // - for quarter bends we just place the corresponding accidental
+        // - the accidental mode can enforce the accidentals for the note
+
+        let accidentalToSet: AccidentalType = AccidentalType.None;
+        if (quarterBend) {
+            accidentalToSet = hasNoteAccidentalWithinOctave ? accidentalForKeySignature : AccidentalType.Natural;
+            switch (accidentalToSet) {
+                case AccidentalType.Natural:
+                    accidentalToSet = AccidentalType.NaturalQuarterNoteUp;
+                    break;
+                case AccidentalType.Sharp:
+                    accidentalToSet = AccidentalType.SharpQuarterNoteUp;
+                    break;
+                case AccidentalType.Flat:
+                    accidentalToSet = AccidentalType.FlatQuarterNoteUp;
+                    break;
+            }
+        } else {
+            // define which accidental should be shown ignoring what might be set on the KS already
+            switch (accidentalMode) {
+                case NoteAccidentalMode.ForceSharp:
+                    accidentalToSet = AccidentalType.Sharp;
+                    break;
+                case NoteAccidentalMode.ForceDoubleSharp:
+                    accidentalToSet = AccidentalType.DoubleSharp;
+                    break;
+                case NoteAccidentalMode.ForceFlat:
+                    accidentalToSet = AccidentalType.Flat;
+                    break;
+                case NoteAccidentalMode.ForceDoubleFlat:
+                    accidentalToSet = AccidentalType.DoubleFlat;
+                    break;
+                default:
+                    // if note has an accidental in the octave, we place a symbol
+                    // according to the Key Signature
+                    if (hasNoteAccidentalWithinOctave) {
+                        accidentalToSet = accidentalForKeySignature;
+                    } else if (hasKeySignatureAccidentalSetForNote) {
+                        // note does not get an accidental, but KS defines one -> Naturalize
+                        accidentalToSet = AccidentalType.Natural;
+                    }
+                    break;
+            }
+
+            // do we need an accidental on the note?
+            if (accidentalToSet !== AccidentalType.None) {
+                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
+                if (currentAccidental != null) {
+                    if (currentAccidental === accidentalToSet) {
+                        accidentalToSet = AccidentalType.None;
+                    }
+                }
+                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
+                else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
+                    accidentalToSet = AccidentalType.None;
+                }
+            } else {
+                // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
+                // and clear the registration
+                if (currentAccidental !== null) {
+                    if (currentAccidental === AccidentalType.Natural) {
+                        accidentalToSet = AccidentalType.None;
+                    } else {
+                        accidentalToSet = AccidentalType.Natural;
+                    }
+                }
+            }
+        }
+
+        return accidentalToSet;
+    }
 }

@@ -55,7 +55,7 @@ export class NumberedBeatPreNotesGlyph extends BeatGlyphBase {
 
                 const accidentalMode = note ? note.accidentalMode : NoteAccidentalMode.Default;
                 const noteValue = AccidentalHelper.getNoteValue(note);
-                let accidentalToSet: AccidentalType = AccidentalHelper.computeAccidental(
+                let accidentalToSet: AccidentalType = ModelUtils.computeAccidental(
                     this.renderer.bar.keySignature,
                     accidentalMode,
                     noteValue,
@@ -274,7 +274,7 @@ export class NumberedBeatGlyph extends BeatOnNoteGlyphBase {
 
                     let steps = stepList[index] + 1;
 
-                    const hasAccidental = AccidentalHelper.AccidentalNotes[index];
+                    const hasAccidental = ModelUtils.AccidentalNotes[index];
                     if (
                         hasAccidental &&
                         !(this.container.preNotes as NumberedBeatPreNotesGlyph).isNaturalizeAccidental

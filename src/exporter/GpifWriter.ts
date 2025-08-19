@@ -3,6 +3,7 @@ import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiUtils } from '@src/midi/MidiUtils';
 import { AccentuationType } from '@src/model/AccentuationType';
+import { AccidentalType } from '@src/model/AccidentalType';
 import { type Automation, AutomationType } from '@src/model/Automation';
 import { type Bar, SustainPedalMarkerType } from '@src/model/Bar';
 import { BarreShape } from '@src/model/BarreShape';
@@ -21,9 +22,11 @@ import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { TechniqueSymbolPlacement } from '@src/model/InstrumentArticulation';
+import type { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import type { MasterBar } from '@src/model/MasterBar';
+import { ModelUtils } from '@src/model/ModelUtils';
 import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { Note } from '@src/model/Note';
 import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
@@ -40,7 +43,6 @@ import { SlideOutType } from '@src/model/SlideOutType';
 import type { Staff } from '@src/model/Staff';
 import type { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
-import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import type { Voice } from '@src/model/Voice';
 import { WahPedal } from '@src/model/WahPedal';
@@ -571,7 +573,7 @@ export class GpifWriter {
         if (note.isPercussion) {
             this.writePitch(properties, 'ConcertPitch', 'C', '-1', '');
         } else {
-            this.writePitchForValue(properties, 'TransposedPitch', note.displayValueWithoutBend, note.accidentalMode);
+            this.writePitchForValue(properties, 'TransposedPitch', note.displayValueWithoutBend, note.accidentalMode, note.beat.voice.bar.keySignature);
         }
     }
 
@@ -579,15 +581,18 @@ export class GpifWriter {
         if (note.isPercussion) {
             this.writePitch(properties, 'ConcertPitch', 'C', '-1', '');
         } else {
-            this.writePitchForValue(properties, 'ConcertPitch', note.realValueWithoutHarmonic, note.accidentalMode);
+            this.writePitchForValue(properties, 'ConcertPitch', note.realValueWithoutHarmonic, note.accidentalMode, note.beat.voice.bar.keySignature);
         }
     }
+
+    private static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
 
     private writePitchForValue(
         properties: XmlNode,
         propertyName: string,
         value: number,
-        accidentalMode: NoteAccidentalMode
+        accidentalMode: NoteAccidentalMode,
+        keySignature: KeySignature
     ) {
         let index = 0;
         let octave = 0;
@@ -599,8 +604,25 @@ export class GpifWriter {
             index = value % 12;
             octave = (value / 12) | 0;
 
-            step = Tuning.defaultSteps[index];
-            accidental = Tuning.defaultAccidentals[index];
+            step = GpifWriter.defaultSteps[index];
+            switch (ModelUtils.computeAccidental(keySignature, NoteAccidentalMode.Default, value, false)) {
+                case AccidentalType.None:
+                case AccidentalType.Natural:
+                    accidental = '';
+                    break;
+                case AccidentalType.Sharp:
+                    accidental = '#';
+                    break;
+                case AccidentalType.Flat:
+                    accidental = 'b';
+                    break;
+                case AccidentalType.DoubleSharp:
+                    accidental = 'x';
+                    break;
+                case AccidentalType.DoubleFlat:
+                    accidental = 'bb';
+                    break;
+            }
         };
         updateParts();
 
@@ -1183,10 +1205,13 @@ export class GpifWriter {
 
                     value.addElement('BarIndex').innerText = mb.index.toString();
                     value.addElement('BarOccurrence').innerText = syncPoint.syncPointValue!.barOccurence.toString();
-                    value.addElement('ModifiedTempo').innerText = modifiedTempoLookup.value.get(syncPoint)!.syncBpm.toString();
+                    value.addElement('ModifiedTempo').innerText = modifiedTempoLookup.value
+                        .get(syncPoint)!
+                        .syncBpm.toString();
                     value.addElement('OriginalTempo').innerText = score.tempo.toString();
-                    let frameOffset = (((syncPoint.syncPointValue!.millisecondOffset - millisecondPadding) / 1000) *
-                            GpifWriter.SampleRate);
+                    let frameOffset =
+                        ((syncPoint.syncPointValue!.millisecondOffset - millisecondPadding) / 1000) *
+                        GpifWriter.SampleRate;
                     frameOffset = Math.floor(frameOffset + 0.5);
                     value.addElement('FrameOffset').innerText = frameOffset.toString();
                 }
@@ -1787,8 +1812,19 @@ export class GpifWriter {
         const masterBarNode = parent.addElement('MasterBar');
 
         const key = masterBarNode.addElement('Key');
-        key.addElement('AccidentalCount').innerText = (masterBar.keySignature as number).toString();
-        key.addElement('Mode').innerText = KeySignatureType[masterBar.keySignatureType];
+
+        let keySignature = masterBar.score.tracks[0].staves[0].bars[masterBar.index].keySignature;
+        const keySignatureType = masterBar.score.tracks[0].staves[0].bars[masterBar.index].keySignatureType;
+
+        // reverse transpose
+        const transposeIndex = ModelUtils.flooredDivision(
+            masterBar.score.tracks[0].staves[0].displayTranspositionPitch,
+            12
+        );
+        keySignature = ModelUtils.transposeKey(keySignature, -transposeIndex);
+
+        key.addElement('AccidentalCount').innerText = (keySignature as number).toString();
+        key.addElement('Mode').innerText = KeySignatureType[keySignatureType];
         key.addElement('Sharps').innerText = 'Sharps';
 
         masterBarNode.addElement('Time').innerText =

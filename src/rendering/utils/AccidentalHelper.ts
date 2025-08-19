@@ -25,49 +25,6 @@ export class AccidentalHelper {
     private _bar: Bar;
     private _barRenderer: LineBarRenderer;
 
-    /**
-     * a lookup list containing an info whether the notes within an octave
-     * need an accidental rendered. the accidental symbol is determined based on the type of key signature.
-     */
-    public static KeySignatureLookup: Array<boolean[]> = [
-        // Flats (where the value is true, a flat accidental is required for the notes)
-        [true, true, true, true, true, true, true, true, true, true, true, true],
-        [true, true, true, true, true, false, true, true, true, true, true, true],
-        [false, true, true, true, true, false, true, true, true, true, true, true],
-        [false, true, true, true, true, false, false, false, true, true, true, true],
-        [false, false, false, true, true, false, false, false, true, true, true, true],
-        [false, false, false, true, true, false, false, false, false, false, true, true],
-        [false, false, false, false, false, false, false, false, false, false, true, true],
-        // natural
-        [false, false, false, false, false, false, false, false, false, false, false, false],
-        // sharps  (where the value is true, a flat accidental is required for the notes)
-        [false, false, false, false, false, true, true, false, false, false, false, false],
-        [true, true, false, false, false, true, true, false, false, false, false, false],
-        [true, true, false, false, false, true, true, true, true, false, false, false],
-        [true, true, true, true, false, true, true, true, true, false, false, false],
-        [true, true, true, true, false, true, true, true, true, true, true, false],
-        [true, true, true, true, true, true, true, true, true, true, true, false],
-        [true, true, true, true, true, true, true, true, true, true, true, true]
-    ];
-
-    /**
-     * Contains the list of notes within an octave have accidentals set.
-     */
-    // prettier-ignore
-    public static AccidentalNotes: boolean[] = [
-        false,
-        true,
-        false,
-        true,
-        false,
-        false,
-        true,
-        false,
-        true,
-        false,
-        true,
-        false
-    ];
 
     /**
      * We always have 7 steps per octave.
@@ -198,99 +155,6 @@ export class AccidentalHelper {
         return line;
     }
 
-    public static computeAccidental(
-        keySignature: KeySignature,
-        accidentalMode: NoteAccidentalMode,
-        noteValue: number,
-        quarterBend: boolean,
-        currentAccidental: AccidentalType | null = null
-    ) {
-        const ks: number = keySignature;
-        const ksi: number = ks + 7;
-        const index: number = noteValue % 12;
-
-        const accidentalForKeySignature: AccidentalType = ksi < 7 ? AccidentalType.Flat : AccidentalType.Sharp;
-        const hasKeySignatureAccidentalSetForNote: boolean = AccidentalHelper.KeySignatureLookup[ksi][index];
-        const hasNoteAccidentalWithinOctave: boolean = AccidentalHelper.AccidentalNotes[index];
-
-        // the general logic is like this:
-        // - we check if the key signature has an accidental defined
-        // - we calculate which accidental a note needs according to its index in the octave
-        // - if the accidental is already placed at this line, nothing needs to be done, otherwise we place it
-        // - if there should not be an accidental, but there is one in the key signature, we clear it.
-
-        // the exceptions are:
-        // - for quarter bends we just place the corresponding accidental
-        // - the accidental mode can enforce the accidentals for the note
-
-        let accidentalToSet: AccidentalType = AccidentalType.None;
-        if (quarterBend) {
-            accidentalToSet = hasNoteAccidentalWithinOctave ? accidentalForKeySignature : AccidentalType.Natural;
-            switch (accidentalToSet) {
-                case AccidentalType.Natural:
-                    accidentalToSet = AccidentalType.NaturalQuarterNoteUp;
-                    break;
-                case AccidentalType.Sharp:
-                    accidentalToSet = AccidentalType.SharpQuarterNoteUp;
-                    break;
-                case AccidentalType.Flat:
-                    accidentalToSet = AccidentalType.FlatQuarterNoteUp;
-                    break;
-            }
-        } else {
-            // define which accidental should be shown ignoring what might be set on the KS already
-            switch (accidentalMode) {
-                case NoteAccidentalMode.ForceSharp:
-                    accidentalToSet = AccidentalType.Sharp;
-                    break;
-                case NoteAccidentalMode.ForceDoubleSharp:
-                    accidentalToSet = AccidentalType.DoubleSharp;
-                    break;
-                case NoteAccidentalMode.ForceFlat:
-                    accidentalToSet = AccidentalType.Flat;
-                    break;
-                case NoteAccidentalMode.ForceDoubleFlat:
-                    accidentalToSet = AccidentalType.DoubleFlat;
-                    break;
-                default:
-                    // if note has an accidental in the octave, we place a symbol
-                    // according to the Key Signature
-                    if (hasNoteAccidentalWithinOctave) {
-                        accidentalToSet = accidentalForKeySignature;
-                    } else if (hasKeySignatureAccidentalSetForNote) {
-                        // note does not get an accidental, but KS defines one -> Naturalize
-                        accidentalToSet = AccidentalType.Natural;
-                    }
-                    break;
-            }
-
-            // do we need an accidental on the note?
-            if (accidentalToSet !== AccidentalType.None) {
-                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
-                if (currentAccidental != null) {
-                    if (currentAccidental === accidentalToSet) {
-                        accidentalToSet = AccidentalType.None;
-                    }
-                }
-                // if there is no accidental on the line, and the key signature has it set already, we clear it on the note
-                else if (hasKeySignatureAccidentalSetForNote && accidentalToSet === accidentalForKeySignature) {
-                    accidentalToSet = AccidentalType.None;
-                }
-            } else {
-                // if we don't want an accidental, but there is already one applied, we place a naturalize accidental
-                // and clear the registration
-                if (currentAccidental !== null) {
-                    if (currentAccidental === AccidentalType.Natural) {
-                        accidentalToSet = AccidentalType.None;
-                    } else {
-                        accidentalToSet = AccidentalType.Natural;
-                    }
-                }
-            }
-        }
-
-        return accidentalToSet;
-    }
 
     private getAccidental(
         noteValue: number,
@@ -314,7 +178,7 @@ export class AccidentalHelper {
                 ? this._registeredAccidentals.get(steps)!
                 : null;
 
-            accidentalToSet = AccidentalHelper.computeAccidental(
+            accidentalToSet = ModelUtils.computeAccidental(
                 this._bar.keySignature,
                 accidentalMode,
                 noteValue,

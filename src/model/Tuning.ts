@@ -10,8 +10,7 @@ export class Tuning {
     private static _fourStrings: Tuning[] = [];
     private static _defaultTunings: Map<number, Tuning> = new Map();
 
-    public static readonly defaultAccidentals: string[] = ['', '#', '', '#', '', '', '#', '', '#', '', '#', ''];
-    public static readonly defaultSteps: string[] = ['C', 'C', 'D', 'D', 'E', 'F', 'F', 'G', 'G', 'A', 'A', 'B'];
+    public static readonly noteNames: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
 
     public static getTextForTuning(tuning: number, includeOctave: boolean): string {
         const parts = Tuning.getTextPartsForTuning(tuning);
@@ -21,7 +20,7 @@ export class Tuning {
     public static getTextPartsForTuning(tuning: number, octaveShift: number = -1): string[] {
         const octave: number = (tuning / 12) | 0;
         const note: number = tuning % 12;
-        const notes: string[] = ['C', 'Db', 'D', 'Eb', 'E', 'F', 'Gb', 'G', 'Ab', 'A', 'Bb', 'B'];
+        const notes: string[] = Tuning.noteNames;
         return [notes[note], (octave + octaveShift).toString()];
     }
 
