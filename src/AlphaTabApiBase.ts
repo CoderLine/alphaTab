@@ -278,10 +278,7 @@ export class AlphaTabApiBase<TSettings> {
         uiFacade.initialize(this, settings);
         Logger.logLevel = this.settings.core.logLevel;
 
-        // backwards compatibility: remove in 2.0
-        if (this.settings.player.playerMode === PlayerMode.Disabled && this.settings.player.enablePlayer) {
-            this.settings.player.playerMode = PlayerMode.EnabledAutomatic;
-        }
+        this.settings.handleBackwardsCompatibility();
 
         Environment.printEnvironmentInfo(false);
 
@@ -449,6 +446,8 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public updateSettings(): void {
+        this.settings.handleBackwardsCompatibility();
+
         const score = this.score;
         if (score) {
             ModelUtils.applyPitchOffsets(this.settings, score);
@@ -3905,9 +3904,9 @@ export class AlphaTabApiBase<TSettings> {
      * @remarks
      * This will not export or use any backing track media but will always use the synthesizer to generate the output.
      * This method works with any PlayerMode active but changing the mode during export can lead to unexpected side effects.
-     * 
+     *
      * See [Audio Export](https://www.alphatab.net/docs/guides/audio-export) for further guidance how to use this feature.
-     * 
+     *
      * @param options The export options.
      * @category Methods - Player
      * @since 1.6.0

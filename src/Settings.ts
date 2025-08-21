@@ -2,7 +2,7 @@ import { CoreSettings } from '@src/CoreSettings';
 import { DisplaySettings } from '@src/DisplaySettings';
 import { ImporterSettings } from '@src/ImporterSettings';
 import { FingeringMode, NotationMode, NotationSettings, NotationElement } from '@src/NotationSettings';
-import { PlayerSettings } from '@src/PlayerSettings';
+import { PlayerMode, PlayerSettings } from '@src/PlayerSettings';
 import { SettingsSerializer } from '@src/generated/SettingsSerializer';
 import type { SettingsJson } from '@src/generated/SettingsJson';
 import { ExporterSettings } from '@src/ExporterSettings';
@@ -74,5 +74,15 @@ export class Settings {
      */
     public fillFromJson(json: SettingsJson): void {
         SettingsSerializer.fromJson(this, json);
+    }
+
+    /**
+     * handles backwards compatibility aspects on the settings, removed in 2.0
+     * @internal
+     */
+    public handleBackwardsCompatibility() {
+        if (this.player.playerMode === PlayerMode.Disabled && this.player.enablePlayer) {
+            this.player.playerMode = PlayerMode.EnabledAutomatic;
+        }
     }
 }
