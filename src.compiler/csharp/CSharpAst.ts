@@ -126,7 +126,7 @@ export enum Visibility {
 export interface DocumentedElement extends Node {
     documentation?: string;
 }
-export interface AttributedElement {
+export interface AttributedElement extends Node {
     attributes?: Attribute[];
 }
 
@@ -174,7 +174,7 @@ export interface EnumDeclaration extends NamedTypeDeclaration {
     members: EnumMember[];
 }
 
-export interface EnumMember extends Node, NamedElement, DocumentedElement {
+export interface EnumMember extends Node, NamedElement, DocumentedElement, AttributedElement {
     nodeType: SyntaxKind.EnumMember;
     initializer?: Expression;
 }
@@ -229,7 +229,7 @@ export interface FieldDeclaration extends MemberDeclaration {
     initializer?: Expression;
 }
 
-export interface PropertyDeclaration extends MemberDeclaration {
+export interface PropertyDeclaration extends MemberDeclaration, AttributedElement {
     nodeType: SyntaxKind.PropertyDeclaration;
     isVirtual: boolean;
     isOverride: boolean;

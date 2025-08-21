@@ -243,6 +243,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
         this.writeLine('@kotlin.ExperimentalUnsignedTypes');
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         this.write('interface ');
         this.writeIdentifier(d.name);
@@ -266,6 +267,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeEnumDeclaration(d: cs.EnumDeclaration) {
         this._forceInteger = true;
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         this.write('enum class ');
         this.writeIdentifier(d.name);
@@ -278,6 +280,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         for (let i = 0; i < d.members.length; i++) {
             const m = d.members[i];
             this.writeDocumentation(m);
+            this.writeAttributes(d);
             this.writeIdentifier(m.name);
             if (m.initializer) {
                 this.write('(');
@@ -472,7 +475,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._returnRunTest.push(d.isTestMethod);
         this.writeDocumentation(d);
         this.writeParameterDocumentation(d);
-
         this.writeAttributes(d);
         if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
@@ -546,6 +548,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         if (d.isStatic) {
             this.write('init ');
@@ -569,6 +572,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
 
         if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
@@ -683,6 +687,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeFieldDeclarat1on(d: cs.FieldDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
         if (this._context.isConst(d)) {
@@ -1968,6 +1973,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.writeLine('@OptIn(kotlin.contracts.ExperimentalContracts::class)');
         this.writeLine('@kotlin.ExperimentalUnsignedTypes');
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         this.write('typealias ');
         this.write(d.name);

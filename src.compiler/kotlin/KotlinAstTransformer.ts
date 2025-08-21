@@ -6,14 +6,15 @@ import CSharpAstTransformer from '../csharp/CSharpAstTransformer';
 import type KotlinEmitterContext from './KotlinEmitterContext';
 
 export default class KotlinAstTransformer extends CSharpAstTransformer {
-    protected override _context: KotlinEmitterContext;
+    protected override context: KotlinEmitterContext;
     public constructor(typeScript: ts.SourceFile, context: KotlinEmitterContext) {
         super(typeScript, context);
-        this._testClassAttribute = '';
-        this._testMethodAttribute = 'TestName';
-        this._snapshotFileAttribute = 'SnapshotFile';
+        this.testClassAttribute = '';
+        this.testMethodAttribute = 'TestName';
+        this.snapshotFileAttribute = 'SnapshotFile';
+        this.deprecatedAttributeName = 'kotlin.Deprecated';
 
-        this._context = context;
+        this.context = context;
     }
 
     public override get extension(): string {
@@ -91,7 +92,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             switch (preUnwrapped.operator) {
                 case '++':
                 case '--':
-                    const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
+                    const op = this.context.typeChecker.getSymbolAtLocation(expression.operand);
                     if (op?.valueDeclaration && op.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
                         this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(op.name);
                     }
@@ -107,7 +108,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             switch (post.operator) {
                 case '++':
                 case '--':
-                    const op = this._context.typeChecker.getSymbolAtLocation(expression.operand);
+                    const op = this.context.typeChecker.getSymbolAtLocation(expression.operand);
                     if (op?.valueDeclaration && op.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
                         this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(op.name);
                     }
@@ -129,7 +130,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             expression.operatorToken.kind === ts.SyntaxKind.LessThanLessThanEqualsToken ||
             expression.operatorToken.kind === ts.SyntaxKind.SlashEqualsToken
         ) {
-            const left = this._context.typeChecker.getSymbolAtLocation(expression.left);
+            const left = this.context.typeChecker.getSymbolAtLocation(expression.left);
             if (left?.valueDeclaration && left.valueDeclaration.kind === ts.SyntaxKind.Parameter) {
                 this._paramsWithAssignment[this._paramsWithAssignment.length - 1].add(left.name);
             }
@@ -143,9 +144,9 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
             cs.isBinaryExpression(bin) &&
             (expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsEqualsToken ||
                 expression.operatorToken.kind === ts.SyntaxKind.EqualsEqualsToken) &&
-            this._currentClassElement?.name &&
-            ts.isIdentifier(this._currentClassElement.name) &&
-            this._currentClassElement.name.text === 'equals' &&
+            this.currentClassElement?.name &&
+            ts.isIdentifier(this.currentClassElement.name) &&
+            this.currentClassElement.name.text === 'equals' &&
             (expression.left.kind === ts.SyntaxKind.ThisKeyword || expression.right.kind === ts.SyntaxKind.ThisKeyword)
         ) {
             (bin as cs.BinaryExpression).operator = '===';
@@ -248,8 +249,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         // similarly in reverse cases, when we have suspend function calling a method which returns a Deferred directly (e.g. on async interface methods)
         // then we call .await()
         if (invocation && cs.isInvocationExpression(invocation)) {
-            const returnType = this._context.typeChecker.getTypeAtLocation(expression);
-            const method = this._context.typeChecker.getSymbolAtLocation(expression.expression);
+            const returnType = this.context.typeChecker.getTypeAtLocation(expression);
+            const method = this.context.typeChecker.getSymbolAtLocation(expression.expression);
 
             if (returnType?.symbol?.name === 'Promise' && (method as any)?.parent?.name !== 'Promise') {
                 const isSuspend =
@@ -266,8 +267,8 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
                     suspendToDeferred.expression = this.makeMemberAccess(
                         suspendToDeferred,
-                        this._context.makeTypeName('alphaTab.core.TypeHelper'),
-                        this._context.toMethodName('suspendToDeferred')
+                        this.context.makeTypeName('alphaTab.core.TypeHelper'),
+                        this.context.toMethodName('suspendToDeferred')
                     );
 
                     suspendToDeferred.arguments = [
@@ -508,26 +509,26 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
     }
 
     private isCastFromEnumToNumber(expression: ts.AsExpression) {
-        const targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
-        const nonNullable = this._context.typeChecker.getNonNullableType(targetType);
+        const targetType = this.context.typeChecker.getTypeFromTypeNode(expression.type);
+        const nonNullable = this.context.typeChecker.getNonNullableType(targetType);
         if (nonNullable.flags === ts.TypeFlags.Number) {
-            const sourceType = this._context.typeChecker.getNonNullableType(
-                this._context.getType(expression.expression)
+            const sourceType = this.context.typeChecker.getNonNullableType(
+                this.context.getType(expression.expression)
             );
             return sourceType.flags & ts.TypeFlags.Enum || sourceType.flags & ts.TypeFlags.EnumLiteral;
         }
         return false;
     }
     private isCastToEnum(expression: ts.AsExpression) {
-        const targetType = this._context.typeChecker.getTypeFromTypeNode(expression.type);
+        const targetType = this.context.typeChecker.getTypeFromTypeNode(expression.type);
         return targetType.flags & ts.TypeFlags.Enum || targetType.flags & ts.TypeFlags.EnumLiteral;
     }
 
     override visitTestClass(d: ts.CallExpression): void {
-        this._csharpFile.usings.push({
+        this.csharpFile.usings.push({
             nodeType: cs.SyntaxKind.UsingDeclaration,
             namespaceOrTypeName: 'kotlinx.coroutines.test',
-            parent: this._csharpFile
+            parent: this.csharpFile
         } as cs.UsingDeclaration);
         super.visitTestClass(d);
     }
