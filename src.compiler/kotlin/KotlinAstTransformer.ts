@@ -512,9 +512,7 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
         const targetType = this.context.typeChecker.getTypeFromTypeNode(expression.type);
         const nonNullable = this.context.typeChecker.getNonNullableType(targetType);
         if (nonNullable.flags === ts.TypeFlags.Number) {
-            const sourceType = this.context.typeChecker.getNonNullableType(
-                this.context.getType(expression.expression)
-            );
+            const sourceType = this.context.typeChecker.getNonNullableType(this.context.getType(expression.expression));
             return sourceType.flags & ts.TypeFlags.Enum || sourceType.flags & ts.TypeFlags.EnumLiteral;
         }
         return false;
@@ -615,15 +613,31 @@ export default class KotlinAstTransformer extends CSharpAstTransformer {
 
             invoc.arguments.push(block);
 
-            const stmt :cs.ExpressionStatement = {
+            const stmt: cs.ExpressionStatement = {
                 nodeType: cs.SyntaxKind.ExpressionStatement,
                 expression: invoc,
                 parent
-            }
+            };
             invoc.parent = stmt;
             return stmt;
         }
 
         return super.visitExpressionStatement(parent, s);
+    }
+
+    protected visitPropertyDeclaration(
+        parent: cs.ClassDeclaration | cs.InterfaceDeclaration,
+        classElement: ts.PropertyDeclaration
+    ) {
+        const prop = super.visitPropertyDeclaration(parent, classElement);
+        if (!prop.initializer && ts.getJSDocTags(classElement).some(e => e.tagName.text === 'lateinit')) {
+            prop.initializer = {
+                nodeType: cs.SyntaxKind.NonNullExpression,
+                expression: {
+                    nodeType: cs.SyntaxKind.NullLiteral
+                } as cs.NullLiteral
+            } as cs.NonNullExpression;
+        }
+        return prop;
     }
 }

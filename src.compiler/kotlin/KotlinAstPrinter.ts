@@ -114,6 +114,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
         this.writeLine('    "UNCHECKED_CAST",');
         this.writeLine('    "USELESS_CAST",');
+        this.writeLine('    "DEPRECATION",');
+        this.writeLine('    "PARAMETER_NAME_CHANGED_ON_OVERRIDE",');
         this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION",');
         this.writeLine('    "UNNECESSARY_SAFE_CALL",');
         this.writeLine('    "UNUSED_ANONYMOUS_PARAMETER",');

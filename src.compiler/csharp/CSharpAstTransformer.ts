@@ -1676,6 +1676,8 @@ export default class CSharpAstTransformer {
         parent.members.push(csProperty);
 
         this.context.registerSymbol(csProperty);
+
+        return csProperty;
     }
 
     protected visitMethodDeclaration(

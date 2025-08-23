@@ -114,6 +114,9 @@ internal abstract class AlphaSynthWorkerApiBase : IAlphaSynth
         set => DispatchOnWorkerThread(() => { Player.IsLooping = value; });
     }
 
+    public PositionChangedEventArgs? LoadedMidiInfo => Player.LoadedMidiInfo;
+    public PositionChangedEventArgs CurrentPosition => Player.CurrentPosition;
+
     public bool Play()
     {
         if (State == PlayerState.Playing || !IsReadyForPlayback)

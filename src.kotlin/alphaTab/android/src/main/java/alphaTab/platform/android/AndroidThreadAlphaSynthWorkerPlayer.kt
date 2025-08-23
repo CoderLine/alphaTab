@@ -176,6 +176,14 @@ internal class AndroidThreadAlphaSynthWorkerPlayer : IAlphaSynth, Runnable {
             _workerQueue.add { _player?.tickPosition = value }
         }
 
+    override val currentPosition: PositionChangedEventArgs
+        get() = _player?.currentPosition ?: PositionChangedEventArgs(
+            0.0, 0.0, 0.0, 0.0, false, 120.0, 120.0
+        )
+
+    override val loadedMidiInfo: PositionChangedEventArgs?
+        get() = _player?.loadedMidiInfo
+
     override var timePosition: Double
         get() = _player?.timePosition ?: 0.0
         set(value) {
