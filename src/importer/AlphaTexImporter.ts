@@ -1351,7 +1351,6 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 return StaffMetaResult.KnownStaffMeta;
             case 'instrument':
-                this.sy = this.newSy();
                 this._staffTuningApplied = false;
                 this.readTrackInstrument();
 
@@ -2599,6 +2598,18 @@ export class AlphaTexImporter extends ScoreImporter {
             automation.type = AutomationType.Instrument;
             automation.value = program;
             beat.automations.push(automation);
+        } else if (syData === 'bank') {
+            this.sy = this.newSy();
+
+            if (this.sy !== AlphaTexSymbols.Number) {
+                this.error('bank-change', AlphaTexSymbols.Number, true);
+            }
+
+            const automation = new Automation();
+            automation.isLinear = false;
+            automation.type = AutomationType.Bank;
+            automation.value = this.syData as number;
+            beat.automations.push(automation);
         } else if (syData === 'fermata') {
             this.sy = this.newSy();
             if (this.sy !== AlphaTexSymbols.String) {
@@ -2611,7 +2622,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this.sy = this.newSy(true);
             if (this.sy === AlphaTexSymbols.Number) {
                 fermata.length = this.syData as number;
-                this.sy = this.newSy(true);
+                this.sy = this.newSy();
             }
 
             beat.fermata = fermata;
@@ -2646,12 +2657,8 @@ export class AlphaTexImporter extends ScoreImporter {
                     beat.beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
                     break;
             }
-            this.sy = this.newSy();
-            return true;
         } else if (syData === 'timer') {
             beat.showTimer = true;
-            this.sy = this.newSy();
-            return true;
         } else {
             // string didn't match any beat effect syntax
             return false;

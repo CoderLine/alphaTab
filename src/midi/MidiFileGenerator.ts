@@ -40,6 +40,7 @@ import { FadeType } from '@src/model/FadeType';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Rasgueado } from '@src/model/Rasgueado';
 import { BackingTrackSyncPoint } from '@src/synth/IAlphaSynth';
+import { GeneralMidi } from '@src/midi/GeneralMidi';
 
 export class MidiNoteDuration {
     public noteOnly: number = 0;
@@ -172,6 +173,12 @@ export class MidiFileGenerator {
         }
     }
 
+    private addBankChange(track: Track, tick: number, channel: number, bank: number) {
+        const lsbMsb = GeneralMidi.bankToLsbMsb(bank);
+        this._handler.addControlChange(track.index, tick, channel, ControllerType.BankSelectCoarse, lsbMsb[1]);
+        this._handler.addControlChange(track.index, tick, channel, ControllerType.BankSelectFine, lsbMsb[0]);
+    }
+
     public static buildTranspositionPitches(score: Score, settings: Settings): Map<number, number> {
         const transpositionPitches = new Map<number, number>();
         for (const track of score.tracks) {
@@ -212,6 +219,7 @@ export class MidiFileGenerator {
             MidiFileGenerator.PitchBendRangeInSemitones
         );
         this.addProgramChange(track, 0, channel, playbackInfo.program);
+        this.addBankChange(track, 0, channel, playbackInfo.bank);
     }
 
     /**
@@ -2255,6 +2263,20 @@ export class MidiFileGenerator {
                     beat.playbackStart + startMove,
                     beat.voice.bar.staff.track.playbackInfo.secondaryChannel,
                     (automation.value | 0) & 0xff
+                );
+                break;
+            case AutomationType.Bank:
+                this.addBankChange(
+                    beat.voice.bar.staff.track,
+                    beat.playbackStart + startMove,
+                    beat.voice.bar.staff.track.playbackInfo.primaryChannel,
+                    automation.value
+                );
+                this.addBankChange(
+                    beat.voice.bar.staff.track,
+                    beat.playbackStart + startMove,
+                    beat.voice.bar.staff.track.playbackInfo.secondaryChannel,
+                    automation.value
                 );
                 break;
             case AutomationType.Balance:

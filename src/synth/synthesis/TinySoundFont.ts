@@ -216,7 +216,7 @@ export class TinySoundFont implements IAudioSampleSynthesizer {
         return processedEvents;
     }
 
-    private processMidiMessage(e: MidiEvent): void {
+    public processMidiMessage(e: MidiEvent): void {
         //Logger.debug('Midi', `Processing Midi message ${MidiEventType[e.type]}/${e.tick}`);
         const command: MidiEventType = e.type;
         switch (command) {

@@ -573,7 +573,13 @@ export class GpifWriter {
         if (note.isPercussion) {
             this.writePitch(properties, 'ConcertPitch', 'C', '-1', '');
         } else {
-            this.writePitchForValue(properties, 'TransposedPitch', note.displayValueWithoutBend, note.accidentalMode, note.beat.voice.bar.keySignature);
+            this.writePitchForValue(
+                properties,
+                'TransposedPitch',
+                note.displayValueWithoutBend,
+                note.accidentalMode,
+                note.beat.voice.bar.keySignature
+            );
         }
     }
 
@@ -581,7 +587,13 @@ export class GpifWriter {
         if (note.isPercussion) {
             this.writePitch(properties, 'ConcertPitch', 'C', '-1', '');
         } else {
-            this.writePitchForValue(properties, 'ConcertPitch', note.realValueWithoutHarmonic, note.accidentalMode, note.beat.voice.bar.keySignature);
+            this.writePitchForValue(
+                properties,
+                'ConcertPitch',
+                note.realValueWithoutHarmonic,
+                note.accidentalMode,
+                note.beat.voice.bar.keySignature
+            );
         }
     }
 
@@ -1306,10 +1318,9 @@ export class GpifWriter {
         soundNode.addElement('Role').setCData(role);
 
         const midi = soundNode.addElement('MIDI');
-        const lsb = bank & 0x7F;
-        const msb = (bank >> 7) & 0x7F;
-        midi.addElement('LSB').innerText = lsb.toString();
-        midi.addElement('MSB').innerText = msb.toString();
+        const lsbMsb = GeneralMidi.bankToLsbMsb(bank);
+        midi.addElement('LSB').innerText = lsbMsb[0].toString();
+        midi.addElement('MSB').innerText = lsbMsb[1].toString();
         midi.addElement('Program').innerText = program.toString();
 
         const automationNode = automationsNode.addElement('Automation');
@@ -1339,9 +1350,9 @@ export class GpifWriter {
                         for (const beat of voice.beats) {
                             const soundAutomation = beat.getAutomation(AutomationType.Instrument);
                             const isTrackSound = bar.index === 0 && beat.index === 0;
-                            
+
                             const bankAutomation = beat.getAutomation(AutomationType.Bank);
-                            if(bankAutomation) {
+                            if (bankAutomation) {
                                 bank = bankAutomation.value;
                             }
 

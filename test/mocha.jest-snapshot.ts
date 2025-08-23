@@ -16,7 +16,7 @@ import type { SyncExpectationResult } from 'expect';
 import { equals, iterableEquality, subsetEquality } from '@jest/expect-utils';
 import * as matcherUtils from 'jest-matcher-utils';
 import { AssertionError } from 'assertion-error';
-import { type PrettyFormatConfig, type PrettyFormatPrinter, ScoreSerializerPlugin } from './PrettyFormat';
+import { MidiEventSerializerPlugin, type PrettyFormatConfig, type PrettyFormatPrinter, ScoreSerializerPlugin } from './PrettyFormat';
 
 // Mocha and Chai integration (called from global-hooks.ts)
 declare global {
@@ -37,6 +37,22 @@ export async function initializeJestSnapshot() {
         serialize(val, config, indentation, depth, refs, printer) {
             //
             return ScoreSerializerPlugin.instance.serialize(
+                val,
+                config as PrettyFormatConfig,
+                indentation,
+                depth,
+                refs,
+                printer as PrettyFormatPrinter
+            );
+        }
+    });
+    addSerializer({
+        test(val) {
+            return MidiEventSerializerPlugin.instance.test(val);
+        },
+        serialize(val, config, indentation, depth, refs, printer) {
+            //
+            return MidiEventSerializerPlugin.instance.serialize(
                 val,
                 config as PrettyFormatConfig,
                 indentation,

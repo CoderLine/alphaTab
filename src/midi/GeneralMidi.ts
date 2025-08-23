@@ -158,6 +158,12 @@ export class GeneralMidi {
         return (program >= 24 && program <= 39) || program === 105 || program === 43;
     }
     public static isBass(program: number): boolean {
-        return (program >= 32 && program <= 39);
+        return program >= 32 && program <= 39;
+    }
+    public static bankToLsbMsb(bank: number): [number, number] {
+        const lsb = bank & 0x7f;
+        const msb = (bank >> 7) & 0x7f;
+
+        return [lsb, msb];
     }
 }
