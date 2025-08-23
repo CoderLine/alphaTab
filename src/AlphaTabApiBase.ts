@@ -275,13 +275,33 @@ export class AlphaTabApiBase<TSettings> {
         this.uiFacade = uiFacade;
         this.container = uiFacade.rootContainer;
 
+        this.activeBeatsChanged = new EventEmitterOfT<ActiveBeatsChangedEventArgs>(() => {
+            if (this._player.state === PlayerState.Playing && this._currentBeat) {
+                return new ActiveBeatsChangedEventArgs(this._currentBeat!.beatLookup.highlightedBeats.map(h => h.beat));
+            }
+            return null;
+        });
+        this.playedBeatChanged = new EventEmitterOfT<Beat>(() => {
+            if (this._player.state === PlayerState.Playing && this._currentBeat) {
+                return this._currentBeat.beat;
+            }
+            return null;
+        });
+        this.scoreLoaded = new EventEmitterOfT<Score>(() => {
+            if (this._score) {
+                return this._score;
+            }
+            return null;
+        });
+
+        this.midiLoaded = new EventEmitterOfT<PositionChangedEventArgs>(() => {
+            return this._player.loadedMidiInfo ?? null;
+        });
+
         uiFacade.initialize(this, settings);
         Logger.logLevel = this.settings.core.logLevel;
 
-        // backwards compatibility: remove in 2.0
-        if (this.settings.player.playerMode === PlayerMode.Disabled && this.settings.player.enablePlayer) {
-            this.settings.player.playerMode = PlayerMode.EnabledAutomatic;
-        }
+        this.settings.handleBackwardsCompatibility();
 
         Environment.printEnvironmentInfo(false);
 
@@ -449,6 +469,8 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      */
     public updateSettings(): void {
+        this.settings.handleBackwardsCompatibility();
+
         const score = this.score;
         if (score) {
             ModelUtils.applyPitchOffsets(this.settings, score);
@@ -1300,6 +1322,24 @@ export class AlphaTabApiBase<TSettings> {
 
     public set timePosition(value: number) {
         this._player.timePosition = value;
+    }
+
+    /**
+     * The total length of the song in midi ticks.
+     * @category Properties - Player
+     * @since 1.6.2
+     */
+    public get endTick(): number {
+        return this._player.currentPosition.endTick;
+    }
+
+    /**
+     * The total length of the song in milliseconds.
+     * @category Properties - Player
+     * @since 1.6.2
+     */
+    public get endTime(): number {
+        return this._player.currentPosition.endTime;
     }
 
     /**
@@ -2276,7 +2316,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public playedBeatChanged: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public readonly playedBeatChanged: IEventEmitterOfT<Beat>;
     private onPlayedBeatChanged(beat: Beat): void {
         if (this._isDestroyed) {
             return;
@@ -2324,8 +2364,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public activeBeatsChanged: IEventEmitterOfT<ActiveBeatsChangedEventArgs> =
-        new EventEmitterOfT<ActiveBeatsChangedEventArgs>();
+    public readonly activeBeatsChanged: IEventEmitterOfT<ActiveBeatsChangedEventArgs>;
 
     private onActiveBeatsChanged(e: ActiveBeatsChangedEventArgs): void {
         if (this._isDestroyed) {
@@ -2374,7 +2413,7 @@ export class AlphaTabApiBase<TSettings> {
      * }
      * ```
      */
-    public beatMouseDown: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public readonly beatMouseDown: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
 
     /**
      * This event is fired whenever the user moves the mouse over a beat after the user already pressed the button on a beat.
@@ -2410,7 +2449,7 @@ export class AlphaTabApiBase<TSettings> {
      * }
      * ```
      */
-    public beatMouseMove: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
+    public readonly beatMouseMove: IEventEmitterOfT<Beat> = new EventEmitterOfT<Beat>();
 
     /**
      * This event is fired whenever the user releases the mouse after a mouse press on a beat.
@@ -2450,7 +2489,7 @@ export class AlphaTabApiBase<TSettings> {
      * }
      * ```
      */
-    public beatMouseUp: IEventEmitterOfT<Beat | null> = new EventEmitterOfT<Beat | null>();
+    public readonly beatMouseUp: IEventEmitterOfT<Beat | null> = new EventEmitterOfT<Beat | null>();
 
     /**
      * This event is fired whenever a the user presses the mouse button on a note head/number.
@@ -2492,7 +2531,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public noteMouseDown: IEventEmitterOfT<Note> = new EventEmitterOfT<Note>();
+    public readonly noteMouseDown: IEventEmitterOfT<Note> = new EventEmitterOfT<Note>();
 
     /**
      * This event is fired whenever the user moves the mouse over a note after the user already pressed the button on a note.
@@ -2534,7 +2573,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public noteMouseMove: IEventEmitterOfT<Note> = new EventEmitterOfT<Note>();
+    public readonly noteMouseMove: IEventEmitterOfT<Note> = new EventEmitterOfT<Note>();
 
     /**
      * This event is fired whenever the user releases the mouse after a mouse press on a note.
@@ -2578,7 +2617,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public noteMouseUp: IEventEmitterOfT<Note | null> = new EventEmitterOfT<Note | null>();
+    public readonly noteMouseUp: IEventEmitterOfT<Note | null> = new EventEmitterOfT<Note | null>();
 
     private get hasCursor() {
         return this.settings.player.playerMode !== PlayerMode.Disabled && this.settings.player.enableCursor;
@@ -2915,7 +2954,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public scoreLoaded: IEventEmitterOfT<Score> = new EventEmitterOfT<Score>();
+    public readonly scoreLoaded: IEventEmitterOfT<Score>;
     private onScoreLoaded(score: Score): void {
         if (this._isDestroyed) {
             return;
@@ -2974,7 +3013,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public resize: IEventEmitterOfT<ResizeEventArgs> = new EventEmitterOfT<ResizeEventArgs>();
+    public readonly resize: IEventEmitterOfT<ResizeEventArgs> = new EventEmitterOfT<ResizeEventArgs>();
     private onResize(e: ResizeEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -3021,7 +3060,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public renderStarted: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
+    public readonly renderStarted: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
     private onRenderStarted(resize: boolean): void {
         if (this._isDestroyed) {
             return;
@@ -3069,7 +3108,8 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+        new EventEmitterOfT<RenderFinishedEventArgs>();
     private onRenderFinished(renderingResult: RenderFinishedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -3120,7 +3160,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public postRenderFinished: IEventEmitter = new EventEmitter();
+    public readonly postRenderFinished: IEventEmitter = new EventEmitter();
     private onPostRenderFinished(): void {
         if (this._isDestroyed) {
             return;
@@ -3174,7 +3214,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
     /**
      * @internal
      */
@@ -3388,7 +3428,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public midiLoad: IEventEmitterOfT<MidiFile> = new EventEmitterOfT<MidiFile>();
+    public readonly midiLoad: IEventEmitterOfT<MidiFile> = new EventEmitterOfT<MidiFile>();
     private onMidiLoad(e: MidiFile): void {
         if (this._isDestroyed) {
             return;
@@ -3436,7 +3476,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
+    public readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
     private onMidiLoaded(e: PositionChangedEventArgs): void {
         if (this._isDestroyed) {
             return;
@@ -3743,7 +3783,7 @@ export class AlphaTabApiBase<TSettings> {
      * ```
      *
      */
-    public settingsUpdated: IEventEmitter = new EventEmitter();
+    public readonly settingsUpdated: IEventEmitter = new EventEmitter();
     private onSettingsUpdated(): void {
         if (this._isDestroyed) {
             return;
@@ -3905,9 +3945,9 @@ export class AlphaTabApiBase<TSettings> {
      * @remarks
      * This will not export or use any backing track media but will always use the synthesizer to generate the output.
      * This method works with any PlayerMode active but changing the mode during export can lead to unexpected side effects.
-     * 
+     *
      * See [Audio Export](https://www.alphatab.net/docs/guides/audio-export) for further guidance how to use this feature.
-     * 
+     *
      * @param options The export options.
      * @category Methods - Player
      * @since 1.6.0

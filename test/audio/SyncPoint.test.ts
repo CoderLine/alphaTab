@@ -134,7 +134,6 @@ describe('SyncPointTests', () => {
                     `${p.masterBarIndex},${p.masterBarOccurence},${p.synthBpm},${p.syncBpm},${p.synthTime},${p.syncTime}`
             )
         ).toMatchSnapshot();
-
     });
 
     it('modified-tempo-lookup', async () => {
@@ -193,6 +192,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
         player.play();
 
         (player.output as TestBackingTrackOutput).playThroughSong(0, 42000, 500);
@@ -208,6 +208,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
         player.play();
 
         (player.output as TestBackingTrackOutput).playThroughSong(0, 42000, 1000);
@@ -222,6 +223,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
 
         // seek on player
         player.timePosition = 2000;
@@ -247,6 +249,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
 
         // seek on player
         player.timePosition = 4000 / 2;
@@ -271,6 +274,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
         player.play();
 
         ((player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler).playThroughSong(
@@ -290,6 +294,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
         player.play();
 
         ((player.output as IExternalMediaSynthOutput).handler as TestExternalMediaHandler).playThroughSong(
@@ -308,6 +313,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
 
         // seek on player
         player.timePosition = 2000;
@@ -333,6 +339,7 @@ describe('SyncPointTests', () => {
         player.positionChanged.on(e => {
             events.push(e);
         });
+        events.shift();
 
         // seek on player
         player.timePosition = 4000 / 2;

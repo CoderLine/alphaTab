@@ -122,12 +122,12 @@ export class AlphaTabWorkerScoreRenderer<T> implements IScoreRenderer {
         });
     }
 
-    public preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
-    public partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+    public readonly preRender: IEventEmitterOfT<boolean> = new EventEmitterOfT<boolean>();
+    public readonly partialRenderFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
         new EventEmitterOfT<RenderFinishedEventArgs>();
-    public partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
+    public readonly partialLayoutFinished: IEventEmitterOfT<RenderFinishedEventArgs> =
         new EventEmitterOfT<RenderFinishedEventArgs>();
-    public renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
-    public postRenderFinished: IEventEmitter = new EventEmitter();
-    public error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    public readonly renderFinished: IEventEmitterOfT<RenderFinishedEventArgs> = new EventEmitterOfT<RenderFinishedEventArgs>();
+    public readonly postRenderFinished: IEventEmitter = new EventEmitter();
+    public readonly error: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
 }

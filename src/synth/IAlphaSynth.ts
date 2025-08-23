@@ -120,6 +120,16 @@ export interface IAlphaSynth {
     timePosition: number;
 
     /**
+     * The information about the main song loaded (does not account for "one time midis" or "count in").
+     */
+    readonly loadedMidiInfo?: PositionChangedEventArgs;
+
+    /**
+     * The latest time information of the played song.
+     */
+    readonly currentPosition: PositionChangedEventArgs;
+
+    /**
      * Gets or sets the range of the song that should be played. Set this to null
      * to play the whole song.
      */

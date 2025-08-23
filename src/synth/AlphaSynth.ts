@@ -43,6 +43,8 @@ export class AlphaSynthBase implements IAlphaSynth {
     private _notPlayedSamples: number = 0;
     private _synthStopping = false;
     private _output: ISynthOutput;
+    private _loadedMidiInfo?: PositionChangedEventArgs;
+    private _currentPosition: PositionChangedEventArgs = new PositionChangedEventArgs(0, 0, 0, 0, false, 120, 120);
 
     public get output(): ISynthOutput {
         return this._output;
@@ -119,6 +121,14 @@ export class AlphaSynthBase implements IAlphaSynth {
         this.timePosition = this.timePosition * (oldSpeed / value);
     }
 
+    public get loadedMidiInfo(): PositionChangedEventArgs | undefined {
+        return this._loadedMidiInfo;
+    }
+
+    public get currentPosition(): PositionChangedEventArgs {
+        return this._currentPosition;
+    }
+
     public get tickPosition(): number {
         return this._tickPosition;
     }
@@ -182,6 +192,27 @@ export class AlphaSynthBase implements IAlphaSynth {
     public constructor(output: ISynthOutput, synthesizer: IAudioSampleSynthesizer, bufferTimeInMilliseconds: number) {
         Logger.debug('AlphaSynth', 'Initializing player');
         this.state = PlayerState.Paused;
+
+        this.ready = new EventEmitter(() => this.isReady);
+        this.readyForPlayback = new EventEmitter(() => this.isReadyForPlayback);
+        this.midiLoaded = new EventEmitterOfT<PositionChangedEventArgs>(() => {
+            if (this._loadedMidiInfo) {
+                return this._loadedMidiInfo;
+            }
+            return null;
+        });
+        this.stateChanged = new EventEmitterOfT<PlayerStateChangedEventArgs>(() => {
+            return new PlayerStateChangedEventArgs(this.state, false);
+        });
+        this.positionChanged = new EventEmitterOfT<PositionChangedEventArgs>(() => {
+            return this._currentPosition;
+        });
+        this.playbackRangeChanged = new EventEmitterOfT<PlaybackRangeChangedEventArgs>(() => {
+            if (this.playbackRange) {
+                return new PlaybackRangeChangedEventArgs(this.playbackRange);
+            }
+            return null;
+        });
 
         Logger.debug('AlphaSynth', 'Creating output');
         this._output = output;
@@ -399,17 +430,16 @@ export class AlphaSynthBase implements IAlphaSynth {
             Logger.debug('AlphaSynth', 'Loading midi from model');
             this.sequencer.loadMidi(midi);
             this._isMidiLoaded = true;
-            (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                new PositionChangedEventArgs(
-                    0,
-                    this.sequencer.currentEndTime,
-                    0,
-                    this.sequencer.currentEndTick,
-                    false,
-                    this.sequencer.currentTempo,
-                    this.sequencer.modifiedTempo
-                )
+            this._loadedMidiInfo = new PositionChangedEventArgs(
+                0,
+                this.sequencer.currentEndTime,
+                0,
+                this.sequencer.currentEndTick,
+                false,
+                this.sequencer.currentTempo,
+                this.sequencer.modifiedTempo
             );
+            (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(this._loadedMidiInfo);
             Logger.debug('AlphaSynth', 'Midi successfully loaded');
             this.checkReadyForPlayback();
             this.tickPosition = 0;
@@ -517,41 +547,46 @@ export class AlphaSynthBase implements IAlphaSynth {
         this.timePosition = this.sequencer.currentTime;
     }
 
-    protected updateTimePosition(timePosition: number, isSeek: boolean): void {
-        // update the real positions
-        let currentTime: number = timePosition;
-        this._timePosition = currentTime;
+    private createPositionChangedEventArgs(isSeek: boolean) {
+        // on fade outs we can have some milliseconds longer, ensure we don't report this
+        let currentTime: number = this._timePosition;
         let currentTick: number = this.sequencer.currentTimePositionToTickPosition(currentTime);
-        this._tickPosition = currentTick;
-
         const endTime: number = this.sequencer.currentEndTime;
         const endTick: number = this.sequencer.currentEndTick;
 
-        // on fade outs we can have some milliseconds longer, ensure we don't report this
         if (currentTime > endTime) {
             currentTime = endTime;
             currentTick = endTick;
         }
 
+        return new PositionChangedEventArgs(
+            currentTime,
+            endTime,
+            currentTick,
+            endTick,
+            isSeek,
+            this.sequencer.currentTempo,
+            this.sequencer.modifiedTempo
+        );
+    }
+
+    protected updateTimePosition(timePosition: number, isSeek: boolean): void {
+        // update the real positions
+        this._timePosition = timePosition;
+        const args = this.createPositionChangedEventArgs(isSeek);
+
+        this._tickPosition = args.currentTick;
+
         const mode = this.sequencer.isPlayingMain ? 'main' : this.sequencer.isPlayingCountIn ? 'count-in' : 'one-time';
 
         Logger.debug(
             'AlphaSynth',
-            `Position changed: (time: ${currentTime}/${endTime}, tick: ${currentTick}/${endTick}, Active Voices: ${this.synthesizer.activeVoiceCount} (${mode}), Tempo original: ${this.sequencer.currentTempo}, Tempo modified: ${this.sequencer.modifiedTempo})`
+            `Position changed: (time: ${args.currentTime}/${args.endTime}, tick: ${args.currentTick}/${args.endTick}, Active Voices: ${this.synthesizer.activeVoiceCount} (${mode}), Tempo original: ${this.sequencer.currentTempo}, Tempo modified: ${this.sequencer.modifiedTempo})`
         );
 
         if (this.sequencer.isPlayingMain) {
-            (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                new PositionChangedEventArgs(
-                    currentTime,
-                    endTime,
-                    currentTick,
-                    endTick,
-                    isSeek,
-                    this.sequencer.currentTempo,
-                    this.sequencer.modifiedTempo
-                )
-            );
+            this._currentPosition = args;
+            (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(args);
         }
 
         // build events which were actually played
@@ -559,7 +594,7 @@ export class AlphaSynthBase implements IAlphaSynth {
             this._playedEventsQueue.clear();
         } else {
             const playedEvents: MidiEvent[] = [];
-            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek()!.time < currentTime) {
+            while (!this._playedEventsQueue.isEmpty && this._playedEventsQueue.peek()!.time < args.currentTime) {
                 const synthEvent = this._playedEventsQueue.dequeue()!;
                 playedEvents.push(synthEvent.event);
             }
@@ -572,21 +607,33 @@ export class AlphaSynthBase implements IAlphaSynth {
         }
     }
 
-    readonly ready: IEventEmitter = new EventEmitter();
-    readonly readyForPlayback: IEventEmitter = new EventEmitter();
-    readonly finished: IEventEmitter = new EventEmitter();
-    readonly soundFontLoaded: IEventEmitter = new EventEmitter();
-    readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
-    readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> =
-        new EventEmitterOfT<PlayerStateChangedEventArgs>();
-    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> =
-        new EventEmitterOfT<PositionChangedEventArgs>();
-    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
+    /**
+     * @lateinit
+     */
+    public readonly ready: IEventEmitter;
+    public readonly readyForPlayback: IEventEmitter = new EventEmitter();
+    public readonly finished: IEventEmitter = new EventEmitter();
+    public readonly soundFontLoaded: IEventEmitter = new EventEmitter();
+    public readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    /**
+     * @lateinit
+     */
+    public readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
+    public readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    /**
+     * @lateinit
+     */
+    public readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs>;
+    /**
+     * @lateinit
+     */
+    public readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
+    public readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
         new EventEmitterOfT<MidiEventsPlayedEventArgs>();
-    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
-        new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+    /**
+     * @lateinit
+     */
+    public readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
 
     /**
      * @internal
