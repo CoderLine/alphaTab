@@ -114,6 +114,8 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.writeLine('    "NON_EXHAUSTIVE_WHEN",');
         this.writeLine('    "UNCHECKED_CAST",');
         this.writeLine('    "USELESS_CAST",');
+        this.writeLine('    "DEPRECATION",');
+        this.writeLine('    "PARAMETER_NAME_CHANGED_ON_OVERRIDE",');
         this.writeLine('    "UNNECESSARY_NOT_NULL_ASSERTION",');
         this.writeLine('    "UNNECESSARY_SAFE_CALL",');
         this.writeLine('    "UNUSED_ANONYMOUS_PARAMETER",');
@@ -243,6 +245,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
         this.writeLine('@kotlin.contracts.ExperimentalContracts');
         this.writeLine('@kotlin.ExperimentalUnsignedTypes');
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         this.write('interface ');
         this.writeIdentifier(d.name);
@@ -266,6 +269,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
     protected writeEnumDeclaration(d: cs.EnumDeclaration) {
         this._forceInteger = true;
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         this.write('enum class ');
         this.writeIdentifier(d.name);
@@ -278,6 +282,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         for (let i = 0; i < d.members.length; i++) {
             const m = d.members[i];
             this.writeDocumentation(m);
+            this.writeAttributes(d);
             this.writeIdentifier(m.name);
             if (m.initializer) {
                 this.write('(');
@@ -472,7 +477,6 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this._returnRunTest.push(d.isTestMethod);
         this.writeDocumentation(d);
         this.writeParameterDocumentation(d);
-
         this.writeAttributes(d);
         if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
@@ -546,6 +550,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         if (d.isStatic) {
             this.write('init ');
@@ -569,6 +574,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
 
         if (d.isStatic) {
             this.writeLine('@kotlin.jvm.JvmStatic');
@@ -683,6 +689,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
 
     protected writeFieldDeclarat1on(d: cs.FieldDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
         if (this._context.isConst(d)) {
@@ -1922,5 +1929,48 @@ export default class KotlinAstPrinter extends AstPrinterBase {
         this.write(expr.label);
         this.write(' = ');
         this.writeExpression(expr.expression);
+    }
+
+    protected writeDelegateDeclaration(d: cs.DelegateDeclaration) {
+        this.writeDocumentation(d);
+
+        this.writeLine('@OptIn(kotlin.contracts.ExperimentalContracts::class)');
+        this.writeLine('@kotlin.ExperimentalUnsignedTypes');
+        this.writeAttributes(d);
+        this.writeVisibility(d.visibility);
+        this.write('typealias ');
+        this.write(d.name);
+        this.write(' = ');
+
+        this.write('(');
+        this.writeCommaSeparated(d.parameters, p => this.writeParameter(p));
+        this.write(') -> ');
+        this.writeType(d.returnType);
+        this.writeLine();
+    }
+
+    protected writeDeconstructDeclaration(expr: cs.DeconstructDeclaration) {
+        this.write('(');
+        expr.names.forEach((v, i) => {
+            if (i > 0) {
+                this.write(', ');
+            }
+            this.write(this.escapeIdentifier(v));
+        });
+        this.write(')');
+    }
+
+    protected writeInvocationExpression(expr: cs.InvocationExpression): void {
+        if (expr.arguments.length === 1 && expr.arguments[0].nodeType === cs.SyntaxKind.Block) {
+            this.writeExpression(expr.expression);
+            if (expr.typeArguments) {
+                this.write('<');
+                this.writeCommaSeparated(expr.typeArguments, t => this.writeType(t));
+                this.write('>');
+            }
+            this.writeBlock(expr.arguments[0] as cs.Block);
+        } else {
+            super.writeInvocationExpression(expr);
+        }
     }
 }

@@ -161,8 +161,24 @@ export default class CSharpAstPrinter extends AstPrinterBase {
         }
     }
 
+    protected writeDelegateDeclaration(d: cs.DelegateDeclaration) {
+        this.writeDocumentation(d);
+        this.writeAttributes(d);
+        this.writeVisibility(d.visibility);
+
+        this.write('delegate ');
+        this.writeType(d.returnType);
+        this.write(` ${d.name}`);
+        this.writeTypeParameters(d.typeParameters);
+        this.writeParameters(d.parameters);
+        this.writeTypeParameterConstraints(d.typeParameters);
+
+        this.writeSemicolon();
+    }
+
     protected writeInterfaceDeclaration(d: cs.InterfaceDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
         if (d.partial) {
@@ -190,6 +206,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeEnumDeclaration(d: cs.EnumDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         this.write(`enum ${d.name}`);
         this.writeLine();
@@ -204,6 +221,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeEnumMember(m: cs.EnumMember): void {
         this.writeDocumentation(m);
+        this.writeAttributes(m);
         this.write(m.name);
         if (m.initializer) {
             this.write(' = ');
@@ -416,6 +434,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeConstructorDeclaration(d: cs.ConstructorDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
         if (d.isStatic) {
             this.write('static ');
@@ -437,6 +456,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writePropertyDeclaration(d: cs.PropertyDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
         const writeAsField = this.writePropertyAsField(d);
@@ -491,6 +511,7 @@ export default class CSharpAstPrinter extends AstPrinterBase {
 
     protected writeFieldDeclarat1on(d: cs.FieldDeclaration) {
         this.writeDocumentation(d);
+        this.writeAttributes(d);
         this.writeVisibility(d.visibility);
 
         if (this._context.isConst(d)) {

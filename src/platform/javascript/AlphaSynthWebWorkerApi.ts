@@ -33,11 +33,11 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     private _metronomeVolume: number = 0;
     private _countInVolume: number = 0;
     private _playbackSpeed: number = 0;
-    private _tickPosition: number = 0;
-    private _timePosition: number = 0;
     private _isLooping: boolean = false;
     private _playbackRange: PlaybackRange | null = null;
     private _midiEventsPlayedFilter: MidiEventType[] = [];
+    private _loadedMidiInfo?: PositionChangedEventArgs;
+    private _currentPosition: PositionChangedEventArgs = new PositionChangedEventArgs(0, 0, 0, 0, false, 120, 120);
 
     public get output(): ISynthOutput {
         return this._output;
@@ -134,15 +134,31 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         });
     }
 
+    public get loadedMidiInfo(): PositionChangedEventArgs | undefined {
+        return this.loadedMidiInfo;
+    }
+
+    public get currentPosition(): PositionChangedEventArgs {
+        return this._currentPosition;
+    }
+
     public get tickPosition(): number {
-        return this._tickPosition;
+        return this._currentPosition.currentTick;
     }
 
     public set tickPosition(value: number) {
         if (value < 0) {
             value = 0;
         }
-        this._tickPosition = value;
+        this._currentPosition = new PositionChangedEventArgs(
+            this._currentPosition.currentTime,
+            this._currentPosition.endTime,
+            value,
+            this._currentPosition.endTick,
+            true,
+            this._currentPosition.originalTempo,
+            this._currentPosition.modifiedTempo
+        );
         this._synth.postMessage({
             cmd: 'alphaSynth.setTickPosition',
             value: value
@@ -150,14 +166,22 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     }
 
     public get timePosition(): number {
-        return this._timePosition;
+        return this._currentPosition.currentTime;
     }
 
     public set timePosition(value: number) {
         if (value < 0) {
             value = 0;
         }
-        this._timePosition = value;
+        this._currentPosition = new PositionChangedEventArgs(
+            value,
+            this._currentPosition.endTime,
+            this._currentPosition.currentTick,
+            this._currentPosition.endTick,
+            true,
+            this._currentPosition.originalTempo,
+            this._currentPosition.modifiedTempo
+        );
         this._synth.postMessage({
             cmd: 'alphaSynth.setTimePosition',
             value: value
@@ -204,8 +228,6 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
         this._masterVolume = 0.0;
         this._metronomeVolume = 0.0;
         this._playbackSpeed = 0.0;
-        this._tickPosition = 0;
-        this._timePosition = 0.0;
         this._isLooping = false;
         this._playbackRange = null;
         this._output = player;
@@ -296,7 +318,9 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
     public applyTranspositionPitches(transpositionPitches: Map<number, number>): void {
         this._synth.postMessage({
             cmd: 'alphaSynth.applyTranspositionPitches',
-            transpositionPitches: JSON.stringify(Array.from(Environment.prepareForPostMessage(transpositionPitches).entries()))
+            transpositionPitches: JSON.stringify(
+                Array.from(Environment.prepareForPostMessage(transpositionPitches).entries())
+            )
         });
     }
 
@@ -355,19 +379,16 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 this.checkReadyForPlayback();
                 break;
             case 'alphaSynth.positionChanged':
-                this._timePosition = data.currentTime;
-                this._tickPosition = data.currentTick;
-                (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                    new PositionChangedEventArgs(
-                        data.currentTime,
-                        data.endTime,
-                        data.currentTick,
-                        data.endTick,
-                        data.isSeek,
-                        data.originalTempo,
-                        data.modifiedTempo
-                    )
+                this._currentPosition = new PositionChangedEventArgs(
+                    data.currentTime,
+                    data.endTime,
+                    data.currentTick,
+                    data.endTick,
+                    data.isSeek,
+                    data.originalTempo,
+                    data.modifiedTempo
                 );
+                (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(this._currentPosition);
                 break;
             case 'alphaSynth.midiEventsPlayed':
                 (this.midiEventsPlayed as EventEmitterOfT<MidiEventsPlayedEventArgs>).trigger(
@@ -397,17 +418,16 @@ export class AlphaSynthWebWorkerApi implements IAlphaSynth {
                 break;
             case 'alphaSynth.midiLoaded':
                 this.checkReadyForPlayback();
-                (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(
-                    new PositionChangedEventArgs(
-                        data.currentTime,
-                        data.endTime,
-                        data.currentTick,
-                        data.endTick,
-                        data.isSeek,
-                        data.originalTempo,
-                        data.modifiedTempo
-                    )
+                this._loadedMidiInfo = new PositionChangedEventArgs(
+                    data.currentTime,
+                    data.endTime,
+                    data.currentTick,
+                    data.endTick,
+                    data.isSeek,
+                    data.originalTempo,
+                    data.modifiedTempo
                 );
+                (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(this._loadedMidiInfo);
                 break;
             case 'alphaSynth.midiLoadFailed':
                 this.checkReadyForPlayback();

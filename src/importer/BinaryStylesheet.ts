@@ -563,9 +563,7 @@ export class BinaryStylesheet {
         prefix: string,
         name: string
     ) {
-        if (style.template !== undefined) {
-            binaryStylesheet.addValue(`${prefix}${name}`, style.template!, DataType.String);
-        }
+        binaryStylesheet.addValue(`${prefix}${name}`, style.template!, DataType.String);
 
         binaryStylesheet.addValue(`${prefix}${name}Alignment`, style.textAlign as number, DataType.Integer);
 
