@@ -21,7 +21,11 @@ export enum AutomationType {
     /**
      * A sync point for synchronizing the internal time axis with an external audio track.
      */
-    SyncPoint = 4
+    SyncPoint = 4,
+    /**
+     * Midi Bank change.
+     */
+    Bank = 4
 }
 
 /**

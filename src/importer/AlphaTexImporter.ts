@@ -1351,29 +1351,17 @@ export class AlphaTexImporter extends ScoreImporter {
                 }
                 return StaffMetaResult.KnownStaffMeta;
             case 'instrument':
-                this.sy = this.newSy();
                 this._staffTuningApplied = false;
-                if (this.sy === AlphaTexSymbols.Number) {
-                    const instrument: number = this.syData as number;
-                    if (instrument >= 0 && instrument <= 127) {
-                        this._currentTrack.playbackInfo.program = this.syData as number;
-                    } else {
-                        this.error('instrument', AlphaTexSymbols.Number, false);
-                    }
-                } else if (this.sy === AlphaTexSymbols.String) {
-                    const instrumentName: string = (this.syData as string).toLowerCase();
-                    if (instrumentName === 'percussion') {
-                        for (const staff of this._currentTrack.staves) {
-                            this.applyPercussionStaff(staff);
-                        }
-                        this._currentTrack.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
-                        this._currentTrack.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
-                    } else {
-                        this._currentTrack.playbackInfo.program = GeneralMidi.getValue(instrumentName);
-                    }
-                } else {
-                    this.error('instrument', AlphaTexSymbols.Number, true);
+                this.readTrackInstrument();
+
+                return StaffMetaResult.KnownStaffMeta;
+            case 'bank':
+                this.sy = this.newSy();
+                if (this.sy !== AlphaTexSymbols.Number) {
+                    this.error('bank', AlphaTexSymbols.Number, true);
                 }
+
+                this._currentTrack.playbackInfo.bank = this.syData as number;
                 this.sy = this.newSy();
                 return StaffMetaResult.KnownStaffMeta;
             case 'lyrics':
@@ -1486,6 +1474,32 @@ export class AlphaTexImporter extends ScoreImporter {
             default:
                 return StaffMetaResult.UnknownStaffMeta;
         }
+    }
+    private readTrackInstrument() {
+        this.sy = this.newSy();
+
+        if (this.sy === AlphaTexSymbols.Number) {
+            const instrument: number = this.syData as number;
+            if (instrument >= 0 && instrument <= 127) {
+                this._currentTrack.playbackInfo.program = this.syData as number;
+            } else {
+                this.error('instrument', AlphaTexSymbols.Number, false);
+            }
+        } else if (this.sy === AlphaTexSymbols.String) {
+            const instrumentName: string = (this.syData as string).toLowerCase();
+            if (instrumentName === 'percussion') {
+                for (const staff of this._currentTrack.staves) {
+                    this.applyPercussionStaff(staff);
+                }
+                this._currentTrack.playbackInfo.primaryChannel = SynthConstants.PercussionChannel;
+                this._currentTrack.playbackInfo.secondaryChannel = SynthConstants.PercussionChannel;
+            } else {
+                this._currentTrack.playbackInfo.program = GeneralMidi.getValue(instrumentName);
+            }
+        } else {
+            this.error('instrument', AlphaTexSymbols.Number, true);
+        }
+        this.sy = this.newSy();
     }
 
     private handleAccidentalMode() {
@@ -1779,6 +1793,18 @@ export class AlphaTexImporter extends ScoreImporter {
                         this._score.stylesheet.perTrackMultiBarRest = new Set<number>();
                     }
                     this._score.stylesheet.perTrackMultiBarRest!.add(this._currentTrack.index);
+                    break;
+                case 'instrument':
+                    this.readTrackInstrument();
+                    break;
+                case 'bank':
+                    this.sy = this.newSy();
+                    if (this.sy !== AlphaTexSymbols.Number) {
+                        this.error('bank', AlphaTexSymbols.Number, true);
+                    }
+
+                    this._currentTrack.playbackInfo.bank = this.syData as number;
+                    this.sy = this.newSy();
                     break;
                 default:
                     this.error('track-properties', AlphaTexSymbols.String, false);
@@ -2572,6 +2598,18 @@ export class AlphaTexImporter extends ScoreImporter {
             automation.type = AutomationType.Instrument;
             automation.value = program;
             beat.automations.push(automation);
+        } else if (syData === 'bank') {
+            this.sy = this.newSy();
+
+            if (this.sy !== AlphaTexSymbols.Number) {
+                this.error('bank-change', AlphaTexSymbols.Number, true);
+            }
+
+            const automation = new Automation();
+            automation.isLinear = false;
+            automation.type = AutomationType.Bank;
+            automation.value = this.syData as number;
+            beat.automations.push(automation);
         } else if (syData === 'fermata') {
             this.sy = this.newSy();
             if (this.sy !== AlphaTexSymbols.String) {
@@ -2584,7 +2622,7 @@ export class AlphaTexImporter extends ScoreImporter {
             this.sy = this.newSy(true);
             if (this.sy === AlphaTexSymbols.Number) {
                 fermata.length = this.syData as number;
-                this.sy = this.newSy(true);
+                this.sy = this.newSy();
             }
 
             beat.fermata = fermata;
@@ -2619,12 +2657,8 @@ export class AlphaTexImporter extends ScoreImporter {
                     beat.beamingMode = BeatBeamingMode.ForceSplitOnSecondaryToNext;
                     break;
             }
-            this.sy = this.newSy();
-            return true;
         } else if (syData === 'timer') {
             beat.showTimer = true;
-            this.sy = this.newSy();
-            return true;
         } else {
             // string didn't match any beat effect syntax
             return false;

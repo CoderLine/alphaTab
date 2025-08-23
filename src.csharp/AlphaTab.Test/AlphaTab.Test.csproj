@@ -7,12 +7,12 @@
         <Nullable>enable</Nullable>
         <LangVersion>10</LangVersion>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <NoWarn>$(NoWarn);0659;0168;1717;1998</NoWarn>
+        <NoWarn>$(NoWarn);0659;0168;1717;1998;618</NoWarn>
     </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-        <PackageReference Include="MSTest.TestAdapter" Version="3.10.1" />
+        <PackageReference Include="MSTest.TestAdapter" Version="3.10.2" />
         <PackageReference Include="MSTest.TestFramework" Version="3.10.2" />
         <PackageReference Include="AlphaSkia" Version="3.4.135" />
         <PackageReference Include="AlphaSkia.Native.Windows" Version="3.4.135" Condition="$([MSBuild]::IsOsPlatform('Windows'))" />

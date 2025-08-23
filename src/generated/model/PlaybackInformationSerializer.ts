@@ -21,6 +21,7 @@ export class PlaybackInformationSerializer {
         o.set("balance", obj.balance);
         o.set("port", obj.port);
         o.set("program", obj.program);
+        o.set("bank", obj.bank);
         o.set("primarychannel", obj.primaryChannel);
         o.set("secondarychannel", obj.secondaryChannel);
         o.set("ismute", obj.isMute);
@@ -40,6 +41,9 @@ export class PlaybackInformationSerializer {
                 return true;
             case "program":
                 obj.program = v! as number;
+                return true;
+            case "bank":
+                obj.bank = v! as number;
                 return true;
             case "primarychannel":
                 obj.primaryChannel = v! as number;

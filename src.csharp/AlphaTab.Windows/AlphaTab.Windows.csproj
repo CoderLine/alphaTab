@@ -10,7 +10,7 @@
         <TargetFramework>net8.0-windows</TargetFramework>
         <UseWPF>true</UseWPF>
         <UseWindowsForms>true</UseWindowsForms>
-        <NoWarn>$(NoWarn);NU5105</NoWarn>
+        <NoWarn>$(NoWarn);NU5105;618</NoWarn>
         <Nullable>enable</Nullable>
         <LangVersion>8</LangVersion>
         <EnableWindowsTargeting>true</EnableWindowsTargeting>

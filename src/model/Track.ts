@@ -112,6 +112,13 @@ export class Track {
      * @json_add addLineBreaks
      */
     public lineBreaks?: Set<number>;
+    
+    /**
+     * Gets whether this track is a percussion track.
+     */
+    public get isPercussion(): boolean {
+        return this.staves.some(s => s.isPercussion);
+    }
 
     /**
      * Adds a new line break.

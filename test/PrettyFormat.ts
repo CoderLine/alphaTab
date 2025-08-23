@@ -322,6 +322,29 @@ import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
+import { MidiEvent } from '@src/midi/MidiEvent';
+
+/**
+ * A serializer plugin for pretty-format for creating simple MidiEbent snapshots
+ */
+export class MidiEventSerializerPlugin implements PrettyFormatNewPlugin {
+    public static readonly instance = new MidiEventSerializerPlugin();
+    serialize(
+        val: unknown,
+        config: PrettyFormatConfig,
+        indentation: string,
+        depth: number,
+        refs: unknown[],
+        printer: PrettyFormatPrinter
+    ): string {
+        const json = JsonConverter.midiEventToJsObject(val as MidiEvent);
+        return printer(json, config, indentation, depth, refs);
+    }
+
+    test(arg0: unknown): boolean {
+        return arg0 instanceof MidiEvent;
+    }
+}
 
 /**
  * A serializer plugin for pretty-format for creating simple Score model snapshots
@@ -538,6 +561,7 @@ export class SnapshotFile {
     private static createConfig() {
         const c = new PrettyFormatConfig();
         c.plugins.push(ScoreSerializerPlugin.instance);
+        c.plugins.push(MidiEventSerializerPlugin.instance);
         return c;
     }
     private static readonly matchOptions: PrettyFormatConfig = SnapshotFile.createConfig();

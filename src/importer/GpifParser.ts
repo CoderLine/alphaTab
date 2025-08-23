@@ -76,6 +76,7 @@ class GpifSound {
     }
 
     public program: number = 0;
+    public bank: number = 0;
 }
 
 /**
@@ -499,25 +500,33 @@ export class GpifParser {
         if (!type) {
             return;
         }
-        let automation: Automation | null = null;
+        const newAutomations: Automation[] = [];
         switch (type) {
             case 'Tempo':
-                automation = Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference);
+                newAutomations.push(Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference));
                 break;
             case 'SyncPoint':
-                automation = new Automation();
-                automation.type = AutomationType.SyncPoint;
-                automation.isLinear = isLinear;
-                automation.ratioPosition = ratioPosition;
-                automation.syncPointValue = syncPointValue;
+                const syncPoint = new Automation();
+                syncPoint.type = AutomationType.SyncPoint;
+                syncPoint.isLinear = isLinear;
+                syncPoint.ratioPosition = ratioPosition;
+                syncPoint.syncPointValue = syncPointValue;
+                newAutomations.push(syncPoint);
                 break;
             case 'Sound':
                 if (textValue && sounds && sounds.has(textValue)) {
-                    automation = Automation.buildInstrumentAutomation(
+                    const bankChange: Automation = new Automation();
+                    bankChange.type = AutomationType.Bank;
+                    bankChange.ratioPosition = ratioPosition;
+                    bankChange.value = sounds.get(textValue)!.bank;
+                    newAutomations.push(bankChange);
+
+                    const programChange = Automation.buildInstrumentAutomation(
                         isLinear,
                         ratioPosition,
                         sounds.get(textValue)!.program
                     );
+                    newAutomations.push(programChange);
                 }
                 break;
             case 'SustainPedal':
@@ -547,16 +556,20 @@ export class GpifParser {
 
                 break;
         }
-        if (automation) {
+        if (newAutomations.length) {
             if (text) {
-                automation.text = text;
+                for (const a of newAutomations) {
+                    a.text = text;
+                }
             }
 
             if (barIndex >= 0) {
                 if (!automations.has(barIndex)) {
                     automations.set(barIndex, []);
                 }
-                automations.get(barIndex)!.push(automation);
+                for (const a of newAutomations) {
+                    automations.get(barIndex)!.push(a);
+                }
             }
         }
     }
@@ -1187,25 +1200,35 @@ export class GpifParser {
             }
         }
 
-        if (sound.role === 'Factory' || track.playbackInfo.program === 0) {
-            track.playbackInfo.program = sound.program;
-        }
-
         if (!this._soundsByTrack.has(trackId)) {
             this._soundsByTrack.set(trackId, new Map<string, GpifSound>());
+
+            // apply first sound
+            track.playbackInfo.program = sound.program;
+            track.playbackInfo.bank = sound.bank;
         }
 
         this._soundsByTrack.get(trackId)!.set(sound.uniqueId, sound);
     }
 
     private parseSoundMidi(sound: GpifSound, node: XmlNode): void {
+        let bankMsb = 0;
+        let bankLsb = 0;
         for (const c of node.childElements()) {
             switch (c.localName) {
                 case 'Program':
                     sound.program = GpifParser.parseIntSafe(c.innerText, 0);
                     break;
+                case 'MSB': // coarse
+                    bankMsb = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
+                case 'LSB': // Fine
+                    bankLsb = GpifParser.parseIntSafe(c.innerText, 0);
+                    break;
             }
         }
+
+        sound.bank = ((bankMsb & 0x7f) << 7) | bankLsb;
     }
 
     private parsePartSounding(trackId: string, track: Track, node: XmlNode): void {
@@ -2717,8 +2740,10 @@ export class GpifParser {
                     }
 
                     keySignature = [KeySignature.C, KeySignatureType.Major];
-                    if (trackIndex < trackIndexToTrackId.length &&                         
-                        this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])) {
+                    if (
+                        trackIndex < trackIndexToTrackId.length &&
+                        this._transposeKeySignaturePerTrack.has(trackIndexToTrackId[trackIndex])
+                    ) {
                         keySignature = [
                             ModelUtils.transposeKey(
                                 keySignature[0],
@@ -2764,9 +2789,15 @@ export class GpifParser {
                             for (const a of automations) {
                                 // NOTE: currently the automations of a bar are applied to the
                                 // first beat of a bar
-                                beat.automations.push(a);
+
+                                const skip =
+                                    // skip bank automations if they are 0 at start
+                                    a.type === AutomationType.Bank && a.value === 0 && bar.index === 0;
+
+                                if (!skip) {
+                                    beat.automations.push(a);
+                                }
                             }
-                        } else {
                         }
                     }
                 }

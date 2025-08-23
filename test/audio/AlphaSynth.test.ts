@@ -13,6 +13,9 @@ import { VorbisFile } from '@src/synth/vorbis/VorbisFile';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { AudioExportOptions } from '@src/synth/IAudioExporter';
+import { type ControlChangeEvent, MidiEventType } from '@src/midi/MidiEvent';
+import { ControllerType } from '@src/midi/ControllerType';
+import { TinySoundFont } from '@src/synth/synthesis/TinySoundFont';
 
 describe('AlphaSynthTests', () => {
     it('pcm-generation', async () => {
@@ -215,7 +218,8 @@ describe('AlphaSynthTests', () => {
 
             for (let i = 0; i < generated.length; i++) {
                 const expected = reference.getFloat32(i * 4, true);
-                if (generated[i] !== expected) { // custom check, chai assertion has quite huge overhead if called that often
+                if (generated[i] !== expected) {
+                    // custom check, chai assertion has quite huge overhead if called that often
                     expect(generated[i]).to.equal(expected, `Difference at index ${i}`);
                 }
             }
@@ -269,5 +273,70 @@ describe('AlphaSynthTests', () => {
         await testAudioExport(score, 'export-sync-points', options => {
             options.useSyncPoints = true;
         });
+    });
+
+    it('midi-bank', () => {
+        const score = ScoreLoader.loadAlphaTex(`
+            \\track T1 { instrument 25 bank 77 }
+                C4 D4 E4 F4 | C4 { instrument 27 bank 1000 } D4 E4 F4
+
+            \\track T1 { instrument 25 bank 50 }
+                C4 D4 E4 F4 | C4 D4 E4 { instrument 27 bank 4000 } F4               
+        `);
+
+        const midi: MidiFile = new MidiFile();
+        const generator: MidiFileGenerator = new MidiFileGenerator(
+            score,
+            new Settings(),
+            new AlphaSynthMidiFileHandler(midi)
+        );
+        generator.applyTranspositionPitches = false;
+        generator.generate();
+
+        const bankChanges: ControlChangeEvent[] = [];
+        for (const e of midi.events) {
+            if (
+                e.type === MidiEventType.ControlChange &&
+                ((e as ControlChangeEvent).controller === ControllerType.BankSelectCoarse ||
+                    (e as ControlChangeEvent).controller === ControllerType.BankSelectFine)
+            ) {
+                bankChanges.push(e as ControlChangeEvent);
+            }
+        }
+
+        expect(bankChanges).toMatchSnapshot();
+
+        const synth = new TinySoundFont(44100);
+
+        let i = 0;
+        function playTo(ticks: number) {
+            while (i < bankChanges.length) {
+                const nextEvent = bankChanges[i];
+                if (nextEvent.tick <= ticks) {
+                    synth.processMidiMessage(nextEvent);
+                    i++;
+                } else {
+                    break;
+                }
+            }
+        }
+
+        playTo(0);
+        expect(synth.channelGetPresetBank(0)).to.equal(77);
+        expect(synth.channelGetPresetBank(1)).to.equal(77);
+        expect(synth.channelGetPresetBank(2)).to.equal(50);
+        expect(synth.channelGetPresetBank(3)).to.equal(50);
+
+        playTo(3840);
+        expect(synth.channelGetPresetBank(0)).to.equal(1000);
+        expect(synth.channelGetPresetBank(1)).to.equal(1000);
+        expect(synth.channelGetPresetBank(2)).to.equal(50);
+        expect(synth.channelGetPresetBank(3)).to.equal(50);
+
+        playTo(3840 * 2);
+        expect(synth.channelGetPresetBank(0)).to.equal(1000);
+        expect(synth.channelGetPresetBank(1)).to.equal(1000);
+        expect(synth.channelGetPresetBank(2)).to.equal(4000);
+        expect(synth.channelGetPresetBank(3)).to.equal(4000);
     });
 });

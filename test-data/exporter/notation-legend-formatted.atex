@@ -16,11 +16,10 @@
    systemsLayout 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 1
    volume 12
    balance 8
+   instrument distortionguitar
 }
   \staff {/* Staff Properties */score tabs}
     \voice /* Voice 1 */
-      // Track 1 Metadata
-      \instrument distortionguitar
       // Staff 1 Metadata
       \tuning E4 B3 G3 D3 A2 E2 "Guitar Standard Tuning" 
       \accidentals auto
