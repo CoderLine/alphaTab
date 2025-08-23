@@ -59,6 +59,7 @@ export class Gp3To5Importer extends ScoreImporter {
     private _trackCount: number = 0;
     private _playbackInfos: PlaybackInformation[] = [];
     private _doubleBars: Set<number> = new Set<number>();
+    private _clefsPerTrack: Map<number, Clef> = new Map<number, Clef>();
     private _keySignatures: Map<number, [KeySignature, KeySignatureType]> = new Map<
         number,
         [KeySignature, KeySignatureType]
@@ -482,30 +483,87 @@ export class Gp3To5Importer extends ScoreImporter {
         mainStaff.capo = IOHelper.readInt32LE(this.data);
         newTrack.color = GpBinaryHelpers.gpReadColor(this.data, false);
         if (this._versionNumber >= 500) {
-            const staveFlags = this.data.readByte();
-            mainStaff.showTablature = (staveFlags & 0x01) !== 0;
-            mainStaff.showStandardNotation = (staveFlags & 0x02) !== 0;
+            const staffFlags = this.data.readByte();
+            mainStaff.showTablature = (staffFlags & 0x01) !== 0;
+            mainStaff.showStandardNotation = (staffFlags & 0x02) !== 0;
 
-            const showChordDiagramListOnTopOfScore = (staveFlags & 0x64) !== 0;
+            const showChordDiagramListOnTopOfScore = (staffFlags & 0x64) !== 0;
 
             if (this._score.stylesheet.perTrackChordDiagramsOnTop === null) {
                 this._score.stylesheet.perTrackChordDiagramsOnTop = new Map<number, boolean>();
             }
             this._score.stylesheet.perTrackChordDiagramsOnTop!.set(newTrack.index, showChordDiagramListOnTopOfScore);
 
-            // flags for
+            // MIDI: Automatic
+            //  0x01 -> always set (unknown)
             //  0x02 -> auto let ring
             //  0x04 -> auto brush
             this.data.readByte();
 
-            // unknown
-            this.data.skip(43);
-        }
-        // unknown
-        if (this._versionNumber >= 510) {
-            this.data.skip(4);
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
-            GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            // RSE: Auto-Accentuation on the Beat
+            // 0 - None
+            // 1 - Very Soft
+            // 2 - Soft
+            // 3 - Medium
+            // 4 - Strong
+            // 5 - Very Strong
+            this.data.readByte();
+
+            newTrack.playbackInfo.bank = this.data.readByte();
+
+            // RSE: Human Playing (1 byte, 0-100%)
+            this.data.readByte();
+
+            // `12` for all tunings which have bass clefs
+            const clefMode = IOHelper.readInt32LE(this.data);
+            if (clefMode === 12) {
+                this._clefsPerTrack.set(index, Clef.F4);
+            } else {
+                this._clefsPerTrack.set(index, Clef.G2);
+            }
+
+            // Unknown, no UI setting seem to affect this
+            IOHelper.readInt32LE(this.data);
+
+            // Unknown, no UI setting seem to affect this
+            // typically: 100
+            IOHelper.readInt32LE(this.data);
+
+            // Unknown, no UI setting seem to affect this
+            // typically: 1 2 3 4 5 6 7 8 9 10
+            this.data.skip(10);
+
+            // Unknown, no UI setting seem to affect this
+            // typically: 255
+            this.data.readByte();
+
+            // Unknown, no UI setting seem to affect this
+            // typically: 3
+            this.data.readByte();
+
+            this.readRseBank();
+
+            // this.data.skip(42);
+            if (this._versionNumber >= 510) {
+                // RSE: 3-band EQ
+                // 1 byte Low
+                // 1 byte Mid
+                // 1 byte High
+                // 1 byte PRE
+                this.data.skip(4);
+
+                // RSE: effect name
+                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+
+                // RSE: effect category
+                GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            }
+        } else {
+            if (GeneralMidi.isBass(newTrack.playbackInfo.program)) {
+                this._clefsPerTrack.set(index, Clef.F4);
+            } else {
+                this._clefsPerTrack.set(index, Clef.G2);
+            }
         }
     }
 
@@ -522,6 +580,8 @@ export class Gp3To5Importer extends ScoreImporter {
         const mainStaff: Staff = track.staves[0];
         if (mainStaff.isPercussion) {
             newBar.clef = Clef.Neutral;
+        } else if (this._clefsPerTrack.has(track.index)) {
+            newBar.clef = this._clefsPerTrack.get(track.index)!;
         }
         mainStaff.addBar(newBar);
 
@@ -976,11 +1036,35 @@ export class Gp3To5Importer extends ScoreImporter {
         }
     }
 
+    private readRseBank() {
+        // RSE Banks on disk are having filenames like this: 033_2_002.ini
+        // 033 is the RSE instrument (selected in the instrument list)
+        // 2 seem to be some sort of style variation. e.g. bass has multiple variations (1,2), guitars have only 1, percussion has only 0
+        //   likely for organizational purposes
+        // 002 is the effective soundbank (selected in the soundbank dropdown)
+
+        // RSE Instrument
+        this.data.skip(4); // IOHelper.readInt32LE(this.data);
+
+        // RSE Style/Variation
+        this.data.skip(4); //IOHelper.readInt32LE(this.data);
+
+        // RSE Soundbank
+        this.data.skip(4); //IOHelper.readInt32LE(this.data);
+
+        // Unknown, no UI setting seem to affect this
+        // typically: -1
+        this.data.skip(4); //IOHelper.readInt32LE(this.data);
+    }
+
     public readMixTableChange(beat: Beat): void {
         const tableChange: MixTableChange = new MixTableChange();
         tableChange.instrument = IOHelper.readSInt8(this.data);
+        // NOTE: The UI shows a Midi Bank selection, but this information is not stored in the file
+        // when reopening the file the bank is always 0
+
         if (this._versionNumber >= 500) {
-            this.data.skip(16); // Rse Info
+            this.readRseBank();
         }
         tableChange.volume = IOHelper.readSInt8(this.data);
         tableChange.balance = IOHelper.readSInt8(this.data);
@@ -992,7 +1076,8 @@ export class Gp3To5Importer extends ScoreImporter {
             tableChange.tempoName = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
         tableChange.tempo = IOHelper.readInt32LE(this.data);
-        // durations
+
+        // durations (in number of beats)
         if (tableChange.volume >= 0) {
             this.data.readByte();
         }
@@ -1021,6 +1106,7 @@ export class Gp3To5Importer extends ScoreImporter {
         if (this._versionNumber >= 400) {
             this.data.readByte(); // mixTableFlags
         }
+
         if (this._versionNumber >= 500) {
             const wahType = IOHelper.readSInt8(this.data);
             // const showWahWah = (mixTableFlags & 0x80) !== 0;

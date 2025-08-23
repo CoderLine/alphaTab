@@ -1296,6 +1296,7 @@ export class GpifWriter {
         role: string,
         barIndex: number,
         program: number,
+        bank: number,
         ratioPosition: number = 0
     ) {
         const soundNode = soundsNode.addElement('Sound');
@@ -1305,8 +1306,10 @@ export class GpifWriter {
         soundNode.addElement('Role').setCData(role);
 
         const midi = soundNode.addElement('MIDI');
-        midi.addElement('LSB').innerText = '0';
-        midi.addElement('MSB').innerText = '0';
+        const lsb = bank & 0x7F;
+        const msb = (bank >> 7) & 0x7F;
+        midi.addElement('LSB').innerText = lsb.toString();
+        midi.addElement('MSB').innerText = msb.toString();
         midi.addElement('Program').innerText = program.toString();
 
         const automationNode = automationsNode.addElement('Automation');
@@ -1328,12 +1331,20 @@ export class GpifWriter {
             const trackSoundRole = 'Factory';
             let trackSoundWritten = false;
 
+            let bank = track.playbackInfo.bank;
+
             for (const staff of track.staves) {
                 for (const bar of staff.bars) {
                     for (const voice of bar.voices) {
                         for (const beat of voice.beats) {
                             const soundAutomation = beat.getAutomation(AutomationType.Instrument);
                             const isTrackSound = bar.index === 0 && beat.index === 0;
+                            
+                            const bankAutomation = beat.getAutomation(AutomationType.Bank);
+                            if(bankAutomation) {
+                                bank = bankAutomation.value;
+                            }
+
                             if (soundAutomation) {
                                 const name = isTrackSound ? trackSoundName : `ProgramChange_${beat.id}`;
                                 const path = isTrackSound ? trackSoundPath : `Midi/${soundAutomation.value}`;
@@ -1347,7 +1358,8 @@ export class GpifWriter {
                                         trackSoundPath,
                                         trackSoundRole,
                                         track.staves[0].bars[0].index,
-                                        track.playbackInfo.program
+                                        track.playbackInfo.program,
+                                        track.playbackInfo.bank
                                     );
                                     trackSoundWritten = true;
                                 }
@@ -1360,6 +1372,7 @@ export class GpifWriter {
                                     role,
                                     bar.index,
                                     soundAutomation.value,
+                                    bank,
                                     soundAutomation.ratioPosition
                                 );
 

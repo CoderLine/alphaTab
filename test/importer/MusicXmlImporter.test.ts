@@ -258,4 +258,14 @@ describe('MusicXmlImporterTests', () => {
         const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/2102-corrupt-direction.xml');
         expect(score).toMatchSnapshot();
     });
+
+    it('bank', async () => {
+        const score = await MusicXmlImporterTestHelper.loadFile('test-data/musicxml4/midi-bank.xml');
+
+        expect(score.tracks[0].playbackInfo.program).to.equal(0);
+        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+
+        expect(score.tracks[1].playbackInfo.program).to.equal(1);
+        expect(score.tracks[1].playbackInfo.bank).to.equal(77);
+    });
 });

@@ -157,4 +157,7 @@ export class GeneralMidi {
     public static isGuitar(program: number): boolean {
         return (program >= 24 && program <= 39) || program === 105 || program === 43;
     }
+    public static isBass(program: number): boolean {
+        return (program >= 32 && program <= 39);
+    }
 }

@@ -75,6 +75,11 @@ class InstrumentArticulationWithPlaybackInfo extends InstrumentArticulation {
     public outputMidiProgram: number = -1;
 
     /**
+     * The midi bank to use when playing the note (-1 if using the default track bank).
+     */
+    public outputMidiBank: number = -1;
+
+    /**
      * The volume to use when playing the note (-1 if using the default track volume).
      */
     public outputVolume: number = -1;
@@ -203,7 +208,6 @@ export class MusicXmlImporter extends ScoreImporter {
 
         return this._score;
     }
-
 
     private extractMusicXml(): string {
         const zip = new ZipReader(this.data);
@@ -623,6 +627,9 @@ export class MusicXmlImporter extends ScoreImporter {
             if (trackInfo.firstArticulation.outputMidiProgram >= 0) {
                 track.playbackInfo.program = trackInfo.firstArticulation.outputMidiProgram;
             }
+            if (trackInfo.firstArticulation.outputMidiBank >= 0) {
+                track.playbackInfo.bank = trackInfo.firstArticulation.outputMidiBank;
+            }
             if (trackInfo.firstArticulation.outputBalance >= 0) {
                 track.playbackInfo.balance = trackInfo.firstArticulation.outputBalance;
             }
@@ -657,7 +664,9 @@ export class MusicXmlImporter extends ScoreImporter {
                     articulation.outputMidiChannel = Number.parseInt(c.innerText) - 1;
                     break;
                 // case 'midi-name': Ignored
-                // case 'midi-bank': Not supported (https://github.com/CoderLine/alphaTab/issues/1986)
+                case 'midi-bank':
+                    articulation.outputMidiBank = Number.parseInt(c.innerText) - 1;
+                    break;
                 case 'midi-program':
                     articulation.outputMidiProgram = Number.parseInt(c.innerText) - 1;
                     break;
@@ -1264,7 +1273,16 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 // case 'midi-channel': Ignored
                 // case 'midi-name': Ignored
-                // case 'midi-bank': Ignored
+                case 'midi-bank':
+                    if (!this._nextBeatAutomations) {
+                        this._nextBeatAutomations = [];
+                    }
+
+                    automation = new Automation();
+                    automation.type = AutomationType.Bank;
+                    automation.value = Number.parseInt(c.innerText) - 1;
+                    this._nextBeatAutomations!.push(automation);
+                    break;
                 case 'midi-program':
                     if (!this._nextBeatAutomations) {
                         this._nextBeatAutomations = [];
@@ -1924,7 +1942,7 @@ export class MusicXmlImporter extends ScoreImporter {
                 case 'direction-type':
                     // See https://github.com/CoderLine/alphaTab/issues/2102
                     const type = c.firstElement;
-                    if(type) {
+                    if (type) {
                         directionTypes.push(type);
                     }
                     break;
@@ -2666,9 +2684,9 @@ export class MusicXmlImporter extends ScoreImporter {
             switch (c.localName) {
                 // case 'ipa': Ignored
                 case 'mute':
-                    if(note && c.innerText === 'palm') {
+                    if (note && c.innerText === 'palm') {
                         note.isPalmMute = true;
-                    }                    
+                    }
                     break;
                 case 'semi-pitched':
                     break;

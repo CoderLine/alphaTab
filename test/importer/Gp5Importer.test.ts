@@ -534,4 +534,14 @@ describe('Gp5ImporterTest', () => {
             TextAlign.Center
         );
     });
+
+    it('bank', async () => {
+        const score = (await GpImporterTestHelper.prepareImporterWithFile('guitarpro5/bank.gp5')).readScore();
+
+        expect(score.tracks[0].playbackInfo.program).to.equal(25);
+        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+
+        expect(score.tracks[1].playbackInfo.program).to.equal(25);
+        expect(score.tracks[1].playbackInfo.bank).to.equal(77);
+    });
 });

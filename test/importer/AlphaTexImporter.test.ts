@@ -2343,4 +2343,22 @@ describe('AlphaTexImporterTest', () => {
 
         testExportRoundtrip(score);
     });
+    
+    it('bank', () => {
+        const score = parseTex(`
+            \\track "Piano" { instrument electricpiano1}
+            c4 d4 e4 f4
+
+            \\track "Piano" { instrument electricpiano1 bank 2 }
+            c4 d4 e4 f4
+        `);
+
+        expect(score.tracks[0].playbackInfo.program).to.equal(4);
+        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+
+        expect(score.tracks[1].playbackInfo.program).to.equal(4);
+        expect(score.tracks[1].playbackInfo.bank).to.equal(2);
+
+        testExportRoundtrip(score);
+    });
 });

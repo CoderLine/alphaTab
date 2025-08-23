@@ -1,5 +1,6 @@
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { AutomationType } from '@src/model/Automation';
 import { BeatBeamingMode } from '@src/model/Beat';
 import { Direction } from '@src/model/Direction';
 import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
@@ -394,5 +395,33 @@ describe('Gp8ImporterTest', () => {
         score.tracks = [];
 
         expect(score).to.toMatchSnapshot();
+    });
+
+    it('bank', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/bank.gp')).readScore();
+
+        expect(score.tracks[0].playbackInfo.program).to.equal(25);
+        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+
+        expect(score.tracks[1].playbackInfo.program).to.equal(25);
+        expect(score.tracks[1].playbackInfo.bank).to.equal(77);
+
+        expect(score.tracks[2].playbackInfo.program).to.equal(25);
+        expect(score.tracks[2].playbackInfo.bank).to.equal(256);
+    });
+
+    it('bank-change', async () => {
+        const score = (await prepareImporterWithFile('guitarpro8/bank-change.gp')).readScore();
+
+        expect(score.tracks[0].playbackInfo.program).to.equal(25);
+        expect(score.tracks[0].playbackInfo.bank).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].automations.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
+        expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(0);
+
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].automations.length).to.equal(2);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Instrument)?.value).to.equal(25);
+        expect(score.tracks[0].staves[0].bars[1].voices[0].beats[0].getAutomation(AutomationType.Bank)?.value).to.equal(256);
     });
 });

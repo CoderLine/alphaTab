@@ -26,6 +26,11 @@ export class PlaybackInformation {
     public program: number = 0;
 
     /**
+     * The midi bank to use. 
+     */
+    public bank: number = 0;
+
+    /**
      * Gets or sets the primary channel for all normal midi events.
      */
     public primaryChannel: number = 0;

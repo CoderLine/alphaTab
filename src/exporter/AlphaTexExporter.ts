@@ -368,6 +368,7 @@ export class AlphaTexExporter extends ScoreExporter {
         if (track.shortName.length > 0) {
             writer.writeString(track.shortName);
         }
+
         writer.writeLine(' {');
         writer.indent();
 
@@ -402,6 +403,13 @@ export class AlphaTexExporter extends ScoreExporter {
             track.score.stylesheet.perTrackMultiBarRest!.has(track.index)
         ) {
             writer.writeLine(` multibarrest`);
+        }
+
+        writer.writeLine(
+            ` instrument ${track.isPercussion ? 'percussion' : GeneralMidi.getName(track.playbackInfo.program)}`
+        );
+        if (track.playbackInfo.bank > 0) {
+            writer.writeLine(` bank ${track.playbackInfo.bank}`);
         }
 
         writer.outdent();
@@ -476,13 +484,7 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         if (voiceIndex === 0) {
-            // Track meta on first bar
             let anyWritten = false;
-            if (bar.index === 0 && bar.staff.index === 0) {
-                const l = writer.tex.length;
-                this.writeTrackMetaTo(writer, bar.staff.track);
-                anyWritten = writer.tex.length > l;
-            }
 
             // Staff meta on first bar
             if (bar.index === 0) {
@@ -517,21 +519,6 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         writer.outdent();
-    }
-
-    private writeTrackMetaTo(writer: AlphaTexWriter, track: Track) {
-        writer.writeSingleLineComment(`Track ${track.index + 1} Metadata`);
-        this.writePlaybackInfoTo(writer, track);
-    }
-
-    private writePlaybackInfoTo(writer: AlphaTexWriter, track: Track) {
-        const isPercussion = track.staves.some(s => s.isPercussion);
-        writer.writeMeta('instrument', isPercussion ? 'percussion' : GeneralMidi.getName(track.playbackInfo.program));
-
-        // Unsupported:
-        // - port
-        // - primaryChannel
-        // - secondaryChannel
     }
 
     private writeStaffMetaTo(writer: AlphaTexWriter, staff: Staff) {
