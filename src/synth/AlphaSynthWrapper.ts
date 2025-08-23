@@ -8,10 +8,10 @@ import type { BackingTrackSyncPoint, IAlphaSynth } from '@src/synth/IAlphaSynth'
 import type { ISynthOutput } from '@src/synth/ISynthOutput';
 import type { MidiEventsPlayedEventArgs } from '@src/synth/MidiEventsPlayedEventArgs';
 import type { PlaybackRange } from '@src/synth/PlaybackRange';
-import type { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
+import { PlaybackRangeChangedEventArgs } from '@src/synth/PlaybackRangeChangedEventArgs';
 import { PlayerState } from '@src/synth/PlayerState';
-import type { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
-import type { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
+import { PlayerStateChangedEventArgs } from '@src/synth/PlayerStateChangedEventArgs';
+import { PositionChangedEventArgs } from '@src/synth/PositionChangedEventArgs';
 import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**
@@ -35,6 +35,27 @@ export class AlphaSynthWrapper implements IAlphaSynth {
 
     private _instance?: IAlphaSynth;
     private _instanceEventUnregister?: (() => void)[];
+
+    public constructor() {
+        this.ready = new EventEmitter(() => this.isReady);
+        this.readyForPlayback = new EventEmitter(() => this.isReadyForPlayback);
+        this.midiLoaded = new EventEmitterOfT<PositionChangedEventArgs>(() => {
+            return this._instance?.loadedMidiInfo ?? null;
+        });
+        this.stateChanged = new EventEmitterOfT<PlayerStateChangedEventArgs>(() => {
+            return new PlayerStateChangedEventArgs(this.state, false);
+        });
+        this.positionChanged = new EventEmitterOfT<PositionChangedEventArgs>(() => {
+            return this.currentPosition;
+        });
+        this.playbackRangeChanged = new EventEmitterOfT<PlaybackRangeChangedEventArgs>(() => {
+            const range = this.playbackRange;
+            if (range) {
+                return new PlaybackRangeChangedEventArgs(range);
+            }
+            return null;
+        });
+    }
 
     public get instance(): IAlphaSynth | undefined {
         return this._instance;
@@ -62,7 +83,9 @@ export class AlphaSynthWrapper implements IAlphaSynth {
                 value.soundFontLoadFailed.on(e => (this.soundFontLoadFailed as EventEmitterOfT<Error>).trigger(e))
             );
             newUnregister.push(
-                value.midiLoaded.on(e => (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(e))
+                value.midiLoaded.on(e => {
+                    (this.midiLoaded as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
+                })
             );
             newUnregister.push(
                 value.midiLoadFailed.on(e => (this.midiLoadFailed as EventEmitterOfT<Error>).trigger(e))
@@ -73,9 +96,9 @@ export class AlphaSynthWrapper implements IAlphaSynth {
                 )
             );
             newUnregister.push(
-                value.positionChanged.on(e =>
-                    (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e)
-                )
+                value.positionChanged.on(e => {
+                    (this.positionChanged as EventEmitterOfT<PositionChangedEventArgs>).trigger(e);
+                })
             );
             newUnregister.push(
                 value.midiEventsPlayed.on(e =>
@@ -176,6 +199,15 @@ export class AlphaSynthWrapper implements IAlphaSynth {
         if (this._instance) {
             this._instance!.playbackSpeed = value;
         }
+    }
+
+    public get loadedMidiInfo(): PositionChangedEventArgs | undefined {
+        return this._instance ? this._instance.loadedMidiInfo : undefined;
+    }
+    public get currentPosition(): PositionChangedEventArgs {
+        return this._instance
+            ? this._instance.currentPosition
+            : new PositionChangedEventArgs(0, 0, 0, 0, false, 120, 120);
     }
 
     public get tickPosition(): number {
@@ -342,19 +374,16 @@ export class AlphaSynthWrapper implements IAlphaSynth {
         }
     }
 
-    readonly ready: IEventEmitter = new EventEmitter();
-    readonly readyForPlayback: IEventEmitter = new EventEmitter();
-    readonly finished: IEventEmitter = new EventEmitter();
-    readonly soundFontLoaded: IEventEmitter = new EventEmitter();
-    readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs> = new EventEmitterOfT<PositionChangedEventArgs>();
-    readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
-    readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs> =
-        new EventEmitterOfT<PlayerStateChangedEventArgs>();
-    readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs> =
-        new EventEmitterOfT<PositionChangedEventArgs>();
-    readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
+    public readonly ready: IEventEmitter;
+    public readonly readyForPlayback: IEventEmitter;
+    public readonly finished: IEventEmitter = new EventEmitter();
+    public readonly soundFontLoaded: IEventEmitter = new EventEmitter();
+    public readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    public readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
+    public readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    public readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs>;
+    public readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
+    public readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
         new EventEmitterOfT<MidiEventsPlayedEventArgs>();
-    readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs> =
-        new EventEmitterOfT<PlaybackRangeChangedEventArgs>();
+    public readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
 }
