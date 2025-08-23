@@ -1222,9 +1222,8 @@ export default class CSharpAstTransformer {
                         case ts.SyntaxKind.JSDocLinkPlain:
                             return comment.text || this.jsDocToString(comment.name);
                     }
-                } else {
-                    return comment.map(v => this.jsDocToString(v)).join('');
                 }
+                return comment.map(v => this.jsDocToString(v)).join('');
         }
     }
 
