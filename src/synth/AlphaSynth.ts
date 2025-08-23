@@ -193,25 +193,6 @@ export class AlphaSynthBase implements IAlphaSynth {
         Logger.debug('AlphaSynth', 'Initializing player');
         this.state = PlayerState.Paused;
 
-        Logger.debug('AlphaSynth', 'Creating output');
-        this._output = output;
-
-        Logger.debug('AlphaSynth', 'Creating synthesizer');
-        this.synthesizer = synthesizer;
-        this.sequencer = new MidiFileSequencer(this.synthesizer);
-
-        Logger.debug('AlphaSynth', 'Opening output');
-        this.output.ready.on(() => {
-            this.isReady = true;
-            (this.ready as EventEmitter).trigger();
-            this.checkReadyForPlayback();
-        });
-        this.output.sampleRequest.on(() => {
-            this.onSampleRequest();
-        });
-        this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
-        this.output.open(bufferTimeInMilliseconds);
-
         this.ready = new EventEmitter(() => this.isReady);
         this.readyForPlayback = new EventEmitter(() => this.isReadyForPlayback);
         this.midiLoaded = new EventEmitterOfT<PositionChangedEventArgs>(() => {
@@ -232,6 +213,25 @@ export class AlphaSynthBase implements IAlphaSynth {
             }
             return null;
         });
+
+        Logger.debug('AlphaSynth', 'Creating output');
+        this._output = output;
+
+        Logger.debug('AlphaSynth', 'Creating synthesizer');
+        this.synthesizer = synthesizer;
+        this.sequencer = new MidiFileSequencer(this.synthesizer);
+
+        Logger.debug('AlphaSynth', 'Opening output');
+        this.output.ready.on(() => {
+            this.isReady = true;
+            (this.ready as EventEmitter).trigger();
+            this.checkReadyForPlayback();
+        });
+        this.output.sampleRequest.on(() => {
+            this.onSampleRequest();
+        });
+        this.output.samplesPlayed.on(this.onSamplesPlayed.bind(this));
+        this.output.open(bufferTimeInMilliseconds);
     }
 
     protected onSampleRequest() {
@@ -607,17 +607,32 @@ export class AlphaSynthBase implements IAlphaSynth {
         }
     }
 
+    /**
+     * @lateinit
+     */
     public readonly ready: IEventEmitter;
     public readonly readyForPlayback: IEventEmitter = new EventEmitter();
     public readonly finished: IEventEmitter = new EventEmitter();
     public readonly soundFontLoaded: IEventEmitter = new EventEmitter();
     public readonly soundFontLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    /**
+     * @lateinit
+     */
     public readonly midiLoaded: IEventEmitterOfT<PositionChangedEventArgs>;
     public readonly midiLoadFailed: IEventEmitterOfT<Error> = new EventEmitterOfT<Error>();
+    /**
+     * @lateinit
+     */
     public readonly stateChanged: IEventEmitterOfT<PlayerStateChangedEventArgs>;
+    /**
+     * @lateinit
+     */
     public readonly positionChanged: IEventEmitterOfT<PositionChangedEventArgs>;
     public readonly midiEventsPlayed: IEventEmitterOfT<MidiEventsPlayedEventArgs> =
         new EventEmitterOfT<MidiEventsPlayedEventArgs>();
+    /**
+     * @lateinit
+     */
     public readonly playbackRangeChanged: IEventEmitterOfT<PlaybackRangeChangedEventArgs>;
 
     /**
