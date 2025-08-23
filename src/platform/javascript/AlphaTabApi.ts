@@ -258,7 +258,7 @@ export class AlphaTabApi extends AlphaTabApiBase<SettingsJson | Settings> {
      * });
      * ```
      */
-    public soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
+    public readonly soundFontLoad: IEventEmitterOfT<ProgressEventArgs> = new EventEmitterOfT<ProgressEventArgs>();
 
     /**
      * Triggers a load of the soundfont from the given URL.

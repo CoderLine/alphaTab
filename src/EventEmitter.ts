@@ -39,9 +39,17 @@ export interface IEventEmitterOfT<T> {
 
 export class EventEmitter implements IEventEmitter {
     private _listeners: (() => void)[] = [];
+    private readonly _fireOnRegister: (() => boolean) | undefined;
+
+    public constructor(fireOnRegister: (() => boolean) | undefined = undefined) {
+        this._fireOnRegister = fireOnRegister;
+    }
 
     public on(value: () => void): () => void {
         this._listeners.push(value);
+        if (this._fireOnRegister?.()) {
+            value();
+        }
         return () => {
             this.off(value);
         };
@@ -63,9 +71,19 @@ export class EventEmitter implements IEventEmitter {
  */
 export class EventEmitterOfT<T> implements IEventEmitterOfT<T> {
     private _listeners: ((arg: T) => void)[] = [];
+    private readonly _fireOnRegister: (() => T | null) | undefined;
 
+    public constructor(fireOnRegister: (() => T | null) | undefined = undefined) {
+        this._fireOnRegister = fireOnRegister;
+    }
     public on(value: (arg: T) => void): () => void {
         this._listeners.push(value);
+        if (this._fireOnRegister) {
+            const arg = this._fireOnRegister();
+            if (arg !== null) {
+                value(arg);
+            }
+        }
         return () => {
             this.off(value);
         };
