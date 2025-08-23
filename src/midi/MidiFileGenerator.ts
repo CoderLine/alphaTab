@@ -218,8 +218,8 @@ export class MidiFileGenerator {
             ControllerType.DataEntryCoarse,
             MidiFileGenerator.PitchBendRangeInSemitones
         );
-        this.addProgramChange(track, 0, channel, playbackInfo.program);
         this.addBankChange(track, 0, channel, playbackInfo.bank);
+        this.addProgramChange(track, 0, channel, playbackInfo.program);
     }
 
     /**

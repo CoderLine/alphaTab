@@ -2789,9 +2789,15 @@ export class GpifParser {
                             for (const a of automations) {
                                 // NOTE: currently the automations of a bar are applied to the
                                 // first beat of a bar
-                                beat.automations.push(a);
+
+                                const skip =
+                                    // skip bank automations if they are 0 at start
+                                    a.type === AutomationType.Bank && a.value === 0 && bar.index === 0;
+
+                                if (!skip) {
+                                    beat.automations.push(a);
+                                }
                             }
-                        } else {
                         }
                     }
                 }

@@ -105,6 +105,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -114,6 +116,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -221,6 +225,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 96),
@@ -230,6 +236,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -302,6 +310,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -311,6 +321,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -389,6 +401,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -398,6 +412,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -469,6 +485,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -478,6 +496,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -535,6 +555,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -544,6 +566,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -655,6 +679,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -664,6 +690,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -774,6 +802,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -783,6 +813,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -845,6 +877,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -854,6 +888,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -911,6 +947,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -920,6 +958,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -983,6 +1023,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 96),
@@ -992,6 +1034,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 6, 4),
@@ -1073,6 +1117,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -1082,6 +1128,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
@@ -1238,6 +1286,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.primaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.primaryChannel, info.program),
 
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.VolumeCoarse, 120),
@@ -1247,6 +1297,8 @@ describe('MidiFileGeneratorTest', () => {
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.RegisteredParameterCourse, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryFine, 0),
             new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.DataEntryCoarse, 16),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectCoarse, 0),
+            new FlatControlChangeEvent(0, 0, info.secondaryChannel, ControllerType.BankSelectFine, 0),
             new FlatProgramChangeEvent(0, 0, info.secondaryChannel, info.program),
 
             new FlatTimeSignatureEvent(0, 4, 4),
