@@ -281,8 +281,8 @@ export class CapellaParser {
 
     private parseBracket(element: XmlNode) {
         const bracket = new Bracket();
-        bracket.from = Number.parseInt(element.getAttribute('from'));
-        bracket.to = Number.parseInt(element.getAttribute('to'));
+        bracket.from = Number.parseInt(element.getAttribute('from'), 10);
+        bracket.to = Number.parseInt(element.getAttribute('to'), 10);
         if (element.attributes.has('curly')) {
             bracket.curly = element.attributes.get('curly') === 'true';
         }
@@ -319,13 +319,13 @@ export class CapellaParser {
                         layout.percussion = c.attributes.get('percussion') === 'true';
                     }
                     if (c.attributes.has('instr')) {
-                        layout.instrument = Number.parseInt(c.attributes.get('instr')!);
+                        layout.instrument = Number.parseInt(c.attributes.get('instr')!, 10);
                     }
                     if (c.attributes.has('volume')) {
-                        layout.volume = Number.parseInt(c.attributes.get('volume')!);
+                        layout.volume = Number.parseInt(c.attributes.get('volume')!, 10);
                     }
                     if (c.attributes.has('transpose')) {
-                        layout.transpose = Number.parseInt(c.attributes.get('transpose')!);
+                        layout.transpose = Number.parseInt(c.attributes.get('transpose')!, 10);
                     }
                     break;
             }
@@ -374,7 +374,7 @@ export class CapellaParser {
     private parseSystem(element: XmlNode) {
         if (element.attributes.has('tempo')) {
             if (this.score.masterBars.length === 0) {
-                this.score.tempo = Number.parseInt(element.attributes.get('tempo')!);
+                this.score.tempo = Number.parseInt(element.attributes.get('tempo')!, 10);
             }
         }
 
@@ -448,8 +448,8 @@ export class CapellaParser {
             default:
                 if (value.indexOf('/') > 0) {
                     const parts = value.split('/');
-                    this._timeSignature.timeSignatureNumerator = Number.parseInt(parts[0]);
-                    this._timeSignature.timeSignatureDenominator = Number.parseInt(parts[1]);
+                    this._timeSignature.timeSignatureNumerator = Number.parseInt(parts[0], 10);
+                    this._timeSignature.timeSignatureDenominator = Number.parseInt(parts[1], 10);
                     this._timeSignature.timeSignatureCommon = false;
                 }
                 break;
@@ -570,7 +570,7 @@ export class CapellaParser {
             const automation = new Automation();
             automation.isLinear = true;
             automation.type = AutomationType.Tempo;
-            automation.value = Number.parseInt(systemElement.attributes.get('tempo')!);
+            automation.value = Number.parseInt(systemElement.attributes.get('tempo')!, 10);
             automation.ratioPosition =
                 this._currentVoiceState.currentPosition / this._currentVoiceState.currentBarDuration;
             this._currentBar.masterBar.tempoAutomations.push(automation);
@@ -589,7 +589,7 @@ export class CapellaParser {
                         break;
                     case 'keySign':
                         this._currentBar.keySignature = Number.parseInt(
-                            c.getAttribute('fifths')
+                            c.getAttribute('fifths'), 10
                         ) as KeySignature;
                         break;
                     case 'timeSign':
@@ -812,7 +812,7 @@ export class CapellaParser {
             switch (c.localName) {
                 case 'alter':
                     if (c.attributes.has('step')) {
-                        note.tone += Number.parseInt(c.attributes.get('step')!);
+                        note.tone += Number.parseInt(c.attributes.get('step')!, 10);
                     }
                     break;
                 case 'tie':
@@ -969,7 +969,7 @@ export class CapellaParser {
         }
 
         // for
-        const fullBars = Number.parseInt(durationBase);
+        const fullBars = Number.parseInt(durationBase, 10);
         if (fullBars === 1) {
             const restBeat = new Beat();
             restBeat.beamingMode = this._beamingMode;
@@ -1012,12 +1012,12 @@ export class CapellaParser {
         beat.duration = this.parseDurationValue(durationBase);
 
         if (element.attributes.has('dots')) {
-            beat.dots = Number.parseInt(element.attributes.get('dots')!);
+            beat.dots = Number.parseInt(element.attributes.get('dots')!, 10);
         }
 
         const tuplet = element.findChildElement('tuplet');
         if (tuplet) {
-            beat.tupletNumerator = Number.parseInt(tuplet.getAttribute('count'));
+            beat.tupletNumerator = Number.parseInt(tuplet.getAttribute('count'), 10);
             const tripartiteMultiplicator = tuplet.getAttribute('tripartite') === 'true' ? 3 : 1;
             const prolongDiff = tuplet.getAttribute('prolong') === 'true' ? 0 : 1;
 
@@ -1107,7 +1107,7 @@ export class CapellaParser {
                     break;
                 case 'basic':
                     if (c.attributes.has('noteRange')) {
-                        noteRange = Number.parseInt(c.attributes.get('noteRange')!);
+                        noteRange = Number.parseInt(c.attributes.get('noteRange')!, 10);
                     }
                     break;
             }
@@ -1129,7 +1129,7 @@ export class CapellaParser {
         const obj = new OctaveClefDrawObject();
 
         if (element.attributes.has('octave')) {
-            obj.octave = Number.parseInt(element.attributes.get('octave')!);
+            obj.octave = Number.parseInt(element.attributes.get('octave')!, 10);
         }
 
         return obj;
@@ -1140,10 +1140,10 @@ export class CapellaParser {
 
         obj.allNumbers = element.attributes.get('allNumbers') === 'true';
         if (element.attributes.has('firstNumber')) {
-            obj.firstNumber = Number.parseInt(element.attributes.get('firstNumber')!);
+            obj.firstNumber = Number.parseInt(element.attributes.get('firstNumber')!, 10);
         }
         if (element.attributes.has('lastNumber')) {
-            obj.lastNumber = Number.parseInt(element.attributes.get('lastNumber')!);
+            obj.lastNumber = Number.parseInt(element.attributes.get('lastNumber')!, 10);
         }
 
         return obj;
@@ -1161,7 +1161,7 @@ export class CapellaParser {
         const obj = new TupletBracketDrawObject();
 
         if (element.attributes.has('number')) {
-            obj.number = Number.parseInt(element.attributes.get('number')!);
+            obj.number = Number.parseInt(element.attributes.get('number')!, 10);
         }
 
         return obj;
@@ -1186,7 +1186,7 @@ export class CapellaParser {
             if (strings.charAt(i) === '/') {
                 obj.chord.strings.push(0);
             } else {
-                obj.chord.strings.push(Number.parseInt(strings.charAt(i)));
+                obj.chord.strings.push(Number.parseInt(strings.charAt(i), 10));
             }
         }
 
@@ -1237,11 +1237,11 @@ export class CapellaParser {
                         obj.fontFace = c.getAttribute('face');
 
                         if (c.attributes.has('weight')) {
-                            obj.weight = Number.parseInt(c.attributes.get('weight')!);
+                            obj.weight = Number.parseInt(c.attributes.get('weight')!, 10);
                         }
 
                         if (c.attributes.has('height')) {
-                            obj.height = Number.parseInt(c.attributes.get('height')!);
+                            obj.height = Number.parseInt(c.attributes.get('height')!, 10);
                         }
 
                         break;

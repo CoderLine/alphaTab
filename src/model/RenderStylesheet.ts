@@ -1,4 +1,3 @@
-// @ts-ignore https://github.com/microsoft/TypeScript/issues/61183
 import type { Track } from '@src/model/Track';
 
 /**

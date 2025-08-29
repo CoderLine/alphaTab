@@ -15,8 +15,12 @@ import slash from 'slash';
 import type { SyncExpectationResult } from 'expect';
 import { equals, iterableEquality, subsetEquality } from '@jest/expect-utils';
 import * as matcherUtils from 'jest-matcher-utils';
-import { AssertionError } from 'assertion-error';
-import { MidiEventSerializerPlugin, type PrettyFormatConfig, type PrettyFormatPrinter, ScoreSerializerPlugin } from './PrettyFormat';
+import {
+    MidiEventSerializerPlugin,
+    type PrettyFormatConfig,
+    type PrettyFormatPrinter,
+    ScoreSerializerPlugin
+} from './PrettyFormat';
 
 // Mocha and Chai integration (called from global-hooks.ts)
 declare global {
@@ -115,7 +119,7 @@ export async function initializeJestSnapshot() {
                 assertionCalls++;
 
                 if (!matchResult.pass) {
-                    throw new AssertionError(matchResult.message());
+                    chai.assert.fail(matchResult.message());
                 }
             }
         );
@@ -236,14 +240,18 @@ const globalConfig: Config.ProjectConfig = {
     transformIgnorePatterns: [],
     watchPathIgnorePatterns: [],
     unmockedModulePathPatterns: undefined,
-    workerIdleMemoryLimit: undefined
+    workerIdleMemoryLimit: undefined,
+    coverageReporters: [],
+    reporters: [],
+    testTimeout: 5000,
+    waitForUnhandledRejections: false
 };
 
 // https://github.com/jestjs/jest/blob/4e7d916ec6a16de5548273c17b5d2c5761b0aebb/packages/jest-config/src/normalize.ts#L1079-L1088
 const argvCi = !!process.env.CI;
 const argvUpdateSnapshot = process.argv.includes('--updateSnapshot');
 const snapshotOptions: SnapshotStateOptions = {
-    updateSnapshot: argvCi ? 'none' : (argvUpdateSnapshot ? 'all' : 'new'),
+    updateSnapshot: argvCi ? 'none' : argvUpdateSnapshot ? 'all' : 'new',
     rootDir: globalConfig.rootDir,
     snapshotFormat: globalConfig.snapshotFormat,
     expand: undefined,

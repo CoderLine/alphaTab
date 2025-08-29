@@ -480,7 +480,7 @@ export class AlphaTexLexer {
         if (this.sy === AlphaTexSymbols.String) {
             this.syData = str;
         } else {
-            this.syData = allowFloat ? Number.parseFloat(str) : Number.parseInt(str);
+            this.syData = allowFloat ? Number.parseFloat(str) : Number.parseInt(str, 10);
         }
         return;
     }

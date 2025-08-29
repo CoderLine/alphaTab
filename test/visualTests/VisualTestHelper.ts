@@ -133,7 +133,7 @@ export class VisualTestHelper {
             api.renderer.postRenderFinished.on(() => {
                 if (runIndex < runs.length) {
                     uiFacade.rootContainer.width = runs[runIndex++].width;
-                    // @ts-ignore
+                    // @ts-expect-error
                     api.triggerResize();
                 } else {
                     resolve();

@@ -1,5 +1,5 @@
 {
-    "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+    "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
     "files": {
         "includes": [
             "**/*.*",
@@ -7,7 +7,7 @@
             "!.rollup.cache",
             "!node_modules",
             "!test-data",
-            "!src/generated/**"
+            "!src/generated"
         ],
         "maxSize": 5242880
     },
@@ -62,7 +62,8 @@
             "complexity": {
                 "useOptionalChain": "off", // its currently a bit sensitive with Kotlin as they evaulate things differently
                 "noStaticOnlyClass": "off", // we are strictly OOP (for transpiler)
-                "noUselessUndefinedInitialization": "off"
+                "noUselessUndefinedInitialization": "off",
+                "noImportantStyles": "off"
             }
         }
     },

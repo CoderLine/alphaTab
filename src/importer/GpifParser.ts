@@ -328,7 +328,7 @@ export class GpifParser {
             return fallback;
         }
 
-        const i = Number.parseInt(text);
+        const i = Number.parseInt(text, 10);
         if (!Number.isNaN(i)) {
             return i;
         }

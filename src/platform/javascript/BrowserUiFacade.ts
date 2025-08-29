@@ -531,7 +531,7 @@ export class BrowserUiFacade implements IUiFacade<unknown> {
                 } else if ('index' in (item as any)) {
                     value = (item as any).index;
                 } else {
-                    value = Number.parseInt((item as any).toString());
+                    value = Number.parseInt((item as any).toString(), 10);
                 }
                 if (value >= 0 || value === -1) {
                     tracks.push(value);
