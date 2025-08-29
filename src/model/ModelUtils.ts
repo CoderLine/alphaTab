@@ -107,7 +107,7 @@ export class ModelUtils {
         }
         const result: TuningParseResult = new TuningParseResult();
 
-        result.octave = Number.parseInt(octave) + 1;
+        result.octave = Number.parseInt(octave, 10) + 1;
         result.note = note.toLowerCase();
         result.tone = ModelUtils.getToneForText(result.note);
 
@@ -684,7 +684,7 @@ export class ModelUtils {
             for (const keySignatureText of transpose) {
                 const keySignature =
                     // digit
-                    (Number.parseInt(keySignatureText.charAt(0)) *
+                    (Number.parseInt(keySignatureText.charAt(0), 10) *
                         // b -> negative, # positive
                         (keySignatureText.charAt(1) === 'b' ? -1 : 1)) as KeySignature;
                 transposeValues.push(keySignature);

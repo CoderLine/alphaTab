@@ -9,7 +9,7 @@ import { assert, expect } from 'chai';
 
 describe('AlphaTexExporterTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
-        const data = await TestPlatform.loadFile('test-data/' + name);
+        const data = await TestPlatform.loadFile(`test-data/${name}`);
         try {
             return ScoreLoader.loadScoreFromBytes(data);
         } catch {

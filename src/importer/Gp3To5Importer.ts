@@ -192,7 +192,7 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         version = version.substr(Gp3To5Importer.VersionString.length + 1);
         const dot: number = version.indexOf(String.fromCharCode(46));
-        this._versionNumber = 100 * Number.parseInt(version.substr(0, dot)) + Number.parseInt(version.substr(dot + 1));
+        this._versionNumber = 100 * Number.parseInt(version.substr(0, dot), 10) + Number.parseInt(version.substr(dot + 1), 10);
         Logger.debug(this.name, `Guitar Pro version ${version} detected`);
     }
 

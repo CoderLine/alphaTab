@@ -246,7 +246,6 @@ export class Environment {
         // <script type="module">
         // import * as alphaTab from 'dist/alphaTab.js';
         try {
-            // @ts-ignore
             const importUrl = import.meta.url;
             // avoid using file:// urls in case of
             // bundlers like webpack
@@ -710,7 +709,7 @@ export class Environment {
      */
     private static detectWebPack(): boolean {
         try {
-            // @ts-ignore
+            // @ts-expect-error
             if (typeof __webpack_require__ === 'function') {
                 return true;
             }
@@ -725,7 +724,7 @@ export class Environment {
      */
     private static detectVite(): boolean {
         try {
-            // @ts-ignore
+            // @ts-expect-error
             if (typeof __BASE__ === 'string') {
                 return true;
             }
@@ -767,7 +766,6 @@ export class Environment {
         }
 
         try {
-            // @ts-ignore
             const url: any = import.meta.url;
             if (url && typeof url === 'string' && !url.startsWith('file://')) {
                 return WebPlatform.BrowserModule;

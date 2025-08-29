@@ -11,7 +11,7 @@ export class JsonHelper {
     public static parseEnum<T>(s: unknown, enumType: any): T | undefined {
         switch (typeof s) {
             case 'string':
-                const num = Number.parseInt(s);
+                const num = Number.parseInt(s, 10);
                 return Number.isNaN(num)
                     ? (enumType[Object.keys(enumType).find(k => k.toLowerCase() === s.toLowerCase()) as any] as any)
                     : (num as unknown as T);

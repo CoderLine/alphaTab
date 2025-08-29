@@ -129,17 +129,17 @@ export class Color {
 
                     if (numbers.length === 3) {
                         return new Color(
-                            Number.parseInt(numbers[0]),
-                            Number.parseInt(numbers[1]),
-                            Number.parseInt(numbers[2])
+                            Number.parseInt(numbers[0], 10),
+                            Number.parseInt(numbers[1], 10),
+                            Number.parseInt(numbers[2], 10)
                         );
                     }
 
                     if (numbers.length === 4) {
                         return new Color(
-                            Number.parseInt(numbers[0]),
-                            Number.parseInt(numbers[1]),
-                            Number.parseInt(numbers[2]),
+                            Number.parseInt(numbers[0], 10),
+                            Number.parseInt(numbers[1], 10),
+                            Number.parseInt(numbers[2], 10),
                             Number.parseFloat(numbers[3]) * 255
                         );
                     }

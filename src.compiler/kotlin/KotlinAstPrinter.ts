@@ -919,6 +919,7 @@ export default class KotlinAstPrinter extends AstPrinterBase {
                             if (ts.isInterfaceDeclaration(d) || ts.isClassDeclaration(d)) {
                                 return d.typeParameters;
                             }
+                            return undefined
                         })
                         .find(x => !!x);
 

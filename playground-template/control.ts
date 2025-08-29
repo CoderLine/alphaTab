@@ -575,7 +575,7 @@ export function setupControl(selector: string, customSettings: alphaTab.json.Set
     for (const a of control.querySelectorAll<HTMLAnchorElement>('.at-zoom-options a')) {
         a.onclick = e => {
             e.preventDefault();
-            at.settings.display.scale = Number.parseInt((e.target as HTMLAnchorElement).innerText) / 100.0;
+            at.settings.display.scale = Number.parseInt((e.target as HTMLAnchorElement).innerText, 10) / 100.0;
             control.querySelector<HTMLElement>('.at-zoom-label')!.innerText = (e.target as HTMLAnchorElement).innerText;
             at.updateSettings();
             at.render();
