@@ -142,7 +142,6 @@ export const AlphaTabPlayground: React.FC = () => {
         if (!api) {
             return;
         }
-
         api.pause();
         switch (mediaType.type) {
             case MediaType.Synth:
@@ -202,7 +201,7 @@ export const AlphaTabPlayground: React.FC = () => {
 
                 break;
         }
-    }, [api, mediaType]);
+    }, [api, mediaType.type]);
 
     return (
         <>
