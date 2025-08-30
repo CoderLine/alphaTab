@@ -52,7 +52,12 @@ export function configureWebWorker(
             entryOptions: {
                 chunkLoading: 'import-scripts',
                 wasmLoading: false,
-                runtime: runtime
+                runtime: runtime,
+                library: {
+                    // prevent any built-in/default library settings
+                    // to be active for this chunk
+                    type: 'at-worker'
+                }
             }
         });
 
