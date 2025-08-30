@@ -57,7 +57,7 @@ export function useAlphaTabEvent<
         api[event].off(handler as any);
       };
     }
-  }, [api, event, handler, ...(deps ?? [])]);
+  }, [api, event, ...(deps ?? [])]);
 }
 
 export const useIsMount = () => {
