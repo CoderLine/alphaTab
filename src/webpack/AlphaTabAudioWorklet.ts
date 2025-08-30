@@ -50,7 +50,12 @@ export function configureAudioWorklet(
             entryOptions: {
                 chunkLoading: false,
                 wasmLoading: false,
-                runtime: runtime
+                runtime: runtime,
+                library: {
+                    // prevent any built-in/default library settings
+                    // to be active for this chunk
+                    type: 'at-worklet'
+                }
             }
         });
 

@@ -18,7 +18,14 @@ describe('WebPack', () => {
                 webpack(
                     {
                         entry: {
-                            app: './src/app.mjs'
+                            app: {
+                                import: './src/app.mjs',
+                                // see https://github.com/CoderLine/alphaTab/issues/2299
+                                library: {
+                                    type: 'assign',
+                                    name: 'alphaTabApp'
+                                }
+                            }
                         },
                         output: {
                             filename: '[name]-[contenthash:8].js',
@@ -99,16 +106,26 @@ describe('WebPack', () => {
                     expect(text).to.include('/* worklet bootstrap */ async function(__webpack_worklet__) {');
                     // without custom bundling the app will bundle alphatab directly
                     expect(text).to.include('class AlphaTabApiBase');
+                    // ensure the library mode is active as needed
+                    expect(text).to.include('alphaTabApp = __webpack_exports__');
 
                     appValidated = true;
                 } else if (file.name.endsWith('.js')) {
                     if (text.includes('class AlphaTabApiBase')) {
+                        // ensure the library mode is does not affect chunks
+                        expect(text).to.not.include('alphaTabApp = __webpack_exports__');
                         coreFileValidated = true; // found core file (imported by worker and worklet)
                     } else if (text.includes('initializeAudioWorklet()')) {
+                        // ensure the library mode is does not affect chunks
+                        expect(text).to.not.include('alphaTabApp = __webpack_exports__');
+
                         // ensure chunk installer is there
                         expect(text).to.include('webpack/runtime/alphaTab audio worker chunk loading');
                         workletValidated = true;
                     } else if (text.includes('initializeWorker()')) {
+                        // ensure the library mode is does not affect chunks
+                        expect(text).to.not.include('alphaTabApp = __webpack_exports__');
+
                         // ensure chunk loader is there
                         expect(text).to.include('webpack/runtime/importScripts chunk loading');
                         workerValidated = true;
