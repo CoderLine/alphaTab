@@ -5,7 +5,7 @@ import styles from './styles.module.scss';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import * as solid from '@fortawesome/free-solid-svg-icons';
 import { useAlphaTabEvent } from '@site/src/hooks';
-import { openFile } from '@site/src/utils';
+import { openFile, openInputFile } from '@site/src/utils';
 import { PlayerProgressIndicator } from '../AlphaTabFull/player-progress-indicator';
 
 export interface PlayerControlsGroupProps {
@@ -62,20 +62,6 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
         setCurrentTime(e.currentTime);
     });
 
-    const open = () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.mxml,.xml,.capx';
-        input.onchange = () => {
-            if (input.files?.length === 1) {
-                openFile(api, input.files[0]);
-            }
-        };
-        document.body.appendChild(input);
-        input.click();
-        document.body.removeChild(input);
-    };
-
     const formatDuration = (milliseconds: number) => {
         let seconds = milliseconds / 1000;
         const minutes = (seconds / 60) | 0;
@@ -99,7 +85,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
                         type="button"
                         onClick={e => {
                             e.preventDefault();
-                            open();
+                            openInputFile(api);
                         }}
                         data-tooltip-id="tooltip-playground"
                         data-tooltip-content="Open File">

@@ -9,7 +9,7 @@ import styles from "./styles.module.scss";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import * as solid from "@fortawesome/free-solid-svg-icons";
 import { useAlphaTabEvent } from "@site/src/hooks";
-import { openFile } from "@site/src/utils";
+import { openFile, openInputFile } from "@site/src/utils";
 
 export interface PlayerControlsGroupProps {
   api: alphaTab.AlphaTabApi;
@@ -56,20 +56,6 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
     setEndTime(e.endTime);
     setCurrentTime(e.currentTime);
   });
-
-  const open = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".gp,.gp3,.gp4,.gp5,.gpx,.musicxml,.mxml,.xml,.capx";
-    input.onchange = () => {
-      if (input.files?.length === 1) {
-        openFile(api, input.files[0]);
-      }
-    };
-    document.body.appendChild(input);
-    input.click();
-    document.body.removeChild(input);
-  };
 
   useEffect(() => {
     api.countInVolume = isCountInActive ? 1 : 0;
@@ -121,7 +107,7 @@ export const PlayerControlsGroup: React.FC<PlayerControlsGroupProps> = ({
             href="#"
             onClick={(e) => {
               e.preventDefault();
-              open();
+              openInputFile(api);
             }}
             title="Open File"
           >
