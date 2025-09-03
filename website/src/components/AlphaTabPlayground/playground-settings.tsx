@@ -373,7 +373,7 @@ function buildSettingsGroups(): SettingsGroupSchema[] {
                 },
                 {
                     label: 'Looping',
-                    ...factory.apiAccessors('looping'),
+                    ...factory.apiAccessors('isLooping'),
                     control: { type: 'boolean-toggle' }
                 },
                 factory.enumDropDown('Player Mode', 'player.playerMode', alphaTab.PlayerMode, noRerender),
