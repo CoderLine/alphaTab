@@ -1,0 +1,26 @@
+{
+    "name": "@coderline/alphatab-website",
+    "version": "1.7.0",
+    "private": true,
+    "description": "THe alphaTab website and documentation.",
+    "homepage": "https://alphatab.net",
+    "bugs": {
+        "url": "https://github.com/coderline/alphaTab/issues"
+    },
+    "author": "Daniel Kuschny",
+    "license": "MPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coderline/alphaTab.git"
+    },
+    "scripts": {
+        "clean": "",
+        "lint": "",
+        "typecheck": "",
+
+        "dev": "",
+        "build": "",
+        "swizzle": "",
+        "serve": ""
+    }
+}

@@ -1,0 +1,6 @@
+{
+    "name": "@coderline/alphatab-playground",
+    "version": "1.7.0",
+    "description": "A development playground for alphaTab to test features while developing",
+    "private": true
+}

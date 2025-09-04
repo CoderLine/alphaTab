@@ -1,0 +1,37 @@
+{
+    "name": "@coderline/alphatab-vite",
+    "version": "1.7.0",
+    "description": "A plugin for Vite to bundle alphaTab into your webapps.",
+    "keywords": [
+        "guitar",
+        "music-notation",
+        "music-sheet",
+        "html5",
+        "svg",
+        "guitar-tablature",
+        "vite"
+    ],
+    "homepage": "https://alphatab.net",
+    "bugs": {
+        "url": "https://github.com/coderline/alphaTab/issues"
+    },
+    "author": "Daniel Kuschny",
+    "license": "MPL-2.0",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/coderline/alphaTab.git"
+    },
+    "type": "module",
+    "main": "dist/alphaTab.vite.js",
+    "module": "dist/alphaTab.vite.mjs",
+    "typings": "dist/alphaTab.vite.d.ts",
+    "scripts": {
+        "clean": "",
+        "lint": "",
+        "typecheck": "",
+
+        "dev": "",
+        "build": "",
+        "test": ""
+    }
+}
