@@ -50,7 +50,7 @@
         "clean": "rimraf dist",
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
-        "prepack": "tsx scripts/prepack.ts",
+        "prepack": "tsx scripts/prepack.mts",
         "bravura-smufl": "tsx scripts/smufl-metadata.ts font/bravura/bravura_metadata.json font/bravura/bravura_alphatab_metadata.json true",
         "generate-typescript": "rimraf src/generated && tsx scripts/generate-typescript.ts",
         "build": "npm run generate-typescript && vite build --mode esm && vite build --mode umd",
