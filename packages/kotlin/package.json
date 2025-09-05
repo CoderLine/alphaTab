@@ -6,7 +6,7 @@
     "scripts": {
         "clean": "rimraf src/android/src/main-generated && rimraf src/android/src/test-generated",
         "transpile": "tsx scripts/transpile.ts",
-        "build": "node scripts/gradlew.mjs assembleRelease",
+        "build": "npm run transpile && node scripts/gradlew.mjs assembleRelease",
         "test": "node scripts/gradlew.mjs testReleaseUnitTest --info"
     }
 }
