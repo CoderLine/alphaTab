@@ -64,9 +64,9 @@ jobs:
       - run: npm ci
       - run: npm run build-csharp
       - run: dotnet nuget push AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-        working-directory: ./packages/csharp/
+        working-directory: ./packages/csharp/src/
       - run: dotnet nuget push AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate
-        working-directory: ./packages/csharp/
+        working-directory: ./packages/csharp/src/
 
   release_kotlin_android:
     name: Kotlin (Android)
