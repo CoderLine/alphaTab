@@ -91,6 +91,7 @@ export function enableTypeScript(config: UserConfig, o: Partial<RollupTypescript
 
 export function umd(
     config: UserConfig,
+    projectDir: string,
     name: string,
     entry: string,
     tsOptions: RollupTypescriptOptions = {},
@@ -99,7 +100,7 @@ export function umd(
     enableTypeScript(config, tsOptions, false);
     const lib = config.build!.lib! as LibraryOptions;
     lib.entry = {
-        [name]: path.resolve(__dirname, entry)
+        [name]: path.resolve(projectDir, entry)
     };
     config.plugins!.push({
         name: 'import-meta',
@@ -134,11 +135,17 @@ export function umd(
     }
 }
 
-export function commonjs(config: UserConfig, name: string, entry: string, tsOptions: RollupTypescriptOptions = {}) {
+export function commonjs(
+    config: UserConfig,
+    projectDir: string,
+    name: string,
+    entry: string,
+    tsOptions: RollupTypescriptOptions = {}
+) {
     enableTypeScript(config, tsOptions, false);
     const lib = config.build!.lib! as LibraryOptions;
     lib.entry = {
-        [name]: path.resolve(__dirname, entry)
+        [name]: path.resolve(projectDir, entry)
     };
     (config.build!.rollupOptions!.output as OutputOptions[]).push({
         globals: {
@@ -154,6 +161,7 @@ export function commonjs(config: UserConfig, name: string, entry: string, tsOpti
 
 export function esm(
     config: UserConfig,
+    projectDir: string,
     name: string,
     entry: string,
     tsOptions: RollupTypescriptOptions = {},
@@ -164,7 +172,7 @@ export function esm(
     const lib = config.build!.lib! as LibraryOptions;
 
     lib.entry = {
-        [name]: path.resolve(__dirname, entry)
+        [name]: path.resolve(projectDir, entry)
     };
 
     (config.build!.rollupOptions!.output as OutputOptions[]).push({

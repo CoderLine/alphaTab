@@ -65,6 +65,7 @@ export default defineConfig(({ mode }) => {
     const esm = (name: string, entry: string) => {
         defaultEsm(
             config,
+            __dirname,
             name,
             entry,
             typeScriptOptions(),
@@ -76,7 +77,7 @@ export default defineConfig(({ mode }) => {
 
     switch (mode) {
         case 'umd':
-            umd(config, 'alphaTab', 'src/alphaTab.main.ts', typeScriptOptions(), true);
+            umd(config, __dirname, 'alphaTab', 'src/alphaTab.main.ts', typeScriptOptions(), true);
             break;
         //case 'esm':
         default:
