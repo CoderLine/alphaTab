@@ -121,8 +121,8 @@ jobs:
       - run: npm run build-kotlin
 
       - run: ./gradlew publishToMavenCentral
-        working-directory: ./packages/kotlin/
+        working-directory: ./packages/kotlin/src/
 
       - run: ./gradlew --stop
-        working-directory: ./packages/kotlin/
+        working-directory: ./packages/kotlin/src/
 
