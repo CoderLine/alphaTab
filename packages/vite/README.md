@@ -1,0 +1,3 @@
+# alphaTab Vite Plugin
+
+TODO

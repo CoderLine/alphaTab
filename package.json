@@ -6,5 +6,31 @@
     "type": "module",
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "scripts": {
+        "clean": "npm run clean --workspaces --if-present",
+        "lint": "npm run lint-ci --workspaces --if-present",
+        "lint-ci": "npm run lint-ci --workspaces --if-present -- --reporter=github",
+        "typecheck": "npm run typecheck --workspaces --if-present",
+        "dev": "npm run dev --workspace=packages/playground",
+
+        "update-version": "node scripts/update-version.mjs",
+
+        "generate-typescript": "npm run generate-typescript --workspace=packages/alphatab",
+        
+        "build": "npm run build --workspace=packages/alphatab",
+        "test": "npm run build --workspace=packages/alphatab",
+
+        "build-web": "npm run build && npm run build-webpack && npm run build-vite",
+        "test-web": "npm run test && npm run test-webpack && npm run test-vite",
+
+        "build-csharp": "npm run build --workspace=packages/csharp",
+        "test-csharp": "npm run test --workspace=packages/csharp",
+
+        "build-vite": "npm run build --workspace=packages/vite",
+        "test-vite": "npm run test --workspace=packages/vite",
+        
+        "build-webpack": "npm run build --workspace=packages/webpack",
+        "test-webpack": "npm run test --workspace=packages/webpack"
+    }
 }

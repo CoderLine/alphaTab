@@ -1,6 +1,6 @@
-import * as alphaTab from '../src/alphaTab.main';
-import Handlebars from 'handlebars';
+import * as alphaTab from '@src/alphaTab.main';
 import * as bootstrap from 'bootstrap';
+import Handlebars from 'handlebars';
 
 const toDomElement = (() => {
     const parser = document.createElement('div');

@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <title>AlphaTab Test Results Diff Viewer</title>
+    <style>
+        @import url('bootstrap/dist/css/bootstrap.min.css');
+        @import url('@fontsource/noto-sans/400.css');
+
+        body {
+            padding: 1rem;
+            font-family: 'Noto Sans', sans-serif;
+            min-height: 100vh;
+        }
+
+        .comparer {
+            position: relative;
+        }
+
+        .slider {
+            position: absolute;
+            top: 30px;
+            right: 0;
+            left: 0;
+            width: 100%;
+        }
+
+        .expected {
+            background: #FFF;
+            position: absolute;
+            left: 0;
+            border: 1px solid red;
+        }
+
+        .diff {
+            border: 1px solid red;
+        }
+
+        .actual {
+            background: #FFF;
+            position: absolute;
+            right: -2px;
+            box-shadow: -7px 0 10px -5px rgba(0, 0, 0, .5);
+            overflow: hidden;
+            border: 1px solid red;
+            border-left: 0;
+        }
+
+        .actual img {
+            position: absolute;
+            right: 0;
+            top: 0;
+            border-left: 1px solid red;
+        }
+
+        .diff {
+            display: none;
+            background: #FFF;
+            position: absolute;
+            left: 0;
+        }
+
+        .controls {
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        .accepted .diff,
+        .accepted .expected,
+        .accepted .actual {
+            border-color: green;
+        }
+
+        .card.accepted {
+            border-color: green;
+        }
+
+        body.hide-accepted .accepted {
+            display: none;
+        }
+
+        .drop-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            display: none;
+            pointer-events: none;
+        }
+
+        body.drop .drop-area {
+            display: flex;
+        }
+
+        .drop-message {
+            width: 200px;
+            height: 200px;
+            font-weight: bold;
+            border: 5px dashed #426d9d;
+            color: #426d9d;
+            display: flex;
+            text-align: center;
+            border-radius: 10px;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>alphaTab - Visual Test Results</h1>
+    <p>
+        This page contains any failing visual tests for comparison and acceptance.
+        Run the <code>visualTests</code> via <code>npm run test</code> or using <a
+            href="https://marketplace.visualstudio.com/items?itemName=coderline.mocha-vscode">Mocha for VS Code</a>.
+    </p>
+    <p>
+        <input type="checkbox" id="hide-accepted" />
+        <label for="hide-accepted">Hide accepted</label>
+    </p>
+    <div id="results-wrapper">
+
+    </div>
+    <script src="/node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+        function setupComparer(card, el, result) {
+            const ex = el.querySelector('.expected');
+            const ac = el.querySelector('.actual');
+            const df = el.querySelector('.diff');
+            const slider = el.querySelector('.slider');
+
+            const exCanvas = ex.querySelector('img');
+            const acCanvas = ac.querySelector('img');
+
+            const width = Math.max(exCanvas.width, acCanvas.width);
+            const height = Math.max(exCanvas.height, acCanvas.height);
+
+            const controlsHeight = 60;
+
+            el.style.width = width + 'px';
+            el.style.height = height + controlsHeight + 'px';
+
+            ex.style.width = width + 'px';
+            ex.style.height = height + 'px';
+            ex.style.top = controlsHeight + 'px';
+
+            ac.style.width = width / 2 + 'px';
+            ac.style.height = height + 'px';
+            ac.style.top = controlsHeight + 'px';
+
+            df.style.width = width + 'px';
+            df.style.height = height + 'px';
+            df.style.top = controlsHeight + 'px';
+
+            slider.oninput = () => {
+                ac.style.width = width * (1 - parseFloat(slider.value)) + 'px';
+            };
+
+            const diffToggle = el.querySelector('.toggle > input');
+            diffToggle.onchange = () => {
+                if (diffToggle.checked) {
+                    df.style.display = 'block';
+                } else {
+                    df.style.display = 'none';
+                }
+            };
+            const acceptButton = el.querySelector('.accept');
+            acceptButton.onclick = () => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', '/test-results/accept', true, null, null);
+                xhr.responseType = 'text';
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.onload = () => {
+                    acceptButton.classList.add('disabled');
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.message) {
+                        acceptButton.innerText = response.message;
+                    } else {
+                        acceptButton.innerText = 'Accepted';
+                    }
+                    card.classList.add('accepted');
+                };
+                xhr.onerror = () => {
+                    alert('error accepting test result');
+                    acceptButton.innerText = 'Accept';
+                }
+                acceptButton.innerText = 'Accepting...';
+                xhr.send(JSON.stringify(result));
+            };
+        }
+
+        async function createComparer(card, result) {
+            const comparer = document.createElement('div');
+            comparer.classList.add('comparer');
+            comparer.innerHTML = `
+                <div class="expected"><img /></div>
+                <div class="actual"><img /></div>
+                <div class="diff"><img /></div>
+                <input type="range" min="0" max="1" step="0.001" value="0.5" class="slider" />
+                <div class="controls">
+                    <label class="toggle">
+                        <input type="checkbox" />
+                        Show Diff
+                    </label>
+                    <button class="accept btn btn-secondary btn-sm">
+                        Accept
+                    </button>
+                </div>
+            `;
+
+            const expected = new Promise((resolve, reject) => {
+                const img = comparer.querySelector('.expected img');
+                img.onload = () => {
+                    resolve(img);
+                };
+                img.onerror = e => {
+                    reject()
+                };
+
+                img.src = '/' + result.originalFile;
+            })
+
+            const actual = new Promise((resolve, reject) => {
+                const img = comparer.querySelector('.actual img');
+                img.onload = () => {
+                    resolve(img);
+                };
+                img.onerror = e => {
+                    reject()
+                };
+
+                if (result.newFile instanceof Uint8Array) {
+                    img.src = URL.createObjectURL(
+                        new Blob([result.newFile.buffer], { type: 'image/png' })
+                    );
+                } else {
+                    img.src = '/' + result.newFile;
+                }
+            })
+
+
+            const diff = new Promise((resolve, reject) => {
+                const img = comparer.querySelector('.diff img');
+                img.onload = () => {
+                    resolve(img);
+                };
+                img.onerror = e => {
+                    reject()
+                };
+
+                if (result.newFile instanceof Uint8Array) {
+                    img.src = URL.createObjectURL(
+                        new Blob([result.diffFile.buffer], { type: 'image/png' })
+                    );
+                } else {
+                    img.src = '/' + result.diffFile;
+                }
+            })
+
+            try {
+                await Promise.allSettled([expected, actual, diff]);
+            }
+            catch (e) {
+                // ignore potentially missing images
+            }
+
+            setupComparer(card, comparer, result);
+
+            return comparer;
+        }
+
+        async function createResultViewer(result) {
+            const resultItem = document.createElement('div');
+            resultItem.classList.add('card', 'm-3');
+
+            const resultBody = document.createElement('div');
+            resultBody.classList.add('card-body');
+            resultItem.appendChild(resultBody);
+
+
+            const resultTitle = document.createElement('h5');
+            resultTitle.classList.add('card-title');
+            resultTitle.innerText = result.originalFile;
+            resultBody.appendChild(resultTitle);
+
+            resultBody.appendChild(await createComparer(resultItem, result));
+
+            return resultItem;
+        }
+
+        async function displayResults(results) {
+            const wrapper = document.querySelector('#results-wrapper');
+            wrapper.innerHTML = '';
+
+            for (const result of results) {
+                wrapper.appendChild(await createResultViewer(result));
+            }
+
+            if (results.length === 0) {
+                wrapper.innerHTML = '<div class="alert alert-success" role="alert">No reported errors on visual tests.</div>'
+            }
+        }
+
+
+
+        function loadResults() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', '/test-results/list', true, null, null);
+            xhr.responseType = 'text';
+            xhr.onload = () => {
+                const response = JSON.parse(xhr.responseText);
+                displayResults(response);
+            };
+            xhr.onerror = () => {
+                alert('error loading test results');
+            }
+            xhr.send();
+        }
+
+        loadResults();
+
+        document.body.addEventListener('dragover', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'link';
+        }, false);
+
+        document.body.addEventListener('dragenter', function (e) {
+            document.body.classList.add('drop');
+        }, true);
+
+        document.body.addEventListener('dragleave', function (e) {
+            document.body.classList.remove('drop');
+        });
+
+        import { ZipReader } from '@src/zip/ZipReader';
+        import { ByteBuffer } from '@src/io/ByteBuffer';
+        document.body.addEventListener('drop', function (e) {
+            e.stopPropagation();
+            e.preventDefault();
+            document.body.classList.remove('drop');
+            const files = e.dataTransfer.files;
+            if (files.length === 1) {
+                const reader = new FileReader();
+                reader.onload = function (data) {
+                    const reader = new ZipReader(ByteBuffer.fromBuffer(new Uint8Array(data.target.result)));
+                    const entries = reader.read();
+
+                    const grouped = new Map();
+                    for (const entry of entries) {
+                        if (entry.data.length > 0) {
+                            let path = entry.fullName.startsWith('test-data/') ? entry.fullName : `test-data/${entry.fullName}`;
+                            const key = path.replace('.diff.png', '').replace('.new.png', '') + '.png';
+                            if (grouped.has(key)) {
+                                if (entry.fullName.endsWith('.diff.png')) {
+                                    grouped.get(key).diffFile = entry.data;
+                                } else if (entry.fullName.endsWith('.new.png')) {
+                                    grouped.get(key).newFile = entry.data;
+                                }
+                            } else {
+                                if (entry.fullName.endsWith('.diff.png')) {
+                                    grouped.set(key, {
+                                        originalFile: key,
+                                        diffFile: entry.data
+                                    });
+                                } else if (entry.fullName.endsWith('.new.png')) {
+                                    grouped.set(key, {
+                                        originalFile: key,
+                                        newFile: entry.data
+                                    });
+                                }
+                            }
+                        }
+                    }
+
+                    const results = Array.from(grouped.values());
+                    displayResults(results);
+                };
+                reader.readAsArrayBuffer(files[0]);
+            }
+        }, true);
+
+        document.querySelector('#hide-accepted').onchange = (e)=>{
+            if(e.target.checked) {
+                document.body.classList.add('hide-accepted');
+            } else {
+                document.body.classList.remove('hide-accepted');
+            }
+        };
+
+    </script>
+
+    <div class="drop-area">
+        <div class="drop-message">
+            Drop Test-Results Zip to page
+        </div>
+    </div>
+</body>
+
+</html>

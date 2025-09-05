@@ -1,6 +1,7 @@
 {
     "name": "@coderline/alphatab-transpiler",
     "version": "1.7.0",
+    "type": "module",
     "description": "The transpiler toolkit to translate alphaTab to C# and Kotlin",
     "private": true,
     "scripts": {

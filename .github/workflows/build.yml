@@ -38,16 +38,16 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
       - run: npm ci
-      - run: npm run build
-      - run: npm run test
+      - run: npm run build-web
+      - run: npm run test-web
         id: test
       - uses: actions/upload-artifact@v4
         if: ${{ failure() && steps.test.conclusion == 'failure' }}
         with: 
           name: test-results-web
           path: |
-            test-data/**/*.new.png
-            test-data/**/*.diff.png
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png
 
   build_csharp:
     name: Build and Test C#
@@ -72,8 +72,8 @@ jobs:
         with: 
           name: test-results-csharp
           path: |
-            test-data/**/*.new.png
-            test-data/**/*.diff.png
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png
 
   build_kotlin:
     name: Build and Test Kotlin
@@ -111,6 +111,6 @@ jobs:
         with: 
           name: test-results-kotlin
           path: |
-            test-data/**/*.new.png
-            test-data/**/*.diff.png      
-      - run: ./src.kotlin/alphaTab/gradlew --stop
+            packages/alphatab/test-data/**/*.new.png
+            packages/alphatab/test-data/**/*.diff.png      
+      - run: ./packages/kotlin/src/gradlew --stop

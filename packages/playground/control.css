@@ -1,26 +1,26 @@
-@import url('../node_modules/@fontsource/noto-sans/300.css');
-@import url('../node_modules/@fontsource/noto-sans/400.css');
-@import url('../node_modules/@fontsource/noto-sans/500.css');
-@import url('../node_modules/@fontsource/noto-sans/700.css');
+@import url('@fontsource/noto-sans/300.css');
+@import url('@fontsource/noto-sans/400.css');
+@import url('@fontsource/noto-sans/500.css');
+@import url('@fontsource/noto-sans/700.css');
 
-@import url('../node_modules/@fontsource/noto-sans/300-italic.css');
-@import url('../node_modules/@fontsource/noto-sans/400-italic.css');
-@import url('../node_modules/@fontsource/noto-sans/500-italic.css');
-@import url('../node_modules/@fontsource/noto-sans/700-italic.css');
+@import url('@fontsource/noto-sans/300-italic.css');
+@import url('@fontsource/noto-sans/400-italic.css');
+@import url('@fontsource/noto-sans/500-italic.css');
+@import url('@fontsource/noto-sans/700-italic.css');
 
-@import url('../node_modules/@fontsource/noto-serif/300.css');
-@import url('../node_modules/@fontsource/noto-serif/400.css');
-@import url('../node_modules/@fontsource/noto-serif/500.css');
-@import url('../node_modules/@fontsource/noto-serif/700.css');
+@import url('@fontsource/noto-serif/300.css');
+@import url('@fontsource/noto-serif/400.css');
+@import url('@fontsource/noto-serif/500.css');
+@import url('@fontsource/noto-serif/700.css');
 
-@import url('../node_modules/@fontsource/noto-serif/300-italic.css');
-@import url('../node_modules/@fontsource/noto-serif/400-italic.css');
-@import url('../node_modules/@fontsource/noto-serif/500-italic.css');
-@import url('../node_modules/@fontsource/noto-serif/700-italic.css');
+@import url('@fontsource/noto-serif/300-italic.css');
+@import url('@fontsource/noto-serif/400-italic.css');
+@import url('@fontsource/noto-serif/500-italic.css');
+@import url('@fontsource/noto-serif/700-italic.css');
 
-@import url('../node_modules/@fortawesome/fontawesome-free/css/all.css');
+@import url('@fortawesome/fontawesome-free/css/all.css');
 
-@import url('../node_modules/bootstrap/dist/css/bootstrap.min.css');
+@import url('bootstrap/dist/css/bootstrap.min.css');
 
 .at-cursor-bar {
     /* Defines the color of the bar background when a bar is played */
@@ -182,7 +182,7 @@ body > * {
 }
 
 input[type='range'] {
-    -webkit-appearance: none;
+    appearance: none;
     background: #d3d3d3;
     outline: none;
     opacity: 0.7;

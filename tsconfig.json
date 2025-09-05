@@ -1,0 +1,44 @@
+{
+    "compilerOptions": {
+        "moduleResolution": "Bundler",
+        "target": "ES2020",
+        "module": "ES2020",
+        "lib": [
+            "ES2015",
+            "ES2016",
+            "ES2017",
+            "ES2021",
+            "es2022.regexp",
+            "es2022.error",
+            "ES2024.Promise",
+            "DOM",
+            "DOM.Iterable",
+            "ES2017.ArrayBuffer",
+            "ES2024.ArrayBuffer"
+        ],
+        "isolatedModules": true,
+        "moduleDetection": "force",
+        "noEmit": true,
+        "strict": true,
+        "allowSyntheticDefaultImports": true,
+        "strictNullChecks": true,
+        "strictPropertyInitialization": true,
+        "emitDecoratorMetadata": false,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
+        "noImplicitOverride": true,
+        "paths": {
+            "@src/*": [
+                "./packages/alphatab/src/*"
+            ]
+        },
+    },
+    "include": [
+        "./packages/alphatab/src"
+    ],
+    "exclude": [
+        "node_modules"
+    ]
+}
