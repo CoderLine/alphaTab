@@ -14,6 +14,7 @@
     },
     "formatter": {
         "includes": [
+            "*.ts",
             "src/**",
             "test/**",
             "src.compiler/**",
@@ -23,6 +24,7 @@
     },
     "linter": {
         "includes": [
+            "*.ts",
             "src/**",
             "test/**",
             "src.compiler/**",

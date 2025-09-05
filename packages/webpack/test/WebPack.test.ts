@@ -31,10 +31,7 @@ describe('WebPack', () => {
                             path: path.resolve('./out')
                         },
                         plugins: [
-                            new AlphaTabWebPackPlugin({
-                                // TODO: monorepo, rely on node_modules resolution
-                                alphaTabSourceDir: '../../../alphatab/dist/'
-                            }),
+                            new AlphaTabWebPackPlugin(),
                             new HtmlWebpackPlugin()
                         ],
                         optimization: {

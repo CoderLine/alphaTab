@@ -1,0 +1,14 @@
+{
+    "name": "@coderline/alphatab-tooling",
+    "version": "1.7.0",
+    "type": "module",
+    "description": "Additional build tooling for alphaTab like common build configurations",
+    "private": true,
+    "devDependencies": {
+        "@microsoft/api-extractor": "^7.52.11",
+        "@rollup/plugin-terser": "^0.4.4",
+        "@rollup/plugin-typescript": "^12.1.4",
+        "rollup-plugin-license": "^3.6.0",
+        "typescript": "^5.9.2"
+    }
+}

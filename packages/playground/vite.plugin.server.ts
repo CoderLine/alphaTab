@@ -2,9 +2,9 @@ import fs from 'node:fs';
 import type { ServerResponse } from 'node:http';
 import path from 'node:path';
 import url from 'node:url';
+import serveStatic from 'serve-static';
 import type { Connect, Plugin } from 'vite';
 import { acceptOne } from '../alphatab/scripts/accept-new-reference-files.common';
-import serveStatic from 'serve-static';
 
 const __dirname = url.fileURLToPath(new URL('.', import.meta.url));
 

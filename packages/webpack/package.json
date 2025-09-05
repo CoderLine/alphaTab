@@ -29,7 +29,6 @@
         "clean": "rimraf dist",
         "lint": "biome lint",
         "typecheck": "tsc --noEmit",
-
         "build": "vite build --mode esm && vite build --mode cjs",
         "test": "mocha"
     },
@@ -37,23 +36,21 @@
         "webpack": "^5.101.3"
     },
     "devDependencies": {
-        "webpack-cli": "^6.0.1",
-        "html-webpack-plugin": "^5.6.4",
         "@biomejs/biome": "^2.2.2",
         "@microsoft/api-extractor": "^7.52.11",
-        "@rollup/plugin-typescript": "^12.1.4",
         "@types/chai": "^5.2.2",
         "@types/mocha": "^10.0.10",
         "@types/node": "^24.3.0",
         "assert": "^2.1.0",
         "chai": "^6.0.1",
+        "html-webpack-plugin": "^5.6.4",
         "mocha": "^11.7.1",
         "rimraf": "^6.0.1",
-        "rollup-plugin-license": "^3.6.0",
         "terser": "^5.43.1",
         "tslib": "^2.8.1",
         "tsx": "^4.20.5",
-        "typescript": "^5.9.2"
+        "typescript": "^5.9.2",
+        "webpack-cli": "^6.0.1"
     },
     "files": [
         "/dist/alphaTab*.js",

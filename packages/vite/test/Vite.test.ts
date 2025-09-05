@@ -18,10 +18,7 @@ describe('Vite', () => {
                 vite.defineConfig({
                     base: '/test-data/project/dist/',
                     plugins: [
-                        alphaTab({
-                            // TODO: monorepo, rely on node_modules resolution
-                            alphaTabSourceDir: '../../../alphatab/dist/'
-                        })
+                        alphaTab()
                     ]
                 })
             );

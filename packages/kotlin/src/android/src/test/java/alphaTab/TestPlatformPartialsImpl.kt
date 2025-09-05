@@ -201,7 +201,7 @@ class TestPlatformPartials {
                 path = path.parent
                     ?: throw AlphaTabError(AlphaTabErrorType.General, "Could not find project root")
             }
-            path.toString()
+            Paths.get(path.toString(), "packages", "alphatab").toString()
         }
 
         private fun openFileRead(path: String): InputStream {

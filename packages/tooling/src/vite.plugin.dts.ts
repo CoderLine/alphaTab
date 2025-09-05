@@ -1,6 +1,6 @@
-import { Extractor, ExtractorConfig, ExtractorResult } from '@microsoft/api-extractor';
-import path from 'path';
-import url from 'url';
+import path from 'node:path';
+import url from 'node:url';
+import { Extractor, ExtractorConfig, type ExtractorResult } from '@microsoft/api-extractor';
 
 export default function generateDts(root: string, entryFile: string, outputFilename: string) {
     const relativePath = path.relative(root, entryFile);
