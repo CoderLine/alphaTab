@@ -24,8 +24,11 @@
         "build-web": "npm run build && npm run build-webpack && npm run build-vite",
         "test-web": "npm run test && npm run test-webpack && npm run test-vite",
 
-        "build-csharp": "npm run build --workspace=packages/csharp",
+        "build-csharp": "npm run generate-typescript && npm run build --workspace=packages/csharp",
         "test-csharp": "npm run test --workspace=packages/csharp",
+
+        "build-kotlin": "npm run generate-typescript && npm run build --workspace=packages/kotlin",
+        "test-kotlin": "npm run test --workspace=packages/kotlin",
 
         "build-vite": "npm run build --workspace=packages/vite",
         "test-vite": "npm run test --workspace=packages/vite",
