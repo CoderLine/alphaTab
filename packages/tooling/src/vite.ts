@@ -198,7 +198,7 @@ export function esm(
                             shouldCreateDts(chunk)
                         ) {
                             this.info(`Creating types for bundle ${file}`);
-                            generateDts(__dirname, chunk.facadeModuleId!, file.replace('.mjs', '.d.ts'));
+                            generateDts(projectDir, chunk.facadeModuleId!, file.replace('.mjs', '.d.ts'));
                         }
                     }
                 }
