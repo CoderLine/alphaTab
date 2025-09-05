@@ -10,6 +10,9 @@ let packageJsonContent = await fs.promises.readFile(packageJsonPath, 'utf-8');
 packageJsonContent = packageJsonContent.replace('"type": "module"', '"type": "commonjs"');
 await fs.promises.writeFile(packageJsonPath, packageJsonContent);
 
+await fs.promises.copyFile(path.resolve(__dirname, '../../../README.md'), path.resolve(__dirname, '../README.md'));
+
+
 // NOTE: Backwards compatibility for bundler plugins
 await fs.promises.copyFile(path.resolve(__dirname, '../../vite/dist/alphaTab.vite.d.ts'), path.resolve(__dirname, '../dist/alphaTab.vite.d.ts'));
 await fs.promises.copyFile(path.resolve(__dirname, '../../vite/dist/alphaTab.vite.js'), path.resolve(__dirname, '../dist/alphaTab.vite.core.js'));

@@ -4,3 +4,4 @@ font/bravura/bravura_alphatab_metadata.json
 test-data/bundler/webpack/out/
 test-data/bundler/vite/public/
 test-data/bundler/dist/public/
+/README.md
