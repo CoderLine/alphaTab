@@ -1,0 +1,28 @@
+{
+    "name": "@coderline/alphatab-playground",
+    "version": "1.7.0",
+    "description": "A development playground for alphaTab to test features while developing",
+    "private": true,
+    "dependencies": {
+        "@coderline/alphatab": "*",
+        "@fontsource/noto-sans": "^5.2.7",
+        "@fontsource/noto-serif": "^5.2.7",
+        "@fortawesome/fontawesome-free": "^7.0.0",
+        "@popperjs/core": "^2.11.8",
+        "@types/serve-static": "^1.15.8",
+        "bootstrap": "^5.3.8",
+        "handlebars": "^4.7.8",
+        "serve-static": "^2.2.0"
+    },
+    "scripts": {
+        "lint": "biome lint",
+        "dev": "vite"
+    },
+    "devDependencies": {
+        "@types/bootstrap": "^5.2.10",
+        "tslib": "^2.8.1",
+        "typescript": "^5.9.2",
+        "vite": "^7.1.4",
+        "vite-tsconfig-paths": "^5.1.4"
+    }
+}

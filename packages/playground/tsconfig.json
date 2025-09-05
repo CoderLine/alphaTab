@@ -1,0 +1,19 @@
+{
+    "extends": "../../tsconfig.json",
+    "compilerOptions": {
+        "baseUrl": ".",
+        "paths": {
+            "@src/*": [
+                "../alphatab/src/*"
+            ]
+        },
+    },
+    "include": [
+        "*.ts",
+        "../alphatab/src"
+    ],
+    "exclude": [
+        "**/node_modules",
+        "../../node_modules",
+    ]
+}

@@ -1,123 +1,39 @@
 {
-    "name": "@coderline/alphatab",
+    "name": "@coderline/alphatab-monorepo",
     "version": "1.7.0",
-    "description": "alphaTab is a music notation and guitar tablature rendering library",
-    "keywords": [
-        "guitar",
-        "music-notation",
-        "music-sheet",
-        "html5",
-        "svg",
-        "guitar-tablature"
-    ],
-    "homepage": "https://alphatab.net",
-    "bugs": {
-        "url": "https://github.com/coderline/alphaTab/issues"
-    },
-    "author": "Daniel Kuschny",
-    "license": "MPL-2.0",
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/coderline/alphaTab.git"
-    },
+    "description": "Monorepo for alphaTab and its related packages",
+    "private": true,
     "type": "module",
-    "main": "dist/alphaTab.js",
-    "module": "dist/alphaTab.mjs",
-    "typings": "dist/alphaTab.d.ts",
-    "exports": {
-        ".": {
-            "types": "./dist/alphaTab.d.ts",
-            "import": "./dist/alphaTab.mjs",
-            "require": "./dist/alphaTab.js"
-        },
-        "./webpack": {
-            "types": "./dist/alphaTab.webpack.d.ts",
-            "import": "./dist/alphaTab.webpack.mjs",
-            "require": "./dist/alphaTab.webpack.js"
-        },
-        "./vite": {
-            "types": "./dist/alphaTab.vite.d.ts",
-            "import": "./dist/alphaTab.vite.mjs",
-            "require": "./dist/alphaTab.vite.js"
-        },
-        "./soundfont/*": "./dist/soundfont/*",
-        "./font/*": "./dist/font/*"
-    },
-    "engines": {
-        "node": ">=6.0.0"
-    },
+    "workspaces": [
+        "packages/*"
+    ],
     "scripts": {
-        "clean": "rimraf dist",
-        "lint": "biome lint",
-        "lint-fix": "biome lint --write",
-        "lint-ci": "biome lint --reporter=github",
-        "format": "biome format --write",
-        "start": "node scripts/setup-playground.js && npm run generate-typescript && vite",
-        "generate-typescript": "rimraf src/generated && tsx src.compiler/typescript/AlphaTabGenerator.ts",
-        "generate-csharp": "npm run generate-typescript && tsx src.compiler/csharp/CSharpTranspiler.ts --outDir dist/lib.csharp",
-        "generate-kotlin": "npm run generate-typescript && tsx src.compiler/kotlin/KotlinTranspiler.ts --outDir dist/lib.kotlin",
-        "build": "npm run generate-typescript && npm run build-web-full",
-        "build-web-full": "npm run build-web && npm run build-vite && npm run build-webpack",
-        "build-web": "vite build --mode esm && vite build --mode umd",
-        "build-vite": "vite build --mode vite-cjs && vite build --mode vite-esm",
-        "build-webpack": "vite build --mode webpack-cjs && vite build --mode webpack-esm",
-        "build-csharp": "npm run generate-csharp && cd src.csharp && dotnet build -c Release",
-        "build-kotlin": "npm run generate-kotlin && node scripts/gradlew.mjs assembleRelease",
-        "test": "mocha",
-        "test-csharp": "cd src.csharp && dotnet test -c Release",
-        "test-kotlin": "node scripts/gradlew.mjs testReleaseUnitTest --info",
-        "test-accept-reference": "tsx scripts/accept-new-reference-files.ts",
-        "typecheck": "tsc --noEmit",
-        "prepack": "node scripts/prepack.mjs",
-        "bravura-smufl": "tsx scripts/smufl-metadata.ts font/bravura/bravura_metadata.json font/bravura/bravura_alphatab_metadata.json true"
-    },
-    "devDependencies": {
-        "@biomejs/biome": "^2.2.2",
-        "@coderline/alphaskia": "^3.4.135",
-        "@coderline/alphaskia-linux": "^3.4.135",
-        "@coderline/alphaskia-windows": "^3.4.135",
-        "@fontsource/noto-sans": "^5.2.7",
-        "@fontsource/noto-serif": "^5.2.7",
-        "@fortawesome/fontawesome-free": "^7.0.0",
-        "@microsoft/api-extractor": "^7.52.11",
-        "@popperjs/core": "^2.11.8",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^12.1.4",
-        "@types/bootstrap": "^5.2.10",
-        "@types/chai": "^5.2.2",
-        "@types/mocha": "^10.0.10",
-        "@types/node": "^24.3.0",
-        "ace-builds": "^1.43.2",
-        "assert": "^2.1.0",
-        "bootstrap": "^5.3.8",
-        "chai": "^6.0.1",
-        "chalk": "^5.6.0",
-        "fs-extra": "^11.3.1",
-        "handlebars": "^4.7.8",
-        "html-webpack-plugin": "^5.6.4",
-        "jest-snapshot": "^30.1.1",
-        "mocha": "^11.7.1",
-        "rimraf": "^6.0.1",
-        "rollup-plugin-copy": "^3.5.0",
-        "rollup-plugin-license": "^3.6.0",
-        "terser": "^5.43.1",
-        "tslib": "^2.8.1",
-        "tsx": "^4.20.5",
-        "typescript": "^5.9.2",
-        "vite": "^7.1.3",
-        "vite-tsconfig-paths": "^5.1.4",
-        "webpack": "^5.101.3",
-        "webpack-cli": "^6.0.1"
-    },
-    "files": [
-        "/dist/alphaTab*.js",
-        "/dist/alphaTab*.mjs",
-        "/dist/alphaTab*.ts",
-        "/dist/font/Bravura.*",
-        "/dist/font/Bravura*.txt",
-        "/dist/font/*.txt",
-        "/dist/soundfont/*",
-        "LICENSE",
-        "LICENSE.header"
-    ]
+        "clean": "npm run clean --workspaces --if-present",
+        "lint": "npm run lint-ci --workspaces --if-present",
+        "lint-ci": "npm run lint-ci --workspaces --if-present -- --reporter=github",
+        "typecheck": "npm run typecheck --workspaces --if-present",
+        "dev": "npm run dev --workspace=packages/playground",
+
+        "update-version": "node scripts/update-version.mjs",
+
+        "generate-typescript": "npm run generate-typescript --workspace=packages/alphatab",
+        
+        "build": "npm run build --workspace=packages/alphatab",
+        "test": "npm run build --workspace=packages/alphatab",
+
+        "build-web": "npm run build && npm run build-webpack && npm run build-vite",
+        "test-web": "npm run test && npm run test-webpack && npm run test-vite",
+
+        "build-csharp": "npm run generate-typescript && npm run build --workspace=packages/csharp",
+        "test-csharp": "npm run test --workspace=packages/csharp",
+
+        "build-kotlin": "npm run generate-typescript && npm run build --workspace=packages/kotlin",
+        "test-kotlin": "npm run test --workspace=packages/kotlin",
+
+        "build-vite": "npm run build --workspace=packages/vite",
+        "test-vite": "npm run test --workspace=packages/vite",
+        
+        "build-webpack": "npm run build --workspace=packages/webpack",
+        "test-webpack": "npm run test --workspace=packages/webpack"
+    }
 }

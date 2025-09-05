@@ -34,10 +34,15 @@ jobs:
           node-version: 'lts/*'
           cache: 'npm'
 
-      - run: node ./scripts/update-version.js alpha ${{github.run_number}}
+      - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
-      - run: npm run build
+      - run: npm run build-web
       - run: npm pack
+        working-directory: ./packages/alphatab/
+      - run: npm pack
+        working-directory: ./packages/vite/
+      - run: npm pack
+        working-directory: ./packages/webpack/
 
       - uses: actions/setup-node@v4
         with:
@@ -45,6 +50,17 @@ jobs:
           registry-url: https://registry.npmjs.org/
 
       - run: npm publish --access public --tag alpha
+        working-directory: ./packages/alphatab/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/vite/
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
+
+      - run: npm publish --access public --tag alpha
+        working-directory: ./packages/webpack/
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPMJS_AUTH_TOKEN}}
 
@@ -66,12 +82,14 @@ jobs:
         with:
           dotnet-version: "8"
 
+      - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
-      - run: node ./scripts/update-csharp-version.js alpha ${{github.run_number}}
       - run: npm run build-csharp
 
-      - run: dotnet nuget push src.csharp/AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
-      - run: dotnet nuget push src.csharp/AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+      - run: dotnet nuget push AlphaTab/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+        working-directory: ./packages/csharp/
+      - run: dotnet nuget push AlphaTab.Windows/bin/Release/*.nupkg -k ${{secrets.NUGET_API_KEY}} -s https://api.nuget.org/v3/index.json
+        working-directory: ./packages/csharp/
 
   nightly_kotlin_android:
     name: Kotlin (Android)
@@ -98,13 +116,13 @@ jobs:
           java-version: "19"
           distribution: "temurin"
 
+      - run: npm run update-version -- alpha ${{github.run_number}}
       - run: npm ci
-      - run: node ./scripts/update-kotlin-version.js SNAPSHOT
       - run: npm run build-kotlin
 
       - run: ./gradlew publishToMavenCentral
-        working-directory: ./src.kotlin/alphaTab/
+        working-directory: ./packages/kotlin/src/
 
       - run: ./gradlew --stop
-        working-directory: ./src.kotlin/alphaTab/
+        working-directory: ./packages/kotlin/src/
 

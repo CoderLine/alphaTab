@@ -1,0 +1,34 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.2.2/schema.json",
+    "root": false,
+    "extends": "//",
+    "files": {
+        "includes": [
+            "**/*.*",
+            "!dist",
+            "!.rollup.cache",
+            "!node_modules",
+            "!test-data",
+            "!src/generated"
+        ]
+    },
+    "formatter": {
+        "includes": [
+            "*.ts",
+            "src/**",
+            "test/**",
+            "src.compiler/**",
+            "playground/**",
+            "playground-template/**"
+        ]
+    },
+    "linter": {
+        "includes": [
+            "*.ts",
+            "src/**",
+            "test/**",
+            "src.compiler/**",
+            "playground-template/**"
+        ]
+    }
+}
