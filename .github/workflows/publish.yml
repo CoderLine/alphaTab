@@ -29,7 +29,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -44,7 +44,7 @@ jobs:
       - run: npm pack
         working-directory: ./packages/webpack/
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
           registry-url: https://registry.npmjs.org/
@@ -73,7 +73,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
           cache: 'npm'
@@ -106,7 +106,7 @@ jobs:
       - uses: actions/checkout@v5
         with:
           lfs: true
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 'lts/*'
           cache: 'npm'
