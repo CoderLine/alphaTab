@@ -374,6 +374,59 @@ import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { MidiEvent } from '@src/midi/MidiEvent';
+import {
+    type AlphaTexAstNode,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataTagNode,
+    AlphaTexNodeType,
+    type AlphaTexNumberLiteral,
+    type AlphaTexStringLiteral
+} from '@src/importer/AlphaTexAst';
+
+export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
+    public static readonly instance = new AlphaTexAstNodePlugin();
+    test(arg0: unknown): boolean {
+        return !!arg0 && typeof arg0 === 'object' && 'nodeType' in arg0;
+    }
+
+    serialize(
+        val: unknown,
+        _config: PrettyFormatConfig,
+        _indentation: string,
+        _depth: number,
+        _refs: unknown[],
+        _printer: PrettyFormatPrinter
+    ): string {
+        const node = val as AlphaTexAstNode;
+        let value: string | undefined = undefined;
+        switch (node.nodeType) {
+            case AlphaTexNodeType.Identifier:
+                value = (node as AlphaTexIdentifier).text;
+                break;
+            case AlphaTexNodeType.MetaDataTag:
+                value = (node as AlphaTexMetaDataTagNode).tag.text;
+                break;
+            case AlphaTexNodeType.NumberLiteral:
+                value = (node as AlphaTexNumberLiteral).value.toString();
+                break;
+            case AlphaTexNodeType.StringLiteral:
+                value = (node as AlphaTexStringLiteral).value;
+                break;
+        }
+        const serializedValue = value !== undefined ? ` ${JSON.stringify(value)}` : '';
+        let str = `Ln ${node.start!.line}->${node.end!.line} Col ${node.start!.col}->${node.end!.col} Off ${node.start!.offset}->${node.end!.offset} ${AlphaTexNodeType[node.nodeType]}${serializedValue}`;
+        if (node.comments) {
+            for (const c of node.comments) {
+                if (c.multiLine) {
+                    str += `\n  /*${c.text}*/`;
+                } else {
+                    str += `\n  //${c.text}`;
+                }
+            }
+        }
+        return str;
+    }
+}
 
 /**
  * A serializer plugin for pretty-format for creating simple MidiEbent snapshots
@@ -622,6 +675,7 @@ export class SnapshotFile {
         const c = new PrettyFormatConfig();
         c.plugins.push(ScoreSerializerPlugin.instance);
         c.plugins.push(MidiEventSerializerPlugin.instance);
+        c.plugins.push(AlphaTexAstNodePlugin.instance);
         return c;
     }
     private static readonly _matchOptions: PrettyFormatConfig = SnapshotFile._createConfig();

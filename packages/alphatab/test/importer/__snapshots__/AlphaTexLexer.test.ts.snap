@@ -1,0 +1,338 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AlphaTexLexerTest basic-tokens 1`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 DotToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 2`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 ColonToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 3`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 ParenthesisOpenToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 4`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 ParenthesisCloseToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 5`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 BraceOpenToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 6`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 BraceCloseToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 7`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 PipeToken,
+]
+`;
+
+exports[`AlphaTexLexerTest basic-tokens 8`] = `
+Array [
+  Ln 1->1 Col 1->1 Off 0->0 AsteriskToken,
+]
+`;
+
+exports[`AlphaTexLexerTest comments 1`] = `
+Array [
+  Ln 2->2 Col 10->14 Off 27->31 Identifier "true"
+  // Single,
+  Ln 3->4 Col 10->1 Off 56->61 Identifier "false"
+  // Single After,
+]
+`;
+
+exports[`AlphaTexLexerTest comments 2`] = `
+Array [
+  Ln 2->3 Col 2->1 Off 12->16 Identifier "true"
+  /** Multi **/,
+  Ln 3->3 Col 2->6 Off 17->21 Identifier "true",
+  Ln 3->3 Col 20->25 Off 35->40 Identifier "false"
+  /** Middle **/,
+]
+`;
+
+exports[`AlphaTexLexerTest floats 1`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 2`] = `
+Array [
+  Ln 1->1 Col 1->6 Off 0->5 NumberLiteral "11.22",
+  Ln 1->1 Col 7->12 Off 6->11 NumberLiteral "33.44",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 3`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+  Ln 1->1 Col 4->4 Off 3->3 DotToken,
+  Ln 1->1 Col 5->6 Off 4->5 NumberLiteral "4",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 4`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+  Ln 1->1 Col 5->5 Off 4->4 DotToken,
+  Ln 1->1 Col 6->7 Off 5->6 NumberLiteral "4",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 5`] = `
+Array [
+  Ln 1->1 Col 1->2 Off 0->1 NumberLiteral "1",
+  Ln 1->1 Col 3->3 Off 2->2 DotToken,
+  Ln 1->1 Col 4->7 Off 3->6 NumberLiteral "1.4",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 6`] = `
+Array [
+  Ln 1->1 Col 1->5 Off 0->4 NumberLiteral "-1.1",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 7`] = `
+Array [
+  Ln 1->1 Col 1->2 Off 0->1 Identifier "-",
+  Ln 1->1 Col 2->2 Off 1->1 DotToken,
+  Ln 1->1 Col 3->4 Off 2->3 NumberLiteral "1",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 8`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+  Ln 1->1 Col 4->4 Off 3->3 ParenthesisOpenToken,
+]
+`;
+
+exports[`AlphaTexLexerTest floats 9`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+  Ln 1->1 Col 4->4 Off 3->3 BraceOpenToken,
+]
+`;
+
+exports[`AlphaTexLexerTest floats 10`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+  Ln 1->1 Col 4->4 Off 3->3 PipeToken,
+]
+`;
+
+exports[`AlphaTexLexerTest floats 11`] = `
+Array [
+  Ln 1->1 Col 1->2 Off 0->1 NumberLiteral "1",
+  Ln 1->1 Col 2->2 Off 1->1 DotToken,
+  Ln 1->1 Col 3->5 Off 2->4 Identifier "1a",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 12`] = `
+Array [
+  Ln 1->1 Col 1->3 Off 0->2 Identifier "1a",
+  Ln 1->1 Col 3->3 Off 2->2 DotToken,
+  Ln 1->1 Col 4->5 Off 3->4 NumberLiteral "1",
+]
+`;
+
+exports[`AlphaTexLexerTest floats 13`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 NumberLiteral "1.1",
+  Ln 1->1 Col 4->9 Off 3->8 MetaDataTag "test",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 1`] = `
+Array [
+  Ln 1->1 Col 1->5 Off 0->4 Identifier "true",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 2`] = `
+Array [
+  Ln 1->1 Col 1->6 Off 0->5 Identifier "false",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 3`] = `
+Array [
+  Ln 1->1 Col 1->11 Off 0->10 Identifier "HelloWorld",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 4`] = `
+Array [
+  Ln 1->1 Col 1->3 Off 0->2 Identifier "C4",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 5`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 Identifier "C#4",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 6`] = `
+Array [
+  Ln 1->1 Col 1->4 Off 0->3 Identifier "Cb4",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 7`] = `
+Array [
+  Ln 1->1 Col 1->15 Off 0->14 Identifier "electricpiano1",
+]
+`;
+
+exports[`AlphaTexLexerTest identifiers 8`] = `
+Array [
+  Ln 1->1 Col 1->11 Off 0->10 Identifier "Unicodeöäü",
+  Ln 1->1 Col 12->20 Off 11->19 Identifier "Unicode😸",
+  Ln 1->1 Col 21->28 Off 20->27 Identifier "Utf16🤘🏻",
+]
+`;
+
+exports[`AlphaTexLexerTest meta-command 1`] = `
+Array [
+  Ln 1->1 Col 1->7 Off 0->6 MetaDataTag "title",
+]
+`;
+
+exports[`AlphaTexLexerTest meta-command 2`] = `
+Array [
+  Ln 1->1 Col 1->9 Off 0->8 MetaDataTag "double",
+]
+`;
+
+exports[`AlphaTexLexerTest meta-command 3`] = `
+Array [
+  Ln 1->1 Col 1->15 Off 0->14 MetaDataTag "withNumber123",
+]
+`;
+
+exports[`AlphaTexLexerTest meta-command 4`] = `
+Array [
+  Ln 1->1 Col 1->14 Off 0->13 MetaDataTag "withUnicode😼",
+]
+`;
+
+exports[`AlphaTexLexerTest meta-command 5`] = `
+Array [
+  Ln 1->1 Col 1->14 Off 0->13 MetaDataTag "withUnicode😼",
+  Ln 1->1 Col 15->15 Off 14->14 DotToken,
+  Ln 1->1 Col 17->31 Off 16->30 MetaDataTag "withNumber123",
+]
+`;
+
+exports[`AlphaTexLexerTest numbers 1`] = `
+Array [
+  Ln 1->1 Col 1->2 Off 0->1 NumberLiteral "1",
+]
+`;
+
+exports[`AlphaTexLexerTest numbers 2`] = `
+Array [
+  Ln 1->1 Col 1->5 Off 0->4 NumberLiteral "1234",
+]
+`;
+
+exports[`AlphaTexLexerTest numbers 3`] = `
+Array [
+  Ln 1->1 Col 1->3 Off 0->2 NumberLiteral "-1",
+]
+`;
+
+exports[`AlphaTexLexerTest numbers 4`] = `
+Array [
+  Ln 1->1 Col 1->6 Off 0->5 NumberLiteral "-1234",
+]
+`;
+
+exports[`AlphaTexLexerTest numbers 5`] = `
+Array [
+  Ln 1->1 Col 1->5 Off 0->4 NumberLiteral "1234",
+  Ln 1->1 Col 6->10 Off 5->9 NumberLiteral "5678",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 1`] = `
+Array [
+  Ln 1->1 Col 1->15 Off 0->14 StringLiteral "Double Quoted",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 2`] = `
+Array [
+  Ln 1->1 Col 1->15 Off 0->14 StringLiteral "Single Quoted",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 3`] = `
+Array [
+  Ln 1->1 Col 1->10 Off 0->9 StringLiteral "Multiple",
+  Ln 1->1 Col 12->20 Off 11->19 StringLiteral "Strings",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 4`] = `
+Array [
+  Ln 1->1 Col 1->19 Off 0->18 StringLiteral "Double \\"Quoted\\"",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 5`] = `
+Array [
+  Ln 1->1 Col 1->19 Off 0->18 StringLiteral "Single 'Quoted'",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 6`] = `
+Array [
+  Ln 1->1 Col 1->8 Off 0->7 StringLiteral "\\r\\n\\t",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 7`] = `
+Array [
+  Ln 1->1 Col 1->8 Off 0->7 StringLiteral "\\r\\n\\t",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 8`] = `
+Array [
+  Ln 1->1 Col 1->14 Off 0->13 StringLiteral "😸",
+]
+`;
+
+exports[`AlphaTexLexerTest strings 9`] = `
+Array [
+  Ln 1->1 Col 1->5 Off 0->4 StringLiteral "😸🤘🏻",
+]
+`;
+
+exports[`AlphaTexLexerTest whitespace 1`] = `
+Array [
+  Ln 1->1 Col 3->3 Off 2->2 DotToken,
+  Ln 2->2 Col 8->8 Off 13->13 DotToken,
+]
+`;

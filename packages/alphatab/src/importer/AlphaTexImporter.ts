@@ -161,6 +161,22 @@ enum AlphaTexAccidentalMode {
 /**
  * @internal
  */
+interface AlphaTexTokenLocation {
+    line: number;
+    col: number;
+    offset: number;
+}
+
+/**
+ * @internal
+ */
+interface AlphaTexTokenInfo {
+    symbolType: AlphaTexSymbols;
+    tokenType: string;
+    start: AlphaTexTokenLocation;
+    end: AlphaTexTokenLocation;
+}
+
 export class AlphaTexLexer {
     private static readonly _eof: number = 0;
 
@@ -173,6 +189,17 @@ export class AlphaTexLexer {
 
     public sy: AlphaTexSymbols = AlphaTexSymbols.No;
     public syData: unknown = '';
+    public syStart: AlphaTexTokenLocation = { line: 0, col: 0, offset: 0 };
+    public syEnd: AlphaTexTokenLocation = { line: 0, col: 0, offset: 0 };
+
+    public buildTokenInfo(tokenType:string): AlphaTexTokenInfo {
+        return {
+            symbolType: this.sy,
+            tokenType,
+            start: this.syStart,
+            end: this.syEnd
+        };
+    }
 
     public lastValidSpot: number[] = [0, 1, 0];
 
@@ -199,6 +226,11 @@ export class AlphaTexLexer {
      */
     private _saveValidSpot(): void {
         this.lastValidSpot = [this._position, this._line, this._col];
+        this.syStart = {
+            line: this._line,
+            col: this._col,
+            offset: this._position
+        };
     }
 
     /**
@@ -402,6 +434,12 @@ export class AlphaTexLexer {
                 this._errorMessage(`Unexpected character ${String.fromCodePoint(this._codepoint)}`);
             }
         }
+
+        this.syEnd = {
+            line: this._line,
+            col: this._col,
+            offset: this._position
+        };
         return this.sy;
     }
 

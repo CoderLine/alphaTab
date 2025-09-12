@@ -16,6 +16,11 @@ class QueueItem<T> {
 export class Queue<T extends object> {
     private _head?: QueueItem<T>;
     private _tail?: QueueItem<T>;
+    private _length: number = 0;
+
+    public get length(): number {
+        return this._length;
+    }
 
     public get isEmpty() {
         return this._head === undefined;
@@ -24,6 +29,7 @@ export class Queue<T extends object> {
     public clear() {
         this._head = undefined;
         this._tail = undefined;
+        this._length = 0;
     }
 
     public enqueue(item: T) {
@@ -34,6 +40,18 @@ export class Queue<T extends object> {
             this._tail = queueItem;
         } else {
             // empty -> new item takes head and tail
+            this._head = queueItem;
+            this._tail = queueItem;
+        }
+        this._length++;
+    }
+
+    public enqueueFront(item: T) {
+        const queueItem = new QueueItem<T>(item);
+        queueItem.next = this._head;
+        if (this._head) {
+            this._head = queueItem;
+        } else {
             this._head = queueItem;
             this._tail = queueItem;
         }
@@ -53,12 +71,13 @@ export class Queue<T extends object> {
             return undefined;
         }
 
-        const newHead:QueueItem<T>|undefined = head.next;
+        const newHead: QueueItem<T> | undefined = head.next;
         this._head = newHead;
         // last item removed?
         if (!newHead) {
             this._tail = undefined;
         }
+        this._length--;
         return head.value;
     }
 }
