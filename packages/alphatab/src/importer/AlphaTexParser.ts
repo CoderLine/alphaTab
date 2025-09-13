@@ -1,14 +1,129 @@
-﻿import type { AlphaTabError } from '@src/AlphaTabError';
-import { AlphaTexError } from '@src/importer/AlphaTexImporter';
-import { IOHelper } from '@src/io/IOHelper';
+﻿import { IOHelper } from '@src/io/IOHelper';
 import { Queue } from '@src/synth/ds/Queue';
-import type * as ast from './AlphaTexAst';
-import { type AlphaTexComment, AlphaTexNodeType } from './AlphaTexAst';
+import {
+    type AlphaTexAstNode,
+    type AlphaTexAstNodeLocation,
+    type AlphaTexBarNode,
+    type AlphaTexBeatDurationChangeNode,
+    type AlphaTexBeatNode,
+    type AlphaTexComment,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataTagNode,
+    type AlphaTexMetaDataWithPropertiesNode,
+    AlphaTexNodeType,
+    type AlphaTexNoteListNode,
+    type AlphaTexNoteNode,
+    type AlphaTexNumberLiteral,
+    type AlphaTexPropertiesNode,
+    type AlphaTexPropertyNode,
+    type AlphaTexScoreNode,
+    type AlphaTexStringLiteral,
+    type AlphaTexTokenNode,
+    type AlphaTexValueList
+} from './AlphaTexAst';
 
-interface AlphaTexTokenLocation {
-    line: number;
-    col: number;
-    offset: number;
+/**
+ * The different severity levels for diagnostics parsing alphaTex.
+ */
+export enum AlphaTexDiagnosticsSeverity {
+    Hint,
+    Warning,
+    Error
+}
+
+/**
+ * A diagnostics message for the alphaTex parser.
+ */
+export interface AlphaTexDiagnostics {
+    /**
+     * The severity of the diagnostic.
+     */
+    severity: AlphaTexDiagnosticsSeverity;
+
+    /**
+     * The start location to which the diagnostic message belongs.
+     */
+    start?: AlphaTexAstNodeLocation;
+
+    /**
+     * The end location to which the diagnostic message belongs.
+     */
+    end?: AlphaTexAstNodeLocation;
+
+    /**
+     * A technical code describing the diagnostic message.
+     */
+    code: AlphaTexDiagnosticCode;
+
+    /**
+     * The textual message for the diagnostic.
+     */
+    message: string;
+}
+
+export enum AlphaTexDiagnosticCode {
+    // 000 - 100 Lexer
+    // 000 - 200 Parser
+
+    /**
+     * Unexpected character at comment start, expected '//' or '/*' but found '/%s'.
+     */
+    AT001 = 1,
+
+    /**
+     * Missing identifier after meta data start.
+     */
+    AT002 = 2,
+
+    /**
+     * Unexpected end of file. Need 4 hex characters on a \uXXXX escape sequence.
+     */
+    AT003 = 3,
+
+    /**
+     * Invalid unicode value. Need 4 hex characters on a \uXXXX escape sequence.
+     */
+    AT004 = 4,
+
+    /**
+     * Unsupported escape sequence. Expected '\n', '\r', '\t', or '\uXXXX' but found '\%s'.
+     */
+    AT005 = 5,
+
+    /**
+     * Unexpected end of file. String not closed.
+     */
+    AT006 = 6,
+
+    /**
+     * Expected a '.' separating the score meta data tags and the bars.
+     */
+    AT100 = 100,
+
+    /**
+     * Missing beat multiplier value after '*'.
+     */
+    AT101 = 101,
+
+    /**
+     * Missing duration value after ':'.
+     */
+    AT102 = 102,
+
+    /**
+     * Unexpected '%s' token. Expected a '\sync' meta data tag.
+     */
+    AT103 = 103,
+
+    /**
+     * Unexpected meta data tag '%s'. Expected a '\sync' meta data tag.
+     */
+    AT104 = 104,
+
+    /**
+     * Unexpected '%s' token. Expected one of following: %s
+     */
+    AT105 = 105
 }
 
 export class AlphaTexLexer {
@@ -21,11 +136,13 @@ export class AlphaTexLexer {
     private _line: number = 1;
     private _col: number = 1;
 
-    public _tokenStart: AlphaTexTokenLocation = { line: 0, col: 0, offset: 0 };
-    public _comments: ast.AlphaTexComment[] | undefined;
-    private _tokenQueue: Queue<ast.AlphaTexAstNode> = new Queue<ast.AlphaTexAstNode>();
+    private _fatalError = false;
 
-    public parseErrors: AlphaTabError[] = [];
+    private _tokenStart: AlphaTexAstNodeLocation = { line: 0, col: 0, offset: 0 };
+    private _comments: AlphaTexComment[] | undefined;
+    private _tokenQueue: Queue<AlphaTexAstNode> = new Queue<AlphaTexAstNode>();
+
+    public diagnostics: AlphaTexDiagnostics[] = [];
 
     public constructor(input: string) {
         this._codepoints = [...IOHelper.iterateCodepoints(input)];
@@ -35,7 +152,15 @@ export class AlphaTexLexer {
         this._codepoint = this._codepoints.length > 0 ? this._codepoints[0] : AlphaTexLexer.Eof;
     }
 
-    public peekToken(): ast.AlphaTexAstNode | undefined {
+    public get canRead() {
+        return !this._fatalError && (!this._tokenQueue.isEmpty || this._offset < this._codepoints.length);
+    }
+
+    public peekToken(): AlphaTexAstNode | undefined {
+        if (this._fatalError) {
+            return undefined;
+        }
+
         if (this._tokenQueue.isEmpty) {
             const token = this.readToken();
             if (!token) {
@@ -48,7 +173,7 @@ export class AlphaTexLexer {
         return this._tokenQueue.peek();
     }
 
-    public nextTokenWithFloats(): ast.AlphaTexAstNode | undefined {
+    public nextTokenWithFloats(): AlphaTexAstNode | undefined {
         // float number tokenizing is a bit tricky in alphaTex
         // we chose <fret>.<string>.<duration> (or <fret>.<string>) as
         // syntax for fretted notes, this conflicts now with a context
@@ -73,35 +198,27 @@ export class AlphaTexLexer {
             floatSeparator.nodeType !== AlphaTexNodeType.DotToken ||
             floatSeparator.start!.offset !== start.end!.offset
         ) {
-            return start as ast.AlphaTexNumberLiteral;
+            return start;
         }
         this.nextToken(); // consume dot
 
         const fractional = this.peekToken();
-        if (!fractional) {
-            this.addError('Missing fractional digits on floating point number');
-            return undefined;
-        }
-
-        if (fractional.start!.offset !== floatSeparator.end!.offset + 1) {
-            this.addError(`Expected a digits but found whitespace`);
-            return undefined;
-        }
-
-        // 1.1a
-        if (fractional.nodeType !== AlphaTexNodeType.NumberLiteral) {
-            this._tokenQueue.enqueueFront(floatSeparator);
-            return start;
-        }
-
-        // -1.-1
-        if ((fractional as ast.AlphaTexNumberLiteral).value < 0) {
+        if (
+            // 1 at end
+            !fractional ||
+            // 1 . 1
+            fractional.start!.offset !== floatSeparator.end!.offset + 1 ||
+            // 1.1a
+            fractional.nodeType !== AlphaTexNodeType.NumberLiteral ||
+            // -1.-1
+            (fractional as AlphaTexNumberLiteral).value < 0
+        ) {
             this._tokenQueue.enqueueFront(floatSeparator);
             return start;
         }
         this.nextToken(); // consume fraction
 
-        const floatNumber: ast.AlphaTexNumberLiteral = {
+        const floatNumber: AlphaTexNumberLiteral = {
             nodeType: AlphaTexNodeType.NumberLiteral,
             start: start.start,
             end: fractional.end,
@@ -114,7 +231,11 @@ export class AlphaTexLexer {
         return floatNumber;
     }
 
-    public nextToken(): ast.AlphaTexAstNode | undefined {
+    public nextToken(): AlphaTexAstNode | undefined {
+        if (this._fatalError) {
+            return undefined;
+        }
+
         if (this._tokenQueue.isEmpty) {
             return this.readToken();
         }
@@ -139,7 +260,11 @@ export class AlphaTexLexer {
         return this._codepoint;
     }
 
-    private currentLocation(): AlphaTexTokenLocation {
+    public currentTokenLocation(): AlphaTexAstNodeLocation {
+        return this._tokenQueue.peek()?.start ?? this.currentLexerLocation();
+    }
+
+    private currentLexerLocation(): AlphaTexAstNodeLocation {
         return {
             line: this._line,
             col: this._col,
@@ -147,11 +272,11 @@ export class AlphaTexLexer {
         };
     }
 
-    private readToken(): ast.AlphaTexAstNode | undefined {
+    private readToken(): AlphaTexAstNode | undefined {
         this._comments = undefined;
 
         while (this._codepoint !== AlphaTexLexer.Eof) {
-            this._tokenStart = this.currentLocation();
+            this._tokenStart = this.currentLexerLocation();
             if (AlphaTexLexer.terminalTokens.has(this._codepoint)) {
                 const token = AlphaTexLexer.terminalTokens.get(this._codepoint)!(this);
                 if (token) {
@@ -160,27 +285,36 @@ export class AlphaTexLexer {
             } else if (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
                 return this.numberOrIdentifier();
             } else {
-                this.addError(`Unexpected character ${String.fromCodePoint(this._codepoint)}`);
-                return undefined;
+                // simply skip unknown characters
+                // there are only a few ascii control characters
+                // which can hit this path
+                this._codepoint = this.nextCodepoint();
             }
         }
 
         return undefined;
     }
 
-    private comment(): ast.AlphaTexAstNode | undefined {
+    private comment(): AlphaTexAstNode | undefined {
         this._codepoint = this.nextCodepoint();
         if (this._codepoint === 0x2f /* / */) {
             this.singleLineComment();
         } else if (this._codepoint === 0x2a /* * */) {
             this.multiLineComment();
         } else {
-            this.addError(`Unexpected character '${String.fromCodePoint(this._codepoint)}'`);
+            this.diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT001,
+                message: `Unexpected character at comment start, expected '//' or '/*' but found '/${String.fromCodePoint(this._codepoint)}'`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: this._tokenStart,
+                end: this.currentLexerLocation()
+            });
+            this._fatalError = true;
         }
         return undefined;
     }
 
-    private static terminalTokens: Map<number, (lexer: AlphaTexLexer) => ast.AlphaTexAstNode | undefined> = new Map([
+    private static terminalTokens: Map<number, (lexer: AlphaTexLexer) => AlphaTexAstNode | undefined> = new Map([
         [0x2f /* / */, l => l.comment()],
         [0x22 /* " */, l => l.string()],
         [0x27 /* ' */, l => l.string()],
@@ -203,7 +337,7 @@ export class AlphaTexLexer {
     ]);
 
     private metaCommand() {
-        const prefixStart = this.currentLocation();
+        const prefixStart = this.currentLexerLocation();
 
         this._codepoint = this.nextCodepoint();
         let prefixType: AlphaTexNodeType;
@@ -216,7 +350,7 @@ export class AlphaTexLexer {
             prefixType = AlphaTexNodeType.BackSlashToken;
         }
 
-        const prefixEnd = this.currentLocation();
+        const prefixEnd = this.currentLexerLocation();
 
         let text = '';
         while (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
@@ -225,15 +359,21 @@ export class AlphaTexLexer {
         }
 
         if (text.length === 0) {
-            this.addError('Missing identifier after meta command start');
+            this.diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT002,
+                message: 'Missing identifier after meta data start',
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: this._tokenStart,
+                end: this.currentLexerLocation()
+            });
             return undefined;
         }
 
-        const token: ast.AlphaTexMetaDataTagNode = {
+        const token: AlphaTexMetaDataTagNode = {
             nodeType: AlphaTexNodeType.MetaDataTag,
             comments: this._comments,
             start: this._tokenStart,
-            end: this.currentLocation(),
+            end: this.currentLexerLocation(),
             prefix: {
                 nodeType: prefixType,
                 start: prefixStart,
@@ -243,18 +383,18 @@ export class AlphaTexLexer {
                 nodeType: AlphaTexNodeType.Identifier,
                 text: text,
                 start: prefixEnd,
-                end: this.currentLocation()
+                end: this.currentLexerLocation()
             }
         };
         return token;
     }
 
-    private token<T extends AlphaTexNodeType>(nodeType: T): ast.AlphaTexTokenNode<T> {
-        const token: ast.AlphaTexTokenNode<T> = {
+    private token<T extends AlphaTexNodeType>(nodeType: T): AlphaTexTokenNode<T> {
+        const token: AlphaTexTokenNode<T> = {
             nodeType: nodeType,
             comments: this._comments,
             start: this._tokenStart,
-            end: this.currentLocation()
+            end: this.currentLexerLocation()
         };
         // consume char
         this._codepoint = this.nextCodepoint();
@@ -291,17 +431,41 @@ export class AlphaTexLexer {
                     for (let i = 0; i < 4; i++) {
                         this._codepoint = this.nextCodepoint();
                         if (this._codepoint === AlphaTexLexer.Eof) {
-                            this.addError('Unexpected end of escape sequence');
+                            this.diagnostics.push({
+                                code: AlphaTexDiagnosticCode.AT003,
+                                message: 'Unexpected end of file. Need 4 hex characters on a \\uXXXX escape sequence',
+                                severity: AlphaTexDiagnosticsSeverity.Error,
+                                start: this._tokenStart,
+                                end: this.currentLexerLocation()
+                            });
+                            this._fatalError = true;
+                            return undefined;
                         }
                         hex += String.fromCodePoint(this._codepoint);
                     }
 
                     codepoint = Number.parseInt(hex, 16);
                     if (Number.isNaN(codepoint)) {
-                        this.addError(`Invalid unicode value ${hex}`);
+                        this.diagnostics.push({
+                            code: AlphaTexDiagnosticCode.AT004,
+                            message: 'Invalid unicode value. Need 4 hex characters on a \\uXXXX escape sequence.',
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: this._tokenStart,
+                            end: this.currentLexerLocation()
+                        });
+                        this._fatalError = true;
+                        return undefined;
                     }
                 } else {
-                    this.addError('Unsupported escape sequence');
+                    this.diagnostics.push({
+                        code: AlphaTexDiagnosticCode.AT005,
+                        message: `Unsupported escape sequence. Expected '\\n', '\\r', '\\t', or '\\uXXXX' but found '\\${String.fromCodePoint(this._codepoint)}'.`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: this._tokenStart,
+                        end: this.currentLexerLocation()
+                    });
+                    this._fatalError = true;
+                    return undefined;
                 }
             } else {
                 codepoint = this._codepoint;
@@ -330,15 +494,23 @@ export class AlphaTexLexer {
             this._codepoint = this.nextCodepoint();
         }
         if (this._codepoint === AlphaTexLexer.Eof) {
-            this.addError('String opened but never closed');
+            this.diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT006,
+                message: `Unexpected end of file. String not closed.`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: this._tokenStart,
+                end: this.currentLexerLocation()
+            });
+            this._fatalError = true;
+            return undefined;
         }
 
-        const stringToken: ast.AlphaTexStringLiteral = {
+        const stringToken: AlphaTexStringLiteral = {
             nodeType: AlphaTexNodeType.StringLiteral,
             value: s,
             comments: this._comments,
             start: this._tokenStart,
-            end: this.currentLocation()
+            end: this.currentLexerLocation()
         };
 
         // string quote end
@@ -351,7 +523,7 @@ export class AlphaTexLexer {
         // multiline comment
         const comment: AlphaTexComment = {
             start: this._tokenStart,
-            end: this.currentLocation(),
+            end: this.currentLexerLocation(),
             text: '',
             multiLine: true
         };
@@ -431,21 +603,21 @@ export class AlphaTexLexer {
         } while (keepReading);
 
         if (isNumber) {
-            const numberLiteral: ast.AlphaTexNumberLiteral = {
+            const numberLiteral: AlphaTexNumberLiteral = {
                 nodeType: AlphaTexNodeType.NumberLiteral,
                 comments: this._comments,
                 start: this._tokenStart,
-                end: this.currentLocation(),
+                end: this.currentLexerLocation(),
                 value: Number.parseInt(str, 10)
             };
             return numberLiteral;
         }
 
-        const identifier: ast.AlphaTexIdentifier = {
+        const identifier: AlphaTexIdentifier = {
             nodeType: AlphaTexNodeType.Identifier,
             comments: this._comments,
             start: this._tokenStart,
-            end: this.currentLocation(),
+            end: this.currentLexerLocation(),
             text: str
         };
         return identifier;
@@ -455,7 +627,7 @@ export class AlphaTexLexer {
         // single line comment
         const comment: AlphaTexComment = {
             start: this._tokenStart,
-            end: this.currentLocation(),
+            end: this.currentLexerLocation(),
             text: '',
             multiLine: false
         };
@@ -478,22 +650,12 @@ export class AlphaTexLexer {
         this._comments!.push(comment);
     }
 
-    private whitespace(): ast.AlphaTexAstNode | undefined {
+    private whitespace(): AlphaTexAstNode | undefined {
         // skip whitespaces
         while (AlphaTexLexer.isWhiteSpace(this._codepoint)) {
             this.nextCodepoint();
         }
         return undefined;
-    }
-
-    private addError(message: string): void {
-        const e: AlphaTexError = AlphaTexError.errorMessage(
-            message,
-            this._tokenStart.offset,
-            this._tokenStart.line,
-            this._tokenStart.col
-        );
-        this.parseErrors.push(e);
     }
 
     private static isDigit(ch: number): boolean {
@@ -530,3 +692,679 @@ export class AlphaTexLexer {
         );
     }
 }
+
+/**
+ * An error used to abort the parsing of the alphaTex source into an
+ */
+class AlphaTexParserAbort extends Error {}
+
+/**
+ * A parser for translating a given alphaTex source into an AST for further use
+ * in the alphaTex importer, editors etc.
+ */
+export class AlphaTexParser {
+    private _lexer: AlphaTexLexer;
+    private _score!: AlphaTexScoreNode;
+    private _diagnostics: AlphaTexDiagnostics[] = [];
+
+    public get diagnostics(): AlphaTexDiagnostics[] {
+        return [...this._lexer.diagnostics, ...this._diagnostics];
+    }
+
+    public constructor(source: string) {
+        this._lexer = new AlphaTexLexer(source);
+    }
+
+    public read(): AlphaTexScoreNode {
+        this.score();
+
+        return this._score;
+    }
+
+    // recursive decent
+
+    private score() {
+        this._score = {
+            nodeType: AlphaTexNodeType.Score,
+            metaData: [],
+            metaDataBarSeparator: undefined,
+            bars: [],
+            barsSyncPointSeparator: undefined,
+            syncPoints: [],
+            start: this._lexer.peekToken()?.start,
+            comments: this._lexer.peekToken()?.comments
+        };
+
+        try {
+            this.scoreMetaData();
+            this.bars();
+            this.syncPoints();
+        } catch (e) {
+            if (e instanceof AlphaTexParserAbort) {
+                // OK
+            } else {
+                throw e;
+            }
+        } finally {
+            this._score.end = this._lexer.currentTokenLocation();
+        }
+    }
+
+    private scoreMetaData() {
+        while (this._lexer.peekToken()?.nodeType === AlphaTexNodeType.MetaDataTag) {
+            const metaData = this.metaDataWithProperties(
+                metaData => this.readScoreMetaDataValues(metaData),
+                property => this.readScoreMetaDataPropertyValues(property)
+            );
+            if (metaData) {
+                this._score.metaData.push();
+            } else {
+                break;
+            }
+        }
+
+        const dot = this._lexer.peekToken();
+        // EOF
+        if (!dot) {
+            return;
+        }
+        if (dot.nodeType !== AlphaTexNodeType.DotToken) {
+            this._diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT100,
+                message: "Expected a '.' separating the score meta data tags and the bars.",
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: dot.start,
+                end: dot.end
+            });
+        } else {
+            this._score.metaDataBarSeparator = this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+        }
+    }
+
+    private bars() {
+        while (this._lexer.canRead) {
+            const token = this._lexer.peekToken();
+            // EOF
+            if (!token) {
+                return;
+            }
+
+            // dot separator marking end of bars
+            if (token.nodeType === AlphaTexNodeType.DotToken) {
+                this._score.barsSyncPointSeparator = token as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+                return;
+            }
+
+            // still reading bars
+            this.bar();
+        }
+    }
+
+    private bar() {
+        const bar: AlphaTexBarNode = {
+            nodeType: AlphaTexNodeType.Bar,
+            trackMetaData: undefined,
+            staffMetaData: undefined,
+            voiceMetaData: undefined,
+            barMetaData: [],
+            beats: [],
+            pipe: undefined,
+            start: this._lexer.peekToken()?.start,
+            comments: this._lexer.peekToken()?.comments
+        };
+        try {
+            this.trackMetaData(bar);
+            this.staffMetaData(bar);
+            this.voiceMetaData(bar);
+            this.barMetaData(bar);
+            this.barBeats(bar);
+
+            if (this._lexer.peekToken()?.nodeType === AlphaTexNodeType.PipeToken) {
+                bar.pipe = this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.PipeToken>;
+            }
+
+            if (
+                bar.trackMetaData ||
+                bar.staffMetaData ||
+                bar.voiceMetaData ||
+                bar.barMetaData.length > 0 ||
+                bar.beats.length > 0 ||
+                bar.pipe
+            ) {
+                bar.end = this._lexer.currentTokenLocation();
+                this._score.bars.push(bar);
+            }
+        } finally {
+            bar.end = this._lexer.currentTokenLocation();
+        }
+    }
+
+    private barMetaData(bar: AlphaTexBarNode) {
+        let token = this._lexer.peekToken();
+        while (token?.nodeType === AlphaTexNodeType.MetaDataTag) {
+            bar.barMetaData.push(
+                this.metaDataWithProperties(
+                    metaData => this.readBarMetaDataValues(metaData),
+                    property => this.readBarMetaDataPropertyValues(property)
+                )!
+            );
+            token = this._lexer.peekToken();
+        }
+    }
+
+    private trackMetaData(bar: AlphaTexBarNode) {
+        const token = this._lexer.peekToken();
+        if (
+            token?.nodeType === AlphaTexNodeType.MetaDataTag &&
+            (token as AlphaTexMetaDataTagNode).tag.text === 'track'
+        ) {
+            bar.trackMetaData = this.metaDataWithProperties(
+                metaData => this.readTrackMetaDataValues(metaData),
+                property => this.readTrackMetaDataPropertyValues(property)
+            );
+        }
+    }
+
+    private staffMetaData(bar: AlphaTexBarNode) {
+        const token = this._lexer.peekToken();
+        if (
+            token?.nodeType === AlphaTexNodeType.MetaDataTag &&
+            (token as AlphaTexMetaDataTagNode).tag.text === 'staff'
+        ) {
+            bar.staffMetaData = this.metaDataWithProperties(
+                metaData => this.readStaffMetaDataValues(metaData),
+                property => this.readStaffMetaDataPropertyValues(property)
+            );
+        }
+    }
+
+    private voiceMetaData(bar: AlphaTexBarNode) {
+        const token = this._lexer.peekToken();
+        if (
+            token?.nodeType === AlphaTexNodeType.MetaDataTag &&
+            (token as AlphaTexMetaDataTagNode).tag.text === 'voice'
+        ) {
+            bar.voiceMetaData = this.metaDataWithProperties(
+                metaData => this.readVoiceMetaDataValues(metaData),
+                property => this.readVoiceMetaDataPropertyValues(property)
+            );
+        }
+    }
+
+    private barBeats(bar: AlphaTexBarNode) {
+        let token = this._lexer.peekToken();
+        while (token && token.nodeType !== AlphaTexNodeType.PipeToken) {
+            const beat = this.beat();
+            if (beat) {
+                bar.beats.push(beat);
+            }
+            token = this._lexer.peekToken();
+        }
+    }
+
+    private beat(): AlphaTexBeatNode | undefined {
+        const beat: AlphaTexBeatNode = {
+            nodeType: AlphaTexNodeType.Beat,
+            durationChange: undefined,
+            notes: undefined,
+            rest: undefined,
+            beatEffects: undefined,
+            beatMultiplier: undefined,
+            beatMultiplierValue: undefined,
+            start: this._lexer.peekToken()?.start,
+            comments: this._lexer.peekToken()?.comments
+        };
+
+        try {
+            beat.durationChange = this.beatDurationChange();
+
+            this.beatContent(beat);
+            if (!beat.notes && !beat.rest) {
+                return undefined;
+            }
+
+            beat.beatEffects = this.properties(property => this.readBeatPropertyValues(property));
+
+            this.beatMultiplier(beat);
+        } finally {
+            beat.end = this._lexer.currentTokenLocation();
+        }
+
+        return beat;
+    }
+
+    private beatDurationChange(): AlphaTexBeatDurationChangeNode | undefined {
+        const colon = this._lexer.peekToken();
+        if (colon?.nodeType !== AlphaTexNodeType.ColonToken) {
+            return undefined;
+        }
+
+        const durationChange: AlphaTexBeatDurationChangeNode = {
+            nodeType: AlphaTexNodeType.BeatDurationChange,
+            colon: this._lexer.nextToken()! as AlphaTexTokenNode<AlphaTexNodeType.ColonToken>,
+            value: undefined,
+            properties: undefined,
+            start: colon.start,
+            comments: colon.comments
+        };
+        try {
+            const durationValue = this._lexer.peekToken();
+            if (!durationValue || durationValue.nodeType !== AlphaTexNodeType.NumberLiteral) {
+                this.diagnostics.push({
+                    code: AlphaTexDiagnosticCode.AT102,
+                    message: "Missing duration value after ':'.",
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: colon!.start,
+                    end: colon!.end
+                });
+                return undefined;
+            }
+            durationChange.value = this._lexer.nextToken() as AlphaTexNumberLiteral;
+
+            durationChange.properties = this.properties(property => this.readDurationChangePropertyValues(property));
+        } finally {
+            durationChange.end = this._lexer.currentTokenLocation();
+        }
+
+        return durationChange;
+    }
+
+    private beatContent(beat: AlphaTexBeatNode) {
+        const notes = this._lexer.peekToken();
+        if (!notes) {
+            return;
+        }
+        if (notes.nodeType === AlphaTexNodeType.Identifier && (notes as AlphaTexIdentifier).text === 'r') {
+            beat.rest = notes as AlphaTexIdentifier;
+        } else if (notes.nodeType === AlphaTexNodeType.ParenthesisOpenToken) {
+            beat.notes = this.noteList();
+        } else {
+            const note = this.note();
+            if (note) {
+                beat.notes = {
+                    nodeType: AlphaTexNodeType.NoteList,
+                    openParenthesis: undefined,
+                    notes: [note],
+                    closeParenthesis: undefined,
+                    start: note.start,
+                    end: note.end
+                };
+            }
+        }
+    }
+
+    private beatMultiplier(beat: AlphaTexBeatNode) {
+        const multiplier = this._lexer.peekToken();
+        if (!multiplier || multiplier.nodeType !== AlphaTexNodeType.AsteriskToken) {
+            return;
+        }
+        beat.beatMultiplier = this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.AsteriskToken>;
+
+        const multiplierValue = this._lexer.peekToken();
+        if (!multiplierValue || multiplierValue.nodeType !== AlphaTexNodeType.NumberLiteral) {
+            this.diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT101,
+                message: "Missing beat multiplier value after '*'.",
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: beat.beatMultiplier!.start,
+                end: beat.beatMultiplier!.end
+            });
+            return;
+        }
+
+        beat.beatMultiplierValue = this._lexer.nextToken() as AlphaTexNumberLiteral;
+    }
+
+    private noteList(): AlphaTexNoteListNode {
+        const noteList: AlphaTexNoteListNode = {
+            nodeType: AlphaTexNodeType.NoteList,
+            openParenthesis: undefined,
+            notes: [],
+            closeParenthesis: undefined,
+            start: this._lexer.peekToken()?.start,
+            comments: this._lexer.peekToken()?.comments
+        };
+        try {
+            if (this._lexer.peekToken()?.nodeType === AlphaTexNodeType.ParenthesisOpenToken) {
+                noteList.openParenthesis =
+                    this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>;
+            }
+
+            let token = this._lexer.peekToken();
+            while (token && token.nodeType !== AlphaTexNodeType.ParenthesisCloseToken) {
+                const note = this.note();
+                if (note) {
+                    noteList.notes.push(note);
+                }
+                token = this._lexer.nextToken();
+            }
+
+            if (this._lexer.peekToken()?.nodeType === AlphaTexNodeType.ParenthesisCloseToken) {
+                noteList.closeParenthesis =
+                    this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisCloseToken>;
+            }
+        } finally {
+            noteList.end = this._lexer.currentTokenLocation();
+        }
+
+        return noteList;
+    }
+
+    private note(): AlphaTexNoteNode | undefined {
+        const noteValue = this._lexer.peekToken();
+        if (!noteValue) {
+            return undefined;
+        }
+
+        const note: AlphaTexNoteNode = {
+            nodeType: AlphaTexNodeType.Note,
+            noteValue: {
+                // placeholder value
+                nodeType: AlphaTexNodeType.Identifier,
+                text: ''
+            } as AlphaTexIdentifier,
+            start: noteValue.start,
+            comments: noteValue.comments
+        };
+        try {
+            switch (noteValue.nodeType) {
+                case AlphaTexNodeType.NumberLiteral:
+                    note.noteValue = this._lexer.nextToken() as AlphaTexNumberLiteral;
+                    break;
+                case AlphaTexNodeType.StringLiteral:
+                    note.noteValue = this._lexer.nextToken() as AlphaTexStringLiteral;
+                    break;
+                case AlphaTexNodeType.Identifier:
+                    note.noteValue = this._lexer.nextToken() as AlphaTexIdentifier;
+                    break;
+                default:
+                    const allowedTypes: string[] = [
+                        AlphaTexNodeType[AlphaTexNodeType.NumberLiteral],
+                        AlphaTexNodeType[AlphaTexNodeType.StringLiteral],
+                        AlphaTexNodeType[AlphaTexNodeType.Identifier]
+                    ];
+                    this.diagnostics.push({
+                        code: AlphaTexDiagnosticCode.AT105,
+                        message: `Unexpected '${AlphaTexNodeType[noteValue.nodeType]}' token. Expected one of following: ${allowedTypes.join(',')}`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: noteValue.start,
+                        end: noteValue.end
+                    });
+                    throw new AlphaTexParserAbort();
+            }
+
+            if (this._lexer.peekToken()?.nodeType === AlphaTexNodeType.DotToken) {
+                note.noteStringDot = this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+
+                const noteString = this._lexer.peekToken();
+                if (!noteString) {
+                    return undefined;
+                }
+
+                if (noteString.nodeType === AlphaTexNodeType.NumberLiteral) {
+                    note.noteString = this._lexer.nextToken() as AlphaTexNumberLiteral;
+                } else {
+                    const allowedTypes: string[] = [AlphaTexNodeType[AlphaTexNodeType.NumberLiteral]];
+                    this.diagnostics.push({
+                        code: AlphaTexDiagnosticCode.AT105,
+                        message: `Unexpected '${AlphaTexNodeType[noteString.nodeType]}' token. Expected one of following: ${allowedTypes.join(',')}`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: noteString.start,
+                        end: noteString.end
+                    });
+                    throw new AlphaTexParserAbort();
+                }
+            }
+
+            note.noteEffects = this.properties(property => this.readNotePropertyValues(property));
+        } finally {
+            note.end = this._lexer.currentTokenLocation();
+        }
+
+        return note;
+    }
+
+    private syncPoints() {
+        while (this._lexer.canRead) {
+            const syncPoint = this.syncPoint();
+            if (!syncPoint) {
+                return;
+            }
+            this._score.syncPoints.push(syncPoint);
+        }
+    }
+
+    private syncPoint(): AlphaTexMetaDataWithPropertiesNode | undefined {
+        const tag = this._lexer.peekToken();
+        if (!tag) {
+            return undefined;
+        }
+        if (tag.nodeType !== AlphaTexNodeType.MetaDataTag) {
+            this._diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT103,
+                message: `Unexpected '${AlphaTexNodeType[tag.nodeType]}' token. Expected a '\\sync' meta data tag.`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: tag.start,
+                end: tag.end
+            });
+            return undefined;
+        }
+        if ((tag as AlphaTexMetaDataTagNode).tag.text !== 'sync') {
+            this._diagnostics.push({
+                code: AlphaTexDiagnosticCode.AT104,
+                message: `Unexpected meta data tag '${(tag as AlphaTexMetaDataTagNode).tag.text}'. Expected a '\\sync' meta data tag.`,
+                severity: AlphaTexDiagnosticsSeverity.Error,
+                start: tag.start,
+                end: tag.end
+            });
+            return undefined;
+        }
+
+        return this.metaDataWithProperties(
+            metaData => this.readSyncPointMetaDataValues(metaData),
+            property => this.readSyncPointMetaDataPropertyValues(property)
+        );
+    }
+
+    private metaDataWithProperties(
+        readValues: (metaData: AlphaTexMetaDataWithPropertiesNode) => AlphaTexValueList | undefined,
+        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexValueList | undefined
+    ): AlphaTexMetaDataWithPropertiesNode | undefined {
+        const tag = this._lexer.peekToken();
+        if (!tag || tag.nodeType !== AlphaTexNodeType.MetaDataTag) {
+            return undefined;
+        }
+
+        const metaDataWithProperties: AlphaTexMetaDataWithPropertiesNode = {
+            nodeType: AlphaTexNodeType.MetaDataWithProperties,
+            tag: this._lexer.nextToken() as AlphaTexMetaDataTagNode,
+            start: tag.start,
+            comments: tag.comments,
+            properties: undefined
+        };
+        try {
+            metaDataWithProperties.values = this.valueList() ?? readValues(metaDataWithProperties);
+            metaDataWithProperties.properties = this.properties(readPropertyValues);
+        } finally {
+            metaDataWithProperties.end = this._lexer.currentTokenLocation();
+        }
+        return metaDataWithProperties;
+    }
+
+    private properties(
+        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexValueList | undefined
+    ): AlphaTexPropertiesNode | undefined {
+        const braceOpen = this._lexer.peekToken();
+        if (!braceOpen || braceOpen.nodeType !== AlphaTexNodeType.BraceOpenToken) {
+            return undefined;
+        }
+
+        const properties: AlphaTexPropertiesNode = {
+            nodeType: AlphaTexNodeType.Properties,
+            openBrace: this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.BraceOpenToken>,
+            properties: [],
+            closeBrace: undefined,
+            start: braceOpen.start,
+            comments: braceOpen.comments
+        };
+        try {
+            let token = this._lexer.peekToken();
+            while (token?.nodeType === AlphaTexNodeType.Identifier) {
+                properties.properties.push(this.property(readPropertyValues));
+                token = this._lexer.nextToken();
+            }
+
+            const braceClose = this._lexer.peekToken();
+            if (braceClose?.nodeType !== AlphaTexNodeType.BraceCloseToken) {
+                properties.closeBrace = this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.BraceCloseToken>;
+            }
+        } finally {
+            properties.end = this._lexer.currentTokenLocation();
+        }
+
+        return properties;
+    }
+
+    private property(
+        readPropertyValues: (property: AlphaTexPropertyNode) => AlphaTexValueList | undefined
+    ): AlphaTexPropertyNode {
+        const property: AlphaTexPropertyNode = {
+            nodeType: AlphaTexNodeType.Property,
+            property: this._lexer.nextToken() as AlphaTexIdentifier,
+            values: undefined
+        };
+        property.start = property.property.start;
+        property.comments = property.property.comments;
+        try {
+            property.values = this.valueList() ?? readPropertyValues(property);
+        } finally {
+            property.end = this._lexer.currentTokenLocation();
+        }
+
+        return property;
+    }
+
+    private valueList(): AlphaTexValueList | undefined {
+        const openParenthesis = this._lexer.peekToken();
+        if (openParenthesis?.nodeType !== AlphaTexNodeType.ParenthesisOpenToken) {
+            return undefined;
+        }
+
+        const valueList: AlphaTexValueList = {
+            nodeType: AlphaTexNodeType.ValueList,
+            openParenthesis: this._lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>,
+            values: [],
+            closeParenthesis: undefined,
+            start: openParenthesis.start,
+            comments: openParenthesis.comments
+        };
+
+        try {
+            let token = this._lexer.peekToken();
+            while (token && token?.nodeType !== AlphaTexNodeType.ParenthesisCloseToken) {
+                switch (token.nodeType) {
+                    case AlphaTexNodeType.Identifier:
+                        valueList.values.push(this._lexer.nextToken() as AlphaTexIdentifier);
+                        break;
+                    case AlphaTexNodeType.StringLiteral:
+                        valueList.values.push(this._lexer.nextToken() as AlphaTexStringLiteral);
+                        break;
+                    case AlphaTexNodeType.NumberLiteral:
+                        valueList.values.push(this._lexer.nextToken() as AlphaTexNumberLiteral);
+                        break;
+                    default:
+                        const allowedTypes: string[] = [
+                            AlphaTexNodeType[AlphaTexNodeType.Identifier],
+                            AlphaTexNodeType[AlphaTexNodeType.StringLiteral],
+                            AlphaTexNodeType[AlphaTexNodeType.NumberLiteral]
+                        ];
+                        this.diagnostics.push({
+                            code: AlphaTexDiagnosticCode.AT105,
+                            message: `Unexpected '${AlphaTexNodeType[token.nodeType]}' token. Expected one of following: ${allowedTypes.join(',')}`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: token.start,
+                            end: token.end
+                        });
+                        // try to skip and continue parsing
+                        this._lexer.nextToken();
+                        break;
+                }
+
+                token = this._lexer.peekToken();
+            }
+        } finally {
+            valueList.end = this._lexer.currentTokenLocation();
+        }
+
+        return valueList;
+    }
+
+    // unfortunately the "old" alphaTex syntax had no strict delimiters
+    // for values and properties. That's why we need to parse the properties exactly
+    // as needed for the identifiers. In an alphaTex2 we should make this parsing simpler.
+    // the parser should not need to do that semantic checks, that's the importers job
+    // but we emit "Hint" diagnostics for now.
+
+    private readScoreMetaDataValues(metaData: AlphaTexMetaDataWithPropertiesNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readScoreMetaDataPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readBarMetaDataValues(metaData: AlphaTexMetaDataWithPropertiesNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readBarMetaDataPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readTrackMetaDataValues(metaData: AlphaTexMetaDataWithPropertiesNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readTrackMetaDataPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readStaffMetaDataValues(metaData: AlphaTexMetaDataWithPropertiesNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readStaffMetaDataPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readVoiceMetaDataValues(metaData: AlphaTexMetaDataWithPropertiesNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readSyncPointMetaDataPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readSyncPointMetaDataValues(metaData: AlphaTexMetaDataWithPropertiesNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readVoiceMetaDataPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readBeatPropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readDurationChangePropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+
+    private readNotePropertyValues(property: AlphaTexPropertyNode): AlphaTexValueList | undefined {
+        throw new Error('TODO');
+    }
+}
+
+// NOTE: Semantic errors will be reported by alphaTexImporter when translating into the
+// score model
