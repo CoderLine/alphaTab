@@ -1,6 +1,6 @@
 import type { AlphaTexAstNode } from '@src/importer/AlphaTexAst';
-import { AlphaTexLexer } from '@src/importer/AlphaTexParser';
 import { expect } from 'chai';
+import {AlphaTexLexer} from "@src/importer/AlphaTexLexer";
 
 describe('AlphaTexLexerTest', () => {
     function lexerTest(source: string) {

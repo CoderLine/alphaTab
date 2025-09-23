@@ -1,5 +1,5 @@
 import { StaveProfile } from '@src/StaveProfile';
-import { AlphaTexError, AlphaTexImporter, AlphaTexLexer, AlphaTexSymbols } from '@src/importer/AlphaTexImporter';
+import { AlphaTexError, AlphaTexImporterOld, AlphaTexLexerOld, AlphaTexSymbols } from '@src/importer/AlphaTexImporterOld';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BrushType } from '@src/model/BrushType';
@@ -48,7 +48,7 @@ import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
 
 describe('AlphaTexImporterTest', () => {
     function parseTex(tex: string): Score {
-        const importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
         return importer.readScore();
     }
@@ -827,14 +827,14 @@ describe('AlphaTexImporterTest', () => {
     it('key-signature-multi-staff', () => {
         const tex: string = `
         \\track T1
-            \\staff 
+            \\staff
                 :1 3.3 | \\ks C 3.3 | \\ks Cmajor 3.3 | \\ks Aminor 3.3 |
                 \\ks F 3.3 | \\ks bbmajor 3.3 | \\ks CMINOR 3.3 | \\ks aB 3.3 | \\ks db 3.3 | \\ks Ebminor 3.3 |
                 \\ks g 3.3 | \\ks Dmajor 3.3 | \\ks f#minor 3.3 | \\ks E 3.3 | \\ks Bmajor 3.3 | \\ks d#minor 3.3
             \\staff
                 \\ks d#minor :1 3.3 | \\ks Bmajor 3.3 | \\ks E 3.3 |
                 \\ks f#minor 3.3 | \\ks Dmajor 3.3 | \\ks g 3.3 | \\ks Ebminor 3.3 | \\ks db 3.3 | \\ks aB 3.3 |
-                \\ks CMINOR 3.3 | \\ks bbmajor 3.3 | \\ks F 3.3 | \\ks Aminor 3.3 | \\ks Cmajor 3.3 | \\ks C 3.3 | \\ks C 3.3  
+                \\ks CMINOR 3.3 | \\ks bbmajor 3.3 | \\ks F 3.3 | \\ks Aminor 3.3 | \\ks Cmajor 3.3 | \\ks C 3.3 | \\ks C 3.3
         `;
         const score: Score = parseTex(tex);
 
@@ -1227,7 +1227,7 @@ describe('AlphaTexImporterTest', () => {
         \\tuning G3 D2 G2 B2 D3 A4
         .
         0.5.2 1.5.4 3.4.4 | 5.3.8 5.3.8 5.3.8 5.3.8 r.2`;
-        const importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         for (const _i of [1, 2]) {
             importer.initFromString(tex, new Settings());
             const score = importer.readScore();
@@ -1402,7 +1402,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('beat-tempo-change', () => {
         const score = parseTex(`
-            . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1  
+            . \\tempo 120 1.1.4 1.1 1.1{tempo 60} 1.1 | 1.1.4{tempo 100} 1.1 1.1{tempo 120} 1.1
         `);
         expect(score.masterBars[0].tempoAutomations).to.have.length(2);
         expect(score.masterBars[0].tempoAutomations[0].value).to.equal(120);
@@ -1547,9 +1547,9 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
             \\track "Piano"
                 \\staff{score} \\tuning piano \\instrument acousticgrandpiano
-                    \\voice 
+                    \\voice
                         c4 d4 e4 f4 | c4 d4 e4 f4
-                    \\voice 
+                    \\voice
                         c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
@@ -1563,9 +1563,9 @@ describe('AlphaTexImporterTest', () => {
 
     it('multi-voice-simple-all-voices', () => {
         const score = parseTex(`
-            \\voice 
+            \\voice
                 c4 d4 e4 f4 | c4 d4 e4 f4
-            \\voice 
+            \\voice
                 c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
@@ -1580,7 +1580,7 @@ describe('AlphaTexImporterTest', () => {
     it('multi-voice-simple-skip-initial', () => {
         const score = parseTex(`
             c4 d4 e4 f4 | c4 d4 e4 f4
-            \\voice 
+            \\voice
             c3 d3 e3 f3 | c3 d3 e3 f3
         `);
 
@@ -1623,7 +1623,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('transpose', () => {
         const score = parseTex(`
-            \\staff 
+            \\staff
             \\displaytranspose 12
             \\transpose 6
             .
@@ -1671,7 +1671,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('beat-ottava', () => {
         const score = parseTex(`
-            3.3.4{ ot 15ma } 3.3.4{ ot 8vb } 
+            3.3.4{ ot 15ma } 3.3.4{ ot 8vb }
         `);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].ottava).to.equal(Ottavia._15ma);
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[1].ottava).to.equal(Ottavia._8vb);
@@ -1872,13 +1872,13 @@ describe('AlphaTexImporterTest', () => {
 
     it('track-properties', () => {
         const score = parseTex(`
-            \\track "First" { 
-                color "#FF0000" 
+            \\track "First" {
+                color "#FF0000"
                 defaultSystemsLayout 6
                 systemsLayout 3 2 3
                 volume 7
                 balance 3
-                mute 
+                mute
                 solo
             }
         `);
@@ -1923,7 +1923,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('note-show-string', () => {
         const score = parseTex(`
-            :8 3.3{ string } 
+            :8 3.3{ string }
         `);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].showStringNumber).to.be.true;
@@ -1932,7 +1932,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('note-hide', () => {
         const score = parseTex(`
-            :8 3.3{ hide } 
+            :8 3.3{ hide }
         `);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].notes[0].isVisible).to.be.false;
@@ -1967,9 +1967,9 @@ describe('AlphaTexImporterTest', () => {
         const score = parseTex(`
         \\clef C4 \\ottava 15ma C4 | C4 |
         \\clef 0 | \\clef 48 | \\clef 60 | \\clef 65 | \\clef 43 |
-        \\clef Neutral | \\clef C3 | \\clef C4 | \\clef F4 | \\clef G2 | 
-        \\clef "Neutral" | \\clef "C3" | \\clef "C4" | \\clef "F4" | \\clef "G2" | 
-        \\clef n | \\clef alto | \\clef tenor | \\clef bass | \\clef treble | 
+        \\clef Neutral | \\clef C3 | \\clef C4 | \\clef F4 | \\clef G2 |
+        \\clef "Neutral" | \\clef "C3" | \\clef "C4" | \\clef "F4" | \\clef "G2" |
+        \\clef n | \\clef alto | \\clef tenor | \\clef bass | \\clef treble |
         \\clef "n" | \\clef "alto" | \\clef "tenor" | \\clef "bass" | \\clef "treble"
         `);
         let barIndex = 0;
@@ -1997,7 +1997,7 @@ describe('AlphaTexImporterTest', () => {
         3.3
         \\track B
         3.3
-        
+
         `);
         expect(score.stylesheet.multiTrackMultiBarRest).to.be.true;
         expect(score.stylesheet.perTrackMultiBarRest).to.be.ok;
@@ -2088,17 +2088,17 @@ describe('AlphaTexImporterTest', () => {
             \\instrument piano
             .
             \\track "T1"
-                \\staff 
-                    \\barlineleft dashed 
-                    \\barlineright dotted 
-                    | 
+                \\staff
+                    \\barlineleft dashed
+                    \\barlineright dotted
+                    |
                     \\barlineleft heavyheavy
                     \\barlineright heavyheavy
-                    
-                \\staff 
-                    \\barlineleft lightlight 
-                    \\barlineright lightheavy 
-                    | 
+
+                \\staff
+                    \\barlineleft lightlight
+                    \\barlineright lightheavy
+                    |
                     \\barlineleft heavylight
                     \\barlineright dashed
             `);
@@ -2113,7 +2113,7 @@ describe('AlphaTexImporterTest', () => {
             \\ro 3.4.4*4 | 3.4.4*4 | \\rc 2 3.4.4*4 |
             3.4.4*4 | 3.4.4*4
             .
-            \\sync 0 0 0 
+            \\sync 0 0 0
             \\sync 0 0 1000 0.5
             \\sync 1 0 2000
             \\sync 3 0 3000
@@ -2140,8 +2140,8 @@ describe('AlphaTexImporterTest', () => {
             .
             \\ts 3 4
             0.4.16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
-            (3.2 0.4).16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) | 
-            (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) | 
+            (3.2 0.4).16 (3.2 -.4) (1.1 -.4) (5.1 -.4) 1.1 3.2 1.1 3.2 2.3.8 (3.2 3.4) |
+            (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
             (3.2 0.4).16 (3.2 -.4) (3.1 -.4) (6.1 -.4) 3.1 3.2 3.1 3.2 3.3.8 (3.2 0.3) |
             .
             \\sync 0 0 0
@@ -2175,7 +2175,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('volume-change', () => {
         const score = parseTex(`
-            \\track "T1" { 
+            \\track "T1" {
                 volume 7
             }
             G4 G4 { volume 8 } G4 { volume 9 }
@@ -2199,7 +2199,7 @@ describe('AlphaTexImporterTest', () => {
 
     it('balance-change', () => {
         const score = parseTex(`
-            \\track "T1" { 
+            \\track "T1" {
                 balance 7
             }
             G4 G4 { balance 8 } G4 { balance 9 }
@@ -2242,7 +2242,7 @@ describe('AlphaTexImporterTest', () => {
     });
 
     function parseNumberOrNameTest(tex: string, allowFloats: boolean, expectedSymbols: string[]) {
-        const lexer = new AlphaTexLexer(tex);
+        const lexer = new AlphaTexLexerOld(tex);
         lexer.init(allowFloats);
 
         const actualSymbols: string[] = [];
@@ -2319,10 +2319,10 @@ describe('AlphaTexImporterTest', () => {
     it('beat-lyrics', () => {
         const score = parseTex(`
             .
-            3.3.3 
-            3.3.3 {lyrics "A"} 
-            3.3.3 {lyrics 0 "B C D"} 
-            3.3.3 {lyrics 0 "E" lyrics 1 "F" lyrics 2 "G"} 
+            3.3.3
+            3.3.3 {lyrics "A"}
+            3.3.3 {lyrics 0 "B C D"}
+            3.3.3 {lyrics 0 "E" lyrics 1 "F" lyrics 2 "G"}
         `);
 
         expect(score.tracks[0].staves[0].bars[0].voices[0].beats[0].lyrics).to.not.be.ok;
@@ -2343,7 +2343,7 @@ describe('AlphaTexImporterTest', () => {
 
         testExportRoundtrip(score);
     });
-    
+
     it('bank', () => {
         const score = parseTex(`
             \\track "Piano" { instrument electricpiano1}

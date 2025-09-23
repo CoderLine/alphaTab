@@ -1,6 +1,6 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@src/Settings';
@@ -98,7 +98,7 @@ describe('EffectsAndAnnotationsTests', () => {
         const settings = new Settings();
         settings.display.barsPerRow = 1;
 
-        const importer = new AlphaTexImporter();
+        const importer = new AlphaTexImporterOld();
         importer.init(ByteBuffer.fromString(tex), settings);
         const score = importer.readScore();
 
@@ -168,7 +168,7 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('sustain-pedal-alphatex', async () => {
-        const importer = new AlphaTexImporter();
+        const importer = new AlphaTexImporterOld();
         const settings = new Settings();
         importer.initFromString(
             `

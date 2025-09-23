@@ -1,6 +1,6 @@
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { VersionInfo } from '@src/generated/VersionInfo';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { CapellaImporter } from '@src/importer/CapellaImporter';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
@@ -410,7 +410,7 @@ export class Environment {
             new Gp7To8Importer(),
             new MusicXmlImporter(),
             new CapellaImporter(),
-            new AlphaTexImporter()
+            new AlphaTexImporterOld()
         ];
     }
 

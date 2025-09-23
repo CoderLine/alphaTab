@@ -3,7 +3,7 @@ import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } f
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiUtils } from '@src/midi/MidiUtils';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
 import { ByteBuffer } from '@src/io/ByteBuffer';
@@ -38,7 +38,7 @@ import { VibratoType } from '@src/model/VibratoType';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
-        const importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
         return importer.readScore();
     };
@@ -1764,7 +1764,7 @@ describe('MidiFileGeneratorTest', () => {
                 3.3.8 { timer }
                 3.3.4 { timer }
                 3.3.4 { timer } |
-                
+
                 3.3.4 { timer tempo 60 }
                 3.3.8 { timer }
                 3.3.8 { timer tempo 240 }
@@ -1804,9 +1804,9 @@ describe('MidiFileGeneratorTest', () => {
 
     it('transpose', () => {
         const score = parseTex(`
-            \\track \\staff \\instrument piano 
+            \\track \\staff \\instrument piano
                     C4.4| r.1
-            \\track \\staff \\instrument piano 
+            \\track \\staff \\instrument piano
                 \\displayTranspose 12
                     r.1 | C4.4 | r.1
             \\track \\staff \\instrument piano

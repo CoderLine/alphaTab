@@ -3,7 +3,7 @@ import { StaveProfile } from '@src/StaveProfile';
 import { Settings } from '@src/Settings';
 import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { NotationElement } from '@src/NotationSettings';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {
@@ -165,7 +165,7 @@ describe('MusicNotationTests', () => {
         const settings = new Settings();
         settings.display.barsPerRow = 5;
 
-        const importer = new AlphaTexImporter();
+        const importer = new AlphaTexImporterOld();
         importer.initFromString(tex, settings);
         const score = importer.readScore();
 

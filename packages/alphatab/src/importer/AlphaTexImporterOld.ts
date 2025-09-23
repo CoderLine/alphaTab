@@ -58,6 +58,7 @@ import { Color } from '@src/model/Color';
 import { BendStyle } from '@src/model/BendStyle';
 import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
+import {AlphaTexAccidentalMode} from "@src/importer/AlphaTexShared";
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -153,14 +154,6 @@ export class AlphaTexError extends AlphaTabError {
 /**
  * @internal
  */
-enum AlphaTexAccidentalMode {
-    Auto = 0,
-    Explicit = 1
-}
-
-/**
- * @internal
- */
 interface AlphaTexTokenLocation {
     line: number;
     col: number;
@@ -177,7 +170,7 @@ interface AlphaTexTokenInfo {
     end: AlphaTexTokenLocation;
 }
 
-export class AlphaTexLexer {
+export class AlphaTexLexerOld {
     private static readonly _eof: number = 0;
 
     private _position: number = 0;
@@ -600,7 +593,7 @@ export class AlphaTexLexer {
  * This importer can parse alphaTex markup into a score structure.
  * @internal
  */
-export class AlphaTexImporter extends ScoreImporter {
+export class AlphaTexImporterOld extends ScoreImporter {
     private _trackChannel: number = 0;
     private _score!: Score;
     private _currentTrack!: Track;
@@ -628,7 +621,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
     private _articulationValueToIndex = new Map<number, number>();
 
-    private _lexer!: AlphaTexLexer;
+    private _lexer!: AlphaTexLexerOld;
 
     private _accidentalMode: AlphaTexAccidentalMode = AlphaTexAccidentalMode.Explicit;
     private _flatSyncPoints: FlatSyncPoint[] = [];
@@ -636,12 +629,12 @@ export class AlphaTexImporter extends ScoreImporter {
     public logErrors: boolean = true;
 
     public get name(): string {
-        return 'AlphaTex';
+        return 'AlphaTex (old)';
     }
 
     public initFromString(tex: string, settings: Settings) {
         this.data = ByteBuffer.empty();
-        this._lexer = new AlphaTexLexer(tex);
+        this._lexer = new AlphaTexLexerOld(tex);
         this.settings = settings;
         // when beginning reading a new score we reset the IDs.
         Score.resetIds();
@@ -666,7 +659,7 @@ export class AlphaTexImporter extends ScoreImporter {
     public readScore(): Score {
         try {
             if (this.data.length > 0) {
-                this._lexer = new AlphaTexLexer(
+                this._lexer = new AlphaTexLexerOld(
                     IOHelper.toString(this.data.readAll(), this.settings.importer.encoding)
                 );
             }
@@ -1275,6 +1268,7 @@ export class AlphaTexImporter extends ScoreImporter {
 
         return anyTopLevelMeta || anyOtherMeta;
     }
+    
     headerFooterStyle(element: ScoreSubElement) {
         const style = ModelUtils.getOrCreateHeaderFooterStyle(this._score, element);
         if (style.isVisible === undefined) {

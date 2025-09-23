@@ -1,10 +1,10 @@
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { Settings } from '@src/Settings';
 import { expect } from 'chai';
 
 describe('ModelUtilsTests', () => {
     function trimTest(tex: string, expectedBars: number) {
-        const importer = new AlphaTexImporter();
+        const importer = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
 
         const score = importer.readScore();
@@ -25,7 +25,7 @@ describe('ModelUtilsTests', () => {
             \\track T1
             C4 | C4 | C4 | C4 | | | |
             \\track T2
-            C4 | C4 | C4 | C4 | C4 | | |    
+            C4 | C4 | C4 | C4 | C4 | | |
         `,
             5
         );

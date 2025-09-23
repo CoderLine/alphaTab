@@ -2,7 +2,7 @@ import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
 import { MidiFile } from '@src/midi/MidiFile';
 import { AlphaSynth } from '@src/synth/AlphaSynth';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { TestOutput } from '@test/audio/TestOutput';
@@ -26,7 +26,7 @@ describe('AlphaSynthTests', () => {
             ' r.8 (3.4 3.3 ).8 r.8 (6.3 6.4 ).8 (5.4 5.3 ).4 {d }r.8 |' +
             ' (0.4 0.3).8 r.8(3.4 3.3).8 r.8(5.4 5.3).4 r.8(3.4 3.3).8 | ' +
             'r.8(0.4 0.3).8(-.3 - .4).2 { d } | ';
-        const importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
         const score: Score = importer.readScore();
         const midi: MidiFile = new MidiFile();
@@ -58,7 +58,7 @@ describe('AlphaSynthTests', () => {
             \\track "T02"
             \\instrument 30
             4.4.4*4`;
-        const importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
         const score: Score = importer.readScore();
         const midi: MidiFile = new MidiFile();
@@ -90,7 +90,7 @@ describe('AlphaSynthTests', () => {
             \\track "T02"
             \\instrument 30
             4.4.4*4`;
-        const importer: AlphaTexImporter = new AlphaTexImporter();
+        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
         const score: Score = importer.readScore();
         const midi: MidiFile = new MidiFile();
@@ -281,7 +281,7 @@ describe('AlphaSynthTests', () => {
                 C4 D4 E4 F4 | C4 { instrument 27 bank 1000 } D4 E4 F4
 
             \\track T1 { instrument 25 bank 50 }
-                C4 D4 E4 F4 | C4 D4 E4 { instrument 27 bank 4000 } F4               
+                C4 D4 E4 F4 | C4 D4 E4 { instrument 27 bank 4000 } F4
         `);
 
         const midi: MidiFile = new MidiFile();

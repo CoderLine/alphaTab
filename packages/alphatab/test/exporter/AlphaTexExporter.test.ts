@@ -1,5 +1,5 @@
 import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
-import { AlphaTexError, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
+import { AlphaTexError, AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
@@ -18,7 +18,7 @@ describe('AlphaTexExporterTest', () => {
     }
 
     function parseAlphaTex(tex: string): Score {
-        const readerBase: AlphaTexImporter = new AlphaTexImporter();
+        const readerBase: AlphaTexImporterOld = new AlphaTexImporterOld();
         readerBase.initFromString(tex, new Settings());
         return readerBase.readScore();
     }

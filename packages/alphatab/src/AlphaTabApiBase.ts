@@ -772,7 +772,7 @@ export class AlphaTabApiBase<TSettings> {
      */
     public tex(tex: string, tracks?: number[]): void {
         try {
-            const parser: AlphaTexImporter = new AlphaTexImporter();
+            const parser: AlphaTexImporterOld = new AlphaTexImporterOld();
             parser.logErrors = true;
             parser.initFromString(tex, this.settings);
             const score: Score = parser.readScore();

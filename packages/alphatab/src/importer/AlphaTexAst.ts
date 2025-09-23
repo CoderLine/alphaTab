@@ -17,7 +17,7 @@ export enum AlphaTexNodeType {
     // General Nodes
     Identifier,
     MetaDataTag,
-    MetaDataWithProperties,
+    MetaData,
     ValueList,
     Properties,
     Property,
@@ -121,13 +121,18 @@ export interface AlphaTexNumberLiteral extends AlphaTexAstNode {
 /**
  * A string literal within alphaTex.
  */
-export interface AlphaTexStringLiteral extends AlphaTexAstNode {
+export interface AlphaTexStringLiteral extends AlphaTexTextNode {
     nodeType: AlphaTexNodeType.StringLiteral;
-    /**
-     * The contained string value described by this literal.
-     */
-    value: string;
 }
+
+/**
+ * Defines the possible types for values in a {@link AlphaTexValueList}
+ */
+export type AlphaTexValueListItem =
+    | AlphaTexIdentifier
+    | AlphaTexStringLiteral
+    | AlphaTexNumberLiteral
+    | AlphaTexValueList;
 
 /**
  * A node holding multiple values optionally grouped by parenthesis.
@@ -143,7 +148,7 @@ export interface AlphaTexValueList extends AlphaTexAstNode {
     /**
      * The list of values.
      */
-    values: (AlphaTexIdentifier | AlphaTexStringLiteral | AlphaTexNumberLiteral | AlphaTexValueList)[];
+    values: AlphaTexValueListItem[];
     /**
      * The close parenthesis token grouping the values.
      */
@@ -152,10 +157,10 @@ export interface AlphaTexValueList extends AlphaTexAstNode {
 
 /**
  * A metadata tag with optional values and optional properties like:
- * `\title "Song Title"`, `\ts 3 4`, `\hidedynamics`, `\track "Name" {color "#F00"}` .
+ * `\track "Name" {color "#F00"}` .
  */
-export interface AlphaTexMetaDataWithPropertiesNode extends AlphaTexAstNode {
-    nodeType: AlphaTexNodeType.MetaDataWithProperties;
+export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
+    nodeType: AlphaTexNodeType.MetaData;
     /**
      * The tag part of the metadata.
      */
@@ -209,15 +214,22 @@ export interface AlphaTexPropertyNode extends AlphaTexAstNode {
 }
 
 /**
+ * A base interface for nodes holding a textual value
+ * like string literals or identifiers.
+ */
+export interface AlphaTexTextNode extends AlphaTexAstNode {
+    /**
+     * The text contained in the node.
+     */
+    text: string;
+}
+
+/**
  * A node describing an identifier. This is typically a string-like value
  * but not quoted.
  */
-export interface AlphaTexIdentifier extends AlphaTexAstNode {
+export interface AlphaTexIdentifier extends AlphaTexTextNode {
     nodeType: AlphaTexNodeType.Identifier;
-    /**
-     * The text of the identifier.
-     */
-    text: string;
 }
 
 //
@@ -232,7 +244,7 @@ export interface AlphaTexScoreNode extends AlphaTexAstNode {
     /**
      * The metadata tags describing the top level score information.
      */
-    metaData: AlphaTexMetaDataWithPropertiesNode[];
+    metaData: AlphaTexMetaDataNode[];
 
     /**
      * The separator between the score metadata and the bars.
@@ -252,7 +264,7 @@ export interface AlphaTexScoreNode extends AlphaTexAstNode {
     /**
      * The sync points for linking the song to an external media.
      */
-    syncPoints: AlphaTexMetaDataWithPropertiesNode[];
+    syncPoints: AlphaTexMetaDataNode[];
 }
 
 /**
@@ -279,26 +291,10 @@ export interface AlphaTexBarNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Bar;
 
     /**
-     * An optional `\track` marker indicating that on this bar
-     * the data of a new track starts.
+     * The metadata tags preceeding the bar contents, might start
+     * new tracks, staves, voices etc.
      */
-    trackMetaData?: AlphaTexMetaDataWithPropertiesNode;
-    /**
-     * An optional `\staff` marker indicating that on this bar
-     * the data of a new staff starts.
-     */
-    staffMetaData?: AlphaTexMetaDataWithPropertiesNode;
-    /**
-     * An optional `\voice` marker indicating that on this bar
-     * the data of a new voice starts.
-     */
-    voiceMetaData?: AlphaTexMetaDataWithPropertiesNode;
-
-    /**
-     * The bar level metadata describing bar or masterbar level
-     * data.
-     */
-    barMetaData: AlphaTexMetaDataWithPropertiesNode[];
+    metaData: AlphaTexMetaDataNode[];
 
     /**
      * The beats contained in this bar.
@@ -329,10 +325,16 @@ export interface AlphaTexBeatNode extends AlphaTexAstNode {
      * The marker indicating that this beat is a rest beat. Currently always an identifier with `r`
      */
     rest?: AlphaTexIdentifier;
+
     /**
-     * The effect list for this beat.
+     * The dot separating the beat content and the postfix beat duration
      */
-    beatEffects?: AlphaTexPropertiesNode;
+    durationDot?: AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+
+    /**
+     * The postfix beat duration.
+     */
+    durationValue?: AlphaTexNumberLiteral;
 
     /**
      * The `*` marker for repeating this beat multiple times. Must have a filled `beatMultiplierValue`
@@ -343,6 +345,11 @@ export interface AlphaTexBeatNode extends AlphaTexAstNode {
      * The numeric value how often the beat should be repeated.
      */
     beatMultiplierValue?: AlphaTexNumberLiteral;
+
+    /**
+     * The effect list for this beat.
+     */
+    beatEffects?: AlphaTexPropertiesNode;
 }
 
 /**
