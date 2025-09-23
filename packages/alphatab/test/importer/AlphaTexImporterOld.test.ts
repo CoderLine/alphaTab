@@ -44,9 +44,9 @@ import { WhammyType } from '@src/model/WhammyType';
 import { TextAlign } from '@src/platform/ICanvas';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
-import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
+import { AlphaTexExporterOld } from '@src/exporter/AlphaTexExporterOld';
 
-describe('AlphaTexImporterTest', () => {
+describe('AlphaTexImporterOldTest', () => {
     function parseTex(tex: string): Score {
         const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
         importer.initFromString(tex, new Settings());
@@ -58,7 +58,7 @@ describe('AlphaTexImporterTest', () => {
     function testExportRoundtrip(expected: Score) {
         ComparisonHelpers.alphaTexExportRoundtripPrepare(expected);
 
-        const exported = new AlphaTexExporter().exportToString(expected);
+        const exported = new AlphaTexExporterOld().exportToString(expected);
         const actual = parseTex(exported);
 
         ComparisonHelpers.alphaTexExportRoundtripEqual('export-roundtrip', actual, expected);

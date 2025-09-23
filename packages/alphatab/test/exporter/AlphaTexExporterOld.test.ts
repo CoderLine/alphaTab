@@ -1,4 +1,4 @@
-import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
+import { AlphaTexExporterOld } from '@src/exporter/AlphaTexExporterOld';
 import { AlphaTexError, AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
@@ -7,7 +7,7 @@ import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { TestPlatform } from '@test/TestPlatform';
 import { assert, expect } from 'chai';
 
-describe('AlphaTexExporterTest', () => {
+describe('AlphaTexExporterOldTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
         const data = await TestPlatform.loadFile(`test-data/${name}`);
         try {
@@ -24,7 +24,7 @@ describe('AlphaTexExporterTest', () => {
     }
 
     function exportAlphaTex(score: Score, settings: Settings | null = null): string {
-        return new AlphaTexExporter().exportToString(score, settings);
+        return new AlphaTexExporterOld().exportToString(score, settings);
     }
 
     async function testRoundTripEqual(name: string, ignoreKeys: string[] | null = null): Promise<void> {

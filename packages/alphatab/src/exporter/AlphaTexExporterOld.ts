@@ -229,13 +229,13 @@ class AlphaTexWriter {
  * This ScoreExporter can write alphaTex strings.
  * @public
  */
-export class AlphaTexExporter extends ScoreExporter {
+export class AlphaTexExporterOld extends ScoreExporter {
     // used to lookup some default values.
     private static readonly _defaultScore = new Score();
     private static readonly _defaultTrack = new Track();
 
     public get name(): string {
-        return 'alphaTex';
+        return 'alphaTex (old)';
     }
 
     public exportToString(score: Score, settings: Settings | null = null) {
