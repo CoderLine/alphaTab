@@ -617,7 +617,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             [
                 [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
                 [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.OptionalAsFloat]
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
             ]
         ],
         ['defaultsystemslayout', AlphaTex1LanguageHandler.numberOnlyValueListTypes],

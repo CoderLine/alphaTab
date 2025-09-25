@@ -1,0 +1,7 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`AlphaTexParserTest valid-empty 1`] = `Ln 1->1 Col 1->1 Off 0->0 Score`;
+
+exports[`AlphaTexParserTest valid-empty: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest valid-empty: parser-diagnostics 1`] = `Array []`;

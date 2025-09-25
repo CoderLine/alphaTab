@@ -95,7 +95,7 @@ export class AlphaTexParser {
             bars: [],
             barsSyncPointSeparator: undefined,
             syncPoints: [],
-            start: this.lexer.peekToken()?.start,
+            start: this.lexer.currentTokenLocation(),
             comments: this.lexer.peekToken()?.comments
         };
 
@@ -167,7 +167,7 @@ export class AlphaTexParser {
             metaData: [],
             beats: [],
             pipe: undefined,
-            start: this.lexer.peekToken()?.start,
+            start: this.lexer.currentTokenLocation(),
             comments: this.lexer.peekToken()?.comments
         };
         try {
@@ -237,7 +237,7 @@ export class AlphaTexParser {
 
         return beat;
     }
-    
+
     private beatDuration(beat: AlphaTexBeatNode) {
         const dot = this.lexer.peekToken();
         if (dot?.nodeType !== AlphaTexNodeType.DotToken) {
@@ -351,7 +351,7 @@ export class AlphaTexParser {
             openParenthesis: undefined,
             notes: [],
             closeParenthesis: undefined,
-            start: this.lexer.peekToken()?.start,
+            start: this.lexer.currentTokenLocation(),
             comments: this.lexer.peekToken()?.comments
         };
         try {

@@ -209,6 +209,11 @@ export class PrettyFormat {
                 ? '[Map]'
                 : `Map {${PrettyFormat.printIteratorEntries(TestPlatform.mapAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer, ' => ')}}`;
         }
+        if (val instanceof Set) {
+            return hitMaxDepth
+                ? '[Set]'
+                : `Set {${PrettyFormat.printIterableValues(TestPlatform.setAsUnknownIterable(val), config, indentation, depth, refs, PrettyFormat.printer)}}`;
+        }
 
         // Avoid failure to serialize global window object in jsdom test environment.
         // For example, not even relevant if window is prop of React element.
@@ -384,7 +389,9 @@ import {
 } from '@src/importer/AlphaTexAst';
 
 export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
+
     public static readonly instance = new AlphaTexAstNodePlugin();
+
     test(arg0: unknown): boolean {
         return !!arg0 && typeof arg0 === 'object' && 'nodeType' in arg0;
     }
@@ -410,7 +417,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 value = (node as AlphaTexNumberLiteral).value.toString();
                 break;
             case AlphaTexNodeType.StringLiteral:
-                value = (node as AlphaTexStringLiteral).value;
+                value = (node as AlphaTexStringLiteral).text;
                 break;
         }
         const serializedValue = value !== undefined ? ` ${JSON.stringify(value)}` : '';
