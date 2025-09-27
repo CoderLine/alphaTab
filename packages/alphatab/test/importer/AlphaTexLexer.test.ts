@@ -1,9 +1,9 @@
 import type { AlphaTexAstNode } from '@src/importer/AlphaTexAst';
-import { AlphaTexLexer } from "@src/importer/AlphaTexLexer";
+import { AlphaTexLexer } from '@src/importer/AlphaTexLexer';
 import { expect } from 'chai';
 
 describe('AlphaTexLexerTest', () => {
-    function lexerTest(source: string) {
+    function lexerTest(source: string, diagnostics: boolean = false) {
         const lexer = new AlphaTexLexer(source);
         const actual: AlphaTexAstNode[] = [];
 
@@ -16,6 +16,9 @@ describe('AlphaTexLexerTest', () => {
         }
 
         expect(actual).toMatchSnapshot();
+        if (diagnostics) {
+            expect(lexer.diagnostics).toMatchSnapshot();
+        }
     }
 
     function floatTest(source: string) {
@@ -112,5 +115,32 @@ describe('AlphaTexLexerTest', () => {
         `);
 
         lexerTest(['/* Multi */', 'true', 'true /* Middle */ false'].join('\n'));
+    });
+
+    describe('errors', () => {
+        it('at001', () => {
+            lexerTest('/a */', true);
+        });
+
+        it('at002', () => {
+            lexerTest('\\ "Test"', true);
+        });
+
+        it('at003', () => {
+            lexerTest('\\uAB', true);
+        });
+
+        it('at004', () => {
+            lexerTest('\\uXXXX', true);
+        });
+
+        it('at005', () => {
+            lexerTest('\\b01010101', true);
+        });
+
+        it('at006', () => {
+            lexerTest('"double', true);
+            lexerTest("'single", true);
+        });
     });
 });

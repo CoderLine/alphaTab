@@ -8,14 +8,14 @@
     type AlphaTexNumberLiteral,
     type AlphaTexStringLiteral,
     type AlphaTexTokenNode
-} from "@src/importer/AlphaTexAst";
+} from '@src/importer/AlphaTexAst';
 import {
     AlphaTexDiagnosticCode,
     type AlphaTexDiagnostics,
     AlphaTexDiagnosticsSeverity
-} from "@src/importer/AlphaTexShared";
-import { IOHelper } from "@src/io/IOHelper";
-import { Queue } from "@src/synth/ds/Queue";
+} from '@src/importer/AlphaTexShared';
+import { IOHelper } from '@src/io/IOHelper';
+import { Queue } from '@src/synth/ds/Queue';
 
 export class AlphaTexLexer {
     private static readonly Eof: number = 0;
@@ -29,7 +29,7 @@ export class AlphaTexLexer {
 
     private _fatalError = false;
 
-    private _tokenStart: AlphaTexAstNodeLocation = {line: 0, col: 0, offset: 0};
+    private _tokenStart: AlphaTexAstNodeLocation = { line: 0, col: 0, offset: 0 };
     private _comments: AlphaTexComment[] | undefined;
     private _tokenQueue: Queue<AlphaTexAstNode> = new Queue<AlphaTexAstNode>();
 
@@ -62,6 +62,10 @@ export class AlphaTexLexer {
         }
 
         return this._tokenQueue.peek();
+    }
+
+    public revert(node: AlphaTexAstNode) {
+        this._tokenQueue.enqueueFront(node);
     }
 
     public nextTokenWithFloats(): AlphaTexAstNode | undefined {
@@ -558,9 +562,11 @@ export class AlphaTexLexer {
     private static isIdentifierStart(ch: number): boolean {
         // allow almost all characters:
         return !(
-            AlphaTexLexer.terminalTokens.has(ch) || // terminal tokens end identifiers
-            ch <= 0x21 || // control characters
-            AlphaTexLexer.isDigit(ch) // digits
+            (
+                AlphaTexLexer.terminalTokens.has(ch) || // terminal tokens end identifiers
+                ch <= 0x21 || // control characters
+                AlphaTexLexer.isDigit(ch)
+            ) // digits
         );
     }
 

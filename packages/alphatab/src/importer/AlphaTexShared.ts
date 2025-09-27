@@ -1,4 +1,4 @@
-﻿import type {AlphaTexAstNodeLocation} from "@src/importer/AlphaTexAst";
+﻿import type { AlphaTexAstNodeLocation } from '@src/importer/AlphaTexAst';
 
 /**
  * The different severity levels for diagnostics parsing alphaTex.
@@ -41,8 +41,10 @@ export interface AlphaTexDiagnostics {
 }
 
 export enum AlphaTexDiagnosticCode {
-    // 000 - 100 Lexer
-    // 000 - 200 Parser
+    // 000 - 99 Lexer Errors
+    // 100 - 199 Lexer Warnings
+    // 200 - 299 Parser Errors
+    // 300 - 399 Parser Warnings
 
     /**
      * Unexpected character at comment start, expected '//' or '/*' but found '/%s'.
@@ -75,57 +77,90 @@ export enum AlphaTexDiagnosticCode {
     AT006 = 6,
 
     /**
-     * Expected a '.' separating the score meta data tags and the bars.
-     */
-    AT100 = 100,
-
-    /**
      * Missing beat multiplier value after '*'.
      */
-    AT101 = 101,
+    AT200 = 200,
 
     /**
      * Missing duration value after ':'.
      */
-    AT102 = 102,
+    AT201 = 201,
 
     /**
      * Unexpected '%s' token. Expected a '\sync' meta data tag.
      */
-    AT103 = 103,
+    AT202 = 202,
 
     /**
      * Unexpected meta data tag '%s'. Expected a '\sync' meta data tag.
      */
-    AT104 = 104,
+    AT203 = 203,
 
     /**
      * Unexpected '%s' token. Expected one of following: %s
      */
-    AT105 = 105,
+    AT204 = 204,
 
     /**
      * Unexpected end of file.
      */
-    AT106 = 106,
+    AT205 = 205,
 
     /**
      * Unrecognized metadata '%s'.
      */
-    AT107 = 107,
+    AT206 = 206,
 
     /**
      * Unrecognized property '%s'.
      */
-    AT108 = 108
+    AT207 = 207,
+
+    /**
+     * Unexpected end of file. Group not closed.
+     */
+    AT208 = 208,
+
+    /**
+     * Unexpected %s value '%s', expected: %s
+     */
+    AT209 = 209,
+
+    /**
+     * Missing values. Expected following values: %s
+     */
+    AT210 = 210,
+
+    /**
+     * Value is out of valid range. Allowed range: %s, Actual Value: %s
+     */
+    AT211 = 211,
+
+    /**
+     * Unrecogized property '%s', expected one of %s
+     */
+    AT212 = 212,
+
+    /**
+     * Invalid format for color
+     */
+    AT213 = 213,
+
+    /**
+     * The '%s' effect needs %s values per item. With %s points, %s values are needed, only %s values found.
+     */
+    AT214 = 214,
+
+    /**
+     * Expected no values, but found some. Values are ignored.
+     */
+    AT300 = 300
 }
 
 /**
  * An error used to abort the parsing of the alphaTex source into an
  */
-export class AlphaTexParserAbort extends Error {
-}
-
+export class AlphaTexParserAbort extends Error {}
 
 export enum AlphaTexAccidentalMode {
     Auto = 0,

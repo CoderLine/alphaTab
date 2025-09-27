@@ -360,15 +360,33 @@ export class PrettyFormat {
     }
 }
 
-import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
-import { MasterBarSerializer } from '@src/generated/model/MasterBarSerializer';
-import { TrackSerializer } from '@src/generated/model/TrackSerializer';
-import { StaffSerializer } from '@src/generated/model/StaffSerializer';
 import { BarSerializer } from '@src/generated/model/BarSerializer';
-import { VoiceSerializer } from '@src/generated/model/VoiceSerializer';
 import { BeatSerializer } from '@src/generated/model/BeatSerializer';
+import { MasterBarSerializer } from '@src/generated/model/MasterBarSerializer';
 import { NoteSerializer } from '@src/generated/model/NoteSerializer';
-import { TestPlatform } from './TestPlatform';
+import { ScoreSerializer } from '@src/generated/model/ScoreSerializer';
+import { StaffSerializer } from '@src/generated/model/StaffSerializer';
+import { TrackSerializer } from '@src/generated/model/TrackSerializer';
+import { VoiceSerializer } from '@src/generated/model/VoiceSerializer';
+import {
+    type AlphaTexAstNode,
+    type AlphaTexBarNode,
+    type AlphaTexBeatDurationChangeNode,
+    type AlphaTexBeatNode,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataNode,
+    type AlphaTexMetaDataTagNode,
+    AlphaTexNodeType,
+    type AlphaTexNoteListNode,
+    type AlphaTexNoteNode,
+    type AlphaTexNumberLiteral,
+    type AlphaTexPropertiesNode,
+    type AlphaTexPropertyNode,
+    type AlphaTexScoreNode,
+    type AlphaTexStringLiteral,
+    type AlphaTexValueList
+} from '@src/importer/AlphaTexAst';
+import { MidiEvent } from '@src/midi/MidiEvent';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import { JsonConverter } from '@src/model/JsonConverter';
@@ -378,31 +396,29 @@ import { Score } from '@src/model/Score';
 import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
-import { MidiEvent } from '@src/midi/MidiEvent';
-import {
-    type AlphaTexAstNode,
-    type AlphaTexIdentifier,
-    type AlphaTexMetaDataTagNode,
-    AlphaTexNodeType,
-    type AlphaTexNumberLiteral,
-    type AlphaTexStringLiteral
-} from '@src/importer/AlphaTexAst';
+import { TestPlatform } from './TestPlatform';
 
+/**
+ * @partial
+ */
 export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
-
     public static readonly instance = new AlphaTexAstNodePlugin();
 
+    /**
+     * @partial
+     * @target web
+     */
     test(arg0: unknown): boolean {
         return !!arg0 && typeof arg0 === 'object' && 'nodeType' in arg0;
     }
 
     serialize(
         val: unknown,
-        _config: PrettyFormatConfig,
-        _indentation: string,
-        _depth: number,
-        _refs: unknown[],
-        _printer: PrettyFormatPrinter
+        config: PrettyFormatConfig,
+        indentation: string,
+        depth: number,
+        refs: unknown[],
+        printer: PrettyFormatPrinter
     ): string {
         const node = val as AlphaTexAstNode;
         let value: string | undefined = undefined;
@@ -421,16 +437,219 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 break;
         }
         const serializedValue = value !== undefined ? ` ${JSON.stringify(value)}` : '';
-        let str = `Ln ${node.start!.line}->${node.end!.line} Col ${node.start!.col}->${node.end!.col} Off ${node.start!.offset}->${node.end!.offset} ${AlphaTexNodeType[node.nodeType]}${serializedValue}`;
-        if (node.comments) {
+
+        // children
+        const children: [string, unknown][] = [];
+
+        if (node.comments && node.comments.length > 0) {
+            const comments: string[] = [];
             for (const c of node.comments) {
                 if (c.multiLine) {
-                    str += `\n  /*${c.text}*/`;
+                    comments.push(`/*${c.text}*/`);
                 } else {
-                    str += `\n  //${c.text}`;
+                    comments.push(`//${c.text}`);
                 }
             }
+            children.push(['comments', comments]);
         }
+
+        switch (node.nodeType) {
+            // case AlphaTexNodeType.DotToken:
+            // case AlphaTexNodeType.BackSlashToken:
+            // case AlphaTexNodeType.DoubleBackSlashToken:
+            // case AlphaTexNodeType.PipeToken:
+            // case AlphaTexNodeType.BraceOpenToken:
+            // case AlphaTexNodeType.BraceCloseToken:
+            // case AlphaTexNodeType.ParenthesisOpenToken:
+            // case AlphaTexNodeType.ParenthesisCloseToken:
+            // case AlphaTexNodeType.ColonToken:
+            // case AlphaTexNodeType.AsteriskToken:
+
+            // case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.MetaDataTag:
+                const tag = node as AlphaTexMetaDataTagNode;
+                if (tag.prefix) {
+                    children.push(['prefix', tag.prefix]);
+                }
+
+                if (tag.tag) {
+                    children.push(['tag', tag.tag]);
+                }
+                break;
+
+            case AlphaTexNodeType.MetaData:
+                const metaData = node as AlphaTexMetaDataNode;
+                if (metaData.tag) {
+                    children.push(['tag', metaData.tag]);
+                }
+                if (metaData.values) {
+                    children.push(['values', metaData.values]);
+                }
+                if (metaData.properties) {
+                    children.push(['properties', metaData.properties]);
+                }
+                break;
+
+            case AlphaTexNodeType.ValueList:
+                const valueList = node as AlphaTexValueList;
+                if (valueList.openParenthesis) {
+                    children.push(['openParenthesis', valueList.openParenthesis]);
+                }
+                if (valueList.values) {
+                    children.push(['values', valueList.values]);
+                }
+                if (valueList.closeParenthesis) {
+                    children.push(['closeParenthesis', valueList.closeParenthesis]);
+                }
+                break;
+
+            case AlphaTexNodeType.Properties:
+                const properties = node as AlphaTexPropertiesNode;
+                if (properties.openBrace) {
+                    children.push(['openBrace', properties.openBrace]);
+                }
+                if (properties.properties) {
+                    children.push(['properties', properties.properties]);
+                }
+                if (properties.closeBrace) {
+                    children.push(['closeBrace', properties.closeBrace]);
+                }
+                break;
+            case AlphaTexNodeType.Property:
+                const property = node as AlphaTexPropertyNode;
+                if (property.property) {
+                    children.push(['property', property.property]);
+                }
+                if (property.values) {
+                    children.push(['properties', property.values]);
+                }
+                break;
+            // case AlphaTexNodeType.NumberLiteral:
+            // case AlphaTexNodeType.StringLiteral:
+            case AlphaTexNodeType.Score:
+                const score = node as AlphaTexScoreNode;
+                if (score.metaData && score.metaData.length > 0) {
+                    children.push(['metaData', score.metaData]);
+                }
+                if (score.metaDataBarSeparator) {
+                    children.push(['metaDataBarSeparator', score.metaDataBarSeparator]);
+                }
+                if (score.bars && score.bars.length > 0) {
+                    children.push(['bars', score.bars]);
+                }
+                if (score.barsSyncPointSeparator) {
+                    children.push(['barsSyncPointSeparator', score.barsSyncPointSeparator]);
+                }
+                if (score.syncPoints && score.syncPoints.length > 0) {
+                    children.push(['syncPoints', score.syncPoints]);
+                }
+                break;
+
+            case AlphaTexNodeType.Bar:
+                const bar = node as AlphaTexBarNode;
+                if (bar.metaData && bar.metaData.length > 0) {
+                    children.push(['metaData', bar.metaData]);
+                }
+                if (bar.beats && bar.beats.length > 0) {
+                    children.push(['beats', bar.beats]);
+                }
+                if (bar.pipe) {
+                    children.push(['pipe', bar.pipe]);
+                }
+                break;
+
+            case AlphaTexNodeType.Beat:
+                const beat = node as AlphaTexBeatNode;
+                if (beat.durationChange) {
+                    children.push(['durationChange', beat.durationChange]);
+                }
+                if (beat.notes) {
+                    children.push(['notes', beat.notes]);
+                }
+                if (beat.rest) {
+                    children.push(['rest', beat.rest]);
+                }
+                if (beat.durationDot) {
+                    children.push(['durationDot', beat.durationDot]);
+                }
+                if (beat.durationValue) {
+                    children.push(['durationValue', beat.durationValue]);
+                }
+                if (beat.beatMultiplier) {
+                    children.push(['beatMultiplier', beat.beatMultiplier]);
+                }
+                if (beat.beatMultiplierValue) {
+                    children.push(['beatMultiplierValue', beat.beatMultiplierValue]);
+                }
+                if (beat.beatEffects) {
+                    children.push(['beatEffects', beat.beatEffects]);
+                }
+                break;
+
+            case AlphaTexNodeType.BeatDurationChange:
+                const beatDurationChange = node as AlphaTexBeatDurationChangeNode;
+                if (beatDurationChange.colon) {
+                    children.push(['colon', beatDurationChange.colon]);
+                }
+                if (beatDurationChange.value) {
+                    children.push(['value', beatDurationChange.value]);
+                }
+                if (beatDurationChange.properties) {
+                    children.push(['properties', beatDurationChange.properties]);
+                }
+                break;
+            case AlphaTexNodeType.NoteList:
+                const noteList = node as AlphaTexNoteListNode;
+                if (noteList.openParenthesis) {
+                    children.push(['openParenthesis', noteList.openParenthesis]);
+                }
+                if (noteList.notes) {
+                    children.push(['notes', noteList.notes]);
+                }
+                if (noteList.closeParenthesis) {
+                    children.push(['closeParenthesis', noteList.closeParenthesis]);
+                }
+                break;
+
+            case AlphaTexNodeType.Note:
+                const note = node as AlphaTexNoteNode;
+                if (note.noteValue) {
+                    children.push(['noteValue', note.noteValue]);
+                }
+                if (note.noteStringDot) {
+                    children.push(['noteStringDot', note.noteStringDot]);
+                }
+                if (note.noteString) {
+                    children.push(['noteString', note.noteString]);
+                }
+                if (note.noteEffects) {
+                    children.push(['noteEffects', note.noteEffects]);
+                }
+                break;
+        }
+
+        let str = `${AlphaTexNodeType[node.nodeType]}${serializedValue} (${node.start!.line},${node.start!.col}) -> (${node.end!.line},${node.end!.col})`;
+
+        if (children.length > 0) {
+            str += ` {${config.spacingOuter}`;
+            const indentationNext = indentation + config.indent;
+
+            for (let i = 0; i < children.length; i++) {
+                const name = children[i][0];
+                const value = printer(children[i][1], config, indentationNext, depth, refs);
+
+                str += `${indentationNext + name}: ${value}`;
+
+                if (i < children.length - 1) {
+                    str += `,${config.spacingInner}`;
+                } else if (!config.min) {
+                    str += ',';
+                }
+            }
+
+            str += `${config.spacingOuter + indentation}}`;
+        }
+
         return str;
     }
 }

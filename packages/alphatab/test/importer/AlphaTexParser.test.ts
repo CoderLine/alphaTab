@@ -2,189 +2,235 @@ import { AlphaTexParser } from '@src/importer/AlphaTexParser';
 import { expect } from 'chai';
 
 describe('AlphaTexParserTest', () => {
-    function parserTest(source: string, message: string) {
+    function parserTest(source: string) {
         const parser = new AlphaTexParser(source);
         const node = parser.read();
         expect(node).to.be.ok;
-        expect(node, message).toMatchSnapshot();
-        expect(parser.lexerDiagnostics, message).toMatchSnapshot('lexer-diagnostics');
-        expect(parser.parserDiagnostics, message).toMatchSnapshot('parser-diagnostics');
+        expect(node).toMatchSnapshot();
+        expect(parser.lexerDiagnostics).toMatchSnapshot('lexer-diagnostics');
+        expect(parser.parserDiagnostics).toMatchSnapshot('parser-diagnostics');
     }
 
-    // TODO: test specifics of the parser to construct the AST
-    // it should cover mainly:
-    // - parsing of intermediate documents (result + diagnostics)
-
-    // we should try to stay here on the parsing level, and not
-    // cover too much of the semantic stuff
-
-    it('valid-empty', () => {
-        parserTest('', 'empty');
+    describe('valid-empty', () => {
+        it('empty', () => parserTest(''));
     });
 
-    it('valid-score-metadata', () => {
-        parserTest(' . ', 'empty');
-        parserTest('\\title ("Title") . ', 'known valuelist');
-        parserTest('\\title "Title" "Template" left . ', 'known semantic');
-        parserTest('\\title "Title" \\subtitle "Sub" . ', 'known multiple');
-        parserTest('\\track "Name" {color "red"} . ', 'known property');
-        parserTest('\\notExisting ("Value") . ', 'unknown valuelist');
-        parserTest('\\notExisting ("Value") \\notExisting ("") . ', 'unknown multiple');
-        parserTest('\\notExisting ("Value") {} . ', 'valuelist propertylist empty');
-        parserTest('\\notExisting ("Value") {unknown (1 2 3)} . ', 'valuelist propertylist unknown prop');
+    describe('valid-score-metadata', () => {
+        it('empty', () => parserTest(' . '));
+        it('known valuelist', () => parserTest('\\title ("Title") . '));
+        it('known semantic', () => parserTest('\\title "Title" "Template" left . '));
+        it('known multiple', () => parserTest('\\title "Title" \\subtitle "Sub" . '));
+        it('known property', () => parserTest('\\track "Name" {color "red"} . '));
+        it('unknown valuelist', () => parserTest('\\notExisting ("Value") . '));
+        it('unknown multiple', () => parserTest('\\notExisting ("Value") \\notExisting ("") . '));
+        it('valuelist propertylist empty', () => parserTest('\\notExisting ("Value") {} . '));
+        it('valuelist propertylist unknown prop', () => parserTest('\\notExisting ("Value") {unknown (1 2 3)} . '));
     });
 
-    it('valid-bars', () => {
-        parserTest(' C4 | C4 ', 'no score meta');
-        parserTest('\\title "Test" . C4 | C4 ', 'with score meta');
-        parserTest('C4 | C4 |  ', 'empty at end');
+    describe('valid-bars', () => {
+        it('no score meta', () => parserTest(' C4 | C4 '));
+        it('with score meta', () => parserTest('\\title "Test" . C4 | C4 '));
+        it('empty at end', () => parserTest('C4 | C4 |  '));
+        it('multiple empty', () => parserTest('C4 | C4 | | | | '));
+        it('multiple empty then filled', () => parserTest('C4 | C4 | | | | C4 '));
     });
 
-    it('valid-bar-meta', () => {
-        parserTest('\\notExisting ("Value") C4 | C4 ', 'unknown no score meta');
-        parserTest('. \\notExisting ("Value") C4 | C4 ', 'unkonwn score meta');
-        parserTest('\\ts 3 4 C4 | C4 ', 'known no score meta');
-        parserTest('. \\ts 3 4  ("Value") C4 | C4 ', 'known score meta');
+    describe('valid-bar-meta', () => {
+        it('unknown no score meta', () => parserTest('\\notExisting ("Value") C4 | C4 '));
+        it('unkonwn score meta', () => parserTest('. \\notExisting ("Value") C4 | C4 '));
+        it('known no score meta', () => parserTest('\\ts 3 4 C4 | C4 '));
+        it('known score meta', () => parserTest('. \\ts 3 4  ("Value") C4 | C4 '));
     });
 
-    it('valid-beats-basic-pitched', () => {
-        parserTest('C4 C5', 'basic');
-        parserTest(':2 C4 :4 C5', 'duration change');
-        parserTest('C4.4 C5.8', 'duration');
-        parserTest('C4*4 C5*2', 'multiplier');
-        parserTest('C4.4 {} C5.4 {}', 'effects empty');
-        parserTest('C4.4 {v f} C5.4 {cre tu 3 2}', 'effects known');
-        parserTest(':2 C4.8 * 2 {cre tu 3 2}', 'complex');
+    describe('valid-beats-basic-pitched', () => {
+        it('basic', () => parserTest('C4 C5'));
+        it('duration change', () => parserTest(':2 C4 :4 C5'));
+        it('duration', () => parserTest('C4.4 C5.8'));
+        it('multiplier', () => parserTest('C4*4 C5*2'));
+        it('effects empty', () => parserTest('C4.4 {} C5.4 {}'));
+        it('effects known', () => parserTest('C4.4 {v f} C5.4 {cre tu 3 2}'));
+        it('complex', () => parserTest(':2 C4.8 * 2 {cre tu 3 2}'));
     });
 
-    it('valid-beats-chord-pitched', () => {
-        parserTest('(C4 C5) (D4 D5)', 'chord');
-        parserTest(':2 (C4 C5) 4: (D4 D5)', 'duration change');
-        parserTest('(C4 C5).4 (D4 D5).8', 'duration');
-        parserTest('(C4 C5)*4 (D4 D5)*2', 'multiplier');
-        parserTest('(C4 C5) {} (D4 D5) {}', 'effects empty');
-        parserTest('(C4 C5) {v f} (D4 D5) {cre tu 3 2}', 'effects known');
-        parserTest(':2 (C4 C5).8 * 2 {cre tu 3 2}', 'complex');
+    describe('valid-beats-chord-pitched', () => {
+        it('chord', () => parserTest('(C4 C5) (D4 D5)'));
+        it('duration change', () => parserTest(':2 (C4 C5) :4 (D4 D5)'));
+        it('duration', () => parserTest('(C4 C5).4 (D4 D5).8'));
+        it('multiplier', () => parserTest('(C4 C5)*4 (D4 D5)*2'));
+        it('effects empty', () => parserTest('(C4 C5) {} (D4 D5) {}'));
+        it('effects known', () => parserTest('(C4 C5) {v f} (D4 D5) {cre tu 3 2}'));
+        it('complex', () => parserTest(':2 (C4 C5).8 * 2 {cre tu 3 2}'));
     });
 
-    it('valid-beats-basic-fretted', () => {
-        parserTest('3.3 4.2', 'basic');
-        parserTest(':2 3.3 :4 4.2', 'duration change');
-        parserTest('3.3.4 4.2.8', 'duration');
-        parserTest('3.3*4 4.2*2', 'multiplier');
-        parserTest('3.3.4 {} 4.2.4 {}', 'effects empty');
-        parserTest('3.3.4 {v f} 4.2.4 {cre tu 3 2}', 'effects known');
-        parserTest(':2 3.3.8 * 2 {cre tu 3 2}', 'complex');
-        parserTest('3.3.8 | 3 . 3 . 8 | 3.3 .8 | 3 . 3.8', 'spacing');
+    describe('valid-beats-basic-fretted', () => {
+        it('basic', () => parserTest('3.3 4.2'));
+        it('duration change', () => parserTest(':2 3.3 :4 4.2'));
+        it('duration', () => parserTest('3.3.4 4.2.8'));
+        it('multiplier', () => parserTest('3.3*4 4.2*2'));
+        it('effects empty', () => parserTest('3.3.4 {} 4.2.4 {}'));
+        it('effects known', () => parserTest('3.3.4 {v f} 4.2.4 {cre tu 3 2}'));
+        it('complex', () => parserTest(':2 3.3.8 * 2 {cre tu 3 2}'));
+        it('spacing', () => parserTest('3.3.8 | 3 . 3 . 8 | 3.3 .8 | 3 . 3.8'));
     });
 
-    it('valid-beats-chord-fretted', () => {
-        parserTest('(3.3 4.2) (1.2 6.1)', 'chord');
-        parserTest(':2 (3.3 4.2) 4: (1.2 6.1)', 'duration change');
-        parserTest('(3.3 4.2).4 (1.2 6.1).8', 'duration');
-        parserTest('(3.3 4.2)*4 (1.2 6.1)*2', 'multiplier');
-        parserTest('(3.3 4.2).4 {} (1.2 6.1).4 {}', 'effects empty');
-        parserTest('(3.3 4.2).4 {v f} (1.2 6.1).4 {cre tu 3 2}', 'effects known');
-        parserTest(':2 (3.3 4.2).8 * 2 {cre tu 3 2}', 'complex');
-        parserTest(
-            `
+    describe('valid-beats-chord-fretted', () => {
+        it('chord', () => parserTest('(3.3 4.2) (1.2 6.1)'));
+        it('duration change', () => parserTest(':2 (3.3 4.2) :4 (1.2 6.1)'));
+        it('duration', () => parserTest('(3.3 4.2).4 (1.2 6.1).8'));
+        it('multiplier', () => parserTest('(3.3 4.2)*4 (1.2 6.1)*2'));
+        it('effects empty', () => parserTest('(3.3 4.2).4 {} (1.2 6.1).4 {}'));
+        it('effects known', () => parserTest('(3.3 4.2).4 {v f} (1.2 6.1).4 {cre tu 3 2}'));
+        it('complex', () => parserTest(':2 (3.3 4.2).8 * 2 {cre tu 3 2}'));
+        it('spacing', () =>
+            parserTest(`
             (
-                3.3.8 
-                3 . 3 . 8 
-                3.3 .8 
-                3 . 3.8
-            )`,
-            'spacing'
-        );
+                3.3 
+                3 . 3
+            ) . 8`));
     });
 
-    it('valid-beats-rest', () => {
-        parserTest('r', 'rest');
-        parserTest(':2 r :4 r', 'duration change');
-        parserTest('r.4 r.8', 'duration');
-        parserTest('r*4 r*2', 'multiplier');
-        parserTest('r.4 {} r.4 {}', 'effects empty');
-        parserTest('r.4 {v f} r.4 {cre tu 3 2}', 'effects known');
-        parserTest(':2 r.8 * 2 {cre tu 3 2}', 'complex');
+    describe('valid-beats-rest', () => {
+        it('rest', () => parserTest('r'));
+        it('duration change', () => parserTest(':2 r :4 r'));
+        it('duration', () => parserTest('r.4 r.8'));
+        it('multiplier', () => parserTest('r*4 r*2'));
+        it('effects empty', () => parserTest('r.4 {} r.4 {}'));
+        it('effects known', () => parserTest('r.4 {v f} r.4 {cre tu 3 2}'));
+        it('complex', () => parserTest(':2 r.8 * 2 {cre tu 3 2}'));
     });
 
-    it('valid-beat-effects', () => {
-        parserTest('C4.8 {}', 'empty');
-        parserTest('C4.8 {unknown (1 2 3)}', 'unknown');
-        parserTest('C4.8 {tu 2 3}', 'known');
-        parserTest('C4.8 {wb (0 -2 0)}', 'known with list');
-        parserTest('C4.8 {cre wb (0 -2 0) tu 3 2}', 'multiple');
+    describe('valid-beat-effects', () => {
+        it('empty', () => parserTest('C4.8 {}'));
+        it('unknown', () => parserTest('C4.8 {unknown (1 2 3)}'));
+        it('known', () => parserTest('C4.8 {tu 2 3}'));
+        it('known with list', () => parserTest('C4.8 {tb (0 -2 0)}'));
+        it('multiple', () => parserTest('C4.8 {cre tb (0 -2 0) tu 3 2}'));
     });
 
-    it('valid-note-effects', () => {
-        parserTest('C4 {}', 'empty');
-        parserTest('C4 {unknown (1 2 3)}', 'unknown');
-        parserTest('C4 {tr 4 4}', 'known');
-        parserTest('C4 {b (0 4 0)}', 'known with list');
-        parserTest('C4 {nh b (0 4 0) v}', 'multiple');
-        parserTest('(C4 {nh b (0 4 0) v} C5 { v h unknown (1 2 3)})', 'multiple chord');
-        parserTest('C4 {nh b (0 4 0) v} { tu 3 2 }', 'with beat effects');
-        parserTest('(C4 {nh b (0 4 0) v} C5 { v h unknown (1 2 3)}) { tu 3 2 }', 'multiple chord beat effects');
+    describe('valid-note-effects', () => {
+        it('empty', () => parserTest('C4 {}'));
+        it('unknown', () => parserTest('C4 {unknown (1 2 3)}'));
+        it('known', () => parserTest('C4 {tr 4 4}'));
+        it('known with list', () => parserTest('C4 {b (0 4 0)}'));
+        it('multiple', () => parserTest('C4 {nh b (0 4 0) v}'));
+        it('multiple chord', () => parserTest('(C4 {nh b (0 4 0) v} C5 { v h unknown (1 2 3)})'));
+        it('with beat effects', () => parserTest('C4 {nh b (0 4 0) v} { tu 3 2 }'));
+        it('beat effects in note effect', () => parserTest('C4 { tu 3 2 }'));
+        it('multiple chord beat effects', () =>
+            parserTest('(C4 {nh b (0 4 0) v} C5 { v h unknown (1 2 3)}) { tu 3 2 }'));
     });
 
-    it('valid-sync-points', () => {
-        parserTest(' . . ', 'empty');
-        parserTest(' . C4 | C5 . ', 'empty with bars');
-        parserTest(' . C4 | C5 | . ', 'empty with bars empty at end');
-        parserTest(' . C4 . \\sync 1 1 1', 'basic');
-        parserTest(' \\title "Test . C4 . \\sync 1 1 1', 'full');
-        parserTest(' . C4 . \\sync (1 1 1)', 'valuelist');
-        parserTest(' . C4 . \\sync (1 1 1) {} ', 'properties empty');
-        parserTest(' . C4 . \\sync (1 1 1) { unknown (1 2 3) } ', 'properties unknown');
+    describe('valid-sync-points', () => {
+        it('empty', () => parserTest(' . . '));
+        it('empty with bars', () => parserTest(' . C4 | C5 . '));
+        it('empty with bars empty at end', () => parserTest(' . C4 | C5 | . '));
+        it('basic simple pitched', () => parserTest(' . C4 . \\sync 1 1 1'));
+        it('basic simple numbered', () => parserTest(' . 32 . \\sync 1 1 1'));
+        it('basic fretted', () => parserTest(' . 3.3 . \\sync 1 1 1'));
+        it('full', () => parserTest(' \\title "Test" . C4.4 . \\sync 1 1 1'));
+        it('valuelist', () => parserTest(' . C4 . \\sync (1 1 1)'));
+        it('properties empty', () => parserTest(' . C4 . \\sync (1 1 1) {} '));
+        it('properties unknown', () => parserTest(' . C4 . \\sync (1 1 1) { unknown (1 2 3) } '));
     });
 
-    it('floats', () => {
-        parserTest('\\tempo 120 "Moderate" 0.5', 'tempo');
-        parserTest('\\unknown (1.2 2.3)', 'valuelist');
-        parserTest('. \\scale 0.5', 'valuelist');
+    describe('floats', () => {
+        it('tempo', () => parserTest('. \\tempo 120 "Moderate" 0.5'));
+        it('tempo parenthesis', () => parserTest('. \\tempo (120 "Moderate" 0.5)'));
+        it('valuelist parenthesis', () => parserTest('\\unknown (1.2 2.3)'));
+        it('valuelist', () => parserTest('. \\scale 0.5'));
     });
 
-    it('comments', () => {
-        parserTest('// Single \n \\title "Test"', 'score meta singleline');
-        parserTest('/* multi\nline*/ \\title "Test"', 'score meta multiline');
-        parserTest('\\title /* multi\nline*/ "Test"', 'score meta multiline middle');
-        parserTest('. // Single \n \\ts 3 4', 'bar meta singleline');
-        parserTest('. /* multi\nline*/ \\ks 3 4', 'bar multiline');
-        parserTest('. \\ks 3 /* multi\nline*/ 4', 'bar multiline middle');
-        parserTest('. C4 // Single \n C5', 'beat singleline');
-        parserTest('. C4 /* multi\nline*/ C5', 'beat multiline');
-        parserTest('. (C4 // Single \n C5)', 'beat chord singleline');
-        parserTest('. (C4 /* multi\nline*/ C5)', 'beat chord multiline');
-        parserTest('. (C4 C5) { // Single \n } ', 'beateffects singleline');
-        parserTest('. (C4 C5) { /* multi\nline*/ }', 'beateffects multiline');
-        parserTest('. (C4 { // Single \n } C5)', 'noteeffects singleline');
-        parserTest('. (C4   { /* multi\nline*/ } C5)', 'noteeffects multiline');
+    describe('comments', () => {
+        it('score meta singleline', () => parserTest('// Single \n \\title "Test"'));
+        it('score meta multiline', () => parserTest('/* multi\nline*/ \\title "Test"'));
+        it('score meta multiline middle', () => parserTest('\\title /* multi\nline*/ "Test"'));
+        it('bar meta singleline', () => parserTest('. // Single \n \\ts 3 4'));
+        it('bar multiline', () => parserTest('. /* multi\nline*/ \\ts 3 4'));
+        it('bar multiline middle', () => parserTest('. \\ts 3 /* multi\nline*/ 4'));
+        it('beat singleline', () => parserTest('. C4 // Single \n C5'));
+        it('beat multiline', () => parserTest('. C4 /* multi\nline*/ C5'));
+        it('beat chord singleline', () => parserTest('. (C4 // Single \n C5)'));
+        it('beat chord multiline', () => parserTest('. (C4 /* multi\nline*/ C5)'));
+        it('beateffects singleline', () => parserTest('. (C4 C5) { // Single \n } '));
+        it('beateffects multiline', () => parserTest('. (C4 C5) { /* multi\nline*/ }'));
+        it('noteeffects singleline', () => parserTest('. (C4 { // Single \n } C5)'));
+        it('noteeffects multiline', () => parserTest('. (C4   { /* multi\nline*/ } C5)'));
     });
 
-    it('ambiguous', () => {
-        parserTest('\\tempo 120 3.3 3.4', 'tempo and stringed note');
-        parserTest('\\tempo 120 "Moderate" 3.4', 'tempo, temponame and stringed note');
+    describe('ambiguous', () => {
+        it('tempo and stringed note', () => parserTest('\\tempo 120 3.3 3.4'));
+        it('tempo, temponame and stringed note', () => parserTest('\\tempo 120 "Moderate" 3.4'));
     });
 
-    it('intermediate', () =>{
-        parserTest('\\', 'started initial meta')
-        parserTest('\\tr', 'started meta')
-        parserTest('\\track "X" {', 'started meta properties')
-        parserTest('\\track "X" { co', 'started meta property name')
-        parserTest('\\track "X" { color "', 'started meta property value')
-        parserTest('\\track "X" { color "red"', 'finished meta property value, not closed ')
-        
-        parserTest('\\title "Ti', 'started meta string')
-        
-        parserTest('\\title "Title" . C', 'started pitched note')
-        parserTest('\\title "Title" . C4 { ', 'started note effects')
-        parserTest('\\title "Title" . C4 { slu', 'started note effect name')
-        parserTest('\\title "Title" . C4 { slur "S1', 'started note effect value')
-        parserTest('\\title "Title" . C4 { slur "S1"', 'finished note effect value, not closed')
-        parserTest('\\title "Title" . C4 { slur "S1" } .', 'started beat duration')
-        parserTest('\\title "Title" . C4 { slur "S1" } . 4 { ', 'started beat effects')
-        parserTest('\\title "Title" . C4 { slur "S1" } . 4 { ras', 'started beat effect name')
-        parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i', 'started beat effect value')
-        parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i" ', 'finished beat effect value, not closed')
-    })
+    // TODO: check how much of the AST we need to provide code completion
+    // currently the parser/lexer are rather "fail fast" and do not
+    // provide many intermediately parsed nodes.
+
+    describe('intermediate', () => {
+        it('started initial meta', () => parserTest('\\'));
+        it('started meta', () => parserTest('\\tr'));
+        it('started meta properties', () => parserTest('\\track "X" {'));
+        it('started meta property name', () => parserTest('\\track "X" { co'));
+        it('started meta property value', () => parserTest('\\track "X" { color "'));
+        it('finished meta property value, not closed ', () => parserTest('\\track "X" { color "red"'));
+
+        it('started meta string', () => parserTest('\\title "Ti'));
+
+        it('started pitched note', () => parserTest('\\title "Title" . C'));
+        it('started note effects', () => parserTest('\\title "Title" . C4 { '));
+        it('started note effect name', () => parserTest('\\title "Title" . C4 { slu'));
+        it('started note effect value', () => parserTest('\\title "Title" . C4 { slur "S1'));
+        it('finished note effect value, not closed', () => parserTest('\\title "Title" . C4 { slur "S1"'));
+        it('started beat duration', () => parserTest('\\title "Title" . C4 { slur "S1" } .'));
+        it('started beat effects', () => parserTest('\\title "Title" . C4 { slur "S1" } . 4 { '));
+        it('started beat effect name', () => parserTest('\\title "Title" . C4 { slur "S1" } . 4 { ras'));
+        it('started beat effect value', () => parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i'));
+        it('finished beat effect value, not closed', () =>
+            parserTest('\\title "Title" . C4 { slur "S1" } . 4 { rasg "i" '));
+    });
+
+    describe('errors', () => {
+        describe('at200', () => {
+            it('missing', () => parserTest('(3.3) * '));
+            it('type', () => parserTest('(3.3) * A'));
+        });
+
+        describe('at201', () => {
+            it('missing', () => parserTest(':'));
+            it('type', () => parserTest(':A'));
+        });
+
+        it('at202', () => parserTest('. C4.8 . sync'));
+        it('at203', () => parserTest('. C4.8 . \\title "Test"'));
+
+        describe('at204', () => {
+            it('beat duration', () => parserTest('(C4).A'));
+            it('note string', () => parserTest('3.A'));
+            it('note value', () => parserTest(' . ( \\notevalue )'));
+            it('value list', () => parserTest('\\meta (\\metavalue)'));
+            it('meta value', () => parserTest('\\title 10'));
+        });
+
+        describe('at205', () => {
+            it('note string', () => parserTest('. (3.'));
+            it('meta value', () => parserTest('\\title'));
+        });
+
+        describe('at206', () => {
+            it('score', () => parserTest('\\unknown'));
+            it('bar', () => parserTest('. \\unknown'));
+        });
+
+        describe('at207', () => {
+            it('bar', () => parserTest('. \\track "Test" {unknown}'));
+            it('beat', () => parserTest('. (C4) {unknown}'));
+            it('note', () => parserTest('. (C4{unknown})'));
+        });
+
+        describe('at208', () => {
+            it('note list', () => parserTest('(C4'));
+            it('properties', () => parserTest('\\track "Test" { color red'));
+            it('values', () => parserTest('\\title ("Test"'));
+        });
+    });
 });

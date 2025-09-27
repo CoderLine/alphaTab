@@ -54,7 +54,7 @@ export class AlphaTexParser {
     public unexpectedToken(actual: AlphaTexAstNode | undefined, expected: AlphaTexNodeType[], abort: boolean) {
         if (!actual) {
             this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT106,
+                code: AlphaTexDiagnosticCode.AT205,
                 start: this.lexer.currentTokenLocation(),
                 end: this.lexer.currentTokenLocation(),
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -62,7 +62,7 @@ export class AlphaTexParser {
             });
         } else {
             this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT105,
+                code: AlphaTexDiagnosticCode.AT204,
                 message: `Unexpected '${AlphaTexNodeType[actual.nodeType]}' token. Expected one of following: ${expected.map(v => AlphaTexNodeType[v]).join(',')}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: actual.start,
@@ -95,8 +95,7 @@ export class AlphaTexParser {
             bars: [],
             barsSyncPointSeparator: undefined,
             syncPoints: [],
-            start: this.lexer.currentTokenLocation(),
-            comments: this.lexer.peekToken()?.comments
+            start: this.lexer.currentTokenLocation()
         };
 
         try {
@@ -129,15 +128,8 @@ export class AlphaTexParser {
         if (!dot) {
             return;
         }
-        if (dot.nodeType !== AlphaTexNodeType.DotToken) {
-            this._diagnostics.push({
-                code: AlphaTexDiagnosticCode.AT100,
-                message: "Expected a '.' separating the score meta data tags and the bars.",
-                severity: AlphaTexDiagnosticsSeverity.Error,
-                start: dot.start,
-                end: dot.end
-            });
-        } else {
+        if (dot.nodeType === AlphaTexNodeType.DotToken) {
+            // NOTE: dot is not mandatory anymore, we can have bar and score metadata mixed at start.
             this._score.metaDataBarSeparator = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
         }
     }
@@ -152,7 +144,8 @@ export class AlphaTexParser {
 
             // dot separator marking end of bars
             if (token.nodeType === AlphaTexNodeType.DotToken) {
-                this._score.barsSyncPointSeparator = token as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+                this._score.barsSyncPointSeparator =
+                    this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
                 return;
             }
 
@@ -167,8 +160,7 @@ export class AlphaTexParser {
             metaData: [],
             beats: [],
             pipe: undefined,
-            start: this.lexer.currentTokenLocation(),
-            comments: this.lexer.peekToken()?.comments
+            start: this.lexer.currentTokenLocation()
         };
         try {
             this.barMetaData(bar);
@@ -197,7 +189,7 @@ export class AlphaTexParser {
 
     private barBeats(bar: AlphaTexBarNode) {
         let token = this.lexer.peekToken();
-        while (token && token.nodeType !== AlphaTexNodeType.PipeToken) {
+        while (token && token.nodeType !== AlphaTexNodeType.PipeToken && token.nodeType !== AlphaTexNodeType.DotToken) {
             const beat = this.beat();
             if (beat) {
                 bar.beats.push(beat);
@@ -215,8 +207,7 @@ export class AlphaTexParser {
             beatEffects: undefined,
             beatMultiplier: undefined,
             beatMultiplierValue: undefined,
-            start: this.lexer.peekToken()?.start,
-            comments: this.lexer.peekToken()?.comments
+            start: this.lexer.peekToken()?.start
         };
 
         try {
@@ -244,21 +235,24 @@ export class AlphaTexParser {
             return;
         }
 
-        beat.durationDot = dot as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+        beat.durationDot = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
 
         const durationValue = this.lexer.peekToken();
-        if (!durationValue || durationValue.nodeType !== AlphaTexNodeType.NumberLiteral) {
-            this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT102,
-                message: "Missing duration value after '.'",
-                severity: AlphaTexDiagnosticsSeverity.Error,
-                start: dot!.start,
-                end: dot!.end
-            });
+        if (durationValue?.nodeType === AlphaTexNodeType.NumberLiteral) {
+            beat.durationValue = this.lexer.nextToken() as AlphaTexNumberLiteral;
             return;
+        } else if (durationValue?.nodeType === AlphaTexNodeType.MetaDataTag) {
+            // handle switch to sync points like: 3.3 . \sync 1 1 1
+            this.lexer.revert(beat.durationDot);
+            beat.durationDot = undefined;
+            return;
+        } else if (!durationValue) {
+            // handle switch to sync points like: 3.3 .
+            // (no sync points yet)
+            return;
+        } else {
+            this.unexpectedToken(durationValue, [AlphaTexNodeType.NumberLiteral], true);
         }
-
-        beat.durationValue = durationValue as AlphaTexNumberLiteral;
     }
 
     private beatDurationChange(): AlphaTexBeatDurationChangeNode | undefined {
@@ -272,14 +266,13 @@ export class AlphaTexParser {
             colon: this.lexer.nextToken()! as AlphaTexTokenNode<AlphaTexNodeType.ColonToken>,
             value: undefined,
             properties: undefined,
-            start: colon.start,
-            comments: colon.comments
+            start: colon.start
         };
         try {
             const durationValue = this.lexer.peekToken();
             if (!durationValue || durationValue.nodeType !== AlphaTexNodeType.NumberLiteral) {
                 this.addParserDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT102,
+                    code: AlphaTexDiagnosticCode.AT201,
                     message: "Missing duration value after ':'.",
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: colon!.start,
@@ -305,7 +298,7 @@ export class AlphaTexParser {
             return;
         }
         if (notes.nodeType === AlphaTexNodeType.Identifier && (notes as AlphaTexIdentifier).text === 'r') {
-            beat.rest = notes as AlphaTexIdentifier;
+            beat.rest = this.lexer.nextToken() as AlphaTexIdentifier;
         } else if (notes.nodeType === AlphaTexNodeType.ParenthesisOpenToken) {
             beat.notes = this.noteList();
         } else {
@@ -333,7 +326,7 @@ export class AlphaTexParser {
         const multiplierValue = this.lexer.peekToken();
         if (!multiplierValue || multiplierValue.nodeType !== AlphaTexNodeType.NumberLiteral) {
             this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT101,
+                code: AlphaTexDiagnosticCode.AT200,
                 message: "Missing beat multiplier value after '*'.",
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: beat.beatMultiplier!.start,
@@ -351,27 +344,35 @@ export class AlphaTexParser {
             openParenthesis: undefined,
             notes: [],
             closeParenthesis: undefined,
-            start: this.lexer.currentTokenLocation(),
-            comments: this.lexer.peekToken()?.comments
+            start: this.lexer.currentTokenLocation()
         };
         try {
-            if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.ParenthesisOpenToken) {
-                noteList.openParenthesis =
-                    this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>;
-            }
+            noteList.openParenthesis =
+                this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>;
 
             let token = this.lexer.peekToken();
             while (token && token.nodeType !== AlphaTexNodeType.ParenthesisCloseToken) {
                 const note = this.note();
                 if (note) {
                     noteList.notes.push(note);
+                } else {
+                    break;
                 }
-                token = this.lexer.nextToken();
+                token = this.lexer.peekToken();
             }
 
-            if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.ParenthesisCloseToken) {
+            const closeParenthesis = this.lexer.peekToken();
+            if (closeParenthesis?.nodeType === AlphaTexNodeType.ParenthesisCloseToken) {
                 noteList.closeParenthesis =
                     this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisCloseToken>;
+            } else {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT208,
+                    message: 'Unexpected end of file. Group not closed.',
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: closeParenthesis?.start ?? this.lexer.currentTokenLocation(),
+                    end: closeParenthesis?.end ?? this.lexer.currentTokenLocation()
+                });
             }
         } finally {
             noteList.end = this.lexer.currentTokenLocation();
@@ -393,13 +394,38 @@ export class AlphaTexParser {
                 nodeType: AlphaTexNodeType.Identifier,
                 text: ''
             } as AlphaTexIdentifier,
-            start: noteValue.start,
-            comments: noteValue.comments
+            start: noteValue.start
         };
         try {
             switch (noteValue.nodeType) {
                 case AlphaTexNodeType.NumberLiteral:
                     note.noteValue = this.lexer.nextToken() as AlphaTexNumberLiteral;
+
+                    if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.DotToken) {
+                        const noteStringDot = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+
+                        const noteString = this.lexer.peekToken();
+                        if (!noteString) {
+                            this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
+                            return undefined;
+                        }
+
+                        // handle switch to sync points like: 3 4 5 . \sync 1 1 1
+                        // in this example the numbers are percussion articulations
+
+                        if (noteString.nodeType === AlphaTexNodeType.MetaDataTag) {
+                            // backtrack
+                            this.lexer.revert(noteStringDot);
+                            return note;
+                        } else if (noteString.nodeType === AlphaTexNodeType.NumberLiteral) {
+                            note.noteStringDot = noteStringDot;
+                            note.noteString = this.lexer.nextToken() as AlphaTexNumberLiteral;
+                        } else {
+                            this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
+                            return undefined;
+                        }
+                    }
+
                     break;
                 case AlphaTexNodeType.StringLiteral:
                     note.noteValue = this.lexer.nextToken() as AlphaTexStringLiteral;
@@ -414,22 +440,6 @@ export class AlphaTexParser {
                         true
                     );
                     return undefined;
-            }
-
-            if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.DotToken) {
-                note.noteStringDot = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
-
-                const noteString = this.lexer.peekToken();
-                if (!noteString) {
-                    return undefined;
-                }
-
-                if (noteString.nodeType === AlphaTexNodeType.NumberLiteral) {
-                    note.noteString = this.lexer.nextToken() as AlphaTexNumberLiteral;
-                } else {
-                    this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
-                    return undefined;
-                }
             }
 
             note.noteEffects = this.properties(property => this._metaDataReader.readNotePropertyValues(this, property));
@@ -457,7 +467,7 @@ export class AlphaTexParser {
         }
         if (tag.nodeType !== AlphaTexNodeType.MetaDataTag) {
             this._diagnostics.push({
-                code: AlphaTexDiagnosticCode.AT103,
+                code: AlphaTexDiagnosticCode.AT202,
                 message: `Unexpected '${AlphaTexNodeType[tag.nodeType]}' token. Expected a '\\sync' meta data tag.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: tag.start,
@@ -467,7 +477,7 @@ export class AlphaTexParser {
         }
         if ((tag as AlphaTexMetaDataTagNode).tag.text !== 'sync') {
             this._diagnostics.push({
-                code: AlphaTexDiagnosticCode.AT104,
+                code: AlphaTexDiagnosticCode.AT203,
                 message: `Unexpected meta data tag '${(tag as AlphaTexMetaDataTagNode).tag.text}'. Expected a '\\sync' meta data tag.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: tag.start,
@@ -489,7 +499,6 @@ export class AlphaTexParser {
             nodeType: AlphaTexNodeType.MetaData,
             tag: this.lexer.nextToken() as AlphaTexMetaDataTagNode,
             start: tag.start,
-            comments: tag.comments,
             properties: undefined
         };
         try {
@@ -516,19 +525,26 @@ export class AlphaTexParser {
             openBrace: this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.BraceOpenToken>,
             properties: [],
             closeBrace: undefined,
-            start: braceOpen.start,
-            comments: braceOpen.comments
+            start: braceOpen.start
         };
         try {
             let token = this.lexer.peekToken();
             while (token?.nodeType === AlphaTexNodeType.Identifier) {
                 properties.properties.push(this.property(readPropertyValues));
-                token = this.lexer.nextToken();
+                token = this.lexer.peekToken();
             }
 
             const braceClose = this.lexer.peekToken();
-            if (braceClose?.nodeType !== AlphaTexNodeType.BraceCloseToken) {
+            if (braceClose?.nodeType === AlphaTexNodeType.BraceCloseToken) {
                 properties.closeBrace = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.BraceCloseToken>;
+            } else {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT208,
+                    message: 'Unexpected end of file. Group not closed.',
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: this.lexer.currentTokenLocation(),
+                    end: this.lexer.currentTokenLocation()
+                });
             }
         } finally {
             properties.end = this.lexer.currentTokenLocation();
@@ -546,7 +562,6 @@ export class AlphaTexParser {
             values: undefined
         };
         property.start = property.property.start;
-        property.comments = property.property.comments;
         try {
             property.values = this.valueList() ?? readPropertyValues(property);
         } finally {
@@ -567,8 +582,7 @@ export class AlphaTexParser {
             openParenthesis: this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>,
             values: [],
             closeParenthesis: undefined,
-            start: openParenthesis.start,
-            comments: openParenthesis.comments
+            start: openParenthesis.start
         };
 
         try {
@@ -602,6 +616,19 @@ export class AlphaTexParser {
                 }
 
                 token = this.lexer.peekToken();
+            }
+
+            if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.ParenthesisCloseToken) {
+                valueList.closeParenthesis =
+                    this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.ParenthesisCloseToken>;
+            } else {
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT208,
+                    message: 'Unexpected end of file. Group not closed.',
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: this.lexer.currentTokenLocation(),
+                    end: this.lexer.currentTokenLocation()
+                });
             }
         } finally {
             valueList.end = this.lexer.currentTokenLocation();

@@ -160,6 +160,18 @@ enum ValueListParseTypesMode {
     OptionalAsFloat,
 
     /**
+     * Same as {@link Optional} but the next value is interpreted as a float.
+     * But this value is only handled on value lists with parenthesis.
+     * @remarks
+     * This mode primarily serves the need of preventing tempo automations
+     * to overlap with stringed notes:
+     *    `\tempo 120 "Moderate" 1.0 2.0` - 1.0 should be a fretted note not the ratio position
+     * but here it is the ratio position:
+     *    `\tempo (120 "Moderate" 1.0) 2.0
+     */
+    OptionalAsFloatInValueList,
+
+    /**
      * Indicates that the value of the given types is optional and if matched the
      * only value of this list.
      * If the token matches, it is added to the value list and the parsing continues.
@@ -612,14 +624,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         ['instructions', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['notices', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['tab', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        [
-            'tempo',
-            [
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ]
-        ],
         ['defaultsystemslayout', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
         ['systemslayout', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
         ['hidedynamics', undefined],
@@ -641,6 +645,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * @private
      */
     private static readonly barMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+        // tempo 120, tempo 120 "Moderate", tempo 120 "Moderate" 0.5
+        [
+            'tempo',
+            [
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional],
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.OptionalAsFloatInValueList]
+            ]
+        ],
+
         // rc 2
         ['rc', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
 
@@ -741,7 +755,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         }
 
         parser.addParserDiagnostic({
-            code: AlphaTexDiagnosticCode.AT107,
+            code: AlphaTexDiagnosticCode.AT206,
             message: `Unrecognized metadata '${metaData.tag.text}'.`,
             severity: AlphaTexDiagnosticsSeverity.Error,
             start: metaData.start,
@@ -790,7 +804,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             }
         }
         parser.addParserDiagnostic({
-            code: AlphaTexDiagnosticCode.AT108,
+            code: AlphaTexDiagnosticCode.AT207,
             message: `Unrecognized property '${property.property.text}'.`,
             severity: AlphaTexDiagnosticsSeverity.Error,
             start: property.property.start,
@@ -831,8 +845,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         const valueList: AlphaTexValueList = {
             nodeType: AlphaTexNodeType.ValueList,
             values: [],
-            start: parser.lexer.peekToken()?.start,
-            comments: parser.lexer.peekToken()?.comments
+            start: parser.lexer.peekToken()?.start
         };
         let error = false;
         try {
@@ -841,14 +854,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 const expected = expectedValues[i];
 
                 const value = parser.lexer.peekToken();
-                if (!value) {
+
+                // prevent parsing of special float values which could overlap
+                // with stringed notes
+                if (expected[1] === ValueListParseTypesMode.OptionalAsFloatInValueList) {
                     break;
                 }
 
                 // NOTE: The parser already handles parenthesized value lists, we only need to handle this
                 // parse mode in the validation.
 
-                if (expected[0].includes(value.nodeType)) {
+                if (value && expected[0].includes(value.nodeType)) {
                     this.handleTypeValueListItem(parser, valueList, value, expected[1]);
                     switch (expected[1]) {
                         case ValueListParseTypesMode.OptionalAndStop:
@@ -874,7 +890,18 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                             parser.unexpectedToken(value, expected[0], true);
                             error = true;
                             break;
-                        // Others: just proceed
+
+                        case ValueListParseTypesMode.Optional:
+                        case ValueListParseTypesMode.OptionalAsFloat:
+                        case ValueListParseTypesMode.OptionalAndStop:
+                            // optional not matched -> try next
+                            i++;
+                            break;
+
+                        case ValueListParseTypesMode.RequiredAsValueList:
+                            // optional -> not matched, value listed ended, check next
+                            i++;
+                            break;
                     }
                 }
             }
@@ -1118,7 +1145,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         if (types === undefined) {
             if (values) {
                 importer.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT001, // TODO code
+                    code: AlphaTexDiagnosticCode.AT300,
                     message: `Expected no values, but found some. Values are ignored.`,
                     start: values.start,
                     end: values.end,
@@ -1176,9 +1203,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                             if (t) {
                                 tuning.push(t.realValue);
                             } else {
+                                const tuningLetters = Array.from(ModelUtils.tuningLetters).join(',');
+                                const accidentalModes = Array.from(ModelUtils.accidentalModeMapping.keys()).join(',');
                                 importer.addSemanticDiagnostic({
-                                    code: AlphaTexDiagnosticCode.AT108, // TODO code
-                                    message: `Expected a tuning value but found '${text}'`,
+                                    code: AlphaTexDiagnosticCode.AT209,
+                                    message: `Unexpected tuning value '${text}', expected: <note><accidental><octave> where <note>=oneOf(${tuningLetters}) <accidental>=oneOf(${accidentalModes}), <octave>=number`,
                                     start: v.start,
                                     end: v.end,
                                     severity: AlphaTexDiagnosticsSeverity.Error
@@ -1250,9 +1279,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                         percussionArticulationNames.set(articulationName.toLowerCase(), number);
                         return ApplyNodeResult.Applied;
                     } else {
+                        const articulations = Array.from(PercussionMapper.instrumentArticulations.keys())
+                            .map(n => `${n}`)
+                            .join(',');
                         importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO code
-                            message: `Unknown articulation ${number}. Refer to https://www.alphatab.net/docs/alphatex/percussion for available ids`,
+                            code: AlphaTexDiagnosticCode.AT209,
+                            message: `Unexpected articulation value '${number}', expected: ${articulations}`,
                             start: metaData.values!.values[1].start,
                             end: metaData.values!.values[1].end,
                             severity: AlphaTexDiagnosticsSeverity.Error
@@ -1335,8 +1367,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage(expectedValues);
 
             importer.addSemanticDiagnostic({
-                code: AlphaTexDiagnosticCode.AT001, // TODO code
-                message: `Missing values. Expected ${expectedTypes}, found`,
+                code: AlphaTexDiagnosticCode.AT210,
+                message: `Missing value. Expected following values: ${expectedTypes}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: parent.start,
                 end: parent.end
@@ -1382,16 +1414,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
                         if (value) {
                             importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT107, // TODO code
-                                message: `Invalid required value. Expected ${expectedTypes}, found: ${AlphaTexNodeType[value.nodeType]}`,
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected required value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: value.start,
                                 end: value.end
                             });
                         } else {
                             importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT107, // TODO code
-                                message: `Missing required value. Expected ${expectedTypes}`,
+                                code: AlphaTexDiagnosticCode.AT210,
+                                message: `Missing values. Expected following values: ${expectedTypes}`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: values.end,
                                 end: values.end
@@ -1401,10 +1433,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                         break;
                     case ValueListParseTypesMode.Optional:
                     case ValueListParseTypesMode.OptionalAsFloat:
+                    case ValueListParseTypesMode.OptionalAsFloatInValueList:
                         if (value) {
                             importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT107, // TODO code
-                                message: `Invalid optional value. Expected ${expectedTypes}, found: ${AlphaTexNodeType[value.nodeType]}`,
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected optional value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}: `,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: value.start,
                                 end: value.end
@@ -1491,7 +1524,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     track.playbackInfo.program = instrument;
                 } else {
                     importer.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT107, // TODO code
+                        code: AlphaTexDiagnosticCode.AT211,
                         message: `Value is out of valid range. Allowed range: 0-127, Actual Value: ${instrument}`,
                         start: metaData.values!.values[0].start,
                         end: metaData.values!.values[0].end,
@@ -1606,7 +1639,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     const knownProps = lookupList.flatMap(l => Array.from(l.keys()));
                     Array.from(AlphaTex1LanguageHandler.chordPropertyValueListTypes.keys()).join(',');
                     importer.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT001, // TODO code
+                        code: AlphaTexDiagnosticCode.AT212,
                         message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
                         start: p.start,
@@ -1677,7 +1710,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                         track.color = Color.fromJson((p.values!.values[0] as AlphaTexTextNode).text)!;
                     } catch {
                         importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO Code
+                            code: AlphaTexDiagnosticCode.AT213,
                             message: `Invalid format for color`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: p.values!.values[0].start,
@@ -1742,8 +1775,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     const denominator = AlphaTex1LanguageHandler.getTupletDenominator(numerator);
                     if (denominator < 0) {
                         importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO code
-                            message: `Unknown default tuplet '${numerator}', also specify the tuplet denominator or use one of: 3, 5, 6, 7, 9, 10, 11, 12`,
+                            code: AlphaTexDiagnosticCode.AT209,
+                            message: `Unexpected default tuplet value '${numerator}', expected: 3, 5, 6, 7, 9, 10, 11 or 12`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: p.values!.values[0].start,
                             end: p.values!.values[0].end
@@ -1890,10 +1923,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     beat.tupletNumerator = numerator;
                     const denominator = AlphaTex1LanguageHandler.getTupletDenominator(numerator);
                     if (denominator < 0) {
-                        // TODO: part of getTupletDenominator?
                         importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO code
-                            message: `Unknown default tuplet '${numerator}', also specify the tuplet denominator or use one of: 3, 5, 6, 7, 9, 10, 11, 12`,
+                            code: AlphaTexDiagnosticCode.AT209,
+                            message: `Unexpected default tuplet value '${numerator}', expected: 3, 5, 6, 7, 9, 10, 11 or 12`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: p.values!.values[0].start,
                             end: p.values!.values[0].end
@@ -2052,8 +2084,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                             break;
                         default:
                             importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT001, // TODO code
-                                message: `Invalid tremolo speed '${tremoloSpeedValue}, expected 8, 16 or 32'`,
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected tremolo speed value '${tremoloSpeedValue}, expected: 8, 16 or 32`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: p.values!.values[0].start,
                                 end: p.values!.values[0].end
@@ -2213,8 +2245,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     default:
                         const allowedValues = ['invert', 'up', 'down', 'auto', 'split', 'merge', 'splitsecondary'];
                         importer.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO code
-                            message: `Invalid beam value '${beamMode}, expected one of: ${allowedValues.join(',')}`,
+                            code: AlphaTexDiagnosticCode.AT209,
+                            message: `Unexpected beam value '${beamMode}', expected: ${allowedValues.join(',')}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: p.values!.values[0].start,
                             end: p.values!.values[0].end
@@ -2289,7 +2321,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     const bendStyle = AlphaTex1LanguageHandler.parseEnumValue(
                         importer,
                         p.values!,
-                        'whammy style',
+                        'bend style',
                         AlphaTex1LanguageHandler.bendStyles,
                         tbi
                     );
@@ -2350,8 +2382,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                             break;
                         default:
                             importer.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT001, // TODO code
-                                message: `Invalid trill duration ${trillDurationValue}, expected 16, 32 or 64'`,
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected trill duration value '${trillDurationValue}', expected: 16, 32 or 64`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: p.values!.values[1].start,
                                 end: p.values!.values[1].end
@@ -2504,7 +2536,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 return Fingers.LittleFinger;
             default:
                 importer.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT107, // TODO code
+                    code: AlphaTexDiagnosticCode.AT211,
                     message: `Value is out of valid range. Allowed range: 1-5, Actual Value: ${value}`,
                     start: values!.values[0].start,
                     end: values!.values[0].end,
@@ -2533,7 +2565,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             const pointCount = Math.ceil(remainingValues / valuesPerItem);
             const neededValues = pointCount * valuesPerItem;
             importer.addSemanticDiagnostic({
-                code: AlphaTexDiagnosticCode.AT001, // TODO Code
+                code: AlphaTexDiagnosticCode.AT214,
                 message: `The '${p.property.text}' effect needs ${valuesPerItem} values per item. With ${pointCount} points, ${neededValues} values are needed, only ${remainingValues} values found.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: p.values!.end,
@@ -2597,8 +2629,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             return lookup.get(txt.toLowerCase())!;
         } else {
             importer.addSemanticDiagnostic({
-                code: AlphaTexDiagnosticCode.AT001, // TODO code
-                message: `Invalid ${name} '${txt}, expected one of: ${Array.from(lookup.keys()).join(',')}`,
+                code: AlphaTexDiagnosticCode.AT209,
+                message: `Unexpected ${name} value '${txt}', expected: ${Array.from(lookup.keys()).join(',')}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: p.values[valueIndex].start,
                 end: p.values[valueIndex].end
