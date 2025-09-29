@@ -10,8 +10,8 @@
     type AlphaTexTokenNode
 } from '@src/importer/AlphaTexAst';
 import {
+    AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
-    type AlphaTexDiagnostics,
     AlphaTexDiagnosticsSeverity
 } from '@src/importer/AlphaTexShared';
 import { IOHelper } from '@src/io/IOHelper';
@@ -33,7 +33,7 @@ export class AlphaTexLexer {
     private _comments: AlphaTexComment[] | undefined;
     private _tokenQueue: Queue<AlphaTexAstNode> = new Queue<AlphaTexAstNode>();
 
-    public diagnostics: AlphaTexDiagnostics[] = [];
+    public readonly lexerDiagnostics = new AlphaTexDiagnosticBag();
 
     public constructor(input: string) {
         this._codepoints = [...IOHelper.iterateCodepoints(input)];
@@ -195,7 +195,7 @@ export class AlphaTexLexer {
         } else if (this._codepoint === 0x2a /* * */) {
             this.multiLineComment();
         } else {
-            this.diagnostics.push({
+            this.lexerDiagnostics.push({
                 code: AlphaTexDiagnosticCode.AT001,
                 message: `Unexpected character at comment start, expected '//' or '/*' but found '/${String.fromCodePoint(this._codepoint)}'`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -252,7 +252,7 @@ export class AlphaTexLexer {
         }
 
         if (text.length === 0) {
-            this.diagnostics.push({
+            this.lexerDiagnostics.push({
                 code: AlphaTexDiagnosticCode.AT002,
                 message: 'Missing identifier after meta data start',
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -324,7 +324,7 @@ export class AlphaTexLexer {
                     for (let i = 0; i < 4; i++) {
                         this._codepoint = this.nextCodepoint();
                         if (this._codepoint === AlphaTexLexer.Eof) {
-                            this.diagnostics.push({
+                            this.lexerDiagnostics.push({
                                 code: AlphaTexDiagnosticCode.AT003,
                                 message: 'Unexpected end of file. Need 4 hex characters on a \\uXXXX escape sequence',
                                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -339,7 +339,7 @@ export class AlphaTexLexer {
 
                     codepoint = Number.parseInt(hex, 16);
                     if (Number.isNaN(codepoint)) {
-                        this.diagnostics.push({
+                        this.lexerDiagnostics.push({
                             code: AlphaTexDiagnosticCode.AT004,
                             message: 'Invalid unicode value. Need 4 hex characters on a \\uXXXX escape sequence.',
                             severity: AlphaTexDiagnosticsSeverity.Error,
@@ -350,7 +350,7 @@ export class AlphaTexLexer {
                         return undefined;
                     }
                 } else {
-                    this.diagnostics.push({
+                    this.lexerDiagnostics.push({
                         code: AlphaTexDiagnosticCode.AT005,
                         message: `Unsupported escape sequence. Expected '\\n', '\\r', '\\t', or '\\uXXXX' but found '\\${String.fromCodePoint(this._codepoint)}'.`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
@@ -387,7 +387,7 @@ export class AlphaTexLexer {
             this._codepoint = this.nextCodepoint();
         }
         if (this._codepoint === AlphaTexLexer.Eof) {
-            this.diagnostics.push({
+            this.lexerDiagnostics.push({
                 code: AlphaTexDiagnosticCode.AT006,
                 message: `Unexpected end of file. String not closed.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -555,8 +555,9 @@ export class AlphaTexLexer {
         return ch >= 0x30 && ch <= 0x39 /* 0-9 */;
     }
 
+
     private static isIdentifierCharacter(ch: number): boolean {
-        return AlphaTexLexer.isIdentifierStart(ch) || AlphaTexLexer.isDigit(ch);
+        return AlphaTexLexer.isIdentifierStart(ch) || AlphaTexLexer.isDigit(ch) || ch === 0x2d /* dash */;
     }
 
     private static isIdentifierStart(ch: number): boolean {

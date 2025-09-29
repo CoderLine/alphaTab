@@ -13,7 +13,7 @@ export enum AlphaTexDiagnosticsSeverity {
 /**
  * A diagnostics message for the alphaTex parser.
  */
-export interface AlphaTexDiagnostics {
+export interface AlphaTexDiagnostic {
     /**
      * The severity of the diagnostic.
      */
@@ -155,6 +155,25 @@ export enum AlphaTexDiagnosticCode {
      * Expected no values, but found some. Values are ignored.
      */
     AT300 = 300
+}
+
+export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
+    private _hasErrors = false;
+    public readonly items: AlphaTexDiagnostic[] = [];
+    public get hasErrors() {
+        return this._hasErrors;
+    }
+
+    public push(diagnostic: AlphaTexDiagnostic) {
+        this.items.push(diagnostic);
+        if (diagnostic.severity === AlphaTexDiagnosticsSeverity.Error) {
+            this._hasErrors = true;
+        }
+    }
+
+    [Symbol.iterator]() {
+        return this.items[Symbol.iterator]();
+    }
 }
 
 /**

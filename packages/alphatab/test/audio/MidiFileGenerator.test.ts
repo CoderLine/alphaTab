@@ -1,46 +1,43 @@
-import { ControllerType } from '@src/midi/ControllerType';
-import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@src/midi/MidiEvent';
-import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
-import { MidiFile } from '@src/midi/MidiFile';
-import { MidiUtils } from '@src/midi/MidiUtils';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { Gp3To5Importer } from '@src/importer/Gp3To5Importer';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { Logger } from '@src/Logger';
+import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
+import { ControllerType } from '@src/midi/ControllerType';
+import { type MidiEvent, MidiEventType, NoteOnEvent, type TimeSignatureEvent } from '@src/midi/MidiEvent';
+import { MidiFile } from '@src/midi/MidiFile';
+import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';
+import type { MidiTickLookup } from '@src/midi/MidiTickLookup';
+import { MidiUtils } from '@src/midi/MidiUtils';
+import { AccentuationType } from '@src/model/AccentuationType';
 import type { Beat } from '@src/model/Beat';
+import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
 import { GraceType } from '@src/model/GraceType';
 import type { Note } from '@src/model/Note';
 import type { PlaybackInformation } from '@src/model/PlaybackInformation';
 import type { Score } from '@src/model/Score';
+import { VibratoType } from '@src/model/VibratoType';
 import { Settings } from '@src/Settings';
-import { Logger } from '@src/Logger';
 import {
-    FlatNoteBendEvent,
     FlatControlChangeEvent,
-    FlatMidiEventGenerator,
     type FlatMidiEvent,
+    FlatMidiEventGenerator,
+    FlatNoteBendEvent,
     FlatNoteEvent,
     FlatProgramChangeEvent,
+    FlatRestEvent,
     FlatTempoEvent,
     FlatTimeSignatureEvent,
-    FlatTrackEndEvent,
-    FlatRestEvent
+    FlatTrackEndEvent
 } from '@test/audio/FlatMidiEventGenerator';
 import { TestPlatform } from '@test/TestPlatform';
-import { AlphaSynthMidiFileHandler } from '@src/midi/AlphaSynthMidiFileHandler';
 import { expect } from 'chai';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
-import type { MidiTickLookup } from '@src/midi/MidiTickLookup';
-import { AccentuationType } from '@src/model/AccentuationType';
-import { Duration } from '@src/model/Duration';
-import { VibratoType } from '@src/model/VibratoType';
 
 describe('MidiFileGeneratorTest', () => {
     const parseTex: (tex: string) => Score = (tex: string): Score => {
-        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
-        importer.initFromString(tex, new Settings());
-        return importer.readScore();
+        return ScoreLoader.loadAlphaTex(tex);
     };
 
     const assertEvents: (actualEvents: FlatMidiEvent[], expectedEvents: FlatMidiEvent[]) => void = (

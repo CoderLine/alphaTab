@@ -9,7 +9,7 @@ import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 
 import { Logger } from '@src/Logger';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all
@@ -24,8 +24,7 @@ export class ScoreLoader {
      * @returns The parsed {@see Score}.
      */
     public static loadAlphaTex(tex: string, settings?: Settings): Score {
-        const parser = new AlphaTexImporterOld();
-        parser.logErrors = true;
+        const parser = new AlphaTexImporter();
         parser.initFromString(tex, settings ?? new Settings());
         return parser.readScore();
     }

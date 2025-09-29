@@ -1,13 +1,9 @@
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
-import { Settings } from '@src/Settings';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { expect } from 'chai';
 
 describe('ModelUtilsTests', () => {
     function trimTest(tex: string, expectedBars: number) {
-        const importer = new AlphaTexImporterOld();
-        importer.initFromString(tex, new Settings());
-
-        const score = importer.readScore();
+        const score = ScoreLoader.loadAlphaTex(tex);
         expect(score.masterBars.length).to.equal(expectedBars);
     }
 

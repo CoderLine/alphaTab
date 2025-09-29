@@ -1,8 +1,9 @@
 ﻿import { AlphaTex1LanguageHandler, type IAlphaTexMetaDataReader } from '@src/importer/AlphaTexLanguageHandler';
 import { AlphaTexLexer } from '@src/importer/AlphaTexLexer';
 import {
+    type AlphaTexDiagnostic,
+    AlphaTexDiagnosticBag, 
     AlphaTexDiagnosticCode,
-    type AlphaTexDiagnostics,
     AlphaTexDiagnosticsSeverity,
     AlphaTexParserAbort
 } from '@src/importer/AlphaTexShared';
@@ -33,19 +34,16 @@ import {
 export class AlphaTexParser {
     public readonly lexer: AlphaTexLexer;
     private _score!: AlphaTexScoreNode;
-    private _diagnostics: AlphaTexDiagnostics[] = [];
     private _metaDataReader: IAlphaTexMetaDataReader = AlphaTex1LanguageHandler.instance;
 
-    public get lexerDiagnostics(): AlphaTexDiagnostics[] {
-        return this.lexer.diagnostics;
+    public get lexerDiagnostics(): AlphaTexDiagnosticBag {
+        return this.lexer.lexerDiagnostics;
     }
 
-    public get parserDiagnostics(): AlphaTexDiagnostics[] {
-        return this._diagnostics;
-    }
+    public readonly parserDiagnostics = new AlphaTexDiagnosticBag();
 
-    public addParserDiagnostic(diagnostics: AlphaTexDiagnostics) {
-        this._diagnostics.push(diagnostics);
+    public addParserDiagnostic(diagnostics: AlphaTexDiagnostic) {
+        this.parserDiagnostics.push(diagnostics);
     }
 
     /**
@@ -189,7 +187,12 @@ export class AlphaTexParser {
 
     private barBeats(bar: AlphaTexBarNode) {
         let token = this.lexer.peekToken();
-        while (token && token.nodeType !== AlphaTexNodeType.PipeToken && token.nodeType !== AlphaTexNodeType.DotToken) {
+        while (
+            token &&
+            token.nodeType !== AlphaTexNodeType.PipeToken &&
+            token.nodeType !== AlphaTexNodeType.DotToken &&
+            token.nodeType !== AlphaTexNodeType.MetaDataTag
+        ) {
             const beat = this.beat();
             if (beat) {
                 bar.beats.push(beat);
@@ -215,7 +218,7 @@ export class AlphaTexParser {
 
             this.beatContent(beat);
             if (!beat.notes && !beat.rest) {
-                return undefined;
+                return beat;
             }
 
             this.beatDuration(beat);
@@ -397,41 +400,30 @@ export class AlphaTexParser {
             start: noteValue.start
         };
         try {
+            let canHaveString = false;
             switch (noteValue.nodeType) {
                 case AlphaTexNodeType.NumberLiteral:
                     note.noteValue = this.lexer.nextToken() as AlphaTexNumberLiteral;
-
-                    if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.DotToken) {
-                        const noteStringDot = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
-
-                        const noteString = this.lexer.peekToken();
-                        if (!noteString) {
-                            this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
-                            return undefined;
-                        }
-
-                        // handle switch to sync points like: 3 4 5 . \sync 1 1 1
-                        // in this example the numbers are percussion articulations
-
-                        if (noteString.nodeType === AlphaTexNodeType.MetaDataTag) {
-                            // backtrack
-                            this.lexer.revert(noteStringDot);
-                            return note;
-                        } else if (noteString.nodeType === AlphaTexNodeType.NumberLiteral) {
-                            note.noteStringDot = noteStringDot;
-                            note.noteString = this.lexer.nextToken() as AlphaTexNumberLiteral;
-                        } else {
-                            this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
-                            return undefined;
-                        }
-                    }
+                    canHaveString = true;
 
                     break;
                 case AlphaTexNodeType.StringLiteral:
                     note.noteValue = this.lexer.nextToken() as AlphaTexStringLiteral;
+                    switch ((note.noteValue as AlphaTexStringLiteral).text) {
+                        case 'x':
+                        case '-':
+                            canHaveString = true;
+                            break;
+                    }
                     break;
                 case AlphaTexNodeType.Identifier:
                     note.noteValue = this.lexer.nextToken() as AlphaTexIdentifier;
+                    switch ((note.noteValue as AlphaTexIdentifier).text) {
+                        case 'x':
+                        case '-':
+                            canHaveString = true;
+                            break;
+                    }
                     break;
                 default:
                     this.unexpectedToken(
@@ -440,6 +432,33 @@ export class AlphaTexParser {
                         true
                     );
                     return undefined;
+            }
+
+            if (canHaveString) {
+                if (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.DotToken) {
+                    const noteStringDot = this.lexer.nextToken() as AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+
+                    const noteString = this.lexer.peekToken();
+                    if (!noteString) {
+                        this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
+                        return undefined;
+                    }
+
+                    // handle switch to sync points like: 3 4 5 . \sync 1 1 1
+                    // in this example the numbers are percussion articulations
+
+                    if (noteString.nodeType === AlphaTexNodeType.MetaDataTag) {
+                        // backtrack
+                        this.lexer.revert(noteStringDot);
+                        return note;
+                    } else if (noteString.nodeType === AlphaTexNodeType.NumberLiteral) {
+                        note.noteStringDot = noteStringDot;
+                        note.noteString = this.lexer.nextToken() as AlphaTexNumberLiteral;
+                    } else {
+                        this.unexpectedToken(noteString, [AlphaTexNodeType.NumberLiteral], true);
+                        return undefined;
+                    }
+                }
             }
 
             note.noteEffects = this.properties(property => this._metaDataReader.readNotePropertyValues(this, property));
@@ -466,7 +485,7 @@ export class AlphaTexParser {
             return undefined;
         }
         if (tag.nodeType !== AlphaTexNodeType.MetaDataTag) {
-            this._diagnostics.push({
+            this.addParserDiagnostic({
                 code: AlphaTexDiagnosticCode.AT202,
                 message: `Unexpected '${AlphaTexNodeType[tag.nodeType]}' token. Expected a '\\sync' meta data tag.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -476,7 +495,7 @@ export class AlphaTexParser {
             return undefined;
         }
         if ((tag as AlphaTexMetaDataTagNode).tag.text !== 'sync') {
-            this._diagnostics.push({
+            this.addParserDiagnostic({
                 code: AlphaTexDiagnosticCode.AT203,
                 message: `Unexpected meta data tag '${(tag as AlphaTexMetaDataTagNode).tag.text}'. Expected a '\\sync' meta data tag.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -637,6 +656,3 @@ export class AlphaTexParser {
         return valueList;
     }
 }
-
-// NOTE: Semantic errors will be reported by alphaTexImporter when translating into the
-// score model

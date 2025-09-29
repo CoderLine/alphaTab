@@ -34,6 +34,5 @@ export class XmlError extends AlphaTabError {
         super(AlphaTabErrorType.Format, message);
         this.xml = xml;
         this.pos = pos;
-        Object.setPrototypeOf(this, XmlError.prototype);
     }
 }

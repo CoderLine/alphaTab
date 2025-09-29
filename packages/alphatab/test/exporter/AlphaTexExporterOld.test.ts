@@ -1,8 +1,8 @@
-import { AlphaTexExporterOld } from '@src/exporter/AlphaTexExporterOld';
-import { AlphaTexError, AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
+import { AlphaTexExporterOld } from '@test/exporter/AlphaTexExporterOld';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
+import { AlphaTexError, AlphaTexImporterOld } from '@test/importer/AlphaTexImporterOld';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { TestPlatform } from '@test/TestPlatform';
 import { assert, expect } from 'chai';
@@ -18,7 +18,7 @@ describe('AlphaTexExporterOldTest', () => {
     }
 
     function parseAlphaTex(tex: string): Score {
-        const readerBase: AlphaTexImporterOld = new AlphaTexImporterOld();
+        const readerBase = new AlphaTexImporterOld();
         readerBase.initFromString(tex, new Settings());
         return readerBase.readScore();
     }

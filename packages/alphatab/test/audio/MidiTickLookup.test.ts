@@ -1,4 +1,3 @@
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { Logger } from '@src/Logger';
@@ -626,9 +625,10 @@ describe('MidiTickLookupTest', () => {
 
     it('before-beat-grace-later-bars', () => {
         const settings = new Settings();
-        const importer = new AlphaTexImporterOld();
-        importer.initFromString('\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1', settings);
-        const score = importer.readScore();
+        const score = ScoreLoader.loadAlphaTex(
+            '\\ts 2 4 1.1.2 | 2.1.4 3.1 | 4.1{gr} 5.1{gr} 6.1.2 | 7.1.4 8.1',
+            settings
+        );
         const lookup = buildLookup(score, settings);
 
         // bar 2 contains the grace notes which stole duration from fret 3 beat.

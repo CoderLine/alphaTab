@@ -1,27 +1,54 @@
-import { GeneralMidi } from '@src/midi/GeneralMidi';
+/*
+ * This file contains a copy of the "old" alphaTex importer
+ * used until 1.6.x for cross referencing purposes
+ */
+import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
+import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { AlphaTexAccidentalMode } from "@src/importer/AlphaTexShared";
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
+import { ByteBuffer } from '@src/io/ByteBuffer';
+import { IOHelper } from '@src/io/IOHelper';
+import { Logger } from '@src/Logger';
+import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType, type FlatSyncPoint } from '@src/model/Automation';
 import { Bar, BarLineStyle, SustainPedalMarker, SustainPedalMarkerType } from '@src/model/Bar';
+import { BarreShape } from '@src/model/BarreShape';
 import { Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
+import { BendStyle } from '@src/model/BendStyle';
+import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
+import { Color } from '@src/model/Color';
 import { CrescendoType } from '@src/model/CrescendoType';
+import { Direction } from '@src/model/Direction';
 import { Duration } from '@src/model/Duration';
 import { DynamicValue } from '@src/model/DynamicValue';
+import { FadeType } from '@src/model/FadeType';
+import { Fermata, FermataType } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
+import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignature } from '@src/model/KeySignature';
+import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import { MasterBar } from '@src/model/MasterBar';
+import { ModelUtils, type TuningParseResult } from '@src/model/ModelUtils';
 import { Note } from '@src/model/Note';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { NoteOrnament } from '@src/model/NoteOrnament';
+import { Ottavia } from '@src/model/Ottavia';
+import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
+import { Rasgueado } from '@src/model/Rasgueado';
+import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
 import { Score, ScoreSubElement } from '@src/model/Score';
 import { Section } from '@src/model/Section';
+import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
 import type { Staff } from '@src/model/Staff';
@@ -30,35 +57,12 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { Voice } from '@src/model/Voice';
-import { Logger } from '@src/Logger';
-import { ModelUtils, type TuningParseResult } from '@src/model/ModelUtils';
-import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
-import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { IOHelper } from '@src/io/IOHelper';
-import type { Settings } from '@src/Settings';
-import { ByteBuffer } from '@src/io/ByteBuffer';
-import { PercussionMapper } from '@src/model/PercussionMapper';
-import { KeySignatureType } from '@src/model/KeySignatureType';
-import { GolpeType } from '@src/model/GolpeType';
-import { FadeType } from '@src/model/FadeType';
 import { WahPedal } from '@src/model/WahPedal';
-import { BarreShape } from '@src/model/BarreShape';
-import { NoteOrnament } from '@src/model/NoteOrnament';
-import { Rasgueado } from '@src/model/Rasgueado';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { Direction } from '@src/model/Direction';
-import { Fermata, FermataType } from '@src/model/Fermata';
-import { Ottavia } from '@src/model/Ottavia';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { BendType } from '@src/model/BendType';
-import { SimileMark } from '@src/model/SimileMark';
 import { WhammyType } from '@src/model/WhammyType';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { Color } from '@src/model/Color';
-import { BendStyle } from '@src/model/BendStyle';
-import { BeamDirection } from '@src/rendering/utils/BeamDirection';
 import { TextAlign } from '@src/platform/ICanvas';
-import {AlphaTexAccidentalMode} from "@src/importer/AlphaTexShared";
+import { BeamDirection } from '@src/rendering/utils/BeamDirection';
+import type { Settings } from '@src/Settings';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**
  * A list of terminals recognized by the alphaTex-parser
@@ -121,7 +125,6 @@ export class AlphaTexError extends AlphaTabError {
         this.expected = expected ?? AlphaTexSymbols.No;
         this.symbol = symbol ?? AlphaTexSymbols.No;
         this.symbolData = symbolData;
-        Object.setPrototypeOf(this, AlphaTexError.prototype);
     }
 
     public static symbolError(

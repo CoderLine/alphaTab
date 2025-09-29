@@ -1,9 +1,9 @@
 import { LayoutMode } from '@src/LayoutMode';
-import { StaveProfile } from '@src/StaveProfile';
-import { Settings } from '@src/Settings';
-import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 import { NotationElement } from '@src/NotationSettings';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
+import { Settings } from '@src/Settings';
+import { StaveProfile } from '@src/StaveProfile';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
+import { VisualTestHelper, VisualTestOptions, VisualTestRun } from '@test/visualTests/VisualTestHelper';
 
 describe('MusicNotationTests', () => {
     it('clefs', async () => {
@@ -165,9 +165,7 @@ describe('MusicNotationTests', () => {
         const settings = new Settings();
         settings.display.barsPerRow = 5;
 
-        const importer = new AlphaTexImporterOld();
-        importer.initFromString(tex, settings);
-        const score = importer.readScore();
+        const score = ScoreLoader.loadAlphaTex(tex, settings);
 
         score.tracks[0].shortName = 'pno.';
         score.stylesheet.hideDynamics = true;

@@ -4,7 +4,7 @@ import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
 import { Environment } from '@src/Environment';
 import type { RenderFinishedEventArgs } from '@src/rendering/RenderFinishedEventArgs';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { PixelMatch, PixelMatchOptions } from '@test/visualTests/PixelMatch';
 import { JsonConverter } from '@src/model/JsonConverter';
@@ -59,7 +59,7 @@ export class VisualTestOptions {
             settings = new Settings();
         }
 
-        const importer = new AlphaTexImporterOld();
+        const importer = new AlphaTexImporter();
         importer.init(ByteBuffer.fromString(tex), settings);
         const score: Score = importer.readScore();
 

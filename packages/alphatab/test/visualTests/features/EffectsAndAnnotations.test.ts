@@ -1,7 +1,5 @@
 import { SystemsLayoutMode } from '@src/DisplaySettings';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
-import { ByteBuffer } from '@src/io/ByteBuffer';
 import { BeatBarreEffectInfo } from '@src/rendering/effects/BeatBarreEffectInfo';
 import { Settings } from '@src/Settings';
 import { TestPlatform } from '@test/TestPlatform';
@@ -98,9 +96,7 @@ describe('EffectsAndAnnotationsTests', () => {
         const settings = new Settings();
         settings.display.barsPerRow = 1;
 
-        const importer = new AlphaTexImporterOld();
-        importer.init(ByteBuffer.fromString(tex), settings);
-        const score = importer.readScore();
+        const score = ScoreLoader.loadAlphaTex(tex);
 
         await VisualTestHelper.runVisualTestFull(
             new VisualTestOptions(
@@ -168,9 +164,8 @@ describe('EffectsAndAnnotationsTests', () => {
     });
 
     it('sustain-pedal-alphatex', async () => {
-        const importer = new AlphaTexImporterOld();
         const settings = new Settings();
-        importer.initFromString(
+        const score = ScoreLoader.loadAlphaTex(
             `
         .
         \\track "pno."
@@ -183,7 +178,6 @@ describe('EffectsAndAnnotationsTests', () => {
         `,
             settings
         );
-        const score = importer.readScore();
         score.stylesheet.hideDynamics = true;
 
         expect(score.tracks[0].staves[0].displayTranspositionPitch).to.equal(0);

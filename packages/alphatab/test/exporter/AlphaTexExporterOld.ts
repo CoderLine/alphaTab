@@ -1,5 +1,10 @@
+/*
+ * This file contains a copy of the "old" alphaTex importer
+ * it was never released but battle tested during implementation
+ */
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { Environment } from '@src/Environment';
+import { ScoreExporter } from '@src/exporter/ScoreExporter';
 import { IOHelper } from '@src/io/IOHelper';
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { AccentuationType } from '@src/model/AccentuationType';
@@ -53,7 +58,6 @@ import { WahPedal } from '@src/model/WahPedal';
 import { WhammyType } from '@src/model/WhammyType';
 import { BeamDirection } from '@src/rendering/_barrel';
 import { Settings } from '@src/Settings';
-import { ScoreExporter } from './ScoreExporter';
 
 /**
  * @internal

@@ -1,13 +1,12 @@
+import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
 import { Gp7To8Importer } from '@src/importer/Gp7To8Importer';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ByteBuffer } from '@src/io/ByteBuffer';
+import { JsonConverter } from '@src/model/JsonConverter';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
-import { TestPlatform } from '@test/TestPlatform';
-import { Gp7Exporter } from '@src/exporter/Gp7Exporter';
-import { JsonConverter } from '@src/model/JsonConverter';
-import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
+import { TestPlatform } from '@test/TestPlatform';
 import { expect } from 'chai';
 
 describe('Gp7ExporterTest', () => {
@@ -129,9 +128,7 @@ describe('Gp7ExporterTest', () => {
         12.2 14.3 12.3 15.2 :32 14.2{h} 15.2{h} 14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}14.2{h} 15.2{h}
         `;
 
-        const importer = new AlphaTexImporterOld();
-        importer.initFromString(tex, new Settings());
-        const expected = importer.readScore();
+        const expected = ScoreLoader.loadAlphaTex(tex);
         const exported = exportGp7(expected);
 
         const actual = prepareImporterWithBytes(exported).readScore();
@@ -151,9 +148,7 @@ describe('Gp7ExporterTest', () => {
         Kick.4 42.4 Kick.4 42.4
         `;
 
-        const importer = new AlphaTexImporterOld();
-        importer.initFromString(tex, new Settings());
-        const expected = importer.readScore();
+        const expected = ScoreLoader.loadAlphaTex(tex);
         const exported = exportGp7(expected);
 
         const actual = prepareImporterWithBytes(exported).readScore();

@@ -17,7 +17,7 @@ describe('AlphaTexLexerTest', () => {
 
         expect(actual).toMatchSnapshot();
         if (diagnostics) {
-            expect(lexer.diagnostics).toMatchSnapshot();
+            expect(lexer.lexerDiagnostics).toMatchSnapshot();
         }
     }
 
@@ -89,6 +89,7 @@ describe('AlphaTexLexerTest', () => {
         lexerTest('Cb4');
         lexerTest('electricpiano1');
         lexerTest('Unicodeöäü Unicode😸 Utf16🤘🏻');
+        lexerTest('dashed-identifier');
     });
 
     it('floats', () => {

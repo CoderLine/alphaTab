@@ -7,8 +7,8 @@ describe('AlphaTexParserTest', () => {
         const node = parser.read();
         expect(node).to.be.ok;
         expect(node).toMatchSnapshot();
-        expect(parser.lexerDiagnostics).toMatchSnapshot('lexer-diagnostics');
-        expect(parser.parserDiagnostics).toMatchSnapshot('parser-diagnostics');
+        expect(parser.lexerDiagnostics.items).toMatchSnapshot('lexer-diagnostics');
+        expect(parser.parserDiagnostics.items).toMatchSnapshot('parser-diagnostics');
     }
 
     describe('valid-empty', () => {
@@ -225,6 +225,9 @@ describe('AlphaTexParserTest', () => {
             it('bar', () => parserTest('. \\track "Test" {unknown}'));
             it('beat', () => parserTest('. (C4) {unknown}'));
             it('note', () => parserTest('. (C4{unknown})'));
+            it('gracetype', () => parserTest('C4 {gr invalid}'));
+            it('barre', () => parserTest('C4 {barre 1 invalid}'));
+            it('fermata', () => parserTest('C4 {fermata invalid}'));
         });
 
         describe('at208', () => {

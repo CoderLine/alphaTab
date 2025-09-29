@@ -58,7 +58,7 @@ Score (1,1) -> (1,26) {
         prefix: BackSlashToken (1,1) -> (1,2),
         tag: Identifier "tempo" (1,2) -> (1,7),
       },
-      values: ValueList (1,8) -> (1,23) {
+      values: ValueList (1,8) -> (1,22) {
         values: Array [
           NumberLiteral "120" (1,8) -> (1,11),
           StringLiteral "Moderate" (1,12) -> (1,21),
@@ -671,7 +671,17 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at201 missing 1`] = `Score (1,1) -> (1,2)`;
+exports[`AlphaTexParserTest errors at201 missing 1`] = `
+Score (1,1) -> (1,2) {
+  bars: Array [
+    Bar (1,1) -> (1,2) {
+      beats: Array [
+        Beat (1,1) -> (1,2),
+      ],
+    },
+  ],
+}
+`;
 
 exports[`AlphaTexParserTest errors at201 missing: lexer-diagnostics 1`] = `Array []`;
 
@@ -866,7 +876,7 @@ Array [
       "line": 1,
       "offset": 9,
     },
-    "message": "Unexpected 'NumberLiteral' token. Expected one of following: StringLiteral",
+    "message": "Unexpected 'NumberLiteral' token. Expected one of following: StringLiteral,Identifier",
     "severity": 2,
     "start": Object {
       "col": 8,
@@ -1101,6 +1111,30 @@ Array [
 ]
 `;
 
+exports[`AlphaTexParserTest errors at207 barre 1`] = `Score (1,1) -> (1,20)`;
+
+exports[`AlphaTexParserTest errors at207 barre: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest errors at207 barre: parser-diagnostics 1`] = `
+Array [
+  Object {
+    "code": 207,
+    "end": Object {
+      "col": 20,
+      "line": 1,
+      "offset": 19,
+    },
+    "message": "Unrecognized property 'invalid'.",
+    "severity": 2,
+    "start": Object {
+      "col": 13,
+      "line": 1,
+      "offset": 12,
+    },
+  },
+]
+`;
+
 exports[`AlphaTexParserTest errors at207 beat 1`] = `
 Score (1,1) -> (1,16) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
@@ -1124,6 +1158,54 @@ Array [
       "col": 9,
       "line": 1,
       "offset": 8,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParserTest errors at207 fermata 1`] = `Score (1,1) -> (1,20)`;
+
+exports[`AlphaTexParserTest errors at207 fermata: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest errors at207 fermata: parser-diagnostics 1`] = `
+Array [
+  Object {
+    "code": 207,
+    "end": Object {
+      "col": 20,
+      "line": 1,
+      "offset": 19,
+    },
+    "message": "Unrecognized property 'invalid'.",
+    "severity": 2,
+    "start": Object {
+      "col": 13,
+      "line": 1,
+      "offset": 12,
+    },
+  },
+]
+`;
+
+exports[`AlphaTexParserTest errors at207 gracetype 1`] = `Score (1,1) -> (1,15)`;
+
+exports[`AlphaTexParserTest errors at207 gracetype: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest errors at207 gracetype: parser-diagnostics 1`] = `
+Array [
+  Object {
+    "code": 207,
+    "end": Object {
+      "col": 15,
+      "line": 1,
+      "offset": 14,
+    },
+    "message": "Unrecognized property 'invalid'.",
+    "severity": 2,
+    "start": Object {
+      "col": 8,
+      "line": 1,
+      "offset": 7,
     },
   },
 ]
@@ -1305,7 +1387,7 @@ Score (1,1) -> (1,28) {
             prefix: BackSlashToken (1,3) -> (1,4),
             tag: Identifier "tempo" (1,4) -> (1,9),
           },
-          values: ValueList (1,10) -> (1,25) {
+          values: ValueList (1,10) -> (1,24) {
             values: Array [
               NumberLiteral "120" (1,10) -> (1,13),
               StringLiteral "Moderate" (1,14) -> (1,23),
@@ -1445,7 +1527,7 @@ Score (1,1) -> (1,50) {
                 noteEffects: Properties (1,21) -> (1,34) {
                   openBrace: BraceOpenToken (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,32) {
+                    Property (1,23) -> (1,33) {
                       property: Identifier "slur" (1,23) -> (1,27),
                       properties: ValueList (1,28) -> (1,32) {
                         values: Array [
@@ -1464,7 +1546,7 @@ Score (1,1) -> (1,50) {
           beatEffects: Properties (1,39) -> (1,50) {
             openBrace: BraceOpenToken (1,39) -> (1,39),
             properties: Array [
-              Property (1,41) -> (1,49) {
+              Property (1,41) -> (1,50) {
                 property: Identifier "rasg" (1,41) -> (1,45),
                 properties: ValueList (1,46) -> (1,49) {
                   values: Array [
@@ -1486,7 +1568,7 @@ exports[`AlphaTexParserTest intermediate finished beat effect value, not closed:
 exports[`AlphaTexParserTest intermediate finished beat effect value, not closed: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 208,
     "end": Object {
       "col": 50,
       "line": 1,
@@ -1539,7 +1621,7 @@ exports[`AlphaTexParserTest intermediate finished meta property value, not close
 exports[`AlphaTexParserTest intermediate finished meta property value, not closed : parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 208,
     "end": Object {
       "col": 25,
       "line": 1,
@@ -1608,7 +1690,7 @@ exports[`AlphaTexParserTest intermediate finished note effect value, not closed:
 exports[`AlphaTexParserTest intermediate finished note effect value, not closed: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 208,
     "end": Object {
       "col": 32,
       "line": 1,
@@ -1652,7 +1734,7 @@ Score (1,1) -> (1,36) {
                 noteEffects: Properties (1,21) -> (1,34) {
                   openBrace: BraceOpenToken (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,32) {
+                    Property (1,23) -> (1,33) {
                       property: Identifier "slur" (1,23) -> (1,27),
                       properties: ValueList (1,28) -> (1,32) {
                         values: Array [
@@ -1702,7 +1784,7 @@ exports[`AlphaTexParserTest intermediate started beat effect name: lexer-diagnos
 exports[`AlphaTexParserTest intermediate started beat effect name: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 108,
+    "code": 207,
     "end": Object {
       "col": 44,
       "line": 1,
@@ -1735,45 +1817,6 @@ Score (1,1) -> (1,48) {
     },
   ],
   metaDataBarSeparator: DotToken (1,16) -> (1,16),
-  bars: Array [
-    Bar (1,18) -> (1,48) {
-      beats: Array [
-        Beat (1,18) -> (1,48) {
-          notes: NoteList (1,18) -> (1,34) {
-            notes: Array [
-              Note (1,18) -> (1,34) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,34) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
-                  properties: Array [
-                    Property (1,23) -> (1,32) {
-                      property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,32) {
-                        values: Array [
-                          StringLiteral "S1" (1,28) -> (1,31),
-                        ],
-                      },
-                    },
-                  ],
-                  closeBrace: BraceCloseToken (1,33) -> (1,33),
-                },
-              },
-            ],
-          },
-          durationDot: DotToken (1,35) -> (1,35),
-          durationValue: NumberLiteral "4" (1,37) -> (1,38),
-          beatEffects: Properties (1,39) -> (1,48) {
-            openBrace: BraceOpenToken (1,39) -> (1,39),
-            properties: Array [
-              Property (1,41) -> (1,48) {
-                property: Identifier "rasg" (1,41) -> (1,45),
-              },
-            ],
-          },
-        },
-      ],
-    },
-  ],
 }
 `;
 
@@ -1800,13 +1843,13 @@ Array [
 exports[`AlphaTexParserTest intermediate started beat effect value: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 205,
     "end": Object {
       "col": 48,
       "line": 1,
       "offset": 47,
     },
-    "message": "Unexpected end of file. Group not closed.",
+    "message": "Unexpected end of file.",
     "severity": 2,
     "start": Object {
       "col": 48,
@@ -1844,7 +1887,7 @@ Score (1,1) -> (1,41) {
                 noteEffects: Properties (1,21) -> (1,34) {
                   openBrace: BraceOpenToken (1,21) -> (1,21),
                   properties: Array [
-                    Property (1,23) -> (1,32) {
+                    Property (1,23) -> (1,33) {
                       property: Identifier "slur" (1,23) -> (1,27),
                       properties: ValueList (1,28) -> (1,32) {
                         values: Array [
@@ -1876,7 +1919,7 @@ exports[`AlphaTexParserTest intermediate started beat effects: lexer-diagnostics
 exports[`AlphaTexParserTest intermediate started beat effects: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 208,
     "end": Object {
       "col": 41,
       "line": 1,
@@ -1946,7 +1989,7 @@ exports[`AlphaTexParserTest intermediate started meta properties: lexer-diagnost
 exports[`AlphaTexParserTest intermediate started meta properties: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 208,
     "end": Object {
       "col": 13,
       "line": 1,
@@ -1970,7 +2013,7 @@ exports[`AlphaTexParserTest intermediate started meta property name: lexer-diagn
 exports[`AlphaTexParserTest intermediate started meta property name: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 108,
+    "code": 207,
     "end": Object {
       "col": 16,
       "line": 1,
@@ -1987,31 +2030,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started meta property value 1`] = `
-Score (1,1) -> (1,21) {
-  metaData: Array [
-    MetaData (1,1) -> (1,21) {
-      tag: MetaDataTag "track" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "track" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,12) {
-        values: Array [
-          StringLiteral "X" (1,8) -> (1,10),
-        ],
-      },
-      properties: Properties (1,12) -> (1,21) {
-        openBrace: BraceOpenToken (1,12) -> (1,12),
-        properties: Array [
-          Property (1,14) -> (1,21) {
-            property: Identifier "color" (1,14) -> (1,19),
-          },
-        ],
-      },
-    },
-  ],
-}
-`;
+exports[`AlphaTexParserTest intermediate started meta property value 1`] = `Score (1,1) -> (1,21)`;
 
 exports[`AlphaTexParserTest intermediate started meta property value: lexer-diagnostics 1`] = `
 Array [
@@ -2036,13 +2055,13 @@ Array [
 exports[`AlphaTexParserTest intermediate started meta property value: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 205,
     "end": Object {
       "col": 21,
       "line": 1,
       "offset": 20,
     },
-    "message": "Unexpected end of file. Group not closed.",
+    "message": "Unexpected end of file.",
     "severity": 2,
     "start": Object {
       "col": 21,
@@ -2053,18 +2072,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started meta string 1`] = `
-Score (1,1) -> (1,11) {
-  metaData: Array [
-    MetaData (1,1) -> (1,11) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-    },
-  ],
-}
-`;
+exports[`AlphaTexParserTest intermediate started meta string 1`] = `Score (1,1) -> (1,11)`;
 
 exports[`AlphaTexParserTest intermediate started meta string: lexer-diagnostics 1`] = `
 Array [
@@ -2086,14 +2094,32 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started meta string: parser-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest intermediate started meta string: parser-diagnostics 1`] = `
+Array [
+  Object {
+    "code": 205,
+    "end": Object {
+      "col": 11,
+      "line": 1,
+      "offset": 10,
+    },
+    "message": "Unexpected end of file.",
+    "severity": 2,
+    "start": Object {
+      "col": 11,
+      "line": 1,
+      "offset": 10,
+    },
+  },
+]
+`;
 
 exports[`AlphaTexParserTest intermediate started meta: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest intermediate started meta: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 107,
+    "code": 206,
     "end": Object {
       "col": 4,
       "line": 1,
@@ -2134,7 +2160,7 @@ exports[`AlphaTexParserTest intermediate started note effect name: lexer-diagnos
 exports[`AlphaTexParserTest intermediate started note effect name: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 108,
+    "code": 207,
     "end": Object {
       "col": 26,
       "line": 1,
@@ -2167,29 +2193,6 @@ Score (1,1) -> (1,31) {
     },
   ],
   metaDataBarSeparator: DotToken (1,16) -> (1,16),
-  bars: Array [
-    Bar (1,18) -> (1,31) {
-      beats: Array [
-        Beat (1,18) -> (1,31) {
-          notes: NoteList (1,18) -> (1,31) {
-            notes: Array [
-              Note (1,18) -> (1,31) {
-                noteValue: Identifier "C4" (1,18) -> (1,20),
-                noteEffects: Properties (1,21) -> (1,31) {
-                  openBrace: BraceOpenToken (1,21) -> (1,21),
-                  properties: Array [
-                    Property (1,23) -> (1,31) {
-                      property: Identifier "slur" (1,23) -> (1,27),
-                    },
-                  ],
-                },
-              },
-            ],
-          },
-        },
-      ],
-    },
-  ],
 }
 `;
 
@@ -2216,13 +2219,13 @@ Array [
 exports[`AlphaTexParserTest intermediate started note effect value: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 205,
     "end": Object {
       "col": 31,
       "line": 1,
       "offset": 30,
     },
-    "message": "Unexpected end of file. Group not closed.",
+    "message": "Unexpected end of file.",
     "severity": 2,
     "start": Object {
       "col": 31,
@@ -2276,7 +2279,7 @@ exports[`AlphaTexParserTest intermediate started note effects: lexer-diagnostics
 exports[`AlphaTexParserTest intermediate started note effects: parser-diagnostics 1`] = `
 Array [
   Object {
-    "code": 7,
+    "code": 208,
     "end": Object {
       "col": 23,
       "line": 1,
@@ -2404,13 +2407,14 @@ Score (1,1) -> (1,30) {
       ],
       beats: Array [
         Beat (1,12) -> (1,22) {
-          notes: NoteList (1,12) -> (1,22) {
+          notes: NoteList (1,12) -> (1,21) {
             openParenthesis: ParenthesisOpenToken (1,12) -> (1,12),
             notes: Array [
               Note (1,13) -> (1,20) {
                 noteValue: StringLiteral "Value" (1,13) -> (1,19),
               },
             ],
+            closeParenthesis: ParenthesisCloseToken (1,20) -> (1,20),
           },
         },
         Beat (1,22) -> (1,25) {
@@ -4822,7 +4826,7 @@ Score (1,1) -> (1,14) {
                 noteEffects: Properties (1,4) -> (1,14) {
                   openBrace: BraceOpenToken (1,4) -> (1,4),
                   properties: Array [
-                    Property (1,6) -> (1,12) {
+                    Property (1,6) -> (1,13) {
                       property: Identifier "tu" (1,6) -> (1,8),
                       properties: ValueList (1,9) -> (1,12) {
                         values: Array [
@@ -5144,7 +5148,7 @@ Score (1,1) -> (1,59) {
           beatEffects: Properties (1,49) -> (1,59) {
             openBrace: BraceOpenToken (1,49) -> (1,49),
             properties: Array [
-              Property (1,51) -> (1,57) {
+              Property (1,51) -> (1,58) {
                 property: Identifier "tu" (1,51) -> (1,53),
                 properties: ValueList (1,54) -> (1,57) {
                   values: Array [
@@ -5257,7 +5261,7 @@ Score (1,1) -> (1,31) {
           beatEffects: Properties (1,21) -> (1,31) {
             openBrace: BraceOpenToken (1,21) -> (1,21),
             properties: Array [
-              Property (1,23) -> (1,29) {
+              Property (1,23) -> (1,30) {
                 property: Identifier "tu" (1,23) -> (1,25),
                 properties: ValueList (1,26) -> (1,29) {
                   values: Array [
@@ -5758,25 +5762,7 @@ exports[`AlphaTexParserTest valid-sync-points empty with bars empty at end: pars
 
 exports[`AlphaTexParserTest valid-sync-points empty with bars: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest valid-sync-points empty with bars: parser-diagnostics 1`] = `
-Array [
-  Object {
-    "code": 102,
-    "end": Object {
-      "col": 12,
-      "line": 1,
-      "offset": 11,
-    },
-    "message": "Missing duration value after '.'",
-    "severity": 2,
-    "start": Object {
-      "col": 12,
-      "line": 1,
-      "offset": 11,
-    },
-  },
-]
-`;
+exports[`AlphaTexParserTest valid-sync-points empty with bars: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-sync-points empty: lexer-diagnostics 1`] = `Array []`;
 

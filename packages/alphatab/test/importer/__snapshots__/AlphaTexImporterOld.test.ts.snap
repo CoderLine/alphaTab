@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
-exports[`AlphaTexImporterTest barlines 1`] = `
+exports[`AlphaTexImporterOldTest barlines 1`] = `
 Map {
   "__kind" => "Score",
   "masterbars" => Array [
@@ -141,7 +141,7 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest sync 1`] = `
+exports[`AlphaTexImporterOldTest sync 1`] = `
 Map {
   "__kind" => "Score",
   "masterbars" => Array [
@@ -268,7 +268,7 @@ Map {
 }
 `;
 
-exports[`AlphaTexImporterTest sync-expect-dot 1`] = `
+exports[`AlphaTexImporterOldTest sync-expect-dot 1`] = `
 Map {
   "__kind" => "Score",
   "artist" => "J.S. Bach (1685-1750)",

@@ -1,8 +1,7 @@
-import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
-import { AlphaTexImporterOld } from '@src/importer/AlphaTexImporterOld';
-import type { Score } from '@src/model/Score';
-import { Settings } from '@src/Settings';
+import { ScoreLoader } from '@src/importer/ScoreLoader';
 import { Logger } from '@src/Logger';
+import { MidiPlaybackController } from '@src/midi/MidiPlaybackController';
+import type { Score } from '@src/model/Score';
 import { GpImporterTestHelper } from '@test/importer/GpImporterTestHelper';
 import { assert, expect } from 'chai';
 
@@ -46,9 +45,7 @@ describe('MidiPlaybackControllerTest', () => {
     }
 
     function testAlphaTexRepeat(tex: string, expectedBars: number[], maxBars: number): void {
-        const importer: AlphaTexImporterOld = new AlphaTexImporterOld();
-        importer.initFromString(tex, new Settings());
-        const score: Score = importer.readScore();
+        const score: Score = ScoreLoader.loadAlphaTex(tex);
         testRepeat(score, expectedBars, maxBars);
     }
 
