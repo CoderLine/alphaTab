@@ -3624,7 +3624,7 @@ export class AlphaTexImporter extends ScoreImporter {
         tempoAutomation.isLinear = false;
         tempoAutomation.type = AutomationType.Tempo;
 
-        if (this.sy === AlphaTexSymbols.LBrace && withPosition) {
+        if (this.sy === AlphaTexSymbols.LParensis && withPosition) {
             this.sy = this.newSy(true);
             if (this.sy !== AlphaTexSymbols.Number) {
                 this.error('tempo', AlphaTexSymbols.Number, true);
@@ -3644,8 +3644,13 @@ export class AlphaTexImporter extends ScoreImporter {
             tempoAutomation.ratioPosition = this.syData as number;
             this.sy = this.newSy();
 
-            if (this.sy !== AlphaTexSymbols.RBrace) {
-                this.error('tempo', AlphaTexSymbols.RBrace, true);
+            if (this.sy === AlphaTexSymbols.String && this.syData === 'hide') {
+                tempoAutomation.isVisible = false;
+                this.sy = this.newSy();
+            }
+
+            if (this.sy !== AlphaTexSymbols.RParensis) {
+                this.error('tempo', AlphaTexSymbols.RParensis, true);
             }
             this.sy = this.newSy();
         } else if (this.sy === AlphaTexSymbols.Number) {

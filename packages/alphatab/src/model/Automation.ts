@@ -108,11 +108,18 @@ export class Automation {
      */
     public text: string = '';
 
+    /**
+     * Whether this automation should be visible. (not all automation types are shown, 
+     * e.g. tempo changes shown in the score while volume changes are not).
+     */
+    public isVisible: boolean = true;
+
     public static buildTempoAutomation(
         isLinear: boolean,
         ratioPosition: number,
         value: number,
-        reference: number
+        reference: number,
+        isVisible: boolean = true
     ): Automation {
         if (reference < 1 || reference > 5) {
             reference = 2;
@@ -123,6 +130,7 @@ export class Automation {
         automation.isLinear = isLinear;
         automation.ratioPosition = ratioPosition;
         automation.value = value * references[reference];
+        automation.isVisible = isVisible;
         return automation;
     }
 

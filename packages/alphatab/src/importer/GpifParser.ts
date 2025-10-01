@@ -441,6 +441,7 @@ export class GpifParser {
         let reference: number = 0;
         let text: string | null = null;
         let syncPointValue: SyncPointData | undefined = undefined;
+        let isVisible = true;
 
         for (const c of node.childElements()) {
             switch (c.localName) {
@@ -495,6 +496,9 @@ export class GpifParser {
                 case 'Text':
                     text = c.innerText;
                     break;
+                case 'Visible':
+                    isVisible = c.innerText.toLowerCase() === 'true';
+                    break;
             }
         }
         if (!type) {
@@ -503,7 +507,9 @@ export class GpifParser {
         const newAutomations: Automation[] = [];
         switch (type) {
             case 'Tempo':
-                newAutomations.push(Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference));
+                newAutomations.push(
+                    Automation.buildTempoAutomation(isLinear, ratioPosition, numberValue, reference, isVisible)
+                );
                 break;
             case 'SyncPoint':
                 const syncPoint = new Automation();
@@ -511,6 +517,7 @@ export class GpifParser {
                 syncPoint.isLinear = isLinear;
                 syncPoint.ratioPosition = ratioPosition;
                 syncPoint.syncPointValue = syncPointValue;
+                syncPoint.isVisible = isVisible;
                 newAutomations.push(syncPoint);
                 break;
             case 'Sound':
@@ -519,6 +526,7 @@ export class GpifParser {
                     bankChange.type = AutomationType.Bank;
                     bankChange.ratioPosition = ratioPosition;
                     bankChange.value = sounds.get(textValue)!.bank;
+                    bankChange.isVisible = isVisible;
                     newAutomations.push(bankChange);
 
                     const programChange = Automation.buildInstrumentAutomation(

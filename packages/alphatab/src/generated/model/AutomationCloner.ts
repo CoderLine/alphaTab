@@ -14,6 +14,7 @@ export class AutomationCloner {
         clone.syncPointValue = original.syncPointValue ? SyncPointDataCloner.clone(original.syncPointValue) : undefined;
         clone.ratioPosition = original.ratioPosition;
         clone.text = original.text;
+        clone.isVisible = original.isVisible;
         return clone;
     }
 }
