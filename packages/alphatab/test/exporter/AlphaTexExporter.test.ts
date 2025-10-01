@@ -50,7 +50,9 @@ describe('AlphaTexExporterTest', () => {
                 }
             }
 
-            assert.fail(`<${fileName}>${unwrapped.toString()}\n${errorLines.join('\n')}${error.stack}\n Tex:\n${exported}`);
+            assert.fail(
+                `<${fileName}>${unwrapped.toString()}\n${errorLines.join('\n')}${error.stack}\n Tex:\n${exported}`
+            );
         }
     }
 

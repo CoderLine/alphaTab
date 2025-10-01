@@ -1098,8 +1098,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         // dy F, dy "F"
         ['dy', AlphaTex1LanguageHandler.textLikeValueListTypes],
 
-        // tempo 120
-        ['tempo', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
+        // tempo 120, tempo 120 "Label", tempo 120 "Label" hide
+        [
+            'tempo',
+            [
+                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required),
+                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional),
+                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional, [
+                    'hide'
+                ])
+            ]
+        ],
 
         // volume 10
         ['volume', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
@@ -1444,7 +1453,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * @private
      */
     private static readonly barMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
-        // tempo 120, tempo 120 "Moderate", tempo 120 "Moderate" 0.5
+        // tempo 120, tempo 120 "Moderate", tempo 120 "Moderate" 0.5, tempo 120 hide 0.5, tempo 120 hide
         [
             'tempo',
             [
@@ -1452,6 +1461,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     [AlphaTexNodeType.NumberLiteral],
                     ValueListParseTypesMode.RequiredAsFloat
                 ),
+                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional, [
+                    'hide'
+                ]),
                 AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional),
                 AlphaTex1LanguageHandler.valueType(
                     [AlphaTexNodeType.NumberLiteral],
@@ -2231,13 +2243,19 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 let ti = 0;
                 const tempo = (metaData.values!.values[ti++] as AlphaTexNumberLiteral).value;
                 let tempoLabel = '';
+                let isVisible = true;
                 let ratioPosition = 0;
 
                 while (ti < metaData.values!.values.length) {
                     switch (metaData.values!.values[ti].nodeType) {
                         case AlphaTexNodeType.Identifier:
                         case AlphaTexNodeType.StringLiteral:
-                            tempoLabel = (metaData.values!.values[ti] as AlphaTexTextNode).text;
+                            const txt = (metaData.values!.values[ti] as AlphaTexTextNode).text;
+                            if (txt === 'hide') {
+                                isVisible = false;
+                            } else {
+                                tempoLabel = txt;
+                            }
                             break;
                         case AlphaTexNodeType.NumberLiteral:
                             ratioPosition = (metaData.values!.values[ti] as AlphaTexNumberLiteral).value;
@@ -2256,6 +2274,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 tempoAutomation.value = tempo;
                 tempoAutomation.text = tempoLabel;
                 tempoAutomation.ratioPosition = ratioPosition;
+                tempoAutomation.isVisible = isVisible;
                 if (bar.index === 0 && ratioPosition === 0) {
                     bar.staff.track.score.tempo = tempo;
                     bar.staff.track.score.tempoLabel = tempoLabel;
@@ -3390,14 +3409,36 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 // NOTE: playbackRatio is calculated on score finish when playback positions are known
                 const tempo = (p.values!.values[0] as AlphaTexNumberLiteral).value;
                 let tempoLabel = '';
-                if (p.values!.values.length > 1) {
+                let isVisible = true;
+
+                if (p.values!.values.length > 2) {
                     tempoLabel = (p.values!.values[1] as AlphaTexTextNode).text;
+                    const hideText = (p.values!.values[2] as AlphaTexTextNode).text;
+                    if (hideText === 'hide') {
+                        isVisible = false;
+                    } else {
+                        importer.addSemanticDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT209,
+                            message: `Unexpected third tempo property value '${hideText}', expected: 'hide'`,
+                            severity: AlphaTexDiagnosticsSeverity.Error,
+                            start: p.values!.values[2].start,
+                            end: p.values!.values[2].end
+                        });
+                        return ApplyNodeResult.NotAppliedSemanticError;
+                    }
+                } else if (p.values!.values.length > 1) {
+                    tempoLabel = (p.values!.values[1] as AlphaTexTextNode).text;
+                    if (tempoLabel === 'hide') {
+                        isVisible = false;
+                        tempoLabel = '';
+                    }
                 }
                 const tempoAutomation = new Automation();
                 tempoAutomation.isLinear = false;
                 tempoAutomation.type = AutomationType.Tempo;
                 tempoAutomation.value = tempo;
                 tempoAutomation.text = tempoLabel;
+                tempoAutomation.isVisible = isVisible;
                 beat.automations.push(tempoAutomation);
                 beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
                 return ApplyNodeResult.Applied;
@@ -4576,6 +4617,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                         nodeType: AlphaTexNodeType.NumberLiteral,
                         value: a.value
                     },
+                    !a.isVisible
+                        ? {
+                              nodeType: AlphaTexNodeType.Identifier,
+                              text: 'hide'
+                          }
+                        : undefined,
                     a.text
                         ? {
                               nodeType: AlphaTexNodeType.StringLiteral,
