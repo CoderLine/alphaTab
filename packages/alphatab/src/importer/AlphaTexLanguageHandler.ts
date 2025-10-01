@@ -11,6 +11,7 @@ import {
     type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
+    type AlphaTexPropertiesNode,
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
@@ -51,21 +52,29 @@ import { HarmonicType } from '@src/model/HarmonicType';
 import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
+import type { MasterBar } from '@src/model/MasterBar';
 import { ModelUtils } from '@src/model/ModelUtils';
 import type { Note } from '@src/model/Note';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
 import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
 import { Rasgueado } from '@src/model/Rasgueado';
-import { BracketExtendMode, TrackNameMode, TrackNameOrientation, TrackNamePolicy } from '@src/model/RenderStylesheet';
-import { type Score, ScoreSubElement } from '@src/model/Score';
+import {
+    BracketExtendMode,
+    type RenderStylesheet,
+    TrackNameMode,
+    TrackNameOrientation,
+    TrackNamePolicy
+} from '@src/model/RenderStylesheet';
+import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { SimileMark } from '@src/model/SimileMark';
 import { SlideInType } from '@src/model/SlideInType';
 import { SlideOutType } from '@src/model/SlideOutType';
-import type { Staff } from '@src/model/Staff';
-import type { Track } from '@src/model/Track';
+import { Staff } from '@src/model/Staff';
+import { Track } from '@src/model/Track';
 import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
@@ -117,6 +126,17 @@ export interface IAlphaTexLanguageHandler {
     readonly knownNoteProperties: Set<string>;
 
     buildSyncPoint(importer: IAlphaTexImporter, metaDataNode: AlphaTexMetaDataNode): FlatSyncPoint | undefined;
+
+    buildScoreMetaDataNodes(score: Score): AlphaTexMetaDataNode[];
+    buildBarMetaDataNodes(
+        staff: Staff,
+        bar: Bar | undefined,
+        voice: number,
+        isMultiVoice: boolean
+    ): AlphaTexMetaDataNode[];
+    buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[];
+    buildBeatEffects(beat: Beat): AlphaTexPropertyNode[];
+    buildNoteEffects(data: Note): AlphaTexPropertyNode[];
 }
 
 export interface IAlphaTexImporterState {
@@ -217,7 +237,144 @@ type ValueListParseTypesExtended = {
 };
 type ValueListParseTypes = ValueListParseTypesExtended[];
 
+/**
+ * AlphaTexNodeFactory (short name for less code)
+ */
+class ATNF {
+    public static metaData(
+        tag: string,
+        values?: AlphaTexValueList,
+        properties?: AlphaTexPropertiesNode
+    ): AlphaTexMetaDataNode {
+        return {
+            nodeType: AlphaTexNodeType.MetaData,
+            tag: {
+                nodeType: AlphaTexNodeType.MetaDataTag,
+                prefix: {
+                    nodeType: AlphaTexNodeType.BackSlashToken
+                },
+                tag: {
+                    nodeType: AlphaTexNodeType.Identifier,
+                    text: tag
+                }
+            },
+            values,
+            properties,
+            propertiesBeforeValues: false
+        };
+    }
+
+    public static identifierMetaData(tag: string, value: string): AlphaTexMetaDataNode {
+        return ATNF.metaData(tag, ATNF.identifierValueList(value));
+    }
+
+    public static numberMetaData(tag: string, value: number): AlphaTexMetaDataNode {
+        return ATNF.metaData(tag, ATNF.numberValueList(value));
+    }
+
+    public static valueList(parenthesis: boolean, values: (AlphaTexValueListItem | undefined)[]): AlphaTexValueList {
+        const valueList: AlphaTexValueList = {
+            nodeType: AlphaTexNodeType.ValueList,
+            values: values.filter(v => v !== undefined)
+        };
+
+        if (parenthesis) {
+            valueList.openParenthesis = {
+                nodeType: AlphaTexNodeType.ParenthesisOpenToken
+            };
+            valueList.closeParenthesis = {
+                nodeType: AlphaTexNodeType.ParenthesisCloseToken
+            };
+        }
+
+        return valueList;
+    }
+
+    public static stringValueList(text: string): AlphaTexValueList | undefined {
+        return {
+            nodeType: AlphaTexNodeType.ValueList,
+            values: [
+                {
+                    nodeType: AlphaTexNodeType.StringLiteral,
+                    text
+                }
+            ]
+        };
+    }
+
+    public static identifierValueList(text: string): AlphaTexValueList | undefined {
+        return {
+            nodeType: AlphaTexNodeType.ValueList,
+            values: [
+                {
+                    nodeType: AlphaTexNodeType.Identifier,
+                    text
+                }
+            ]
+        };
+    }
+
+    public static numberValueList(value: number): AlphaTexValueList | undefined {
+        return {
+            nodeType: AlphaTexNodeType.ValueList,
+            values: [
+                {
+                    nodeType: AlphaTexNodeType.NumberLiteral,
+                    value
+                }
+            ]
+        };
+    }
+
+    public static properties(
+        properties: ([string, AlphaTexValueList | undefined] | undefined)[]
+    ): AlphaTexPropertiesNode {
+        const node: AlphaTexPropertiesNode = {
+            nodeType: AlphaTexNodeType.Properties,
+            properties: properties
+                .filter(p => p !== undefined)
+                .map(p => ({
+                    nodeType: AlphaTexNodeType.Property,
+                    property: {
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: p[0]
+                    },
+                    values: p[1]
+                })),
+            openBrace: {
+                nodeType: AlphaTexNodeType.BraceOpenToken
+            },
+            closeBrace: {
+                nodeType: AlphaTexNodeType.BraceCloseToken
+            }
+        };
+
+        return node;
+    }
+
+    public static property(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexValueList) {
+        properties.push({
+            nodeType: AlphaTexNodeType.Property,
+            property: {
+                nodeType: AlphaTexNodeType.Identifier,
+                text: identifier
+            },
+            values
+        });
+    }
+}
+
 class AlphaTex1EnumMappings {
+    private static reverse<TKey, TValue>(map: Map<TKey, TValue>): Map<TValue, TKey> {
+        const reversed = new Map<TValue, TKey>();
+        for (const [k, v] of map) {
+            if (!reversed.has(v)) {
+                reversed.set(v, k);
+            }
+        }
+        return reversed;
+    }
+
     public static readonly whammyTypes = new Map<string, WhammyType>([
         ['none', WhammyType.None],
         ['custom', WhammyType.Custom],
@@ -228,11 +385,15 @@ class AlphaTex1EnumMappings {
         ['predivedive', WhammyType.PrediveDive]
     ]);
 
+    public static readonly whammyTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.whammyTypes);
+
     public static readonly bendStyles = new Map<string, BendStyle>([
         ['gradual', BendStyle.Gradual],
         ['fast', BendStyle.Fast],
         ['default', BendStyle.Default]
     ]);
+
+    public static readonly bendStylesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.bendStyles);
 
     public static readonly graceTypes = new Map<string, GraceType>([
         ['ob', GraceType.OnBeat],
@@ -240,21 +401,30 @@ class AlphaTex1EnumMappings {
         ['bb', GraceType.BeforeBeat]
     ]);
 
+    public static readonly graceTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.graceTypes);
+
     public static readonly fermataTypes = new Map<string, FermataType>([
         ['short', FermataType.Short],
         ['medium', FermataType.Medium],
         ['long', FermataType.Long]
     ]);
 
+    public static readonly fermataTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.fermataTypes);
+
     public static readonly accidentalModes = new Map<string, AlphaTexAccidentalMode>([
         ['auto', AlphaTexAccidentalMode.Auto],
         ['explicit', AlphaTexAccidentalMode.Explicit]
     ]);
 
+    public static readonly accidentalModesReversed = AlphaTex1EnumMappings.reverse(
+        AlphaTex1EnumMappings.accidentalModes
+    );
+
     public static readonly barreShapes = new Map<string, BarreShape>([
         ['full', BarreShape.Full],
         ['half', BarreShape.Half]
     ]);
+    public static readonly barreShapesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.barreShapes);
 
     public static readonly ottava = new Map<string, Ottavia>([
         ['15ma', Ottavia._15ma],
@@ -263,6 +433,7 @@ class AlphaTex1EnumMappings {
         ['8vb', Ottavia._8vb],
         ['15mb', Ottavia._15mb]
     ]);
+    public static readonly ottavaReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.ottava);
 
     public static readonly rasgueadoPatterns = new Map<string, Rasgueado>([
         ['ii', Rasgueado.Ii],
@@ -284,6 +455,9 @@ class AlphaTex1EnumMappings {
         ['eamii', Rasgueado.Eamii],
         ['peami', Rasgueado.Peami]
     ]);
+    public static readonly rasgueadoPatternsReversed = AlphaTex1EnumMappings.reverse(
+        AlphaTex1EnumMappings.rasgueadoPatterns
+    );
 
     public static dynamics = new Map<string, DynamicValue>([
         ['ppp', DynamicValue.PPP],
@@ -313,34 +487,46 @@ class AlphaTex1EnumMappings {
         ['pf', DynamicValue.PF],
         ['sfzp', DynamicValue.SFZP]
     ]);
+    public static readonly dynamicsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.dynamics);
 
     public static readonly bracketExtendModes = new Map<string, BracketExtendMode>([
         ['nobrackets', BracketExtendMode.NoBrackets],
         ['groupstaves', BracketExtendMode.GroupStaves],
         ['groupsimilarinstruments', BracketExtendMode.GroupSimilarInstruments]
     ]);
+    public static readonly bracketExtendModesReversed = AlphaTex1EnumMappings.reverse(
+        AlphaTex1EnumMappings.bracketExtendModes
+    );
 
     public static readonly trackNamePolicies = new Map<string, TrackNamePolicy>([
         ['hidden', TrackNamePolicy.Hidden],
         ['firstsystem', TrackNamePolicy.FirstSystem],
         ['allsystems', TrackNamePolicy.AllSystems]
     ]);
+    public static readonly trackNamePoliciesReversed = AlphaTex1EnumMappings.reverse(
+        AlphaTex1EnumMappings.trackNamePolicies
+    );
 
     public static readonly trackNameOrientations = new Map<string, TrackNameOrientation>([
         ['horizontal', TrackNameOrientation.Horizontal],
         ['vertical', TrackNameOrientation.Vertical]
     ]);
+    public static readonly trackNameOrientationsReversed = AlphaTex1EnumMappings.reverse(
+        AlphaTex1EnumMappings.trackNameOrientations
+    );
 
     public static readonly trackNameMode = new Map<string, TrackNameMode>([
         ['fullname', TrackNameMode.FullName],
         ['shortname', TrackNameMode.ShortName]
     ]);
+    public static readonly trackNameModeReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.trackNameMode);
 
     public static readonly textAligns = new Map<string, TextAlign>([
         ['left', TextAlign.Left],
         ['center', TextAlign.Center],
         ['right', TextAlign.Right]
     ]);
+    public static readonly textAlignsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.textAligns);
 
     public static readonly bendTypes = new Map<string, BendType>([
         ['none', BendType.None],
@@ -353,6 +539,7 @@ class AlphaTex1EnumMappings {
         ['prebendbend', BendType.PrebendBend],
         ['prebendrelease', BendType.PrebendRelease]
     ]);
+    public static readonly bendTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.bendTypes);
 
     public static readonly keySignatures = new Map<string, KeySignature>([
         ['cb', KeySignature.Cb],
@@ -414,6 +601,42 @@ class AlphaTex1EnumMappings {
         ['c#', KeySignature.CSharp],
         ['c#major', KeySignature.CSharp],
         ['a#minor', KeySignature.CSharp]
+    ]);
+
+    public static readonly keySignaturesMajorReversed = new Map<KeySignature, string>([
+        [KeySignature.Cb, 'cb'],
+        [KeySignature.Gb, 'gb'],
+        [KeySignature.Db, 'db'],
+        [KeySignature.Ab, 'ab'],
+        [KeySignature.Eb, 'eb'],
+        [KeySignature.Bb, 'bb'],
+        [KeySignature.F, 'f'],
+        [KeySignature.C, 'c'],
+        [KeySignature.G, 'g'],
+        [KeySignature.D, 'd'],
+        [KeySignature.A, 'a'],
+        [KeySignature.E, 'e'],
+        [KeySignature.B, 'b'],
+        [KeySignature.FSharp, 'f#'],
+        [KeySignature.CSharp, 'c#']
+    ]);
+
+    public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
+        [KeySignature.Cb, 'abminor'],
+        [KeySignature.Gb, 'ebminor'],
+        [KeySignature.Db, 'bbminor'],
+        [KeySignature.Ab, 'fminor'],
+        [KeySignature.Eb, 'cminor'],
+        [KeySignature.Bb, 'gminor'],
+        [KeySignature.F, 'dminor'],
+        [KeySignature.C, 'aminor'],
+        [KeySignature.G, 'eminor'],
+        [KeySignature.D, 'bminor'],
+        [KeySignature.A, 'f#minor'],
+        [KeySignature.E, 'c#minor'],
+        [KeySignature.B, 'g#minor'],
+        [KeySignature.FSharp, 'd#minor'],
+        [KeySignature.CSharp, 'a#minor']
     ]);
 
     public static readonly keySignatureTypes = new Map<string, KeySignatureType>([
@@ -494,36 +717,38 @@ class AlphaTex1EnumMappings {
         ['n', Clef.Neutral],
         ['neutral', Clef.Neutral]
     ]);
+    public static readonly clefsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.clefs);
 
     public static readonly tripletFeels = new Map<string, TripletFeel>([
+        ['notripletfeel', TripletFeel.NoTripletFeel],
         ['no', TripletFeel.NoTripletFeel],
         ['none', TripletFeel.NoTripletFeel],
-        ['notripletfeel', TripletFeel.NoTripletFeel],
 
+        ['triplet16th', TripletFeel.Triplet16th],
         ['t16', TripletFeel.Triplet16th],
         ['triplet-16th', TripletFeel.Triplet16th],
-        ['triplet16th', TripletFeel.Triplet16th],
 
+        ['triplet8th', TripletFeel.Triplet8th],
         ['t8', TripletFeel.Triplet8th],
         ['triplet-8th', TripletFeel.Triplet8th],
-        ['triplet8th', TripletFeel.Triplet8th],
 
+        ['dotted16th', TripletFeel.Dotted16th],
         ['d16', TripletFeel.Dotted16th],
         ['dotted-16th', TripletFeel.Dotted16th],
-        ['dotted16th', TripletFeel.Dotted16th],
 
+        ['dotted8th', TripletFeel.Dotted8th],
         ['d8', TripletFeel.Dotted8th],
         ['dotted-8th', TripletFeel.Dotted8th],
-        ['dotted8th', TripletFeel.Dotted8th],
 
+        ['scottish16th', TripletFeel.Scottish16th],
         ['s16', TripletFeel.Scottish16th],
         ['scottish-16th', TripletFeel.Scottish16th],
-        ['scottish16th', TripletFeel.Scottish16th],
 
+        ['scottish8th', TripletFeel.Scottish8th],
         ['s8', TripletFeel.Scottish8th],
-        ['scottish-8th', TripletFeel.Scottish8th],
-        ['scottish8th', TripletFeel.Scottish8th]
+        ['scottish-8th', TripletFeel.Scottish8th]
     ]);
+    public static readonly tripletFeelsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.tripletFeels);
 
     public static readonly barLines = new Map<string, BarLineStyle>([
         ['automatic', BarLineStyle.Automatic],
@@ -539,14 +764,16 @@ class AlphaTex1EnumMappings {
         ['short', BarLineStyle.Short],
         ['tick', BarLineStyle.Tick]
     ]);
+    public static readonly barLinesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.barLines);
 
     public static readonly ottavia = new Map<string, Ottavia>([
         ['15ma', Ottavia._15ma],
         ['8va', Ottavia._8va],
         ['regular', Ottavia.Regular],
         ['8vb', Ottavia._8vb],
-        ['15mbs', Ottavia._15mb]
+        ['15mb', Ottavia._15mb]
     ]);
+    public static readonly ottaviaReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.ottavia);
 
     public static readonly simileMarks = new Map<string, SimileMark>([
         ['none', SimileMark.None],
@@ -554,6 +781,7 @@ class AlphaTex1EnumMappings {
         ['firstofdouble', SimileMark.FirstOfDouble],
         ['secondofdouble', SimileMark.SecondOfDouble]
     ]);
+    public static readonly simileMarksReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.simileMarks);
 
     public static readonly directions = new Map<string, Direction>([
         ['fine', Direction.TargetFine],
@@ -580,6 +808,7 @@ class AlphaTex1EnumMappings {
         ['dacoda', Direction.JumpDaCoda],
         ['dadoublecoda', Direction.JumpDaDoubleCoda]
     ]);
+    public static readonly directionsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.directions);
 }
 
 export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlphaTexLanguageHandler {
@@ -605,6 +834,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     private static readonly scoreInfoValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional],
+        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
+    ]);
+    private static readonly scoreInfoTemplateValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
+        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
     ]);
     private static readonly numberOnlyValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
@@ -1170,9 +1403,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         ['album', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['words', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['music', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['wordsandmusic', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
+        ['wordsandmusic', AlphaTex1LanguageHandler.scoreInfoTemplateValueListTypes],
         ['copyright', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['copyright2', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
+        ['copyright2', AlphaTex1LanguageHandler.scoreInfoTemplateValueListTypes],
         ['instructions', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['notices', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['tab', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
@@ -1647,31 +1880,31 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         switch (metaData.tag.tag.text.toLowerCase()) {
             case 'title':
                 score.title = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Title, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Title, metaData);
                 return ApplyNodeResult.Applied;
             case 'subtitle':
                 score.subTitle = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.SubTitle, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.SubTitle, metaData);
                 return ApplyNodeResult.Applied;
             case 'artist':
                 score.artist = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Artist, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Artist, metaData);
                 return ApplyNodeResult.Applied;
             case 'album':
                 score.album = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Album, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Album, metaData);
                 return ApplyNodeResult.Applied;
             case 'words':
                 score.words = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Words, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Words, metaData);
                 return ApplyNodeResult.Applied;
             case 'music':
                 score.music = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Music, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Music, metaData);
                 return ApplyNodeResult.Applied;
             case 'copyright':
                 score.copyright = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Copyright, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Copyright, metaData);
                 return ApplyNodeResult.Applied;
             case 'instructions':
                 score.instructions = (metaData.values!.values[0] as AlphaTexTextNode).text;
@@ -1681,7 +1914,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 return ApplyNodeResult.Applied;
             case 'tab':
                 score.tab = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Transcriber, metaData, 1);
+                this.headerFooterStyle(importer, score, ScoreSubElement.Transcriber, metaData);
                 return ApplyNodeResult.Applied;
             case 'copyright2':
                 this.headerFooterStyle(importer, score, ScoreSubElement.CopyrightSecondLine, metaData, 0);
@@ -2013,13 +2246,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     ti++;
                 }
 
-                const tempoAutomation = new Automation();
+                let tempoAutomation = bar.masterBar.tempoAutomations.find(a => a.ratioPosition === ratioPosition);
+                if (!tempoAutomation) {
+                    tempoAutomation = new Automation();
+                    bar.masterBar.tempoAutomations.push(tempoAutomation);
+                }
                 tempoAutomation.isLinear = false;
                 tempoAutomation.type = AutomationType.Tempo;
                 tempoAutomation.value = tempo;
                 tempoAutomation.text = tempoLabel;
                 tempoAutomation.ratioPosition = ratioPosition;
-                bar.masterBar.tempoAutomations.push(tempoAutomation);
                 if (bar.index === 0 && ratioPosition === 0) {
                     bar.staff.track.score.tempo = tempo;
                     bar.staff.track.score.tempoLabel = tempoLabel;
@@ -2544,7 +2780,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         score: Score,
         element: ScoreSubElement,
         metaData: AlphaTexMetaDataNode,
-        startIndex: number
+        startIndex: number = 1
     ) {
         const remaining = metaData.values!.values.length - startIndex;
         if (remaining < 1) {
@@ -3773,5 +4009,1221 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             });
             return undefined;
         }
+    }
+
+    // used to lookup some default values.
+    private static readonly defaultScore = new Score();
+    private static readonly defaultTrack = new Track();
+
+    public buildScoreMetaDataNodes(score: Score): AlphaTexMetaDataNode[] {
+        const nodes: AlphaTexMetaDataNode[] = [];
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'album', score, score.album, ScoreSubElement.Album);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'artist', score, score.artist, ScoreSubElement.Artist);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(
+            nodes,
+            'copyright',
+            score,
+            score.copyright,
+            ScoreSubElement.Copyright
+        );
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(
+            nodes,
+            'copyright2',
+            score,
+            undefined,
+            ScoreSubElement.CopyrightSecondLine
+        );
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(
+            nodes,
+            'wordsandmusic',
+            score,
+            undefined,
+            ScoreSubElement.WordsAndMusic,
+            true
+        );
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'instructions', score, score.instructions, undefined);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'music', score, score.music, ScoreSubElement.Music);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'notices', score, score.notices, undefined);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'subtitle', score, score.subTitle, ScoreSubElement.SubTitle);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'title', score, score.title, ScoreSubElement.Title);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'words', score, score.words, ScoreSubElement.Words);
+        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'tab', score, score.tab, ScoreSubElement.Transcriber);
+
+        nodes.push(
+            ATNF.metaData(
+                'tempo',
+                ATNF.valueList(false, [
+                    { nodeType: AlphaTexNodeType.NumberLiteral, value: score.tempo },
+                    score.tempoLabel ? { nodeType: AlphaTexNodeType.StringLiteral, text: score.tempoLabel } : undefined
+                ])
+            )
+        );
+
+        if (score.defaultSystemsLayout !== AlphaTex1LanguageHandler.defaultScore.defaultSystemsLayout) {
+            nodes.push(ATNF.numberMetaData('defaultSystemsLayout', score.defaultSystemsLayout));
+        }
+        if (score.systemsLayout.length > 0) {
+            nodes.push(
+                ATNF.metaData(
+                    'systemsLayout',
+                    ATNF.valueList(
+                        false,
+                        score.systemsLayout.map(l => ({ nodeType: AlphaTexNodeType.NumberLiteral, value: l }))
+                    )
+                )
+            );
+        }
+
+        AlphaTex1LanguageHandler.buildStyleSheetMetaData(nodes, score.stylesheet);
+
+        if (nodes.length > 0) {
+            nodes[0].leadingComments = [
+                {
+                    text: 'Score Metadata',
+                    multiLine: false
+                }
+            ];
+        }
+
+        return nodes;
+    }
+
+    private static buildStyleSheetMetaData(nodes: AlphaTexMetaDataNode[], stylesheet: RenderStylesheet) {
+        const firstStyleSheet = nodes.length;
+
+        if (stylesheet.hideDynamics) {
+            nodes.push(ATNF.metaData('hideDynamics'));
+        }
+        if (stylesheet.bracketExtendMode !== AlphaTex1LanguageHandler.defaultScore.stylesheet.bracketExtendMode) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'bracketExtendMode',
+                    AlphaTex1EnumMappings.bracketExtendModesReversed.get(stylesheet.bracketExtendMode)!
+                )
+            );
+        }
+        if (stylesheet.useSystemSignSeparator) {
+            nodes.push(ATNF.metaData('useSystemSignSeparator'));
+        }
+        if (stylesheet.multiTrackMultiBarRest) {
+            nodes.push(ATNF.metaData('multiBarRest'));
+        }
+        if (
+            stylesheet.singleTrackTrackNamePolicy !==
+            AlphaTex1LanguageHandler.defaultScore.stylesheet.singleTrackTrackNamePolicy
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'singleTrackTrackNamePolicy',
+                    AlphaTex1EnumMappings.trackNamePoliciesReversed.get(stylesheet.singleTrackTrackNamePolicy)!
+                )
+            );
+        }
+        if (
+            stylesheet.multiTrackTrackNamePolicy !==
+            AlphaTex1LanguageHandler.defaultScore.stylesheet.multiTrackTrackNamePolicy
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'multiTrackTrackNamePolicy',
+                    AlphaTex1EnumMappings.trackNamePoliciesReversed.get(stylesheet.multiTrackTrackNamePolicy)!
+                )
+            );
+        }
+        if (
+            stylesheet.firstSystemTrackNameMode !==
+            AlphaTex1LanguageHandler.defaultScore.stylesheet.firstSystemTrackNameMode
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'firstSystemTrackNameMode',
+                    AlphaTex1EnumMappings.trackNameModeReversed.get(stylesheet.firstSystemTrackNameMode)!
+                )
+            );
+        }
+        if (
+            stylesheet.otherSystemsTrackNameMode !==
+            AlphaTex1LanguageHandler.defaultScore.stylesheet.otherSystemsTrackNameMode
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'otherSystemsTrackNameMode',
+                    AlphaTex1EnumMappings.trackNameModeReversed.get(stylesheet.otherSystemsTrackNameMode)!
+                )
+            );
+        }
+        if (
+            stylesheet.firstSystemTrackNameOrientation !==
+            AlphaTex1LanguageHandler.defaultScore.stylesheet.firstSystemTrackNameOrientation
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'firstSystemTrackNameOrientation',
+                    AlphaTex1EnumMappings.trackNameOrientationsReversed.get(stylesheet.firstSystemTrackNameOrientation)!
+                )
+            );
+        }
+        if (
+            stylesheet.otherSystemsTrackNameOrientation !==
+            AlphaTex1LanguageHandler.defaultScore.stylesheet.otherSystemsTrackNameOrientation
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData(
+                    'otherSystemsTrackNameOrientation',
+                    AlphaTex1EnumMappings.trackNameOrientationsReversed.get(
+                        stylesheet.otherSystemsTrackNameOrientation
+                    )!
+                )
+            );
+        }
+
+        // Unsupported:
+        // 'globaldisplaychorddiagramsontop',
+        // 'pertrackchorddiagramsontop',
+        // 'globaldisplaytuning',
+        // 'pertrackdisplaytuning',
+        // 'pertrackchorddiagramsontop',
+        // 'pertrackmultibarrest',
+
+        if (firstStyleSheet < nodes.length) {
+            nodes[firstStyleSheet].leadingComments = [
+                {
+                    multiLine: false,
+                    text: 'Score Stylesheet'
+                }
+            ];
+        }
+    }
+
+    private static buildScoreInfoMeta(
+        nodes: AlphaTexMetaDataNode[],
+        tag: string,
+        score: Score,
+        value: string | undefined,
+        element: ScoreSubElement | undefined,
+        writeIfEmpty: boolean = false
+    ) {
+        if (value !== undefined && value.length === 0 && !writeIfEmpty) {
+            return;
+        }
+
+        const valueList: AlphaTexValueList = {
+            nodeType: AlphaTexNodeType.ValueList,
+            values: []
+        };
+
+        if (value !== undefined) {
+            valueList.values.push({ nodeType: AlphaTexNodeType.StringLiteral, text: value });
+        }
+
+        if (element !== undefined) {
+            const style =
+                score.style && score.style.headerAndFooter.has(element)
+                    ? score.style.headerAndFooter.get(element)
+                    : undefined;
+            const defaultStyle = ScoreStyle.defaultHeaderAndFooter.has(element)
+                ? ScoreStyle.defaultHeaderAndFooter.get(element)
+                : undefined;
+            if (style && (!defaultStyle || !HeaderFooterStyle.equals(defaultStyle, style))) {
+                valueList.values.push({
+                    nodeType: AlphaTexNodeType.StringLiteral,
+                    text: style.isVisible === false ? '' : style.template
+                });
+                valueList.values.push({
+                    nodeType: AlphaTexNodeType.Identifier,
+                    text: AlphaTex1EnumMappings.textAlignsReversed.get(style.textAlign)!
+                });
+            }
+        }
+
+        // do not write with all defaults
+        if (value === undefined && valueList.values.length === 0) {
+            return undefined;
+        } else if (value !== undefined && value.length === 0 && valueList.values.length === 1) {
+            return undefined;
+        }
+
+        nodes.push(ATNF.metaData(tag, valueList));
+    }
+
+    public buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[] {
+        const nodes: AlphaTexMetaDataNode[] = [];
+
+        const flatSyncPoints = score.exportFlatSyncPoints();
+        for (const p of flatSyncPoints) {
+            nodes.push(
+                ATNF.metaData(
+                    'sync',
+                    ATNF.valueList(false, [
+                        { nodeType: AlphaTexNodeType.NumberLiteral, value: p.barIndex },
+                        { nodeType: AlphaTexNodeType.NumberLiteral, value: p.barOccurence },
+                        { nodeType: AlphaTexNodeType.NumberLiteral, value: p.millisecondOffset },
+                        p.barPosition > 0
+                            ? { nodeType: AlphaTexNodeType.NumberLiteral, value: p.barPosition }
+                            : undefined
+                    ])
+                )
+            );
+        }
+
+        return nodes;
+    }
+
+    public buildBarMetaDataNodes(
+        staff: Staff,
+        bar: Bar | undefined,
+        voice: number,
+        isMultiVoice: boolean
+    ): AlphaTexMetaDataNode[] {
+        const nodes: AlphaTexMetaDataNode[] = [];
+
+        AlphaTex1LanguageHandler.buildStructuralMetaDataNodes(bar, staff, nodes, isMultiVoice, voice);
+        if (!bar) {
+            return nodes;
+        }
+
+        if (voice === 0) {
+            // Master Bar meta on first track
+            if (staff.index === 0 && staff.track.index === 0) {
+                AlphaTex1LanguageHandler.buildMasterBarMetaDataNodes(nodes, bar.masterBar);
+            }
+        }
+
+        const firstBarMetaIndex = nodes.length;
+
+        if (voice === 0 && bar.index === 0 && staff.index === 0 && staff.track.index === 0) {
+            nodes.push(ATNF.identifierMetaData('accidentals', 'auto'));
+        }
+
+        if (bar.index === 0 || bar.clef !== bar.previousBar?.clef) {
+            nodes.push(ATNF.identifierMetaData('clef', AlphaTex1EnumMappings.clefsReversed.get(bar.clef)!));
+        }
+
+        if ((bar.index === 0 && bar.clefOttava !== Ottavia.Regular) || bar.clefOttava !== bar.previousBar?.clefOttava) {
+            nodes.push(ATNF.identifierMetaData('ottava', AlphaTex1EnumMappings.ottavaReversed.get(bar.clefOttava)!));
+        }
+
+        if ((bar.index === 0 && bar.simileMark !== SimileMark.None) || bar.simileMark !== bar.previousBar?.simileMark) {
+            nodes.push(
+                ATNF.identifierMetaData('simile', AlphaTex1EnumMappings.simileMarksReversed.get(bar.simileMark)!)
+            );
+        }
+
+        if (bar.displayScale !== 1) {
+            nodes.push(ATNF.numberMetaData('scale', bar.displayScale));
+        }
+
+        if (bar.displayWidth > 0) {
+            nodes.push(ATNF.numberMetaData('width', bar.displayWidth));
+        }
+
+        // sustainPedals are on beat level
+        for (const sp of bar.sustainPedals) {
+            let pedalType = '';
+            switch (sp.pedalType) {
+                case SustainPedalMarkerType.Down:
+                    pedalType = 'spd';
+                    break;
+                case SustainPedalMarkerType.Hold:
+                    pedalType = 'sph';
+                    break;
+                case SustainPedalMarkerType.Up:
+                    pedalType = 'spu';
+                    break;
+            }
+            if (pedalType) {
+                nodes.push(ATNF.numberMetaData(pedalType, sp.ratioPosition));
+            }
+        }
+
+        if (bar.barLineLeft !== BarLineStyle.Automatic) {
+            nodes.push(
+                ATNF.identifierMetaData('barLineLeft', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineLeft)!)
+            );
+        }
+
+        if (bar.barLineRight !== BarLineStyle.Automatic) {
+            nodes.push(
+                ATNF.identifierMetaData('barLineRight', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineRight)!)
+            );
+        }
+
+        if (
+            bar.index === 0 ||
+            bar.keySignature !== bar.previousBar!.keySignature ||
+            bar.keySignatureType !== bar.previousBar!.keySignatureType
+        ) {
+            let ks = '';
+            if (bar.keySignatureType === KeySignatureType.Minor) {
+                ks = AlphaTex1EnumMappings.keySignaturesMinorReversed.get(bar.keySignature)!;
+            } else {
+                ks = AlphaTex1EnumMappings.keySignaturesMajorReversed.get(bar.keySignature)!;
+            }
+            nodes.push(ATNF.identifierMetaData('ks', ks));
+        }
+
+        if (firstBarMetaIndex < nodes.length) {
+            nodes[firstBarMetaIndex].leadingComments = [
+                {
+                    multiLine: false,
+                    text: `Bar ${bar.index + 1} Metadata`
+                }
+            ];
+        }
+
+        return nodes;
+    }
+    private static buildStaffMetaDataNodes(nodes: AlphaTexMetaDataNode[], staff: Staff) {
+        const firstStaffMetaIndex = nodes.length;
+
+        if (staff.capo !== 0) {
+            nodes.push(ATNF.numberMetaData('capo', staff.capo));
+        }
+        if (staff.isPercussion) {
+            nodes.push(ATNF.identifierMetaData('articulation', 'defaults'));
+        } else if (staff.isStringed) {
+            const tuning = ATNF.metaData(
+                'tuning',
+                ATNF.valueList(
+                    false,
+                    staff.stringTuning.tunings.map(t => ({
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: Tuning.getTextForTuning(t, true)
+                    }))
+                )
+            );
+            nodes.push(tuning);
+
+            if (
+                staff.track.score.stylesheet.perTrackDisplayTuning &&
+                staff.track.score.stylesheet.perTrackDisplayTuning!.has(staff.track.index)
+            ) {
+                tuning.values!.values.push({ nodeType: AlphaTexNodeType.Identifier, text: 'hide' });
+            }
+
+            if (staff.stringTuning.name.length > 0) {
+                tuning.values!.values.push({ nodeType: AlphaTexNodeType.StringLiteral, text: staff.stringTuning.name });
+            }
+        }
+
+        if (staff.transpositionPitch !== 0) {
+            nodes.push(ATNF.numberMetaData('transpose', -staff.transpositionPitch));
+        }
+
+        const defaultTransposition = ModelUtils.displayTranspositionPitches.has(staff.track.playbackInfo.program)
+            ? ModelUtils.displayTranspositionPitches.get(staff.track.playbackInfo.program)!
+            : 0;
+        if (staff.displayTranspositionPitch !== defaultTransposition) {
+            nodes.push(ATNF.numberMetaData('displaytranspose', -staff.displayTranspositionPitch));
+        }
+
+        if (staff.chords != null) {
+            for (const [_, chord] of staff.chords!) {
+                nodes.push(AlphaTex1LanguageHandler.buildChordNode(chord));
+            }
+        }
+
+        if (firstStaffMetaIndex < nodes.length) {
+            nodes[firstStaffMetaIndex].leadingComments = [
+                {
+                    multiLine: false,
+                    text: `Staff ${staff.index + 1} Metadata`
+                }
+            ];
+        }
+    }
+
+    private static buildChordNode(chord: Chord): AlphaTexMetaDataNode {
+        const chordNode = ATNF.metaData(
+            'chord',
+            ATNF.valueList(false, [{ nodeType: AlphaTexNodeType.StringLiteral, text: chord.name }]),
+            ATNF.properties([
+                chord.firstFret >= 0 ? ['firstfret', ATNF.numberValueList(chord.firstFret)] : undefined,
+                ['showdiagram', ATNF.identifierValueList(chord.showDiagram ? 'true' : 'false')],
+                ['showfingering', ATNF.identifierValueList(chord.showFingering ? 'true' : 'false')],
+                ['showname', ATNF.identifierValueList(chord.showName ? 'true' : 'false')],
+                chord.barreFrets.length > 0
+                    ? [
+                          'barre',
+                          ATNF.valueList(
+                              false,
+                              chord.barreFrets.map(f => ({ nodeType: AlphaTexNodeType.NumberLiteral, value: f }))
+                          )
+                      ]
+                    : undefined
+            ])
+        );
+        chordNode.propertiesBeforeValues = true;
+
+        for (let i = 0; i < chord.staff.tuning.length; i++) {
+            if (i < chord.strings.length && chord.strings[i] >= 0) {
+                chordNode.values!.values.push({ nodeType: AlphaTexNodeType.NumberLiteral, value: chord.strings[i] });
+            } else {
+                chordNode.values!.values.push({ nodeType: AlphaTexNodeType.Identifier, text: 'x' });
+            }
+        }
+
+        return chordNode;
+    }
+
+    private static buildMasterBarMetaDataNodes(nodes: AlphaTexMetaDataNode[], masterBar: MasterBar) {
+        const firstMetaIndex = nodes.length;
+
+        if (masterBar.alternateEndings !== 0) {
+            nodes.push(
+                ATNF.metaData(
+                    'ae',
+                    ATNF.valueList(
+                        true,
+                        ModelUtils.getAlternateEndingsList(masterBar.alternateEndings).map(i => ({
+                            nodeType: AlphaTexNodeType.NumberLiteral,
+                            value: i + 1
+                        }))
+                    )
+                )
+            );
+        }
+
+        if (masterBar.isRepeatStart) {
+            nodes.push(ATNF.metaData('ro'));
+        }
+
+        if (masterBar.isRepeatEnd) {
+            nodes.push(ATNF.numberMetaData('rc', masterBar.repeatCount));
+        }
+
+        if (
+            masterBar.index === 0 ||
+            masterBar.timeSignatureCommon !== masterBar.previousMasterBar?.timeSignatureCommon ||
+            masterBar.timeSignatureNumerator !== masterBar.previousMasterBar.timeSignatureNumerator ||
+            masterBar.timeSignatureDenominator !== masterBar.previousMasterBar.timeSignatureDenominator
+        ) {
+            if (masterBar.timeSignatureCommon) {
+                nodes.push(ATNF.identifierMetaData('ts', 'common'));
+            } else {
+                nodes.push(
+                    ATNF.metaData(
+                        'ts',
+                        ATNF.valueList(false, [
+                            {
+                                nodeType: AlphaTexNodeType.NumberLiteral,
+                                value: masterBar.timeSignatureNumerator
+                            },
+                            {
+                                nodeType: AlphaTexNodeType.NumberLiteral,
+                                value: masterBar.timeSignatureDenominator
+                            }
+                        ])
+                    )
+                );
+            }
+        }
+
+        if (
+            (masterBar.index > 0 && masterBar.tripletFeel !== masterBar.previousMasterBar?.tripletFeel) ||
+            (masterBar.index === 0 && masterBar.tripletFeel !== TripletFeel.NoTripletFeel)
+        ) {
+            nodes.push(
+                ATNF.identifierMetaData('tf', AlphaTex1EnumMappings.tripletFeelsReversed.get(masterBar.tripletFeel)!)
+            );
+        }
+
+        if (masterBar.isFreeTime) {
+            nodes.push(ATNF.metaData('ft'));
+        }
+
+        if (masterBar.section != null) {
+            nodes.push(
+                ATNF.metaData(
+                    'section',
+                    ATNF.valueList(false, [
+                        {
+                            nodeType: AlphaTexNodeType.StringLiteral,
+                            text: masterBar.section.marker
+                        },
+                        {
+                            nodeType: AlphaTexNodeType.StringLiteral,
+                            text: masterBar.section.text
+                        }
+                    ])
+                )
+            );
+        }
+
+        if (masterBar.isAnacrusis) {
+            nodes.push(ATNF.metaData('ac'));
+        }
+
+        if (masterBar.displayScale !== 1) {
+            nodes.push(ATNF.numberMetaData('scale', masterBar.displayScale));
+        }
+
+        if (masterBar.displayWidth > 0) {
+            nodes.push(ATNF.numberMetaData('width', masterBar.displayWidth));
+        }
+
+        if (masterBar.directions) {
+            for (const d of masterBar.directions!) {
+                nodes.push(ATNF.identifierMetaData('jump', AlphaTex1EnumMappings.directionsReversed.get(d)!));
+            }
+        }
+
+        for (const a of masterBar.tempoAutomations) {
+            const tempo = ATNF.metaData(
+                'tempo',
+                ATNF.valueList(true, [
+                    {
+                        nodeType: AlphaTexNodeType.NumberLiteral,
+                        value: a.value
+                    },
+                    a.text
+                        ? {
+                              nodeType: AlphaTexNodeType.StringLiteral,
+                              text: a.text
+                          }
+                        : undefined,
+                    a.ratioPosition > 0
+                        ? {
+                              nodeType: AlphaTexNodeType.NumberLiteral,
+                              value: a.ratioPosition
+                          }
+                        : undefined
+                ])
+            );
+            if (tempo.values!.values.length === 1) {
+                tempo.values!.openParenthesis = undefined;
+                tempo.values!.closeParenthesis = undefined;
+            }
+            nodes.push(tempo);
+        }
+
+        if (firstMetaIndex < nodes.length) {
+            nodes[firstMetaIndex].leadingComments = [
+                {
+                    multiLine: false,
+                    text: `Masterbar ${masterBar.index + 1} Metadata`
+                }
+            ];
+        }
+    }
+
+    private static buildStructuralMetaDataNodes(
+        bar: Bar | undefined,
+        staff: Staff,
+        nodes: AlphaTexMetaDataNode[],
+        isMultiVoice: boolean,
+        voice: number
+    ) {
+        if (bar === undefined || bar.index === 0) {
+            if (voice === 0) {
+                if (staff.index === 0) {
+                    nodes.push(AlphaTex1LanguageHandler.buildNewTrackNode(staff.track));
+                }
+                nodes.push(AlphaTex1LanguageHandler.buildNewStaffNode(staff));
+                AlphaTex1LanguageHandler.buildStaffMetaDataNodes(nodes, staff);
+            }
+
+            if (isMultiVoice) {
+                const voiceNode = ATNF.metaData('voice');
+                voiceNode.trailingComments = [
+                    {
+                        multiLine: true,
+                        text: `Voice ${voice + 1}`
+                    }
+                ];
+                nodes.push(voiceNode);
+            }
+        }
+    }
+
+    private static buildNewStaffNode(staff: Staff): AlphaTexMetaDataNode {
+        const node = ATNF.metaData(
+            'staff',
+            undefined,
+            ATNF.properties([
+                staff.showStandardNotation
+                    ? [
+                          'score',
+                          ATNF.valueList(false, [
+                              staff.standardNotationLineCount !== Staff.DefaultStandardNotationLineCount
+                                  ? { nodeType: AlphaTexNodeType.NumberLiteral, value: staff.standardNotationLineCount }
+                                  : undefined
+                          ])
+                      ]
+                    : undefined,
+                staff.showTablature ? ['tabs', undefined] : undefined,
+                staff.showSlash ? ['slash', undefined] : undefined,
+                staff.showNumbered ? ['numbered', undefined] : undefined
+            ])
+        );
+
+        if (node.properties && node.properties.properties.length > 0) {
+            node.properties.properties[0]!.leadingComments = [
+                {
+                    multiLine: false,
+                    text: 'Staff Properties'
+                }
+            ];
+        }
+
+        return node;
+    }
+
+    private static buildNewTrackNode(track: Track): AlphaTexMetaDataNode {
+        const node = ATNF.metaData(
+            'track',
+            ATNF.valueList(false, [
+                { nodeType: AlphaTexNodeType.StringLiteral, text: track.name },
+                track.shortName.length > 0
+                    ? { nodeType: AlphaTexNodeType.StringLiteral, text: track.shortName }
+                    : undefined
+            ]),
+            ATNF.properties([
+                track.color.rgba !== AlphaTex1LanguageHandler.defaultTrack.color.rgba
+                    ? ['color', ATNF.stringValueList(track.color.rgba)]
+                    : undefined,
+                track.defaultSystemsLayout !== AlphaTex1LanguageHandler.defaultTrack.defaultSystemsLayout
+                    ? ['defaultSystemsLayout', ATNF.numberValueList(track.defaultSystemsLayout)]
+                    : undefined,
+                track.systemsLayout.length
+                    ? [
+                          'systemsLayout',
+                          ATNF.valueList(
+                              false,
+                              track.systemsLayout.map(d => ({ nodeType: AlphaTexNodeType.NumberLiteral, value: d }))
+                          )
+                      ]
+                    : undefined,
+                ['volume', ATNF.numberValueList(track.playbackInfo.volume)],
+                ['balance', ATNF.numberValueList(track.playbackInfo.balance)],
+                track.playbackInfo.isMute ? ['mute', undefined] : undefined,
+                track.playbackInfo.isSolo ? ['solo', undefined] : undefined,
+                track.score.stylesheet.perTrackMultiBarRest &&
+                track.score.stylesheet.perTrackMultiBarRest!.has(track.index)
+                    ? ['multiBarRest', undefined]
+                    : undefined,
+                [
+                    'instrument',
+                    ATNF.identifierValueList(
+                        track.isPercussion ? 'percussion' : GeneralMidi.getName(track.playbackInfo.program)
+                    )
+                ],
+                track.playbackInfo.bank > 0 ? ['bank', ATNF.numberValueList(track.playbackInfo.bank)] : undefined
+            ])
+        );
+
+        if (node.properties && node.properties.properties.length > 0) {
+            node.properties.properties[0]!.leadingComments = [
+                {
+                    multiLine: false,
+                    text: 'Track Properties'
+                }
+            ];
+        }
+
+        return node;
+    }
+
+    public buildNoteEffects(note: Note): AlphaTexPropertyNode[] {
+        const properties: AlphaTexPropertyNode[] = [];
+
+        if (note.hasBend) {
+            ATNF.property(
+                properties,
+                'be',
+                ATNF.valueList(false, [
+                    {
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!
+                    },
+                    note.bendStyle !== BendStyle.Default
+                        ? {
+                              nodeType: AlphaTexNodeType.Identifier,
+                              text: AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!
+                          }
+                        : undefined,
+                    ATNF.valueList(
+                        true,
+                        note.bendPoints!.flatMap(p => [
+                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.offset } as AlphaTexNumberLiteral,
+                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.value } as AlphaTexNumberLiteral
+                        ])
+                    )
+                ])
+            );
+        }
+
+        let harmonicType = '';
+        switch (note.harmonicType) {
+            case HarmonicType.Natural:
+                ATNF.property(properties, 'nh');
+                break;
+            case HarmonicType.Artificial:
+                harmonicType = 'ah';
+                break;
+            case HarmonicType.Pinch:
+                harmonicType = 'ph';
+                break;
+            case HarmonicType.Tap:
+                harmonicType = 'th';
+                break;
+            case HarmonicType.Semi:
+                harmonicType = 'sh';
+                break;
+            case HarmonicType.Feedback:
+                harmonicType = 'fh';
+                break;
+        }
+        if (harmonicType) {
+            ATNF.property(properties, harmonicType, ATNF.numberValueList(note.harmonicValue));
+        }
+
+        if (note.showStringNumber) {
+            ATNF.property(properties, 'string');
+        }
+
+        if (note.isTrill) {
+            ATNF.property(
+                properties,
+                'tr',
+                ATNF.valueList(false, [
+                    { nodeType: AlphaTexNodeType.NumberLiteral, value: note.trillFret },
+                    { nodeType: AlphaTexNodeType.NumberLiteral, value: note.trillSpeed as number }
+                ])
+            );
+        }
+
+        switch (note.vibrato) {
+            case VibratoType.Slight:
+                ATNF.property(properties, 'v');
+                break;
+            case VibratoType.Wide:
+                ATNF.property(properties, 'vw');
+                break;
+        }
+
+        switch (note.slideInType) {
+            case SlideInType.IntoFromBelow:
+                ATNF.property(properties, 'sib');
+                break;
+            case SlideInType.IntoFromAbove:
+                ATNF.property(properties, 'sia');
+                break;
+        }
+
+        switch (note.slideOutType) {
+            case SlideOutType.Shift:
+                ATNF.property(properties, 'ss');
+                break;
+            case SlideOutType.Legato:
+                ATNF.property(properties, 'sl');
+                break;
+            case SlideOutType.OutUp:
+                ATNF.property(properties, 'sou');
+                break;
+            case SlideOutType.OutDown:
+                ATNF.property(properties, 'sod');
+                break;
+            case SlideOutType.PickSlideDown:
+                ATNF.property(properties, 'psd');
+                break;
+            case SlideOutType.PickSlideUp:
+                ATNF.property(properties, 'psu');
+                break;
+        }
+
+        if (note.isHammerPullOrigin) {
+            ATNF.property(properties, 'h');
+        }
+
+        if (note.isLeftHandTapped) {
+            ATNF.property(properties, 'lht');
+        }
+
+        if (note.isGhost) {
+            ATNF.property(properties, 'g');
+        }
+
+        switch (note.accentuated) {
+            case AccentuationType.Normal:
+                ATNF.property(properties, 'ac');
+                break;
+            case AccentuationType.Heavy:
+                ATNF.property(properties, 'hac');
+                break;
+            case AccentuationType.Tenuto:
+                ATNF.property(properties, 'ten');
+                break;
+        }
+
+        if (note.isPalmMute) {
+            ATNF.property(properties, 'pm');
+        }
+
+        if (note.isStaccato) {
+            ATNF.property(properties, 'st');
+        }
+
+        if (note.isLetRing) {
+            ATNF.property(properties, 'lr');
+        }
+
+        if (note.isDead) {
+            ATNF.property(properties, 'x');
+        }
+
+        if (note.isTieDestination) {
+            ATNF.property(properties, 't');
+        }
+        if (note.leftHandFinger >= 0) {
+            ATNF.property(properties, 'lf', ATNF.numberValueList((note.leftHandFinger as number) + 1));
+        }
+        if (note.rightHandFinger >= 0) {
+            ATNF.property(properties, 'rf', ATNF.numberValueList((note.rightHandFinger as number) + 1));
+        }
+
+        if (!note.isVisible) {
+            ATNF.property(properties, 'hide');
+        }
+
+        if (note.isSlurOrigin) {
+            const slurId = `s${note.id}`;
+            ATNF.property(properties, 'slur', ATNF.identifierValueList(slurId));
+        }
+
+        if (note.isSlurDestination) {
+            const slurId = `s${note.slurOrigin!.id}`;
+            ATNF.property(properties, 'slur', ATNF.identifierValueList(slurId));
+        }
+
+        if (note.accidentalMode !== NoteAccidentalMode.Default) {
+            ATNF.property(
+                properties,
+                'acc',
+                ATNF.identifierValueList(ModelUtils.reverseAccidentalModeMapping.get(note.accidentalMode)!)
+            );
+        }
+
+        switch (note.ornament) {
+            case NoteOrnament.InvertedTurn:
+                ATNF.property(properties, 'iturn');
+                break;
+            case NoteOrnament.Turn:
+                ATNF.property(properties, 'turn');
+                break;
+            case NoteOrnament.UpperMordent:
+                ATNF.property(properties, 'umordent');
+                break;
+            case NoteOrnament.LowerMordent:
+                ATNF.property(properties, 'lmordent');
+                break;
+        }
+
+        return properties;
+    }
+
+    public buildBeatEffects(beat: Beat): AlphaTexPropertyNode[] {
+        const properties: AlphaTexPropertyNode[] = [];
+
+        switch (beat.fade) {
+            case FadeType.FadeIn:
+                ATNF.property(properties, 'f');
+                break;
+            case FadeType.FadeOut:
+                ATNF.property(properties, 'fo');
+                break;
+            case FadeType.VolumeSwell:
+                ATNF.property(properties, 'vs');
+                break;
+        }
+
+        if (beat.vibrato === VibratoType.Slight) {
+            ATNF.property(properties, 'v');
+        } else if (beat.vibrato === VibratoType.Wide) {
+            ATNF.property(properties, 'vw');
+        }
+
+        if (beat.slap) {
+            ATNF.property(properties, 's');
+        }
+
+        if (beat.pop) {
+            ATNF.property(properties, 'p');
+        }
+
+        if (beat.tap) {
+            ATNF.property(properties, 'tt');
+        }
+
+        if (beat.dots >= 2) {
+            ATNF.property(properties, 'dd');
+        } else if (beat.dots > 0) {
+            ATNF.property(properties, 'd');
+        }
+
+        if (beat.pickStroke === PickStroke.Up) {
+            ATNF.property(properties, 'su');
+        } else if (beat.pickStroke === PickStroke.Down) {
+            ATNF.property(properties, 'sd');
+        }
+
+        if (beat.hasTuplet) {
+            ATNF.property(
+                properties,
+                'tu',
+                ATNF.valueList(false, [
+                    { nodeType: AlphaTexNodeType.NumberLiteral, value: beat.tupletNumerator },
+                    { nodeType: AlphaTexNodeType.NumberLiteral, value: beat.tupletDenominator }
+                ])
+            );
+        }
+
+        if (beat.hasWhammyBar) {
+            ATNF.property(
+                properties,
+                'tbe',
+                ATNF.valueList(false, [
+                    {
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!
+                    },
+                    {
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!
+                    },
+                    ATNF.valueList(
+                        true,
+                        beat.whammyBarPoints!.flatMap(p => [
+                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.offset } as AlphaTexNumberLiteral,
+                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.value } as AlphaTexNumberLiteral
+                        ])
+                    )
+                ])
+            );
+        }
+
+        let brushType = '';
+        switch (beat.brushType) {
+            case BrushType.BrushUp:
+                brushType = 'bu';
+
+                break;
+            case BrushType.BrushDown:
+                brushType = 'bd';
+                break;
+            case BrushType.ArpeggioUp:
+                brushType = 'au';
+                break;
+            case BrushType.ArpeggioDown:
+                brushType = 'ad';
+                break;
+        }
+        if (brushType) {
+            ATNF.property(properties, brushType, ATNF.numberValueList(beat.brushDuration));
+        }
+
+        if (beat.chord != null) {
+            ATNF.property(properties, 'ch', ATNF.stringValueList(beat.chord.name));
+        }
+
+        if (beat.ottava !== Ottavia.Regular) {
+            ATNF.property(
+                properties,
+                'ot',
+                ATNF.identifierValueList(AlphaTex1EnumMappings.ottavaReversed.get(beat.ottava)!)
+            );
+        }
+
+        if (beat.hasRasgueado) {
+            ATNF.property(
+                properties,
+                'rasg',
+                ATNF.identifierValueList(AlphaTex1EnumMappings.rasgueadoPatternsReversed.get(beat.rasgueado)!)
+            );
+        }
+
+        if (beat.text != null) {
+            ATNF.property(properties, 'txt', ATNF.stringValueList(beat.text));
+        }
+
+        if (beat.lyrics != null && beat.lyrics!.length > 0) {
+            if (beat.lyrics.length > 1) {
+                for (let i = 0; i < beat.lyrics.length; i++) {
+                    ATNF.property(
+                        properties,
+                        'lyrics',
+                        ATNF.valueList(false, [
+                            {
+                                nodeType: AlphaTexNodeType.NumberLiteral,
+                                value: i
+                            },
+                            {
+                                nodeType: AlphaTexNodeType.StringLiteral,
+                                text: beat.lyrics[i]
+                            }
+                        ])
+                    );
+                }
+            } else {
+                ATNF.property(properties, 'lyrics', ATNF.stringValueList(beat.lyrics[0]));
+            }
+        }
+
+        if (beat.graceType !== GraceType.None) {
+            ATNF.property(
+                properties,
+                'gr',
+                beat.graceType === GraceType.BeforeBeat
+                    ? undefined
+                    : ATNF.identifierValueList(AlphaTex1EnumMappings.graceTypesReversed.get(beat.graceType)!)
+            );
+        }
+
+        if (beat.isTremolo) {
+            ATNF.property(properties, 'tp', ATNF.numberValueList(beat.tremoloSpeed as number));
+        }
+
+        switch (beat.crescendo) {
+            case CrescendoType.Crescendo:
+                ATNF.property(properties, 'cre');
+                break;
+            case CrescendoType.Decrescendo:
+                ATNF.property(properties, 'dec');
+                break;
+        }
+
+        if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
+            ATNF.property(
+                properties,
+                'dy',
+                ATNF.identifierValueList(AlphaTex1EnumMappings.dynamicsReversed.get(beat.dynamics)!)
+            );
+        }
+
+        const fermata = beat.fermata;
+        if (fermata != null) {
+            ATNF.property(
+                properties,
+                'fermata',
+                ATNF.valueList(false, [
+                    {
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: AlphaTex1EnumMappings.fermataTypesReversed.get(beat.fermata!.type)!
+                    },
+                    {
+                        nodeType: AlphaTexNodeType.NumberLiteral,
+                        value: beat.fermata!.length
+                    }
+                ])
+            );
+        }
+
+        if (beat.isLegatoOrigin) {
+            ATNF.property(properties, 'legatoorigin');
+        }
+
+        for (const automation of beat.automations) {
+            switch (automation.type) {
+                case AutomationType.Tempo:
+                    ATNF.property(
+                        properties,
+                        'tempo',
+                        ATNF.valueList(false, [
+                            { nodeType: AlphaTexNodeType.NumberLiteral, value: automation.value },
+                            automation.text.length === 0
+                                ? undefined
+                                : {
+                                      nodeType: AlphaTexNodeType.StringLiteral,
+                                      text: automation.text
+                                  }
+                        ])
+                    );
+                    break;
+                case AutomationType.Volume:
+                    ATNF.property(properties, 'volume', ATNF.numberValueList(automation.value));
+                    break;
+                case AutomationType.Instrument:
+                    if (!beat.voice.bar.staff.isPercussion) {
+                        ATNF.property(
+                            properties,
+                            'instrument',
+                            ATNF.identifierValueList(GeneralMidi.getName(automation.value))
+                        );
+                    }
+                    break;
+                case AutomationType.Balance:
+                    ATNF.property(properties, 'balance', ATNF.numberValueList(automation.value));
+                    break;
+            }
+        }
+
+        switch (beat.wahPedal) {
+            case WahPedal.Open:
+                ATNF.property(properties, 'waho');
+                break;
+            case WahPedal.Closed:
+                ATNF.property(properties, 'wahc');
+                break;
+        }
+
+        if (beat.isBarre) {
+            ATNF.property(
+                properties,
+                'barre',
+                ATNF.valueList(false, [
+                    { nodeType: AlphaTexNodeType.NumberLiteral, value: beat.barreFret },
+                    {
+                        nodeType: AlphaTexNodeType.Identifier,
+                        text: AlphaTex1EnumMappings.barreShapesReversed.get(beat.barreShape)!
+                    }
+                ])
+            );
+        }
+
+        if (beat.slashed) {
+            ATNF.property(properties, 'slashed');
+        }
+
+        if (beat.deadSlapped) {
+            ATNF.property(properties, 'ds');
+        }
+
+        switch (beat.golpe) {
+            case GolpeType.Thumb:
+                ATNF.property(properties, 'glpt');
+                break;
+            case GolpeType.Finger:
+                ATNF.property(properties, 'glpf');
+                break;
+        }
+
+        if (beat.invertBeamDirection) {
+            ATNF.property(properties, 'beam', ATNF.identifierValueList('invert'));
+        } else if (beat.preferredBeamDirection !== null) {
+            ATNF.property(properties, 'beam', ATNF.identifierValueList(BeamDirection[beat.preferredBeamDirection!]));
+        }
+
+        let beamingModeValue = '';
+        switch (beat.beamingMode) {
+            case BeatBeamingMode.ForceSplitToNext:
+                beamingModeValue = 'split';
+                break;
+            case BeatBeamingMode.ForceMergeWithNext:
+                beamingModeValue = 'merge';
+                break;
+            case BeatBeamingMode.ForceSplitOnSecondaryToNext:
+                beamingModeValue = 'splitsecondary';
+                break;
+        }
+
+        if (beamingModeValue) {
+            ATNF.property(properties, 'beam', ATNF.identifierValueList(beamingModeValue));
+        }
+
+        if (beat.showTimer) {
+            ATNF.property(properties, 'timer');
+        }
+
+        return properties;
     }
 }

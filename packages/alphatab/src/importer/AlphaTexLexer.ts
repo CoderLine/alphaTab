@@ -30,7 +30,8 @@ export class AlphaTexLexer {
     private _fatalError = false;
 
     private _tokenStart: AlphaTexAstNodeLocation = { line: 0, col: 0, offset: 0 };
-    private _comments: AlphaTexComment[] | undefined;
+    private _leadingComments: AlphaTexComment[] | undefined;
+    private _trailingCommentNode: AlphaTexAstNode | undefined;
     private _tokenQueue: Queue<AlphaTexAstNode> = new Queue<AlphaTexAstNode>();
 
     public readonly lexerDiagnostics = new AlphaTexDiagnosticBag();
@@ -117,7 +118,7 @@ export class AlphaTexLexer {
             nodeType: AlphaTexNodeType.NumberLiteral,
             start: start.start,
             end: fractional.end,
-            comments: start.comments,
+            leadingComments: start.leadingComments,
             value: Number.parseFloat(
                 String.fromCodePoint(...this._codepoints.slice(start.start!.offset, fractional.end!.offset))
             )
@@ -166,17 +167,19 @@ export class AlphaTexLexer {
     }
 
     private readToken(): AlphaTexAstNode | undefined {
-        this._comments = undefined;
-
+        this._leadingComments = undefined;
         while (this._codepoint !== AlphaTexLexer.Eof) {
             this._tokenStart = this.currentLexerLocation();
             if (AlphaTexLexer.terminalTokens.has(this._codepoint)) {
                 const token = AlphaTexLexer.terminalTokens.get(this._codepoint)!(this);
                 if (token) {
+                    this._trailingCommentNode = token;
                     return token;
                 }
             } else if (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
-                return this.numberOrIdentifier();
+                const identifier = this.numberOrIdentifier();
+                this._trailingCommentNode = identifier;
+                return identifier;
             } else {
                 // simply skip unknown characters
                 // there are only a few ascii control characters
@@ -264,7 +267,7 @@ export class AlphaTexLexer {
 
         const token: AlphaTexMetaDataTagNode = {
             nodeType: AlphaTexNodeType.MetaDataTag,
-            comments: this._comments,
+            leadingComments: this._leadingComments,
             start: this._tokenStart,
             end: this.currentLexerLocation(),
             prefix: {
@@ -285,7 +288,7 @@ export class AlphaTexLexer {
     private token<T extends AlphaTexNodeType>(nodeType: T): AlphaTexTokenNode<T> {
         const token: AlphaTexTokenNode<T> = {
             nodeType: nodeType,
-            comments: this._comments,
+            leadingComments: this._leadingComments,
             start: this._tokenStart,
             end: this.currentLexerLocation()
         };
@@ -401,7 +404,7 @@ export class AlphaTexLexer {
         const stringToken: AlphaTexStringLiteral = {
             nodeType: AlphaTexNodeType.StringLiteral,
             text: s,
-            comments: this._comments,
+            leadingComments: this._leadingComments,
             start: this._tokenStart,
             end: this.currentLexerLocation()
         };
@@ -413,7 +416,7 @@ export class AlphaTexLexer {
     }
 
     private multiLineComment() {
-        // multiline comment
+        const trailingCommentNode = this._trailingCommentNode;
         const comment: AlphaTexComment = {
             start: this._tokenStart,
             end: this.currentLexerLocation(),
@@ -442,8 +445,13 @@ export class AlphaTexLexer {
             }
         }
 
-        this._comments ??= [];
-        this._comments!.push(comment);
+        if (trailingCommentNode) {
+            trailingCommentNode.trailingComments ??= [];
+            trailingCommentNode.trailingComments.push(comment);
+        } else {
+            this._leadingComments ??= [];
+            this._leadingComments!.push(comment);
+        }
     }
 
     private numberOrIdentifier() {
@@ -498,7 +506,7 @@ export class AlphaTexLexer {
         if (isNumber) {
             const numberLiteral: AlphaTexNumberLiteral = {
                 nodeType: AlphaTexNodeType.NumberLiteral,
-                comments: this._comments,
+                leadingComments: this._leadingComments,
                 start: this._tokenStart,
                 end: this.currentLexerLocation(),
                 value: Number.parseInt(str, 10)
@@ -508,7 +516,7 @@ export class AlphaTexLexer {
 
         const identifier: AlphaTexIdentifier = {
             nodeType: AlphaTexNodeType.Identifier,
-            comments: this._comments,
+            leadingComments: this._leadingComments,
             start: this._tokenStart,
             end: this.currentLexerLocation(),
             text: str
@@ -518,6 +526,7 @@ export class AlphaTexLexer {
 
     private singleLineComment() {
         // single line comment
+        const trailingCommentNode = this._trailingCommentNode;
         const comment: AlphaTexComment = {
             start: this._tokenStart,
             end: this.currentLexerLocation(),
@@ -539,13 +548,21 @@ export class AlphaTexLexer {
                 break;
             }
         }
-        this._comments ??= [];
-        this._comments!.push(comment);
+        if (trailingCommentNode) {
+            trailingCommentNode.trailingComments ??= [];
+            trailingCommentNode.trailingComments.push(comment);
+        } else {
+            this._leadingComments ??= [];
+            this._leadingComments!.push(comment);
+        }
     }
 
     private whitespace(): AlphaTexAstNode | undefined {
         // skip whitespaces
         while (AlphaTexLexer.isWhiteSpace(this._codepoint)) {
+            if (this._codepoint === 0x0a /* \n */) {
+                this._trailingCommentNode = undefined;
+            }
             this.nextCodepoint();
         }
         return undefined;
@@ -554,7 +571,6 @@ export class AlphaTexLexer {
     private static isDigit(ch: number): boolean {
         return ch >= 0x30 && ch <= 0x39 /* 0-9 */;
     }
-
 
     private static isIdentifierCharacter(ch: number): boolean {
         return AlphaTexLexer.isIdentifierStart(ch) || AlphaTexLexer.isDigit(ch) || ch === 0x2d /* dash */;

@@ -1,3 +1,4 @@
+import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { AutomationType } from '@src/model/Automation';
@@ -41,12 +42,11 @@ import { HarmonicsEffectInfo } from '@src/rendering/effects/HarmonicsEffectInfo'
 import { ScoreRenderer } from '@src/rendering/ScoreRenderer';
 import { Settings } from '@src/Settings';
 import { StaveProfile } from '@src/StaveProfile';
-import { AlphaTexExporterOld } from '@test/exporter/AlphaTexExporterOld';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
 
-describe('AlphaTexImporterNewTest', () => {
+describe('AlphaTexImporterTest', () => {
     function importErrorTest(tex: string) {
         const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
@@ -84,8 +84,7 @@ describe('AlphaTexImporterNewTest', () => {
     function testExportRoundtrip(expected: Score) {
         ComparisonHelpers.alphaTexExportRoundtripPrepare(expected);
 
-        // TODO: use new exporter once ready
-        const exported = new AlphaTexExporterOld().exportToString(expected);
+        const exported = new AlphaTexExporter().exportToString(expected);
         const actual = parseTex(exported);
 
         ComparisonHelpers.alphaTexExportRoundtripEqual('export-roundtrip', actual, expected);

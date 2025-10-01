@@ -1,3 +1,4 @@
+import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
@@ -77,11 +78,11 @@ describe('AlphaTexImporterOldNewCompat', () => {
         // use exporters to create alphaTex code for comparison test
 
         const exportedOld = new AlphaTexExporterOld().exportToString(expected, settings);
-        readAndCompare(name, ignoreKeys, exportedOld, settings);
+        await readAndCompare(name, ignoreKeys, exportedOld, settings);
 
-        // TOOD: activate after implementation
+        // old importer cannot load new alphaTex
         // const exportedNew = new AlphaTexExporter().exportToString(expected, settings);
-        // readAndCompare(name, ignoreKeys, exportedNew, settings);
+        // await readAndCompare(name, ignoreKeys, exportedNew, settings);
     }
 
     async function testRoundTripFolderEqual(name: string): Promise<void> {

@@ -18,9 +18,9 @@ describe('ModelUtilsTests', () => {
     it('trimEmptyBarsAtEndMultiTrackMixed', () => {
         trimTest(
             `
-            \\track T1
+            \\track "T1"
             C4 | C4 | C4 | C4 | | | |
-            \\track T2
+            \\track "T2"
             C4 | C4 | C4 | C4 | C4 | | |
         `,
             5

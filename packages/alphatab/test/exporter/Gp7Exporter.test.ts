@@ -139,7 +139,7 @@ describe('Gp7ExporterTest', () => {
         ComparisonHelpers.expectJsonEqual(expectedJson, actualJson, '<alphatex>', ['accidentalmode']);
     });
 
-    it('alphatex-drumps-to-gp7', () => {
+    it('alphatex-drums-to-gp7', () => {
         const tex = `\\track "Drums"
         \\instrument percussion
         \\clef neutral

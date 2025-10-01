@@ -5,7 +5,7 @@ import { AlphaTexExporterOld } from '@test/exporter/AlphaTexExporterOld';
 import { AlphaTexError, AlphaTexImporterOld } from '@test/importer/AlphaTexImporterOld';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { TestPlatform } from '@test/TestPlatform';
-import { assert, expect } from 'chai';
+import { assert } from 'chai';
 
 describe('AlphaTexExporterOldTest', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -113,26 +113,5 @@ describe('AlphaTexExporterOldTest', () => {
 
     it('gp7-to-alphaTex', async () => {
         await testRoundTripEqual(`conversion/full-song.gp`);
-    });
-
-    it('exact-contents-formatted', async () => {
-        const score = (await loadScore('visual-tests/notation-legend/notation-legend.gp'))!;
-
-        // fill some more details to cover all features
-        score.title = 'Notation Legend';
-        score.subTitle = 'for test suite';
-        score.artist = 'alphaTab';
-
-        const settings = new Settings();
-        settings.exporter.comments = true;
-        settings.exporter.indent = 2;
-
-        let data = exportAlphaTex(score!, settings);
-        let expected = await TestPlatform.loadFileAsString('test-data/exporter/notation-legend-formatted.atex');
-
-        data = data.replaceAll('\r', '').trim();
-        expected = expected.replaceAll('\r', '').trim();
-
-        expect(data).to.equal(expected);
     });
 });

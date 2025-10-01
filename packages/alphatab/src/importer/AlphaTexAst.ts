@@ -75,7 +75,12 @@ export interface AlphaTexAstNode {
     /**
      * The comments preceeding this node.
      */
-    comments?: AlphaTexComment[];
+    leadingComments?: AlphaTexComment[];
+
+    /**
+     * The comments after this node (if starting on the same line).
+     */
+    trailingComments?: AlphaTexComment[];
 }
 
 /**
@@ -175,6 +180,11 @@ export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
      * The optional properties attached to the metadata.
      */
     properties?: AlphaTexPropertiesNode;
+
+    /**
+     * Whether the properties are listed before the values (if both are present).
+     */
+    propertiesBeforeValues: boolean;
 }
 
 /**

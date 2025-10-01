@@ -54,6 +54,24 @@ export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
     public parserDiagnostics?: AlphaTexDiagnosticBag;
     public semanticDiagnostics?: AlphaTexDiagnosticBag;
 
+    public *iterateDiagnostics() {
+        if (this.lexerDiagnostics) {
+            for (const d of this.lexerDiagnostics.items) {
+                yield d;
+            }
+        }
+        if (this.parserDiagnostics) {
+            for (const d of this.parserDiagnostics.items) {
+                yield d;
+            }
+        }
+        if (this.semanticDiagnostics) {
+            for (const d of this.semanticDiagnostics.items) {
+                yield d;
+            }
+        }
+    }
+
     public constructor(
         message: string,
         lexerDiagnostics?: AlphaTexDiagnosticBag,
@@ -269,6 +287,12 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     }
 
     private beginStaff(staff: Staff) {
+        // ensure previous staff is properly initialized
+        if (this._state._currentStaff) {
+            this.detectTuningForStaff();
+            this.handleTransposition();
+        }
+
         this._state._currentStaff = staff;
         this._state.slurs.clear();
         this._state._barIndex = 0;
@@ -329,6 +353,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             }
         } else {
             this.newBar(this._state._currentStaff);
+            this.detectTuningForStaff();
+            this.handleTransposition();
         }
     }
 
@@ -409,7 +435,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 case ApplyNodeResult.NotAppliedUnrecognizedMarker:
                     const knownProps = Array.from(this._handler.knownBeatProperties).join(',');
                     this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT001, // TODO code
+                        code: AlphaTexDiagnosticCode.AT212,
                         message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
                         start: p.start,
@@ -440,7 +466,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     case ApplyNodeResult.NotAppliedUnrecognizedMarker:
                         const knownProps = Array.from(this._handler.knownBeatDurationProperties).join(',');
                         this.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO code
+                            code: AlphaTexDiagnosticCode.AT212,
                             message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: p.start,
@@ -478,8 +504,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 return Duration.TwoHundredFiftySixth;
             default:
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT001, // TODO Code
-                    message: `Invalid duration value '${duration.value}', expected one of, -4, -2, 1, 2, 4, 8, 16, 32, 64, 128, 256`,
+                    code: AlphaTexDiagnosticCode.AT209,
+                    message: `Unexpected duration value '${duration.value}', expected: -4, -2, 1, 2, 4, 8, 16, 32, 64, 128 or 256`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: duration.start,
                     end: duration.end
@@ -502,8 +528,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 fret = (node.noteValue as AlphaTexNumberLiteral).value;
                 if (this._state._currentStaff.isPercussion && !PercussionMapper.instrumentArticulations.has(fret)) {
                     this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT001, // TODO code,
-                        message: `Unknown percussion articulation '${fret}'.`,
+                        code: AlphaTexDiagnosticCode.AT209,
+                        message: `Unexpected percussion articulation value '${fret}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
                         start: node.noteValue.start,
                         end: node.noteValue.end
@@ -520,8 +546,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         fret = this._state.percussionArticulationNames.get(articulationName)!;
                     } else {
                         this.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT001, // TODO code,
-                            message: `Unknown percussion articulation '${articulationName}'.`,
+                            code: AlphaTexDiagnosticCode.AT209,
+                            message: `Unexpected percussion articulation value '${articulationName}', expected: oneOf(${Array.from(this._state.percussionArticulationNames.keys()).join(',')}).`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: node.noteValue.start,
                             end: node.noteValue.end
@@ -544,8 +570,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
                             if (this._state._currentStaff.isStringed) {
                                 this.addSemanticDiagnostic({
-                                    code: AlphaTexDiagnosticCode.AT001, // TODO code,
-                                    message: `Cannot use pitched note value '${str}'  on string staff, please specify notes using the 'fret.string' syntax.`,
+                                    code: AlphaTexDiagnosticCode.AT215,
+                                    message: `Cannot use pitched note value '${str}' on string staff, please specify notes using the 'fret.string' syntax.`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
                                     start: node.noteValue.start,
                                     end: node.noteValue.end
@@ -555,8 +581,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
                             if (this._state._currentStaff.isPercussion) {
                                 this.addSemanticDiagnostic({
-                                    code: AlphaTexDiagnosticCode.AT001, // TODO code,
-                                    message: `Cannot use pitched note value '${str}'  on percussion staff, please specify percussion articulations with numbers or names.`,
+                                    code: AlphaTexDiagnosticCode.AT216,
+                                    message: `Cannot use pitched note value '${str}' on percussion staff, please specify percussion articulations with numbers or names.`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
                                     start: node.noteValue.start,
                                     end: node.noteValue.end
@@ -571,7 +597,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                             }
                         } else {
                             this.addSemanticDiagnostic({
-                                code: AlphaTexDiagnosticCode.AT001, // TODO code,
+                                code: AlphaTexDiagnosticCode.AT217,
                                 message: `Unrecognized note value '${str}'.`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: node.noteValue.start,
@@ -593,7 +619,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             // Fret [Dot] String
             if (!node.noteString) {
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT001, // TODO code,
+                    code: AlphaTexDiagnosticCode.AT218,
                     message: `Missing string for fretted note.`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: node.noteValue.end,
@@ -605,7 +631,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             noteString = node.noteString!.value;
             if (noteString < 1 || noteString > this._state._currentStaff.tuning.length) {
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT001, // TODO code,
+                    code: AlphaTexDiagnosticCode.AT219,
                     message: `Note string is out of range. Available range: 1-${this._state._currentStaff.tuning.length}`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: node.noteValue.end,
@@ -635,8 +661,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                 const articulation = PercussionMapper.getArticulationByInputMidiNumber(articulationValue);
                 if (articulation === null) {
                     this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT001, // TODO code,
-                        message: `Unknown articulation value ${articulationValue}`,
+                        code: AlphaTexDiagnosticCode.AT209,
+                        message: `Unexpected articulation value '${articulationValue}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
                         start: node.noteValue.end,
                         end: node.noteValue.end
@@ -682,7 +708,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         .concat(Array.from(this._handler.knownBeatProperties))
                         .join(',');
                     this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT212, // TODO code
+                        code: AlphaTexDiagnosticCode.AT212,
                         message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
                         start: p.start,
@@ -709,7 +735,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             const program = this._state._currentTrack.playbackInfo.program;
             if (ModelUtils.displayTranspositionPitches.has(program)) {
                 // guitar E4 B3 G3 D3 A2 E2
-                this._state._currentStaff.displayTranspositionPitch = ModelUtils.displayTranspositionPitches.get(program)!;
+                this._state._currentStaff.displayTranspositionPitch =
+                    ModelUtils.displayTranspositionPitches.get(program)!;
             } else {
                 this._state._currentStaff.displayTranspositionPitch = 0;
             }
@@ -720,7 +747,10 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     private detectTuningForStaff() {
         // detect tuning for staff
         const program = this._state._currentTrack.playbackInfo.program;
-        if (!this._state.staffTuningApplied.has(this._state._currentStaff) && !this._state.staffHasExplicitTuning.has(this._state._currentStaff)) {
+        if (
+            !this._state.staffTuningApplied.has(this._state._currentStaff) &&
+            !this._state.staffHasExplicitTuning.has(this._state._currentStaff)
+        ) {
             // reset to defaults
             this._state._currentStaff.stringTuning.tunings = [];
 
@@ -792,13 +822,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     continue;
             }
 
-            if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
-                if (!bar) {
-                    bar = this.newBar(this._state._currentStaff);
-                }
-
-                this.applyBarMetaData(bar, m);
-            } else if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+            if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
                 result = this._handler.applyStaffMetaData(this, this._state._currentStaff, m);
 
                 switch (result) {
@@ -816,11 +840,17 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         });
                         break;
                 }
+            } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                if (!bar) {
+                    bar = this.newBar(this._state._currentStaff);
+                }
+
+                this.applyBarMetaData(bar, m);
             } else {
                 const knownMeta = Array.from(this._handler.knownBarMetaDataTags).join(',');
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT001, // TODO Code
-                    message: `Unrecognized bar level metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
+                    code: AlphaTexDiagnosticCode.AT206,
+                    message: `Unrecognized metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: m.tag.start,
                     end: m.tag.end

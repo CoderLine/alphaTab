@@ -48,37 +48,6 @@ Array [
 ]
 `;
 
-exports[`AlphaTexLexerTest comments 1`] = `
-Array [
-  Identifier "true" (2,10) -> (2,14) {
-    comments: Array [
-      "// Single",
-    ],
-  },
-  Identifier "false" (3,10) -> (4,1) {
-    comments: Array [
-      "// Single After",
-    ],
-  },
-]
-`;
-
-exports[`AlphaTexLexerTest comments 2`] = `
-Array [
-  Identifier "true" (2,2) -> (3,1) {
-    comments: Array [
-      "/** Multi **/",
-    ],
-  },
-  Identifier "true" (3,2) -> (3,6),
-  Identifier "false" (3,20) -> (3,25) {
-    comments: Array [
-      "/** Middle **/",
-    ],
-  },
-]
-`;
-
 exports[`AlphaTexLexerTest errors at001 1`] = `
 Array [
   Identifier "a" (1,2) -> (1,3),
@@ -389,6 +358,23 @@ Array [
 ]
 `;
 
+exports[`AlphaTexLexerTest leading-comments 1`] = `
+Array [
+  Identifier "true" (2,10) -> (3,1) {
+    leadingComments: Array [
+      "// Single",
+    ],
+  },
+  Identifier "false" (6,10) -> (7,1) {
+    leadingComments: Array [
+      "/** Multi **/",
+      "/** Multi2 **/",
+      "// Single",
+    ],
+  },
+]
+`;
+
 exports[`AlphaTexLexerTest meta-command 1`] = `
 Array [
   MetaDataTag "title" (1,1) -> (1,7) {
@@ -522,6 +508,34 @@ Array [
 exports[`AlphaTexLexerTest strings 9`] = `
 Array [
   StringLiteral "😸🤘🏻" (1,1) -> (1,5),
+]
+`;
+
+exports[`AlphaTexLexerTest trailing-comments 1`] = `
+Array [
+  Identifier "true" (1,10) -> (1,14) {
+    trailingComments: Array [
+      "// Single After",
+    ],
+  },
+  Identifier "false" (2,10) -> (2,15) {
+    trailingComments: Array [
+      "/** Multi After **/",
+    ],
+  },
+  Identifier "true" (3,23) -> (3,27) {
+    leadingComments: Array [
+      "/** before **/",
+    ],
+    trailingComments: Array [
+      "/** middle **/",
+    ],
+  },
+  Identifier "false" (3,41) -> (3,46) {
+    trailingComments: Array [
+      "// after",
+    ],
+  },
 ]
 `;
 

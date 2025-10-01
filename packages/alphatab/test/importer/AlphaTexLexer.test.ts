@@ -108,14 +108,23 @@ describe('AlphaTexLexerTest', () => {
         floatTest('1.1\\test');
     });
 
-    it('comments', () => {
+    it('leading-comments', () => {
         lexerTest(`
         // Single
-        true // Single After
+        true
+        /* Multi */
+        /* Multi2 */
+        // Single
         false
         `);
+    });
 
-        lexerTest(['/* Multi */', 'true', 'true /* Middle */ false'].join('\n'));
+    it('trailing-comments', () => {
+        lexerTest(`
+        true // Single After
+        false /* Multi After */
+        /* before */ true /* middle */ false // after
+        `);
     });
 
     describe('errors', () => {

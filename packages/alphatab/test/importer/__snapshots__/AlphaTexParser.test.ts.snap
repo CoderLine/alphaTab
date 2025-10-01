@@ -91,23 +91,23 @@ exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: lexer-
 exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments bar meta singleline 1`] = `
-Score (1,1) -> (2,10) {
+Score (1,1) -> (3,10) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (2,3) -> (2,10) {
+    Bar (3,3) -> (3,10) {
       metaData: Array [
-        MetaData (2,3) -> (2,10) {
-          tag: MetaDataTag "ts" (2,3) -> (2,6) {
-            comments: Array [
+        MetaData (3,3) -> (3,10) {
+          tag: MetaDataTag "ts" (3,3) -> (3,6) {
+            leadingComments: Array [
               "// Single ",
             ],
-            prefix: BackSlashToken (2,3) -> (2,4),
-            tag: Identifier "ts" (2,4) -> (2,6),
+            prefix: BackSlashToken (3,3) -> (3,4),
+            tag: Identifier "ts" (3,4) -> (3,6),
           },
-          values: ValueList (2,7) -> (2,10) {
+          values: ValueList (3,7) -> (3,10) {
             values: Array [
-              NumberLiteral "3" (2,7) -> (2,8),
-              NumberLiteral "4" (2,9) -> (2,10),
+              NumberLiteral "3" (3,7) -> (3,8),
+              NumberLiteral "4" (3,9) -> (3,10),
             ],
           },
         },
@@ -122,24 +122,24 @@ exports[`AlphaTexParserTest comments bar meta singleline: lexer-diagnostics 1`] 
 exports[`AlphaTexParserTest comments bar meta singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments bar multiline 1`] = `
-Score (1,1) -> (2,16) {
+Score (1,1) -> (3,16) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (2,9) -> (2,16) {
+    Bar (3,9) -> (3,16) {
       metaData: Array [
-        MetaData (2,9) -> (2,16) {
-          tag: MetaDataTag "ts" (2,9) -> (2,12) {
-            comments: Array [
+        MetaData (3,9) -> (3,16) {
+          tag: MetaDataTag "ts" (3,9) -> (3,12) {
+            leadingComments: Array [
               "/** multi
 line**/",
             ],
-            prefix: BackSlashToken (2,9) -> (2,10),
-            tag: Identifier "ts" (2,10) -> (2,12),
+            prefix: BackSlashToken (3,9) -> (3,10),
+            tag: Identifier "ts" (3,10) -> (3,12),
           },
-          values: ValueList (2,13) -> (2,16) {
+          values: ValueList (3,13) -> (3,16) {
             values: Array [
-              NumberLiteral "3" (2,13) -> (2,14),
-              NumberLiteral "4" (2,15) -> (2,16),
+              NumberLiteral "3" (3,13) -> (3,14),
+              NumberLiteral "4" (3,15) -> (3,16),
             ],
           },
         },
@@ -150,25 +150,25 @@ line**/",
 `;
 
 exports[`AlphaTexParserTest comments bar multiline middle 1`] = `
-Score (1,1) -> (2,10) {
+Score (1,1) -> (3,10) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,10) {
+    Bar (2,2) -> (3,10) {
       metaData: Array [
-        MetaData (1,3) -> (2,10) {
-          tag: MetaDataTag "ts" (1,3) -> (1,6) {
-            prefix: BackSlashToken (1,3) -> (1,4),
-            tag: Identifier "ts" (1,4) -> (1,6),
+        MetaData (2,2) -> (3,10) {
+          tag: MetaDataTag "ts" (2,2) -> (2,5) {
+            prefix: BackSlashToken (2,2) -> (2,3),
+            tag: Identifier "ts" (2,3) -> (2,5),
           },
-          values: ValueList (1,7) -> (2,10) {
+          values: ValueList (2,6) -> (3,10) {
             values: Array [
-              NumberLiteral "3" (1,7) -> (1,8),
-              NumberLiteral "4" (2,9) -> (2,10) {
-                comments: Array [
+              NumberLiteral "3" (2,6) -> (2,7) {
+                trailingComments: Array [
                   "/** multi
 line**/",
                 ],
               },
+              NumberLiteral "4" (3,9) -> (3,10),
             ],
           },
         },
@@ -187,28 +187,28 @@ exports[`AlphaTexParserTest comments bar multiline: lexer-diagnostics 1`] = `Arr
 exports[`AlphaTexParserTest comments bar multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beat chord multiline 1`] = `
-Score (1,1) -> (2,12) {
+Score (1,1) -> (3,12) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,12) {
+    Bar (1,3) -> (3,12) {
       beats: Array [
-        Beat (1,3) -> (2,12) {
-          notes: NoteList (1,3) -> (2,12) {
+        Beat (1,3) -> (3,12) {
+          notes: NoteList (1,3) -> (3,12) {
             openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (2,9) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+              Note (1,4) -> (3,9) {
+                noteValue: Identifier "C4" (1,4) -> (2,1),
               },
-              Note (2,9) -> (2,11) {
-                noteValue: Identifier "C5" (2,9) -> (2,11) {
-                  comments: Array [
+              Note (3,9) -> (3,11) {
+                noteValue: Identifier "C5" (3,9) -> (3,11) {
+                  leadingComments: Array [
                     "/** multi
 line**/",
                   ],
                 },
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (2,11) -> (2,11),
+            closeParenthesis: ParenthesisCloseToken (3,11) -> (3,11),
           },
         },
       ],
@@ -222,27 +222,27 @@ exports[`AlphaTexParserTest comments beat chord multiline: lexer-diagnostics 1`]
 exports[`AlphaTexParserTest comments beat chord multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beat chord singleline 1`] = `
-Score (1,1) -> (2,6) {
+Score (1,1) -> (3,6) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,6) {
+    Bar (1,3) -> (3,6) {
       beats: Array [
-        Beat (1,3) -> (2,6) {
-          notes: NoteList (1,3) -> (2,6) {
+        Beat (1,3) -> (3,6) {
+          notes: NoteList (1,3) -> (3,6) {
             openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (2,3) {
-                noteValue: Identifier "C4" (1,4) -> (1,6),
+              Note (1,4) -> (3,3) {
+                noteValue: Identifier "C4" (1,4) -> (2,1),
               },
-              Note (2,3) -> (2,5) {
-                noteValue: Identifier "C5" (2,3) -> (2,5) {
-                  comments: Array [
+              Note (3,3) -> (3,5) {
+                noteValue: Identifier "C5" (3,3) -> (3,5) {
+                  leadingComments: Array [
                     "// Single ",
                   ],
                 },
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (2,5) -> (2,5),
+            closeParenthesis: ParenthesisCloseToken (3,5) -> (3,5),
           },
         },
       ],
@@ -256,26 +256,26 @@ exports[`AlphaTexParserTest comments beat chord singleline: lexer-diagnostics 1`
 exports[`AlphaTexParserTest comments beat chord singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beat multiline 1`] = `
-Score (1,1) -> (2,11) {
+Score (1,1) -> (3,11) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,11) {
+    Bar (1,3) -> (3,11) {
       beats: Array [
-        Beat (1,3) -> (2,9) {
-          notes: NoteList (1,3) -> (2,9) {
+        Beat (1,3) -> (3,9) {
+          notes: NoteList (1,3) -> (3,9) {
             notes: Array [
-              Note (1,3) -> (2,9) {
-                noteValue: Identifier "C4" (1,3) -> (1,5),
+              Note (1,3) -> (3,9) {
+                noteValue: Identifier "C4" (1,3) -> (2,1),
               },
             ],
           },
         },
-        Beat (2,9) -> (2,11) {
-          notes: NoteList (2,9) -> (2,11) {
+        Beat (3,9) -> (3,11) {
+          notes: NoteList (3,9) -> (3,11) {
             notes: Array [
-              Note (2,9) -> (2,11) {
-                noteValue: Identifier "C5" (2,9) -> (2,11) {
-                  comments: Array [
+              Note (3,9) -> (3,11) {
+                noteValue: Identifier "C5" (3,9) -> (3,11) {
+                  leadingComments: Array [
                     "/** multi
 line**/",
                   ],
@@ -295,26 +295,26 @@ exports[`AlphaTexParserTest comments beat multiline: lexer-diagnostics 1`] = `Ar
 exports[`AlphaTexParserTest comments beat multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beat singleline 1`] = `
-Score (1,1) -> (2,5) {
+Score (1,1) -> (3,5) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,5) {
+    Bar (1,3) -> (3,5) {
       beats: Array [
-        Beat (1,3) -> (2,3) {
-          notes: NoteList (1,3) -> (2,3) {
+        Beat (1,3) -> (3,3) {
+          notes: NoteList (1,3) -> (3,3) {
             notes: Array [
-              Note (1,3) -> (2,3) {
-                noteValue: Identifier "C4" (1,3) -> (1,5),
+              Note (1,3) -> (3,3) {
+                noteValue: Identifier "C4" (1,3) -> (2,1),
               },
             ],
           },
         },
-        Beat (2,3) -> (2,5) {
-          notes: NoteList (2,3) -> (2,5) {
+        Beat (3,3) -> (3,5) {
+          notes: NoteList (3,3) -> (3,5) {
             notes: Array [
-              Note (2,3) -> (2,5) {
-                noteValue: Identifier "C5" (2,3) -> (2,5) {
-                  comments: Array [
+              Note (3,3) -> (3,5) {
+                noteValue: Identifier "C5" (3,3) -> (3,5) {
+                  leadingComments: Array [
                     "// Single ",
                   ],
                 },
@@ -333,12 +333,12 @@ exports[`AlphaTexParserTest comments beat singleline: lexer-diagnostics 1`] = `A
 exports[`AlphaTexParserTest comments beat singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beateffects multiline 1`] = `
-Score (1,1) -> (2,10) {
+Score (1,1) -> (3,10) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,10) {
+    Bar (1,3) -> (3,10) {
       beats: Array [
-        Beat (1,3) -> (2,10) {
+        Beat (1,3) -> (3,10) {
           notes: NoteList (1,3) -> (1,10) {
             openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
             notes: Array [
@@ -351,11 +351,11 @@ Score (1,1) -> (2,10) {
             ],
             closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
           },
-          beatEffects: Properties (1,11) -> (2,10) {
+          beatEffects: Properties (1,11) -> (3,10) {
             openBrace: BraceOpenToken (1,11) -> (1,11),
             properties: Array [],
-            closeBrace: BraceCloseToken (2,9) -> (2,9) {
-              comments: Array [
+            closeBrace: BraceCloseToken (3,9) -> (3,9) {
+              leadingComments: Array [
                 "/** multi
 line**/",
               ],
@@ -373,12 +373,12 @@ exports[`AlphaTexParserTest comments beateffects multiline: lexer-diagnostics 1`
 exports[`AlphaTexParserTest comments beateffects multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments beateffects singleline 1`] = `
-Score (1,1) -> (2,5) {
+Score (1,1) -> (3,5) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,5) {
+    Bar (1,3) -> (3,5) {
       beats: Array [
-        Beat (1,3) -> (2,4) {
+        Beat (1,3) -> (3,4) {
           notes: NoteList (1,3) -> (1,10) {
             openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
             notes: Array [
@@ -391,11 +391,11 @@ Score (1,1) -> (2,5) {
             ],
             closeParenthesis: ParenthesisCloseToken (1,9) -> (1,9),
           },
-          beatEffects: Properties (1,11) -> (2,4) {
+          beatEffects: Properties (1,11) -> (3,4) {
             openBrace: BraceOpenToken (1,11) -> (1,11),
             properties: Array [],
-            closeBrace: BraceCloseToken (2,3) -> (2,3) {
-              comments: Array [
+            closeBrace: BraceCloseToken (3,3) -> (3,3) {
+              leadingComments: Array [
                 "// Single ",
               ],
             },
@@ -412,33 +412,33 @@ exports[`AlphaTexParserTest comments beateffects singleline: lexer-diagnostics 1
 exports[`AlphaTexParserTest comments beateffects singleline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments noteeffects multiline 1`] = `
-Score (1,1) -> (2,14) {
+Score (1,1) -> (3,14) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,14) {
+    Bar (1,3) -> (3,14) {
       beats: Array [
-        Beat (1,3) -> (2,14) {
-          notes: NoteList (1,3) -> (2,14) {
+        Beat (1,3) -> (3,14) {
+          notes: NoteList (1,3) -> (3,14) {
             openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (2,10) {
+              Note (1,4) -> (3,10) {
                 noteValue: Identifier "C4" (1,4) -> (1,6),
-                noteEffects: Properties (1,9) -> (2,10) {
+                noteEffects: Properties (1,9) -> (3,10) {
                   openBrace: BraceOpenToken (1,9) -> (1,9),
                   properties: Array [],
-                  closeBrace: BraceCloseToken (2,9) -> (2,9) {
-                    comments: Array [
+                  closeBrace: BraceCloseToken (3,9) -> (3,9) {
+                    leadingComments: Array [
                       "/** multi
 line**/",
                     ],
                   },
                 },
               },
-              Note (2,11) -> (2,13) {
-                noteValue: Identifier "C5" (2,11) -> (2,13),
+              Note (3,11) -> (3,13) {
+                noteValue: Identifier "C5" (3,11) -> (3,13),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (2,13) -> (2,13),
+            closeParenthesis: ParenthesisCloseToken (3,13) -> (3,13),
           },
         },
       ],
@@ -452,32 +452,32 @@ exports[`AlphaTexParserTest comments noteeffects multiline: lexer-diagnostics 1`
 exports[`AlphaTexParserTest comments noteeffects multiline: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest comments noteeffects singleline 1`] = `
-Score (1,1) -> (2,8) {
+Score (1,1) -> (3,8) {
   metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (2,8) {
+    Bar (1,3) -> (3,8) {
       beats: Array [
-        Beat (1,3) -> (2,8) {
-          notes: NoteList (1,3) -> (2,8) {
+        Beat (1,3) -> (3,8) {
+          notes: NoteList (1,3) -> (3,8) {
             openParenthesis: ParenthesisOpenToken (1,3) -> (1,3),
             notes: Array [
-              Note (1,4) -> (2,4) {
+              Note (1,4) -> (3,4) {
                 noteValue: Identifier "C4" (1,4) -> (1,6),
-                noteEffects: Properties (1,7) -> (2,4) {
+                noteEffects: Properties (1,7) -> (3,4) {
                   openBrace: BraceOpenToken (1,7) -> (1,7),
                   properties: Array [],
-                  closeBrace: BraceCloseToken (2,3) -> (2,3) {
-                    comments: Array [
+                  closeBrace: BraceCloseToken (3,3) -> (3,3) {
+                    leadingComments: Array [
                       "// Single ",
                     ],
                   },
                 },
               },
-              Note (2,5) -> (2,7) {
-                noteValue: Identifier "C5" (2,5) -> (2,7),
+              Note (3,5) -> (3,7) {
+                noteValue: Identifier "C5" (3,5) -> (3,7),
               },
             ],
-            closeParenthesis: ParenthesisCloseToken (2,7) -> (2,7),
+            closeParenthesis: ParenthesisCloseToken (3,7) -> (3,7),
           },
         },
       ],
@@ -495,7 +495,7 @@ Score (1,1) -> (2,22) {
   metaData: Array [
     MetaData (2,9) -> (2,22) {
       tag: MetaDataTag "title" (2,9) -> (2,15) {
-        comments: Array [
+        leadingComments: Array [
           "/** multi
 line**/",
         ],
@@ -517,17 +517,16 @@ Score (1,1) -> (2,15) {
   metaData: Array [
     MetaData (1,1) -> (2,15) {
       tag: MetaDataTag "title" (1,1) -> (1,7) {
+        trailingComments: Array [
+          "/** multi
+line**/",
+        ],
         prefix: BackSlashToken (1,1) -> (1,2),
         tag: Identifier "title" (1,2) -> (1,7),
       },
       values: ValueList (2,9) -> (2,15) {
         values: Array [
-          StringLiteral "Test" (2,9) -> (2,14) {
-            comments: Array [
-              "/** multi
-line**/",
-            ],
-          },
+          StringLiteral "Test" (2,9) -> (2,14),
         ],
       },
     },
@@ -548,7 +547,7 @@ Score (1,1) -> (2,16) {
   metaData: Array [
     MetaData (2,3) -> (2,16) {
       tag: MetaDataTag "title" (2,3) -> (2,9) {
-        comments: Array [
+        leadingComments: Array [
           "// Single ",
         ],
         prefix: BackSlashToken (2,3) -> (2,4),
@@ -5360,6 +5359,43 @@ Score (1,1) -> (1,31) {
   metaDataBarSeparator: DotToken (1,29) -> (1,29),
 }
 `;
+
+exports[`AlphaTexParserTest valid-score-metadata known property before value 1`] = `
+Score (1,1) -> (1,31) {
+  metaData: Array [
+    MetaData (1,1) -> (1,29) {
+      tag: MetaDataTag "track" (1,1) -> (1,7) {
+        prefix: BackSlashToken (1,1) -> (1,2),
+        tag: Identifier "track" (1,2) -> (1,7),
+      },
+      values: ValueList (1,22) -> (1,29) {
+        values: Array [
+          StringLiteral "Name" (1,22) -> (1,27),
+        ],
+      },
+      properties: Properties (1,8) -> (1,21) {
+        openBrace: BraceOpenToken (1,8) -> (1,8),
+        properties: Array [
+          Property (1,9) -> (1,20) {
+            property: Identifier "color" (1,9) -> (1,14),
+            properties: ValueList (1,15) -> (1,20) {
+              values: Array [
+                StringLiteral "red" (1,15) -> (1,19),
+              ],
+            },
+          },
+        ],
+        closeBrace: BraceCloseToken (1,20) -> (1,20),
+      },
+    },
+  ],
+  metaDataBarSeparator: DotToken (1,29) -> (1,29),
+}
+`;
+
+exports[`AlphaTexParserTest valid-score-metadata known property before value: lexer-diagnostics 1`] = `Array []`;
+
+exports[`AlphaTexParserTest valid-score-metadata known property before value: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest valid-score-metadata known property: lexer-diagnostics 1`] = `Array []`;
 

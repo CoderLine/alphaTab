@@ -270,10 +270,10 @@ describe('AlphaSynthTests', () => {
 
     it('midi-bank', () => {
         const score = ScoreLoader.loadAlphaTex(`
-            \\track T1 { instrument 25 bank 77 }
+            \\track "T1" { instrument 25 bank 77 }
                 C4 D4 E4 F4 | C4 { instrument 27 bank 1000 } D4 E4 F4
 
-            \\track T1 { instrument 25 bank 50 }
+            \\track "T1" { instrument 25 bank 50 }
                 C4 D4 E4 F4 | C4 D4 E4 { instrument 27 bank 4000 } F4
         `);
 

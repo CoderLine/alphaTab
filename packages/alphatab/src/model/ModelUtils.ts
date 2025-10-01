@@ -1,17 +1,17 @@
+import { AccidentalType } from '@src/model/AccidentalType';
+import { Automation, AutomationType } from '@src/model/Automation';
+import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
 import type { Duration } from '@src/model/Duration';
-import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
-import type { Settings } from '@src/Settings';
-import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
-import { MasterBar } from '@src/model/MasterBar';
-import type { Track } from '@src/model/Track';
-import { SynthConstants } from '@src/synth/SynthConstants';
-import { Bar } from '@src/model/Bar';
-import { Voice } from '@src/model/Voice';
-import { Automation, AutomationType } from '@src/model/Automation';
-import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
 import type { KeySignature } from '@src/model/KeySignature';
-import { AccidentalType } from '@src/model/AccidentalType';
+import { MasterBar } from '@src/model/MasterBar';
+import { MusicFontSymbol } from '@src/model/MusicFontSymbol';
+import { NoteAccidentalMode } from '@src/model/NoteAccidentalMode';
+import { HeaderFooterStyle, type Score, ScoreStyle, type ScoreSubElement } from '@src/model/Score';
+import type { Track } from '@src/model/Track';
+import { Voice } from '@src/model/Voice';
+import type { Settings } from '@src/Settings';
+import { SynthConstants } from '@src/synth/SynthConstants';
 
 /**
  * @internal
@@ -225,6 +225,25 @@ export class ModelUtils {
 
         ['forcedoubleflat', NoteAccidentalMode.ForceDoubleFlat],
         ['bb', NoteAccidentalMode.ForceDoubleFlat]
+    ]);
+
+    /**
+     * @internal
+     */
+    public static readonly reverseAccidentalModeMapping = new Map<NoteAccidentalMode, string>([
+        [NoteAccidentalMode.Default, 'd'],
+
+        [NoteAccidentalMode.ForceNone, 'forcenone'],
+
+        [NoteAccidentalMode.ForceNatural, 'forcenatural'],
+
+        [NoteAccidentalMode.ForceSharp, '#'],
+
+        [NoteAccidentalMode.ForceDoubleSharp, 'x'],
+
+        [NoteAccidentalMode.ForceFlat, 'b'],
+
+        [NoteAccidentalMode.ForceDoubleFlat, 'bb']
     ]);
 
     public static parseAccidentalMode(data: string): NoteAccidentalMode {

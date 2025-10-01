@@ -152,6 +152,31 @@ export enum AlphaTexDiagnosticCode {
     AT214 = 214,
 
     /**
+     * Cannot use pitched note value '%s' on %s staff, please specify notes using the 'fret.string' syntax.
+     */
+    AT215 = 215,
+
+    /**
+     * Cannot use pitched note value '%s' on percussion staff, please specify percussion articulations with numbers or names.
+     */
+    AT216 = 216,
+
+    /**
+     * Unrecognized note value '%s'.
+     */
+    AT217 = 217,
+
+    /**
+     * Missing string for fretted note.
+     */
+    AT218 = 218,
+
+    /**
+     * Note string is out of range. Available range: 1-%s
+     */
+    AT219 = 219,
+
+    /**
      * Expected no values, but found some. Values are ignored.
      */
     AT300 = 300

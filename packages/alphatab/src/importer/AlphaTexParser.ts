@@ -2,7 +2,7 @@
 import { AlphaTexLexer } from '@src/importer/AlphaTexLexer';
 import {
     type AlphaTexDiagnostic,
-    AlphaTexDiagnosticBag, 
+    AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
     AlphaTexParserAbort
@@ -518,13 +518,25 @@ export class AlphaTexParser {
             nodeType: AlphaTexNodeType.MetaData,
             tag: this.lexer.nextToken() as AlphaTexMetaDataTagNode,
             start: tag.start,
-            properties: undefined
+            properties: undefined,
+            propertiesBeforeValues: false,
         };
         try {
-            metaData.values = this.valueList() ?? this._metaDataReader.readMetaDataValues(this, metaData.tag);
-            metaData.properties = this.properties(property =>
-                this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
-            );
+            // properties can be before or after the values, this is a again a historical
+            // inconsistency on chords
+            const braceCandidate = this.lexer.peekToken();
+            if (braceCandidate?.nodeType === AlphaTexNodeType.BraceOpenToken) {
+                metaData.propertiesBeforeValues = true;
+                metaData.properties = this.properties(property =>
+                    this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
+                );
+                metaData.values = this.valueList() ?? this._metaDataReader.readMetaDataValues(this, metaData.tag);
+            } else {
+                metaData.values = this.valueList() ?? this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                metaData.properties = this.properties(property =>
+                    this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
+                );
+            }
         } finally {
             metaData.end = this.lexer.currentTokenLocation();
         }

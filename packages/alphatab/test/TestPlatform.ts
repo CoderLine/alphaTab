@@ -68,6 +68,16 @@ export class TestPlatform {
         return IOHelper.toString(data, 'UTF-8');
     }
 
+    /**
+     * @target web
+     * @partial
+     */
+    public static async saveFileAsString(name: string, data: string): Promise<void> {
+        const directory = path.dirname(name);
+        await fs.promises.mkdir(directory, { recursive: true });
+        await fs.promises.writeFile(name, data, { encoding: 'utf-8' });
+    }
+
     public static changeExtension(file: string, extension: string): string {
         const lastDot: number = file.lastIndexOf('.');
         if (lastDot === -1) {

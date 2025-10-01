@@ -36,10 +36,10 @@ export default function server(): Plugin {
     return {
         name: 'at-test-data-server',
         configureServer(server) {
-            const testDataPath = path.join(__dirname, 'test-data');
+            const testDataPath = path.join(__dirname, '..', 'alphaTab', 'test-data');
 
             server.middlewares.use('/font', serveStatic(path.join(__dirname, '..', 'alphatab', 'font')));
-            server.middlewares.use('/test-data', serveStatic(path.join(__dirname, '..', 'alphatab', 'test-data')));
+            server.middlewares.use('/test-data', serveStatic(testDataPath));
 
             server.middlewares.use('/test-results/list', (_req, res) => {
                 try {

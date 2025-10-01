@@ -441,16 +441,28 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
         // children
         const children: [string, unknown][] = [];
 
-        if (node.comments && node.comments.length > 0) {
+        if (node.leadingComments && node.leadingComments.length > 0) {
             const comments: string[] = [];
-            for (const c of node.comments) {
+            for (const c of node.leadingComments) {
                 if (c.multiLine) {
                     comments.push(`/*${c.text}*/`);
                 } else {
                     comments.push(`//${c.text}`);
                 }
             }
-            children.push(['comments', comments]);
+            children.push(['leadingComments', comments]);
+        }
+
+        if (node.trailingComments && node.trailingComments.length > 0) {
+            const comments: string[] = [];
+            for (const c of node.trailingComments) {
+                if (c.multiLine) {
+                    comments.push(`/*${c.text}*/`);
+                } else {
+                    comments.push(`//${c.text}`);
+                }
+            }
+            children.push(['trailingComments', comments]);
         }
 
         switch (node.nodeType) {
