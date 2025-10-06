@@ -36,7 +36,7 @@
         "webpack": "^5.101.3"
     },
     "devDependencies": {
-        "@biomejs/biome": "^2.2.4",
+        "@biomejs/biome": "^2.2.5",
         "@microsoft/api-extractor": "^7.52.13",
         "@types/chai": "^5.2.2",
         "@types/mocha": "^10.0.10",
