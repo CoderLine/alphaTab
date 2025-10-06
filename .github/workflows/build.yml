@@ -99,7 +99,7 @@ jobs:
         with:
           java-version: '19'
           distribution: 'temurin'
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v5
         with:
           cache-read-only: false
       - run: npm ci
