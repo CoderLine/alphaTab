@@ -397,6 +397,7 @@ import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { TestPlatform } from './TestPlatform';
+import { AlphaTexDiagnostic } from '@src/importer/AlphaTexShared';
 
 /**
  * @partial
@@ -648,9 +649,9 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
 
             for (let i = 0; i < children.length; i++) {
                 const name = children[i][0];
-                const value = printer(children[i][1], config, indentationNext, depth, refs);
+                const childValue = printer(children[i][1], config, indentationNext, depth, refs);
 
-                str += `${indentationNext + name}: ${value}`;
+                str += `${indentationNext + name}: ${childValue}`;
 
                 if (i < children.length - 1) {
                     str += `,${config.spacingInner}`;
@@ -663,6 +664,53 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
         }
 
         return str;
+    }
+}
+
+/**
+ * @partial
+ */
+export class AlphaTexDiagnosticPlugin implements PrettyFormatNewPlugin {
+    public static readonly instance = new AlphaTexDiagnosticPlugin();
+
+    /**
+     * @partial
+     * @target web
+     */
+    test(arg0: unknown): boolean {
+        return !!arg0 && typeof arg0 === 'object' && 'severity' in arg0;
+    }
+
+    serialize(
+        val: unknown,
+        config: PrettyFormatConfig,
+        indentation: string,
+        depth: number,
+        refs: unknown[],
+        printer: PrettyFormatPrinter
+    ): string {
+        const v = val as AlphaTexDiagnostic;
+        const map = new Map<string, unknown>();
+
+        map.set('code', v.code);
+        map.set('severity', v.severity as number);
+        map.set('message', v.message);
+        if (v.start) {
+            const start = new Map<string, number>();
+            map.set('start', start);
+            start.set('col', v.start.col);
+            start.set('line', v.start.line);
+            start.set('offset', v.start.offset);
+        }
+        if (v.end) {
+            const end = new Map<string, number>();
+            map.set('start', end);
+            end.set('col', v.end.col);
+            end.set('line', v.end.line);
+            end.set('offset', v.end.offset);
+        }
+
+        return printer(map, config, indentation, depth, refs);
     }
 }
 
@@ -913,6 +961,7 @@ export class SnapshotFile {
         const c = new PrettyFormatConfig();
         c.plugins.push(ScoreSerializerPlugin.instance);
         c.plugins.push(MidiEventSerializerPlugin.instance);
+        c.plugins.push(AlphaTexDiagnosticPlugin.instance);
         c.plugins.push(AlphaTexAstNodePlugin.instance);
         return c;
     }

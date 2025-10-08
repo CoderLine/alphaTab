@@ -35,7 +35,8 @@
                 "noDescendingSpecificity": "off"
             },
             "suspicious": {
-                "noExplicitAny": "off" // used in areas where we work with dynamic JSON data
+                "noExplicitAny": "off", // used in areas where we work with dynamic JSON data
+                "noEmptyInterface": "off" // we use these for marker interfaces 
             },
             "correctness": {
                 "noUnusedImports": {

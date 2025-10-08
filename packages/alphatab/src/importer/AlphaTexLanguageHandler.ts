@@ -6,17 +6,22 @@
 
 import {
     type AlphaTexAstNode,
+    type AlphaTexBackSlashTokenNode,
+    type AlphaTexBraceCloseTokenNode,
+    type AlphaTexBraceOpenTokenNode,
     type AlphaTexIdentifier,
     type AlphaTexMetaDataNode,
     type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
+    type AlphaTexParenthesisCloseTokenNode,
+    type AlphaTexParenthesisOpenTokenNode,
     type AlphaTexPropertiesNode,
     type AlphaTexPropertyNode,
     type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexValueList,
-    type AlphaTexValueListItem
+    type IAlphaTexValueListItem
 } from '@src/importer/AlphaTexAst';
 import type { AlphaTexParser } from '@src/importer/AlphaTexParser';
 import {
@@ -155,7 +160,7 @@ export interface IAlphaTexImporterState {
 }
 
 export interface IAlphaTexImporter {
-    state: IAlphaTexImporterState;
+    readonly state: IAlphaTexImporterState;
 
     makeStaffPitched(staff: Staff): void;
     startNewVoice(): void;
@@ -228,19 +233,36 @@ enum ValueListParseTypesMode {
     ValueListWithoutParenthesis
 }
 
-type ValueListParseTypesBasic = [AlphaTexNodeType[] /* accepted types */, ValueListParseTypesMode];
-type ValueListParseTypesExtended = {
+/**
+ * @record
+ */
+interface ValueListParseTypesExtended {
     expectedTypes: Set<AlphaTexNodeType>;
     parseMode: ValueListParseTypesMode;
     allowedValues?: Set<string>;
     reservedIdentifiers?: Set<string>;
-};
-type ValueListParseTypes = ValueListParseTypesExtended[];
+}
 
 /**
  * AlphaTexNodeFactory (short name for less code)
  */
 class ATNF {
+    static identifier(text: string): AlphaTexIdentifier {
+        return {
+            nodeType: AlphaTexNodeType.Identifier,
+            text
+        } as AlphaTexIdentifier;
+    }
+    static stringLiteral(text: string): AlphaTexStringLiteral {
+        return { nodeType: AlphaTexNodeType.StringLiteral, text } as AlphaTexStringLiteral;
+    }
+    static numberLiteral(value: number): AlphaTexNumberLiteral {
+        return {
+            nodeType: AlphaTexNodeType.NumberLiteral,
+            value
+        } as AlphaTexNumberLiteral;
+    }
+
     public static metaData(
         tag: string,
         values?: AlphaTexValueList,
@@ -252,16 +274,16 @@ class ATNF {
                 nodeType: AlphaTexNodeType.MetaDataTag,
                 prefix: {
                     nodeType: AlphaTexNodeType.BackSlashToken
-                },
+                } as AlphaTexBackSlashTokenNode,
                 tag: {
                     nodeType: AlphaTexNodeType.Identifier,
                     text: tag
-                }
-            },
+                } as AlphaTexIdentifier
+            } as AlphaTexMetaDataTagNode,
             values,
             properties,
             propertiesBeforeValues: false
-        };
+        } as AlphaTexMetaDataNode;
     }
 
     public static identifierMetaData(tag: string, value: string): AlphaTexMetaDataNode {
@@ -272,82 +294,59 @@ class ATNF {
         return ATNF.metaData(tag, ATNF.numberValueList(value));
     }
 
-    public static valueList(parenthesis: boolean, values: (AlphaTexValueListItem | undefined)[]): AlphaTexValueList {
-        const valueList: AlphaTexValueList = {
+    public static valueList(parenthesis: boolean, values: (IAlphaTexValueListItem | undefined)[]): AlphaTexValueList {
+        const valueList = {
             nodeType: AlphaTexNodeType.ValueList,
             values: values.filter(v => v !== undefined)
-        };
+        } as AlphaTexValueList;
 
         if (parenthesis) {
             valueList.openParenthesis = {
                 nodeType: AlphaTexNodeType.ParenthesisOpenToken
-            };
+            } as AlphaTexParenthesisOpenTokenNode;
             valueList.closeParenthesis = {
                 nodeType: AlphaTexNodeType.ParenthesisCloseToken
-            };
+            } as AlphaTexParenthesisCloseTokenNode;
         }
 
         return valueList;
     }
 
-    public static stringValueList(text: string): AlphaTexValueList | undefined {
-        return {
-            nodeType: AlphaTexNodeType.ValueList,
-            values: [
-                {
-                    nodeType: AlphaTexNodeType.StringLiteral,
-                    text
-                }
-            ]
-        };
+    public static stringValueList(text: string): AlphaTexValueList {
+        return ATNF.valueList(false, [ATNF.stringLiteral(text)]);
     }
 
-    public static identifierValueList(text: string): AlphaTexValueList | undefined {
-        return {
-            nodeType: AlphaTexNodeType.ValueList,
-            values: [
-                {
-                    nodeType: AlphaTexNodeType.Identifier,
-                    text
-                }
-            ]
-        };
+    public static identifierValueList(text: string): AlphaTexValueList {
+        return ATNF.valueList(false, [ATNF.identifier(text)]);
     }
 
     public static numberValueList(value: number): AlphaTexValueList | undefined {
-        return {
-            nodeType: AlphaTexNodeType.ValueList,
-            values: [
-                {
-                    nodeType: AlphaTexNodeType.NumberLiteral,
-                    value
-                }
-            ]
-        };
+        return ATNF.valueList(false, [ATNF.numberLiteral(value)]);
     }
 
     public static properties(
         properties: ([string, AlphaTexValueList | undefined] | undefined)[]
     ): AlphaTexPropertiesNode {
-        const node: AlphaTexPropertiesNode = {
+        const node = {
             nodeType: AlphaTexNodeType.Properties,
-            properties: properties
-                .filter(p => p !== undefined)
-                .map(p => ({
-                    nodeType: AlphaTexNodeType.Property,
-                    property: {
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: p[0]
-                    },
-                    values: p[1]
-                })),
+            properties: [],
             openBrace: {
                 nodeType: AlphaTexNodeType.BraceOpenToken
-            },
+            } as AlphaTexBraceOpenTokenNode,
             closeBrace: {
                 nodeType: AlphaTexNodeType.BraceCloseToken
+            } as AlphaTexBraceCloseTokenNode
+        } as AlphaTexPropertiesNode;
+
+        for (const p of properties) {
+            if (p) {
+                node.properties.push({
+                    nodeType: AlphaTexNodeType.Property,
+                    property: ATNF.identifier(p[0]),
+                    values: p[1]
+                } as AlphaTexPropertyNode);
             }
-        };
+        }
 
         return node;
     }
@@ -355,17 +354,14 @@ class ATNF {
     public static property(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexValueList) {
         properties.push({
             nodeType: AlphaTexNodeType.Property,
-            property: {
-                nodeType: AlphaTexNodeType.Identifier,
-                text: identifier
-            },
+            property: ATNF.identifier(identifier),
             values
         });
     }
 }
 
 class AlphaTex1EnumMappings {
-    private static reverse<TKey, TValue>(map: Map<TKey, TValue>): Map<TValue, TKey> {
+    private static reverse<TKey, TValue extends number>(map: Map<TKey, TValue>): Map<TValue, TKey> {
         const reversed = new Map<TValue, TKey>();
         for (const [k, v] of map) {
             if (!reversed.has(v)) {
@@ -827,23 +823,25 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             reservedIdentifiers: reservedIdentifiers ? new Set<string>(reservedIdentifiers) : undefined
         };
     }
-    private static basicList(basic: ValueListParseTypesBasic[]): ValueListParseTypesExtended[] {
+    private static basicList(
+        basic: [AlphaTexNodeType[] /* accepted types */, ValueListParseTypesMode][]
+    ): ValueListParseTypesExtended[] {
         return basic.map(b => AlphaTex1LanguageHandler.valueType(b[0], b[1]));
     }
 
-    private static readonly scoreInfoValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
+    private static readonly scoreInfoValueListTypes = AlphaTex1LanguageHandler.basicList([
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional],
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
     ]);
-    private static readonly scoreInfoTemplateValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
+    private static readonly scoreInfoTemplateValueListTypes = AlphaTex1LanguageHandler.basicList([
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
     ]);
-    private static readonly numberOnlyValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
+    private static readonly numberOnlyValueListTypes = AlphaTex1LanguageHandler.basicList([
         [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required]
     ]);
-    private static readonly textLikeValueListTypes: ValueListParseTypes = AlphaTex1LanguageHandler.basicList([
+    private static readonly textLikeValueListTypes = AlphaTex1LanguageHandler.basicList([
         [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required]
     ]);
 
@@ -851,7 +849,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
      * in `\chord {}` properties.
      */
-    private static readonly chordPropertyValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly chordPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // firstfret 3
         ['firstfret', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
 
@@ -901,7 +899,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
      * in `\staff {}` properties.
      */
-    private static readonly staffPropertyValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly staffPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // score, score 1
         [
             'score',
@@ -916,7 +914,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
      * in `\track {}` properties.
      */
-    private static readonly trackPropertyValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly trackPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // color red, color "#FF0000"
         ['color', AlphaTex1LanguageHandler.textLikeValueListTypes],
 
@@ -960,7 +958,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
      * in beat level properties (beat effects).
      */
-    private static readonly beatPropertyValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly beatPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         ['f', undefined],
         ['fo', undefined],
         ['vs', undefined],
@@ -1176,7 +1174,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
      * in beat duration properties.
      */
-    private static readonly beatDurationPropertyValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly beatDurationPropertyValueListTypes = new Map<
+        string,
+        ValueListParseTypesExtended[] | undefined
+    >([
         // tu 3, tu 3,2
         [
             'tu',
@@ -1191,7 +1192,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
      * in note level properties (note effects).
      */
-    private static readonly notePropertyValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly notePropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         [
             'nh',
             AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
@@ -1314,7 +1315,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         ['slur', AlphaTex1LanguageHandler.textLikeValueListTypes]
     ]);
 
-    private static readonly syncMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly syncMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // \sync BarIndex Occurence MillisecondOffset
         // \sync BarIndex Occurence MillisecondOffset RatioPosition
         [
@@ -1328,7 +1329,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         ]
     ]);
 
-    private static readonly structuralMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly structuralMetaDataValueListTypes = new Map<
+        string,
+        ValueListParseTypesExtended[] | undefined
+    >([
         // track, track Name, track ShortName Name, track "Name", track "ShortName" "Name"
         [
             'track',
@@ -1341,7 +1345,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         ['voice', undefined]
     ]);
 
-    private static readonly staffMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly staffMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // tuning E4 B3 G3 D3 A2 E2, \tuning "E4" "B3" "G3" "D3"
         [
             'tuning',
@@ -1405,7 +1409,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         ['transpose', AlphaTex1LanguageHandler.numberOnlyValueListTypes]
     ]);
 
-    private static readonly scoreMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly scoreMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         ['title', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['subtitle', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
         ['artist', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
@@ -1452,7 +1456,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
      * {@link readTypedValueList}
      * @private
      */
-    private static readonly barMetaDataValueListTypes = new Map<string, ValueListParseTypes | undefined>([
+    private static readonly barMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // tempo 120, tempo 120 "Moderate", tempo 120 "Moderate" 0.5, tempo 120 hide 0.5, tempo 120 hide
         [
             'tempo',
@@ -1652,7 +1656,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
     private readPropertyValues(
         parser: AlphaTexParser,
-        lookups: Map<string, ValueListParseTypes | undefined>[],
+        lookups: Map<string, ValueListParseTypesExtended[] | undefined>[],
         property: AlphaTexPropertyNode
     ): AlphaTexValueList | undefined {
         const tag = property.property.text.toLowerCase();
@@ -1707,14 +1711,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
     private readTypedValueList(
         parser: AlphaTexParser,
-        expectedValues: ValueListParseTypes,
+        expectedValues: ValueListParseTypesExtended[],
         endOfListTypes?: Set<AlphaTexNodeType>
     ): AlphaTexValueList | undefined {
-        const valueList: AlphaTexValueList = {
-            nodeType: AlphaTexNodeType.ValueList,
-            values: [],
-            start: parser.lexer.peekToken()?.start
-        };
+        const valueList: AlphaTexValueList = ATNF.valueList(false, []);
+        valueList.start = parser.lexer.peekToken()?.start;
         let error = false;
         let parseRemaining = endOfListTypes !== undefined;
         try {
@@ -1833,7 +1834,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     }
                 } else if (expected?.reservedIdentifiers) {
                     const identifierText = (parser.lexer.peekToken() as AlphaTexIdentifier).text;
-                    if (!expected?.reservedIdentifiers.has(identifierText.toLowerCase())) {
+                    if (!expected.reservedIdentifiers.has(identifierText.toLowerCase())) {
                         valueList.values.push(parser.lexer.nextToken() as AlphaTexIdentifier);
                     }
                 } else {
@@ -2045,7 +2046,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
     private checkValueListTypes(
         importer: IAlphaTexImporter,
-        lookupList: Map<string, ValueListParseTypes | undefined>[],
+        lookupList: Map<string, ValueListParseTypesExtended[] | undefined>[],
         parent: AlphaTexAstNode,
         tag: string,
         values: AlphaTexValueList | undefined
@@ -2173,7 +2174,23 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 chord.name = (metaData.values!.values[0] as AlphaTexTextNode).text;
 
                 for (let i = 1; i < metaData.values!.values.length; i++) {
-                    chord.strings.push((metaData.values!.values[i] as AlphaTexNumberLiteral).value);
+                    const v = metaData.values!.values[i];
+                    if (v.nodeType === AlphaTexNodeType.NumberLiteral) {
+                        chord.strings.push((v as AlphaTexNumberLiteral).value);
+                    } else if (v.nodeType === AlphaTexNodeType.Identifier) {
+                        const txt = (v as AlphaTexIdentifier).text;
+                        if (txt === 'x') {
+                            chord.strings.push(-1);
+                        } else {
+                            importer.addSemanticDiagnostic({
+                                code: AlphaTexDiagnosticCode.AT209,
+                                message: `Unexpected chord value '${txt}', expected: 'x'`,
+                                severity: AlphaTexDiagnosticsSeverity.Error,
+                                start: v.start,
+                                end: v.end
+                            });
+                        }
+                    }
                 }
                 staff.addChord(AlphaTex1LanguageHandler.getChordId(staff, chord.name), chord);
                 return ApplyNodeResult.Applied;
@@ -2404,7 +2421,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                             default:
                                 importer.addSemanticDiagnostic({
                                     code: AlphaTexDiagnosticCode.AT209,
-                                    message: `Unexpected clef value '${clef}', expected: ${Array.from(AlphaTex1EnumMappings.clefs.keys()).join(',')}`,
+                                    message: `Unexpected clef value '${clefValue}', expected: ${Array.from(AlphaTex1EnumMappings.clefs.keys()).join(',')}`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
                                     start: metaData.values!.values[0].start,
                                     end: metaData.values!.values[0].end
@@ -2634,7 +2651,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
     private validateValueListTypes(
         importer: IAlphaTexImporter,
-        expectedValues: ValueListParseTypes,
+        expectedValues: ValueListParseTypesExtended[],
         parent: AlphaTexAstNode,
         values: AlphaTexValueList | undefined
     ) {
@@ -2668,7 +2685,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         while (expectedIndex < expectedValues.length) {
             const expected = expectedValues[expectedIndex];
 
-            const value = actualIndex < values.values.length ? values.values[actualIndex] : undefined;
+            const value: IAlphaTexValueListItem | undefined =
+                actualIndex < values.values.length ? values.values[actualIndex] : undefined;
 
             // basic match
             if (value && expected.expectedTypes.has(value.nodeType)) {
@@ -2690,6 +2708,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 continue;
             }
 
+            const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage([expected]);
+
             // value list
             if (
                 value &&
@@ -2701,7 +2721,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 expectedIndex++;
                 for (const item of (value as AlphaTexValueList).values) {
                     if (!expected.expectedTypes.has(item.nodeType)) {
-                        const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage([expected]);
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT209,
                             message: `Unexpected list item value '${AlphaTexNodeType[value.nodeType]}', expected: ${expectedTypes}`,
@@ -2715,7 +2734,6 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             }
 
             // error handling
-            const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage([expected]);
             if (value) {
                 switch (expected.parseMode) {
                     case ValueListParseTypesMode.ValueListWithoutParenthesis:
@@ -2835,7 +2853,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         style.textAlign = textAlign!;
     }
 
-    private static buildExpectedTypesMessage(values: ValueListParseTypes) {
+    private static buildExpectedTypesMessage(values: ValueListParseTypesExtended[]) {
         const parts: string[] = [];
 
         for (const v of values) {
@@ -2925,7 +2943,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         }
     }
 
-    private static booleanLikeValue(values: AlphaTexValueListItem[], i: number): boolean {
+    private static booleanLikeValue(values: IAlphaTexValueListItem[], i: number): boolean {
         if (i >= values.length) {
             return true;
         }
@@ -2972,7 +2990,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
     private checkProperty(
         importer: IAlphaTexImporter,
-        lookupList: Map<string, ValueListParseTypes | undefined>[],
+        lookupList: Map<string, ValueListParseTypesExtended[] | undefined>[],
         p: AlphaTexPropertyNode
     ): boolean {
         const result = this.checkValueListTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.values);
@@ -3966,7 +3984,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             values = (values[valueStartIndex] as AlphaTexValueList).values;
             valueStartIndex = 0;
             remainingValues = values.length;
-            errorNode = values[valueStartIndex];
+            errorNode = values[valueStartIndex] as AlphaTexAstNode;
         }
 
         const valuesPerItem = exact ? 2 : 1;
@@ -4026,7 +4044,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     //
     // string -> enum mappings
 
-    private static parseEnumValue<TValue>(
+    private static parseEnumValue<TValue extends number>(
         importer: IAlphaTexImporter,
         p: AlphaTexValueList,
         name: string,
@@ -4094,8 +4112,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             ATNF.metaData(
                 'tempo',
                 ATNF.valueList(false, [
-                    { nodeType: AlphaTexNodeType.NumberLiteral, value: score.tempo },
-                    score.tempoLabel ? { nodeType: AlphaTexNodeType.StringLiteral, text: score.tempoLabel } : undefined
+                    ATNF.numberLiteral(score.tempo),
+                    score.tempoLabel ? ATNF.stringLiteral(score.tempoLabel) : undefined
                 ])
             )
         );
@@ -4109,7 +4127,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     'systemsLayout',
                     ATNF.valueList(
                         false,
-                        score.systemsLayout.map(l => ({ nodeType: AlphaTexNodeType.NumberLiteral, value: l }))
+                        score.systemsLayout.map(l => ATNF.numberLiteral(l) as IAlphaTexValueListItem)
                     )
                 )
             );
@@ -4243,18 +4261,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         value: string | undefined,
         element: ScoreSubElement | undefined,
         writeIfEmpty: boolean = false
-    ) {
+    ): void {
         if (value !== undefined && value.length === 0 && !writeIfEmpty) {
             return;
         }
 
-        const valueList: AlphaTexValueList = {
-            nodeType: AlphaTexNodeType.ValueList,
-            values: []
-        };
+        const valueList: AlphaTexValueList = ATNF.valueList(false, []);
 
         if (value !== undefined) {
-            valueList.values.push({ nodeType: AlphaTexNodeType.StringLiteral, text: value });
+            valueList.values.push(ATNF.stringLiteral(value));
         }
 
         if (element !== undefined) {
@@ -4266,22 +4281,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 ? ScoreStyle.defaultHeaderAndFooter.get(element)
                 : undefined;
             if (style && (!defaultStyle || !HeaderFooterStyle.equals(defaultStyle, style))) {
-                valueList.values.push({
-                    nodeType: AlphaTexNodeType.StringLiteral,
-                    text: style.isVisible === false ? '' : style.template
-                });
-                valueList.values.push({
-                    nodeType: AlphaTexNodeType.Identifier,
-                    text: AlphaTex1EnumMappings.textAlignsReversed.get(style.textAlign)!
-                });
+                valueList.values.push(ATNF.stringLiteral(style.isVisible === false ? '' : style.template));
+                valueList.values.push(ATNF.identifier(AlphaTex1EnumMappings.textAlignsReversed.get(style.textAlign)!));
             }
         }
 
         // do not write with all defaults
         if (value === undefined && valueList.values.length === 0) {
-            return undefined;
+            return;
         } else if (value !== undefined && value.length === 0 && valueList.values.length === 1) {
-            return undefined;
+            return;
         }
 
         nodes.push(ATNF.metaData(tag, valueList));
@@ -4296,12 +4305,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 ATNF.metaData(
                     'sync',
                     ATNF.valueList(false, [
-                        { nodeType: AlphaTexNodeType.NumberLiteral, value: p.barIndex },
-                        { nodeType: AlphaTexNodeType.NumberLiteral, value: p.barOccurence },
-                        { nodeType: AlphaTexNodeType.NumberLiteral, value: p.millisecondOffset },
-                        p.barPosition > 0
-                            ? { nodeType: AlphaTexNodeType.NumberLiteral, value: p.barPosition }
-                            : undefined
+                        ATNF.numberLiteral(p.barIndex),
+                        ATNF.numberLiteral(p.barOccurence),
+                        ATNF.numberLiteral(p.millisecondOffset),
+                        p.barPosition > 0 ? ATNF.numberLiteral(p.barPosition) : undefined
                     ])
                 )
             );
@@ -4427,10 +4434,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 'tuning',
                 ATNF.valueList(
                     false,
-                    staff.stringTuning.tunings.map(t => ({
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: Tuning.getTextForTuning(t, true)
-                    }))
+                    staff.stringTuning.tunings.map(
+                        t => ATNF.identifier(Tuning.getTextForTuning(t, true)) as IAlphaTexValueListItem
+                    )
                 )
             );
             nodes.push(tuning);
@@ -4439,11 +4445,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 staff.track.score.stylesheet.perTrackDisplayTuning &&
                 staff.track.score.stylesheet.perTrackDisplayTuning!.has(staff.track.index)
             ) {
-                tuning.values!.values.push({ nodeType: AlphaTexNodeType.Identifier, text: 'hide' });
+                tuning.values!.values.push(ATNF.identifier('hide'));
             }
 
             if (staff.stringTuning.name.length > 0) {
-                tuning.values!.values.push({ nodeType: AlphaTexNodeType.StringLiteral, text: staff.stringTuning.name });
+                tuning.values!.values.push(ATNF.stringLiteral(staff.stringTuning.name));
             }
         }
 
@@ -4477,7 +4483,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     private static buildChordNode(chord: Chord): AlphaTexMetaDataNode {
         const chordNode = ATNF.metaData(
             'chord',
-            ATNF.valueList(false, [{ nodeType: AlphaTexNodeType.StringLiteral, text: chord.name }]),
+            ATNF.valueList(false, [ATNF.stringLiteral(chord.name)]),
             ATNF.properties([
                 chord.firstFret >= 0 ? ['firstfret', ATNF.numberValueList(chord.firstFret)] : undefined,
                 ['showdiagram', ATNF.identifierValueList(chord.showDiagram ? 'true' : 'false')],
@@ -4488,7 +4494,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                           'barre',
                           ATNF.valueList(
                               false,
-                              chord.barreFrets.map(f => ({ nodeType: AlphaTexNodeType.NumberLiteral, value: f }))
+                              chord.barreFrets.map(f => ATNF.numberLiteral(f) as IAlphaTexValueListItem)
                           )
                       ]
                     : undefined
@@ -4498,9 +4504,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
         for (let i = 0; i < chord.staff.tuning.length; i++) {
             if (i < chord.strings.length && chord.strings[i] >= 0) {
-                chordNode.values!.values.push({ nodeType: AlphaTexNodeType.NumberLiteral, value: chord.strings[i] });
+                chordNode.values!.values.push(ATNF.numberLiteral(chord.strings[i]));
             } else {
-                chordNode.values!.values.push({ nodeType: AlphaTexNodeType.Identifier, text: 'x' });
+                chordNode.values!.values.push(ATNF.identifier('x'));
             }
         }
 
@@ -4516,10 +4522,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     'ae',
                     ATNF.valueList(
                         true,
-                        ModelUtils.getAlternateEndingsList(masterBar.alternateEndings).map(i => ({
-                            nodeType: AlphaTexNodeType.NumberLiteral,
-                            value: i + 1
-                        }))
+                        ModelUtils.getAlternateEndingsList(masterBar.alternateEndings).map(
+                            i => ATNF.numberLiteral(i + 1) as IAlphaTexValueListItem
+                        )
                     )
                 )
             );
@@ -4546,14 +4551,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     ATNF.metaData(
                         'ts',
                         ATNF.valueList(false, [
-                            {
-                                nodeType: AlphaTexNodeType.NumberLiteral,
-                                value: masterBar.timeSignatureNumerator
-                            },
-                            {
-                                nodeType: AlphaTexNodeType.NumberLiteral,
-                                value: masterBar.timeSignatureDenominator
-                            }
+                            ATNF.numberLiteral(masterBar.timeSignatureNumerator),
+                            ATNF.numberLiteral(masterBar.timeSignatureDenominator)
                         ])
                     )
                 );
@@ -4578,14 +4577,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 ATNF.metaData(
                     'section',
                     ATNF.valueList(false, [
-                        {
-                            nodeType: AlphaTexNodeType.StringLiteral,
-                            text: masterBar.section.marker
-                        },
-                        {
-                            nodeType: AlphaTexNodeType.StringLiteral,
-                            text: masterBar.section.text
-                        }
+                        ATNF.stringLiteral(masterBar.section.marker),
+                        ATNF.stringLiteral(masterBar.section.text)
                     ])
                 )
             );
@@ -4613,28 +4606,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
             const tempo = ATNF.metaData(
                 'tempo',
                 ATNF.valueList(true, [
-                    {
-                        nodeType: AlphaTexNodeType.NumberLiteral,
-                        value: a.value
-                    },
-                    !a.isVisible
-                        ? {
-                              nodeType: AlphaTexNodeType.Identifier,
-                              text: 'hide'
-                          }
-                        : undefined,
-                    a.text
-                        ? {
-                              nodeType: AlphaTexNodeType.StringLiteral,
-                              text: a.text
-                          }
-                        : undefined,
-                    a.ratioPosition > 0
-                        ? {
-                              nodeType: AlphaTexNodeType.NumberLiteral,
-                              value: a.ratioPosition
-                          }
-                        : undefined
+                    ATNF.numberLiteral(a.value),
+                    !a.isVisible ? ATNF.identifier('hide') : undefined,
+                    a.text ? ATNF.stringLiteral(a.text) : undefined,
+                    a.ratioPosition > 0 ? ATNF.numberLiteral(a.ratioPosition) : undefined
                 ])
             );
             if (tempo.values!.values.length === 1) {
@@ -4693,14 +4668,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                           'score',
                           ATNF.valueList(false, [
                               staff.standardNotationLineCount !== Staff.DefaultStandardNotationLineCount
-                                  ? { nodeType: AlphaTexNodeType.NumberLiteral, value: staff.standardNotationLineCount }
+                                  ? ATNF.numberLiteral(staff.standardNotationLineCount)
                                   : undefined
                           ])
                       ]
                     : undefined,
-                staff.showTablature ? ['tabs', undefined] : undefined,
-                staff.showSlash ? ['slash', undefined] : undefined,
-                staff.showNumbered ? ['numbered', undefined] : undefined
+                staff.showTablature ? (['tabs', undefined] as [string, AlphaTexValueList | undefined]) : undefined,
+                staff.showSlash ? (['slash', undefined] as [string, AlphaTexValueList | undefined]) : undefined,
+                staff.showNumbered ? (['numbered', undefined] as [string, AlphaTexValueList | undefined]) : undefined
             ])
         );
 
@@ -4720,10 +4695,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         const node = ATNF.metaData(
             'track',
             ATNF.valueList(false, [
-                { nodeType: AlphaTexNodeType.StringLiteral, text: track.name },
-                track.shortName.length > 0
-                    ? { nodeType: AlphaTexNodeType.StringLiteral, text: track.shortName }
-                    : undefined
+                ATNF.stringLiteral(track.name),
+                track.shortName.length > 0 ? ATNF.stringLiteral(track.shortName) : undefined
             ]),
             ATNF.properties([
                 track.color.rgba !== AlphaTex1LanguageHandler.defaultTrack.color.rgba
@@ -4737,17 +4710,21 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                           'systemsLayout',
                           ATNF.valueList(
                               false,
-                              track.systemsLayout.map(d => ({ nodeType: AlphaTexNodeType.NumberLiteral, value: d }))
+                              track.systemsLayout.map(d => ATNF.numberLiteral(d) as IAlphaTexValueListItem)
                           )
                       ]
                     : undefined,
                 ['volume', ATNF.numberValueList(track.playbackInfo.volume)],
                 ['balance', ATNF.numberValueList(track.playbackInfo.balance)],
-                track.playbackInfo.isMute ? ['mute', undefined] : undefined,
-                track.playbackInfo.isSolo ? ['solo', undefined] : undefined,
+                track.playbackInfo.isMute
+                    ? (['mute', undefined] as [string, AlphaTexValueList | undefined])
+                    : undefined,
+                track.playbackInfo.isSolo
+                    ? (['solo', undefined] as [string, AlphaTexValueList | undefined])
+                    : undefined,
                 track.score.stylesheet.perTrackMultiBarRest &&
                 track.score.stylesheet.perTrackMultiBarRest!.has(track.index)
-                    ? ['multiBarRest', undefined]
+                    ? (['multiBarRest', undefined] as [string, AlphaTexValueList | undefined])
                     : undefined,
                 [
                     'instrument',
@@ -4779,22 +4756,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 properties,
                 'be',
                 ATNF.valueList(false, [
-                    {
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!
-                    },
+                    ATNF.identifier(AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!),
                     note.bendStyle !== BendStyle.Default
-                        ? {
-                              nodeType: AlphaTexNodeType.Identifier,
-                              text: AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!
-                          }
+                        ? ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!)
                         : undefined,
                     ATNF.valueList(
                         true,
-                        note.bendPoints!.flatMap(p => [
-                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.offset } as AlphaTexNumberLiteral,
-                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.value } as AlphaTexNumberLiteral
-                        ])
+                        note.bendPoints!.flatMap(
+                            p => [ATNF.numberLiteral(p.offset), ATNF.numberLiteral(p.value)] as IAlphaTexValueListItem[]
+                        )
                     )
                 ])
             );
@@ -4834,8 +4804,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 properties,
                 'tr',
                 ATNF.valueList(false, [
-                    { nodeType: AlphaTexNodeType.NumberLiteral, value: note.trillFret },
-                    { nodeType: AlphaTexNodeType.NumberLiteral, value: note.trillSpeed as number }
+                    ATNF.numberLiteral(note.trillFret),
+                    ATNF.numberLiteral(note.trillSpeed as number)
                 ])
             );
         }
@@ -5019,8 +4989,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 properties,
                 'tu',
                 ATNF.valueList(false, [
-                    { nodeType: AlphaTexNodeType.NumberLiteral, value: beat.tupletNumerator },
-                    { nodeType: AlphaTexNodeType.NumberLiteral, value: beat.tupletDenominator }
+                    ATNF.numberLiteral(beat.tupletNumerator),
+                    ATNF.numberLiteral(beat.tupletDenominator)
                 ])
             );
         }
@@ -5030,20 +5000,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 properties,
                 'tbe',
                 ATNF.valueList(false, [
-                    {
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!
-                    },
-                    {
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!
-                    },
+                    ATNF.identifier(AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!),
+                    ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!),
                     ATNF.valueList(
                         true,
-                        beat.whammyBarPoints!.flatMap(p => [
-                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.offset } as AlphaTexNumberLiteral,
-                            { nodeType: AlphaTexNodeType.NumberLiteral, value: p.value } as AlphaTexNumberLiteral
-                        ])
+                        beat.whammyBarPoints!.flatMap(
+                            p => [ATNF.numberLiteral(p.offset), ATNF.numberLiteral(p.value)] as IAlphaTexValueListItem[]
+                        )
                     )
                 ])
             );
@@ -5099,16 +5062,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                     ATNF.property(
                         properties,
                         'lyrics',
-                        ATNF.valueList(false, [
-                            {
-                                nodeType: AlphaTexNodeType.NumberLiteral,
-                                value: i
-                            },
-                            {
-                                nodeType: AlphaTexNodeType.StringLiteral,
-                                text: beat.lyrics[i]
-                            }
-                        ])
+                        ATNF.valueList(false, [ATNF.numberLiteral(i), ATNF.stringLiteral(beat.lyrics[i])])
                     );
                 }
             } else {
@@ -5153,14 +5107,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 properties,
                 'fermata',
                 ATNF.valueList(false, [
-                    {
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: AlphaTex1EnumMappings.fermataTypesReversed.get(beat.fermata!.type)!
-                    },
-                    {
-                        nodeType: AlphaTexNodeType.NumberLiteral,
-                        value: beat.fermata!.length
-                    }
+                    ATNF.identifier(AlphaTex1EnumMappings.fermataTypesReversed.get(beat.fermata!.type)!),
+                    ATNF.numberLiteral(beat.fermata!.length)
                 ])
             );
         }
@@ -5176,13 +5124,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                         properties,
                         'tempo',
                         ATNF.valueList(false, [
-                            { nodeType: AlphaTexNodeType.NumberLiteral, value: automation.value },
-                            automation.text.length === 0
-                                ? undefined
-                                : {
-                                      nodeType: AlphaTexNodeType.StringLiteral,
-                                      text: automation.text
-                                  }
+                            ATNF.numberLiteral(automation.value),
+                            automation.text.length === 0 ? undefined : ATNF.stringLiteral(automation.text)
                         ])
                     );
                     break;
@@ -5218,11 +5161,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
                 properties,
                 'barre',
                 ATNF.valueList(false, [
-                    { nodeType: AlphaTexNodeType.NumberLiteral, value: beat.barreFret },
-                    {
-                        nodeType: AlphaTexNodeType.Identifier,
-                        text: AlphaTex1EnumMappings.barreShapesReversed.get(beat.barreShape)!
-                    }
+                    ATNF.numberLiteral(beat.barreFret),
+                    ATNF.identifier(AlphaTex1EnumMappings.barreShapesReversed.get(beat.barreShape)!)
                 ])
             );
         }

@@ -1,4 +1,3 @@
-import { AlphaTexExporter } from '@src/exporter/AlphaTexExporter';
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
 import type { Score } from '@src/model/Score';
@@ -45,6 +44,7 @@ describe('AlphaTexImporterOldNewCompat', () => {
             }
 
             assert.fail(`<${fileName}>${e}\n${errorLine}${error.stack}\n Tex:\n${tex}`);
+            return;
         }
 
         try {
@@ -61,6 +61,7 @@ describe('AlphaTexImporterOldNewCompat', () => {
                 errorDetails = (error.cause as AlphaTexErrorWithDiagnostics).toString();
             }
             assert.fail(`<${fileName}>${e}\n${errorDetails}${error.stack}\n Tex:\n${tex}`);
+            return;
         }
 
         ComparisonHelpers.alphaTexExportRoundtripEqual(fileName, oldScore, newScore, ignoreKeys);

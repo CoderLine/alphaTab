@@ -1,6 +1,7 @@
 ﻿import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
 import {
+    AlphaTexAstNode,
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
     type AlphaTexBeatNode,
@@ -162,7 +163,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     private _handler: IAlphaTexLanguageHandler = AlphaTex1LanguageHandler.instance;
     private _state = new AlphaTexImportState();
 
-    public get state() {
+    public get state(): IAlphaTexImporterState {
         return this._state;
     }
 
@@ -523,23 +524,24 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let octave: number = -1;
         let tone: number = -1;
         let accidentalMode = NoteAccidentalMode.Default;
-        switch (node.noteValue.nodeType) {
+        const noteValue = node.noteValue as AlphaTexAstNode;
+        switch (noteValue.nodeType) {
             case AlphaTexNodeType.NumberLiteral:
-                fret = (node.noteValue as AlphaTexNumberLiteral).value;
+                fret = (noteValue as AlphaTexNumberLiteral).value;
                 if (this._state.currentStaff.isPercussion && !PercussionMapper.instrumentArticulations.has(fret)) {
                     this.addSemanticDiagnostic({
                         code: AlphaTexDiagnosticCode.AT209,
                         message: `Unexpected percussion articulation value '${fret}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
-                        start: node.noteValue.start,
-                        end: node.noteValue.end
+                        start: noteValue.start,
+                        end: noteValue.end
                     });
                     return;
                 }
                 break;
             case AlphaTexNodeType.StringLiteral:
             case AlphaTexNodeType.Identifier:
-                const str = (node.noteValue as AlphaTexTextNode).text;
+                const str = (noteValue as AlphaTexTextNode).text;
                 if (this._state.currentStaff.isPercussion) {
                     const articulationName = str.toLowerCase();
                     if (this._state.percussionArticulationNames.has(articulationName)) {
@@ -549,8 +551,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                             code: AlphaTexDiagnosticCode.AT209,
                             message: `Unexpected percussion articulation value '${articulationName}', expected: oneOf(${Array.from(this._state.percussionArticulationNames.keys()).join(',')}).`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: node.noteValue.start,
-                            end: node.noteValue.end
+                            start: noteValue.start,
+                            end: noteValue.end
                         });
                         return;
                     }
@@ -573,8 +575,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                                     code: AlphaTexDiagnosticCode.AT215,
                                     message: `Cannot use pitched note value '${str}' on string staff, please specify notes using the 'fret.string' syntax.`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
-                                    start: node.noteValue.start,
-                                    end: node.noteValue.end
+                                    start: noteValue.start,
+                                    end: noteValue.end
                                 });
                                 return;
                             }
@@ -584,8 +586,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                                     code: AlphaTexDiagnosticCode.AT216,
                                     message: `Cannot use pitched note value '${str}' on percussion staff, please specify percussion articulations with numbers or names.`,
                                     severity: AlphaTexDiagnosticsSeverity.Error,
-                                    start: node.noteValue.start,
-                                    end: node.noteValue.end
+                                    start: noteValue.start,
+                                    end: noteValue.end
                                 });
                                 return;
                             }
@@ -600,8 +602,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                                 code: AlphaTexDiagnosticCode.AT217,
                                 message: `Unrecognized note value '${str}'.`,
                                 severity: AlphaTexDiagnosticsSeverity.Error,
-                                start: node.noteValue.start,
-                                end: node.noteValue.end
+                                start: noteValue.start,
+                                end: noteValue.end
                             });
                             return;
                         }
@@ -622,8 +624,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     code: AlphaTexDiagnosticCode.AT218,
                     message: `Missing string for fretted note.`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: node.noteValue.end,
-                    end: node.noteValue.end
+                    start: noteValue.end,
+                    end: noteValue.end
                 });
                 return;
             }
@@ -634,8 +636,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     code: AlphaTexDiagnosticCode.AT219,
                     message: `Note string is out of range. Available range: 1-${this._state.currentStaff.tuning.length}`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: node.noteValue.end,
-                    end: node.noteValue.end
+                    start: noteValue.end,
+                    end: noteValue.end
                 });
                 return;
             }
@@ -664,8 +666,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                         code: AlphaTexDiagnosticCode.AT209,
                         message: `Unexpected articulation value '${articulationValue}', expected: oneOf(${Array.from(PercussionMapper.instrumentArticulations.keys()).join(',')}).`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
-                        start: node.noteValue.end,
-                        end: node.noteValue.end
+                        start: noteValue.end,
+                        end: noteValue.end
                     });
                     return;
                 }

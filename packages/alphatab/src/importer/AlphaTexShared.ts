@@ -12,6 +12,7 @@ export enum AlphaTexDiagnosticsSeverity {
 
 /**
  * A diagnostics message for the alphaTex parser.
+ * @record
  */
 export interface AlphaTexDiagnostic {
     /**
@@ -196,7 +197,7 @@ export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
         }
     }
 
-    [Symbol.iterator]() {
+    [Symbol.iterator](): Iterator<AlphaTexDiagnostic> {
         return this.items[Symbol.iterator]();
     }
 }

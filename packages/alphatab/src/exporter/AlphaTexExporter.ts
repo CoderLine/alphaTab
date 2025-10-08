@@ -1,7 +1,6 @@
 import { Environment } from '@src/Environment';
 import { ScoreExporter } from '@src/exporter/ScoreExporter';
 import {
-    type AlphaTexAstNode,
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
     type AlphaTexBeatNode,
@@ -17,7 +16,7 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexValueList,
-    type AlphaTexValueListItem
+    type IAlphaTexAstNode,
 } from '@src/importer/AlphaTexAst';
 import { AlphaTex1LanguageHandler, type IAlphaTexLanguageHandler } from '@src/importer/AlphaTexLanguageHandler';
 import { IOHelper } from '@src/io/IOHelper';
@@ -347,7 +346,7 @@ class AlphaTexPrinter {
         this.writeComments(values.trailingComments);
     }
 
-    private writeValue(v: AlphaTexValueListItem | undefined) {
+    private writeValue(v: IAlphaTexAstNode | undefined) {
         if (!v) {
             return;
         }
@@ -370,7 +369,7 @@ class AlphaTexPrinter {
         this.writeComments(v.trailingComments);
     }
 
-    private writeToken(tokenNode: AlphaTexAstNode | undefined, newLine: boolean) {
+    private writeToken(tokenNode: IAlphaTexAstNode | undefined, newLine: boolean) {
         if (tokenNode) {
             this.writeComments(tokenNode.leadingComments);
             switch (tokenNode.nodeType) {

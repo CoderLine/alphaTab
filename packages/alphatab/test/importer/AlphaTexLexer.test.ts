@@ -17,7 +17,7 @@ describe('AlphaTexLexerTest', () => {
 
         expect(actual).toMatchSnapshot();
         if (diagnostics) {
-            expect(lexer.lexerDiagnostics).toMatchSnapshot();
+            expect(lexer.lexerDiagnostics.items).toMatchSnapshot();
         }
     }
 
@@ -137,15 +137,15 @@ describe('AlphaTexLexerTest', () => {
         });
 
         it('at003', () => {
-            lexerTest('\\uAB', true);
+            lexerTest('"\\uAB"', true);
         });
 
         it('at004', () => {
-            lexerTest('\\uXXXX', true);
+            lexerTest('"\\uXXXX"', true);
         });
 
         it('at005', () => {
-            lexerTest('\\b01010101', true);
+            lexerTest('"\\b01010101"', true);
         });
 
         it('at006', () => {

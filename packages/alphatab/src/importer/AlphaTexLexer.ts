@@ -1,13 +1,24 @@
 ﻿import {
+    type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
     type AlphaTexAstNodeLocation,
+    type AlphaTexBackSlashTokenNode,
+    type AlphaTexBraceCloseTokenNode,
+    type AlphaTexBraceOpenTokenNode,
+    type AlphaTexColonTokenNode,
     type AlphaTexComment,
+    type AlphaTexDotTokenNode,
+    type AlphaTexDoubleBackSlashTokenNode,
     type AlphaTexIdentifier,
     type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
+    type AlphaTexParenthesisCloseTokenNode,
+    type AlphaTexParenthesisOpenTokenNode,
+    type AlphaTexPipeTokenNode,
     type AlphaTexStringLiteral,
-    type AlphaTexTokenNode
+    type AlphaTexTokenNode,
+    type IAlphaTexMetaDataTagPrefixNode
 } from '@src/importer/AlphaTexAst';
 import {
     AlphaTexDiagnosticBag,
@@ -215,14 +226,20 @@ export class AlphaTexLexer {
         [0x22 /* " */, l => l.string()],
         [0x27 /* ' */, l => l.string()],
         [0x2d /* - */, l => l.numberOrIdentifier()],
-        [0x2e /* . */, l => l.token<AlphaTexNodeType.DotToken>(AlphaTexNodeType.DotToken)],
-        [0x3a /* : */, l => l.token<AlphaTexNodeType.ColonToken>(AlphaTexNodeType.ColonToken)],
-        [0x28 /* ( */, l => l.token<AlphaTexNodeType.ParenthesisOpenToken>(AlphaTexNodeType.ParenthesisOpenToken)],
-        [0x29 /* ) */, l => l.token<AlphaTexNodeType.ParenthesisCloseToken>(AlphaTexNodeType.ParenthesisCloseToken)],
-        [0x7b /* { */, l => l.token<AlphaTexNodeType.BraceOpenToken>(AlphaTexNodeType.BraceOpenToken)],
-        [0x7d /* } */, l => l.token<AlphaTexNodeType.BraceCloseToken>(AlphaTexNodeType.BraceCloseToken)],
-        [0x7c /* | */, l => l.token<AlphaTexNodeType.PipeToken>(AlphaTexNodeType.PipeToken)],
-        [0x2a /* * */, l => l.token<AlphaTexNodeType.AsteriskToken>(AlphaTexNodeType.AsteriskToken)],
+        [0x2e /* . */, l => l.token({ nodeType: AlphaTexNodeType.DotToken } as AlphaTexDotTokenNode)],
+        [0x3a /* : */, l => l.token({ nodeType: AlphaTexNodeType.ColonToken } as AlphaTexColonTokenNode)],
+        [
+            0x28 /* ( */,
+            l => l.token({ nodeType: AlphaTexNodeType.ParenthesisOpenToken } as AlphaTexParenthesisOpenTokenNode)
+        ],
+        [
+            0x29 /* ) */,
+            l => l.token({ nodeType: AlphaTexNodeType.ParenthesisCloseToken } as AlphaTexParenthesisCloseTokenNode)
+        ],
+        [0x7b /* { */, l => l.token({ nodeType: AlphaTexNodeType.BraceOpenToken } as AlphaTexBraceOpenTokenNode)],
+        [0x7d /* } */, l => l.token({ nodeType: AlphaTexNodeType.BraceCloseToken } as AlphaTexBraceCloseTokenNode)],
+        [0x7c /* | */, l => l.token({ nodeType: AlphaTexNodeType.PipeToken } as AlphaTexPipeTokenNode)],
+        [0x2a /* * */, l => l.token({ nodeType: AlphaTexNodeType.AsteriskToken } as AlphaTexAsteriskTokenNode)],
         [0x5c /* \ */, l => l.metaCommand()],
 
         [0x09 /* \t */, l => l.whitespace()],
@@ -236,17 +253,26 @@ export class AlphaTexLexer {
         const prefixStart = this.currentLexerLocation();
 
         this._codepoint = this.nextCodepoint();
-        let prefixType: AlphaTexNodeType;
+        let prefix: IAlphaTexMetaDataTagPrefixNode;
 
         // allow double backslash (easier to test when copying from escaped Strings)
+        let prefixEnd: AlphaTexAstNodeLocation;
         if (this._codepoint === 0x5c /* \ */) {
             this._codepoint = this.nextCodepoint();
-            prefixType = AlphaTexNodeType.DoubleBackSlashToken;
+            prefixEnd = this.currentLexerLocation();
+            prefix = {
+                nodeType: AlphaTexNodeType.DoubleBackSlashToken,
+                start: prefixStart,
+                end: prefixEnd
+            } as AlphaTexDoubleBackSlashTokenNode;
         } else {
-            prefixType = AlphaTexNodeType.BackSlashToken;
+            prefixEnd = this.currentLexerLocation();
+            prefix = {
+                nodeType: AlphaTexNodeType.BackSlashToken,
+                start: prefixStart,
+                end: prefixEnd
+            } as AlphaTexBackSlashTokenNode;
         }
-
-        const prefixEnd = this.currentLexerLocation();
 
         let text = '';
         while (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
@@ -270,11 +296,7 @@ export class AlphaTexLexer {
             leadingComments: this._leadingComments,
             start: this._tokenStart,
             end: this.currentLexerLocation(),
-            prefix: {
-                nodeType: prefixType,
-                start: prefixStart,
-                end: prefixEnd
-            },
+            prefix: prefix,
             tag: {
                 nodeType: AlphaTexNodeType.Identifier,
                 text: text,
@@ -285,16 +307,13 @@ export class AlphaTexLexer {
         return token;
     }
 
-    private token<T extends AlphaTexNodeType>(nodeType: T): AlphaTexTokenNode<T> {
-        const token: AlphaTexTokenNode<T> = {
-            nodeType: nodeType,
-            leadingComments: this._leadingComments,
-            start: this._tokenStart,
-            end: this.currentLexerLocation()
-        };
+    private token<T extends AlphaTexTokenNode>(t: T): T {
+        t.leadingComments = this._leadingComments;
+        t.start = this._tokenStart;
+        t.end = this.currentLexerLocation();
         // consume char
         this._codepoint = this.nextCodepoint();
-        return token;
+        return t;
     }
 
     private string() {
@@ -454,7 +473,7 @@ export class AlphaTexLexer {
         }
     }
 
-    private numberOrIdentifier() {
+    private numberOrIdentifier(): AlphaTexAstNode {
         let str: string = '';
 
         // assume number at start

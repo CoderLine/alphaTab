@@ -147,19 +147,14 @@ exports[`AlphaTexImporterTest errors at209 accidentalmode: parser-diagnostics 1`
 
 exports[`AlphaTexImporterTest errors at209 accidentalmode: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 21,
-      "line": 1,
-      "offset": 20,
-    },
-    "message": "Unexpected accidental mode value 'invalid', expected: auto,explicit",
-    "severity": 2,
-    "start": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected accidental mode value 'invalid', expected: auto,explicit",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
     },
   },
 ]
@@ -171,19 +166,14 @@ exports[`AlphaTexImporterTest errors at209 articulation: parser-diagnostics 1`] 
 
 exports[`AlphaTexImporterTest errors at209 articulation: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 23,
-      "line": 1,
-      "offset": 22,
-    },
-    "message": "Unexpected articulation value '0', expected: 38,37,91,42,92,46,44,35,36,50,48,47,45,43,93,51,53,94,55,95,52,96,49,97,57,98,99,100,56,101,102,103,77,76,60,104,105,61,106,107,66,65,68,67,64,108,109,63,110,62,72,71,73,74,86,87,54,111,112,113,79,78,58,81,80,114,115,116,69,117,85,75,70,118,119,120,82,122,84,123,83,124,125,39,40,31,41,59,126,127,29,30,33,34",
-    "severity": 2,
-    "start": Object {
-      "col": 22,
-      "line": 1,
-      "offset": 21,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected articulation value '0', expected: 38,37,91,42,92,46,44,35,36,50,48,47,45,43,93,51,53,94,55,95,52,96,49,97,57,98,99,100,56,101,102,103,77,76,60,104,105,61,106,107,66,65,68,67,64,108,109,63,110,62,72,71,73,74,86,87,54,111,112,113,79,78,58,81,80,114,115,116,69,117,85,75,70,118,119,120,82,122,84,123,83,124,125,39,40,31,41,59,126,127,29,30,33,34",
+    "start" => Map {
+      "col" => 23,
+      "line" => 1,
+      "offset" => 22,
     },
   },
 ]
@@ -195,19 +185,14 @@ exports[`AlphaTexImporterTest errors at209 bar optional: parser-diagnostics 1`] 
 
 exports[`AlphaTexImporterTest errors at209 bar optional: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 18,
-      "line": 1,
-      "offset": 17,
-    },
-    "message": "Unexpected additional value 'NumberLiteral', expected: required(StringLiteral|Identifier),optional(StringLiteral|Identifier)",
-    "severity": 2,
-    "start": Object {
-      "col": 17,
-      "line": 1,
-      "offset": 16,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'NumberLiteral', expected: required(StringLiteral|Identifier),optional(StringLiteral|Identifier)",
+    "start" => Map {
+      "col" => 18,
+      "line" => 1,
+      "offset" => 17,
     },
   },
 ]
@@ -219,19 +204,14 @@ exports[`AlphaTexImporterTest errors at209 bar required: parser-diagnostics 1`] 
 
 exports[`AlphaTexImporterTest errors at209 bar required: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
-    },
-    "message": "Unexpected required value 'StringLiteral', expected: required(NumberLiteral)",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected required value 'StringLiteral', expected: required(NumberLiteral)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
     },
   },
 ]
@@ -243,19 +223,14 @@ exports[`AlphaTexImporterTest errors at209 barre: parser-diagnostics 1`] = `Arra
 
 exports[`AlphaTexImporterTest errors at209 barre: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 21,
-      "line": 1,
-      "offset": 20,
-    },
-    "message": "Unexpected barre shape value 'invalid', expected: full,half",
-    "severity": 2,
-    "start": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected barre shape value 'invalid', expected: full,half",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
     },
   },
 ]
@@ -267,19 +242,14 @@ exports[`AlphaTexImporterTest errors at209 beam: parser-diagnostics 1`] = `Array
 
 exports[`AlphaTexImporterTest errors at209 beam: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 19,
-      "line": 1,
-      "offset": 18,
-    },
-    "message": "Unexpected beam value 'invalid', expected: invert,up,down,auto,split,merge,splitsecondary",
-    "severity": 2,
-    "start": Object {
-      "col": 12,
-      "line": 1,
-      "offset": 11,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected beam value 'invalid', expected: invert,up,down,auto,split,merge,splitsecondary",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
     },
   },
 ]
@@ -291,19 +261,14 @@ exports[`AlphaTexImporterTest errors at209 beat tuplet: parser-diagnostics 1`] =
 
 exports[`AlphaTexImporterTest errors at209 beat tuplet: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
-    },
-    "message": "Unexpected default tuplet value '0', expected: 3, 5, 6, 7, 9, 10, 11 or 12",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected default tuplet value '0', expected: 3, 5, 6, 7, 9, 10, 11 or 12",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
     },
   },
 ]
@@ -315,19 +280,14 @@ exports[`AlphaTexImporterTest errors at209 bendstyle: parser-diagnostics 1`] = `
 
 exports[`AlphaTexImporterTest errors at209 bendstyle: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 19,
-      "line": 1,
-      "offset": 18,
-    },
-    "message": "Unexpected bend style value 'invalid', expected: gradual,fast,default",
-    "severity": 2,
-    "start": Object {
-      "col": 12,
-      "line": 1,
-      "offset": 11,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected bend style value 'invalid', expected: gradual,fast,default",
+    "start" => Map {
+      "col" => 19,
+      "line" => 1,
+      "offset" => 18,
     },
   },
 ]
@@ -339,19 +299,14 @@ exports[`AlphaTexImporterTest errors at209 bendtype: parser-diagnostics 1`] = `A
 
 exports[`AlphaTexImporterTest errors at209 bendtype: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
-    },
-    "message": "Unexpected bend type value 'invalid', expected: none,custom,bend,release,bendrelease,hold,prebend,prebendbend,prebendrelease",
-    "severity": 2,
-    "start": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected bend type value 'invalid', expected: none,custom,bend,release,bendrelease,hold,prebend,prebendbend,prebendrelease",
+    "start" => Map {
+      "col" => 14,
+      "line" => 1,
+      "offset" => 13,
     },
   },
 ]
@@ -363,19 +318,14 @@ exports[`AlphaTexImporterTest errors at209 bracketextendmode: parser-diagnostics
 
 exports[`AlphaTexImporterTest errors at209 bracketextendmode: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 27,
-      "line": 1,
-      "offset": 26,
-    },
-    "message": "Unexpected bracket extend mode value 'invalid', expected: nobrackets,groupstaves,groupsimilarinstruments",
-    "severity": 2,
-    "start": Object {
-      "col": 20,
-      "line": 1,
-      "offset": 19,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected bracket extend mode value 'invalid', expected: nobrackets,groupstaves,groupsimilarinstruments",
+    "start" => Map {
+      "col" => 27,
+      "line" => 1,
+      "offset" => 26,
     },
   },
 ]
@@ -387,19 +337,14 @@ exports[`AlphaTexImporterTest errors at209 duration tuplet: parser-diagnostics 1
 
 exports[`AlphaTexImporterTest errors at209 duration tuplet: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
-    },
-    "message": "Unexpected default tuplet value '0', expected: 3, 5, 6, 7, 9, 10, 11 or 12",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected default tuplet value '0', expected: 3, 5, 6, 7, 9, 10, 11 or 12",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
     },
   },
 ]
@@ -411,19 +356,14 @@ exports[`AlphaTexImporterTest errors at209 dynamic: parser-diagnostics 1`] = `Ar
 
 exports[`AlphaTexImporterTest errors at209 dynamic: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 15,
-      "line": 1,
-      "offset": 14,
-    },
-    "message": "Unexpected dynamic value 'invalid', expected: ppp,pp,p,mp,mf,f,ff,fff,pppp,ppppp,pppppp,ffff,fffff,ffffff,sf,sfp,sfpp,fp,rf,rfz,sfz,sffz,fz,n,pf,sfzp",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected dynamic value 'invalid', expected: ppp,pp,p,mp,mf,f,ff,fff,pppp,ppppp,pppppp,ffff,fffff,ffffff,sf,sfp,sfpp,fp,rf,rfz,sfz,sffz,fz,n,pf,sfzp",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
     },
   },
 ]
@@ -435,19 +375,14 @@ exports[`AlphaTexImporterTest errors at209 fermata: parser-diagnostics 1`] = `Ar
 
 exports[`AlphaTexImporterTest errors at209 fermata: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 21,
-      "line": 1,
-      "offset": 20,
-    },
-    "message": "Unexpected fermata value 'invalid', expected: short,medium,long",
-    "severity": 2,
-    "start": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected fermata value 'invalid', expected: short,medium,long",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
     },
   },
 ]
@@ -459,19 +394,14 @@ exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: parser-diag
 
 exports[`AlphaTexImporterTest errors at209 firstsystemtracknamemode: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 34,
-      "line": 1,
-      "offset": 33,
-    },
-    "message": "Unexpected track name mode value 'invalid', expected: fullname,shortname",
-    "severity": 2,
-    "start": Object {
-      "col": 27,
-      "line": 1,
-      "offset": 26,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name mode value 'invalid', expected: fullname,shortname",
+    "start" => Map {
+      "col" => 34,
+      "line" => 1,
+      "offset" => 33,
     },
   },
 ]
@@ -483,19 +413,14 @@ exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: pars
 
 exports[`AlphaTexImporterTest errors at209 firstsystemtracknameorientation: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 41,
-      "line": 1,
-      "offset": 40,
-    },
-    "message": "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
-    "severity": 2,
-    "start": Object {
-      "col": 34,
-      "line": 1,
-      "offset": 33,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
+    "start" => Map {
+      "col" => 41,
+      "line" => 1,
+      "offset" => 40,
     },
   },
 ]
@@ -507,19 +432,14 @@ exports[`AlphaTexImporterTest errors at209 gracetype: parser-diagnostics 1`] = `
 
 exports[`AlphaTexImporterTest errors at209 gracetype: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 16,
-      "line": 1,
-      "offset": 15,
-    },
-    "message": "Unexpected whammy style value 'invalid', expected: ob,b,bb",
-    "severity": 2,
-    "start": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy style value 'invalid', expected: ob,b,bb",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
     },
   },
 ]
@@ -531,19 +451,14 @@ exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: parser-dia
 
 exports[`AlphaTexImporterTest errors at209 multitracktracknamepolicy: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 35,
-      "line": 1,
-      "offset": 34,
-    },
-    "message": "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
-    "severity": 2,
-    "start": Object {
-      "col": 28,
-      "line": 1,
-      "offset": 27,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
+    "start" => Map {
+      "col" => 35,
+      "line" => 1,
+      "offset" => 34,
     },
   },
 ]
@@ -555,19 +470,14 @@ exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: parser-dia
 
 exports[`AlphaTexImporterTest errors at209 othersystemstracknamemode: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 35,
-      "line": 1,
-      "offset": 34,
-    },
-    "message": "Unexpected track name mode value 'invalid', expected: fullname,shortname",
-    "severity": 2,
-    "start": Object {
-      "col": 28,
-      "line": 1,
-      "offset": 27,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name mode value 'invalid', expected: fullname,shortname",
+    "start" => Map {
+      "col" => 35,
+      "line" => 1,
+      "offset" => 34,
     },
   },
 ]
@@ -579,19 +489,14 @@ exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: par
 
 exports[`AlphaTexImporterTest errors at209 othersystemstracknameorientation: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 41,
-      "line": 1,
-      "offset": 40,
-    },
-    "message": "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
-    "severity": 2,
-    "start": Object {
-      "col": 34,
-      "line": 1,
-      "offset": 33,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name orientation value 'invalid', expected: horizontal,vertical",
+    "start" => Map {
+      "col" => 41,
+      "line" => 1,
+      "offset" => 40,
     },
   },
 ]
@@ -603,19 +508,14 @@ exports[`AlphaTexImporterTest errors at209 ottava: parser-diagnostics 1`] = `Arr
 
 exports[`AlphaTexImporterTest errors at209 ottava: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 15,
-      "line": 1,
-      "offset": 14,
-    },
-    "message": "Unexpected ottava value 'invalid', expected: 15ma,8va,regular,8vb,15mb",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected ottava value 'invalid', expected: 15ma,8va,regular,8vb,15mb",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
     },
   },
 ]
@@ -627,19 +527,14 @@ exports[`AlphaTexImporterTest errors at209 rasg: parser-diagnostics 1`] = `Array
 
 exports[`AlphaTexImporterTest errors at209 rasg: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 17,
-      "line": 1,
-      "offset": 16,
-    },
-    "message": "Unexpected rasgueado pattern value 'invalid', expected: ii,mi,miitriplet,miianapaest,pmptriplet,pmpanapaest,peitriplet,peianapaest,paitriplet,paianapaest,amitriplet,amianapaest,ppp,amii,amip,eami,eamii,peami",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected rasgueado pattern value 'invalid', expected: ii,mi,miitriplet,miianapaest,pmptriplet,pmpanapaest,peitriplet,peianapaest,paitriplet,paianapaest,amitriplet,amianapaest,ppp,amii,amip,eami,eamii,peami",
+    "start" => Map {
+      "col" => 17,
+      "line" => 1,
+      "offset" => 16,
     },
   },
 ]
@@ -651,19 +546,14 @@ exports[`AlphaTexImporterTest errors at209 score optional: parser-diagnostics 1`
 
 exports[`AlphaTexImporterTest errors at209 score optional: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 18,
-      "line": 1,
-      "offset": 17,
-    },
-    "message": "Unexpected additional value 'NumberLiteral', expected: required(StringLiteral|Identifier),optional(StringLiteral|Identifier),optional(StringLiteral|Identifier)",
-    "severity": 2,
-    "start": Object {
-      "col": 17,
-      "line": 1,
-      "offset": 16,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected additional value 'NumberLiteral', expected: required(StringLiteral|Identifier),optional(StringLiteral|Identifier),optional(StringLiteral|Identifier)",
+    "start" => Map {
+      "col" => 18,
+      "line" => 1,
+      "offset" => 17,
     },
   },
 ]
@@ -675,19 +565,14 @@ exports[`AlphaTexImporterTest errors at209 score required: parser-diagnostics 1`
 
 exports[`AlphaTexImporterTest errors at209 score required: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
-    },
-    "message": "Unexpected required value 'NumberLiteral', expected: required(StringLiteral|Identifier)",
-    "severity": 2,
-    "start": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected required value 'NumberLiteral', expected: required(StringLiteral|Identifier)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
     },
   },
 ]
@@ -699,19 +584,14 @@ exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: parser-di
 
 exports[`AlphaTexImporterTest errors at209 singletracktracknamepolicy: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 36,
-      "line": 1,
-      "offset": 35,
-    },
-    "message": "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
-    "severity": 2,
-    "start": Object {
-      "col": 29,
-      "line": 1,
-      "offset": 28,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected track name policy value 'invalid', expected: hidden,firstsystem,allsystems",
+    "start" => Map {
+      "col" => 36,
+      "line" => 1,
+      "offset" => 35,
     },
   },
 ]
@@ -723,19 +603,14 @@ exports[`AlphaTexImporterTest errors at209 textalign: parser-diagnostics 1`] = `
 
 exports[`AlphaTexImporterTest errors at209 textalign: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 25,
-      "line": 1,
-      "offset": 24,
-    },
-    "message": "Unexpected textAlign value 'invalid', expected: left,center,right",
-    "severity": 2,
-    "start": Object {
-      "col": 18,
-      "line": 1,
-      "offset": 17,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected textAlign value 'invalid', expected: left,center,right",
+    "start" => Map {
+      "col" => 25,
+      "line" => 1,
+      "offset" => 24,
     },
   },
 ]
@@ -747,19 +622,14 @@ exports[`AlphaTexImporterTest errors at209 tremolo speed: parser-diagnostics 1`]
 
 exports[`AlphaTexImporterTest errors at209 tremolo speed: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
-    },
-    "message": "Unexpected tremolo speed value '0, expected: 8, 16 or 32",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected tremolo speed value '0, expected: 8, 16 or 32",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
     },
   },
 ]
@@ -771,19 +641,14 @@ exports[`AlphaTexImporterTest errors at209 trill: parser-diagnostics 1`] = `Arra
 
 exports[`AlphaTexImporterTest errors at209 trill: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
-    },
-    "message": "Unexpected trill duration value '0', expected: 16, 32 or 64",
-    "severity": 2,
-    "start": Object {
-      "col": 13,
-      "line": 1,
-      "offset": 12,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected trill duration value '0', expected: 16, 32 or 64",
+    "start" => Map {
+      "col" => 14,
+      "line" => 1,
+      "offset" => 13,
     },
   },
 ]
@@ -795,19 +660,14 @@ exports[`AlphaTexImporterTest errors at209 tuning: parser-diagnostics 1`] = `Arr
 
 exports[`AlphaTexImporterTest errors at209 tuning: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 16,
-      "line": 1,
-      "offset": 15,
-    },
-    "message": "Unexpected tuning value 'Invalid', expected: <note><accidental><octave> where <note>=oneOf(67,68,69,70,71,65,66,99,100,101,102,103,97,98,35) <accidental>=oneOf(default,d,forcenone,-,forcenatural,n,forcesharp,#,forcedoublesharp,##,x,forceflat,b,forcedoubleflat,bb), <octave>=number",
-    "severity": 2,
-    "start": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected tuning value 'Invalid', expected: <note><accidental><octave> where <note>=oneOf(67,68,69,70,71,65,66,99,100,101,102,103,97,98,35) <accidental>=oneOf(default,d,forcenone,-,forcenatural,n,forcesharp,#,forcedoublesharp,##,x,forceflat,b,forcedoubleflat,bb), <octave>=number",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
     },
   },
 ]
@@ -819,19 +679,14 @@ exports[`AlphaTexImporterTest errors at209 whammybarstyle: parser-diagnostics 1`
 
 exports[`AlphaTexImporterTest errors at209 whammybarstyle: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 20,
-      "line": 1,
-      "offset": 19,
-    },
-    "message": "Unexpected whammy style value 'invalid', expected: gradual,fast,default",
-    "severity": 2,
-    "start": Object {
-      "col": 13,
-      "line": 1,
-      "offset": 12,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy style value 'invalid', expected: gradual,fast,default",
+    "start" => Map {
+      "col" => 20,
+      "line" => 1,
+      "offset" => 19,
     },
   },
 ]
@@ -843,19 +698,14 @@ exports[`AlphaTexImporterTest errors at209 whammybartype: parser-diagnostics 1`]
 
 exports[`AlphaTexImporterTest errors at209 whammybartype: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 209,
-    "end": Object {
-      "col": 15,
-      "line": 1,
-      "offset": 14,
-    },
-    "message": "Unexpected whammy type value 'invalid', expected: none,custom,dive,dip,hold,predive,predivedive",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 209,
+    "severity" => 2,
+    "message" => "Unexpected whammy type value 'invalid', expected: none,custom,dive,dip,hold,predive,predivedive",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
     },
   },
 ]
@@ -867,19 +717,14 @@ exports[`AlphaTexImporterTest errors at210 bar empty: parser-diagnostics 1`] = `
 
 exports[`AlphaTexImporterTest errors at210 bar empty: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 210,
-    "end": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
-    },
-    "message": "Missing values. Expected following values: required(NumberLiteral)",
-    "severity": 2,
-    "start": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
+  Map {
+    "code" => 210,
+    "severity" => 2,
+    "message" => "Missing values. Expected following values: required(NumberLiteral)",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
     },
   },
 ]
@@ -891,19 +736,14 @@ exports[`AlphaTexImporterTest errors at210 bar missing: parser-diagnostics 1`] =
 
 exports[`AlphaTexImporterTest errors at210 bar missing: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 210,
-    "end": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
-    },
-    "message": "Missing values. Expected following values: required(NumberLiteral)",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 210,
+    "severity" => 2,
+    "message" => "Missing values. Expected following values: required(NumberLiteral)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
     },
   },
 ]
@@ -915,19 +755,14 @@ exports[`AlphaTexImporterTest errors at210 score empty: parser-diagnostics 1`] =
 
 exports[`AlphaTexImporterTest errors at210 score empty: semantic-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 210,
-    "end": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
-    },
-    "message": "Missing values. Expected following values: required(StringLiteral|Identifier)",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 210,
+    "severity" => 2,
+    "message" => "Missing values. Expected following values: required(StringLiteral|Identifier)",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
     },
   },
 ]

@@ -39,6 +39,7 @@ export enum AlphaTexNodeType {
 
 /**
  * Maps an AST node into its respective source code location.
+ * @record
  */
 export interface AlphaTexAstNodeLocation {
     /**
@@ -58,7 +59,7 @@ export interface AlphaTexAstNodeLocation {
 /**
  * The base type for all alphaTex AST nodes
  */
-export interface AlphaTexAstNode {
+export interface IAlphaTexAstNode {
     /**
      * The type of the node.
      */
@@ -83,8 +84,18 @@ export interface AlphaTexAstNode {
     trailingComments?: AlphaTexComment[];
 }
 
+
+
+/**
+ * The base type for all alphaTex AST nodes
+ * @record
+ */
+export interface AlphaTexAstNode extends IAlphaTexAstNode {
+}
+
 /**
  * A comment attached to a node.
+ * @record
  */
 export interface AlphaTexComment {
     /**
@@ -107,15 +118,85 @@ export interface AlphaTexComment {
 
 /**
  * A node describing a single token like dots or colons.
+ * @record
  */
-export interface AlphaTexTokenNode<T extends AlphaTexNodeType> extends AlphaTexAstNode {
-    nodeType: T;
+export interface AlphaTexTokenNode extends AlphaTexAstNode {}
+
+/**
+ * @record
+ */
+export interface AlphaTexDotTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.DotToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexBackSlashTokenNode extends AlphaTexTokenNode, IAlphaTexMetaDataTagPrefixNode {
+    nodeType: AlphaTexNodeType.BackSlashToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexDoubleBackSlashTokenNode extends AlphaTexTokenNode, IAlphaTexMetaDataTagPrefixNode {
+    nodeType: AlphaTexNodeType.DoubleBackSlashToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexPipeTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.PipeToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexBraceOpenTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.BraceOpenToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexBraceCloseTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.BraceCloseToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexParenthesisOpenTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.ParenthesisOpenToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexParenthesisCloseTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.ParenthesisCloseToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexColonTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.ColonToken;
+}
+
+/**
+ * @record
+ */
+export interface AlphaTexAsteriskTokenNode extends AlphaTexTokenNode {
+    nodeType: AlphaTexNodeType.AsteriskToken;
 }
 
 /**
  * A number literal within alphaTex. Can be a integer or floating point number.
+ * @record
  */
-export interface AlphaTexNumberLiteral extends AlphaTexAstNode {
+export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.NumberLiteral;
     /**
      * The numeric value described by this literal.
@@ -125,44 +206,43 @@ export interface AlphaTexNumberLiteral extends AlphaTexAstNode {
 
 /**
  * A string literal within alphaTex.
+ * @record
  */
-export interface AlphaTexStringLiteral extends AlphaTexTextNode {
+export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexValueListItem , IAlphaTexNoteValueNode{
     nodeType: AlphaTexNodeType.StringLiteral;
 }
 
 /**
  * Defines the possible types for values in a {@link AlphaTexValueList}
  */
-export type AlphaTexValueListItem =
-    | AlphaTexIdentifier
-    | AlphaTexStringLiteral
-    | AlphaTexNumberLiteral
-    | AlphaTexValueList;
+export interface IAlphaTexValueListItem extends IAlphaTexAstNode {} 
 
 /**
  * A node holding multiple values optionally grouped by parenthesis.
  * Whether parenthesis are needed depends on the context.
  * Used in contexts like bend effects `3.3{b (0 4)}`.
+ * @record
  */
-export interface AlphaTexValueList extends AlphaTexAstNode {
+export interface AlphaTexValueList extends AlphaTexAstNode, IAlphaTexValueListItem {
     nodeType: AlphaTexNodeType.ValueList;
     /**
      * The open parenthesis token grouping the values.
      */
-    openParenthesis?: AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>;
+    openParenthesis?: AlphaTexParenthesisOpenTokenNode;
     /**
      * The list of values.
      */
-    values: AlphaTexValueListItem[];
+    values: IAlphaTexValueListItem[];
     /**
      * The close parenthesis token grouping the values.
      */
-    closeParenthesis?: AlphaTexTokenNode<AlphaTexNodeType.ParenthesisCloseToken>;
+    closeParenthesis?: AlphaTexParenthesisCloseTokenNode;
 }
 
 /**
  * A metadata tag with optional values and optional properties like:
  * `\track "Name" {color "#F00"}` .
+ * @record
  */
 export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.MetaData;
@@ -190,13 +270,14 @@ export interface AlphaTexMetaDataNode extends AlphaTexAstNode {
 /**
  * A node describing a list of properties grouped by braces.
  * Used in contexts like note effects, beat effects
+ * @record
  */
 export interface AlphaTexPropertiesNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Properties;
     /**
      * The open brace grouping the properties (if needed).
      */
-    openBrace?: AlphaTexTokenNode<AlphaTexNodeType.BraceOpenToken>;
+    openBrace?: AlphaTexBraceOpenTokenNode;
     /**
      * The individual properties
      */
@@ -204,11 +285,12 @@ export interface AlphaTexPropertiesNode extends AlphaTexAstNode {
     /**
      * The close brace grouping the properties (if needed).
      */
-    closeBrace?: AlphaTexTokenNode<AlphaTexNodeType.BraceCloseToken>;
+    closeBrace?: AlphaTexBraceCloseTokenNode;
 }
 
 /**
  * A node describing a property with attached values.
+ * @record
  */
 export interface AlphaTexPropertyNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Property;
@@ -226,6 +308,7 @@ export interface AlphaTexPropertyNode extends AlphaTexAstNode {
 /**
  * A base interface for nodes holding a textual value
  * like string literals or identifiers.
+ * @record
  */
 export interface AlphaTexTextNode extends AlphaTexAstNode {
     /**
@@ -237,8 +320,9 @@ export interface AlphaTexTextNode extends AlphaTexAstNode {
 /**
  * A node describing an identifier. This is typically a string-like value
  * but not quoted.
+ * @record
  */
-export interface AlphaTexIdentifier extends AlphaTexTextNode {
+export interface AlphaTexIdentifier extends AlphaTexTextNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.Identifier;
 }
 
@@ -247,6 +331,7 @@ export interface AlphaTexIdentifier extends AlphaTexTextNode {
 
 /**
  * A node describing the root of an alphaTex file for a musical score.
+ * @record
  */
 export interface AlphaTexScoreNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Score;
@@ -259,7 +344,7 @@ export interface AlphaTexScoreNode extends AlphaTexAstNode {
     /**
      * The separator between the score metadata and the bars.
      */
-    metaDataBarSeparator?: AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+    metaDataBarSeparator?: AlphaTexDotTokenNode;
 
     /**
      * The bars describing the contents of the song.
@@ -269,7 +354,7 @@ export interface AlphaTexScoreNode extends AlphaTexAstNode {
     /**
      * The separator between the bars and the sync points.
      */
-    barsSyncPointSeparator?: AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+    barsSyncPointSeparator?: AlphaTexDotTokenNode;
 
     /**
      * The sync points for linking the song to an external media.
@@ -277,17 +362,18 @@ export interface AlphaTexScoreNode extends AlphaTexAstNode {
     syncPoints: AlphaTexMetaDataNode[];
 }
 
+export interface IAlphaTexMetaDataTagPrefixNode extends IAlphaTexAstNode {}
+
 /**
  * A metadata tag marker like `\title`
+ * @record
  */
 export interface AlphaTexMetaDataTagNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.MetaDataTag;
     /**
      * The prefix indicating the start of the tag (e.g. `\` or `\\`)
      */
-    prefix?:
-        | AlphaTexTokenNode<AlphaTexNodeType.BackSlashToken>
-        | AlphaTexTokenNode<AlphaTexNodeType.DoubleBackSlashToken>;
+    prefix?: IAlphaTexMetaDataTagPrefixNode;
     /**
      * The identifier of the tag (e.g. `title`)
      */
@@ -296,6 +382,7 @@ export interface AlphaTexMetaDataTagNode extends AlphaTexAstNode {
 
 /**
  * A node describing the bar level contents as written in alphaTex.
+ * @record
  */
 export interface AlphaTexBarNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Bar;
@@ -314,11 +401,12 @@ export interface AlphaTexBarNode extends AlphaTexAstNode {
     /**
      * The pipe symbol denoting the end of the bar.
      */
-    pipe?: AlphaTexTokenNode<AlphaTexNodeType.PipeToken>;
+    pipe?: AlphaTexPipeTokenNode;
 }
 
 /**
  * A node describing a beat within alphaTex.
+ * @record
  */
 export interface AlphaTexBeatNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Beat;
@@ -339,7 +427,7 @@ export interface AlphaTexBeatNode extends AlphaTexAstNode {
     /**
      * The dot separating the beat content and the postfix beat duration
      */
-    durationDot?: AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+    durationDot?: AlphaTexDotTokenNode;
 
     /**
      * The postfix beat duration.
@@ -349,7 +437,7 @@ export interface AlphaTexBeatNode extends AlphaTexAstNode {
     /**
      * The `*` marker for repeating this beat multiple times. Must have a filled `beatMultiplierValue`
      */
-    beatMultiplier?: AlphaTexTokenNode<AlphaTexNodeType.AsteriskToken>;
+    beatMultiplier?: AlphaTexAsteriskTokenNode;
 
     /**
      * The numeric value how often the beat should be repeated.
@@ -364,13 +452,14 @@ export interface AlphaTexBeatNode extends AlphaTexAstNode {
 
 /**
  * A list of notes for the beat.
+ * @record
  */
 export interface AlphaTexNoteListNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.NoteList;
     /**
      * An open parenthesis token to group multiple notes for a beat.
      */
-    openParenthesis?: AlphaTexTokenNode<AlphaTexNodeType.ParenthesisOpenToken>;
+    openParenthesis?: AlphaTexParenthesisOpenTokenNode;
 
     /**
      * The notes contained in this list.
@@ -380,11 +469,14 @@ export interface AlphaTexNoteListNode extends AlphaTexAstNode {
     /**
      * A close parenthesis token to group multiple notes for a beat.
      */
-    closeParenthesis?: AlphaTexTokenNode<AlphaTexNodeType.ParenthesisCloseToken>;
+    closeParenthesis?: AlphaTexParenthesisCloseTokenNode;
 }
+
+export interface IAlphaTexNoteValueNode extends IAlphaTexAstNode {}
 
 /**
  * A node describing a single note.
+ * @record
  */
 export interface AlphaTexNoteNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Note;
@@ -393,12 +485,12 @@ export interface AlphaTexNoteNode extends AlphaTexAstNode {
      * The value of the note. Depending on whether it is a fretted, pitched or percussion
      * note this value varies.
      */
-    noteValue: AlphaTexNumberLiteral | AlphaTexStringLiteral | AlphaTexIdentifier;
+    noteValue: IAlphaTexNoteValueNode;
 
     /**
      * The dot separating the note value and the string for fretted/stringed instruments like guitars.
      */
-    noteStringDot?: AlphaTexTokenNode<AlphaTexNodeType.DotToken>;
+    noteStringDot?: AlphaTexDotTokenNode;
 
     /**
      * The string value for fretted/stringed notes like guitars.
@@ -416,13 +508,14 @@ export interface AlphaTexNoteNode extends AlphaTexAstNode {
 
 /**
  * A note describing a duration change like `:4` or `:4 { tu 3 }`
+ * @record
  */
 export interface AlphaTexBeatDurationChangeNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.BeatDurationChange;
     /**
      * The colon token marking the duration change node
      */
-    colon: AlphaTexTokenNode<AlphaTexNodeType.ColonToken>;
+    colon: AlphaTexColonTokenNode;
     /**
      * The numeric value describing the duration.
      */

@@ -55,26 +55,18 @@ Array [
 `;
 
 exports[`AlphaTexLexerTest errors at001 2`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": true,
-  "items": Array [
-    Object {
-      "code": 1,
-      "end": Object {
-        "col": 2,
-        "line": 1,
-        "offset": 1,
-      },
-      "message": "Unexpected character at comment start, expected '//' or '/*' but found '/a'",
-      "severity": 2,
-      "start": Object {
-        "col": 1,
-        "line": 1,
-        "offset": 0,
-      },
+Array [
+  Map {
+    "code" => 1,
+    "severity" => 2,
+    "message" => "Unexpected character at comment start, expected '//' or '/*' but found '/a'",
+    "start" => Map {
+      "col" => 2,
+      "line" => 1,
+      "offset" => 1,
     },
-  ],
-}
+  },
+]
 `;
 
 exports[`AlphaTexLexerTest errors at002 1`] = `
@@ -84,124 +76,111 @@ Array [
 `;
 
 exports[`AlphaTexLexerTest errors at002 2`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": true,
-  "items": Array [
-    Object {
-      "code": 2,
-      "end": Object {
-        "col": 2,
-        "line": 1,
-        "offset": 1,
-      },
-      "message": "Missing identifier after meta data start",
-      "severity": 2,
-      "start": Object {
-        "col": 1,
-        "line": 1,
-        "offset": 0,
-      },
-    },
-  ],
-}
-`;
-
-exports[`AlphaTexLexerTest errors at003 1`] = `
 Array [
-  MetaDataTag "uAB" (1,1) -> (1,5) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "uAB" (1,2) -> (1,5),
+  Map {
+    "code" => 2,
+    "severity" => 2,
+    "message" => "Missing identifier after meta data start",
+    "start" => Map {
+      "col" => 2,
+      "line" => 1,
+      "offset" => 1,
+    },
   },
 ]
 `;
 
+exports[`AlphaTexLexerTest errors at003 1`] = `Array []`;
+
 exports[`AlphaTexLexerTest errors at003 2`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": false,
-  "items": Array [],
-}
+Array [
+  Map {
+    "code" => 3,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Need 4 hex characters on a \\\\uXXXX escape sequence",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
+    },
+  },
+]
 `;
 
 exports[`AlphaTexLexerTest errors at004 1`] = `
 Array [
-  MetaDataTag "uXXXX" (1,1) -> (1,7) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "uXXXX" (1,2) -> (1,7),
-  },
+  Identifier "X" (1,7) -> (1,8),
 ]
 `;
 
 exports[`AlphaTexLexerTest errors at004 2`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": false,
-  "items": Array [],
-}
-`;
-
-exports[`AlphaTexLexerTest errors at005 1`] = `
 Array [
-  MetaDataTag "b01010101" (1,1) -> (1,11) {
-    prefix: BackSlashToken (1,1) -> (1,2),
-    tag: Identifier "b01010101" (1,2) -> (1,11),
+  Map {
+    "code" => 4,
+    "severity" => 2,
+    "message" => "Invalid unicode value. Need 4 hex characters on a \\\\uXXXX escape sequence.",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
+    },
   },
 ]
 `;
 
+exports[`AlphaTexLexerTest errors at005 1`] = `
+Array [
+  Identifier "b01010101" (1,3) -> (1,12),
+]
+`;
+
 exports[`AlphaTexLexerTest errors at005 2`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": false,
-  "items": Array [],
-}
+Array [
+  Map {
+    "code" => 5,
+    "severity" => 2,
+    "message" => "Unsupported escape sequence. Expected '\\\\n', '\\\\r', '\\\\t', or '\\\\uXXXX' but found '\\\\b'.",
+    "start" => Map {
+      "col" => 3,
+      "line" => 1,
+      "offset" => 2,
+    },
+  },
+]
 `;
 
 exports[`AlphaTexLexerTest errors at006 1`] = `Array []`;
 
 exports[`AlphaTexLexerTest errors at006 2`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": true,
-  "items": Array [
-    Object {
-      "code": 6,
-      "end": Object {
-        "col": 8,
-        "line": 1,
-        "offset": 7,
-      },
-      "message": "Unexpected end of file. String not closed.",
-      "severity": 2,
-      "start": Object {
-        "col": 1,
-        "line": 1,
-        "offset": 0,
-      },
+Array [
+  Map {
+    "code" => 6,
+    "severity" => 2,
+    "message" => "Unexpected end of file. String not closed.",
+    "start" => Map {
+      "col" => 8,
+      "line" => 1,
+      "offset" => 7,
     },
-  ],
-}
+  },
+]
 `;
 
 exports[`AlphaTexLexerTest errors at006 3`] = `Array []`;
 
 exports[`AlphaTexLexerTest errors at006 4`] = `
-AlphaTexDiagnosticBag {
-  "_hasErrors": true,
-  "items": Array [
-    Object {
-      "code": 6,
-      "end": Object {
-        "col": 8,
-        "line": 1,
-        "offset": 7,
-      },
-      "message": "Unexpected end of file. String not closed.",
-      "severity": 2,
-      "start": Object {
-        "col": 1,
-        "line": 1,
-        "offset": 0,
-      },
+Array [
+  Map {
+    "code" => 6,
+    "severity" => 2,
+    "message" => "Unexpected end of file. String not closed.",
+    "start" => Map {
+      "col" => 8,
+      "line" => 1,
+      "offset" => 7,
     },
-  ],
-}
+  },
+]
 `;
 
 exports[`AlphaTexLexerTest floats 1`] = `

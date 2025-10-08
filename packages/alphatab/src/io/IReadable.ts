@@ -54,6 +54,5 @@ export interface IReadable {
 export class EndOfReaderError extends AlphaTabError {
     public constructor() {
         super(AlphaTabErrorType.Format, 'Unexpected end of data within reader');
-        (this, EndOfReaderError.prototype);
     }
 }

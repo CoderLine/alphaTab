@@ -596,19 +596,14 @@ exports[`AlphaTexParserTest errors at200 missing: lexer-diagnostics 1`] = `Array
 
 exports[`AlphaTexParserTest errors at200 missing: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 200,
-    "end": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
-    },
-    "message": "Missing beat multiplier value after '*'.",
-    "severity": 2,
-    "start": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
+  Map {
+    "code" => 200,
+    "severity" => 2,
+    "message" => "Missing beat multiplier value after '*'.",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
     },
   },
 ]
@@ -652,19 +647,14 @@ exports[`AlphaTexParserTest errors at200 type: lexer-diagnostics 1`] = `Array []
 
 exports[`AlphaTexParserTest errors at200 type: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 200,
-    "end": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
-    },
-    "message": "Missing beat multiplier value after '*'.",
-    "severity": 2,
-    "start": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
+  Map {
+    "code" => 200,
+    "severity" => 2,
+    "message" => "Missing beat multiplier value after '*'.",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
     },
   },
 ]
@@ -686,19 +676,14 @@ exports[`AlphaTexParserTest errors at201 missing: lexer-diagnostics 1`] = `Array
 
 exports[`AlphaTexParserTest errors at201 missing: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 201,
-    "end": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
-    },
-    "message": "Missing duration value after ':'.",
-    "severity": 2,
-    "start": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
+  Map {
+    "code" => 201,
+    "severity" => 2,
+    "message" => "Missing duration value after ':'.",
+    "start" => Map {
+      "col" => 1,
+      "line" => 1,
+      "offset" => 0,
     },
   },
 ]
@@ -728,19 +713,14 @@ exports[`AlphaTexParserTest errors at201 type: lexer-diagnostics 1`] = `Array []
 
 exports[`AlphaTexParserTest errors at201 type: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 201,
-    "end": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
-    },
-    "message": "Missing duration value after ':'.",
-    "severity": 2,
-    "start": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
+  Map {
+    "code" => 201,
+    "severity" => 2,
+    "message" => "Missing duration value after ':'.",
+    "start" => Map {
+      "col" => 1,
+      "line" => 1,
+      "offset" => 0,
     },
   },
 ]
@@ -774,19 +754,14 @@ exports[`AlphaTexParserTest errors at202: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest errors at202: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 202,
-    "end": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
-    },
-    "message": "Unexpected 'Identifier' token. Expected a '\\\\sync' meta data tag.",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 202,
+    "severity" => 2,
+    "message" => "Unexpected 'Identifier' token. Expected a '\\\\sync' meta data tag.",
+    "start" => Map {
+      "col" => 14,
+      "line" => 1,
+      "offset" => 13,
     },
   },
 ]
@@ -820,19 +795,14 @@ exports[`AlphaTexParserTest errors at203: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest errors at203: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 203,
-    "end": Object {
-      "col": 16,
-      "line": 1,
-      "offset": 15,
-    },
-    "message": "Unexpected meta data tag 'title'. Expected a '\\\\sync' meta data tag.",
-    "severity": 2,
-    "start": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
+  Map {
+    "code" => 203,
+    "severity" => 2,
+    "message" => "Unexpected meta data tag 'title'. Expected a '\\\\sync' meta data tag.",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
     },
   },
 ]
@@ -844,19 +814,14 @@ exports[`AlphaTexParserTest errors at204 beat duration: lexer-diagnostics 1`] = 
 
 exports[`AlphaTexParserTest errors at204 beat duration: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 204,
-    "end": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
-    },
-    "message": "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
-    "severity": 2,
-    "start": Object {
-      "col": 6,
-      "line": 1,
-      "offset": 5,
+  Map {
+    "code" => 204,
+    "severity" => 2,
+    "message" => "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
     },
   },
 ]
@@ -868,19 +833,14 @@ exports[`AlphaTexParserTest errors at204 meta value: lexer-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest errors at204 meta value: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 204,
-    "end": Object {
-      "col": 10,
-      "line": 1,
-      "offset": 9,
-    },
-    "message": "Unexpected 'NumberLiteral' token. Expected one of following: StringLiteral,Identifier",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 204,
+    "severity" => 2,
+    "message" => "Unexpected 'NumberLiteral' token. Expected one of following: StringLiteral,Identifier",
+    "start" => Map {
+      "col" => 10,
+      "line" => 1,
+      "offset" => 9,
     },
   },
 ]
@@ -892,19 +852,14 @@ exports[`AlphaTexParserTest errors at204 note string: lexer-diagnostics 1`] = `A
 
 exports[`AlphaTexParserTest errors at204 note string: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 204,
-    "end": Object {
-      "col": 4,
-      "line": 1,
-      "offset": 3,
-    },
-    "message": "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
-    "severity": 2,
-    "start": Object {
-      "col": 3,
-      "line": 1,
-      "offset": 2,
+  Map {
+    "code" => 204,
+    "severity" => 2,
+    "message" => "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
+    "start" => Map {
+      "col" => 4,
+      "line" => 1,
+      "offset" => 3,
     },
   },
 ]
@@ -920,19 +875,14 @@ exports[`AlphaTexParserTest errors at204 note value: lexer-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest errors at204 note value: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 204,
-    "end": Object {
-      "col": 16,
-      "line": 1,
-      "offset": 15,
-    },
-    "message": "Unexpected 'MetaDataTag' token. Expected one of following: NumberLiteral,StringLiteral,Identifier",
-    "severity": 2,
-    "start": Object {
-      "col": 6,
-      "line": 1,
-      "offset": 5,
+  Map {
+    "code" => 204,
+    "severity" => 2,
+    "message" => "Unexpected 'MetaDataTag' token. Expected one of following: NumberLiteral,StringLiteral,Identifier",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
     },
   },
 ]
@@ -960,19 +910,14 @@ exports[`AlphaTexParserTest errors at204 value list: lexer-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest errors at204 value list: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 204,
-    "end": Object {
-      "col": 18,
-      "line": 1,
-      "offset": 17,
-    },
-    "message": "Unexpected 'MetaDataTag' token. Expected one of following: Identifier,StringLiteral,NumberLiteral",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 204,
+    "severity" => 2,
+    "message" => "Unexpected 'MetaDataTag' token. Expected one of following: Identifier,StringLiteral,NumberLiteral",
+    "start" => Map {
+      "col" => 18,
+      "line" => 1,
+      "offset" => 17,
     },
   },
 ]
@@ -984,19 +929,14 @@ exports[`AlphaTexParserTest errors at205 meta value: lexer-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest errors at205 meta value: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 205,
-    "end": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
-    },
-    "message": "Unexpected end of file.",
-    "severity": 2,
-    "start": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unexpected end of file.",
+    "start" => Map {
+      "col" => 7,
+      "line" => 1,
+      "offset" => 6,
     },
   },
 ]
@@ -1012,19 +952,14 @@ exports[`AlphaTexParserTest errors at205 note string: lexer-diagnostics 1`] = `A
 
 exports[`AlphaTexParserTest errors at205 note string: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 205,
-    "end": Object {
-      "col": 6,
-      "line": 1,
-      "offset": 5,
-    },
-    "message": "Unexpected end of file.",
-    "severity": 2,
-    "start": Object {
-      "col": 6,
-      "line": 1,
-      "offset": 5,
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unexpected end of file.",
+    "start" => Map {
+      "col" => 6,
+      "line" => 1,
+      "offset" => 5,
     },
   },
 ]
@@ -1040,19 +975,14 @@ exports[`AlphaTexParserTest errors at206 bar: lexer-diagnostics 1`] = `Array []`
 
 exports[`AlphaTexParserTest errors at206 bar: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 206,
-    "end": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
-    },
-    "message": "Unrecognized metadata 'unknown'.",
-    "severity": 2,
-    "start": Object {
-      "col": 3,
-      "line": 1,
-      "offset": 2,
+  Map {
+    "code" => 206,
+    "severity" => 2,
+    "message" => "Unrecognized metadata 'unknown'.",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
     },
   },
 ]
@@ -1064,19 +994,14 @@ exports[`AlphaTexParserTest errors at206 score: lexer-diagnostics 1`] = `Array [
 
 exports[`AlphaTexParserTest errors at206 score: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 206,
-    "end": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
-    },
-    "message": "Unrecognized metadata 'unknown'.",
-    "severity": 2,
-    "start": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
+  Map {
+    "code" => 206,
+    "severity" => 2,
+    "message" => "Unrecognized metadata 'unknown'.",
+    "start" => Map {
+      "col" => 9,
+      "line" => 1,
+      "offset" => 8,
     },
   },
 ]
@@ -1092,19 +1017,14 @@ exports[`AlphaTexParserTest errors at207 bar: lexer-diagnostics 1`] = `Array []`
 
 exports[`AlphaTexParserTest errors at207 bar: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 25,
-      "line": 1,
-      "offset": 24,
-    },
-    "message": "Unrecognized property 'unknown'.",
-    "severity": 2,
-    "start": Object {
-      "col": 18,
-      "line": 1,
-      "offset": 17,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'unknown'.",
+    "start" => Map {
+      "col" => 25,
+      "line" => 1,
+      "offset" => 24,
     },
   },
 ]
@@ -1116,19 +1036,14 @@ exports[`AlphaTexParserTest errors at207 barre: lexer-diagnostics 1`] = `Array [
 
 exports[`AlphaTexParserTest errors at207 barre: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 20,
-      "line": 1,
-      "offset": 19,
-    },
-    "message": "Unrecognized property 'invalid'.",
-    "severity": 2,
-    "start": Object {
-      "col": 13,
-      "line": 1,
-      "offset": 12,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 20,
+      "line" => 1,
+      "offset" => 19,
     },
   },
 ]
@@ -1144,19 +1059,14 @@ exports[`AlphaTexParserTest errors at207 beat: lexer-diagnostics 1`] = `Array []
 
 exports[`AlphaTexParserTest errors at207 beat: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 16,
-      "line": 1,
-      "offset": 15,
-    },
-    "message": "Unrecognized property 'unknown'.",
-    "severity": 2,
-    "start": Object {
-      "col": 9,
-      "line": 1,
-      "offset": 8,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'unknown'.",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
     },
   },
 ]
@@ -1168,19 +1078,14 @@ exports[`AlphaTexParserTest errors at207 fermata: lexer-diagnostics 1`] = `Array
 
 exports[`AlphaTexParserTest errors at207 fermata: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 20,
-      "line": 1,
-      "offset": 19,
-    },
-    "message": "Unrecognized property 'invalid'.",
-    "severity": 2,
-    "start": Object {
-      "col": 13,
-      "line": 1,
-      "offset": 12,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 20,
+      "line" => 1,
+      "offset" => 19,
     },
   },
 ]
@@ -1192,19 +1097,14 @@ exports[`AlphaTexParserTest errors at207 gracetype: lexer-diagnostics 1`] = `Arr
 
 exports[`AlphaTexParserTest errors at207 gracetype: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 15,
-      "line": 1,
-      "offset": 14,
-    },
-    "message": "Unrecognized property 'invalid'.",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'invalid'.",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
     },
   },
 ]
@@ -1220,19 +1120,14 @@ exports[`AlphaTexParserTest errors at207 note: lexer-diagnostics 1`] = `Array []
 
 exports[`AlphaTexParserTest errors at207 note: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
-    },
-    "message": "Unrecognized property 'unknown'.",
-    "severity": 2,
-    "start": Object {
-      "col": 7,
-      "line": 1,
-      "offset": 6,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'unknown'.",
+    "start" => Map {
+      "col" => 14,
+      "line" => 1,
+      "offset" => 13,
     },
   },
 ]
@@ -1263,19 +1158,14 @@ exports[`AlphaTexParserTest errors at208 note list: lexer-diagnostics 1`] = `Arr
 
 exports[`AlphaTexParserTest errors at208 note list: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 4,
-      "line": 1,
-      "offset": 3,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 4,
-      "line": 1,
-      "offset": 3,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 4,
+      "line" => 1,
+      "offset" => 3,
     },
   },
 ]
@@ -1316,19 +1206,14 @@ exports[`AlphaTexParserTest errors at208 properties: lexer-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest errors at208 properties: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 26,
-      "line": 1,
-      "offset": 25,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 26,
-      "line": 1,
-      "offset": 25,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 26,
+      "line" => 1,
+      "offset" => 25,
     },
   },
 ]
@@ -1357,19 +1242,14 @@ exports[`AlphaTexParserTest errors at208 values: lexer-diagnostics 1`] = `Array 
 
 exports[`AlphaTexParserTest errors at208 values: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 15,
-      "line": 1,
-      "offset": 14,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 15,
-      "line": 1,
-      "offset": 14,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 15,
+      "line" => 1,
+      "offset" => 14,
     },
   },
 ]
@@ -1566,19 +1446,14 @@ exports[`AlphaTexParserTest intermediate finished beat effect value, not closed:
 
 exports[`AlphaTexParserTest intermediate finished beat effect value, not closed: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 50,
-      "line": 1,
-      "offset": 49,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 50,
-      "line": 1,
-      "offset": 49,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 50,
+      "line" => 1,
+      "offset" => 49,
     },
   },
 ]
@@ -1619,19 +1494,14 @@ exports[`AlphaTexParserTest intermediate finished meta property value, not close
 
 exports[`AlphaTexParserTest intermediate finished meta property value, not closed : parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 25,
-      "line": 1,
-      "offset": 24,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 25,
-      "line": 1,
-      "offset": 24,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 25,
+      "line" => 1,
+      "offset" => 24,
     },
   },
 ]
@@ -1688,19 +1558,14 @@ exports[`AlphaTexParserTest intermediate finished note effect value, not closed:
 
 exports[`AlphaTexParserTest intermediate finished note effect value, not closed: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 32,
-      "line": 1,
-      "offset": 31,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 32,
-      "line": 1,
-      "offset": 31,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 32,
+      "line" => 1,
+      "offset" => 31,
     },
   },
 ]
@@ -1782,19 +1647,14 @@ exports[`AlphaTexParserTest intermediate started beat effect name: lexer-diagnos
 
 exports[`AlphaTexParserTest intermediate started beat effect name: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 44,
-      "line": 1,
-      "offset": 43,
-    },
-    "message": "Unrecognized property 'ras'.",
-    "severity": 2,
-    "start": Object {
-      "col": 41,
-      "line": 1,
-      "offset": 40,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'ras'.",
+    "start" => Map {
+      "col" => 44,
+      "line" => 1,
+      "offset" => 43,
     },
   },
 ]
@@ -1821,19 +1681,14 @@ Score (1,1) -> (1,48) {
 
 exports[`AlphaTexParserTest intermediate started beat effect value: lexer-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 6,
-    "end": Object {
-      "col": 48,
-      "line": 1,
-      "offset": 47,
-    },
-    "message": "Unexpected end of file. String not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 46,
-      "line": 1,
-      "offset": 45,
+  Map {
+    "code" => 6,
+    "severity" => 2,
+    "message" => "Unexpected end of file. String not closed.",
+    "start" => Map {
+      "col" => 48,
+      "line" => 1,
+      "offset" => 47,
     },
   },
 ]
@@ -1841,19 +1696,14 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started beat effect value: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 205,
-    "end": Object {
-      "col": 48,
-      "line": 1,
-      "offset": 47,
-    },
-    "message": "Unexpected end of file.",
-    "severity": 2,
-    "start": Object {
-      "col": 48,
-      "line": 1,
-      "offset": 47,
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unexpected end of file.",
+    "start" => Map {
+      "col" => 48,
+      "line" => 1,
+      "offset" => 47,
     },
   },
 ]
@@ -1917,19 +1767,14 @@ exports[`AlphaTexParserTest intermediate started beat effects: lexer-diagnostics
 
 exports[`AlphaTexParserTest intermediate started beat effects: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 41,
-      "line": 1,
-      "offset": 40,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 41,
-      "line": 1,
-      "offset": 40,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 41,
+      "line" => 1,
+      "offset" => 40,
     },
   },
 ]
@@ -1939,19 +1784,14 @@ exports[`AlphaTexParserTest intermediate started initial meta 1`] = `Score (1,1)
 
 exports[`AlphaTexParserTest intermediate started initial meta: lexer-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 2,
-    "end": Object {
-      "col": 2,
-      "line": 1,
-      "offset": 1,
-    },
-    "message": "Missing identifier after meta data start",
-    "severity": 2,
-    "start": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
+  Map {
+    "code" => 2,
+    "severity" => 2,
+    "message" => "Missing identifier after meta data start",
+    "start" => Map {
+      "col" => 2,
+      "line" => 1,
+      "offset" => 1,
     },
   },
 ]
@@ -1987,19 +1827,14 @@ exports[`AlphaTexParserTest intermediate started meta properties: lexer-diagnost
 
 exports[`AlphaTexParserTest intermediate started meta properties: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 13,
-      "line": 1,
-      "offset": 12,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 13,
-      "line": 1,
-      "offset": 12,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 13,
+      "line" => 1,
+      "offset" => 12,
     },
   },
 ]
@@ -2011,19 +1846,14 @@ exports[`AlphaTexParserTest intermediate started meta property name: lexer-diagn
 
 exports[`AlphaTexParserTest intermediate started meta property name: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 16,
-      "line": 1,
-      "offset": 15,
-    },
-    "message": "Unrecognized property 'co'.",
-    "severity": 2,
-    "start": Object {
-      "col": 14,
-      "line": 1,
-      "offset": 13,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'co'.",
+    "start" => Map {
+      "col" => 16,
+      "line" => 1,
+      "offset" => 15,
     },
   },
 ]
@@ -2033,19 +1863,14 @@ exports[`AlphaTexParserTest intermediate started meta property value 1`] = `Scor
 
 exports[`AlphaTexParserTest intermediate started meta property value: lexer-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 6,
-    "end": Object {
-      "col": 21,
-      "line": 1,
-      "offset": 20,
-    },
-    "message": "Unexpected end of file. String not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 20,
-      "line": 1,
-      "offset": 19,
+  Map {
+    "code" => 6,
+    "severity" => 2,
+    "message" => "Unexpected end of file. String not closed.",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
     },
   },
 ]
@@ -2053,19 +1878,14 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started meta property value: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 205,
-    "end": Object {
-      "col": 21,
-      "line": 1,
-      "offset": 20,
-    },
-    "message": "Unexpected end of file.",
-    "severity": 2,
-    "start": Object {
-      "col": 21,
-      "line": 1,
-      "offset": 20,
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unexpected end of file.",
+    "start" => Map {
+      "col" => 21,
+      "line" => 1,
+      "offset" => 20,
     },
   },
 ]
@@ -2075,19 +1895,14 @@ exports[`AlphaTexParserTest intermediate started meta string 1`] = `Score (1,1) 
 
 exports[`AlphaTexParserTest intermediate started meta string: lexer-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 6,
-    "end": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
-    },
-    "message": "Unexpected end of file. String not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 8,
-      "line": 1,
-      "offset": 7,
+  Map {
+    "code" => 6,
+    "severity" => 2,
+    "message" => "Unexpected end of file. String not closed.",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
     },
   },
 ]
@@ -2095,19 +1910,14 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started meta string: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 205,
-    "end": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
-    },
-    "message": "Unexpected end of file.",
-    "severity": 2,
-    "start": Object {
-      "col": 11,
-      "line": 1,
-      "offset": 10,
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unexpected end of file.",
+    "start" => Map {
+      "col" => 11,
+      "line" => 1,
+      "offset" => 10,
     },
   },
 ]
@@ -2117,19 +1927,14 @@ exports[`AlphaTexParserTest intermediate started meta: lexer-diagnostics 1`] = `
 
 exports[`AlphaTexParserTest intermediate started meta: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 206,
-    "end": Object {
-      "col": 4,
-      "line": 1,
-      "offset": 3,
-    },
-    "message": "Unrecognized metadata 'tr'.",
-    "severity": 2,
-    "start": Object {
-      "col": 1,
-      "line": 1,
-      "offset": 0,
+  Map {
+    "code" => 206,
+    "severity" => 2,
+    "message" => "Unrecognized metadata 'tr'.",
+    "start" => Map {
+      "col" => 4,
+      "line" => 1,
+      "offset" => 3,
     },
   },
 ]
@@ -2158,19 +1963,14 @@ exports[`AlphaTexParserTest intermediate started note effect name: lexer-diagnos
 
 exports[`AlphaTexParserTest intermediate started note effect name: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 207,
-    "end": Object {
-      "col": 26,
-      "line": 1,
-      "offset": 25,
-    },
-    "message": "Unrecognized property 'slu'.",
-    "severity": 2,
-    "start": Object {
-      "col": 23,
-      "line": 1,
-      "offset": 22,
+  Map {
+    "code" => 207,
+    "severity" => 2,
+    "message" => "Unrecognized property 'slu'.",
+    "start" => Map {
+      "col" => 26,
+      "line" => 1,
+      "offset" => 25,
     },
   },
 ]
@@ -2197,19 +1997,14 @@ Score (1,1) -> (1,31) {
 
 exports[`AlphaTexParserTest intermediate started note effect value: lexer-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 6,
-    "end": Object {
-      "col": 31,
-      "line": 1,
-      "offset": 30,
-    },
-    "message": "Unexpected end of file. String not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 28,
-      "line": 1,
-      "offset": 27,
+  Map {
+    "code" => 6,
+    "severity" => 2,
+    "message" => "Unexpected end of file. String not closed.",
+    "start" => Map {
+      "col" => 31,
+      "line" => 1,
+      "offset" => 30,
     },
   },
 ]
@@ -2217,19 +2012,14 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started note effect value: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 205,
-    "end": Object {
-      "col": 31,
-      "line": 1,
-      "offset": 30,
-    },
-    "message": "Unexpected end of file.",
-    "severity": 2,
-    "start": Object {
-      "col": 31,
-      "line": 1,
-      "offset": 30,
+  Map {
+    "code" => 205,
+    "severity" => 2,
+    "message" => "Unexpected end of file.",
+    "start" => Map {
+      "col" => 31,
+      "line" => 1,
+      "offset" => 30,
     },
   },
 ]
@@ -2277,19 +2067,14 @@ exports[`AlphaTexParserTest intermediate started note effects: lexer-diagnostics
 
 exports[`AlphaTexParserTest intermediate started note effects: parser-diagnostics 1`] = `
 Array [
-  Object {
-    "code": 208,
-    "end": Object {
-      "col": 23,
-      "line": 1,
-      "offset": 22,
-    },
-    "message": "Unexpected end of file. Group not closed.",
-    "severity": 2,
-    "start": Object {
-      "col": 23,
-      "line": 1,
-      "offset": 22,
+  Map {
+    "code" => 208,
+    "severity" => 2,
+    "message" => "Unexpected end of file. Group not closed.",
+    "start" => Map {
+      "col" => 23,
+      "line" => 1,
+      "offset" => 22,
     },
   },
 ]

@@ -155,6 +155,7 @@ export class AlphaTexError extends AlphaTabError {
 }
 
 /**
+ * @record
  * @internal
  */
 interface AlphaTexTokenLocation {
@@ -164,6 +165,7 @@ interface AlphaTexTokenLocation {
 }
 
 /**
+ * @record
  * @internal
  */
 interface AlphaTexTokenInfo {

@@ -47,6 +47,9 @@ import { VisualTestHelper } from '@test/visualTests/VisualTestHelper';
 import { assert, expect } from 'chai';
 
 describe('AlphaTexImporterTest', () => {
+    /**
+     * @static
+     */
     function importErrorTest(tex: string) {
         const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
@@ -60,6 +63,9 @@ describe('AlphaTexImporterTest', () => {
         }
     }
 
+    /**
+     * @static
+     */
     function parseTex(tex: string): Score {
         const importer: AlphaTexImporter = new AlphaTexImporter();
         importer.initFromString(tex, new Settings());
