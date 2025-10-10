@@ -4,7 +4,7 @@
  */
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { AlphaTexAccidentalMode } from "@src/importer/AlphaTexShared";
+import { AlphaTexAccidentalMode } from "@src/importer/alphaTex/AlphaTexShared";
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';

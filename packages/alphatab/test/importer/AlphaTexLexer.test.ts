@@ -1,5 +1,5 @@
-import type { AlphaTexAstNode } from '@src/importer/AlphaTexAst';
-import { AlphaTexLexer } from '@src/importer/AlphaTexLexer';
+import type { AlphaTexAstNode } from '@src/importer/alphaTex/AlphaTexAst';
+import { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
 import { expect } from 'chai';
 
 describe('AlphaTexLexerTest', () => {

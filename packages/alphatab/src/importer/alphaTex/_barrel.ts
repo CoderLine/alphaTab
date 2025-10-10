@@ -1,0 +1,46 @@
+export {
+    type AlphaTexAsteriskTokenNode,
+    type AlphaTexAstNode,
+    type AlphaTexAstNodeLocation,
+    type AlphaTexBackSlashTokenNode,
+    type AlphaTexBarNode,
+    type AlphaTexBeatDurationChangeNode,
+    type AlphaTexBeatNode,
+    type AlphaTexBraceCloseTokenNode,
+    type AlphaTexBraceOpenTokenNode,
+    type AlphaTexColonTokenNode,
+    type AlphaTexComment,
+    type AlphaTexDotTokenNode,
+    type AlphaTexDoubleBackSlashTokenNode,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataNode,
+    type AlphaTexMetaDataTagNode,
+    AlphaTexNodeType,
+    type AlphaTexNoteListNode,
+    type AlphaTexNoteNode,
+    type AlphaTexNumberLiteral,
+    type AlphaTexParenthesisCloseTokenNode,
+    type AlphaTexParenthesisOpenTokenNode,
+    type AlphaTexPipeTokenNode,
+    type AlphaTexPropertiesNode,
+    type AlphaTexPropertyNode,
+    type AlphaTexScoreNode,
+    type AlphaTexStringLiteral,
+    type AlphaTexTextNode,
+    type AlphaTexTokenNode,
+    type AlphaTexValueList,
+    type IAlphaTexAstNode,
+    type IAlphaTexMetaDataTagPrefixNode,
+    type IAlphaTexNoteValueNode,
+    type IAlphaTexValueListItem
+} from '@src/importer/alphaTex/AlphaTexAst';
+export { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
+export { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
+export {
+    AlphaTexAccidentalMode,
+    type AlphaTexDiagnostic, 
+    AlphaTexDiagnosticBag,
+    AlphaTexDiagnosticCode,
+    AlphaTexDiagnosticsSeverity
+} from '@src/importer/alphaTex/AlphaTexShared';
+

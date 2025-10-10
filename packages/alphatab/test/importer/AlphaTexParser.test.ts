@@ -1,4 +1,4 @@
-import { AlphaTexParser } from '@src/importer/AlphaTexParser';
+import { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
 import { expect } from 'chai';
 
 describe('AlphaTexParserTest', () => {

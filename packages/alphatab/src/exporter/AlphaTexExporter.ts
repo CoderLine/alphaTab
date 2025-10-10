@@ -1,5 +1,6 @@
 import { Environment } from '@src/Environment';
 import { ScoreExporter } from '@src/exporter/ScoreExporter';
+import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
@@ -17,8 +18,8 @@ import {
     type AlphaTexStringLiteral,
     type AlphaTexValueList,
     type IAlphaTexAstNode,
-} from '@src/importer/AlphaTexAst';
-import { AlphaTex1LanguageHandler, type IAlphaTexLanguageHandler } from '@src/importer/AlphaTexLanguageHandler';
+} from '@src/importer/alphaTex/AlphaTexAst';
+import type { IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { IOHelper } from '@src/io/IOHelper';
 import type { Bar } from '@src/model/Bar';
 import type { Beat } from '@src/model/Beat';
@@ -439,7 +440,7 @@ class AlphaTexPrinter {
  * This ScoreExporter can write alphaTex strings.
  */
 export class AlphaTexExporter extends ScoreExporter {
-    private _handler: IAlphaTexLanguageHandler = AlphaTex1LanguageHandler.instance;
+    private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
 
     public get name(): string {
         return 'alphaTex';

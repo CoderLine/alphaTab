@@ -19,12 +19,12 @@
     type AlphaTexStringLiteral,
     type AlphaTexTokenNode,
     type IAlphaTexMetaDataTagPrefixNode
-} from '@src/importer/AlphaTexAst';
+} from '@src/importer/alphaTex/AlphaTexAst';
 import {
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity
-} from '@src/importer/AlphaTexShared';
+} from '@src/importer/alphaTex/AlphaTexShared';
 import { IOHelper } from '@src/io/IOHelper';
 import { Queue } from '@src/synth/ds/Queue';
 

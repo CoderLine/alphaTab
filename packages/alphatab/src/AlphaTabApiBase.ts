@@ -773,6 +773,7 @@ export class AlphaTabApiBase<TSettings> {
     public tex(tex: string, tracks?: number[]): void {
         try {
             const parser = new AlphaTexImporter();
+            parser.logErrors = true;
             parser.initFromString(tex, this.settings);
             const score: Score = parser.readScore();
             this.renderScore(score, tracks);

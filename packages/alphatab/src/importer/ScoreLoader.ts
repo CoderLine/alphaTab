@@ -1,15 +1,12 @@
 import { Environment } from '@src/Environment';
 import { FileLoadError } from '@src/FileLoadError';
-
+import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import type { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
-
+import { Logger } from '@src/Logger';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
-
-import { Logger } from '@src/Logger';
-import { AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 
 /**
  * The ScoreLoader enables you easy loading of Scores using all
@@ -25,6 +22,7 @@ export class ScoreLoader {
      */
     public static loadAlphaTex(tex: string, settings?: Settings): Score {
         const parser = new AlphaTexImporter();
+        parser.logErrors = true;
         parser.initFromString(tex, settings ?? new Settings());
         return parser.readScore();
     }

@@ -1,36 +1,33 @@
-﻿// unfortunately the "old" alphaTex syntax had no strict delimiters
+// unfortunately the "old" alphaTex syntax had no strict delimiters
 // for values and properties. That's why we need to parse the properties exactly
 // as needed for the identifiers. In an alphaTex2 we should make this parsing simpler.
 // the parser should not need to do that semantic checks, that's the importers job
 // but we emit "Hint" diagnostics for now.
 
+import { AlphaTex1EnumMappings } from '@src/importer/alphaTex/AlphaTex1EnumMappings';
+import {
+    AlphaTex1LanguageDefinitions,
+    type ValueListParseTypesExtended,
+    ValueListParseTypesMode
+} from '@src/importer/alphaTex/AlphaTex1LanguageDefinitions';
 import {
     type AlphaTexAstNode,
-    type AlphaTexBackSlashTokenNode,
-    type AlphaTexBraceCloseTokenNode,
-    type AlphaTexBraceOpenTokenNode,
     type AlphaTexIdentifier,
     type AlphaTexMetaDataNode,
-    type AlphaTexMetaDataTagNode,
     AlphaTexNodeType,
     type AlphaTexNumberLiteral,
-    type AlphaTexParenthesisCloseTokenNode,
-    type AlphaTexParenthesisOpenTokenNode,
-    type AlphaTexPropertiesNode,
     type AlphaTexPropertyNode,
-    type AlphaTexStringLiteral,
     type AlphaTexTextNode,
     type AlphaTexValueList,
     type IAlphaTexValueListItem
-} from '@src/importer/AlphaTexAst';
-import type { AlphaTexParser } from '@src/importer/AlphaTexParser';
+} from '@src/importer/alphaTex/AlphaTexAst';
 import {
-    AlphaTexAccidentalMode,
-    type AlphaTexDiagnostic,
     AlphaTexDiagnosticCode,
     AlphaTexDiagnosticsSeverity,
-    AlphaTexParserAbort
-} from '@src/importer/AlphaTexShared';
+    type IAlphaTexImporter
+} from '@src/importer/alphaTex/AlphaTexShared';
+import { ATNF } from '@src/importer/alphaTex/ATNF';
+import { ApplyNodeResult, type IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType, type FlatSyncPoint } from '@src/model/Automation';
@@ -39,22 +36,18 @@ import { BarreShape } from '@src/model/BarreShape';
 import { type Beat, BeatBeamingMode } from '@src/model/Beat';
 import { BendPoint } from '@src/model/BendPoint';
 import { BendStyle } from '@src/model/BendStyle';
-import { BendType } from '@src/model/BendType';
 import { BrushType } from '@src/model/BrushType';
 import { Chord } from '@src/model/Chord';
 import { Clef } from '@src/model/Clef';
 import { Color } from '@src/model/Color';
 import { CrescendoType } from '@src/model/CrescendoType';
-import { Direction } from '@src/model/Direction';
 import { Duration } from '@src/model/Duration';
-import { DynamicValue } from '@src/model/DynamicValue';
 import { FadeType } from '@src/model/FadeType';
-import { Fermata, FermataType } from '@src/model/Fermata';
+import { Fermata } from '@src/model/Fermata';
 import { Fingers } from '@src/model/Fingers';
 import { GolpeType } from '@src/model/GolpeType';
 import { GraceType } from '@src/model/GraceType';
 import { HarmonicType } from '@src/model/HarmonicType';
-import { KeySignature } from '@src/model/KeySignature';
 import { KeySignatureType } from '@src/model/KeySignatureType';
 import { Lyrics } from '@src/model/Lyrics';
 import type { MasterBar } from '@src/model/MasterBar';
@@ -65,14 +58,7 @@ import { NoteOrnament } from '@src/model/NoteOrnament';
 import { Ottavia } from '@src/model/Ottavia';
 import { PercussionMapper } from '@src/model/PercussionMapper';
 import { PickStroke } from '@src/model/PickStroke';
-import { Rasgueado } from '@src/model/Rasgueado';
-import {
-    BracketExtendMode,
-    type RenderStylesheet,
-    TrackNameMode,
-    TrackNameOrientation,
-    TrackNamePolicy
-} from '@src/model/RenderStylesheet';
+import type { RenderStylesheet } from '@src/model/RenderStylesheet';
 import { HeaderFooterStyle, Score, ScoreStyle, ScoreSubElement } from '@src/model/Score';
 import { Section } from '@src/model/Section';
 import { SimileMark } from '@src/model/SimileMark';
@@ -84,1795 +70,11 @@ import { TripletFeel } from '@src/model/TripletFeel';
 import { Tuning } from '@src/model/Tuning';
 import { VibratoType } from '@src/model/VibratoType';
 import { WahPedal } from '@src/model/WahPedal';
-import { WhammyType } from '@src/model/WhammyType';
-import { TextAlign } from '@src/platform/ICanvas';
 import { BeamDirection } from '@src/rendering/_barrel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 
-export interface IAlphaTexMetaDataReader {
-    readMetaDataValues(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexValueList | undefined;
-
-    readMetaDataPropertyValues(
-        parser: AlphaTexParser,
-        metaData: AlphaTexMetaDataTagNode,
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined;
-
-    readBeatPropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexValueList | undefined;
-
-    readDurationChangePropertyValues(
-        parser: AlphaTexParser,
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined;
-
-    readNotePropertyValues(parser: AlphaTexParser, property: AlphaTexPropertyNode): AlphaTexValueList | undefined;
-}
-
-export enum ApplyNodeResult {
-    Applied,
-    NotAppliedSemanticError,
-    NotAppliedUnrecognizedMarker
-}
-
-export interface IAlphaTexLanguageHandler {
-    applyStructuralMetaData(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
-    applyScoreMetaData(importer: IAlphaTexImporter, score: Score, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
-    applyStaffMetaData(importer: IAlphaTexImporter, staff: Staff, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
-    applyBarMetaData(importer: IAlphaTexImporter, bar: Bar, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
-
-    applyBeatDurationProperty(importer: IAlphaTexImporter, property: AlphaTexPropertyNode): ApplyNodeResult;
-    applyBeatProperty(importer: IAlphaTexImporter, beat: Beat, property: AlphaTexPropertyNode): ApplyNodeResult;
-    applyNoteProperty(importer: IAlphaTexImporter, note: Note, p: AlphaTexPropertyNode): ApplyNodeResult;
-
-    readonly knownStaffMetaDataTags: Set<string>;
-    readonly knownBeatProperties: Set<string>;
-    readonly knownBarMetaDataTags: Set<string>;
-    readonly knownBeatDurationProperties: Set<string>;
-    readonly knownNoteProperties: Set<string>;
-
-    buildSyncPoint(importer: IAlphaTexImporter, metaDataNode: AlphaTexMetaDataNode): FlatSyncPoint | undefined;
-
-    buildScoreMetaDataNodes(score: Score): AlphaTexMetaDataNode[];
-    buildBarMetaDataNodes(
-        staff: Staff,
-        bar: Bar | undefined,
-        voice: number,
-        isMultiVoice: boolean
-    ): AlphaTexMetaDataNode[];
-    buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[];
-    buildBeatEffects(beat: Beat): AlphaTexPropertyNode[];
-    buildNoteEffects(data: Note): AlphaTexPropertyNode[];
-}
-
-export interface IAlphaTexImporterState {
-    accidentalMode: AlphaTexAccidentalMode;
-    currentDynamics: DynamicValue;
-    currentTupletNumerator: number;
-    currentTupletDenominator: number;
-
-    readonly slurs: Map<string, Note>;
-    readonly percussionArticulationNames: Map<string, number>;
-    readonly lyrics: Map<number, Lyrics[]>;
-    readonly staffHasExplicitDisplayTransposition: Set<Staff>;
-    readonly staffHasExplicitTuning: Set<Staff>;
-    readonly staffTuningApplied: Set<Staff>;
-    readonly sustainPedalToBeat: Map<SustainPedalMarker, Beat>;
-}
-
-export interface IAlphaTexImporter {
-    readonly state: IAlphaTexImporterState;
-
-    makeStaffPitched(staff: Staff): void;
-    startNewVoice(): void;
-    startNewTrack(): Track;
-    applyPercussionStaff(staff: Staff): void;
-    startNewStaff(): Staff;
-    addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic): void;
-}
-
-/**
- * Defines how the value of the meta data tag is parsed.
- */
-enum ValueListParseTypesMode {
-    /**
-     * Indicates that the value of the given types is required.
-     * If the token matches, it is added to the value list.
-     * If the token does not match, an error diagnostic is added and parsing is stopped.
-     */
-    Required,
-    /**
-     * Indicates that the value of the given types is optional.
-     * If the token matches, it is added to the value list.
-     * If the token does not match, the value list completes and parsing continues.
-     */
-    Optional,
-
-    /**
-     * Same as {@link Required} but the next value is interpreted as a float.
-     */
-    RequiredAsFloat,
-
-    /**
-     * Same as {@link Optional} but the next value is interpreted as a float.
-     */
-    OptionalAsFloat,
-
-    /**
-     * Same as {@link Optional} but the next value is interpreted as a float.
-     * But this value is only handled on value lists with parenthesis.
-     * @remarks
-     * This mode primarily serves the need of preventing tempo automations
-     * to overlap with stringed notes:
-     *    `\tempo 120 "Moderate" 1.0 2.0` - 1.0 should be a fretted note not the ratio position
-     * but here it is the ratio position:
-     *    `\tempo (120 "Moderate" 1.0) 2.0
-     */
-    OptionalAsFloatInValueList,
-
-    /**
-     * Indicates that the value of the given types is optional and if matched the
-     * only value of this list.
-     * If the token matches, it is added to the value list and the parsing continues.
-     * If the token does not match, the value list completes and parsing continues.
-     */
-    OptionalAndStop,
-
-    /**
-     * Indicates that multiple values of the same types should be parsed as a value list.
-     * If the token is a open parenthesis, it starts reading the specified types as value list. If an unexpected item is
-     * encountered an error diagnostic is added.
-     * If the token is not an open parenthesis, an error diagnostic is added and parsing is stopped.
-     */
-    RequiredAsValueList,
-
-    /**
-     * Indicates that multiple values of the same types should be parsed.
-     * If the token matches, it is added to the value list. Parsing stays on the current type.
-     * If the token does not match, the value list completes and parsing continues.
-     */
-    ValueListWithoutParenthesis
-}
-
-/**
- * @record
- */
-interface ValueListParseTypesExtended {
-    expectedTypes: Set<AlphaTexNodeType>;
-    parseMode: ValueListParseTypesMode;
-    allowedValues?: Set<string>;
-    reservedIdentifiers?: Set<string>;
-}
-
-/**
- * AlphaTexNodeFactory (short name for less code)
- */
-class ATNF {
-    static identifier(text: string): AlphaTexIdentifier {
-        return {
-            nodeType: AlphaTexNodeType.Identifier,
-            text
-        } as AlphaTexIdentifier;
-    }
-    static stringLiteral(text: string): AlphaTexStringLiteral {
-        return { nodeType: AlphaTexNodeType.StringLiteral, text } as AlphaTexStringLiteral;
-    }
-    static numberLiteral(value: number): AlphaTexNumberLiteral {
-        return {
-            nodeType: AlphaTexNodeType.NumberLiteral,
-            value
-        } as AlphaTexNumberLiteral;
-    }
-
-    public static metaData(
-        tag: string,
-        values?: AlphaTexValueList,
-        properties?: AlphaTexPropertiesNode
-    ): AlphaTexMetaDataNode {
-        return {
-            nodeType: AlphaTexNodeType.MetaData,
-            tag: {
-                nodeType: AlphaTexNodeType.MetaDataTag,
-                prefix: {
-                    nodeType: AlphaTexNodeType.BackSlashToken
-                } as AlphaTexBackSlashTokenNode,
-                tag: {
-                    nodeType: AlphaTexNodeType.Identifier,
-                    text: tag
-                } as AlphaTexIdentifier
-            } as AlphaTexMetaDataTagNode,
-            values,
-            properties,
-            propertiesBeforeValues: false
-        } as AlphaTexMetaDataNode;
-    }
-
-    public static identifierMetaData(tag: string, value: string): AlphaTexMetaDataNode {
-        return ATNF.metaData(tag, ATNF.identifierValueList(value));
-    }
-
-    public static numberMetaData(tag: string, value: number): AlphaTexMetaDataNode {
-        return ATNF.metaData(tag, ATNF.numberValueList(value));
-    }
-
-    public static valueList(parenthesis: boolean, values: (IAlphaTexValueListItem | undefined)[]): AlphaTexValueList {
-        const valueList = {
-            nodeType: AlphaTexNodeType.ValueList,
-            values: values.filter(v => v !== undefined)
-        } as AlphaTexValueList;
-
-        if (parenthesis) {
-            valueList.openParenthesis = {
-                nodeType: AlphaTexNodeType.ParenthesisOpenToken
-            } as AlphaTexParenthesisOpenTokenNode;
-            valueList.closeParenthesis = {
-                nodeType: AlphaTexNodeType.ParenthesisCloseToken
-            } as AlphaTexParenthesisCloseTokenNode;
-        }
-
-        return valueList;
-    }
-
-    public static stringValueList(text: string): AlphaTexValueList {
-        return ATNF.valueList(false, [ATNF.stringLiteral(text)]);
-    }
-
-    public static identifierValueList(text: string): AlphaTexValueList {
-        return ATNF.valueList(false, [ATNF.identifier(text)]);
-    }
-
-    public static numberValueList(value: number): AlphaTexValueList | undefined {
-        return ATNF.valueList(false, [ATNF.numberLiteral(value)]);
-    }
-
-    public static properties(
-        properties: ([string, AlphaTexValueList | undefined] | undefined)[]
-    ): AlphaTexPropertiesNode {
-        const node = {
-            nodeType: AlphaTexNodeType.Properties,
-            properties: [],
-            openBrace: {
-                nodeType: AlphaTexNodeType.BraceOpenToken
-            } as AlphaTexBraceOpenTokenNode,
-            closeBrace: {
-                nodeType: AlphaTexNodeType.BraceCloseToken
-            } as AlphaTexBraceCloseTokenNode
-        } as AlphaTexPropertiesNode;
-
-        for (const p of properties) {
-            if (p) {
-                node.properties.push({
-                    nodeType: AlphaTexNodeType.Property,
-                    property: ATNF.identifier(p[0]),
-                    values: p[1]
-                } as AlphaTexPropertyNode);
-            }
-        }
-
-        return node;
-    }
-
-    public static property(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexValueList) {
-        properties.push({
-            nodeType: AlphaTexNodeType.Property,
-            property: ATNF.identifier(identifier),
-            values
-        });
-    }
-}
-
-class AlphaTex1EnumMappings {
-    private static reverse<TKey, TValue extends number>(map: Map<TKey, TValue>): Map<TValue, TKey> {
-        const reversed = new Map<TValue, TKey>();
-        for (const [k, v] of map) {
-            if (!reversed.has(v)) {
-                reversed.set(v, k);
-            }
-        }
-        return reversed;
-    }
-
-    public static readonly whammyTypes = new Map<string, WhammyType>([
-        ['none', WhammyType.None],
-        ['custom', WhammyType.Custom],
-        ['dive', WhammyType.Dive],
-        ['dip', WhammyType.Dip],
-        ['hold', WhammyType.Hold],
-        ['predive', WhammyType.Predive],
-        ['predivedive', WhammyType.PrediveDive]
-    ]);
-
-    public static readonly whammyTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.whammyTypes);
-
-    public static readonly bendStyles = new Map<string, BendStyle>([
-        ['gradual', BendStyle.Gradual],
-        ['fast', BendStyle.Fast],
-        ['default', BendStyle.Default]
-    ]);
-
-    public static readonly bendStylesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.bendStyles);
-
-    public static readonly graceTypes = new Map<string, GraceType>([
-        ['ob', GraceType.OnBeat],
-        ['b', GraceType.BendGrace],
-        ['bb', GraceType.BeforeBeat]
-    ]);
-
-    public static readonly graceTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.graceTypes);
-
-    public static readonly fermataTypes = new Map<string, FermataType>([
-        ['short', FermataType.Short],
-        ['medium', FermataType.Medium],
-        ['long', FermataType.Long]
-    ]);
-
-    public static readonly fermataTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.fermataTypes);
-
-    public static readonly accidentalModes = new Map<string, AlphaTexAccidentalMode>([
-        ['auto', AlphaTexAccidentalMode.Auto],
-        ['explicit', AlphaTexAccidentalMode.Explicit]
-    ]);
-
-    public static readonly accidentalModesReversed = AlphaTex1EnumMappings.reverse(
-        AlphaTex1EnumMappings.accidentalModes
-    );
-
-    public static readonly barreShapes = new Map<string, BarreShape>([
-        ['full', BarreShape.Full],
-        ['half', BarreShape.Half]
-    ]);
-    public static readonly barreShapesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.barreShapes);
-
-    public static readonly ottava = new Map<string, Ottavia>([
-        ['15ma', Ottavia._15ma],
-        ['8va', Ottavia._8va],
-        ['regular', Ottavia.Regular],
-        ['8vb', Ottavia._8vb],
-        ['15mb', Ottavia._15mb]
-    ]);
-    public static readonly ottavaReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.ottava);
-
-    public static readonly rasgueadoPatterns = new Map<string, Rasgueado>([
-        ['ii', Rasgueado.Ii],
-        ['mi', Rasgueado.Mi],
-        ['miitriplet', Rasgueado.MiiTriplet],
-        ['miianapaest', Rasgueado.MiiAnapaest],
-        ['pmptriplet', Rasgueado.PmpTriplet],
-        ['pmpanapaest', Rasgueado.PmpAnapaest],
-        ['peitriplet', Rasgueado.PeiTriplet],
-        ['peianapaest', Rasgueado.PeiAnapaest],
-        ['paitriplet', Rasgueado.PaiTriplet],
-        ['paianapaest', Rasgueado.PaiAnapaest],
-        ['amitriplet', Rasgueado.AmiTriplet],
-        ['amianapaest', Rasgueado.AmiAnapaest],
-        ['ppp', Rasgueado.Ppp],
-        ['amii', Rasgueado.Amii],
-        ['amip', Rasgueado.Amip],
-        ['eami', Rasgueado.Eami],
-        ['eamii', Rasgueado.Eamii],
-        ['peami', Rasgueado.Peami]
-    ]);
-    public static readonly rasgueadoPatternsReversed = AlphaTex1EnumMappings.reverse(
-        AlphaTex1EnumMappings.rasgueadoPatterns
-    );
-
-    public static dynamics = new Map<string, DynamicValue>([
-        ['ppp', DynamicValue.PPP],
-        ['pp', DynamicValue.PP],
-        ['p', DynamicValue.P],
-        ['mp', DynamicValue.MP],
-        ['mf', DynamicValue.MF],
-        ['f', DynamicValue.F],
-        ['ff', DynamicValue.FF],
-        ['fff', DynamicValue.FFF],
-        ['pppp', DynamicValue.PPPP],
-        ['ppppp', DynamicValue.PPPPP],
-        ['pppppp', DynamicValue.PPPPPP],
-        ['ffff', DynamicValue.FFFF],
-        ['fffff', DynamicValue.FFFFF],
-        ['ffffff', DynamicValue.FFFFFF],
-        ['sf', DynamicValue.SF],
-        ['sfp', DynamicValue.SFP],
-        ['sfpp', DynamicValue.SFPP],
-        ['fp', DynamicValue.FP],
-        ['rf', DynamicValue.RF],
-        ['rfz', DynamicValue.RFZ],
-        ['sfz', DynamicValue.SFZ],
-        ['sffz', DynamicValue.SFFZ],
-        ['fz', DynamicValue.FZ],
-        ['n', DynamicValue.N],
-        ['pf', DynamicValue.PF],
-        ['sfzp', DynamicValue.SFZP]
-    ]);
-    public static readonly dynamicsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.dynamics);
-
-    public static readonly bracketExtendModes = new Map<string, BracketExtendMode>([
-        ['nobrackets', BracketExtendMode.NoBrackets],
-        ['groupstaves', BracketExtendMode.GroupStaves],
-        ['groupsimilarinstruments', BracketExtendMode.GroupSimilarInstruments]
-    ]);
-    public static readonly bracketExtendModesReversed = AlphaTex1EnumMappings.reverse(
-        AlphaTex1EnumMappings.bracketExtendModes
-    );
-
-    public static readonly trackNamePolicies = new Map<string, TrackNamePolicy>([
-        ['hidden', TrackNamePolicy.Hidden],
-        ['firstsystem', TrackNamePolicy.FirstSystem],
-        ['allsystems', TrackNamePolicy.AllSystems]
-    ]);
-    public static readonly trackNamePoliciesReversed = AlphaTex1EnumMappings.reverse(
-        AlphaTex1EnumMappings.trackNamePolicies
-    );
-
-    public static readonly trackNameOrientations = new Map<string, TrackNameOrientation>([
-        ['horizontal', TrackNameOrientation.Horizontal],
-        ['vertical', TrackNameOrientation.Vertical]
-    ]);
-    public static readonly trackNameOrientationsReversed = AlphaTex1EnumMappings.reverse(
-        AlphaTex1EnumMappings.trackNameOrientations
-    );
-
-    public static readonly trackNameMode = new Map<string, TrackNameMode>([
-        ['fullname', TrackNameMode.FullName],
-        ['shortname', TrackNameMode.ShortName]
-    ]);
-    public static readonly trackNameModeReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.trackNameMode);
-
-    public static readonly textAligns = new Map<string, TextAlign>([
-        ['left', TextAlign.Left],
-        ['center', TextAlign.Center],
-        ['right', TextAlign.Right]
-    ]);
-    public static readonly textAlignsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.textAligns);
-
-    public static readonly bendTypes = new Map<string, BendType>([
-        ['none', BendType.None],
-        ['custom', BendType.Custom],
-        ['bend', BendType.Bend],
-        ['release', BendType.Release],
-        ['bendrelease', BendType.BendRelease],
-        ['hold', BendType.Hold],
-        ['prebend', BendType.Prebend],
-        ['prebendbend', BendType.PrebendBend],
-        ['prebendrelease', BendType.PrebendRelease]
-    ]);
-    public static readonly bendTypesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.bendTypes);
-
-    public static readonly keySignatures = new Map<string, KeySignature>([
-        ['cb', KeySignature.Cb],
-        ['cbmajor', KeySignature.Cb],
-        ['abminor', KeySignature.Cb],
-
-        ['gb', KeySignature.Gb],
-        ['gbmajor', KeySignature.Gb],
-        ['ebminor', KeySignature.Gb],
-
-        ['db', KeySignature.Db],
-        ['dbmajor', KeySignature.Db],
-        ['bbminor', KeySignature.Db],
-
-        ['ab', KeySignature.Ab],
-        ['abmajor', KeySignature.Ab],
-        ['fminor', KeySignature.Ab],
-
-        ['eb', KeySignature.Eb],
-        ['ebmajor', KeySignature.Eb],
-        ['cminor', KeySignature.Eb],
-
-        ['bb', KeySignature.Bb],
-        ['bbmajor', KeySignature.Bb],
-        ['gminor', KeySignature.Bb],
-
-        ['f', KeySignature.F],
-        ['fmajor', KeySignature.F],
-        ['dminor', KeySignature.F],
-
-        ['c', KeySignature.C],
-        ['cmajor', KeySignature.C],
-        ['aminor', KeySignature.C],
-
-        ['g', KeySignature.G],
-        ['gmajor', KeySignature.G],
-        ['eminor', KeySignature.G],
-
-        ['d', KeySignature.D],
-        ['dmajor', KeySignature.D],
-        ['bminor', KeySignature.D],
-
-        ['a', KeySignature.A],
-        ['amajor', KeySignature.A],
-        ['f#minor', KeySignature.A],
-
-        ['e', KeySignature.E],
-        ['emajor', KeySignature.E],
-        ['c#minor', KeySignature.E],
-
-        ['b', KeySignature.B],
-        ['bmajor', KeySignature.B],
-        ['g#minor', KeySignature.B],
-
-        ['f#', KeySignature.FSharp],
-        ['f#major', KeySignature.FSharp],
-        ['d#minor', KeySignature.FSharp],
-
-        ['c#', KeySignature.CSharp],
-        ['c#major', KeySignature.CSharp],
-        ['a#minor', KeySignature.CSharp]
-    ]);
-
-    public static readonly keySignaturesMajorReversed = new Map<KeySignature, string>([
-        [KeySignature.Cb, 'cb'],
-        [KeySignature.Gb, 'gb'],
-        [KeySignature.Db, 'db'],
-        [KeySignature.Ab, 'ab'],
-        [KeySignature.Eb, 'eb'],
-        [KeySignature.Bb, 'bb'],
-        [KeySignature.F, 'f'],
-        [KeySignature.C, 'c'],
-        [KeySignature.G, 'g'],
-        [KeySignature.D, 'd'],
-        [KeySignature.A, 'a'],
-        [KeySignature.E, 'e'],
-        [KeySignature.B, 'b'],
-        [KeySignature.FSharp, 'f#'],
-        [KeySignature.CSharp, 'c#']
-    ]);
-
-    public static readonly keySignaturesMinorReversed = new Map<KeySignature, string>([
-        [KeySignature.Cb, 'abminor'],
-        [KeySignature.Gb, 'ebminor'],
-        [KeySignature.Db, 'bbminor'],
-        [KeySignature.Ab, 'fminor'],
-        [KeySignature.Eb, 'cminor'],
-        [KeySignature.Bb, 'gminor'],
-        [KeySignature.F, 'dminor'],
-        [KeySignature.C, 'aminor'],
-        [KeySignature.G, 'eminor'],
-        [KeySignature.D, 'bminor'],
-        [KeySignature.A, 'f#minor'],
-        [KeySignature.E, 'c#minor'],
-        [KeySignature.B, 'g#minor'],
-        [KeySignature.FSharp, 'd#minor'],
-        [KeySignature.CSharp, 'a#minor']
-    ]);
-
-    public static readonly keySignatureTypes = new Map<string, KeySignatureType>([
-        ['cb', KeySignatureType.Major],
-        ['cbmajor', KeySignatureType.Major],
-        ['abminor', KeySignatureType.Minor],
-
-        ['gb', KeySignatureType.Major],
-        ['gbmajor', KeySignatureType.Major],
-        ['ebminor', KeySignatureType.Minor],
-
-        ['db', KeySignatureType.Major],
-        ['dbmajor', KeySignatureType.Major],
-        ['bbminor', KeySignatureType.Minor],
-
-        ['ab', KeySignatureType.Major],
-        ['abmajor', KeySignatureType.Major],
-        ['fminor', KeySignatureType.Minor],
-
-        ['eb', KeySignatureType.Major],
-        ['ebmajor', KeySignatureType.Major],
-        ['cminor', KeySignatureType.Minor],
-
-        ['bb', KeySignatureType.Major],
-        ['bbmajor', KeySignatureType.Major],
-        ['gminor', KeySignatureType.Minor],
-
-        ['f', KeySignatureType.Major],
-        ['fmajor', KeySignatureType.Major],
-        ['dminor', KeySignatureType.Minor],
-
-        ['c', KeySignatureType.Major],
-        ['cmajor', KeySignatureType.Major],
-        ['aminor', KeySignatureType.Minor],
-
-        ['g', KeySignatureType.Major],
-        ['gmajor', KeySignatureType.Major],
-        ['eminor', KeySignatureType.Minor],
-
-        ['d', KeySignatureType.Major],
-        ['dmajor', KeySignatureType.Major],
-        ['bminor', KeySignatureType.Minor],
-
-        ['a', KeySignatureType.Major],
-        ['amajor', KeySignatureType.Major],
-        ['f#minor', KeySignatureType.Minor],
-
-        ['e', KeySignatureType.Major],
-        ['emajor', KeySignatureType.Major],
-        ['c#minor', KeySignatureType.Minor],
-
-        ['b', KeySignatureType.Major],
-        ['bmajor', KeySignatureType.Major],
-        ['g#minor', KeySignatureType.Minor],
-
-        ['f#', KeySignatureType.Major],
-        ['f#major', KeySignatureType.Major],
-        ['d#minor', KeySignatureType.Minor],
-
-        ['c#', KeySignatureType.Major],
-        ['c#major', KeySignatureType.Major],
-        ['a#minor', KeySignatureType.Minor]
-    ]);
-
-    public static readonly clefs = new Map<string, Clef>([
-        ['g2', Clef.G2],
-        ['treble', Clef.G2],
-
-        ['f4', Clef.F4],
-        ['bass', Clef.F4],
-
-        ['c3', Clef.C3],
-        ['alto', Clef.C3],
-
-        ['c4', Clef.C4],
-        ['tenor', Clef.C4],
-
-        ['n', Clef.Neutral],
-        ['neutral', Clef.Neutral]
-    ]);
-    public static readonly clefsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.clefs);
-
-    public static readonly tripletFeels = new Map<string, TripletFeel>([
-        ['notripletfeel', TripletFeel.NoTripletFeel],
-        ['no', TripletFeel.NoTripletFeel],
-        ['none', TripletFeel.NoTripletFeel],
-
-        ['triplet16th', TripletFeel.Triplet16th],
-        ['t16', TripletFeel.Triplet16th],
-        ['triplet-16th', TripletFeel.Triplet16th],
-
-        ['triplet8th', TripletFeel.Triplet8th],
-        ['t8', TripletFeel.Triplet8th],
-        ['triplet-8th', TripletFeel.Triplet8th],
-
-        ['dotted16th', TripletFeel.Dotted16th],
-        ['d16', TripletFeel.Dotted16th],
-        ['dotted-16th', TripletFeel.Dotted16th],
-
-        ['dotted8th', TripletFeel.Dotted8th],
-        ['d8', TripletFeel.Dotted8th],
-        ['dotted-8th', TripletFeel.Dotted8th],
-
-        ['scottish16th', TripletFeel.Scottish16th],
-        ['s16', TripletFeel.Scottish16th],
-        ['scottish-16th', TripletFeel.Scottish16th],
-
-        ['scottish8th', TripletFeel.Scottish8th],
-        ['s8', TripletFeel.Scottish8th],
-        ['scottish-8th', TripletFeel.Scottish8th]
-    ]);
-    public static readonly tripletFeelsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.tripletFeels);
-
-    public static readonly barLines = new Map<string, BarLineStyle>([
-        ['automatic', BarLineStyle.Automatic],
-        ['dashed', BarLineStyle.Dashed],
-        ['dotted', BarLineStyle.Dotted],
-        ['heavy', BarLineStyle.Heavy],
-        ['heavyheavy', BarLineStyle.HeavyHeavy],
-        ['heavylight', BarLineStyle.HeavyLight],
-        ['lightheavy', BarLineStyle.LightHeavy],
-        ['lightlight', BarLineStyle.LightLight],
-        ['none', BarLineStyle.None],
-        ['regular', BarLineStyle.Regular],
-        ['short', BarLineStyle.Short],
-        ['tick', BarLineStyle.Tick]
-    ]);
-    public static readonly barLinesReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.barLines);
-
-    public static readonly ottavia = new Map<string, Ottavia>([
-        ['15ma', Ottavia._15ma],
-        ['8va', Ottavia._8va],
-        ['regular', Ottavia.Regular],
-        ['8vb', Ottavia._8vb],
-        ['15mb', Ottavia._15mb]
-    ]);
-    public static readonly ottaviaReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.ottavia);
-
-    public static readonly simileMarks = new Map<string, SimileMark>([
-        ['none', SimileMark.None],
-        ['simple', SimileMark.Simple],
-        ['firstofdouble', SimileMark.FirstOfDouble],
-        ['secondofdouble', SimileMark.SecondOfDouble]
-    ]);
-    public static readonly simileMarksReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.simileMarks);
-
-    public static readonly directions = new Map<string, Direction>([
-        ['fine', Direction.TargetFine],
-        ['segno', Direction.TargetSegno],
-        ['segnosegno', Direction.TargetSegnoSegno],
-        ['coda', Direction.TargetCoda],
-        ['doublecoda', Direction.TargetDoubleCoda],
-
-        ['dacapo', Direction.JumpDaCapo],
-        ['dacapoalcoda', Direction.JumpDaCapoAlCoda],
-        ['dacapoaldoublecoda', Direction.JumpDaCapoAlDoubleCoda],
-        ['dacapoalfine', Direction.JumpDaCapoAlFine],
-
-        ['dalsegno', Direction.JumpDalSegno],
-        ['dalsegnoalcoda', Direction.JumpDalSegnoAlCoda],
-        ['dalsegnoaldoublecoda', Direction.JumpDalSegnoAlDoubleCoda],
-        ['dalsegnoalfine', Direction.JumpDalSegnoAlFine],
-
-        ['dalsegnosegno', Direction.JumpDalSegnoSegno],
-        ['dalsegnosegnoalcoda', Direction.JumpDalSegnoSegnoAlCoda],
-        ['dalsegnosegnoaldoublecoda', Direction.JumpDalSegnoSegnoAlDoubleCoda],
-        ['dalsegnosegnoalfine', Direction.JumpDalSegnoSegnoAlFine],
-
-        ['dacoda', Direction.JumpDaCoda],
-        ['dadoublecoda', Direction.JumpDaDoubleCoda]
-    ]);
-    public static readonly directionsReversed = AlphaTex1EnumMappings.reverse(AlphaTex1EnumMappings.directions);
-}
-
-export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlphaTexLanguageHandler {
+export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
-
-    private static valueType(
-        expectedTypes: AlphaTexNodeType[],
-        parseMode: ValueListParseTypesMode,
-        allowedValues?: string[],
-        reservedIdentifiers?: string[]
-    ): ValueListParseTypesExtended {
-        return {
-            expectedTypes: new Set<AlphaTexNodeType>(expectedTypes),
-            parseMode,
-            allowedValues: allowedValues ? new Set<string>(allowedValues) : undefined,
-            reservedIdentifiers: reservedIdentifiers ? new Set<string>(reservedIdentifiers) : undefined
-        };
-    }
-    private static basicList(
-        basic: [AlphaTexNodeType[] /* accepted types */, ValueListParseTypesMode][]
-    ): ValueListParseTypesExtended[] {
-        return basic.map(b => AlphaTex1LanguageHandler.valueType(b[0], b[1]));
-    }
-
-    private static readonly scoreInfoValueListTypes = AlphaTex1LanguageHandler.basicList([
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional],
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
-    ]);
-    private static readonly scoreInfoTemplateValueListTypes = AlphaTex1LanguageHandler.basicList([
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
-    ]);
-    private static readonly numberOnlyValueListTypes = AlphaTex1LanguageHandler.basicList([
-        [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required]
-    ]);
-    private static readonly textLikeValueListTypes = AlphaTex1LanguageHandler.basicList([
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required]
-    ]);
-
-    /**
-     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
-     * in `\chord {}` properties.
-     */
-    private static readonly chordPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // firstfret 3
-        ['firstfret', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // showdiagram, showdiagram true, showdiagram false, showdiagram 0, showdiagram 1
-        [
-            'showdiagram',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Optional
-                ]
-            ])
-        ],
-
-        // showfingering, showfingering true, showfingering false, showfingering 0, showfingering 1
-        [
-            'showfingering',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Optional
-                ]
-            ])
-        ],
-
-        // showname, showname true, showname false, showname 0, showname 1
-        [
-            'showname',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Optional
-                ]
-            ])
-        ],
-
-        // barre 1 2 3
-        [
-            'barre',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.ValueListWithoutParenthesis]
-            ])
-        ]
-    ]);
-
-    /**
-     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
-     * in `\staff {}` properties.
-     */
-    private static readonly staffPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // score, score 1
-        [
-            'score',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-        ['tabs', undefined],
-        ['slash', undefined],
-        ['numbered', undefined]
-    ]);
-
-    /**
-     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
-     * in `\track {}` properties.
-     */
-    private static readonly trackPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // color red, color "#FF0000"
-        ['color', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // defaultsystemslayout 3
-        ['defaultsystemslayout', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // volume 16
-        ['volume', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // balance 16
-        ['balance', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // bank 16
-        ['bank', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // systemslayout 1 2 3 4 5
-        [
-            'systemslayout',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.ValueListWithoutParenthesis]
-            ])
-        ],
-
-        // instrument 27, instrument percussion, instrument "acoustic guitar nylon"
-        [
-            'instrument',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ]
-            ])
-        ],
-
-        ['mute', undefined],
-        ['solo', undefined],
-        ['multibarrest', undefined]
-    ]);
-
-    /**
-     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
-     * in beat level properties (beat effects).
-     */
-    private static readonly beatPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        ['f', undefined],
-        ['fo', undefined],
-        ['vs', undefined],
-        ['v', undefined],
-        ['vw', undefined],
-        ['s', undefined],
-        ['p', undefined],
-        ['tt', undefined],
-        ['dd', undefined],
-        ['d', undefined],
-        ['su', undefined],
-        ['sd', undefined],
-        ['cre', undefined],
-        ['dec', undefined],
-        ['spd', undefined],
-        ['sph', undefined],
-        ['spu', undefined],
-        ['spe', undefined],
-        ['slashed', undefined],
-        ['ds', undefined],
-        ['glpf', undefined],
-        ['glpt', undefined],
-        ['waho', undefined],
-        ['wahc', undefined],
-        ['legatoorigin', undefined],
-        ['timer', undefined],
-
-        // tu 3, tu 3,2
-        [
-            'tu',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ],
-
-        // txt "Text", txt Intro
-        ['txt', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // lyrics "Lyrics", lyrics 2 "Lyrics Line 2"
-        [
-            'lyrics',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Required]
-            ])
-        ],
-
-        // tu 3, tu 3 2
-        [
-            'tu',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ],
-
-        // tb dip fast (0 -1 0), tb dip (0 -1 0), tb (0 -1 0)
-        [
-            'tb',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.RequiredAsValueList
-                )
-            ]
-        ],
-
-        // tbe dip fast (0 0 -1 30 0 60), tbe dip (0 0 -1 30 0 60), tbe (0 0 -1 30 0 60)
-        [
-            'tbe',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.RequiredAsValueList
-                )
-            ]
-        ],
-
-        // bu, bu 16
-        [
-            'bu',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        // bd, bd 16
-        [
-            'bd',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        // au, au 16
-        [
-            'au',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        // ad, ad 16
-        [
-            'ad',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        // ch C, ch "C"
-        ['ch', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // gr, gr ob, gr b
-        [
-            'gr',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    Array.from(AlphaTex1EnumMappings.graceTypes.keys())
-                )
-            ]
-        ],
-
-        // dy F, dy "F"
-        ['dy', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // tempo 120, tempo 120 "Label", tempo 120 "Label" hide
-        [
-            'tempo',
-            [
-                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required),
-                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional),
-                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional, [
-                    'hide'
-                ])
-            ]
-        ],
-
-        // volume 10
-        ['volume', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // balance 0
-        ['balance', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // tp 16
-        ['tp', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // barre 7, barre 7 full, barre 7 "half"
-        [
-            'barre',
-            [
-                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    Array.from(AlphaTex1EnumMappings.barreShapes.keys())
-                )
-            ]
-        ],
-
-        // rasg ii, rasg "mi"
-        ['rasg', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // ot 15ma, ot "regular"
-        ['ot', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // instrument 27, instrument percussion, instrument "acoustic guitar nylon"
-        [
-            'instrument',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ]
-            ])
-        ],
-
-        // bank 127
-        ['bank', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // fermata short, fermata short 0.5
-        [
-            'fermata',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    Array.from(AlphaTex1EnumMappings.fermataTypes.keys())
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.OptionalAsFloat
-                )
-            ]
-        ],
-
-        // beam invert
-        ['beam', AlphaTex1LanguageHandler.textLikeValueListTypes]
-    ]);
-
-    /**
-     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
-     * in beat duration properties.
-     */
-    private static readonly beatDurationPropertyValueListTypes = new Map<
-        string,
-        ValueListParseTypesExtended[] | undefined
-    >([
-        // tu 3, tu 3,2
-        [
-            'tu',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ]
-    ]);
-
-    /**
-     * Contains the definitions how to read the values for given properties using {@link readTypedValueList}
-     * in note level properties (note effects).
-     */
-    private static readonly notePropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        [
-            'nh',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-        [
-            'ah',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-        [
-            'th',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-        [
-            'ph',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-        [
-            'sh',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-        [
-            'fh',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        ['v', undefined],
-        ['vw', undefined],
-        ['sl', undefined],
-        ['ss', undefined],
-        ['sib', undefined],
-        ['sia', undefined],
-        ['sou', undefined],
-        ['sod', undefined],
-        ['psd', undefined],
-        ['psu', undefined],
-        ['h', undefined],
-        ['lht', undefined],
-        ['g', undefined],
-        ['ac', undefined],
-        ['hac', undefined],
-        ['ten', undefined],
-        ['pm', undefined],
-        ['st', undefined],
-        ['lr', undefined],
-        ['x', undefined],
-        ['-', undefined],
-        ['t', undefined],
-        ['turn', undefined],
-        ['iturn', undefined],
-        ['umordent', undefined],
-        ['lmordent', undefined],
-        ['string', undefined],
-        ['hide', undefined],
-
-        // b bendRelease fast (0 4 0), b bendRelease (0 4 0), b (0 4 0)
-        [
-            'b',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.RequiredAsValueList
-                )
-            ]
-        ],
-
-        //  be bendRelease fast (0 0 4 30 0 60), be bendRelease (0 0 4 30 0 60), be (0 0 4 30 0 60)
-        [
-            'be',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    Array.from(AlphaTex1EnumMappings.bendTypes.keys())
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    Array.from(AlphaTex1EnumMappings.bendStyles.keys())
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.RequiredAsValueList
-                )
-            ]
-        ],
-
-        // tr 14, tr 14 32
-        [
-            'tr',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ],
-
-        // lf, lf 1
-        [
-            'lf',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        // rf, rf 1
-        [
-            'rf',
-            AlphaTex1LanguageHandler.basicList([[[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]])
-        ],
-
-        // acc "#"
-        ['acc', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // slur S1, slur "1"
-        ['slur', AlphaTex1LanguageHandler.textLikeValueListTypes]
-    ]);
-
-    private static readonly syncMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // \sync BarIndex Occurence MillisecondOffset
-        // \sync BarIndex Occurence MillisecondOffset RatioPosition
-        [
-            'sync',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.OptionalAsFloat]
-            ])
-        ]
-    ]);
-
-    private static readonly structuralMetaDataValueListTypes = new Map<
-        string,
-        ValueListParseTypesExtended[] | undefined
-    >([
-        // track, track Name, track ShortName Name, track "Name", track "ShortName" "Name"
-        [
-            'track',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ],
-        ['staff', undefined],
-        ['voice', undefined]
-    ]);
-
-    private static readonly staffMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // tuning E4 B3 G3 D3 A2 E2, \tuning "E4" "B3" "G3" "D3"
-        [
-            'tuning',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral],
-                    ValueListParseTypesMode.ValueListWithoutParenthesis
-                ]
-            ])
-        ],
-
-        // chord "C" 0 1 0 2 3 x
-        [
-            'chord',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Required],
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.ValueListWithoutParenthesis
-                ]
-            ])
-        ],
-        // capo 3
-        ['capo', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // instrument 27, instrument percussion, instrument "acoustic guitar nylon"
-        [
-            'instrument',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ]
-            ])
-        ],
-        // bank 127
-        ['bank', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // lyrics "Text", lyrics 1 "Text"
-        [
-            'lyrics',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Required]
-            ])
-        ],
-
-        // articulation defaults, articulation "Name" 27
-        [
-            'articulation',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ],
-
-        // displaytranspose -12
-        ['displaytranspose', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // transpose -12
-        ['transpose', AlphaTex1LanguageHandler.numberOnlyValueListTypes]
-    ]);
-
-    private static readonly scoreMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        ['title', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['subtitle', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['artist', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['album', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['words', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['music', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['wordsandmusic', AlphaTex1LanguageHandler.scoreInfoTemplateValueListTypes],
-        ['copyright', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['copyright2', AlphaTex1LanguageHandler.scoreInfoTemplateValueListTypes],
-        ['instructions', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['notices', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['tab', AlphaTex1LanguageHandler.scoreInfoValueListTypes],
-        ['defaultsystemslayout', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-        // systemslayout 1 2 3 4 5
-        [
-            'systemslayout',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.ValueListWithoutParenthesis]
-            ])
-        ],
-        ['hidedynamics', undefined],
-        ['showdynamics', undefined],
-        ['usesystemsignseparator', undefined],
-        ['multibarrest', undefined],
-        ['bracketextendmode', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        ['singletracktracknamepolicy', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        ['multitracktracknamepolicy', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        ['firstsystemtracknamemode', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        ['othersystemstracknamemode', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        ['firstsystemtracknameorientation', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        ['othersystemstracknameorientation', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        // tempo 120, tempo 120 "Moderate"
-        [
-            'tempo',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ]
-    ]);
-
-    /**
-     * Contains the definitions how to read the metadata values for given metadata tags using
-     * {@link readTypedValueList}
-     * @private
-     */
-    private static readonly barMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // tempo 120, tempo 120 "Moderate", tempo 120 "Moderate" 0.5, tempo 120 hide 0.5, tempo 120 hide
-        [
-            'tempo',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.RequiredAsFloat
-                ),
-                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional, [
-                    'hide'
-                ]),
-                AlphaTex1LanguageHandler.valueType([AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.OptionalAsFloatInValueList
-                )
-            ]
-        ],
-
-        // rc 2
-        ['rc', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // ae (1 2 3), ae 2
-        [
-            'ae',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsValueList]
-            ])
-        ],
-
-        // ts common, ts "common", ts 3 4
-        [
-            'ts',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.OptionalAndStop
-                ],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required]
-            ])
-        ],
-
-        // ks fmajor or ks "fmajor"
-        ['ks', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // clef G2, clef "g2", clef 43,
-        [
-            'clef',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ]
-            ])
-        ],
-
-        // section "Text", section "Marker" "Text", section Intro, section I Intro
-        [
-            'section',
-            [
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Required
-                ),
-                AlphaTex1LanguageHandler.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    undefined,
-                    ['x', '-', 'r']
-                )
-            ]
-        ],
-
-        // tf triplet16th, tf "Triplet16th", tf 1
-        [
-            'tf',
-            AlphaTex1LanguageHandler.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ]
-            ])
-        ],
-
-        // barlineleft dotted, barlineleft "dotted"
-        ['barlineleft', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        // barlineright dotted, barlineright "dotted"
-        ['barlineright', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        // accidentals auto, accidentals "explicit"
-        ['accidentals', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        // jump fine, jump "segno"
-        ['jump', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        // ottava 15ma, ottava "regular"
-        ['ottava', AlphaTex1LanguageHandler.textLikeValueListTypes],
-        // simile none, simile "firstOfDouble"
-        ['simile', AlphaTex1LanguageHandler.textLikeValueListTypes],
-
-        // width 300
-        ['width', AlphaTex1LanguageHandler.numberOnlyValueListTypes],
-
-        // scale 0.5
-        [
-            'scale',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
-            ])
-        ],
-
-        [
-            'spd',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
-            ])
-        ],
-        [
-            'spu',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
-            ])
-        ],
-        [
-            'sph',
-            AlphaTex1LanguageHandler.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
-            ])
-        ],
-
-        ['ft', undefined],
-        ['ro', undefined],
-        ['ac', undefined],
-        ['db', undefined]
-    ]);
-
-    private static readonly metaDataValueListTypes = [
-        AlphaTex1LanguageHandler.scoreMetaDataValueListTypes,
-        AlphaTex1LanguageHandler.staffMetaDataValueListTypes,
-        AlphaTex1LanguageHandler.structuralMetaDataValueListTypes,
-        AlphaTex1LanguageHandler.barMetaDataValueListTypes,
-        AlphaTex1LanguageHandler.syncMetaDataValueListTypes
-    ];
-
-    public readMetaDataValues(
-        parser: AlphaTexParser,
-        metaData: AlphaTexMetaDataTagNode
-    ): AlphaTexValueList | undefined {
-        const tag = metaData.tag.text.toLowerCase();
-        for (const lookup of AlphaTex1LanguageHandler.metaDataValueListTypes) {
-            if (lookup.has(tag)) {
-                const types = lookup.get(tag);
-                if (types) {
-                    return this.readTypedValueList(parser, types);
-                } else {
-                    return undefined;
-                }
-            }
-        }
-
-        parser.addParserDiagnostic({
-            code: AlphaTexDiagnosticCode.AT206,
-            message: `Unrecognized metadata '${metaData.tag.text}'.`,
-            severity: AlphaTexDiagnosticsSeverity.Error,
-            start: metaData.start,
-            end: metaData.end
-        });
-        throw new AlphaTexParserAbort();
-    }
-
-    public readMetaDataPropertyValues(
-        parser: AlphaTexParser,
-        metaData: AlphaTexMetaDataTagNode,
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined {
-        switch (metaData.tag.text.toLowerCase()) {
-            case 'track':
-                return this.readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageHandler.trackPropertyValueListTypes],
-                    property
-                );
-            case 'chord':
-                return this.readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageHandler.chordPropertyValueListTypes],
-                    property
-                );
-            case 'staff':
-                return this.readPropertyValues(
-                    parser,
-                    [AlphaTex1LanguageHandler.staffPropertyValueListTypes],
-                    property
-                );
-            default:
-                return undefined;
-        }
-    }
-
-    private readPropertyValues(
-        parser: AlphaTexParser,
-        lookups: Map<string, ValueListParseTypesExtended[] | undefined>[],
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined {
-        const tag = property.property.text.toLowerCase();
-        const endOfProperty = new Set<AlphaTexNodeType>([
-            AlphaTexNodeType.Identifier,
-            AlphaTexNodeType.BraceCloseToken
-        ]);
-        for (const lookup of lookups) {
-            if (lookup.has(tag)) {
-                const types = lookup.get(tag);
-                if (types) {
-                    return this.readTypedValueList(parser, types, endOfProperty);
-                } else {
-                    return undefined;
-                }
-            }
-        }
-        parser.addParserDiagnostic({
-            code: AlphaTexDiagnosticCode.AT207,
-            message: `Unrecognized property '${property.property.text}'.`,
-            severity: AlphaTexDiagnosticsSeverity.Error,
-            start: property.property.start,
-            end: property.property.end
-        });
-        throw new AlphaTexParserAbort();
-    }
-
-    public readBeatPropertyValues(
-        parser: AlphaTexParser,
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined {
-        return this.readPropertyValues(parser, [AlphaTex1LanguageHandler.beatPropertyValueListTypes], property);
-    }
-
-    public readDurationChangePropertyValues(
-        parser: AlphaTexParser,
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined {
-        return this.readPropertyValues(parser, [AlphaTex1LanguageHandler.beatDurationPropertyValueListTypes], property);
-    }
-
-    public readNotePropertyValues(
-        parser: AlphaTexParser,
-        property: AlphaTexPropertyNode
-    ): AlphaTexValueList | undefined {
-        return this.readPropertyValues(
-            parser,
-            [AlphaTex1LanguageHandler.notePropertyValueListTypes, AlphaTex1LanguageHandler.beatPropertyValueListTypes],
-            property
-        );
-    }
-
-    private readTypedValueList(
-        parser: AlphaTexParser,
-        expectedValues: ValueListParseTypesExtended[],
-        endOfListTypes?: Set<AlphaTexNodeType>
-    ): AlphaTexValueList | undefined {
-        const valueList: AlphaTexValueList = ATNF.valueList(false, []);
-        valueList.start = parser.lexer.peekToken()?.start;
-        let error = false;
-        let parseRemaining = endOfListTypes !== undefined;
-        try {
-            let i = 0;
-            while (i < expectedValues.length) {
-                const expected = expectedValues[i];
-
-                const value = parser.lexer.peekToken();
-
-                // prevent parsing of special float values which could overlap
-                // with stringed notes
-                if (expected.parseMode === ValueListParseTypesMode.OptionalAsFloatInValueList) {
-                    parseRemaining = false;
-                    break;
-                }
-
-                // NOTE: The parser already handles parenthesized value lists, we only need to handle this
-                // parse mode in the validation.
-
-                if (
-                    value &&
-                    (expected.expectedTypes.has(value.nodeType) ||
-                        // value lists start with a parenthesis open token
-                        AlphaTex1LanguageHandler.isValueListMatch(value, expected))
-                ) {
-                    this.handleTypeValueListItem(parser, valueList, value, expected);
-                    switch (expected.parseMode) {
-                        case ValueListParseTypesMode.OptionalAndStop:
-                            // stop reading values
-                            i = expectedValues.length;
-                            break;
-                        case ValueListParseTypesMode.ValueListWithoutParenthesis:
-                            // stay on current element
-                            break;
-                        default:
-                            // advance to next item
-                            i++;
-                            break;
-                    }
-                } else {
-                    switch (expected.parseMode) {
-                        // end of value list
-                        case ValueListParseTypesMode.ValueListWithoutParenthesis:
-                            i++;
-                            break;
-                        case ValueListParseTypesMode.Required:
-                        case ValueListParseTypesMode.RequiredAsFloat:
-                            parser.unexpectedToken(value, Array.from(expected.expectedTypes), true);
-                            error = true;
-                            break;
-
-                        case ValueListParseTypesMode.Optional:
-                        case ValueListParseTypesMode.OptionalAsFloat:
-                        case ValueListParseTypesMode.OptionalAndStop:
-                            // optional not matched -> try next
-                            i++;
-                            break;
-
-                        case ValueListParseTypesMode.RequiredAsValueList:
-                            // optional -> not matched, value listed ended, check next
-                            i++;
-                            break;
-                    }
-                }
-            }
-        } finally {
-            valueList.end = parser.lexer.currentTokenLocation();
-        }
-
-        if (error) {
-            throw new AlphaTexParserAbort();
-        }
-
-        // read remaining values user might have supplied
-        if (parseRemaining) {
-            let remaining = parser.lexer.peekToken();
-            while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
-                if (this.handleTypeValueListItem(parser, valueList, remaining, undefined)) {
-                    remaining = parser.lexer.peekToken();
-                } else {
-                    remaining = undefined;
-                }
-            }
-        }
-
-        if (valueList.values.length === 0) {
-            return undefined;
-        }
-
-        return valueList;
-    }
-    private static isValueListMatch(value: AlphaTexAstNode, expected: ValueListParseTypesExtended): boolean {
-        if (value.nodeType !== AlphaTexNodeType.ParenthesisOpenToken) {
-            return false;
-        }
-
-        return (
-            expected.expectedTypes.has(AlphaTexNodeType.ValueList) ||
-            expected.parseMode === ValueListParseTypesMode.ValueListWithoutParenthesis ||
-            expected.parseMode === ValueListParseTypesMode.RequiredAsValueList
-        );
-    }
-
-    private handleTypeValueListItem(
-        parser: AlphaTexParser,
-        valueList: AlphaTexValueList,
-        value: AlphaTexAstNode,
-        expected: ValueListParseTypesExtended | undefined
-    ): boolean {
-        switch (value.nodeType) {
-            case AlphaTexNodeType.Identifier:
-                if (expected?.allowedValues) {
-                    const identifierText = (parser.lexer.peekToken() as AlphaTexIdentifier).text;
-                    if (expected.allowedValues.has(identifierText.toLowerCase())) {
-                        valueList.values.push(parser.lexer.nextToken() as AlphaTexIdentifier);
-                    }
-                } else if (expected?.reservedIdentifiers) {
-                    const identifierText = (parser.lexer.peekToken() as AlphaTexIdentifier).text;
-                    if (!expected.reservedIdentifiers.has(identifierText.toLowerCase())) {
-                        valueList.values.push(parser.lexer.nextToken() as AlphaTexIdentifier);
-                    }
-                } else {
-                    valueList.values.push(parser.lexer.nextToken() as AlphaTexIdentifier);
-                }
-
-                return true;
-            case AlphaTexNodeType.StringLiteral:
-                if (expected?.allowedValues) {
-                    const identifierText = (parser.lexer.peekToken() as AlphaTexStringLiteral).text;
-                    if (expected.allowedValues.has(identifierText.toLowerCase())) {
-                        valueList.values.push(parser.lexer.nextToken() as AlphaTexStringLiteral);
-                    }
-                } else {
-                    valueList.values.push(parser.lexer.nextToken() as AlphaTexStringLiteral);
-                }
-                return true;
-            case AlphaTexNodeType.NumberLiteral:
-                const parseMode = expected?.parseMode ?? ValueListParseTypesMode.Optional;
-                switch (parseMode) {
-                    case ValueListParseTypesMode.RequiredAsFloat:
-                    case ValueListParseTypesMode.OptionalAsFloat:
-                        valueList.values.push(parser.lexer.nextTokenWithFloats() as AlphaTexNumberLiteral);
-                        break;
-                    default:
-                        valueList.values.push(parser.lexer.nextToken() as AlphaTexNumberLiteral);
-                        break;
-                }
-                return true;
-            case AlphaTexNodeType.ParenthesisOpenToken:
-                const nestedList = parser.valueList();
-                if (nestedList) {
-                    valueList.values.push(nestedList);
-                }
-                return true;
-        }
-        return false;
-    }
 
     public applyScoreMetaData(
         importer: IAlphaTexImporter,
@@ -1881,7 +83,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     ): ApplyNodeResult {
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageHandler.scoreMetaDataValueListTypes],
+            [AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.values
@@ -2084,7 +286,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     ): ApplyNodeResult {
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageHandler.staffMetaDataValueListTypes],
+            [AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.values
@@ -2246,7 +448,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     public applyBarMetaData(importer: IAlphaTexImporter, bar: Bar, metaData: AlphaTexMetaDataNode): ApplyNodeResult {
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageHandler.barMetaDataValueListTypes],
+            [AlphaTex1LanguageDefinitions.barMetaDataValueListTypes],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.values
@@ -2628,7 +830,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
     public buildSyncPoint(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode): FlatSyncPoint | undefined {
         const tag = metaData.tag.tag.text.toLowerCase();
-        const types = AlphaTex1LanguageHandler.syncMetaDataValueListTypes.get(tag)!;
+        const types = AlphaTex1LanguageDefinitions.syncMetaDataValueListTypes.get(tag)!;
         if (!this.validateValueListTypes(importer, types, metaData, metaData.values)) {
             return undefined;
         }
@@ -2919,7 +1121,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this.checkProperty(importer, [AlphaTex1LanguageHandler.chordPropertyValueListTypes], p)) {
+            if (!this.checkProperty(importer, [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes], p)) {
                 continue;
             }
 
@@ -3002,7 +1204,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
 
                 case ApplyNodeResult.NotAppliedUnrecognizedMarker:
                     const knownProps = lookupList.flatMap(l => Array.from(l.keys()));
-                    Array.from(AlphaTex1LanguageHandler.chordPropertyValueListTypes.keys()).join(',');
+                    Array.from(AlphaTex1LanguageDefinitions.chordPropertyValueListTypes.keys()).join(',');
                     importer.addSemanticDiagnostic({
                         code: AlphaTexDiagnosticCode.AT212,
                         message: `Unrecogized property '${p.property.text}', expected one of ${knownProps}`,
@@ -3028,7 +1230,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         let showNumbered: boolean = false;
 
         for (const p of metaData.properties.properties) {
-            if (!this.checkProperty(importer, [AlphaTex1LanguageHandler.staffPropertyValueListTypes], p)) {
+            if (!this.checkProperty(importer, [AlphaTex1LanguageDefinitions.staffPropertyValueListTypes], p)) {
                 continue;
             }
 
@@ -3065,7 +1267,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this.checkProperty(importer, [AlphaTex1LanguageHandler.trackPropertyValueListTypes], p)) {
+            if (!this.checkProperty(importer, [AlphaTex1LanguageDefinitions.trackPropertyValueListTypes], p)) {
                 continue;
             }
 
@@ -3120,7 +1322,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     public applyBeatDurationProperty(importer: IAlphaTexImporter, p: AlphaTexPropertyNode): ApplyNodeResult {
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageHandler.beatDurationPropertyValueListTypes],
+            [AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes],
             p,
             p.property.text.toLowerCase(),
             p.values
@@ -3183,14 +1385,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     private _knownBarMetaDataTags: Set<string> | undefined = undefined;
     public get knownBarMetaDataTags() {
         if (!this._knownBarMetaDataTags) {
-            this._knownBarMetaDataTags = new Set<string>(AlphaTex1LanguageHandler.barMetaDataValueListTypes.keys());
+            this._knownBarMetaDataTags = new Set<string>(AlphaTex1LanguageDefinitions.barMetaDataValueListTypes.keys());
         }
         return this._knownBarMetaDataTags;
     }
     private _knownStaffMetaDataTags: Set<string> | undefined = undefined;
     public get knownStaffMetaDataTags() {
         if (!this._knownStaffMetaDataTags) {
-            this._knownStaffMetaDataTags = new Set<string>(AlphaTex1LanguageHandler.staffMetaDataValueListTypes.keys());
+            this._knownStaffMetaDataTags = new Set<string>(
+                AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes.keys()
+            );
         }
         return this._knownStaffMetaDataTags;
     }
@@ -3199,7 +1403,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     public get knownBeatDurationProperties() {
         if (!this._knownBeatDurationProperties) {
             this._knownBeatDurationProperties = new Set<string>(
-                AlphaTex1LanguageHandler.beatDurationPropertyValueListTypes.keys()
+                AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes.keys()
             );
         }
         return this._knownBeatDurationProperties;
@@ -3208,7 +1412,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     private _knownBeatProperties: Set<string> | undefined = undefined;
     public get knownBeatProperties() {
         if (!this._knownBeatProperties) {
-            this._knownBeatProperties = new Set<string>(AlphaTex1LanguageHandler.beatPropertyValueListTypes.keys());
+            this._knownBeatProperties = new Set<string>(AlphaTex1LanguageDefinitions.beatPropertyValueListTypes.keys());
         }
         return this._knownBeatProperties;
     }
@@ -3216,7 +1420,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
     private _knownNoteProperties: Set<string> | undefined = undefined;
     public get knownNoteProperties() {
         if (!this._knownNoteProperties) {
-            this._knownNoteProperties = new Set<string>(AlphaTex1LanguageHandler.notePropertyValueListTypes.keys());
+            this._knownNoteProperties = new Set<string>(AlphaTex1LanguageDefinitions.notePropertyValueListTypes.keys());
         }
         return this._knownNoteProperties;
     }
@@ -3225,7 +1429,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         const tag = p.property.text.toLowerCase();
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageHandler.beatPropertyValueListTypes],
+            [AlphaTex1LanguageDefinitions.beatPropertyValueListTypes],
             p,
             tag,
             p.values
@@ -3699,7 +1903,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         const tag = p.property.text.toLowerCase();
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageHandler.notePropertyValueListTypes],
+            [AlphaTex1LanguageDefinitions.notePropertyValueListTypes],
             p,
             tag,
             p.values
@@ -4892,10 +3096,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         if (note.isTieDestination) {
             ATNF.property(properties, 't');
         }
-        if (note.leftHandFinger >= 0) {
+        if (note.leftHandFinger >= Fingers.Thumb) {
             ATNF.property(properties, 'lf', ATNF.numberValueList((note.leftHandFinger as number) + 1));
         }
-        if (note.rightHandFinger >= 0) {
+        if (note.rightHandFinger >= Fingers.Thumb) {
             ATNF.property(properties, 'rf', ATNF.numberValueList((note.rightHandFinger as number) + 1));
         }
 
@@ -5081,7 +3285,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexMetaDataReader, IAlpha
         }
 
         if (beat.isTremolo) {
-            ATNF.property(properties, 'tp', ATNF.numberValueList(beat.tremoloSpeed as number));
+            ATNF.property(properties, 'tp', ATNF.numberValueList(beat.tremoloSpeed! as number));
         }
 
         switch (beat.crescendo) {

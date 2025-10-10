@@ -1,7 +1,8 @@
 ﻿import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
+import { AlphaTex1LanguageHandler } from '@src/importer/alphaTex/AlphaTex1LanguageHandler';
 import {
-    AlphaTexAstNode,
+    type AlphaTexAstNode,
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
     type AlphaTexBeatNode,
@@ -12,26 +13,26 @@ import {
     type AlphaTexPropertiesNode,
     type AlphaTexScoreNode,
     type AlphaTexTextNode
-} from '@src/importer/AlphaTexAst';
-import {
-    AlphaTex1LanguageHandler,
-    ApplyNodeResult,
-    type IAlphaTexImporter,
-    type IAlphaTexImporterState,
-    type IAlphaTexLanguageHandler
-} from '@src/importer/AlphaTexLanguageHandler';
-import { AlphaTexParser } from '@src/importer/AlphaTexParser';
+} from '@src/importer/alphaTex/AlphaTexAst';
+import { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
 import {
     AlphaTexAccidentalMode,
     type AlphaTexDiagnostic,
     AlphaTexDiagnosticBag,
     AlphaTexDiagnosticCode,
-    AlphaTexDiagnosticsSeverity
-} from '@src/importer/AlphaTexShared';
+    AlphaTexDiagnosticsSeverity,
+    type IAlphaTexImporter,
+    type IAlphaTexImporterState
+} from '@src/importer/alphaTex/AlphaTexShared';
+import {
+    ApplyNodeResult,
+    type IAlphaTexLanguageImportHandler
+} from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
 import { IOHelper } from '@src/io/IOHelper';
+import { Logger } from '@src/Logger';
 import type { FlatSyncPoint } from '@src/model/Automation';
 import { Bar, type SustainPedalMarker } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
@@ -87,7 +88,7 @@ export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
 
     public override toString(): string {
         return [
-            this.message,
+            this.message!,
             'lexer diagnostics:',
             AlphaTexErrorWithDiagnostics.diagnosticsToString(this.lexerDiagnostics, '  '),
             'parser diagnostics:',
@@ -160,15 +161,11 @@ class AlphaTexImportState implements IAlphaTexImporterState {
 
 export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter {
     private _parser!: AlphaTexParser;
-    private _handler: IAlphaTexLanguageHandler = AlphaTex1LanguageHandler.instance;
+    private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
     private _state = new AlphaTexImportState();
 
     public get state(): IAlphaTexImporterState {
         return this._state;
-    }
-
-    public addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic) {
-        this.semanticDiagnostics.push(diagnostic);
     }
 
     public get name(): string {
@@ -183,7 +180,13 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         return this._parser.parserDiagnostics;
     }
 
+    public logErrors: boolean = false;
+
     public readonly semanticDiagnostics = new AlphaTexDiagnosticBag();
+
+    public addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic) {
+        this.semanticDiagnostics.push(diagnostic);
+    }
 
     public initFromString(tex: string, settings: Settings) {
         this.data = ByteBuffer.empty();
@@ -205,18 +208,27 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         try {
             scoreNode = this._parser.read();
         } catch (e) {
+            if (this.logErrors) {
+                Logger.error('AlphaTex', `Error while parsing alphaTex: ${(e as Error).toString()}`);
+            }
             throw new UnsupportedFormatError('Error parsing alphaTex, check inner error for detials', e as Error);
         }
 
         if (this._parser.parserDiagnostics.hasErrors || this._parser.lexer.lexerDiagnostics.hasErrors) {
+            const error = new AlphaTexErrorWithDiagnostics(
+                'There are errors in the parsed alphaTex, check the diagnostics for details',
+                this.lexerDiagnostics,
+                this.parserDiagnostics,
+                this.semanticDiagnostics
+            );
+
+            if (this.logErrors) {
+                Logger.error('AlphaTex', `Error while parsing alphaTex: ${error.toString()}`);
+            }
+
             throw new UnsupportedFormatError(
-                'Error parsing alphaTex, check diagnostics for details',
-                new AlphaTexErrorWithDiagnostics(
-                    'There are errors in the parsed alphaTex, check the diagnostics for details',
-                    this.lexerDiagnostics,
-                    this.parserDiagnostics,
-                    this.semanticDiagnostics
-                )
+                'Error parsing alphaTex, check diagnostics on inner error for details',
+                error
             );
         }
 
@@ -234,12 +246,19 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         if (this.semanticDiagnostics.hasErrors) {
             if (this._state.hasAnyProperData) {
-                throw new AlphaTexErrorWithDiagnostics(
+                const error = new AlphaTexErrorWithDiagnostics(
                     'There are errors in the parsed alphaTex, check the diagnostics for details',
                     this.lexerDiagnostics,
                     this.parserDiagnostics,
                     this.semanticDiagnostics
                 );
+                if (this.logErrors) {
+                    if (this.logErrors) {
+                        Logger.error('AlphaTex', `Error while parsing alphaTex: ${error.toString()}`);
+                    }
+                }
+
+                throw error;
             } else {
                 throw new UnsupportedFormatError('No alphaTex data found');
             }

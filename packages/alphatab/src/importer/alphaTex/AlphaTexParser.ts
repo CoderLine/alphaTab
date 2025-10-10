@@ -1,12 +1,4 @@
-﻿import { AlphaTex1LanguageHandler, type IAlphaTexMetaDataReader } from '@src/importer/AlphaTexLanguageHandler';
-import { AlphaTexLexer } from '@src/importer/AlphaTexLexer';
-import {
-    type AlphaTexDiagnostic,
-    AlphaTexDiagnosticBag,
-    AlphaTexDiagnosticCode,
-    AlphaTexDiagnosticsSeverity,
-    AlphaTexParserAbort
-} from '@src/importer/AlphaTexShared';
+﻿import { AlphaTex1MetaDataReader } from '@src/importer/alphaTex/AlphaTex1MetaDataReader';
 import {
     type AlphaTexAsteriskTokenNode,
     type AlphaTexAstNode,
@@ -32,7 +24,16 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexValueList
-} from './AlphaTexAst';
+} from '@src/importer/alphaTex/AlphaTexAst';
+import { AlphaTexLexer } from '@src/importer/alphaTex/AlphaTexLexer';
+import {
+    type AlphaTexDiagnostic,
+    AlphaTexDiagnosticBag,
+    AlphaTexDiagnosticCode,
+    AlphaTexDiagnosticsSeverity,
+    AlphaTexParserAbort
+} from '@src/importer/alphaTex/AlphaTexShared';
+import type { IAlphaTexMetaDataReader } from '@src/importer/alphaTex/IAlphaTexMetaDataReader';
 
 /**
  * A parser for translating a given alphaTex source into an AST for further use
@@ -41,7 +42,7 @@ import {
 export class AlphaTexParser {
     public readonly lexer: AlphaTexLexer;
     private _score!: AlphaTexScoreNode;
-    private _metaDataReader: IAlphaTexMetaDataReader = AlphaTex1LanguageHandler.instance;
+    private _metaDataReader: IAlphaTexMetaDataReader = AlphaTex1MetaDataReader.instance;
 
     public get lexerDiagnostics(): AlphaTexDiagnosticBag {
         return this.lexer.lexerDiagnostics;
@@ -408,7 +409,7 @@ export class AlphaTexParser {
             switch (noteValue.nodeType) {
                 case AlphaTexNodeType.NumberLiteral:
                     note.noteValue = this.lexer.nextToken() as AlphaTexNumberLiteral;
-                    
+
                     canHaveString = true;
 
                     break;
@@ -634,9 +635,7 @@ export class AlphaTexParser {
                     case AlphaTexNodeType.NumberLiteral:
                         // in value lists we can always assume floats
                         // (within parenthesis we have no risk of syntax overlaps)
-                        valueList.values.push(
-                            this.lexer.nextTokenWithFloats() as AlphaTexNumberLiteral
-                        );
+                        valueList.values.push(this.lexer.nextTokenWithFloats() as AlphaTexNumberLiteral);
                         break;
                     default:
                         this.unexpectedToken(

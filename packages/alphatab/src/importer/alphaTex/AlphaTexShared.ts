@@ -1,4 +1,11 @@
-﻿import type { AlphaTexAstNodeLocation } from '@src/importer/AlphaTexAst';
+﻿import type { AlphaTexAstNodeLocation } from '@src/importer/alphaTex/AlphaTexAst';
+import { SustainPedalMarker } from '@src/model/Bar';
+import { Beat } from '@src/model/Beat';
+import { DynamicValue } from '@src/model/DynamicValue';
+import { Lyrics } from '@src/model/Lyrics';
+import { Note } from '@src/model/Note';
+import { Staff } from '@src/model/Staff';
+import { Track } from '@src/model/Track';
 
 /**
  * The different severity levels for diagnostics parsing alphaTex.
@@ -210,4 +217,30 @@ export class AlphaTexParserAbort extends Error {}
 export enum AlphaTexAccidentalMode {
     Auto = 0,
     Explicit = 1
+}
+
+export interface IAlphaTexImporterState {
+    accidentalMode: AlphaTexAccidentalMode;
+    currentDynamics: DynamicValue;
+    currentTupletNumerator: number;
+    currentTupletDenominator: number;
+
+    readonly slurs: Map<string, Note>;
+    readonly percussionArticulationNames: Map<string, number>;
+    readonly lyrics: Map<number, Lyrics[]>;
+    readonly staffHasExplicitDisplayTransposition: Set<Staff>;
+    readonly staffHasExplicitTuning: Set<Staff>;
+    readonly staffTuningApplied: Set<Staff>;
+    readonly sustainPedalToBeat: Map<SustainPedalMarker, Beat>;
+}
+
+export interface IAlphaTexImporter {
+    readonly state: IAlphaTexImporterState;
+
+    makeStaffPitched(staff: Staff): void;
+    startNewVoice(): void;
+    startNewTrack(): Track;
+    applyPercussionStaff(staff: Staff): void;
+    startNewStaff(): Staff;
+    addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic): void;
 }

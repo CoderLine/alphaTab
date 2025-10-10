@@ -385,7 +385,7 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexValueList
-} from '@src/importer/AlphaTexAst';
+} from '@src/importer/alphaTex/AlphaTexAst';
 import { MidiEvent } from '@src/midi/MidiEvent';
 import { Bar } from '@src/model/Bar';
 import { Beat } from '@src/model/Beat';
@@ -397,7 +397,7 @@ import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { TestPlatform } from './TestPlatform';
-import { AlphaTexDiagnostic } from '@src/importer/AlphaTexShared';
+import { AlphaTexDiagnostic } from '@src/importer/alphaTex/AlphaTexShared';
 
 /**
  * @partial
