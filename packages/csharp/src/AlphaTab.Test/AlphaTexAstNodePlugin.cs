@@ -1,4 +1,4 @@
-﻿using AlphaTab.Importer;
+﻿using AlphaTab.Importer.AlphaTex;
 
 namespace AlphaTab;
 

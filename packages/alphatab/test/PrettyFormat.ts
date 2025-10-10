@@ -125,7 +125,7 @@ export class PrettyFormat {
         switch (typeof val) {
             case 'string':
                 if (escapeString) {
-                    return `"${(val as string).replaceAll(/"|\\/g, '\\$&')}"`;
+                    return `"${(val as string).replaceAll(/"|\\/g, v => `\\${v}`)}"`;
                 }
                 return `"${val}"`;
             case 'number':

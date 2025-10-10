@@ -41,7 +41,7 @@ describe('AlphaTexExporterTest', () => {
             const errorLines: string[] = [];
 
             const error = e as Error;
-            const unwrapped = error.cause instanceof AlphaTexErrorWithDiagnostics ? error.cause : error;
+            const unwrapped = error.cause instanceof AlphaTexErrorWithDiagnostics ? error.cause! : error;
             if (unwrapped instanceof AlphaTexErrorWithDiagnostics) {
                 const withDiag = unwrapped as AlphaTexErrorWithDiagnostics;
                 const lines = exported.split('\n');

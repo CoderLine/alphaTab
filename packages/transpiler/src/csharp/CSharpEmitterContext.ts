@@ -296,13 +296,7 @@ export default class CSharpEmitterContext {
         }
 
         if (node.tsType) {
-            resolved = this.getTypeFromTsType(
-                node,
-                node.tsType,
-                node.tsSymbol,
-                node.typeArguments,
-                node.tsNode
-            );
+            resolved = this.getTypeFromTsType(node, node.tsType, node.tsSymbol, node.typeArguments, node.tsNode);
         }
 
         if (resolved) {
@@ -1193,7 +1187,7 @@ export default class CSharpEmitterContext {
         tsType: ts.Type,
         typeArguments?: cs.UnresolvedTypeNode[]
     ): cs.TypeNode | null {
-               const tsSymbol = tsType.aliasSymbol ?? tsType.symbol;
+        const tsSymbol = tsType.aliasSymbol ?? tsType.symbol;
         const symbolKey = this.getSymbolKey(tsSymbol);
         if (!symbolKey) {
             return null;

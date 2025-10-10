@@ -73,7 +73,7 @@ class WriterGroup {
  * A small helper to write formatted alphaTex code to a string buffer.
  * @internal
  */
-class AlphaTexWriter {
+class AlphaTexWriterOld {
     public tex: string = '';
     public isStartOfLine: boolean = true;
     public indentString: string = '';
@@ -253,7 +253,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
     }
 
     public scoreToAlphaTexString(score: Score): string {
-        const writer = new AlphaTexWriter();
+        const writer = new AlphaTexWriterOld();
         writer.comments = this.settings.exporter.comments;
         writer.indentString = this.settings.exporter.indent > 0 ? ' '.repeat(this.settings.exporter.indent) : '';
         this._writeScoreTo(writer, score);
