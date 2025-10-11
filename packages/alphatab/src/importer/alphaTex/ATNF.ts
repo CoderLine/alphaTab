@@ -1,4 +1,20 @@
-import { AlphaTexBackSlashTokenNode, AlphaTexBraceCloseTokenNode, AlphaTexBraceOpenTokenNode, AlphaTexIdentifier, AlphaTexMetaDataNode, AlphaTexMetaDataTagNode, AlphaTexNodeType, AlphaTexNumberLiteral, AlphaTexParenthesisCloseTokenNode, AlphaTexParenthesisOpenTokenNode, AlphaTexPropertiesNode, AlphaTexPropertyNode, AlphaTexStringLiteral, AlphaTexValueList, IAlphaTexValueListItem } from "@src/importer/alphaTex/AlphaTexAst";
+import {
+    type AlphaTexBackSlashTokenNode,
+    type AlphaTexBraceCloseTokenNode,
+    type AlphaTexBraceOpenTokenNode,
+    type AlphaTexIdentifier,
+    type AlphaTexMetaDataNode,
+    type AlphaTexMetaDataTagNode,
+    AlphaTexNodeType,
+    type AlphaTexNumberLiteral,
+    type AlphaTexParenthesisCloseTokenNode,
+    type AlphaTexParenthesisOpenTokenNode,
+    type AlphaTexPropertiesNode,
+    type AlphaTexPropertyNode,
+    type AlphaTexStringLiteral,
+    type AlphaTexValueList,
+    type IAlphaTexValueListItem
+} from '@src/importer/alphaTex/AlphaTexAst';
 
 /**
  * AlphaTexNodeFactory (short name for less code)
@@ -51,13 +67,20 @@ export class ATNF {
         return ATNF.metaData(tag, ATNF.numberValueList(value));
     }
 
-    public static valueList(parenthesis: boolean, values: (IAlphaTexValueListItem | undefined)[]): AlphaTexValueList {
+    public static valueList(
+        values: (IAlphaTexValueListItem | undefined)[],
+        parentheses?: boolean
+    ): AlphaTexValueList | undefined {
         const valueList = {
             nodeType: AlphaTexNodeType.ValueList,
             values: values.filter(v => v !== undefined)
         } as AlphaTexValueList;
 
-        if (parenthesis) {
+        if(parentheses === undefined) {
+            parentheses = valueList.values.length > 1;
+        }
+
+        if (parentheses) {
             valueList.openParenthesis = {
                 nodeType: AlphaTexNodeType.ParenthesisOpenToken
             } as AlphaTexParenthesisOpenTokenNode;
@@ -66,19 +89,23 @@ export class ATNF {
             } as AlphaTexParenthesisCloseTokenNode;
         }
 
+        if (valueList.values.length === 0) {
+            return undefined;
+        }
+
         return valueList;
     }
 
     public static stringValueList(text: string): AlphaTexValueList {
-        return ATNF.valueList(false, [ATNF.stringLiteral(text)]);
+        return ATNF.valueList([ATNF.stringLiteral(text)])!;
     }
 
     public static identifierValueList(text: string): AlphaTexValueList {
-        return ATNF.valueList(false, [ATNF.identifier(text)]);
+        return ATNF.valueList([ATNF.identifier(text)])!;
     }
 
     public static numberValueList(value: number): AlphaTexValueList {
-        return ATNF.valueList(false, [ATNF.numberLiteral(value)]);
+        return ATNF.valueList([ATNF.numberLiteral(value)])!;
     }
 
     public static properties(

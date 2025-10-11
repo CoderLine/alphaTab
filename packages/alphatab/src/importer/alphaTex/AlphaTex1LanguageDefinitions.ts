@@ -617,20 +617,6 @@ export class AlphaTex1LanguageDefinitions {
         ['slur', AlphaTex1LanguageDefinitions.textLikeValueListTypes]
     ]);
 
-    public static readonly syncMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        // \sync BarIndex Occurence MillisecondOffset
-        // \sync BarIndex Occurence MillisecondOffset RatioPosition
-        [
-            'sync',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.OptionalAsFloat]
-            ])
-        ]
-    ]);
-
     public static readonly structuralMetaDataValueListTypes = new Map<
         string,
         ValueListParseTypesExtended[] | undefined
@@ -742,15 +728,7 @@ export class AlphaTex1LanguageDefinitions {
         ['firstsystemtracknamemode', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
         ['othersystemstracknamemode', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
         ['firstsystemtracknameorientation', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['othersystemstracknameorientation', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        // tempo 120, tempo 120 "Moderate"
-        [
-            'tempo',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional]
-            ])
-        ]
+        ['othersystemstracknameorientation', AlphaTex1LanguageDefinitions.textLikeValueListTypes]
     ]);
 
     /**
@@ -895,14 +873,25 @@ export class AlphaTex1LanguageDefinitions {
         ['ft', undefined],
         ['ro', undefined],
         ['ac', undefined],
-        ['db', undefined]
+        ['db', undefined],
+
+        // \sync BarIndex Occurence MillisecondOffset
+        // \sync BarIndex Occurence MillisecondOffset RatioPosition
+        [
+            'sync',
+            AlphaTex1LanguageDefinitions.basicList([
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.OptionalAsFloat]
+            ])
+        ]
     ]);
 
     public static readonly metaDataValueListTypes = [
         AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes,
         AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes,
         AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes,
-        AlphaTex1LanguageDefinitions.barMetaDataValueListTypes,
-        AlphaTex1LanguageDefinitions.syncMetaDataValueListTypes
+        AlphaTex1LanguageDefinitions.barMetaDataValueListTypes
     ];
 }

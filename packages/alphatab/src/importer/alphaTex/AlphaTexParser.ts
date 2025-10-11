@@ -60,7 +60,7 @@ export class AlphaTexParser {
     public unexpectedToken(actual: AlphaTexAstNode | undefined, expected: AlphaTexNodeType[], abort: boolean) {
         if (!actual) {
             this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT205,
+                code: AlphaTexDiagnosticCode.AT203,
                 start: this.lexer.currentTokenLocation(),
                 end: this.lexer.currentTokenLocation(),
                 severity: AlphaTexDiagnosticsSeverity.Error,
@@ -68,7 +68,7 @@ export class AlphaTexParser {
             });
         } else {
             this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT204,
+                code: AlphaTexDiagnosticCode.AT202,
                 message: `Unexpected '${AlphaTexNodeType[actual.nodeType]}' token. Expected one of following: ${expected.map(v => AlphaTexNodeType[v]).join(',')}`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: actual.start,
@@ -357,7 +357,7 @@ export class AlphaTexParser {
                 noteList.closeParenthesis = this.lexer.nextToken() as AlphaTexParenthesisCloseTokenNode;
             } else {
                 this.addParserDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT208,
+                    code: AlphaTexDiagnosticCode.AT206,
                     message: 'Unexpected end of file. Group not closed.',
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: closeParenthesis?.start ?? this.lexer.currentTokenLocation(),
@@ -482,7 +482,7 @@ export class AlphaTexParser {
                 metaData.values = this.valueList();
                 if (!metaData.values) {
                     metaData.values = this._metaDataReader.readMetaDataValues(this, metaData.tag);
-                    if (metaData.values) {
+                    if (metaData.values && metaData.values.values.length > 1) {
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT301,
                             message: `Metadata values should be wrapped into parenthesis.`,
@@ -492,7 +492,7 @@ export class AlphaTexParser {
                         });
 
                         this.addParserDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT301,
+                            code: AlphaTexDiagnosticCode.AT302,
                             message: `Metadata values should be placed before metadata properties.`,
                             severity: AlphaTexDiagnosticsSeverity.Warning,
                             start: metaData.values?.start ?? metaData.start,
@@ -504,7 +504,7 @@ export class AlphaTexParser {
                 metaData.values = this.valueList();
                 if (!metaData.values) {
                     metaData.values = this._metaDataReader.readMetaDataValues(this, metaData.tag);
-                    if (metaData.values) {
+                    if (metaData.values && metaData.values.values.length > 1) {
                         this.addParserDiagnostic({
                             code: AlphaTexDiagnosticCode.AT301,
                             message: `Metadata values should be wrapped into parenthesis.`,
@@ -552,7 +552,7 @@ export class AlphaTexParser {
                 properties.closeBrace = this.lexer.nextToken() as AlphaTexBraceCloseTokenNode;
             } else {
                 this.addParserDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT208,
+                    code: AlphaTexDiagnosticCode.AT206,
                     message: 'Unexpected end of file. Group not closed.',
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: this.lexer.currentTokenLocation(),
@@ -579,7 +579,7 @@ export class AlphaTexParser {
             property.values = this.valueList();
             if (!property.values) {
                 property.values = readPropertyValues(property);
-                if (property.values) {
+                if (property.values && property.values.values.length > 1) {
                     this.addParserDiagnostic({
                         code: AlphaTexDiagnosticCode.AT303,
                         message: 'Property values should be wrapped into parenthesis.',
@@ -647,7 +647,7 @@ export class AlphaTexParser {
                 valueList.closeParenthesis = this.lexer.nextToken() as AlphaTexParenthesisCloseTokenNode;
             } else {
                 this.addParserDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT208,
+                    code: AlphaTexDiagnosticCode.AT206,
                     message: 'Unexpected end of file. Group not closed.',
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: this.lexer.currentTokenLocation(),

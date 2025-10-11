@@ -6,6 +6,7 @@ import {
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
     type AlphaTexBeatNode,
+    type AlphaTexMetaDataNode,
     AlphaTexNodeType,
     type AlphaTexNoteNode,
     type AlphaTexNumberLiteral,
@@ -25,6 +26,7 @@ import {
 } from '@src/importer/alphaTex/AlphaTexShared';
 import {
     ApplyNodeResult,
+    ApplyStructuralMetaDataResult,
     type IAlphaTexLanguageImportHandler
 } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
@@ -49,6 +51,7 @@ import { Track } from '@src/model/Track';
 import { Tuning } from '@src/model/Tuning';
 import { Voice } from '@src/model/Voice';
 import type { Settings } from '@src/Settings';
+import { Lazy } from '@src/util/Lazy';
 
 export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
     public lexerDiagnostics?: AlphaTexDiagnosticBag;
@@ -133,6 +136,7 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public barIndex: number = 0;
     public voiceIndex: number = 0;
     public ignoredInitialVoice = false;
+    public ignoredInitialStaff = false;
     public ignoredInitialTrack = false;
     public currentDuration = Duration.Quarter;
     public articulationValueToIndex = new Map<number, number>();
@@ -182,10 +186,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     public readonly semanticDiagnostics = new AlphaTexDiagnosticBag();
 
-    public constructor() {
-        super();
-    }
-
     public addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic) {
         this.semanticDiagnostics.push(diagnostic);
     }
@@ -213,7 +213,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             if (this.logErrors) {
                 Logger.error('AlphaTex', `Error while parsing alphaTex: ${(e as Error).toString()}`);
             }
-            throw new UnsupportedFormatError('Error parsing alphaTex, check inner error for detials', e as Error);
+            throw new UnsupportedFormatError('Error parsing alphaTex, check inner error for details', e as Error);
         }
 
         if (this._parser.parserDiagnostics.hasErrors || this._parser.lexer.lexerDiagnostics.hasErrors) {
@@ -281,8 +281,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     private createDefaultScore(): void {
         this._state.score = new Score();
-        this._state.score.tempo = 120;
-        this._state.score.tempoLabel = '';
         this.newTrack();
     }
 
@@ -593,7 +591,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             // Fret [Dot] String
             if (!node.noteString) {
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT218,
+                    code: AlphaTexDiagnosticCode.AT207,
                     message: `Missing string for fretted note.`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: noteValue.end,
@@ -605,7 +603,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             noteString = node.noteString!.value;
             if (noteString < 1 || noteString > this._state.currentStaff!.tuning.length) {
                 this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT219,
+                    code: AlphaTexDiagnosticCode.AT208,
                     message: `Note string is out of range. Available range: 1-${this._state.currentStaff!.tuning.length}`,
                     severity: AlphaTexDiagnosticsSeverity.Error,
                     start: noteValue.end,
@@ -781,52 +779,143 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     }
 
     private barMeta(node: AlphaTexBarNode): Bar {
-        let bar: Bar | undefined = undefined;
+        // it might be a bit an edge case but a valid one:
+        // one might repeat multiple structural metadata
+        // in one bar starting multiple tracks/staves/voices which are
+        // empty.
+        // for this reason we first remember the bar metadata
+        // and do not create bars directly
+        // the tricky thing is: \track, \staff, \voice might not create
+        // new items but reuse the initial ones.
+        // here we need to detect such scenarios and ensure we apply
+        // any preceeding metadata to empty bars
+
+        let initialBarMeta: AlphaTexMetaDataNode[] | undefined =
+            this._state.score.masterBars.length > 0 ? undefined : [];
+
+        const resetInitialBarMeta = () => {
+            // reset state
+            if (!initialBarMeta) {
+                return;
+            }
+
+            initialBarMeta = undefined;
+            previousStaff = this._state.currentStaff!;
+            hadNewTrack = false;
+            hadNewStaff = false;
+            applyInitialBarMetaToPreviousStaff = false;
+        };
+
+        const bar: Lazy<Bar> = new Lazy<Bar>(() => {
+            const b = this.newBar(this._state.currentStaff!);
+            if (initialBarMeta) {
+                for (const initial of initialBarMeta) {
+                    this._handler.applyBarMetaData(this, b, initial);
+                }
+                resetInitialBarMeta();
+            }
+            return b;
+        });
+
+        let previousStaff = this._state.currentStaff!;
+        let hadNewTrack = false;
+        let hadNewStaff = false;
+        let applyInitialBarMetaToPreviousStaff = false;
 
         // bar meta
         for (const m of node.metaData) {
-            let result = ApplyNodeResult.NotAppliedUnrecognizedMarker;
-
             const tag = m.tag.tag.text.toLowerCase();
             if (this._handler.knownStructuralMetaDataTags.has(tag)) {
-                result = this._handler.applyStructuralMetaData(this, m);
-                // need for a new bar
-                bar = undefined;
-            } else if (this._handler.knownScoreMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
-                result = this._handler.applyScoreMetaData(this, this._state.score, m);
-            } else if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
-                result = this._handler.applyStaffMetaData(this, this._state.currentStaff!, m);
-            } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
-                if (!bar) {
-                    bar = this.newBar(this._state.currentStaff!);
+                this._state.hasAnyProperData = true;
+
+                const result = this._handler.applyStructuralMetaData(this, m);
+                switch (result) {
+                    case ApplyStructuralMetaDataResult.AppliedNewTrack:
+                        if (hadNewStaff) {
+                            // new track after new staff -> apply to previous staff
+                            applyInitialBarMetaToPreviousStaff = true;
+                        } else if (hadNewTrack) {
+                            // multiple new tracks -> apply to previous staff
+                            applyInitialBarMetaToPreviousStaff = true;
+                        } else {
+                            hadNewTrack = true;
+                            previousStaff = this._state.currentStaff!;
+                        }
+
+                        bar.reset();
+
+                        break;
+                    case ApplyStructuralMetaDataResult.AppliedNewStaff:
+                        if (hadNewStaff) {
+                            applyInitialBarMetaToPreviousStaff = true;
+                        } else {
+                            hadNewStaff = true;
+                            previousStaff = this._state.currentStaff!;
+                        }
+
+                        // new bar needed on new structural level
+                        bar.reset();
+                        break;
                 }
 
-                result = this._handler.applyBarMetaData(this, bar, m);
-            }
+                if (initialBarMeta) {
+                    if (applyInitialBarMetaToPreviousStaff) {
+                        if (previousStaff.bars.length === 0) {
+                            // need initial bar
+                            const initialBar: Bar = new Bar();
+                            previousStaff.addBar(initialBar);
 
-            switch (result) {
-                case ApplyNodeResult.Applied:
-                case ApplyNodeResult.NotAppliedSemanticError:
-                    this._state.hasAnyProperData = true;
-                    break;
-                case ApplyNodeResult.NotAppliedUnrecognizedMarker:
-                    const knownMeta = Array.from(this._handler.allKnownMetaDataTags).join(',');
-                    this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT206,
-                        message: `Unrecognized metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
-                        severity: AlphaTexDiagnosticsSeverity.Error,
-                        start: m.tag.start,
-                        end: m.tag.end
-                    });
-                    break;
+                            const initialVoice: Voice = new Voice();
+                            initialBar.addVoice(initialVoice);
+
+                            if (previousStaff.bars.length > this._state.score.masterBars.length) {
+                                const master = new MasterBar();
+                                this._state.score.addMasterBar(master);
+                            }
+
+                            // apply all data
+                            for (const m of initialBarMeta) {
+                                this._handler.applyBarMetaData(this, initialBar, m);
+                            }
+
+                            resetInitialBarMeta();
+                        } else {
+                            // this should never occur. as far I can judge,
+                            // we only run into this case when we have multiple \ and \staff tags
+                            // without content inbetween, hence they should be empty
+                            throw new AlphaTabError(
+                                AlphaTabErrorType.AlphaTex,
+                                `Unexpected internal error, didn't expect a filled staff after multiple \\track and/or \\staff tags. Please report this problem providing the input alphaTex.`
+                            );
+                        }
+                    }
+                }
+            } else if (this._handler.knownScoreMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                this._state.hasAnyProperData = true;
+                this._handler.applyScoreMetaData(this, this._state.score, m);
+            } else if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                this._state.hasAnyProperData = true;
+                this._handler.applyStaffMetaData(this, this._state.currentStaff!, m);
+            } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                this._state.hasAnyProperData = true;
+                if (initialBarMeta) {
+                    initialBarMeta.push(m);
+                } else {
+                    this._handler.applyBarMetaData(this, bar.value, m);
+                }
+            } else {
+                const knownMeta = Array.from(this._handler.allKnownMetaDataTags).join(',');
+                this.addSemanticDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT204,
+                    message: `Unrecognized metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
+                    severity: AlphaTexDiagnosticsSeverity.Error,
+                    start: m.tag.start,
+                    end: m.tag.end
+                });
             }
         }
 
-        if (!bar) {
-            bar = this.newBar(this._state.currentStaff!);
-        }
-
-        return bar;
+        return bar.value;
     }
 
     private newBar(staff: Staff): Bar {
@@ -875,7 +964,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     public startNewStaff(): Staff {
         this._state.ignoredInitialVoice = false;
 
-        if (this._state.currentTrack!.staves[0].bars.length > 0) {
+        if (this._state.ignoredInitialStaff || this._state.currentTrack!.staves[0].bars.length > 0) {
             const previousWasPercussion = this._state.currentStaff!.isPercussion;
             this._state.currentTrack!.ensureStaveCount(this._state.currentTrack!.staves.length + 1);
             const staff = this._state.currentTrack!.staves[this._state.currentTrack!.staves.length - 1];
@@ -886,6 +975,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             }
 
             this._state.currentDynamics = DynamicValue.F;
+        } else {
+            this._state.ignoredInitialStaff = true;
         }
         return this._state.currentStaff!;
     }
@@ -898,6 +989,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     public startNewTrack(): Track {
         this._state.ignoredInitialVoice = false;
+        this._state.ignoredInitialStaff = false;
 
         // new track starting? - if no masterbars it's the \track of the initial track.
         if (this._state.ignoredInitialTrack || this._state.score.masterBars.length > 0) {

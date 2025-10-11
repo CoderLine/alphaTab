@@ -57,9 +57,9 @@ describe('AlphaTexImporterTest', () => {
             importer.readScore();
             assert.fail('Expected error on import');
         } catch {
-            expect(importer.lexerDiagnostics.items).toMatchSnapshot('lexer-diagnostics');
-            expect(importer.parserDiagnostics.items).toMatchSnapshot('parser-diagnostics');
-            expect(importer.semanticDiagnostics.items).toMatchSnapshot('semantic-diagnostics');
+            expect(importer.lexerDiagnostics.errors).toMatchSnapshot('lexer-diagnostics');
+            expect(importer.parserDiagnostics.errors).toMatchSnapshot('parser-diagnostics');
+            expect(importer.semanticDiagnostics.errors).toMatchSnapshot('semantic-diagnostics');
         }
     }
 
@@ -68,6 +68,7 @@ describe('AlphaTexImporterTest', () => {
      */
     function parseTex(tex: string): Score {
         const importer: AlphaTexImporter = new AlphaTexImporter();
+        importer.logErrors = true;
         importer.initFromString(tex, new Settings());
         try {
             return importer.readScore();
@@ -2362,6 +2363,53 @@ describe('AlphaTexImporterTest', () => {
             it('score empty', () => importErrorTest('\\title ()'));
             it('bar empty', () => importErrorTest('. \\ts ()'));
             it('bar missing', () => importErrorTest('. \\ts (3)'));
+        });
+    });
+
+    describe('bar-meta-interweaving', () => {
+        function test(tex: string) {
+            expect(parseTex(tex)).toMatchSnapshot();
+        }
+
+        describe('initial', () => {
+            it('meta-track', () => test(`\\clef C3 \\track "T1"`));
+            it('meta-track-staff', () => test(`\\clef C3 \\track "T1" \\staff`));
+            it('meta-track-staff-voice', () => test(`\\clef C3 \\track "T1" \\staff \\voice`));
+            it('meta-track-staff-voice-voice', () => test(`\\clef C3 \\track "T1" \\staff \\voice \\voice`));
+            it('meta-track-staff-staff', () => test(`\\clef C3 \\track "T1" \\staff \\staff`));
+            it('meta-track-voice', () => test(`\\clef C3 \\track "T1" \\voice`));
+            it('meta-track-voice-voice', () => test(`\\clef C3 \\track "T1" \\voice \\voice`));
+            it('meta-track-track', () => test(`\\clef C3 \\track "T1" \\track "T2"`));
+
+            it('meta-staff', () => test(`\\clef C3 \\staff`));
+            it('meta-staff-voice', () => test(`\\clef C3 \\staff \\voice`));
+            it('meta-staff-voice-voice', () => test(`\\clef C3 \\staff \\voice \\voice`));
+            it('meta-staff-staff', () => test(`\\clef C3 \\staff \\staff`));
+
+            it('meta-voice', () => test(`\\clef C3 \\voice`));
+            it('meta-voice-voice', () => test(`\\clef C3 \\voice \\voice`));
+            it('meta-track-track-meta', () => test(`\\clef C3 \\track "T1" \\track "T2" \\clef C4`));
+        });
+
+        
+        describe('with-previous-bars', () => {
+            it('meta-track', () => test(`C4 | C5 | \\clef C3 \\track "T1"`));
+            it('meta-track-staff', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\staff`));
+            it('meta-track-staff-voice', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\staff \\voice`));
+            it('meta-track-staff-voice-voice', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\staff \\voice \\voice`));
+            it('meta-track-staff-staff', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\staff \\staff`));
+            it('meta-track-voice', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\voice`));
+            it('meta-track-voice-voice', () => test(`\\clef C3 \\track "T1" \\voice \\voice`));
+            it('meta-track-track', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\track "T2"`));
+
+            it('meta-staff', () => test(`C4 | C5 | \\clef C3 \\staff`));
+            it('meta-staff-voice', () => test(`C4 | C5 | \\clef C3 \\staff \\voice`));
+            it('meta-staff-voice-voice', () => test(`C4 | C5 | \\clef C3 \\staff \\voice \\voice`));
+            it('meta-staff-staff', () => test(`C4 | C5 | \\clef C3 \\staff \\staff`));
+
+            it('meta-voice', () => test(`C4 | C5 | \\clef C3 \\voice`));
+            it('meta-voice-voice', () => test(`C4 | C5 | \\clef C3 \\voice \\voice`));
+            it('meta-track-track-meta', () => test(`C4 | C5 | \\clef C3 \\track "T1" \\track "T2" \\clef C4`));
         });
     });
 });

@@ -4,7 +4,7 @@
  */
 import { AlphaTabError, AlphaTabErrorType } from '@src/AlphaTabError';
 import { BeatCloner } from '@src/generated/model/BeatCloner';
-import { AlphaTexAccidentalMode } from "@src/importer/alphaTex/AlphaTexShared";
+import { AlphaTexAccidentalMode } from '@src/importer/alphaTex/AlphaTexShared';
 import { ScoreImporter } from '@src/importer/ScoreImporter';
 import { UnsupportedFormatError } from '@src/importer/UnsupportedFormatError';
 import { ByteBuffer } from '@src/io/ByteBuffer';
@@ -190,7 +190,7 @@ export class AlphaTexLexerOld {
     public syStart: AlphaTexTokenLocation = { line: 0, col: 0, offset: 0 };
     public syEnd: AlphaTexTokenLocation = { line: 0, col: 0, offset: 0 };
 
-    public buildTokenInfo(tokenType:string): AlphaTexTokenInfo {
+    public buildTokenInfo(tokenType: string): AlphaTexTokenInfo {
         return {
             symbolType: this.sy,
             tokenType,
@@ -602,6 +602,9 @@ export class AlphaTexImporterOld extends ScoreImporter {
     private _trackChannel: number = 0;
     private _score!: Score;
     private _currentTrack!: Track;
+
+    private _initialTempo = 0;
+    private _initialTempoLabel = '';
 
     private _currentStaff!: Staff;
     private _barIndex: number = 0;
@@ -1131,6 +1134,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
                         this._initialTempo.text = this._syData as string;
                         this._sy = this._newSy();
                     }
+
                     anyTopLevelMeta = true;
                     break;
                 case 'defaultsystemslayout':
@@ -1273,7 +1277,7 @@ export class AlphaTexImporterOld extends ScoreImporter {
 
         return anyTopLevelMeta || anyOtherMeta;
     }
-    
+
     headerFooterStyle(element: ScoreSubElement) {
         const style = ModelUtils.getOrCreateHeaderFooterStyle(this._score, element);
         if (style.isVisible === undefined) {

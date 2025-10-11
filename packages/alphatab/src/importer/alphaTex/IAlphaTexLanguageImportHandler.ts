@@ -11,9 +11,16 @@ export enum ApplyNodeResult {
     NotAppliedSemanticError,
     NotAppliedUnrecognizedMarker
 }
+export enum ApplyStructuralMetaDataResult {
+    AppliedNewTrack,
+    AppliedNewStaff,
+    AppliedNewVoice,
+    NotAppliedSemanticError,
+    NotAppliedUnrecognizedMarker
+}
 
 export interface IAlphaTexLanguageImportHandler {
-    applyStructuralMetaData(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
+    applyStructuralMetaData(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode): ApplyStructuralMetaDataResult;
     applyScoreMetaData(importer: IAlphaTexImporter, score: Score, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
     applyStaffMetaData(importer: IAlphaTexImporter, staff: Staff, metaData: AlphaTexMetaDataNode): ApplyNodeResult;
     applyBarMetaData(importer: IAlphaTexImporter, bar: Bar, metaData: AlphaTexMetaDataNode): ApplyNodeResult;

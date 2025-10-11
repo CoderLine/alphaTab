@@ -7,8 +7,8 @@ describe('AlphaTexParserTest', () => {
         const node = parser.read();
         expect(node).to.be.ok;
         expect(node).toMatchSnapshot();
-        expect(parser.lexerDiagnostics.items).toMatchSnapshot('lexer-diagnostics');
-        expect(parser.parserDiagnostics.items).toMatchSnapshot('parser-diagnostics');
+        expect(parser.lexerDiagnostics.errors).toMatchSnapshot('lexer-diagnostics');
+        expect(parser.parserDiagnostics.errors).toMatchSnapshot('parser-diagnostics');
     }
 
     describe('valid-empty', () => {
@@ -201,10 +201,7 @@ describe('AlphaTexParserTest', () => {
             it('type', () => parserTest(':A'));
         });
 
-        it('at202', () => parserTest('. C4.8 . sync'));
-        it('at203', () => parserTest('. C4.8 . \\title "Test"'));
-
-        describe('at204', () => {
+        describe('at202', () => {
             it('beat duration', () => parserTest('(C4).A'));
             it('note string', () => parserTest('3.A'));
             it('note value', () => parserTest(' . ( \\notevalue )'));
@@ -212,17 +209,17 @@ describe('AlphaTexParserTest', () => {
             it('meta value', () => parserTest('\\title 10'));
         });
 
-        describe('at205', () => {
+        describe('at203', () => {
             it('note string', () => parserTest('. (3.'));
             it('meta value', () => parserTest('\\title'));
         });
 
-        describe('at206', () => {
+        describe('at204', () => {
             it('score', () => parserTest('\\unknown'));
             it('bar', () => parserTest('. \\unknown'));
         });
 
-        describe('at207', () => {
+        describe('at205', () => {
             it('bar', () => parserTest('. \\track "Test" {unknown}'));
             it('beat', () => parserTest('. (C4) {unknown}'));
             it('note', () => parserTest('. (C4{unknown})'));
@@ -231,7 +228,7 @@ describe('AlphaTexParserTest', () => {
             it('fermata', () => parserTest('C4 {fermata invalid}'));
         });
 
-        describe('at208', () => {
+        describe('at206', () => {
             it('note list', () => parserTest('(C4'));
             it('properties', () => parserTest('\\track "Test" { color red'));
             it('values', () => parserTest('\\title ("Test"'));

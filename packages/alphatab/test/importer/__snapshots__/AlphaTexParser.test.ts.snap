@@ -2,21 +2,21 @@
 
 exports[`AlphaTexParserTest ambiguous tempo and stringed note 1`] = `
 Score (1,1) -> (1,19) {
-  metaData: Array [
-    MetaData (1,1) -> (1,12) {
-      tag: MetaDataTag "tempo" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "tempo" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,12) {
-        values: Array [
-          NumberLiteral "120" (1,8) -> (1,11),
-        ],
-      },
-    },
-  ],
   bars: Array [
-    Bar (1,12) -> (1,19) {
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        MetaData (1,1) -> (1,12) {
+          tag: MetaDataTag "tempo" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "tempo" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,12) {
+            values: Array [
+              NumberLiteral "120" (1,8) -> (1,11),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,12) -> (1,16) {
           notes: NoteList (1,12) -> (1,16) {
@@ -52,22 +52,22 @@ exports[`AlphaTexParserTest ambiguous tempo and stringed note: parser-diagnostic
 
 exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note 1`] = `
 Score (1,1) -> (1,26) {
-  metaData: Array [
-    MetaData (1,1) -> (1,23) {
-      tag: MetaDataTag "tempo" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "tempo" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,22) {
-        values: Array [
-          NumberLiteral "120" (1,8) -> (1,11),
-          StringLiteral "Moderate" (1,12) -> (1,21),
-        ],
-      },
-    },
-  ],
   bars: Array [
-    Bar (1,23) -> (1,26) {
+    Bar (1,1) -> (1,26) {
+      metaData: Array [
+        MetaData (1,1) -> (1,23) {
+          tag: MetaDataTag "tempo" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "tempo" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,23) {
+            values: Array [
+              NumberLiteral "120" (1,8) -> (1,11),
+              StringLiteral "Moderate" (1,12) -> (1,21),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,23) -> (1,26) {
           notes: NoteList (1,23) -> (1,26) {
@@ -92,9 +92,8 @@ exports[`AlphaTexParserTest ambiguous tempo, temponame and stringed note: parser
 
 exports[`AlphaTexParserTest comments bar meta singleline 1`] = `
 Score (1,1) -> (3,10) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (3,3) -> (3,10) {
+    Bar (1,1) -> (3,10) {
       metaData: Array [
         MetaData (3,3) -> (3,10) {
           tag: MetaDataTag "ts" (3,3) -> (3,6) {
@@ -123,9 +122,8 @@ exports[`AlphaTexParserTest comments bar meta singleline: parser-diagnostics 1`]
 
 exports[`AlphaTexParserTest comments bar multiline 1`] = `
 Score (1,1) -> (3,16) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (3,9) -> (3,16) {
+    Bar (1,1) -> (3,16) {
       metaData: Array [
         MetaData (3,9) -> (3,16) {
           tag: MetaDataTag "ts" (3,9) -> (3,12) {
@@ -151,9 +149,8 @@ line**/",
 
 exports[`AlphaTexParserTest comments bar multiline middle 1`] = `
 Score (1,1) -> (3,10) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (2,2) -> (3,10) {
+    Bar (1,1) -> (3,10) {
       metaData: Array [
         MetaData (2,2) -> (3,10) {
           tag: MetaDataTag "ts" (2,2) -> (2,5) {
@@ -188,9 +185,8 @@ exports[`AlphaTexParserTest comments bar multiline: parser-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest comments beat chord multiline 1`] = `
 Score (1,1) -> (3,12) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,12) {
+    Bar (1,1) -> (3,12) {
       beats: Array [
         Beat (1,3) -> (3,12) {
           notes: NoteList (1,3) -> (3,12) {
@@ -223,9 +219,8 @@ exports[`AlphaTexParserTest comments beat chord multiline: parser-diagnostics 1`
 
 exports[`AlphaTexParserTest comments beat chord singleline 1`] = `
 Score (1,1) -> (3,6) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,6) {
+    Bar (1,1) -> (3,6) {
       beats: Array [
         Beat (1,3) -> (3,6) {
           notes: NoteList (1,3) -> (3,6) {
@@ -257,9 +252,8 @@ exports[`AlphaTexParserTest comments beat chord singleline: parser-diagnostics 1
 
 exports[`AlphaTexParserTest comments beat multiline 1`] = `
 Score (1,1) -> (3,11) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,11) {
+    Bar (1,1) -> (3,11) {
       beats: Array [
         Beat (1,3) -> (3,9) {
           notes: NoteList (1,3) -> (3,9) {
@@ -296,9 +290,8 @@ exports[`AlphaTexParserTest comments beat multiline: parser-diagnostics 1`] = `A
 
 exports[`AlphaTexParserTest comments beat singleline 1`] = `
 Score (1,1) -> (3,5) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,5) {
+    Bar (1,1) -> (3,5) {
       beats: Array [
         Beat (1,3) -> (3,3) {
           notes: NoteList (1,3) -> (3,3) {
@@ -334,9 +327,8 @@ exports[`AlphaTexParserTest comments beat singleline: parser-diagnostics 1`] = `
 
 exports[`AlphaTexParserTest comments beateffects multiline 1`] = `
 Score (1,1) -> (3,10) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,10) {
+    Bar (1,1) -> (3,10) {
       beats: Array [
         Beat (1,3) -> (3,10) {
           notes: NoteList (1,3) -> (1,10) {
@@ -374,9 +366,8 @@ exports[`AlphaTexParserTest comments beateffects multiline: parser-diagnostics 1
 
 exports[`AlphaTexParserTest comments beateffects singleline 1`] = `
 Score (1,1) -> (3,5) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,5) {
+    Bar (1,1) -> (3,5) {
       beats: Array [
         Beat (1,3) -> (3,4) {
           notes: NoteList (1,3) -> (1,10) {
@@ -413,9 +404,8 @@ exports[`AlphaTexParserTest comments beateffects singleline: parser-diagnostics 
 
 exports[`AlphaTexParserTest comments noteeffects multiline 1`] = `
 Score (1,1) -> (3,14) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,14) {
+    Bar (1,1) -> (3,14) {
       beats: Array [
         Beat (1,3) -> (3,14) {
           notes: NoteList (1,3) -> (3,14) {
@@ -453,9 +443,8 @@ exports[`AlphaTexParserTest comments noteeffects multiline: parser-diagnostics 1
 
 exports[`AlphaTexParserTest comments noteeffects singleline 1`] = `
 Score (1,1) -> (3,8) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (3,8) {
+    Bar (1,1) -> (3,8) {
       beats: Array [
         Beat (1,3) -> (3,8) {
           notes: NoteList (1,3) -> (3,8) {
@@ -492,21 +481,25 @@ exports[`AlphaTexParserTest comments noteeffects singleline: parser-diagnostics 
 
 exports[`AlphaTexParserTest comments score meta multiline 1`] = `
 Score (1,1) -> (2,22) {
-  metaData: Array [
-    MetaData (2,9) -> (2,22) {
-      tag: MetaDataTag "title" (2,9) -> (2,15) {
-        leadingComments: Array [
-          "/** multi
+  bars: Array [
+    Bar (2,9) -> (2,22) {
+      metaData: Array [
+        MetaData (2,9) -> (2,22) {
+          tag: MetaDataTag "title" (2,9) -> (2,15) {
+            leadingComments: Array [
+              "/** multi
 line**/",
-        ],
-        prefix: BackSlashToken (2,9) -> (2,10),
-        tag: Identifier "title" (2,10) -> (2,15),
-      },
-      values: ValueList (2,16) -> (2,22) {
-        values: Array [
-          StringLiteral "Test" (2,16) -> (2,21),
-        ],
-      },
+            ],
+            prefix: BackSlashToken (2,9) -> (2,10),
+            tag: Identifier "title" (2,10) -> (2,15),
+          },
+          values: ValueList (2,16) -> (2,22) {
+            values: Array [
+              StringLiteral "Test" (2,16) -> (2,21),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -514,21 +507,25 @@ line**/",
 
 exports[`AlphaTexParserTest comments score meta multiline middle 1`] = `
 Score (1,1) -> (2,15) {
-  metaData: Array [
-    MetaData (1,1) -> (2,15) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        trailingComments: Array [
-          "/** multi
+  bars: Array [
+    Bar (1,1) -> (2,15) {
+      metaData: Array [
+        MetaData (1,1) -> (2,15) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            trailingComments: Array [
+              "/** multi
 line**/",
-        ],
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (2,9) -> (2,15) {
-        values: Array [
-          StringLiteral "Test" (2,9) -> (2,14),
-        ],
-      },
+            ],
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (2,9) -> (2,15) {
+            values: Array [
+              StringLiteral "Test" (2,9) -> (2,14),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -544,20 +541,24 @@ exports[`AlphaTexParserTest comments score meta multiline: parser-diagnostics 1`
 
 exports[`AlphaTexParserTest comments score meta singleline 1`] = `
 Score (1,1) -> (2,16) {
-  metaData: Array [
-    MetaData (2,3) -> (2,16) {
-      tag: MetaDataTag "title" (2,3) -> (2,9) {
-        leadingComments: Array [
-          "// Single ",
-        ],
-        prefix: BackSlashToken (2,3) -> (2,4),
-        tag: Identifier "title" (2,4) -> (2,9),
-      },
-      values: ValueList (2,10) -> (2,16) {
-        values: Array [
-          StringLiteral "Test" (2,10) -> (2,15),
-        ],
-      },
+  bars: Array [
+    Bar (2,3) -> (2,16) {
+      metaData: Array [
+        MetaData (2,3) -> (2,16) {
+          tag: MetaDataTag "title" (2,3) -> (2,9) {
+            leadingComments: Array [
+              "// Single ",
+            ],
+            prefix: BackSlashToken (2,3) -> (2,4),
+            tag: Identifier "title" (2,4) -> (2,9),
+          },
+          values: ValueList (2,10) -> (2,16) {
+            values: Array [
+              StringLiteral "Test" (2,10) -> (2,15),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -726,96 +727,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at202 1`] = `
-Score (1,1) -> (1,10) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-  bars: Array [
-    Bar (1,3) -> (1,8) {
-      beats: Array [
-        Beat (1,3) -> (1,8) {
-          notes: NoteList (1,3) -> (1,5) {
-            notes: Array [
-              Note (1,3) -> (1,5) {
-                noteValue: Identifier "C4" (1,3) -> (1,5),
-              },
-            ],
-          },
-          durationDot: DotToken (1,5) -> (1,5),
-          durationValue: NumberLiteral "8" (1,6) -> (1,7),
-        },
-      ],
-    },
-  ],
-  barsSyncPointSeparator: DotToken (1,8) -> (1,8),
-}
-`;
+exports[`AlphaTexParserTest errors at202 beat duration 1`] = `Score (1,1) -> (1,6)`;
 
-exports[`AlphaTexParserTest errors at202: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at202 beat duration: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at202: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at202 beat duration: parser-diagnostics 1`] = `
 Array [
   Map {
     "code" => 202,
-    "severity" => 2,
-    "message" => "Unexpected 'Identifier' token. Expected a '\\\\sync' meta data tag.",
-    "start" => Map {
-      "col" => 14,
-      "line" => 1,
-      "offset" => 13,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexParserTest errors at203 1`] = `
-Score (1,1) -> (1,10) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-  bars: Array [
-    Bar (1,3) -> (1,8) {
-      beats: Array [
-        Beat (1,3) -> (1,8) {
-          notes: NoteList (1,3) -> (1,5) {
-            notes: Array [
-              Note (1,3) -> (1,5) {
-                noteValue: Identifier "C4" (1,3) -> (1,5),
-              },
-            ],
-          },
-          durationDot: DotToken (1,5) -> (1,5),
-          durationValue: NumberLiteral "8" (1,6) -> (1,7),
-        },
-      ],
-    },
-  ],
-  barsSyncPointSeparator: DotToken (1,8) -> (1,8),
-}
-`;
-
-exports[`AlphaTexParserTest errors at203: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexParserTest errors at203: parser-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 203,
-    "severity" => 2,
-    "message" => "Unexpected meta data tag 'title'. Expected a '\\\\sync' meta data tag.",
-    "start" => Map {
-      "col" => 16,
-      "line" => 1,
-      "offset" => 15,
-    },
-  },
-]
-`;
-
-exports[`AlphaTexParserTest errors at204 beat duration 1`] = `Score (1,1) -> (1,6)`;
-
-exports[`AlphaTexParserTest errors at204 beat duration: lexer-diagnostics 1`] = `Array []`;
-
-exports[`AlphaTexParserTest errors at204 beat duration: parser-diagnostics 1`] = `
-Array [
-  Map {
-    "code" => 204,
     "severity" => 2,
     "message" => "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
     "start" => Map {
@@ -827,14 +746,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at204 meta value 1`] = `Score (1,1) -> (1,8)`;
+exports[`AlphaTexParserTest errors at202 meta value 1`] = `Score (1,1) -> (1,8)`;
 
-exports[`AlphaTexParserTest errors at204 meta value: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at202 meta value: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at204 meta value: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at202 meta value: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 204,
+    "code" => 202,
     "severity" => 2,
     "message" => "Unexpected 'NumberLiteral' token. Expected one of following: StringLiteral,Identifier",
     "start" => Map {
@@ -846,14 +765,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at204 note string 1`] = `Score (1,1) -> (1,3)`;
+exports[`AlphaTexParserTest errors at202 note string 1`] = `Score (1,1) -> (1,3)`;
 
-exports[`AlphaTexParserTest errors at204 note string: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at202 note string: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at204 note string: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at202 note string: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 204,
+    "code" => 202,
     "severity" => 2,
     "message" => "Unexpected 'Identifier' token. Expected one of following: NumberLiteral",
     "start" => Map {
@@ -865,18 +784,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at204 note value 1`] = `
-Score (1,1) -> (1,6) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
-}
-`;
+exports[`AlphaTexParserTest errors at202 note value 1`] = `Score (1,1) -> (1,6)`;
 
-exports[`AlphaTexParserTest errors at204 note value: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at202 note value: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at204 note value: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at202 note value: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 204,
+    "code" => 202,
     "severity" => 2,
     "message" => "Unexpected 'MetaDataTag' token. Expected one of following: NumberLiteral,StringLiteral,Identifier",
     "start" => Map {
@@ -888,30 +803,34 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at204 value list 1`] = `
+exports[`AlphaTexParserTest errors at202 value list 1`] = `
 Score (1,1) -> (1,19) {
-  metaData: Array [
-    MetaData (1,1) -> (1,19) {
-      tag: MetaDataTag "meta" (1,1) -> (1,6) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "meta" (1,2) -> (1,6),
-      },
-      values: ValueList (1,7) -> (1,19) {
-        openParenthesis: ParenthesisOpenToken (1,7) -> (1,7),
-        values: Array [],
-        closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
-      },
+  bars: Array [
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        MetaData (1,1) -> (1,19) {
+          tag: MetaDataTag "meta" (1,1) -> (1,6) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "meta" (1,2) -> (1,6),
+          },
+          values: ValueList (1,7) -> (1,19) {
+            openParenthesis: ParenthesisOpenToken (1,7) -> (1,7),
+            values: Array [],
+            closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
+          },
+        },
+      ],
     },
   ],
 }
 `;
 
-exports[`AlphaTexParserTest errors at204 value list: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at202 value list: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at204 value list: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at202 value list: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 204,
+    "code" => 202,
     "severity" => 2,
     "message" => "Unexpected 'MetaDataTag' token. Expected one of following: Identifier,StringLiteral,NumberLiteral",
     "start" => Map {
@@ -923,14 +842,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at205 meta value 1`] = `Score (1,1) -> (1,7)`;
+exports[`AlphaTexParserTest errors at203 meta value 1`] = `Score (1,1) -> (1,7)`;
 
-exports[`AlphaTexParserTest errors at205 meta value: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at203 meta value: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at205 meta value: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at203 meta value: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 205,
+    "code" => 203,
     "severity" => 2,
     "message" => "Unexpected end of file.",
     "start" => Map {
@@ -942,18 +861,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at205 note string 1`] = `
-Score (1,1) -> (1,6) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-}
-`;
+exports[`AlphaTexParserTest errors at203 note string 1`] = `Score (1,1) -> (1,6)`;
 
-exports[`AlphaTexParserTest errors at205 note string: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at203 note string: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at205 note string: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at203 note string: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 205,
+    "code" => 203,
     "severity" => 2,
     "message" => "Unexpected end of file.",
     "start" => Map {
@@ -965,18 +880,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at206 bar 1`] = `
-Score (1,1) -> (1,11) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-}
-`;
+exports[`AlphaTexParserTest errors at204 bar 1`] = `Score (1,1) -> (1,11)`;
 
-exports[`AlphaTexParserTest errors at206 bar: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at204 bar: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at206 bar: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at204 bar: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 206,
+    "code" => 204,
     "severity" => 2,
     "message" => "Unrecognized metadata 'unknown'.",
     "start" => Map {
@@ -988,14 +899,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at206 score 1`] = `Score (1,1) -> (1,9)`;
+exports[`AlphaTexParserTest errors at204 score 1`] = `Score (1,1) -> (1,9)`;
 
-exports[`AlphaTexParserTest errors at206 score: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at204 score: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at206 score: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at204 score: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 206,
+    "code" => 204,
     "severity" => 2,
     "message" => "Unrecognized metadata 'unknown'.",
     "start" => Map {
@@ -1007,18 +918,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at207 bar 1`] = `
-Score (1,1) -> (1,25) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-}
-`;
+exports[`AlphaTexParserTest errors at205 bar 1`] = `Score (1,1) -> (1,25)`;
 
-exports[`AlphaTexParserTest errors at207 bar: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at205 bar: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at207 bar: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at205 bar: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
     "start" => Map {
@@ -1030,14 +937,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at207 barre 1`] = `Score (1,1) -> (1,20)`;
+exports[`AlphaTexParserTest errors at205 barre 1`] = `Score (1,1) -> (1,20)`;
 
-exports[`AlphaTexParserTest errors at207 barre: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at205 barre: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at207 barre: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at205 barre: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
     "start" => Map {
@@ -1049,18 +956,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at207 beat 1`] = `
-Score (1,1) -> (1,16) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-}
-`;
+exports[`AlphaTexParserTest errors at205 beat 1`] = `Score (1,1) -> (1,16)`;
 
-exports[`AlphaTexParserTest errors at207 beat: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at205 beat: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at207 beat: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at205 beat: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
     "start" => Map {
@@ -1072,14 +975,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at207 fermata 1`] = `Score (1,1) -> (1,20)`;
+exports[`AlphaTexParserTest errors at205 fermata 1`] = `Score (1,1) -> (1,20)`;
 
-exports[`AlphaTexParserTest errors at207 fermata: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at205 fermata: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at207 fermata: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at205 fermata: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
     "start" => Map {
@@ -1091,14 +994,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at207 gracetype 1`] = `Score (1,1) -> (1,15)`;
+exports[`AlphaTexParserTest errors at205 gracetype 1`] = `Score (1,1) -> (1,15)`;
 
-exports[`AlphaTexParserTest errors at207 gracetype: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at205 gracetype: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at207 gracetype: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at205 gracetype: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'invalid'.",
     "start" => Map {
@@ -1110,18 +1013,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at207 note 1`] = `
-Score (1,1) -> (1,14) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
-}
-`;
+exports[`AlphaTexParserTest errors at205 note 1`] = `Score (1,1) -> (1,14)`;
 
-exports[`AlphaTexParserTest errors at207 note: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at205 note: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at207 note: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at205 note: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'unknown'.",
     "start" => Map {
@@ -1133,7 +1032,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at208 note list 1`] = `
+exports[`AlphaTexParserTest errors at206 note list 1`] = `
 Score (1,1) -> (1,4) {
   bars: Array [
     Bar (1,1) -> (1,4) {
@@ -1154,12 +1053,12 @@ Score (1,1) -> (1,4) {
 }
 `;
 
-exports[`AlphaTexParserTest errors at208 note list: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at206 note list: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at208 note list: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at206 note list: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1171,43 +1070,47 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at208 properties 1`] = `
+exports[`AlphaTexParserTest errors at206 properties 1`] = `
 Score (1,1) -> (1,26) {
-  metaData: Array [
-    MetaData (1,1) -> (1,26) {
-      tag: MetaDataTag "track" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "track" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,15) {
-        values: Array [
-          StringLiteral "Test" (1,8) -> (1,13),
-        ],
-      },
-      properties: Properties (1,15) -> (1,26) {
-        openBrace: BraceOpenToken (1,15) -> (1,15),
-        properties: Array [
-          Property (1,17) -> (1,26) {
-            property: Identifier "color" (1,17) -> (1,22),
-            properties: ValueList (1,23) -> (1,26) {
-              values: Array [
-                Identifier "red" (1,23) -> (1,26),
-              ],
-            },
+  bars: Array [
+    Bar (1,1) -> (1,26) {
+      metaData: Array [
+        MetaData (1,1) -> (1,26) {
+          tag: MetaDataTag "track" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "track" (1,2) -> (1,7),
           },
-        ],
-      },
+          values: ValueList (1,8) -> (1,15) {
+            values: Array [
+              StringLiteral "Test" (1,8) -> (1,13),
+            ],
+          },
+          properties: Properties (1,15) -> (1,26) {
+            openBrace: BraceOpenToken (1,15) -> (1,15),
+            properties: Array [
+              Property (1,17) -> (1,26) {
+                property: Identifier "color" (1,17) -> (1,22),
+                properties: ValueList (1,23) -> (1,26) {
+                  values: Array [
+                    Identifier "red" (1,23) -> (1,26),
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
     },
   ],
 }
 `;
 
-exports[`AlphaTexParserTest errors at208 properties: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at206 properties: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at208 properties: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at206 properties: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1219,31 +1122,35 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest errors at208 values 1`] = `
+exports[`AlphaTexParserTest errors at206 values 1`] = `
 Score (1,1) -> (1,15) {
-  metaData: Array [
-    MetaData (1,1) -> (1,15) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,15) {
-        openParenthesis: ParenthesisOpenToken (1,8) -> (1,8),
-        values: Array [
-          StringLiteral "Test" (1,9) -> (1,14),
-        ],
-      },
+  bars: Array [
+    Bar (1,1) -> (1,15) {
+      metaData: Array [
+        MetaData (1,1) -> (1,15) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,15) {
+            openParenthesis: ParenthesisOpenToken (1,8) -> (1,8),
+            values: Array [
+              StringLiteral "Test" (1,9) -> (1,14),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
 `;
 
-exports[`AlphaTexParserTest errors at208 values: lexer-diagnostics 1`] = `Array []`;
+exports[`AlphaTexParserTest errors at206 values: lexer-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest errors at208 values: parser-diagnostics 1`] = `
+exports[`AlphaTexParserTest errors at206 values: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1257,16 +1164,15 @@ Array [
 
 exports[`AlphaTexParserTest floats tempo 1`] = `
 Score (1,1) -> (1,28) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (1,28) {
+    Bar (1,1) -> (1,28) {
       metaData: Array [
         MetaData (1,3) -> (1,25) {
           tag: MetaDataTag "tempo" (1,3) -> (1,9) {
             prefix: BackSlashToken (1,3) -> (1,4),
             tag: Identifier "tempo" (1,4) -> (1,9),
           },
-          values: ValueList (1,10) -> (1,24) {
+          values: ValueList (1,10) -> (1,25) {
             values: Array [
               NumberLiteral "120" (1,10) -> (1,13),
               StringLiteral "Moderate" (1,14) -> (1,23),
@@ -1294,9 +1200,8 @@ Score (1,1) -> (1,28) {
 
 exports[`AlphaTexParserTest floats tempo parenthesis 1`] = `
 Score (1,1) -> (1,30) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (1,30) {
+    Bar (1,1) -> (1,30) {
       metaData: Array [
         MetaData (1,3) -> (1,30) {
           tag: MetaDataTag "tempo" (1,3) -> (1,9) {
@@ -1329,9 +1234,8 @@ exports[`AlphaTexParserTest floats tempo: parser-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest floats valuelist 1`] = `
 Score (1,1) -> (1,13) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (1,13) {
+    Bar (1,1) -> (1,13) {
       metaData: Array [
         MetaData (1,3) -> (1,13) {
           tag: MetaDataTag "scale" (1,3) -> (1,9) {
@@ -1352,20 +1256,24 @@ Score (1,1) -> (1,13) {
 
 exports[`AlphaTexParserTest floats valuelist parenthesis 1`] = `
 Score (1,1) -> (1,19) {
-  metaData: Array [
-    MetaData (1,1) -> (1,19) {
-      tag: MetaDataTag "unknown" (1,1) -> (1,9) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "unknown" (1,2) -> (1,9),
-      },
-      values: ValueList (1,10) -> (1,19) {
-        openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
-        values: Array [
-          NumberLiteral "1.2" (1,11) -> (1,14),
-          NumberLiteral "2.3" (1,15) -> (1,18),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
-      },
+  bars: Array [
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        MetaData (1,1) -> (1,19) {
+          tag: MetaDataTag "unknown" (1,1) -> (1,9) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "unknown" (1,2) -> (1,9),
+          },
+          values: ValueList (1,10) -> (1,19) {
+            openParenthesis: ParenthesisOpenToken (1,10) -> (1,10),
+            values: Array [
+              NumberLiteral "1.2" (1,11) -> (1,14),
+              NumberLiteral "2.3" (1,15) -> (1,18),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,18) -> (1,18),
+          },
+        },
+      ],
     },
   ],
 }
@@ -1381,22 +1289,21 @@ exports[`AlphaTexParserTest floats valuelist: parser-diagnostics 1`] = `Array []
 
 exports[`AlphaTexParserTest intermediate finished beat effect value, not closed 1`] = `
 Score (1,1) -> (1,50) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,50) {
+    Bar (1,1) -> (1,50) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,50) {
           notes: NoteList (1,18) -> (1,34) {
@@ -1408,7 +1315,7 @@ Score (1,1) -> (1,50) {
                   properties: Array [
                     Property (1,23) -> (1,33) {
                       property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,32) {
+                      properties: ValueList (1,28) -> (1,33) {
                         values: Array [
                           StringLiteral "S1" (1,28) -> (1,31),
                         ],
@@ -1427,7 +1334,7 @@ Score (1,1) -> (1,50) {
             properties: Array [
               Property (1,41) -> (1,50) {
                 property: Identifier "rasg" (1,41) -> (1,45),
-                properties: ValueList (1,46) -> (1,49) {
+                properties: ValueList (1,46) -> (1,50) {
                   values: Array [
                     StringLiteral "i" (1,46) -> (1,48),
                   ],
@@ -1447,7 +1354,7 @@ exports[`AlphaTexParserTest intermediate finished beat effect value, not closed:
 exports[`AlphaTexParserTest intermediate finished beat effect value, not closed: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1461,30 +1368,34 @@ Array [
 
 exports[`AlphaTexParserTest intermediate finished meta property value, not closed  1`] = `
 Score (1,1) -> (1,25) {
-  metaData: Array [
-    MetaData (1,1) -> (1,25) {
-      tag: MetaDataTag "track" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "track" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,12) {
-        values: Array [
-          StringLiteral "X" (1,8) -> (1,10),
-        ],
-      },
-      properties: Properties (1,12) -> (1,25) {
-        openBrace: BraceOpenToken (1,12) -> (1,12),
-        properties: Array [
-          Property (1,14) -> (1,25) {
-            property: Identifier "color" (1,14) -> (1,19),
-            properties: ValueList (1,20) -> (1,25) {
-              values: Array [
-                StringLiteral "red" (1,20) -> (1,24),
-              ],
-            },
+  bars: Array [
+    Bar (1,1) -> (1,25) {
+      metaData: Array [
+        MetaData (1,1) -> (1,25) {
+          tag: MetaDataTag "track" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "track" (1,2) -> (1,7),
           },
-        ],
-      },
+          values: ValueList (1,8) -> (1,12) {
+            values: Array [
+              StringLiteral "X" (1,8) -> (1,10),
+            ],
+          },
+          properties: Properties (1,12) -> (1,25) {
+            openBrace: BraceOpenToken (1,12) -> (1,12),
+            properties: Array [
+              Property (1,14) -> (1,25) {
+                property: Identifier "color" (1,14) -> (1,19),
+                properties: ValueList (1,20) -> (1,25) {
+                  values: Array [
+                    StringLiteral "red" (1,20) -> (1,24),
+                  ],
+                },
+              },
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -1495,7 +1406,7 @@ exports[`AlphaTexParserTest intermediate finished meta property value, not close
 exports[`AlphaTexParserTest intermediate finished meta property value, not closed : parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1509,22 +1420,21 @@ Array [
 
 exports[`AlphaTexParserTest intermediate finished note effect value, not closed 1`] = `
 Score (1,1) -> (1,32) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,32) {
+    Bar (1,1) -> (1,32) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,32) {
           notes: NoteList (1,18) -> (1,32) {
@@ -1559,7 +1469,7 @@ exports[`AlphaTexParserTest intermediate finished note effect value, not closed:
 exports[`AlphaTexParserTest intermediate finished note effect value, not closed: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1573,22 +1483,21 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started beat duration 1`] = `
 Score (1,1) -> (1,36) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,36) {
+    Bar (1,1) -> (1,36) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,36) {
           notes: NoteList (1,18) -> (1,34) {
@@ -1600,7 +1509,7 @@ Score (1,1) -> (1,36) {
                   properties: Array [
                     Property (1,23) -> (1,33) {
                       property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,32) {
+                      properties: ValueList (1,28) -> (1,33) {
                         values: Array [
                           StringLiteral "S1" (1,28) -> (1,31),
                         ],
@@ -1624,31 +1533,14 @@ exports[`AlphaTexParserTest intermediate started beat duration: lexer-diagnostic
 
 exports[`AlphaTexParserTest intermediate started beat duration: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest intermediate started beat effect name 1`] = `
-Score (1,1) -> (1,44) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
-}
-`;
+exports[`AlphaTexParserTest intermediate started beat effect name 1`] = `Score (1,1) -> (1,44)`;
 
 exports[`AlphaTexParserTest intermediate started beat effect name: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest intermediate started beat effect name: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'ras'.",
     "start" => Map {
@@ -1660,24 +1552,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started beat effect value 1`] = `
-Score (1,1) -> (1,48) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
-}
-`;
+exports[`AlphaTexParserTest intermediate started beat effect value 1`] = `Score (1,1) -> (1,48)`;
 
 exports[`AlphaTexParserTest intermediate started beat effect value: lexer-diagnostics 1`] = `
 Array [
@@ -1697,7 +1572,7 @@ Array [
 exports[`AlphaTexParserTest intermediate started beat effect value: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 205,
+    "code" => 203,
     "severity" => 2,
     "message" => "Unexpected end of file.",
     "start" => Map {
@@ -1711,22 +1586,21 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started beat effects 1`] = `
 Score (1,1) -> (1,41) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,41) {
+    Bar (1,1) -> (1,41) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,41) {
           notes: NoteList (1,18) -> (1,34) {
@@ -1738,7 +1612,7 @@ Score (1,1) -> (1,41) {
                   properties: Array [
                     Property (1,23) -> (1,33) {
                       property: Identifier "slur" (1,23) -> (1,27),
-                      properties: ValueList (1,28) -> (1,32) {
+                      properties: ValueList (1,28) -> (1,33) {
                         values: Array [
                           StringLiteral "S1" (1,28) -> (1,31),
                         ],
@@ -1768,7 +1642,7 @@ exports[`AlphaTexParserTest intermediate started beat effects: lexer-diagnostics
 exports[`AlphaTexParserTest intermediate started beat effects: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1803,21 +1677,25 @@ exports[`AlphaTexParserTest intermediate started meta 1`] = `Score (1,1) -> (1,4
 
 exports[`AlphaTexParserTest intermediate started meta properties 1`] = `
 Score (1,1) -> (1,13) {
-  metaData: Array [
-    MetaData (1,1) -> (1,13) {
-      tag: MetaDataTag "track" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "track" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,12) {
-        values: Array [
-          StringLiteral "X" (1,8) -> (1,10),
-        ],
-      },
-      properties: Properties (1,12) -> (1,13) {
-        openBrace: BraceOpenToken (1,12) -> (1,12),
-        properties: Array [],
-      },
+  bars: Array [
+    Bar (1,1) -> (1,13) {
+      metaData: Array [
+        MetaData (1,1) -> (1,13) {
+          tag: MetaDataTag "track" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "track" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,12) {
+            values: Array [
+              StringLiteral "X" (1,8) -> (1,10),
+            ],
+          },
+          properties: Properties (1,12) -> (1,13) {
+            openBrace: BraceOpenToken (1,12) -> (1,12),
+            properties: Array [],
+          },
+        },
+      ],
     },
   ],
 }
@@ -1828,7 +1706,7 @@ exports[`AlphaTexParserTest intermediate started meta properties: lexer-diagnost
 exports[`AlphaTexParserTest intermediate started meta properties: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -1847,7 +1725,7 @@ exports[`AlphaTexParserTest intermediate started meta property name: lexer-diagn
 exports[`AlphaTexParserTest intermediate started meta property name: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'co'.",
     "start" => Map {
@@ -1879,7 +1757,7 @@ Array [
 exports[`AlphaTexParserTest intermediate started meta property value: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 205,
+    "code" => 203,
     "severity" => 2,
     "message" => "Unexpected end of file.",
     "start" => Map {
@@ -1911,7 +1789,7 @@ Array [
 exports[`AlphaTexParserTest intermediate started meta string: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 205,
+    "code" => 203,
     "severity" => 2,
     "message" => "Unexpected end of file.",
     "start" => Map {
@@ -1928,7 +1806,7 @@ exports[`AlphaTexParserTest intermediate started meta: lexer-diagnostics 1`] = `
 exports[`AlphaTexParserTest intermediate started meta: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 206,
+    "code" => 204,
     "severity" => 2,
     "message" => "Unrecognized metadata 'tr'.",
     "start" => Map {
@@ -1940,31 +1818,14 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started note effect name 1`] = `
-Score (1,1) -> (1,26) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
-}
-`;
+exports[`AlphaTexParserTest intermediate started note effect name 1`] = `Score (1,1) -> (1,26)`;
 
 exports[`AlphaTexParserTest intermediate started note effect name: lexer-diagnostics 1`] = `Array []`;
 
 exports[`AlphaTexParserTest intermediate started note effect name: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 207,
+    "code" => 205,
     "severity" => 2,
     "message" => "Unrecognized property 'slu'.",
     "start" => Map {
@@ -1976,24 +1837,7 @@ Array [
 ]
 `;
 
-exports[`AlphaTexParserTest intermediate started note effect value 1`] = `
-Score (1,1) -> (1,31) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
-}
-`;
+exports[`AlphaTexParserTest intermediate started note effect value 1`] = `Score (1,1) -> (1,31)`;
 
 exports[`AlphaTexParserTest intermediate started note effect value: lexer-diagnostics 1`] = `
 Array [
@@ -2013,7 +1857,7 @@ Array [
 exports[`AlphaTexParserTest intermediate started note effect value: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 205,
+    "code" => 203,
     "severity" => 2,
     "message" => "Unexpected end of file.",
     "start" => Map {
@@ -2027,22 +1871,21 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started note effects 1`] = `
 Score (1,1) -> (1,23) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,23) {
+    Bar (1,1) -> (1,23) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,23) {
           notes: NoteList (1,18) -> (1,23) {
@@ -2068,7 +1911,7 @@ exports[`AlphaTexParserTest intermediate started note effects: lexer-diagnostics
 exports[`AlphaTexParserTest intermediate started note effects: parser-diagnostics 1`] = `
 Array [
   Map {
-    "code" => 208,
+    "code" => 206,
     "severity" => 2,
     "message" => "Unexpected end of file. Group not closed.",
     "start" => Map {
@@ -2082,22 +1925,21 @@ Array [
 
 exports[`AlphaTexParserTest intermediate started pitched note 1`] = `
 Score (1,1) -> (1,19) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,19) {
+    Bar (1,1) -> (1,19) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,19) {
           notes: NoteList (1,18) -> (1,19) {
@@ -2120,22 +1962,22 @@ exports[`AlphaTexParserTest intermediate started pitched note: parser-diagnostic
 
 exports[`AlphaTexParserTest valid-bar-meta known no score meta 1`] = `
 Score (1,1) -> (1,17) {
-  metaData: Array [
-    MetaData (1,1) -> (1,9) {
-      tag: MetaDataTag "ts" (1,1) -> (1,4) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "ts" (1,2) -> (1,4),
-      },
-      values: ValueList (1,5) -> (1,8) {
-        values: Array [
-          NumberLiteral "3" (1,5) -> (1,6),
-          NumberLiteral "4" (1,7) -> (1,8),
-        ],
-      },
-    },
-  ],
   bars: Array [
-    Bar (1,9) -> (1,13) {
+    Bar (1,1) -> (1,13) {
+      metaData: Array [
+        MetaData (1,1) -> (1,9) {
+          tag: MetaDataTag "ts" (1,1) -> (1,4) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "ts" (1,2) -> (1,4),
+          },
+          values: ValueList (1,5) -> (1,8) {
+            values: Array [
+              NumberLiteral "3" (1,5) -> (1,6),
+              NumberLiteral "4" (1,7) -> (1,8),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,9) -> (1,12) {
           notes: NoteList (1,9) -> (1,12) {
@@ -2172,9 +2014,8 @@ exports[`AlphaTexParserTest valid-bar-meta known no score meta: parser-diagnosti
 
 exports[`AlphaTexParserTest valid-bar-meta known score meta 1`] = `
 Score (1,1) -> (1,30) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (1,26) {
+    Bar (1,1) -> (1,26) {
       metaData: Array [
         MetaData (1,3) -> (1,12) {
           tag: MetaDataTag "ts" (1,3) -> (1,6) {
@@ -2236,23 +2077,23 @@ exports[`AlphaTexParserTest valid-bar-meta known score meta: parser-diagnostics 
 
 exports[`AlphaTexParserTest valid-bar-meta unknown no score meta 1`] = `
 Score (1,1) -> (1,32) {
-  metaData: Array [
-    MetaData (1,1) -> (1,24) {
-      tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "notExisting" (1,2) -> (1,13),
-      },
-      values: ValueList (1,14) -> (1,23) {
-        openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
-        values: Array [
-          StringLiteral "Value" (1,15) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
-      },
-    },
-  ],
   bars: Array [
-    Bar (1,24) -> (1,28) {
+    Bar (1,1) -> (1,28) {
+      metaData: Array [
+        MetaData (1,1) -> (1,24) {
+          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "notExisting" (1,2) -> (1,13),
+          },
+          values: ValueList (1,14) -> (1,23) {
+            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+            values: Array [
+              StringLiteral "Value" (1,15) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+          },
+        },
+      ],
       beats: Array [
         Beat (1,24) -> (1,27) {
           notes: NoteList (1,24) -> (1,27) {
@@ -2289,9 +2130,8 @@ exports[`AlphaTexParserTest valid-bar-meta unknown no score meta: parser-diagnos
 
 exports[`AlphaTexParserTest valid-bar-meta unkonwn score meta 1`] = `
 Score (1,1) -> (1,34) {
-  metaDataBarSeparator: DotToken (1,1) -> (1,1),
   bars: Array [
-    Bar (1,3) -> (1,30) {
+    Bar (1,1) -> (1,30) {
       metaData: Array [
         MetaData (1,3) -> (1,26) {
           tag: MetaDataTag "notExisting" (1,3) -> (1,15) {
@@ -2529,22 +2369,21 @@ exports[`AlphaTexParserTest valid-bars no score meta: parser-diagnostics 1`] = `
 
 exports[`AlphaTexParserTest valid-bars with score meta 1`] = `
 Score (1,1) -> (1,25) {
-  metaData: Array [
-    MetaData (1,1) -> (1,15) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,15) {
-        values: Array [
-          StringLiteral "Test" (1,8) -> (1,13),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,15) -> (1,15),
   bars: Array [
-    Bar (1,17) -> (1,21) {
+    Bar (1,1) -> (1,21) {
+      metaData: Array [
+        MetaData (1,1) -> (1,15) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,15) {
+            values: Array [
+              StringLiteral "Test" (1,8) -> (1,13),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,17) -> (1,20) {
           notes: NoteList (1,17) -> (1,20) {
@@ -4612,7 +4451,7 @@ Score (1,1) -> (1,14) {
                   properties: Array [
                     Property (1,6) -> (1,13) {
                       property: Identifier "tu" (1,6) -> (1,8),
-                      properties: ValueList (1,9) -> (1,12) {
+                      properties: ValueList (1,9) -> (1,13) {
                         values: Array [
                           NumberLiteral "3" (1,9) -> (1,10),
                           NumberLiteral "2" (1,11) -> (1,12),
@@ -4934,7 +4773,7 @@ Score (1,1) -> (1,59) {
             properties: Array [
               Property (1,51) -> (1,58) {
                 property: Identifier "tu" (1,51) -> (1,53),
-                properties: ValueList (1,54) -> (1,57) {
+                properties: ValueList (1,54) -> (1,58) {
                   values: Array [
                     NumberLiteral "3" (1,54) -> (1,55),
                     NumberLiteral "2" (1,56) -> (1,57),
@@ -5047,7 +4886,7 @@ Score (1,1) -> (1,31) {
             properties: Array [
               Property (1,23) -> (1,30) {
                 property: Identifier "tu" (1,23) -> (1,25),
-                properties: ValueList (1,26) -> (1,29) {
+                properties: ValueList (1,26) -> (1,30) {
                   values: Array [
                     NumberLiteral "3" (1,26) -> (1,27),
                     NumberLiteral "2" (1,28) -> (1,29),
@@ -5068,11 +4907,7 @@ exports[`AlphaTexParserTest valid-note-effects with beat effects: lexer-diagnost
 
 exports[`AlphaTexParserTest valid-note-effects with beat effects: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest valid-score-metadata empty 1`] = `
-Score (1,1) -> (1,4) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
-}
-`;
+exports[`AlphaTexParserTest valid-score-metadata empty 1`] = `Score (1,1) -> (1,4)`;
 
 exports[`AlphaTexParserTest valid-score-metadata empty: lexer-diagnostics 1`] = `Array []`;
 
@@ -5080,31 +4915,34 @@ exports[`AlphaTexParserTest valid-score-metadata empty: parser-diagnostics 1`] =
 
 exports[`AlphaTexParserTest valid-score-metadata known multiple 1`] = `
 Score (1,1) -> (1,34) {
-  metaData: Array [
-    MetaData (1,1) -> (1,16) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,16) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-        ],
-      },
-    },
-    MetaData (1,16) -> (1,32) {
-      tag: MetaDataTag "subtitle" (1,16) -> (1,25) {
-        prefix: BackSlashToken (1,16) -> (1,17),
-        tag: Identifier "subtitle" (1,17) -> (1,25),
-      },
-      values: ValueList (1,26) -> (1,32) {
-        values: Array [
-          StringLiteral "Sub" (1,26) -> (1,30),
-        ],
-      },
+  bars: Array [
+    Bar (1,1) -> (1,34) {
+      metaData: Array [
+        MetaData (1,1) -> (1,16) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,16) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+            ],
+          },
+        },
+        MetaData (1,16) -> (1,32) {
+          tag: MetaDataTag "subtitle" (1,16) -> (1,25) {
+            prefix: BackSlashToken (1,16) -> (1,17),
+            tag: Identifier "subtitle" (1,17) -> (1,25),
+          },
+          values: ValueList (1,26) -> (1,32) {
+            values: Array [
+              StringLiteral "Sub" (1,26) -> (1,30),
+            ],
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,32) -> (1,32),
 }
 `;
 
@@ -5114,67 +4952,73 @@ exports[`AlphaTexParserTest valid-score-metadata known multiple: parser-diagnost
 
 exports[`AlphaTexParserTest valid-score-metadata known property 1`] = `
 Score (1,1) -> (1,31) {
-  metaData: Array [
-    MetaData (1,1) -> (1,28) {
-      tag: MetaDataTag "track" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "track" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,15) {
-        values: Array [
-          StringLiteral "Name" (1,8) -> (1,13),
-        ],
-      },
-      properties: Properties (1,15) -> (1,28) {
-        openBrace: BraceOpenToken (1,15) -> (1,15),
-        properties: Array [
-          Property (1,16) -> (1,27) {
-            property: Identifier "color" (1,16) -> (1,21),
-            properties: ValueList (1,22) -> (1,27) {
-              values: Array [
-                StringLiteral "red" (1,22) -> (1,26),
-              ],
-            },
+  bars: Array [
+    Bar (1,1) -> (1,31) {
+      metaData: Array [
+        MetaData (1,1) -> (1,28) {
+          tag: MetaDataTag "track" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "track" (1,2) -> (1,7),
           },
-        ],
-        closeBrace: BraceCloseToken (1,27) -> (1,27),
-      },
+          values: ValueList (1,8) -> (1,15) {
+            values: Array [
+              StringLiteral "Name" (1,8) -> (1,13),
+            ],
+          },
+          properties: Properties (1,15) -> (1,28) {
+            openBrace: BraceOpenToken (1,15) -> (1,15),
+            properties: Array [
+              Property (1,16) -> (1,27) {
+                property: Identifier "color" (1,16) -> (1,21),
+                properties: ValueList (1,22) -> (1,27) {
+                  values: Array [
+                    StringLiteral "red" (1,22) -> (1,26),
+                  ],
+                },
+              },
+            ],
+            closeBrace: BraceCloseToken (1,27) -> (1,27),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,29) -> (1,29),
 }
 `;
 
 exports[`AlphaTexParserTest valid-score-metadata known property before value 1`] = `
 Score (1,1) -> (1,31) {
-  metaData: Array [
-    MetaData (1,1) -> (1,29) {
-      tag: MetaDataTag "track" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "track" (1,2) -> (1,7),
-      },
-      values: ValueList (1,22) -> (1,29) {
-        values: Array [
-          StringLiteral "Name" (1,22) -> (1,27),
-        ],
-      },
-      properties: Properties (1,8) -> (1,21) {
-        openBrace: BraceOpenToken (1,8) -> (1,8),
-        properties: Array [
-          Property (1,9) -> (1,20) {
-            property: Identifier "color" (1,9) -> (1,14),
-            properties: ValueList (1,15) -> (1,20) {
-              values: Array [
-                StringLiteral "red" (1,15) -> (1,19),
-              ],
-            },
+  bars: Array [
+    Bar (1,1) -> (1,31) {
+      metaData: Array [
+        MetaData (1,1) -> (1,29) {
+          tag: MetaDataTag "track" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "track" (1,2) -> (1,7),
           },
-        ],
-        closeBrace: BraceCloseToken (1,20) -> (1,20),
-      },
+          values: ValueList (1,22) -> (1,29) {
+            values: Array [
+              StringLiteral "Name" (1,22) -> (1,27),
+            ],
+          },
+          properties: Properties (1,8) -> (1,21) {
+            openBrace: BraceOpenToken (1,8) -> (1,8),
+            properties: Array [
+              Property (1,9) -> (1,20) {
+                property: Identifier "color" (1,9) -> (1,14),
+                properties: ValueList (1,15) -> (1,20) {
+                  values: Array [
+                    StringLiteral "red" (1,15) -> (1,19),
+                  ],
+                },
+              },
+            ],
+            closeBrace: BraceCloseToken (1,20) -> (1,20),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,29) -> (1,29),
 }
 `;
 
@@ -5188,22 +5032,25 @@ exports[`AlphaTexParserTest valid-score-metadata known property: parser-diagnost
 
 exports[`AlphaTexParserTest valid-score-metadata known semantic 1`] = `
 Score (1,1) -> (1,34) {
-  metaData: Array [
-    MetaData (1,1) -> (1,32) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,31) {
-        values: Array [
-          StringLiteral "Title" (1,8) -> (1,14),
-          StringLiteral "Template" (1,16) -> (1,25),
-          Identifier "left" (1,27) -> (1,31),
-        ],
-      },
+  bars: Array [
+    Bar (1,1) -> (1,34) {
+      metaData: Array [
+        MetaData (1,1) -> (1,32) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,31) {
+            values: Array [
+              StringLiteral "Title" (1,8) -> (1,14),
+              StringLiteral "Template" (1,16) -> (1,25),
+              Identifier "left" (1,27) -> (1,31),
+            ],
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,32) -> (1,32),
 }
 `;
 
@@ -5213,22 +5060,25 @@ exports[`AlphaTexParserTest valid-score-metadata known semantic: parser-diagnost
 
 exports[`AlphaTexParserTest valid-score-metadata known valuelist 1`] = `
 Score (1,1) -> (1,20) {
-  metaData: Array [
-    MetaData (1,1) -> (1,18) {
-      tag: MetaDataTag "title" (1,1) -> (1,7) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "title" (1,2) -> (1,7),
-      },
-      values: ValueList (1,8) -> (1,17) {
-        openParenthesis: ParenthesisOpenToken (1,8) -> (1,8),
-        values: Array [
-          StringLiteral "Title" (1,9) -> (1,15),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,16) -> (1,16),
-      },
+  bars: Array [
+    Bar (1,1) -> (1,20) {
+      metaData: Array [
+        MetaData (1,1) -> (1,18) {
+          tag: MetaDataTag "title" (1,1) -> (1,7) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "title" (1,2) -> (1,7),
+          },
+          values: ValueList (1,8) -> (1,17) {
+            openParenthesis: ParenthesisOpenToken (1,8) -> (1,8),
+            values: Array [
+              StringLiteral "Title" (1,9) -> (1,15),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,16) -> (1,16),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,18) -> (1,18),
 }
 `;
 
@@ -5238,35 +5088,38 @@ exports[`AlphaTexParserTest valid-score-metadata known valuelist: parser-diagnos
 
 exports[`AlphaTexParserTest valid-score-metadata unknown multiple 1`] = `
 Score (1,1) -> (1,44) {
-  metaData: Array [
-    MetaData (1,1) -> (1,24) {
-      tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "notExisting" (1,2) -> (1,13),
-      },
-      values: ValueList (1,14) -> (1,23) {
-        openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
-        values: Array [
-          StringLiteral "Value" (1,15) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
-      },
-    },
-    MetaData (1,24) -> (1,42) {
-      tag: MetaDataTag "notExisting" (1,24) -> (1,36) {
-        prefix: BackSlashToken (1,24) -> (1,25),
-        tag: Identifier "notExisting" (1,25) -> (1,36),
-      },
-      values: ValueList (1,37) -> (1,41) {
-        openParenthesis: ParenthesisOpenToken (1,37) -> (1,37),
-        values: Array [
-          StringLiteral "" (1,38) -> (1,39),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,40) -> (1,40),
-      },
+  bars: Array [
+    Bar (1,1) -> (1,44) {
+      metaData: Array [
+        MetaData (1,1) -> (1,24) {
+          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "notExisting" (1,2) -> (1,13),
+          },
+          values: ValueList (1,14) -> (1,23) {
+            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+            values: Array [
+              StringLiteral "Value" (1,15) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+          },
+        },
+        MetaData (1,24) -> (1,42) {
+          tag: MetaDataTag "notExisting" (1,24) -> (1,36) {
+            prefix: BackSlashToken (1,24) -> (1,25),
+            tag: Identifier "notExisting" (1,25) -> (1,36),
+          },
+          values: ValueList (1,37) -> (1,41) {
+            openParenthesis: ParenthesisOpenToken (1,37) -> (1,37),
+            values: Array [
+              StringLiteral "" (1,38) -> (1,39),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,40) -> (1,40),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,42) -> (1,42),
 }
 `;
 
@@ -5276,22 +5129,25 @@ exports[`AlphaTexParserTest valid-score-metadata unknown multiple: parser-diagno
 
 exports[`AlphaTexParserTest valid-score-metadata unknown valuelist 1`] = `
 Score (1,1) -> (1,26) {
-  metaData: Array [
-    MetaData (1,1) -> (1,24) {
-      tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "notExisting" (1,2) -> (1,13),
-      },
-      values: ValueList (1,14) -> (1,23) {
-        openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
-        values: Array [
-          StringLiteral "Value" (1,15) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
-      },
+  bars: Array [
+    Bar (1,1) -> (1,26) {
+      metaData: Array [
+        MetaData (1,1) -> (1,24) {
+          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "notExisting" (1,2) -> (1,13),
+          },
+          values: ValueList (1,14) -> (1,23) {
+            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+            values: Array [
+              StringLiteral "Value" (1,15) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,24) -> (1,24),
 }
 `;
 
@@ -5301,27 +5157,30 @@ exports[`AlphaTexParserTest valid-score-metadata unknown valuelist: parser-diagn
 
 exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist empty 1`] = `
 Score (1,1) -> (1,29) {
-  metaData: Array [
-    MetaData (1,1) -> (1,26) {
-      tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "notExisting" (1,2) -> (1,13),
-      },
-      values: ValueList (1,14) -> (1,23) {
-        openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
-        values: Array [
-          StringLiteral "Value" (1,15) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
-      },
-      properties: Properties (1,24) -> (1,26) {
-        openBrace: BraceOpenToken (1,24) -> (1,24),
-        properties: Array [],
-        closeBrace: BraceCloseToken (1,25) -> (1,25),
-      },
+  bars: Array [
+    Bar (1,1) -> (1,29) {
+      metaData: Array [
+        MetaData (1,1) -> (1,26) {
+          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "notExisting" (1,2) -> (1,13),
+          },
+          values: ValueList (1,14) -> (1,23) {
+            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+            values: Array [
+              StringLiteral "Value" (1,15) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+          },
+          properties: Properties (1,24) -> (1,26) {
+            openBrace: BraceOpenToken (1,24) -> (1,24),
+            properties: Array [],
+            closeBrace: BraceCloseToken (1,25) -> (1,25),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,27) -> (1,27),
 }
 `;
 
@@ -5331,40 +5190,43 @@ exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist empty: p
 
 exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist unknown prop 1`] = `
 Score (1,1) -> (1,44) {
-  metaData: Array [
-    MetaData (1,1) -> (1,41) {
-      tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
-        prefix: BackSlashToken (1,1) -> (1,2),
-        tag: Identifier "notExisting" (1,2) -> (1,13),
-      },
-      values: ValueList (1,14) -> (1,23) {
-        openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
-        values: Array [
-          StringLiteral "Value" (1,15) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
-      },
-      properties: Properties (1,24) -> (1,41) {
-        openBrace: BraceOpenToken (1,24) -> (1,24),
-        properties: Array [
-          Property (1,25) -> (1,40) {
-            property: Identifier "unknown" (1,25) -> (1,32),
-            properties: ValueList (1,33) -> (1,40) {
-              openParenthesis: ParenthesisOpenToken (1,33) -> (1,33),
-              values: Array [
-                NumberLiteral "1" (1,34) -> (1,35),
-                NumberLiteral "2" (1,36) -> (1,37),
-                NumberLiteral "3" (1,38) -> (1,39),
-              ],
-              closeParenthesis: ParenthesisCloseToken (1,39) -> (1,39),
-            },
+  bars: Array [
+    Bar (1,1) -> (1,44) {
+      metaData: Array [
+        MetaData (1,1) -> (1,41) {
+          tag: MetaDataTag "notExisting" (1,1) -> (1,13) {
+            prefix: BackSlashToken (1,1) -> (1,2),
+            tag: Identifier "notExisting" (1,2) -> (1,13),
           },
-        ],
-        closeBrace: BraceCloseToken (1,40) -> (1,40),
-      },
+          values: ValueList (1,14) -> (1,23) {
+            openParenthesis: ParenthesisOpenToken (1,14) -> (1,14),
+            values: Array [
+              StringLiteral "Value" (1,15) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,22) -> (1,22),
+          },
+          properties: Properties (1,24) -> (1,41) {
+            openBrace: BraceOpenToken (1,24) -> (1,24),
+            properties: Array [
+              Property (1,25) -> (1,40) {
+                property: Identifier "unknown" (1,25) -> (1,32),
+                properties: ValueList (1,33) -> (1,40) {
+                  openParenthesis: ParenthesisOpenToken (1,33) -> (1,33),
+                  values: Array [
+                    NumberLiteral "1" (1,34) -> (1,35),
+                    NumberLiteral "2" (1,36) -> (1,37),
+                    NumberLiteral "3" (1,38) -> (1,39),
+                  ],
+                  closeParenthesis: ParenthesisCloseToken (1,39) -> (1,39),
+                },
+              },
+            ],
+            closeBrace: BraceCloseToken (1,40) -> (1,40),
+          },
+        },
+      ],
     },
   ],
-  metaDataBarSeparator: DotToken (1,42) -> (1,42),
 }
 `;
 
@@ -5374,9 +5236,8 @@ exports[`AlphaTexParserTest valid-score-metadata valuelist propertylist unknown 
 
 exports[`AlphaTexParserTest valid-sync-points basic fretted 1`] = `
 Score (1,1) -> (1,21) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,8) {
+    Bar (1,2) -> (1,8) {
       beats: Array [
         Beat (1,4) -> (1,8) {
           notes: NoteList (1,4) -> (1,8) {
@@ -5391,21 +5252,22 @@ Score (1,1) -> (1,21) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,8) -> (1,8),
-  syncPoints: Array [
-    MetaData (1,10) -> (1,21) {
-      tag: MetaDataTag "sync" (1,10) -> (1,15) {
-        prefix: BackSlashToken (1,10) -> (1,11),
-        tag: Identifier "sync" (1,11) -> (1,15),
-      },
-      values: ValueList (1,16) -> (1,21) {
-        values: Array [
-          NumberLiteral "1" (1,16) -> (1,17),
-          NumberLiteral "1" (1,18) -> (1,19),
-          NumberLiteral "1" (1,20) -> (1,21),
-        ],
-      },
+    Bar (1,8) -> (1,21) {
+      metaData: Array [
+        MetaData (1,10) -> (1,21) {
+          tag: MetaDataTag "sync" (1,10) -> (1,15) {
+            prefix: BackSlashToken (1,10) -> (1,11),
+            tag: Identifier "sync" (1,11) -> (1,15),
+          },
+          values: ValueList (1,16) -> (1,21) {
+            values: Array [
+              NumberLiteral "1" (1,16) -> (1,17),
+              NumberLiteral "1" (1,18) -> (1,19),
+              NumberLiteral "1" (1,20) -> (1,21),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -5417,9 +5279,8 @@ exports[`AlphaTexParserTest valid-sync-points basic fretted: parser-diagnostics 
 
 exports[`AlphaTexParserTest valid-sync-points basic simple numbered 1`] = `
 Score (1,1) -> (1,20) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,7) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5432,21 +5293,22 @@ Score (1,1) -> (1,20) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,7) -> (1,7),
-  syncPoints: Array [
-    MetaData (1,9) -> (1,20) {
-      tag: MetaDataTag "sync" (1,9) -> (1,14) {
-        prefix: BackSlashToken (1,9) -> (1,10),
-        tag: Identifier "sync" (1,10) -> (1,14),
-      },
-      values: ValueList (1,15) -> (1,20) {
-        values: Array [
-          NumberLiteral "1" (1,15) -> (1,16),
-          NumberLiteral "1" (1,17) -> (1,18),
-          NumberLiteral "1" (1,19) -> (1,20),
-        ],
-      },
+    Bar (1,7) -> (1,20) {
+      metaData: Array [
+        MetaData (1,9) -> (1,20) {
+          tag: MetaDataTag "sync" (1,9) -> (1,14) {
+            prefix: BackSlashToken (1,9) -> (1,10),
+            tag: Identifier "sync" (1,10) -> (1,14),
+          },
+          values: ValueList (1,15) -> (1,20) {
+            values: Array [
+              NumberLiteral "1" (1,15) -> (1,16),
+              NumberLiteral "1" (1,17) -> (1,18),
+              NumberLiteral "1" (1,19) -> (1,20),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -5458,9 +5320,8 @@ exports[`AlphaTexParserTest valid-sync-points basic simple numbered: parser-diag
 
 exports[`AlphaTexParserTest valid-sync-points basic simple pitched 1`] = `
 Score (1,1) -> (1,20) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,7) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5473,21 +5334,22 @@ Score (1,1) -> (1,20) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,7) -> (1,7),
-  syncPoints: Array [
-    MetaData (1,9) -> (1,20) {
-      tag: MetaDataTag "sync" (1,9) -> (1,14) {
-        prefix: BackSlashToken (1,9) -> (1,10),
-        tag: Identifier "sync" (1,10) -> (1,14),
-      },
-      values: ValueList (1,15) -> (1,20) {
-        values: Array [
-          NumberLiteral "1" (1,15) -> (1,16),
-          NumberLiteral "1" (1,17) -> (1,18),
-          NumberLiteral "1" (1,19) -> (1,20),
-        ],
-      },
+    Bar (1,7) -> (1,20) {
+      metaData: Array [
+        MetaData (1,9) -> (1,20) {
+          tag: MetaDataTag "sync" (1,9) -> (1,14) {
+            prefix: BackSlashToken (1,9) -> (1,10),
+            tag: Identifier "sync" (1,10) -> (1,14),
+          },
+          values: ValueList (1,15) -> (1,20) {
+            values: Array [
+              NumberLiteral "1" (1,15) -> (1,16),
+              NumberLiteral "1" (1,17) -> (1,18),
+              NumberLiteral "1" (1,19) -> (1,20),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -5497,18 +5359,12 @@ exports[`AlphaTexParserTest valid-sync-points basic simple pitched: lexer-diagno
 
 exports[`AlphaTexParserTest valid-sync-points basic simple pitched: parser-diagnostics 1`] = `Array []`;
 
-exports[`AlphaTexParserTest valid-sync-points empty 1`] = `
-Score (1,1) -> (1,6) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
-  barsSyncPointSeparator: DotToken (1,4) -> (1,4),
-}
-`;
+exports[`AlphaTexParserTest valid-sync-points empty 1`] = `Score (1,1) -> (1,6)`;
 
 exports[`AlphaTexParserTest valid-sync-points empty with bars 1`] = `
 Score (1,1) -> (1,14) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,8) {
+    Bar (1,2) -> (1,8) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5542,9 +5398,8 @@ Score (1,1) -> (1,14) {
 
 exports[`AlphaTexParserTest valid-sync-points empty with bars empty at end 1`] = `
 Score (1,1) -> (1,16) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,8) {
+    Bar (1,2) -> (1,8) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5573,7 +5428,6 @@ Score (1,1) -> (1,16) {
       pipe: PipeToken (1,12) -> (1,12),
     },
   ],
-  barsSyncPointSeparator: DotToken (1,14) -> (1,14),
 }
 `;
 
@@ -5591,22 +5445,21 @@ exports[`AlphaTexParserTest valid-sync-points empty: parser-diagnostics 1`] = `A
 
 exports[`AlphaTexParserTest valid-sync-points full 1`] = `
 Score (1,1) -> (1,36) {
-  metaData: Array [
-    MetaData (1,2) -> (1,16) {
-      tag: MetaDataTag "title" (1,2) -> (1,8) {
-        prefix: BackSlashToken (1,2) -> (1,3),
-        tag: Identifier "title" (1,3) -> (1,8),
-      },
-      values: ValueList (1,9) -> (1,16) {
-        values: Array [
-          StringLiteral "Test" (1,9) -> (1,14),
-        ],
-      },
-    },
-  ],
-  metaDataBarSeparator: DotToken (1,16) -> (1,16),
   bars: Array [
-    Bar (1,18) -> (1,23) {
+    Bar (1,2) -> (1,23) {
+      metaData: Array [
+        MetaData (1,2) -> (1,16) {
+          tag: MetaDataTag "title" (1,2) -> (1,8) {
+            prefix: BackSlashToken (1,2) -> (1,3),
+            tag: Identifier "title" (1,3) -> (1,8),
+          },
+          values: ValueList (1,9) -> (1,16) {
+            values: Array [
+              StringLiteral "Test" (1,9) -> (1,14),
+            ],
+          },
+        },
+      ],
       beats: Array [
         Beat (1,18) -> (1,23) {
           notes: NoteList (1,18) -> (1,20) {
@@ -5621,21 +5474,22 @@ Score (1,1) -> (1,36) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,23) -> (1,23),
-  syncPoints: Array [
-    MetaData (1,25) -> (1,36) {
-      tag: MetaDataTag "sync" (1,25) -> (1,30) {
-        prefix: BackSlashToken (1,25) -> (1,26),
-        tag: Identifier "sync" (1,26) -> (1,30),
-      },
-      values: ValueList (1,31) -> (1,36) {
-        values: Array [
-          NumberLiteral "1" (1,31) -> (1,32),
-          NumberLiteral "1" (1,33) -> (1,34),
-          NumberLiteral "1" (1,35) -> (1,36),
-        ],
-      },
+    Bar (1,23) -> (1,36) {
+      metaData: Array [
+        MetaData (1,25) -> (1,36) {
+          tag: MetaDataTag "sync" (1,25) -> (1,30) {
+            prefix: BackSlashToken (1,25) -> (1,26),
+            tag: Identifier "sync" (1,26) -> (1,30),
+          },
+          values: ValueList (1,31) -> (1,36) {
+            values: Array [
+              NumberLiteral "1" (1,31) -> (1,32),
+              NumberLiteral "1" (1,33) -> (1,34),
+              NumberLiteral "1" (1,35) -> (1,36),
+            ],
+          },
+        },
+      ],
     },
   ],
 }
@@ -5647,9 +5501,8 @@ exports[`AlphaTexParserTest valid-sync-points full: parser-diagnostics 1`] = `Ar
 
 exports[`AlphaTexParserTest valid-sync-points properties empty 1`] = `
 Score (1,1) -> (1,26) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,7) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5662,28 +5515,29 @@ Score (1,1) -> (1,26) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,7) -> (1,7),
-  syncPoints: Array [
-    MetaData (1,9) -> (1,25) {
-      tag: MetaDataTag "sync" (1,9) -> (1,14) {
-        prefix: BackSlashToken (1,9) -> (1,10),
-        tag: Identifier "sync" (1,10) -> (1,14),
-      },
-      values: ValueList (1,15) -> (1,22) {
-        openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
-        values: Array [
-          NumberLiteral "1" (1,16) -> (1,17),
-          NumberLiteral "1" (1,18) -> (1,19),
-          NumberLiteral "1" (1,20) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
-      },
-      properties: Properties (1,23) -> (1,25) {
-        openBrace: BraceOpenToken (1,23) -> (1,23),
-        properties: Array [],
-        closeBrace: BraceCloseToken (1,24) -> (1,24),
-      },
+    Bar (1,7) -> (1,26) {
+      metaData: Array [
+        MetaData (1,9) -> (1,25) {
+          tag: MetaDataTag "sync" (1,9) -> (1,14) {
+            prefix: BackSlashToken (1,9) -> (1,10),
+            tag: Identifier "sync" (1,10) -> (1,14),
+          },
+          values: ValueList (1,15) -> (1,22) {
+            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+            values: Array [
+              NumberLiteral "1" (1,16) -> (1,17),
+              NumberLiteral "1" (1,18) -> (1,19),
+              NumberLiteral "1" (1,20) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+          },
+          properties: Properties (1,23) -> (1,25) {
+            openBrace: BraceOpenToken (1,23) -> (1,23),
+            properties: Array [],
+            closeBrace: BraceCloseToken (1,24) -> (1,24),
+          },
+        },
+      ],
     },
   ],
 }
@@ -5695,9 +5549,8 @@ exports[`AlphaTexParserTest valid-sync-points properties empty: parser-diagnosti
 
 exports[`AlphaTexParserTest valid-sync-points properties unknown 1`] = `
 Score (1,1) -> (1,43) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,7) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5710,41 +5563,42 @@ Score (1,1) -> (1,43) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,7) -> (1,7),
-  syncPoints: Array [
-    MetaData (1,9) -> (1,42) {
-      tag: MetaDataTag "sync" (1,9) -> (1,14) {
-        prefix: BackSlashToken (1,9) -> (1,10),
-        tag: Identifier "sync" (1,10) -> (1,14),
-      },
-      values: ValueList (1,15) -> (1,22) {
-        openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
-        values: Array [
-          NumberLiteral "1" (1,16) -> (1,17),
-          NumberLiteral "1" (1,18) -> (1,19),
-          NumberLiteral "1" (1,20) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
-      },
-      properties: Properties (1,23) -> (1,42) {
-        openBrace: BraceOpenToken (1,23) -> (1,23),
-        properties: Array [
-          Property (1,25) -> (1,40) {
-            property: Identifier "unknown" (1,25) -> (1,32),
-            properties: ValueList (1,33) -> (1,40) {
-              openParenthesis: ParenthesisOpenToken (1,33) -> (1,33),
-              values: Array [
-                NumberLiteral "1" (1,34) -> (1,35),
-                NumberLiteral "2" (1,36) -> (1,37),
-                NumberLiteral "3" (1,38) -> (1,39),
-              ],
-              closeParenthesis: ParenthesisCloseToken (1,39) -> (1,39),
-            },
+    Bar (1,7) -> (1,43) {
+      metaData: Array [
+        MetaData (1,9) -> (1,42) {
+          tag: MetaDataTag "sync" (1,9) -> (1,14) {
+            prefix: BackSlashToken (1,9) -> (1,10),
+            tag: Identifier "sync" (1,10) -> (1,14),
           },
-        ],
-        closeBrace: BraceCloseToken (1,41) -> (1,41),
-      },
+          values: ValueList (1,15) -> (1,22) {
+            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+            values: Array [
+              NumberLiteral "1" (1,16) -> (1,17),
+              NumberLiteral "1" (1,18) -> (1,19),
+              NumberLiteral "1" (1,20) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+          },
+          properties: Properties (1,23) -> (1,42) {
+            openBrace: BraceOpenToken (1,23) -> (1,23),
+            properties: Array [
+              Property (1,25) -> (1,40) {
+                property: Identifier "unknown" (1,25) -> (1,32),
+                properties: ValueList (1,33) -> (1,40) {
+                  openParenthesis: ParenthesisOpenToken (1,33) -> (1,33),
+                  values: Array [
+                    NumberLiteral "1" (1,34) -> (1,35),
+                    NumberLiteral "2" (1,36) -> (1,37),
+                    NumberLiteral "3" (1,38) -> (1,39),
+                  ],
+                  closeParenthesis: ParenthesisCloseToken (1,39) -> (1,39),
+                },
+              },
+            ],
+            closeBrace: BraceCloseToken (1,41) -> (1,41),
+          },
+        },
+      ],
     },
   ],
 }
@@ -5756,9 +5610,8 @@ exports[`AlphaTexParserTest valid-sync-points properties unknown: parser-diagnos
 
 exports[`AlphaTexParserTest valid-sync-points valuelist 1`] = `
 Score (1,1) -> (1,22) {
-  metaDataBarSeparator: DotToken (1,2) -> (1,2),
   bars: Array [
-    Bar (1,4) -> (1,7) {
+    Bar (1,2) -> (1,7) {
       beats: Array [
         Beat (1,4) -> (1,7) {
           notes: NoteList (1,4) -> (1,7) {
@@ -5771,23 +5624,24 @@ Score (1,1) -> (1,22) {
         },
       ],
     },
-  ],
-  barsSyncPointSeparator: DotToken (1,7) -> (1,7),
-  syncPoints: Array [
-    MetaData (1,9) -> (1,22) {
-      tag: MetaDataTag "sync" (1,9) -> (1,14) {
-        prefix: BackSlashToken (1,9) -> (1,10),
-        tag: Identifier "sync" (1,10) -> (1,14),
-      },
-      values: ValueList (1,15) -> (1,22) {
-        openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
-        values: Array [
-          NumberLiteral "1" (1,16) -> (1,17),
-          NumberLiteral "1" (1,18) -> (1,19),
-          NumberLiteral "1" (1,20) -> (1,21),
-        ],
-        closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
-      },
+    Bar (1,7) -> (1,22) {
+      metaData: Array [
+        MetaData (1,9) -> (1,22) {
+          tag: MetaDataTag "sync" (1,9) -> (1,14) {
+            prefix: BackSlashToken (1,9) -> (1,10),
+            tag: Identifier "sync" (1,10) -> (1,14),
+          },
+          values: ValueList (1,15) -> (1,22) {
+            openParenthesis: ParenthesisOpenToken (1,15) -> (1,15),
+            values: Array [
+              NumberLiteral "1" (1,16) -> (1,17),
+              NumberLiteral "1" (1,18) -> (1,19),
+              NumberLiteral "1" (1,20) -> (1,21),
+            ],
+            closeParenthesis: ParenthesisCloseToken (1,21) -> (1,21),
+          },
+        },
+      ],
     },
   ],
 }

@@ -84,14 +84,11 @@ export interface IAlphaTexAstNode {
     trailingComments?: AlphaTexComment[];
 }
 
-
-
 /**
  * The base type for all alphaTex AST nodes
  * @record
  */
-export interface AlphaTexAstNode extends IAlphaTexAstNode {
-}
+export interface AlphaTexAstNode extends IAlphaTexAstNode {}
 
 /**
  * A comment attached to a node.
@@ -208,14 +205,14 @@ export interface AlphaTexNumberLiteral extends AlphaTexAstNode, IAlphaTexValueLi
  * A string literal within alphaTex.
  * @record
  */
-export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexValueListItem , IAlphaTexNoteValueNode{
+export interface AlphaTexStringLiteral extends AlphaTexTextNode, IAlphaTexValueListItem, IAlphaTexNoteValueNode {
     nodeType: AlphaTexNodeType.StringLiteral;
 }
 
 /**
  * Defines the possible types for values in a {@link AlphaTexValueList}
  */
-export interface IAlphaTexValueListItem extends IAlphaTexAstNode {} 
+export interface IAlphaTexValueListItem extends IAlphaTexAstNode {}
 
 /**
  * A node holding multiple values optionally grouped by parenthesis.
@@ -223,7 +220,7 @@ export interface IAlphaTexValueListItem extends IAlphaTexAstNode {}
  * Used in contexts like bend effects `3.3{b (0 4)}`.
  * @record
  */
-export interface AlphaTexValueList extends AlphaTexAstNode, IAlphaTexValueListItem {
+export interface AlphaTexValueList extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.ValueList;
     /**
      * The open parenthesis token grouping the values.

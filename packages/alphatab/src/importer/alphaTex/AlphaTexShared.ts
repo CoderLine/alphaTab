@@ -5,6 +5,7 @@ import type { Beat } from '@src/model/Beat';
 import type { DynamicValue } from '@src/model/DynamicValue';
 import type { Lyrics } from '@src/model/Lyrics';
 import type { Note } from '@src/model/Note';
+import type { Score } from '@src/model/Score';
 import type { Staff } from '@src/model/Staff';
 import type { Track } from '@src/model/Track';
 
@@ -96,37 +97,37 @@ export enum AlphaTexDiagnosticCode {
     AT201 = 201,
 
     /**
-     * Unexpected '%s' token. Expected a '\sync' meta data tag.
+     * Unexpected '%s' token. Expected one of following: %s
      */
     AT202 = 202,
 
     /**
-     * Unexpected meta data tag '%s'. Expected a '\sync' meta data tag.
+     * Unexpected end of file.
      */
     AT203 = 203,
 
     /**
-     * Unexpected '%s' token. Expected one of following: %s
+     * Unrecognized metadata '%s'.
      */
     AT204 = 204,
 
     /**
-     * Unexpected end of file.
+     * Unrecognized property '%s'.
      */
     AT205 = 205,
 
     /**
-     * Unrecognized metadata '%s'.
+     * Unexpected end of file. Group not closed.
      */
     AT206 = 206,
 
     /**
-     * Unrecognized property '%s'.
+     * Missing string for fretted note.
      */
     AT207 = 207,
 
     /**
-     * Unexpected end of file. Group not closed.
+     * Note string is out of range. Available range: 1-%s
      */
     AT208 = 208,
 
@@ -176,16 +177,6 @@ export enum AlphaTexDiagnosticCode {
     AT217 = 217,
 
     /**
-     * Missing string for fretted note.
-     */
-    AT218 = 218,
-
-    /**
-     * Note string is out of range. Available range: 1-%s
-     */
-    AT219 = 219,
-
-    /**
      * Expected no values, but found some. Values are ignored.
      */
     AT300 = 300,
@@ -214,6 +205,11 @@ export enum AlphaTexDiagnosticCode {
 export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
     private _hasErrors = false;
     public readonly items: AlphaTexDiagnostic[] = [];
+    
+    public get errors(): AlphaTexDiagnostic[] {
+        return this.items.filter(i => i.severity === AlphaTexDiagnosticsSeverity.Error);
+    }
+
     public get hasErrors() {
         return this._hasErrors;
     }
@@ -241,6 +237,7 @@ export enum AlphaTexAccidentalMode {
 }
 
 export interface IAlphaTexImporterState {
+    score: Score;
     accidentalMode: AlphaTexAccidentalMode;
     currentDynamics: DynamicValue;
     currentTupletNumerator: number;
@@ -258,7 +255,7 @@ export interface IAlphaTexImporterState {
 
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
-    
+
     makeStaffPitched(staff: Staff): void;
     startNewVoice(): void;
     startNewTrack(): Track;

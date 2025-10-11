@@ -541,20 +541,8 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
             // case AlphaTexNodeType.StringLiteral:
             case AlphaTexNodeType.Score:
                 const score = node as AlphaTexScoreNode;
-                if (score.metaData && score.metaData.length > 0) {
-                    children.push(['metaData', score.metaData]);
-                }
-                if (score.metaDataBarSeparator) {
-                    children.push(['metaDataBarSeparator', score.metaDataBarSeparator]);
-                }
                 if (score.bars && score.bars.length > 0) {
                     children.push(['bars', score.bars]);
-                }
-                if (score.barsSyncPointSeparator) {
-                    children.push(['barsSyncPointSeparator', score.barsSyncPointSeparator]);
-                }
-                if (score.syncPoints && score.syncPoints.length > 0) {
-                    children.push(['syncPoints', score.syncPoints]);
                 }
                 break;
 
@@ -641,7 +629,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 break;
         }
 
-        let str = `${AlphaTexNodeType[node.nodeType]}${serializedValue} (${node.start!.line},${node.start!.col}) -> (${node.end!.line},${node.end!.col})`;
+        let str = `${AlphaTexNodeType[node.nodeType]}${serializedValue} (${node.start?.line},${node.start?.col}) -> (${node.end?.line},${node.end?.col})`;
 
         if (children.length > 0) {
             str += ` {${config.spacingOuter}`;

@@ -472,6 +472,8 @@ export class AlphaTexExporter extends ScoreExporter {
                 metaData: this._handler.buildScoreMetaDataNodes(data),
                 beats: []
             });
+        } else {
+            score.bars[0].metaData = this._handler.buildScoreMetaDataNodes(data).concat(score.bars[0].metaData);
         }
 
         score.bars.push({
