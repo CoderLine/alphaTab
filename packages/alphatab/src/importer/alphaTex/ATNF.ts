@@ -69,16 +69,14 @@ export class ATNF {
 
     public static valueList(
         values: (IAlphaTexValueListItem | undefined)[],
-        parentheses?: boolean
+        parentheses: boolean | undefined = undefined
     ): AlphaTexValueList | undefined {
         const valueList = {
             nodeType: AlphaTexNodeType.ValueList,
             values: values.filter(v => v !== undefined)
         } as AlphaTexValueList;
 
-        const addParenthesis:boolean = parentheses === undefined 
-            ? valueList.values.length > 1
-            : parentheses; 
+        const addParenthesis: boolean = parentheses === undefined ? valueList.values.length > 1 : parentheses;
 
         if (addParenthesis) {
             valueList.openParenthesis = {
