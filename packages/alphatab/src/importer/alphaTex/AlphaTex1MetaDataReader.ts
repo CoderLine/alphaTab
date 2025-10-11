@@ -290,7 +290,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             case AlphaTexNodeType.ParenthesisOpenToken:
                 const nestedList = parser.valueList();
                 if (nestedList) {
-                    valueList.push(nestedList);
+                    for (const v of nestedList.values) {
+                        valueList.push(v);
+                    }
                 }
                 return true;
         }

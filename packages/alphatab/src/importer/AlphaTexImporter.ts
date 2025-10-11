@@ -793,6 +793,11 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let initialBarMeta: AlphaTexMetaDataNode[] | undefined =
             this._state.score.masterBars.length > 0 ? undefined : [];
 
+        let previousStaff = this._state.currentStaff!;
+        let hadNewTrack = false;
+        let hadNewStaff = false;
+        let applyInitialBarMetaToPreviousStaff = false;
+
         const resetInitialBarMeta = () => {
             // reset state
             if (!initialBarMeta) {
@@ -816,11 +821,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             }
             return b;
         });
-
-        let previousStaff = this._state.currentStaff!;
-        let hadNewTrack = false;
-        let hadNewStaff = false;
-        let applyInitialBarMetaToPreviousStaff = false;
 
         // bar meta
         for (const m of node.metaData) {
@@ -874,8 +874,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                             }
 
                             // apply all data
-                            for (const m of initialBarMeta) {
-                                this._handler.applyBarMetaData(this, initialBar, m);
+                            for (const initial of initialBarMeta) {
+                                this._handler.applyBarMetaData(this, initialBar, initial);
                             }
 
                             resetInitialBarMeta();

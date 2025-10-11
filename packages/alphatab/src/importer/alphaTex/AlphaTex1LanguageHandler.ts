@@ -1388,7 +1388,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     public get allKnownMetaDataTags() {
         if (!this._allKnownBarMetaDataTags) {
             this._allKnownBarMetaDataTags = new Set<string>();
-            const lists = [
+            const lists: Iterable<string>[] = [
                 AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes.keys(),
                 AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes.keys(),
                 AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes.keys(),
@@ -2977,12 +2977,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         const properties: AlphaTexPropertyNode[] = [];
 
         if (note.hasBend) {
-            const beValue = ATNF.valueList([
-                ATNF.identifier(AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!),
-                note.bendStyle !== BendStyle.Default
-                    ? ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!)
-                    : undefined
-            ], true)!;
+            const beValue = ATNF.valueList(
+                [
+                    ATNF.identifier(AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!),
+                    note.bendStyle !== BendStyle.Default
+                        ? ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!)
+                        : undefined
+                ],
+                true
+            )!;
             for (const p of note.bendPoints!) {
                 beValue.values.push(ATNF.numberLiteral(p.offset));
                 beValue.values.push(ATNF.numberLiteral(p.value));
@@ -3211,10 +3214,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (beat.hasWhammyBar) {
-            const tbeValues = ATNF.valueList([
-                ATNF.identifier(AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!),
-                ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!)
-            ], true)!;
+            const tbeValues = ATNF.valueList(
+                [
+                    ATNF.identifier(AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!),
+                    ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!)
+                ],
+                true
+            )!;
             for (const p of beat.whammyBarPoints!) {
                 tbeValues.values.push(ATNF.numberLiteral(p.offset));
                 tbeValues.values.push(ATNF.numberLiteral(p.value));

@@ -76,11 +76,11 @@ export class ATNF {
             values: values.filter(v => v !== undefined)
         } as AlphaTexValueList;
 
-        if(parentheses === undefined) {
-            parentheses = valueList.values.length > 1;
-        }
+        const addParenthesis:boolean = parentheses === undefined 
+            ? valueList.values.length > 1
+            : parentheses; 
 
-        if (parentheses) {
+        if (addParenthesis) {
             valueList.openParenthesis = {
                 nodeType: AlphaTexNodeType.ParenthesisOpenToken
             } as AlphaTexParenthesisOpenTokenNode;
