@@ -27,7 +27,10 @@ import {
     type IAlphaTexImporter
 } from '@src/importer/alphaTex/AlphaTexShared';
 import { ATNF } from '@src/importer/alphaTex/ATNF';
-import { ApplyNodeResult, type IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
+import {
+    ApplyNodeResult,
+    type IAlphaTexLanguageImportHandler
+} from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { GeneralMidi } from '@src/midi/GeneralMidi';
 import { AccentuationType } from '@src/model/AccentuationType';
 import { Automation, AutomationType, type FlatSyncPoint } from '@src/model/Automation';
@@ -448,7 +451,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     public applyBarMetaData(importer: IAlphaTexImporter, bar: Bar, metaData: AlphaTexMetaDataNode): ApplyNodeResult {
         const result = this.checkValueListTypes(
             importer,
-            [AlphaTex1LanguageDefinitions.barMetaDataValueListTypes],
+            [
+                AlphaTex1LanguageDefinitions.barMetaDataValueListTypes,
+                AlphaTex1LanguageDefinitions.syncMetaDataValueListTypes
+            ],
             metaData,
             metaData.tag.tag.text.toLowerCase(),
             metaData.values
@@ -458,6 +464,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         switch (metaData.tag.tag.text.toLowerCase()) {
+            case 'sync':
+                const syncPoint = this.buildSyncPoint(importer, metaData);
+                if (syncPoint) {
+                    importer.state.syncPoints.push(syncPoint);
+                    return ApplyNodeResult.Applied;
+                }
+                return ApplyNodeResult.NotAppliedSemanticError;
             case 'tempo':
                 let ti = 0;
                 const tempo = (metaData.values!.values[ti++] as AlphaTexNumberLiteral).value;
@@ -1382,6 +1395,45 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
+    private _allKnownBarMetaDataTags: Set<string> | undefined = undefined;
+    public get allKnownMetaDataTags() {
+        if (!this._allKnownBarMetaDataTags) {
+            this._allKnownBarMetaDataTags = new Set<string>();
+            const lists = [
+                AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes.keys(),
+                AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes.keys(),
+                AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes.keys(),
+                AlphaTex1LanguageDefinitions.barMetaDataValueListTypes.keys()
+            ];
+            for (const l of lists) {
+                for (const v of l) {
+                    this._allKnownBarMetaDataTags.add(v);
+                }
+            }
+        }
+        return this._allKnownBarMetaDataTags;
+    }
+
+    private _knownScoreMetaDataTags: Set<string> | undefined = undefined;
+    public get knownScoreMetaDataTags() {
+        if (!this._knownScoreMetaDataTags) {
+            this._knownScoreMetaDataTags = new Set<string>(
+                AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes.keys()
+            );
+        }
+        return this._knownScoreMetaDataTags;
+    }
+
+    private _knownStructuralMetaDataTags: Set<string> | undefined = undefined;
+    public get knownStructuralMetaDataTags() {
+        if (!this._knownStructuralMetaDataTags) {
+            this._knownStructuralMetaDataTags = new Set<string>(
+                AlphaTex1LanguageDefinitions.structuralMetaDataValueListTypes.keys()
+            );
+        }
+        return this._knownStructuralMetaDataTags;
+    }
+
     private _knownBarMetaDataTags: Set<string> | undefined = undefined;
     public get knownBarMetaDataTags() {
         if (!this._knownBarMetaDataTags) {
@@ -1389,6 +1441,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         return this._knownBarMetaDataTags;
     }
+
     private _knownStaffMetaDataTags: Set<string> | undefined = undefined;
     public get knownStaffMetaDataTags() {
         if (!this._knownStaffMetaDataTags) {

@@ -96,18 +96,12 @@ export class AlphaTexParser {
     private score() {
         this._score = {
             nodeType: AlphaTexNodeType.Score,
-            metaData: [],
-            metaDataBarSeparator: undefined,
             bars: [],
-            barsSyncPointSeparator: undefined,
-            syncPoints: [],
             start: this.lexer.currentTokenLocation()
         };
 
         try {
-            this.scoreMetaData();
             this.bars();
-            this.syncPoints();
         } catch (e) {
             if (e instanceof AlphaTexParserAbort) {
                 // OK
@@ -119,38 +113,11 @@ export class AlphaTexParser {
         }
     }
 
-    private scoreMetaData() {
-        while (this.lexer.peekToken()?.nodeType === AlphaTexNodeType.MetaDataTag) {
-            const metaData = this.metaData();
-            if (metaData) {
-                this._score.metaData.push(metaData);
-            } else {
-                break;
-            }
-        }
-
-        const dot = this.lexer.peekToken();
-        // EOF
-        if (!dot) {
-            return;
-        }
-        if (dot.nodeType === AlphaTexNodeType.DotToken) {
-            // NOTE: dot is not mandatory anymore, we can have bar and score metadata mixed at start.
-            this._score.metaDataBarSeparator = this.lexer.nextToken() as AlphaTexDotTokenNode;
-        }
-    }
-
     private bars() {
         while (this.lexer.canRead) {
             const token = this.lexer.peekToken();
             // EOF
             if (!token) {
-                return;
-            }
-
-            // dot separator marking end of bars
-            if (token.nodeType === AlphaTexNodeType.DotToken) {
-                this._score.barsSyncPointSeparator = this.lexer.nextToken() as AlphaTexDotTokenNode;
                 return;
             }
 
@@ -186,8 +153,23 @@ export class AlphaTexParser {
 
     private barMetaData(bar: AlphaTexBarNode) {
         let token = this.lexer.peekToken();
-        while (token?.nodeType === AlphaTexNodeType.MetaDataTag) {
-            bar.metaData.push(this.metaData()!);
+        while (
+            token &&
+            (token.nodeType === AlphaTexNodeType.MetaDataTag || token.nodeType === AlphaTexNodeType.DotToken)
+        ) {
+            if (token.nodeType === AlphaTexNodeType.DotToken) {
+                const dot = this.lexer.nextToken()!;
+                this.addParserDiagnostic({
+                    code: AlphaTexDiagnosticCode.AT400,
+                    message: `The dots separating score metadata, score contents and the sync points can be removed.`,
+                    severity: AlphaTexDiagnosticsSeverity.Hint,
+                    start: dot.start,
+                    end: dot.end
+                });
+            } else {
+                bar.metaData.push(this.metaData()!);
+            }
+
             token = this.lexer.peekToken();
         }
     }
@@ -475,45 +457,6 @@ export class AlphaTexParser {
         return note;
     }
 
-    private syncPoints() {
-        while (this.lexer.canRead) {
-            const syncPoint = this.syncPoint();
-            if (!syncPoint) {
-                return;
-            }
-            this._score.syncPoints.push(syncPoint);
-        }
-    }
-
-    private syncPoint(): AlphaTexMetaDataNode | undefined {
-        const tag = this.lexer.peekToken();
-        if (!tag) {
-            return undefined;
-        }
-        if (tag.nodeType !== AlphaTexNodeType.MetaDataTag) {
-            this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT202,
-                message: `Unexpected '${AlphaTexNodeType[tag.nodeType]}' token. Expected a '\\sync' meta data tag.`,
-                severity: AlphaTexDiagnosticsSeverity.Error,
-                start: tag.start,
-                end: tag.end
-            });
-            return undefined;
-        }
-        if ((tag as AlphaTexMetaDataTagNode).tag.text !== 'sync') {
-            this.addParserDiagnostic({
-                code: AlphaTexDiagnosticCode.AT203,
-                message: `Unexpected meta data tag '${(tag as AlphaTexMetaDataTagNode).tag.text}'. Expected a '\\sync' meta data tag.`,
-                severity: AlphaTexDiagnosticsSeverity.Error,
-                start: tag.start,
-                end: tag.end
-            });
-            return undefined;
-        }
-
-        return this.metaData();
-    }
-
     private metaData(): AlphaTexMetaDataNode | undefined {
         const tag = this.lexer.peekToken();
         if (!tag || tag.nodeType !== AlphaTexNodeType.MetaDataTag) {
@@ -536,9 +479,42 @@ export class AlphaTexParser {
                 metaData.properties = this.properties(property =>
                     this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
                 );
-                metaData.values = this.valueList() ?? this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                metaData.values = this.valueList();
+                if (!metaData.values) {
+                    metaData.values = this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                    if (metaData.values) {
+                        this.addParserDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT301,
+                            message: `Metadata values should be wrapped into parenthesis.`,
+                            severity: AlphaTexDiagnosticsSeverity.Warning,
+                            start: metaData.values?.start ?? metaData.start,
+                            end: metaData.values?.end ?? metaData.end
+                        });
+
+                        this.addParserDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT301,
+                            message: `Metadata values should be placed before metadata properties.`,
+                            severity: AlphaTexDiagnosticsSeverity.Warning,
+                            start: metaData.values?.start ?? metaData.start,
+                            end: metaData.values?.end ?? metaData.end
+                        });
+                    }
+                }
             } else {
-                metaData.values = this.valueList() ?? this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                metaData.values = this.valueList();
+                if (!metaData.values) {
+                    metaData.values = this._metaDataReader.readMetaDataValues(this, metaData.tag);
+                    if (metaData.values) {
+                        this.addParserDiagnostic({
+                            code: AlphaTexDiagnosticCode.AT301,
+                            message: `Metadata values should be wrapped into parenthesis.`,
+                            severity: AlphaTexDiagnosticsSeverity.Warning,
+                            start: metaData.values?.start ?? metaData.start,
+                            end: metaData.values?.end ?? metaData.end
+                        });
+                    }
+                }
+
                 metaData.properties = this.properties(property =>
                     this._metaDataReader.readMetaDataPropertyValues(this, metaData.tag, property)
                 );
@@ -600,7 +576,19 @@ export class AlphaTexParser {
         };
         property.start = property.property.start;
         try {
-            property.values = this.valueList() ?? readPropertyValues(property);
+            property.values = this.valueList();
+            if (!property.values) {
+                property.values = readPropertyValues(property);
+                if (property.values) {
+                    this.addParserDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT303,
+                        message: 'Property values should be wrapped into parenthesis.',
+                        severity: AlphaTexDiagnosticsSeverity.Warning,
+                        start: property.values.start,
+                        end: property.values.end
+                    });
+                }
+            }
         } finally {
             property.end = this.lexer.currentTokenLocation();
         }

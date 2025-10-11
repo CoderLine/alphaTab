@@ -1,6 +1,5 @@
 ﻿import type { AlphaTexMetaDataNode, AlphaTexPropertyNode } from '@src/importer/alphaTex/AlphaTexAst';
 import type { IAlphaTexImporter } from '@src/importer/alphaTex/AlphaTexShared';
-import type { FlatSyncPoint } from '@src/model/Automation';
 import type { Bar } from '@src/model/Bar';
 import type { Beat } from '@src/model/Beat';
 import type { Note } from '@src/model/Note';
@@ -23,13 +22,15 @@ export interface IAlphaTexLanguageImportHandler {
     applyBeatProperty(importer: IAlphaTexImporter, beat: Beat, property: AlphaTexPropertyNode): ApplyNodeResult;
     applyNoteProperty(importer: IAlphaTexImporter, note: Note, p: AlphaTexPropertyNode): ApplyNodeResult;
 
+    readonly allKnownMetaDataTags: Set<string>;
+    readonly knownScoreMetaDataTags: Set<string>;
+    readonly knownStructuralMetaDataTags: Set<string>;
     readonly knownStaffMetaDataTags: Set<string>;
-    readonly knownBeatProperties: Set<string>;
     readonly knownBarMetaDataTags: Set<string>;
+
+    readonly knownBeatProperties: Set<string>;
     readonly knownBeatDurationProperties: Set<string>;
     readonly knownNoteProperties: Set<string>;
-
-    buildSyncPoint(importer: IAlphaTexImporter, metaDataNode: AlphaTexMetaDataNode): FlatSyncPoint | undefined;
 
     buildScoreMetaDataNodes(score: Score): AlphaTexMetaDataNode[];
     buildBarMetaDataNodes(

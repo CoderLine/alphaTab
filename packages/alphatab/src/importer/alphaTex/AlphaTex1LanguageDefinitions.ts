@@ -631,7 +631,7 @@ export class AlphaTex1LanguageDefinitions {
         ]
     ]);
 
-    private static readonly structuralMetaDataValueListTypes = new Map<
+    public static readonly structuralMetaDataValueListTypes = new Map<
         string,
         ValueListParseTypesExtended[] | undefined
     >([

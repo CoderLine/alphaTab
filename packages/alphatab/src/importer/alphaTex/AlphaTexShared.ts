@@ -1,17 +1,17 @@
 ﻿import type { AlphaTexAstNodeLocation } from '@src/importer/alphaTex/AlphaTexAst';
-import { SustainPedalMarker } from '@src/model/Bar';
-import { Beat } from '@src/model/Beat';
-import { DynamicValue } from '@src/model/DynamicValue';
-import { Lyrics } from '@src/model/Lyrics';
-import { Note } from '@src/model/Note';
-import { Staff } from '@src/model/Staff';
-import { Track } from '@src/model/Track';
+import type { FlatSyncPoint } from '@src/model/Automation';
+import type { SustainPedalMarker } from '@src/model/Bar';
+import type { Beat } from '@src/model/Beat';
+import type { DynamicValue } from '@src/model/DynamicValue';
+import type { Lyrics } from '@src/model/Lyrics';
+import type { Note } from '@src/model/Note';
+import type { Staff } from '@src/model/Staff';
+import type { Track } from '@src/model/Track';
 
 /**
  * The different severity levels for diagnostics parsing alphaTex.
  */
 export enum AlphaTexDiagnosticsSeverity {
-    // TODO: hints when syntax without delimiters are used
     Hint = 0,
     Warning = 1,
     Error = 2
@@ -53,6 +53,7 @@ export enum AlphaTexDiagnosticCode {
     // 100 - 199 Lexer Warnings
     // 200 - 299 Parser Errors
     // 300 - 399 Parser Warnings
+    // 400 - 499 Parser Hints
 
     /**
      * Unexpected character at comment start, expected '//' or '/*' but found '/%s'.
@@ -187,7 +188,27 @@ export enum AlphaTexDiagnosticCode {
     /**
      * Expected no values, but found some. Values are ignored.
      */
-    AT300 = 300
+    AT300 = 300,
+
+    /**
+     * Metadata values should be wrapped into parenthesis.
+     */
+    AT301 = 301,
+
+    /**
+     * Metadata values should be placed before metadata properties.
+     */
+    AT302 = 302,
+
+    /**
+     * Property values should be wrapped into parenthesis.
+     */
+    AT303 = 303,
+
+    /**
+     * he dots separating score metadata, score contents and the sync points can be removed.
+     */
+    AT400 = 400
 }
 
 export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
@@ -225,6 +246,7 @@ export interface IAlphaTexImporterState {
     currentTupletNumerator: number;
     currentTupletDenominator: number;
 
+    readonly syncPoints: FlatSyncPoint[];
     readonly slurs: Map<string, Note>;
     readonly percussionArticulationNames: Map<string, number>;
     readonly lyrics: Map<number, Lyrics[]>;
@@ -236,7 +258,7 @@ export interface IAlphaTexImporterState {
 
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
-
+    
     makeStaffPitched(staff: Staff): void;
     startNewVoice(): void;
     startNewTrack(): Track;

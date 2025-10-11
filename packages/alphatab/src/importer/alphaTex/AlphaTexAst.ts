@@ -335,31 +335,10 @@ export interface AlphaTexIdentifier extends AlphaTexTextNode, IAlphaTexValueList
  */
 export interface AlphaTexScoreNode extends AlphaTexAstNode {
     nodeType: AlphaTexNodeType.Score;
-
-    /**
-     * The metadata tags describing the top level score information.
-     */
-    metaData: AlphaTexMetaDataNode[];
-
-    /**
-     * The separator between the score metadata and the bars.
-     */
-    metaDataBarSeparator?: AlphaTexDotTokenNode;
-
     /**
      * The bars describing the contents of the song.
      */
     bars: AlphaTexBarNode[];
-
-    /**
-     * The separator between the bars and the sync points.
-     */
-    barsSyncPointSeparator?: AlphaTexDotTokenNode;
-
-    /**
-     * The sync points for linking the song to an external media.
-     */
-    syncPoints: AlphaTexMetaDataNode[];
 }
 
 export interface IAlphaTexMetaDataTagPrefixNode extends IAlphaTexAstNode {}

@@ -17,7 +17,7 @@ import {
     type AlphaTexScoreNode,
     type AlphaTexStringLiteral,
     type AlphaTexValueList,
-    type IAlphaTexAstNode,
+    type IAlphaTexAstNode
 } from '@src/importer/alphaTex/AlphaTexAst';
 import type { IAlphaTexLanguageImportHandler } from '@src/importer/alphaTex/IAlphaTexLanguageImportHandler';
 import { IOHelper } from '@src/io/IOHelper';
@@ -107,15 +107,9 @@ class AlphaTexPrinter {
     public writeScoreNode(node: AlphaTexScoreNode) {
         this.writeComments(node.leadingComments);
 
-        this.writeMetaDataList(node.metaData);
-        this.writeToken(node.metaDataBarSeparator, true);
-
         for (const b of node.bars) {
             this.writeBar(b);
         }
-        this.writeToken(node.barsSyncPointSeparator, true);
-
-        this.writeMetaDataList(node.syncPoints);
 
         this.writeComments(node.trailingComments);
     }
@@ -465,30 +459,26 @@ export class AlphaTexExporter extends ScoreExporter {
     private score(data: Score): AlphaTexScoreNode {
         const score: AlphaTexScoreNode = {
             nodeType: AlphaTexNodeType.Score,
-            metaData: [],
-            metaDataBarSeparator: undefined,
-            bars: [],
-            barsSyncPointSeparator: undefined,
-            syncPoints: []
+            bars: []
         };
-
-        score.metaData = this._handler.buildScoreMetaDataNodes(data);
-        if (score.metaData.length > 0) {
-            score.metaDataBarSeparator = {
-                nodeType: AlphaTexNodeType.DotToken
-            };
-        }
 
         for (const t of data.tracks) {
             this.track(score, t);
         }
 
-        score.syncPoints = this._handler.buildSyncPointNodes(data);
-        if (score.syncPoints.length > 0) {
-            score.barsSyncPointSeparator = {
-                nodeType: AlphaTexNodeType.DotToken
-            };
+        if (score.bars.length === 0) {
+            score.bars.push({
+                nodeType: AlphaTexNodeType.Bar,
+                metaData: this._handler.buildScoreMetaDataNodes(data),
+                beats: []
+            });
         }
+
+        score.bars.push({
+            nodeType: AlphaTexNodeType.Bar,
+            metaData: this._handler.buildSyncPointNodes(data),
+            beats: []
+        });
 
         return score;
     }

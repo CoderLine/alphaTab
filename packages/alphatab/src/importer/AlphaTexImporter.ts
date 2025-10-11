@@ -6,7 +6,6 @@ import {
     type AlphaTexBarNode,
     type AlphaTexBeatDurationChangeNode,
     type AlphaTexBeatNode,
-    type AlphaTexMetaDataNode,
     AlphaTexNodeType,
     type AlphaTexNoteNode,
     type AlphaTexNumberLiteral,
@@ -127,8 +126,6 @@ export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
 }
 
 class AlphaTexImportState implements IAlphaTexImporterState {
-    public readonly _initialBarMetaData: AlphaTexMetaDataNode[] = [];
-
     public trackChannel: number = 0;
     public score!: Score;
     public currentTrack?: Track;
@@ -151,17 +148,18 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public readonly staffHasExplicitTuning = new Set<Staff>();
     public readonly staffHasExplicitDisplayTransposition = new Set<Staff>();
     public readonly staffDisplayTranspositionApplied = new Set<Staff>();
+    public readonly syncPoints: FlatSyncPoint[] = [];
+
     public currentDynamics = DynamicValue.F;
     public accidentalMode = AlphaTexAccidentalMode.Explicit;
     public currentTupletNumerator = -1;
     public currentTupletDenominator = -1;
-
-    public _syncPoints: FlatSyncPoint[] = [];
 }
 
 export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter {
     private _parser!: AlphaTexParser;
     private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
+
     private _state = new AlphaTexImportState();
 
     public get state(): IAlphaTexImporterState {
@@ -183,6 +181,10 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
     public logErrors: boolean = false;
 
     public readonly semanticDiagnostics = new AlphaTexDiagnosticBag();
+
+    public constructor() {
+        super();
+    }
 
     public addSemanticDiagnostic(diagnostic: AlphaTexDiagnostic) {
         this.semanticDiagnostics.push(diagnostic);
@@ -236,13 +238,11 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         // as long we have some nodes, we can already start semantically
         // validating and using them
 
-        if (scoreNode.metaData.length === 0 && scoreNode.bars.length === 0) {
+        if (scoreNode.bars.length === 0) {
             throw new UnsupportedFormatError('No alphaTex data found');
         }
 
-        this.metaData(scoreNode);
         this.bars(scoreNode);
-        this.syncPoints(scoreNode);
 
         if (this.semanticDiagnostics.hasErrors) {
             if (this._state.hasAnyProperData) {
@@ -268,7 +268,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         this._state.score.finish(this.settings);
         ModelUtils.trimEmptyBarsAtEnd(this._state.score);
         this._state.score.rebuildRepeatGroups();
-        this._state.score.applyFlatSyncPoints(this._state._syncPoints);
+        this._state.score.applyFlatSyncPoints(this._state.syncPoints);
         for (const [track, lyrics] of this._state.lyrics) {
             this._state.score.tracks[track].applyLyrics(lyrics);
         }
@@ -317,53 +317,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         this._state.slurs.clear();
         this._state.barIndex = 0;
         this._state.voiceIndex = 0;
-    }
-
-    private metaData(score: AlphaTexScoreNode) {
-        for (const metaData of score.metaData) {
-            if (this.handleStructuralMetaData(metaData)) {
-                continue;
-            }
-
-            let result = this._handler.applyScoreMetaData(this, this._state.score, metaData);
-
-            // fallback to staff meta
-            if (result === ApplyNodeResult.NotAppliedUnrecognizedMarker) {
-                result = this._handler.applyStaffMetaData(this, this._state.currentStaff!, metaData);
-            }
-
-            // allow bar meta (remember it for later)
-            if (
-                result === ApplyNodeResult.NotAppliedUnrecognizedMarker &&
-                this._handler.knownBarMetaDataTags.has(metaData.tag.tag.text.toLowerCase())
-            ) {
-                this._state._initialBarMetaData.push(metaData);
-                this._state.hasAnyProperData = true;
-                result = ApplyNodeResult.Applied;
-            }
-
-            switch (result) {
-                case ApplyNodeResult.Applied:
-                case ApplyNodeResult.NotAppliedSemanticError:
-                    this._state.hasAnyProperData = true;
-                    break;
-                case ApplyNodeResult.NotAppliedUnrecognizedMarker:
-                    this.addSemanticDiagnostic({
-                        code: AlphaTexDiagnosticCode.AT206,
-                        message: `Unrecognized metadata '${metaData.tag.tag.text}'.`,
-                        severity: AlphaTexDiagnosticsSeverity.Error,
-                        start: metaData.start,
-                        end: metaData.end
-                    });
-                    break;
-            }
-        }
-
-        // NOTE: we do not validate that we have a "dot" after initial metadata
-        // with the new parser this separator is not really needed
-        // we simply allow all metadata on start,
-        // in alphaTex2 we can remove the separate top level meta
-        // and simply check for known tags on the initial bar.
     }
 
     private bars(node: AlphaTexScoreNode) {
@@ -832,50 +785,40 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         // bar meta
         for (const m of node.metaData) {
-            // handle structural meta
-            let result = this._handler.applyStructuralMetaData(this, m);
-            switch (result) {
-                case ApplyNodeResult.Applied:
-                case ApplyNodeResult.NotAppliedSemanticError:
-                    // need for a new bar
-                    bar = undefined;
-                    this._state.hasAnyProperData = true;
-                    continue;
-            }
+            let result = ApplyNodeResult.NotAppliedUnrecognizedMarker;
 
-            if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+            const tag = m.tag.tag.text.toLowerCase();
+            if (this._handler.knownStructuralMetaDataTags.has(tag)) {
+                result = this._handler.applyStructuralMetaData(this, m);
+                // need for a new bar
+                bar = undefined;
+            } else if (this._handler.knownScoreMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
+                result = this._handler.applyScoreMetaData(this, this._state.score, m);
+            } else if (this._handler.knownStaffMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
                 result = this._handler.applyStaffMetaData(this, this._state.currentStaff!, m);
-
-                switch (result) {
-                    case ApplyNodeResult.Applied:
-                    case ApplyNodeResult.NotAppliedSemanticError:
-                        this._state.hasAnyProperData = true;
-                        break;
-                    case ApplyNodeResult.NotAppliedUnrecognizedMarker:
-                        this.addSemanticDiagnostic({
-                            code: AlphaTexDiagnosticCode.AT206,
-                            message: `Unrecognized metadata '${m.tag.tag.text}'.`,
-                            severity: AlphaTexDiagnosticsSeverity.Error,
-                            start: m.start,
-                            end: m.end
-                        });
-                        break;
-                }
             } else if (this._handler.knownBarMetaDataTags.has(m.tag.tag.text.toLowerCase())) {
                 if (!bar) {
                     bar = this.newBar(this._state.currentStaff!);
                 }
 
-                this.applyBarMetaData(bar, m);
-            } else {
-                const knownMeta = Array.from(this._handler.knownBarMetaDataTags).join(',');
-                this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT206,
-                    message: `Unrecognized metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: m.tag.start,
-                    end: m.tag.end
-                });
+                result = this._handler.applyBarMetaData(this, bar, m);
+            }
+
+            switch (result) {
+                case ApplyNodeResult.Applied:
+                case ApplyNodeResult.NotAppliedSemanticError:
+                    this._state.hasAnyProperData = true;
+                    break;
+                case ApplyNodeResult.NotAppliedUnrecognizedMarker:
+                    const knownMeta = Array.from(this._handler.allKnownMetaDataTags).join(',');
+                    this.addSemanticDiagnostic({
+                        code: AlphaTexDiagnosticCode.AT206,
+                        message: `Unrecognized metadata '${m.tag.tag.text}', expected one of: ${knownMeta}`,
+                        severity: AlphaTexDiagnosticsSeverity.Error,
+                        start: m.tag.start,
+                        end: m.tag.end
+                    });
+                    break;
             }
         }
 
@@ -884,25 +827,6 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
 
         return bar;
-    }
-    private applyBarMetaData(bar: Bar, m: AlphaTexMetaDataNode) {
-        const result = this._handler.applyBarMetaData(this, bar, m);
-
-        switch (result) {
-            case ApplyNodeResult.Applied:
-            case ApplyNodeResult.NotAppliedSemanticError:
-                this._state.hasAnyProperData = true;
-                break;
-            case ApplyNodeResult.NotAppliedUnrecognizedMarker:
-                this.addSemanticDiagnostic({
-                    code: AlphaTexDiagnosticCode.AT206,
-                    message: `Unrecognized metadata '${m.tag.tag.text}'.`,
-                    severity: AlphaTexDiagnosticsSeverity.Error,
-                    start: m.start,
-                    end: m.end
-                });
-                break;
-        }
     }
 
     private newBar(staff: Staff): Bar {
@@ -945,44 +869,13 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             }
         }
 
-        if (this._state._initialBarMetaData.length > 0) {
-            for (const metaData of this._state._initialBarMetaData) {
-                this.applyBarMetaData(newBar, metaData);
-            }
-            this._state._initialBarMetaData.splice(0, this._state._initialBarMetaData.length);
-        }
-
         return newBar;
-    }
-
-    private syncPoints(score: AlphaTexScoreNode) {
-        for (const syncPoint of score.syncPoints) {
-            const flat = this._handler.buildSyncPoint(this, syncPoint);
-            if (flat) {
-                this._state._syncPoints.push(flat);
-            }
-        }
-    }
-
-    private handleStructuralMetaData(metaData: AlphaTexMetaDataNode) {
-        const result = this._handler.applyStructuralMetaData(this, metaData);
-        switch (result) {
-            case ApplyNodeResult.Applied:
-            case ApplyNodeResult.NotAppliedSemanticError:
-                this._state.hasAnyProperData = true;
-                return true;
-            // case ApplyMetaDataResult.NotAppliedUnrecognizedMeta:
-            default:
-                return false;
-        }
     }
 
     public startNewStaff(): Staff {
         this._state.ignoredInitialVoice = false;
 
-        if (this._state.currentTrack!.staves[0].bars.length > 0
-        )
-        {
+        if (this._state.currentTrack!.staves[0].bars.length > 0) {
             const previousWasPercussion = this._state.currentStaff!.isPercussion;
             this._state.currentTrack!.ensureStaveCount(this._state.currentTrack!.staves.length + 1);
             const staff = this._state.currentTrack!.staves[this._state.currentTrack!.staves.length - 1];
