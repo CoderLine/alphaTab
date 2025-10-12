@@ -2835,9 +2835,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 'tempo',
                 ATNF.valueList([
                     ATNF.numberLiteral(a.value),
-                    !a.isVisible ? ATNF.identifier('hide') : undefined,
                     a.text ? ATNF.stringLiteral(a.text) : undefined,
-                    a.ratioPosition > 0 ? ATNF.numberLiteral(a.ratioPosition) : undefined
+                    a.ratioPosition > 0 ? ATNF.numberLiteral(a.ratioPosition) : undefined,
+                    !a.isVisible ? ATNF.identifier('hide') : undefined,
                 ])
             );
             if (tempo.values!.values.length === 1) {
