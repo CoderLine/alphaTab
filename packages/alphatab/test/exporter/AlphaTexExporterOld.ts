@@ -685,7 +685,7 @@ export class AlphaTexExporterOld extends ScoreExporter {
             }
             writer.write(`${a.ratioPosition} `);
             if (!a.isVisible) {
-                writer.writeLine('hide ');
+                writer.write('hide ');
             }
             writer.writeLine(`)`);
         }

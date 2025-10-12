@@ -746,17 +746,17 @@ export class AlphaTex1LanguageDefinitions {
                     ValueListParseTypesMode.RequiredAsFloat
                 ),
                 AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    ['hide']
-                ),
-                AlphaTex1LanguageDefinitions.valueType(
                     [AlphaTexNodeType.StringLiteral],
                     ValueListParseTypesMode.Optional
                 ),
                 AlphaTex1LanguageDefinitions.valueType(
                     [AlphaTexNodeType.NumberLiteral],
                     ValueListParseTypesMode.OptionalAsFloatInValueList
+                ),
+                AlphaTex1LanguageDefinitions.valueType(
+                    [AlphaTexNodeType.Identifier],
+                    ValueListParseTypesMode.Optional,
+                    ['hide']
                 )
             ]
         ],
