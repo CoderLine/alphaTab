@@ -144,7 +144,6 @@ Map {
 exports[`AlphaTexImporterTest sync 1`] = `
 Map {
   "__kind" => "Score",
-  "tempo" => 90,
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
@@ -275,7 +274,6 @@ Map {
   "artist" => "J.S. Bach (1685-1750)",
   "copyright" => "Public Domain",
   "title" => "Prelude in D Minor",
-  "tempo" => 80,
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",

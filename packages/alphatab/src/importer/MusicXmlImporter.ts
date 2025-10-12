@@ -198,7 +198,6 @@ export class MusicXmlImporter extends ScoreImporter {
             throw new UnsupportedFormatError('Unsupported format', e as Error);
         }
         this._score = new Score();
-        this._score.tempo = 120;
         this._score.stylesheet.hideDynamics = true;
 
         this.parseDom(dom);
@@ -1995,9 +1994,6 @@ export class MusicXmlImporter extends ScoreImporter {
 
             if (!this.hasSameTempo(masterBar, tempoAutomation)) {
                 masterBar.tempoAutomations.push(tempoAutomation);
-                if (masterBar.index === 0) {
-                    masterBar.score.tempo = tempoAutomation.value;
-                }
             }
         }
 
@@ -2153,9 +2149,6 @@ export class MusicXmlImporter extends ScoreImporter {
 
             if (!this.hasSameTempo(masterBar, tempoAutomation)) {
                 masterBar.tempoAutomations.push(tempoAutomation);
-                if (masterBar.index === 0) {
-                    masterBar.score.tempo = tempoAutomation.value;
-                }
             }
         }
     }

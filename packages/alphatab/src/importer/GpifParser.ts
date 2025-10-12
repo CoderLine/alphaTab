@@ -2829,12 +2829,6 @@ export class GpifParser {
                 const automation: Automation = automations[i];
                 switch (automation.type) {
                     case AutomationType.Tempo:
-                        if (barNumber === 0) {
-                            this.score.tempo = automation.value | 0;
-                            if (automation.text) {
-                                this.score.tempoLabel = automation.text;
-                            }
-                        }
                         masterBar.tempoAutomations.push(automation);
                         break;
                     case AutomationType.SyncPoint:

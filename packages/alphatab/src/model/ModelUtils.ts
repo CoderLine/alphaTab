@@ -569,6 +569,22 @@ export class ModelUtils {
                 }
             }
         }
+
+        // ensure first masterbar has a tempo automation for score tempo
+        if (score.masterBars.length > 0) {
+            const firstTempoAutomation = score.masterBars[0].tempoAutomations.find(
+                a => a.type === AutomationType.Tempo && a.ratioPosition === 0
+            );
+            if (!firstTempoAutomation) {
+                const tempoAutomation = new Automation();
+                tempoAutomation.isLinear = false;
+                tempoAutomation.type = AutomationType.Tempo;
+                tempoAutomation.value = score.tempo;
+                tempoAutomation.text = score.tempoLabel;
+                tempoAutomation.isVisible = false;
+                score.masterBars[0].tempoAutomations.push(tempoAutomation);
+            }
+        }
     }
 
     /**

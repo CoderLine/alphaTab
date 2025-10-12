@@ -112,6 +112,7 @@ export class CapellaParser {
 
     private _voiceCounts!: Map<number /*track*/, number /*count*/>;
     private _isFirstSystem: boolean = true;
+    private _initialTempo: number = -1;
 
     public parseXml(xml: string, settings: Settings): void {
         this._galleryObjects = new Map<string, DrawObject>();
@@ -177,7 +178,6 @@ export class CapellaParser {
         }
         if (root.localName === 'score') {
             this.score = new Score();
-            this.score.tempo = 120;
             // parse all children
             for (const n of root.childElements()) {
                 switch (n.localName) {
@@ -374,7 +374,7 @@ export class CapellaParser {
     private parseSystem(element: XmlNode) {
         if (element.attributes.has('tempo')) {
             if (this.score.masterBars.length === 0) {
-                this.score.tempo = Number.parseInt(element.attributes.get('tempo')!, 10);
+                this._initialTempo = Number.parseInt(element.attributes.get('tempo')!, 10);
             }
         }
 
@@ -488,7 +488,6 @@ export class CapellaParser {
             currentBar.clefOttava = staff.bars[staff.bars.length - 1].clefOttava;
             currentBar.keySignature = staff.bars[staff.bars.length - 1].keySignature;
             currentBar.keySignatureType = staff.bars[staff.bars.length - 1].keySignatureType;
-
         } else {
             currentBar.clef = this._currentStaffLayout.defaultClef;
         }
@@ -500,6 +499,8 @@ export class CapellaParser {
             this.score.addMasterBar(master);
             if (master.index > 0) {
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
+            } else if (this._initialTempo > 0) {
+                master.tempoAutomations.push(Automation.buildTempoAutomation(false, 0, this._initialTempo, 0));
             }
 
             master.timeSignatureDenominator = this._timeSignature.timeSignatureDenominator;
@@ -588,9 +589,7 @@ export class CapellaParser {
                         this._currentBar.clefOttava = this.parseClefOttava(c.getAttribute('clef'));
                         break;
                     case 'keySign':
-                        this._currentBar.keySignature = Number.parseInt(
-                            c.getAttribute('fifths'), 10
-                        ) as KeySignature;
+                        this._currentBar.keySignature = Number.parseInt(c.getAttribute('fifths'), 10) as KeySignature;
                         break;
                     case 'timeSign':
                         this.parseTime(c.getAttribute('time'));

@@ -67,6 +67,7 @@ export class Gp3To5Importer extends ScoreImporter {
     private _beatTextChunksByTrack: Map<number, string[]> = new Map<number, string[]>();
 
     private _directionLookup: Map<number, Direction[]> = new Map<number, Direction[]>();
+    private _initialTempo: Automation | undefined;
 
     public get name(): string {
         return 'Guitar Pro 3-5';
@@ -98,12 +99,13 @@ export class Gp3To5Importer extends ScoreImporter {
             this.data.skip(19);
         }
         // page setup since GP5
+        this._initialTempo = Automation.buildTempoAutomation(false, 0, 0, 0);
         if (this._versionNumber >= 500) {
             this.readPageSetup();
-            this._score.tempoLabel = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
+            this._initialTempo.text = GpBinaryHelpers.gpReadStringIntByte(this.data, this.settings.importer.encoding);
         }
         // tempo stuff
-        this._score.tempo = IOHelper.readInt32LE(this.data);
+        this._initialTempo.value = IOHelper.readInt32LE(this.data);
         if (this._versionNumber >= 510) {
             GpBinaryHelpers.gpReadBool(this.data); // hide tempo?
         }
@@ -192,7 +194,8 @@ export class Gp3To5Importer extends ScoreImporter {
         }
         version = version.substr(Gp3To5Importer.VersionString.length + 1);
         const dot: number = version.indexOf(String.fromCharCode(46));
-        this._versionNumber = 100 * Number.parseInt(version.substr(0, dot), 10) + Number.parseInt(version.substr(dot + 1), 10);
+        this._versionNumber =
+            100 * Number.parseInt(version.substr(0, dot), 10) + Number.parseInt(version.substr(dot + 1), 10);
         Logger.debug(this.name, `Guitar Pro version ${version} detected`);
     }
 
@@ -317,6 +320,10 @@ export class Gp3To5Importer extends ScoreImporter {
             previousMasterBar = this._score.masterBars[this._score.masterBars.length - 1];
         }
         const newMasterBar: MasterBar = new MasterBar();
+        if (!previousMasterBar && this._initialTempo!.value > 0) {
+            newMasterBar.tempoAutomations.push(this._initialTempo!);
+        }
+
         const flags: number = this.data.readByte();
         // time signature
         if ((flags & 0x01) !== 0) {

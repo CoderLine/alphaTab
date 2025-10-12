@@ -1243,7 +1243,7 @@ describe('MidiFileGeneratorTest', () => {
         const tex: string = '\\tempo 120 . \\tempo 60 3.3*4 | \\tempo 80 3.3*4';
         const score: Score = parseTex(tex);
 
-        expect(score.tempo).to.be.equal(120);
+        expect(score.tempo).to.be.equal(60);
         expect(score.masterBars[0].tempoAutomations).to.have.length(1);
         expect(score.masterBars[0].tempoAutomations[0]!.value).to.be.equal(60);
 

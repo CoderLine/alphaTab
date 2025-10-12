@@ -268,14 +268,22 @@ export class Score {
     public tab: string = '';
 
     /**
-     * Gets or sets the global tempo of the song in BPM. The tempo might change via {@link MasterBar.tempoAutomations}.
+     * The initial tempo of the song in BPM. The tempo might change via {@link MasterBar.tempoAutomations}.
      */
-    public tempo: number = 120;
+    public get tempo(): number {
+        return this.masterBars.length && this.masterBars[0].tempoAutomations.length > 0
+            ? this.masterBars[0].tempoAutomations[0].value
+            : 120;
+    }
 
     /**
-     * Gets or sets the name/label of the tempo.
+     * The name/label of the initial tempo.
      */
-    public tempoLabel: string = '';
+    public get tempoLabel(): string {
+        return this.masterBars.length && this.masterBars[0].tempoAutomations.length > 0
+            ? this.masterBars[0].tempoAutomations[0].text
+            : '';
+    }
 
     /**
      * Gets or sets a list of all masterbars contained in this song.

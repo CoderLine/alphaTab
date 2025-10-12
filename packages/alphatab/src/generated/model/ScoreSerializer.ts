@@ -36,8 +36,6 @@ export class ScoreSerializer {
         o.set("title", obj.title);
         o.set("words", obj.words);
         o.set("tab", obj.tab);
-        o.set("tempo", obj.tempo);
-        o.set("tempolabel", obj.tempoLabel);
         o.set("masterbars", obj.masterBars.map(i => MasterBarSerializer.toJson(i)));
         o.set("tracks", obj.tracks.map(i => TrackSerializer.toJson(i)));
         o.set("defaultsystemslayout", obj.defaultSystemsLayout);
@@ -82,12 +80,6 @@ export class ScoreSerializer {
                 return true;
             case "tab":
                 obj.tab = v! as string;
-                return true;
-            case "tempo":
-                obj.tempo = v! as number;
-                return true;
-            case "tempolabel":
-                obj.tempoLabel = v! as string;
                 return true;
             case "masterbars":
                 obj.masterBars = [];

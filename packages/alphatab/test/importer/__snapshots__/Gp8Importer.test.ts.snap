@@ -6,7 +6,6 @@ Map {
   "artist" => "JerryC",
   "music" => "JerryC",
   "title" => "Canon Rock",
-  "tempo" => 90,
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",

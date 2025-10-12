@@ -29,7 +29,7 @@ export class TempoEffectInfo extends EffectBarRendererInfo {
             beat.voice.bar.staff.index === 0 &&
             beat.voice.index === 0 &&
             beat.index === 0 &&
-            beat.voice.bar.masterBar.tempoAutomations.filter(a => a.isVisible).length > 0
+            beat.voice.bar.masterBar.tempoAutomations.some(t => t.isVisible)
         );
     }
 
