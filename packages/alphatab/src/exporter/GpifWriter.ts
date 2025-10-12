@@ -1198,7 +1198,7 @@ export class GpifWriter {
                 tempoAutomation.addElement('Linear').innerText = automation.isLinear ? 'true' : 'false';
                 tempoAutomation.addElement('Bar').innerText = mb.index.toString();
                 tempoAutomation.addElement('Position').innerText = automation.ratioPosition.toString();
-                tempoAutomation.addElement('Visible').innerText = 'true';
+                tempoAutomation.addElement('Visible').innerText = automation.isVisible ? 'true' : 'false';
                 tempoAutomation.addElement('Value').innerText = `${automation.value} 2`;
                 if (automation.text) {
                     tempoAutomation.addElement('Text').innerText = automation.text;

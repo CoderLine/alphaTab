@@ -2361,4 +2361,20 @@ describe('AlphaTexImporterTest', () => {
 
         testExportRoundtrip(score);
     });
+
+    
+    it('hide-tempo', () => {
+        const score = parseTex(`
+            .
+            \\tempo (120 "Moderate" 0)
+            c4 d4 e4 f4 |
+            \\tempo (120 "Moderate" 0 hide)
+            c4 d4 e4 f4
+        `);
+
+        expect(score.masterBars[0].tempoAutomations[0].isVisible).to.be.true;
+        expect(score.masterBars[1].tempoAutomations[0].isVisible).to.be.false;
+
+        testExportRoundtrip(score);
+    });
 });

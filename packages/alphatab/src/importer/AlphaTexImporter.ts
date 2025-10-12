@@ -556,6 +556,7 @@ export class AlphaTexImporter extends ScoreImporter {
     private _currentStaff!: Staff;
     private _barIndex: number = 0;
     private _voiceIndex: number = 0;
+    private _initialTempo = Automation.buildTempoAutomation(false, 0, 120, 0);
 
     // Last known position that had valid syntax/symbols
     private _currentDuration: Duration = Duration.QuadrupleWhole;
@@ -768,8 +769,6 @@ export class AlphaTexImporter extends ScoreImporter {
      */
     private createDefaultScore(): void {
         this._score = new Score();
-        this._score.tempo = 120;
-        this._score.tempoLabel = '';
         this.newTrack();
     }
 
@@ -1073,13 +1072,13 @@ export class AlphaTexImporter extends ScoreImporter {
                 case 'tempo':
                     this.sy = this.newSy(true);
                     if (this.sy === AlphaTexSymbols.Number) {
-                        this._score.tempo = this.syData as number;
+                        this._initialTempo.value = this.syData as number;
                     } else {
                         this.error('tempo', AlphaTexSymbols.Number, true);
                     }
                     this.sy = this.newSy();
                     if (this.sy === AlphaTexSymbols.String) {
-                        this._score.tempoLabel = this.syData as string;
+                        this._initialTempo.text = this.syData as string;
                         this.sy = this.newSy();
                     }
                     anyTopLevelMeta = true;
@@ -1878,6 +1877,8 @@ export class AlphaTexImporter extends ScoreImporter {
                 master.timeSignatureDenominator = master.previousMasterBar!.timeSignatureDenominator;
                 master.timeSignatureNumerator = master.previousMasterBar!.timeSignatureNumerator;
                 master.tripletFeel = master.previousMasterBar!.tripletFeel;
+            } else {
+                master.tempoAutomations.push(this._initialTempo);
             }
         }
         const anyBarMeta = this.barMeta(bar);
@@ -2367,8 +2368,19 @@ export class AlphaTexImporter extends ScoreImporter {
         } else if (syData === 'tempo') {
             // NOTE: playbackRatio is calculated on score finish when playback positions are known
             const tempoAutomation = this.readTempoAutomation(false);
+
+            if (beat.index === 0) {
+                const existing = beat.voice.bar.masterBar.tempoAutomations.find(a => a.ratioPosition === 0);
+                if (existing) {
+                    existing.value = tempoAutomation.value;
+                    existing.text = tempoAutomation.text;
+                    beat.automations.push(existing);
+                    return true;
+                }
+            }
             beat.automations.push(tempoAutomation);
             beat.voice.bar.masterBar.tempoAutomations.push(tempoAutomation);
+
             return true;
         } else if (syData === 'volume') {
             // NOTE: playbackRatio is calculated on score finish when playback positions are known
@@ -3326,7 +3338,14 @@ export class AlphaTexImporter extends ScoreImporter {
             } else if (syData === 'tempo') {
                 const tempoAutomation = this.readTempoAutomation(true);
 
-                master.tempoAutomations.push(tempoAutomation);
+                const existing = master.tempoAutomations.find(a => a.ratioPosition === tempoAutomation.ratioPosition);
+                if (existing) {
+                    existing.value = tempoAutomation.value;
+                    existing.text = tempoAutomation.text;
+                    existing.isVisible = tempoAutomation.isVisible;
+                } else {
+                    master.tempoAutomations.push(tempoAutomation);
+                }
             } else if (syData === 'section') {
                 this.sy = this.newSy();
                 if (this.sy !== AlphaTexSymbols.String) {
@@ -3624,7 +3643,7 @@ export class AlphaTexImporter extends ScoreImporter {
         tempoAutomation.isLinear = false;
         tempoAutomation.type = AutomationType.Tempo;
 
-        if (this.sy === AlphaTexSymbols.LBrace && withPosition) {
+        if (this.sy === AlphaTexSymbols.LParensis && withPosition) {
             this.sy = this.newSy(true);
             if (this.sy !== AlphaTexSymbols.Number) {
                 this.error('tempo', AlphaTexSymbols.Number, true);
@@ -3644,8 +3663,13 @@ export class AlphaTexImporter extends ScoreImporter {
             tempoAutomation.ratioPosition = this.syData as number;
             this.sy = this.newSy();
 
-            if (this.sy !== AlphaTexSymbols.RBrace) {
-                this.error('tempo', AlphaTexSymbols.RBrace, true);
+            if (this.sy === AlphaTexSymbols.String && (this.syData as string) === 'hide') {
+                tempoAutomation.isVisible = false;
+                this.sy = this.newSy();
+            }
+
+            if (this.sy !== AlphaTexSymbols.RParensis) {
+                this.error('tempo', AlphaTexSymbols.RParensis, true);
             }
             this.sy = this.newSy();
         } else if (this.sy === AlphaTexSymbols.Number) {

@@ -13,6 +13,7 @@ Map {
           "value" => 120,
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
       ],
     },
@@ -47,6 +48,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -142,7 +144,6 @@ Map {
 exports[`AlphaTexImporterTest sync 1`] = `
 Map {
   "__kind" => "Score",
-  "tempo" => 90,
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
@@ -153,6 +154,7 @@ Map {
           "value" => 90,
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "syncpoints" => Array [
@@ -166,6 +168,7 @@ Map {
           },
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
         Map {
           "islinear" => false,
@@ -177,6 +180,7 @@ Map {
           },
           "ratioposition" => 0.5,
           "text" => "",
+          "isvisible" => true,
         },
       ],
     },
@@ -193,6 +197,7 @@ Map {
           },
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "start" => 3840,
@@ -215,6 +220,7 @@ Map {
           },
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
         Map {
           "islinear" => false,
@@ -226,6 +232,7 @@ Map {
           },
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "start" => 11520,
@@ -252,6 +259,7 @@ Map {
           },
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "start" => 23040,
@@ -266,7 +274,6 @@ Map {
   "artist" => "J.S. Bach (1685-1750)",
   "copyright" => "Public Domain",
   "title" => "Prelude in D Minor",
-  "tempo" => 80,
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
@@ -278,6 +285,7 @@ Map {
           "value" => 80,
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "syncpoints" => Array [
@@ -291,6 +299,7 @@ Map {
           },
           "ratioposition" => 0,
           "text" => "",
+          "isvisible" => true,
         },
         Map {
           "islinear" => false,
@@ -302,6 +311,7 @@ Map {
           },
           "ratioposition" => 0.666,
           "text" => "",
+          "isvisible" => true,
         },
       ],
     },
@@ -319,6 +329,7 @@ Map {
           },
           "ratioposition" => 0.666,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "start" => 2880,
@@ -337,6 +348,7 @@ Map {
           },
           "ratioposition" => 0.333,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "start" => 5760,
@@ -355,6 +367,7 @@ Map {
           },
           "ratioposition" => 1,
           "text" => "",
+          "isvisible" => true,
         },
       ],
       "start" => 8640,

@@ -28,6 +28,7 @@ export class AutomationSerializer {
         }
         o.set("ratioposition", obj.ratioPosition);
         o.set("text", obj.text);
+        o.set("isvisible", obj.isVisible);
         return o;
     }
     public static setProperty(obj: Automation, property: string, v: unknown): boolean {
@@ -55,6 +56,9 @@ export class AutomationSerializer {
                 return true;
             case "text":
                 obj.text = v! as string;
+                return true;
+            case "isvisible":
+                obj.isVisible = v! as boolean;
                 return true;
         }
         return false;

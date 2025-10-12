@@ -670,11 +670,15 @@ export class AlphaTexExporter extends ScoreExporter {
         }
 
         for (const a of masterBar.tempoAutomations) {
-            writer.write(`\\tempo { ${a.value} `);
+            writer.write(`\\tempo ( ${a.value} `);
             if (a.text) {
                 writer.writeString(a.text);
             }
-            writer.writeLine(`${a.ratioPosition} }`);
+            writer.write(`${a.ratioPosition} `);
+            if (!a.isVisible) {
+                writer.writeLine('hide ');
+            }
+            writer.writeLine(`)`);
         }
 
         writer.dropSingleLineComment();

@@ -6,6 +6,16 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
     },
   ],
   "tracks" => Array [
@@ -41,6 +51,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -74,6 +85,16 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturecommon" => true,
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
     },
     Map {
       "__kind" => "MasterBar",
@@ -170,6 +191,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -551,6 +573,16 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
       "isanacrusis" => true,
     },
     Map {
@@ -596,6 +628,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -716,6 +749,7 @@ Map {
                           "value" => 1,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -833,6 +867,16 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
     },
     Map {
       "__kind" => "MasterBar",
@@ -869,6 +913,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -951,6 +996,7 @@ Map {
                           "value" => 1,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -1035,6 +1081,7 @@ Map {
                           "value" => 2,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -1108,6 +1155,16 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturecommon" => true,
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
     },
     Map {
       "__kind" => "MasterBar",
@@ -1153,6 +1210,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -1470,6 +1528,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 1920,
@@ -1693,6 +1752,16 @@ Map {
     Map {
       "__kind" => "MasterBar",
       "timesignaturecommon" => true,
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
     },
   ],
   "tracks" => Array [
@@ -1721,6 +1790,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 240,
@@ -2320,6 +2390,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 240,
@@ -2728,6 +2799,16 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
       "isanacrusis" => true,
     },
     Map {
@@ -2773,6 +2854,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -2893,6 +2975,7 @@ Map {
                           "value" => 1,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -3010,6 +3093,16 @@ Map {
   "masterbars" => Array [
     Map {
       "__kind" => "MasterBar",
+      "tempoautomations" => Array [
+        Map {
+          "islinear" => false,
+          "type" => 0,
+          "value" => 120,
+          "ratioposition" => 0,
+          "text" => "",
+          "isvisible" => false,
+        },
+      ],
     },
     Map {
       "__kind" => "MasterBar",
@@ -3046,6 +3139,7 @@ Map {
                           "value" => 0,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -3128,6 +3222,7 @@ Map {
                           "value" => 1,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,
@@ -3212,6 +3307,7 @@ Map {
                           "value" => 2,
                           "ratioposition" => 0,
                           "text" => "",
+                          "isvisible" => true,
                         },
                       ],
                       "displayduration" => 960,

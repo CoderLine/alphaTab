@@ -32,7 +32,7 @@
       \chord {firstfret 1 showdiagram true showfingering false showname true } "G(no5)/B" -1 -1 -1 5 2 -1 
       // Masterbar 1 Metadata
       \ts 4 4
-      \tempo { 60 0 }
+      \tempo ( 60 0 )
       
       // Bar 1
         // Bar 1 Metadata
@@ -565,7 +565,7 @@
         7.5.8{dec beam Up}
       |
       // Masterbar 82 Metadata
-      \tempo { 164 0 }
+      \tempo ( 164 0 )
       
       // Bar 82
         // Bar 82 / Voice 1 contents
@@ -590,7 +590,7 @@
       |
       // Masterbar 84 Metadata
       \ts 4 4
-      \tempo { 60 0 }
+      \tempo ( 60 0 )
       
       // Bar 84
         // Bar 84 / Voice 1 contents

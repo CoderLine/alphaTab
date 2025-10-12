@@ -249,7 +249,7 @@ const globalConfig: Config.ProjectConfig = {
 
 // https://github.com/jestjs/jest/blob/4e7d916ec6a16de5548273c17b5d2c5761b0aebb/packages/jest-config/src/normalize.ts#L1079-L1088
 const argvCi = !!process.env.CI;
-const argvUpdateSnapshot = process.argv.includes('--updateSnapshot');
+const argvUpdateSnapshot = process.argv.includes('--updateSnapshot') || process.env.UPDATE_SNAPSHOT === 'true';
 const snapshotOptions: SnapshotStateOptions = {
     updateSnapshot: argvCi ? 'none' : argvUpdateSnapshot ? 'all' : 'new',
     rootDir: globalConfig.rootDir,
@@ -289,9 +289,9 @@ function storeSnapshotState(snapshotState: SnapshotState) {
 
     const uncheckedCount = snapshotState.getUncheckedCount();
     const uncheckedKeys = snapshotState.getUncheckedKeys();
-    if (uncheckedCount) {
-        snapshotState.removeUncheckedKeys();
-    }
+    // if (uncheckedCount) {
+    //     snapshotState.removeUncheckedKeys();
+    // }
     const status = snapshotState.save();
 
     // https://github.com/jestjs/jest/blob/4e7d916ec6a16de5548273c17b5d2c5761b0aebb/packages/jest-test-result/src/helpers.ts#L119C1-L120C1
