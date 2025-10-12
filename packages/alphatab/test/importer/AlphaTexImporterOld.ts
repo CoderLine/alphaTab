@@ -603,9 +603,6 @@ export class AlphaTexImporterOld extends ScoreImporter {
     private _score!: Score;
     private _currentTrack!: Track;
 
-    private _initialTempo = 0;
-    private _initialTempoLabel = '';
-
     private _currentStaff!: Staff;
     private _barIndex: number = 0;
     private _voiceIndex: number = 0;
