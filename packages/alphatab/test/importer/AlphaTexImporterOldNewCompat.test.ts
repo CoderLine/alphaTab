@@ -1,12 +1,13 @@
 import { AlphaTexErrorWithDiagnostics, AlphaTexImporter } from '@src/importer/AlphaTexImporter';
 import { ScoreLoader } from '@src/importer/ScoreLoader';
+import { Logger } from '@src/Logger';
 import type { Score } from '@src/model/Score';
 import { Settings } from '@src/Settings';
 import { AlphaTexExporterOld } from '@test/exporter/AlphaTexExporterOld';
 import { AlphaTexError, AlphaTexImporterOld } from '@test/importer/AlphaTexImporterOld';
 import { ComparisonHelpers } from '@test/model/ComparisonHelpers';
 import { TestPlatform } from '@test/TestPlatform';
-import { assert } from 'chai';
+import { assert, expect } from 'chai';
 
 describe('AlphaTexImporterOldNewCompat', () => {
     async function loadScore(name: string): Promise<Score | null> {
@@ -128,4 +129,92 @@ describe('AlphaTexImporterOldNewCompat', () => {
     it('visual-special-tracks', async () => {
         await testRoundTripFolderEqual('visual-tests/special-tracks');
     });
+
+    it('performance', async () => {
+        const newTex = await TestPlatform.loadFileAsString('test-data/exporter/notation-legend-formatted.atex');
+        const settings = new Settings();
+        const oldTex = new AlphaTexExporterOld().exportToString(ScoreLoader.loadAlphaTex(newTex, settings));
+
+        let sumNew = 0;
+
+        function run(i: number, check: boolean) {
+            const oldImporter = new AlphaTexImporterOld();
+            oldImporter.initFromString(oldTex, settings);
+
+            const oldStart = performance.now();
+            oldImporter.readScore();
+            const oldEnd = performance.now();
+
+            const newImporter = new AlphaTexImporter();
+            newImporter.initFromString(oldTex, settings);
+
+            const newStart = performance.now();
+            newImporter.readScore();
+            const newEnd = performance.now();
+
+            if (check) {
+                const oldTime = oldEnd - oldStart;
+                const newTime = newEnd - newStart;
+                Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Old', i, oldTime);
+                Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'New', i, newTime);
+                Logger.info('Test-AlphaTexImporterOldNewCompat-performance', 'Diff', i, newTime - oldTime);
+                sumNew += newTime;
+            }
+        }
+
+        // warmup
+        for (let i = 0; i < 3; i++) {
+            run(i, false);
+        }
+
+        const testCount = 10;
+        for (let i = 0; i < testCount; i++) {
+            run(i, true);
+        }
+
+        const avgNew = sumNew / testCount;
+        expect(avgNew).to.be.lessThan(25);
+    });
+
+    // it('profile', async () => {
+    //     const session = new inspector.Session();
+    //     session.connect();
+
+    //     const newTex = await TestPlatform.loadFileAsString('test-data/exporter/notation-legend-formatted.atex');
+    //     const settings = new Settings();
+    //     const oldTex = new AlphaTexExporterOld().exportToString(ScoreLoader.loadAlphaTex(newTex, settings));
+
+    //     await new Promise<void>(resolve => {
+    //         session.post('Profiler.enable', () =>
+    //             session.post('Profiler.start', () => {
+    //                 resolve();
+    //             })
+    //         );
+    //     });
+
+    //     for (let i = 0; i < 10; i++) {
+    //         const newImporter = new AlphaTexImporter();
+    //         newImporter.initFromString(oldTex, settings);
+    //         newImporter.readScore();
+    //     }
+
+    //     await new Promise<void>((resolve, reject) => {
+    //         session.post('Profiler.stop', async (sessionErr, data) => {
+    //             if (sessionErr) {
+    //                 reject(sessionErr);
+    //                 return;
+    //             }
+
+    //             try {
+    //                 await TestPlatform.saveFileAsString(
+    //                     `${new Date().toISOString().replaceAll(/[^0-9]/g, '')}.cpuprofile`,
+    //                     JSON.stringify(data.profile)
+    //                 );
+    //                 resolve();
+    //             } catch (e) {
+    //                 reject(e);
+    //             }
+    //         });
+    //     });
+    // }).timeout(60000);
 });
