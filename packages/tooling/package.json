@@ -5,7 +5,7 @@
     "description": "Additional build tooling for alphaTab like common build configurations",
     "private": true,
     "devDependencies": {
-        "@microsoft/api-extractor": "^7.52.13",
+        "@microsoft/api-extractor": "^7.53.1",
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.4",
         "rollup-plugin-license": "^3.6.0",
