@@ -9,6 +9,6 @@
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^12.1.4",
         "rollup-plugin-license": "^3.6.0",
-        "typescript": "^5.9.2"
+        "typescript": "^5.9.3"
     }
 }
