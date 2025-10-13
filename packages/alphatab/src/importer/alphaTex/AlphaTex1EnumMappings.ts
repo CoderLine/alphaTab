@@ -20,17 +20,26 @@ import { TextAlign } from '@src/platform/ICanvas';
 
 /**
  * @internal
+ * @partial
  */
 export class AlphaTex1EnumMappings {
-    private static *_basicMappingIterator<T>(type: object) {
+    /**
+     * @target web
+     * @partial
+     */
+    private static _toEnum<T>(type: object, value:number,) {
+        return value as T;
+    }
+
+    private static *_basicMappingIterator<T extends number>(type: object) {
         for (const [name, value] of Object.entries(type).filter(e => typeof e[1] === 'number')) {
             const txt = name.startsWith('_') ? name.substring(1) : name;
-            yield [txt.toLowerCase(), value as number as T] as [string, T];
+            yield [txt.toLowerCase(), AlphaTex1EnumMappings._toEnum<T>(type, value as number)] as [string, T];
         }
     }
 
-    private static _basic<T>(type: object, additionals?: [string, T][]): Map<string, T> {
-        const mapping = new Map<string, T>(AlphaTex1EnumMappings._basicMappingIterator(type));
+    private static _basic<T extends number>(type: object, additionals?: [string, T][]): Map<string, T> {
+        const mapping = new Map<string, T>(AlphaTex1EnumMappings._basicMappingIterator<T>(type));
         if (additionals) {
             for (const i of additionals) {
                 mapping.set(i[0], i[1]);
