@@ -33,6 +33,7 @@ import { Settings } from '@src/Settings';
 
 /**
  * A small helper to write formatted alphaTex code to a string buffer.
+ * @internal
  */
 class AlphaTexWriter {
     public tex: string = '';
@@ -52,7 +53,7 @@ class AlphaTexWriter {
         }
     }
 
-    private preWrite() {
+    private _preWrite() {
         // indent if needed
         if (this.isStartOfLine && this.indentString.length > 0) {
             for (let i = 0; i < this.currentIndent; i++) {
@@ -63,18 +64,18 @@ class AlphaTexWriter {
     }
 
     public write(text: string) {
-        this.preWrite();
+        this._preWrite();
         this.tex += text;
         this.isStartOfLine = false;
     }
 
     public writeString(text: string) {
-        this.preWrite();
+        this._preWrite();
         this.tex += Environment.quoteJsonString(text);
     }
 
     public writeLine(text?: string) {
-        this.preWrite();
+        this._preWrite();
         if (text !== undefined) {
             this.tex += text;
         }
@@ -89,6 +90,9 @@ class AlphaTexWriter {
     }
 }
 
+/**
+ * @internal
+ */
 class AlphaTexPrinter {
     private _writer: AlphaTexWriter;
     private _comments = false;
@@ -105,106 +109,106 @@ class AlphaTexPrinter {
     }
 
     public writeScoreNode(node: AlphaTexScoreNode) {
-        this.writeComments(node.leadingComments);
+        this._writeComments(node.leadingComments);
 
         for (const b of node.bars) {
-            this.writeBar(b);
+            this._writeBar(b);
         }
 
-        this.writeComments(node.trailingComments);
+        this._writeComments(node.trailingComments);
     }
 
-    private writeBar(bar: AlphaTexBarNode) {
-        this.writeComments(bar.leadingComments);
-        this.writeMetaDataList(bar.metaData);
+    private _writeBar(bar: AlphaTexBarNode) {
+        this._writeComments(bar.leadingComments);
+        this._writeMetaDataList(bar.metaData);
 
         this._writer.indent();
 
         for (const beat of bar.beats) {
-            this.writeBeat(beat);
+            this._writeBeat(beat);
         }
 
         this._writer.outdent();
 
-        this.writeComments(bar.trailingComments);
-        this.writeToken(bar.pipe, true);
+        this._writeComments(bar.trailingComments);
+        this._writeToken(bar.pipe, true);
     }
 
-    private writeBeat(beat: AlphaTexBeatNode) {
-        this.writeComments(beat.leadingComments);
+    private _writeBeat(beat: AlphaTexBeatNode) {
+        this._writeComments(beat.leadingComments);
         if (beat.durationChange) {
-            this.writeDurationChange(beat.durationChange);
+            this._writeDurationChange(beat.durationChange);
         }
 
         if (beat.rest) {
-            this.writeValue(beat.rest);
+            this._writeValue(beat.rest);
         } else if (beat.notes) {
-            this.writeNotes(beat.notes);
+            this._writeNotes(beat.notes);
         }
 
-        this.writeToken(beat.durationDot, false);
-        this.writeValue(beat.durationValue);
+        this._writeToken(beat.durationDot, false);
+        this._writeValue(beat.durationValue);
 
-        this.writeToken(beat.beatMultiplier, false);
-        this.writeValue(beat.beatMultiplierValue);
+        this._writeToken(beat.beatMultiplier, false);
+        this._writeValue(beat.beatMultiplierValue);
 
         if (beat.beatEffects) {
-            this.writeProperties(beat.beatEffects, false);
+            this._writeProperties(beat.beatEffects, false);
         }
 
-        this.writeComments(beat.trailingComments);
+        this._writeComments(beat.trailingComments);
         this._writer.writeLine();
     }
 
-    private writeNotes(notes: AlphaTexNoteListNode) {
-        this.writeComments(notes.leadingComments);
-        this.writeToken(notes.openParenthesis, false);
+    private _writeNotes(notes: AlphaTexNoteListNode) {
+        this._writeComments(notes.leadingComments);
+        this._writeToken(notes.openParenthesis, false);
 
         let first = true;
         for (const n of notes.notes) {
             if (!first) {
                 this._writer.write(' ');
             }
-            this.writeNote(n);
+            this._writeNote(n);
             first = false;
         }
 
-        this.writeToken(notes.closeParenthesis, false);
-        this.writeComments(notes.trailingComments);
+        this._writeToken(notes.closeParenthesis, false);
+        this._writeComments(notes.trailingComments);
     }
 
-    private writeNote(n: AlphaTexNoteNode) {
-        this.writeComments(n.leadingComments);
+    private _writeNote(n: AlphaTexNoteNode) {
+        this._writeComments(n.leadingComments);
 
-        this.writeValue(n.noteValue);
-        this.writeToken(n.noteStringDot, false);
-        this.writeValue(n.noteString);
+        this._writeValue(n.noteValue);
+        this._writeToken(n.noteStringDot, false);
+        this._writeValue(n.noteString);
 
         if (n.noteEffects) {
-            this.writeProperties(n.noteEffects, false);
+            this._writeProperties(n.noteEffects, false);
         }
 
-        this.writeComments(n.trailingComments);
+        this._writeComments(n.trailingComments);
     }
 
-    private writeDurationChange(durationChange: AlphaTexBeatDurationChangeNode) {
-        this.writeComments(durationChange.leadingComments);
-        this.writeToken(durationChange.colon, false);
-        this.writeValue(durationChange.value);
+    private _writeDurationChange(durationChange: AlphaTexBeatDurationChangeNode) {
+        this._writeComments(durationChange.leadingComments);
+        this._writeToken(durationChange.colon, false);
+        this._writeValue(durationChange.value);
 
         if (durationChange.properties) {
             this._writer.write(' ');
-            this.writeProperties(durationChange.properties, false);
+            this._writeProperties(durationChange.properties, false);
         }
 
-        this.writeComments(durationChange.trailingComments);
+        this._writeComments(durationChange.trailingComments);
 
         this._writer.write(' ');
     }
 
-    private writeMetaDataList(metaData: AlphaTexMetaDataNode[]) {
+    private _writeMetaDataList(metaData: AlphaTexMetaDataNode[]) {
         for (const m of metaData) {
-            this.writeMetaData(m);
+            this._writeMetaData(m);
         }
     }
 
@@ -212,7 +216,7 @@ class AlphaTexPrinter {
     private _staffIndex = 0;
     private _voiceIndex = 0;
 
-    private writeMetaData(m: AlphaTexMetaDataNode) {
+    private _writeMetaData(m: AlphaTexMetaDataNode) {
         // outdent from previous items if we had indents
         switch (m.tag.tag.text) {
             case 'track':
@@ -232,36 +236,36 @@ class AlphaTexPrinter {
                 break;
         }
 
-        this.writeComments(m.leadingComments);
-        this.writeToken(m.tag.prefix, false);
-        this.writeValue(m.tag.tag);
+        this._writeComments(m.leadingComments);
+        this._writeToken(m.tag.prefix, false);
+        this._writeValue(m.tag.tag);
 
         let newLineAfterMeta = true;
         if (m.propertiesBeforeValues) {
             if (m.properties) {
                 this._writer.write(' ');
-                this.writeProperties(m.properties, false);
+                this._writeProperties(m.properties, false);
             }
             if (m.values) {
                 this._writer.write(' ');
-                this.writeValues(m.values);
+                this._writeValues(m.values);
             }
         } else {
             if (m.values) {
                 this._writer.write(' ');
-                this.writeValues(m.values);
+                this._writeValues(m.values);
             }
 
             if (m.properties) {
                 this._writer.write(' ');
-                this.writeProperties(m.properties, true);
+                this._writeProperties(m.properties, true);
                 newLineAfterMeta = false;
             }
         }
 
         if (m.trailingComments) {
             this._writer.write(' ');
-            this.writeComments(m.trailingComments);
+            this._writeComments(m.trailingComments);
         }
 
         // outdent from previous items if we had indents
@@ -288,9 +292,9 @@ class AlphaTexPrinter {
         }
     }
 
-    private writeProperties(properties: AlphaTexPropertiesNode, indent: boolean) {
-        this.writeComments(properties.leadingComments);
-        this.writeToken(properties.openBrace, indent);
+    private _writeProperties(properties: AlphaTexPropertiesNode, indent: boolean) {
+        this._writeComments(properties.leadingComments);
+        this._writeToken(properties.openBrace, indent);
         if (indent) {
             this._writer.indent();
         }
@@ -300,7 +304,7 @@ class AlphaTexPrinter {
             if (!first && !indent) {
                 this._writer.write(' ');
             }
-            this.writeProperty(p);
+            this._writeProperty(p);
             first = false;
             if (indent) {
                 this._writer.writeLine();
@@ -310,103 +314,103 @@ class AlphaTexPrinter {
         if (indent) {
             this._writer.outdent();
         }
-        this.writeToken(properties.closeBrace, indent);
-        this.writeComments(properties.trailingComments);
+        this._writeToken(properties.closeBrace, indent);
+        this._writeComments(properties.trailingComments);
     }
 
-    private writeProperty(p: AlphaTexPropertyNode) {
-        this.writeComments(p.leadingComments);
+    private _writeProperty(p: AlphaTexPropertyNode) {
+        this._writeComments(p.leadingComments);
 
-        this.writeValue(p.property);
+        this._writeValue(p.property);
         if (p.values) {
             this._writer.write(' ');
-            this.writeValues(p.values);
+            this._writeValues(p.values);
         }
 
-        this.writeComments(p.trailingComments);
+        this._writeComments(p.trailingComments);
     }
 
-    private writeValues(values: AlphaTexValueList) {
-        this.writeComments(values.leadingComments);
-        this.writeToken(values.openParenthesis, false);
+    private _writeValues(values: AlphaTexValueList) {
+        this._writeComments(values.leadingComments);
+        this._writeToken(values.openParenthesis, false);
         let first = true;
         for (const v of values.values) {
             if (!first) {
                 this._writer.write(' ');
             }
-            this.writeValue(v);
+            this._writeValue(v);
             first = false;
         }
-        this.writeToken(values.closeParenthesis, false);
-        this.writeComments(values.trailingComments);
+        this._writeToken(values.closeParenthesis, false);
+        this._writeComments(values.trailingComments);
     }
 
-    private writeValue(v: IAlphaTexAstNode | undefined) {
+    private _writeValue(v: IAlphaTexAstNode | undefined) {
         if (!v) {
             return;
         }
-        this.writeComments(v.leadingComments);
+        this._writeComments(v.leadingComments);
         switch (v.nodeType) {
-            case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.Ident:
                 this._writer.write((v as AlphaTexIdentifier).text);
                 break;
 
-            case AlphaTexNodeType.ValueList:
-                this.writeValues(v as AlphaTexValueList);
+            case AlphaTexNodeType.Values:
+                this._writeValues(v as AlphaTexValueList);
                 break;
-            case AlphaTexNodeType.NumberLiteral:
+            case AlphaTexNodeType.Number:
                 this._writer.write((v as AlphaTexNumberLiteral).value.toString());
                 break;
-            case AlphaTexNodeType.StringLiteral:
+            case AlphaTexNodeType.String:
                 this._writer.writeString((v as AlphaTexStringLiteral).text);
                 break;
         }
-        this.writeComments(v.trailingComments);
+        this._writeComments(v.trailingComments);
     }
 
-    private writeToken(tokenNode: IAlphaTexAstNode | undefined, newLine: boolean) {
+    private _writeToken(tokenNode: IAlphaTexAstNode | undefined, newLine: boolean) {
         if (tokenNode) {
-            this.writeComments(tokenNode.leadingComments);
+            this._writeComments(tokenNode.leadingComments);
             switch (tokenNode.nodeType) {
-                case AlphaTexNodeType.DotToken:
+                case AlphaTexNodeType.Dot:
                     this._writer.write('.');
                     break;
-                case AlphaTexNodeType.BackSlashToken:
+                case AlphaTexNodeType.Backslash:
                     this._writer.write('\\');
                     break;
-                case AlphaTexNodeType.DoubleBackSlashToken:
+                case AlphaTexNodeType.DoubleBackslash:
                     this._writer.write('\\\\');
                     break;
-                case AlphaTexNodeType.PipeToken:
+                case AlphaTexNodeType.Pipe:
                     this._writer.write('|');
                     break;
-                case AlphaTexNodeType.BraceOpenToken:
+                case AlphaTexNodeType.LBrace:
                     this._writer.write('{');
                     break;
-                case AlphaTexNodeType.BraceCloseToken:
+                case AlphaTexNodeType.RBrace:
                     this._writer.write('}');
                     break;
-                case AlphaTexNodeType.ParenthesisOpenToken:
+                case AlphaTexNodeType.LParen:
                     this._writer.write('(');
                     break;
-                case AlphaTexNodeType.ParenthesisCloseToken:
+                case AlphaTexNodeType.RParen:
                     this._writer.write(')');
                     break;
-                case AlphaTexNodeType.ColonToken:
+                case AlphaTexNodeType.Colon:
                     this._writer.write(':');
                     break;
-                case AlphaTexNodeType.AsteriskToken:
+                case AlphaTexNodeType.Asterisk:
                     this._writer.write('*');
                     break;
             }
-            this.writeComments(tokenNode.trailingComments);
+            this._writeComments(tokenNode.trailingComments);
             if (newLine) {
                 this._writer.writeLine();
             }
         }
     }
 
-    private writeComments(comments: AlphaTexComment[] | undefined) {
+    private _writeComments(comments: AlphaTexComment[] | undefined) {
         if (!this._comments || !comments) {
             return;
         }
@@ -432,6 +436,7 @@ class AlphaTexPrinter {
 
 /**
  * This ScoreExporter can write alphaTex strings.
+ * @public
  */
 export class AlphaTexExporter extends ScoreExporter {
     private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
@@ -452,18 +457,18 @@ export class AlphaTexExporter extends ScoreExporter {
 
     public scoreToAlphaTexString(score: Score): string {
         const printer = new AlphaTexPrinter(this.settings);
-        printer.writeScoreNode(this.score(score));
+        printer.writeScoreNode(this._score(score));
         return printer.tex;
     }
 
-    private score(data: Score): AlphaTexScoreNode {
+    private _score(data: Score): AlphaTexScoreNode {
         const score: AlphaTexScoreNode = {
             nodeType: AlphaTexNodeType.Score,
             bars: []
         };
 
         for (const t of data.tracks) {
-            this.track(score, t);
+            this._track(score, t);
         }
 
         if (score.bars.length === 0) {
@@ -487,13 +492,13 @@ export class AlphaTexExporter extends ScoreExporter {
         return score;
     }
 
-    private track(score: AlphaTexScoreNode, data: Track) {
+    private _track(score: AlphaTexScoreNode, data: Track) {
         for (const s of data.staves) {
-            this.staff(score, s);
+            this._staff(score, s);
         }
     }
 
-    private staff(score: AlphaTexScoreNode, data: Staff) {
+    private _staff(score: AlphaTexScoreNode, data: Staff) {
         const voiceCount = Math.max(...data.filledVoices) + 1;
 
         if (data.bars.length === 0) {
@@ -506,18 +511,18 @@ export class AlphaTexExporter extends ScoreExporter {
             score.bars.push(bar);
         } else {
             for (let v = 0; v < voiceCount; v++) {
-                this.voice(score, v, data, voiceCount > 1);
+                this._voice(score, v, data, voiceCount > 1);
             }
         }
     }
 
-    private voice(score: AlphaTexScoreNode, v: number, data: Staff, isMultiVoice: boolean) {
+    private _voice(score: AlphaTexScoreNode, v: number, data: Staff, isMultiVoice: boolean) {
         for (const bar of data.bars) {
-            this.bar(score, bar, v, isMultiVoice);
+            this._bar(score, bar, v, isMultiVoice);
         }
     }
 
-    private bar(score: AlphaTexScoreNode, data: Bar, voiceIndex: number, isMultiVoice: boolean) {
+    private _bar(score: AlphaTexScoreNode, data: Bar, voiceIndex: number, isMultiVoice: boolean) {
         const bar: AlphaTexBarNode = {
             nodeType: AlphaTexNodeType.Bar,
             metaData: this._handler.buildBarMetaDataNodes(data.staff, data, voiceIndex, isMultiVoice),
@@ -536,7 +541,7 @@ export class AlphaTexExporter extends ScoreExporter {
                 ];
             } else {
                 for (const b of voice.beats) {
-                    bar.beats.push(this.beat(b));
+                    bar.beats.push(this._beat(b));
                 }
                 if (bar.beats.length > 0) {
                     bar.beats[0].leadingComments ??= [];
@@ -557,14 +562,14 @@ export class AlphaTexExporter extends ScoreExporter {
 
         if (data.index < data.staff.bars.length - 1) {
             bar.pipe = {
-                nodeType: AlphaTexNodeType.PipeToken
+                nodeType: AlphaTexNodeType.Pipe
             };
         }
 
         score.bars.push(bar);
     }
 
-    private beat(data: Beat): AlphaTexBeatNode {
+    private _beat(data: Beat): AlphaTexBeatNode {
         const beat: AlphaTexBeatNode = {
             nodeType: AlphaTexNodeType.Beat,
             durationChange: undefined,
@@ -575,43 +580,43 @@ export class AlphaTexExporter extends ScoreExporter {
 
         if (data.isRest) {
             beat.rest = {
-                nodeType: AlphaTexNodeType.Identifier,
+                nodeType: AlphaTexNodeType.Ident,
                 text: 'r'
             };
         } else {
-            beat.notes = this.notes(data.notes);
+            beat.notes = this._notes(data.notes);
         }
 
         beat.durationDot = {
-            nodeType: AlphaTexNodeType.DotToken
+            nodeType: AlphaTexNodeType.Dot
         };
         beat.durationValue = {
-            nodeType: AlphaTexNodeType.NumberLiteral,
+            nodeType: AlphaTexNodeType.Number,
             value: data.duration as number
         };
 
-        beat.beatEffects = this.beatEffects(data);
+        beat.beatEffects = this._beatEffects(data);
 
         return beat;
     }
 
-    private beatEffects(data: Beat): AlphaTexPropertiesNode | undefined {
+    private _beatEffects(data: Beat): AlphaTexPropertiesNode | undefined {
         const properties = this._handler.buildBeatEffects(data);
         return properties.length > 0
             ? {
-                  nodeType: AlphaTexNodeType.Properties,
+                  nodeType: AlphaTexNodeType.Props,
                   openBrace: {
-                      nodeType: AlphaTexNodeType.BraceOpenToken
+                      nodeType: AlphaTexNodeType.LBrace
                   },
                   properties,
                   closeBrace: {
-                      nodeType: AlphaTexNodeType.BraceCloseToken
+                      nodeType: AlphaTexNodeType.RBrace
                   }
               }
             : undefined;
     }
 
-    private notes(data: Note[]): AlphaTexNoteListNode {
+    private _notes(data: Note[]): AlphaTexNoteListNode {
         const notes: AlphaTexNoteListNode = {
             nodeType: AlphaTexNodeType.NoteList,
             openParenthesis: undefined,
@@ -621,73 +626,73 @@ export class AlphaTexExporter extends ScoreExporter {
 
         if (data.length === 0 || data.length > 1) {
             notes.openParenthesis = {
-                nodeType: AlphaTexNodeType.ParenthesisOpenToken
+                nodeType: AlphaTexNodeType.LParen
             };
             notes.closeParenthesis = {
-                nodeType: AlphaTexNodeType.ParenthesisCloseToken
+                nodeType: AlphaTexNodeType.RParen
             };
         }
 
         for (const n of data) {
-            notes.notes.push(this.note(n));
+            notes.notes.push(this._note(n));
         }
 
         return notes;
     }
 
-    private note(data: Note): AlphaTexNoteNode {
+    private _note(data: Note): AlphaTexNoteNode {
         const note: AlphaTexNoteNode = {
             nodeType: AlphaTexNodeType.Note,
             noteValue: {
                 // placeholder value
-                nodeType: AlphaTexNodeType.Identifier,
+                nodeType: AlphaTexNodeType.Ident,
                 text: ''
             } as AlphaTexIdentifier
         };
 
         if (data.isPercussion) {
             note.noteValue = {
-                nodeType: AlphaTexNodeType.StringLiteral,
+                nodeType: AlphaTexNodeType.String,
                 text: PercussionMapper.getArticulationName(data)
             } as AlphaTexStringLiteral;
         } else if (data.isPiano) {
             note.noteValue = {
-                nodeType: AlphaTexNodeType.Identifier,
+                nodeType: AlphaTexNodeType.Ident,
                 text: Tuning.getTextForTuning(data.realValueWithoutHarmonic, true)
             } as AlphaTexIdentifier;
         } else if (data.isStringed) {
             note.noteValue = {
-                nodeType: AlphaTexNodeType.NumberLiteral,
+                nodeType: AlphaTexNodeType.Number,
                 value: data.fret
             } as AlphaTexNumberLiteral;
             note.noteStringDot = {
-                nodeType: AlphaTexNodeType.DotToken
+                nodeType: AlphaTexNodeType.Dot
             };
             const stringNumber = data.beat.voice.bar.staff.tuning.length - data.string + 1;
             note.noteString = {
-                nodeType: AlphaTexNodeType.NumberLiteral,
+                nodeType: AlphaTexNodeType.Number,
                 value: stringNumber
             };
         } else {
             throw new Error('What kind of note');
         }
 
-        note.noteEffects = this.noteEffects(data);
+        note.noteEffects = this._noteEffects(data);
 
         return note;
     }
 
-    private noteEffects(data: Note): AlphaTexPropertiesNode | undefined {
+    private _noteEffects(data: Note): AlphaTexPropertiesNode | undefined {
         const properties = this._handler.buildNoteEffects(data);
         return properties.length > 0
             ? {
-                  nodeType: AlphaTexNodeType.Properties,
+                  nodeType: AlphaTexNodeType.Props,
                   openBrace: {
-                      nodeType: AlphaTexNodeType.BraceOpenToken
+                      nodeType: AlphaTexNodeType.LBrace
                   },
                   properties,
                   closeBrace: {
-                      nodeType: AlphaTexNodeType.BraceCloseToken
+                      nodeType: AlphaTexNodeType.RBrace
                   }
               }
             : undefined;

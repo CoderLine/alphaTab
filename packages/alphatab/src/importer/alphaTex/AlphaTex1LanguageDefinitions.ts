@@ -3,6 +3,7 @@ import { AlphaTexNodeType } from '@src/importer/alphaTex/AlphaTexAst';
 
 /**
  * Defines how the value of the meta data tag is parsed.
+ * @internal
  */
 export enum ValueListParseTypesMode {
     /**
@@ -66,6 +67,7 @@ export enum ValueListParseTypesMode {
 
 /**
  * @record
+ * @internal
  */
 export interface ValueListParseTypesExtended {
     expectedTypes: Set<AlphaTexNodeType>;
@@ -74,8 +76,11 @@ export interface ValueListParseTypesExtended {
     reservedIdentifiers?: Set<string>;
 }
 
+/**
+ * @internal
+ */
 export class AlphaTex1LanguageDefinitions {
-    private static valueType(
+    private static _valueType(
         expectedTypes: AlphaTexNodeType[],
         parseMode: ValueListParseTypesMode,
         allowedValues?: string[],
@@ -88,26 +93,26 @@ export class AlphaTex1LanguageDefinitions {
             reservedIdentifiers: reservedIdentifiers ? new Set<string>(reservedIdentifiers) : undefined
         };
     }
-    private static basicList(
+    private static _basicList(
         basic: [AlphaTexNodeType[] /* accepted types */, ValueListParseTypesMode][]
     ): ValueListParseTypesExtended[] {
-        return basic.map(b => AlphaTex1LanguageDefinitions.valueType(b[0], b[1]));
+        return basic.map(b => AlphaTex1LanguageDefinitions._valueType(b[0], b[1]));
     }
 
-    private static readonly scoreInfoValueListTypes = AlphaTex1LanguageDefinitions.basicList([
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional],
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
+    private static readonly _scoreInfoValueListTypes = AlphaTex1LanguageDefinitions._basicList([
+        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Required],
+        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional],
+        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional]
     ]);
-    private static readonly scoreInfoTemplateValueListTypes = AlphaTex1LanguageDefinitions.basicList([
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Optional]
+    private static readonly _scoreInfoTemplateValueListTypes = AlphaTex1LanguageDefinitions._basicList([
+        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Required],
+        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional]
     ]);
-    private static readonly numberOnlyValueListTypes = AlphaTex1LanguageDefinitions.basicList([
-        [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required]
+    private static readonly _numberOnlyValueListTypes = AlphaTex1LanguageDefinitions._basicList([
+        [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required]
     ]);
-    private static readonly textLikeValueListTypes = AlphaTex1LanguageDefinitions.basicList([
-        [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required]
+    private static readonly _textLikeValueListTypes = AlphaTex1LanguageDefinitions._basicList([
+        [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Required]
     ]);
 
     /**
@@ -116,14 +121,14 @@ export class AlphaTex1LanguageDefinitions {
      */
     public static readonly chordPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // firstfret 3
-        ['firstfret', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['firstfret', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // showdiagram, showdiagram true, showdiagram false, showdiagram 0, showdiagram 1
         [
             'showdiagram',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Optional
                 ]
             ])
@@ -132,9 +137,9 @@ export class AlphaTex1LanguageDefinitions {
         // showfingering, showfingering true, showfingering false, showfingering 0, showfingering 1
         [
             'showfingering',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Optional
                 ]
             ])
@@ -143,9 +148,9 @@ export class AlphaTex1LanguageDefinitions {
         // showname, showname true, showname false, showname 0, showname 1
         [
             'showname',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Optional
                 ]
             ])
@@ -154,8 +159,8 @@ export class AlphaTex1LanguageDefinitions {
         // barre 1 2 3
         [
             'barre',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.ValueListWithoutParenthesis]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.ValueListWithoutParenthesis]
             ])
         ]
     ]);
@@ -168,9 +173,7 @@ export class AlphaTex1LanguageDefinitions {
         // score, score 1
         [
             'score',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
         ['tabs', undefined],
         ['slash', undefined],
@@ -183,34 +186,34 @@ export class AlphaTex1LanguageDefinitions {
      */
     public static readonly trackPropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         // color red, color "#FF0000"
-        ['color', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['color', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // defaultsystemslayout 3
-        ['defaultsystemslayout', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['defaultsystemslayout', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // volume 16
-        ['volume', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['volume', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // balance 16
-        ['balance', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['balance', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // bank 16
-        ['bank', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['bank', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // systemslayout 1 2 3 4 5
         [
             'systemslayout',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.ValueListWithoutParenthesis]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.ValueListWithoutParenthesis]
             ])
         ],
 
         // instrument 27, instrument percussion, instrument "acoustic guitar nylon"
         [
             'instrument',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Required
                 ]
             ])
@@ -256,30 +259,30 @@ export class AlphaTex1LanguageDefinitions {
         // tu 3, tu 3,2
         [
             'tu',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]
             ])
         ],
 
         // txt "Text", txt Intro
-        ['txt', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['txt', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // lyrics "Lyrics", lyrics 2 "Lyrics Line 2"
         [
             'lyrics',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Required]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional],
+                [[AlphaTexNodeType.String], ValueListParseTypesMode.Required]
             ])
         ],
 
         // tu 3, tu 3 2
         [
             'tu',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]
             ])
         ],
 
@@ -287,16 +290,16 @@ export class AlphaTex1LanguageDefinitions {
         [
             'tb',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.RequiredAsValueList
                 )
             ]
@@ -306,16 +309,16 @@ export class AlphaTex1LanguageDefinitions {
         [
             'tbe',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.RequiredAsValueList
                 )
             ]
@@ -324,44 +327,36 @@ export class AlphaTex1LanguageDefinitions {
         // bu, bu 16
         [
             'bu',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         // bd, bd 16
         [
             'bd',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         // au, au 16
         [
             'au',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         // ad, ad 16
         [
             'ad',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         // ch C, ch "C"
-        ['ch', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['ch', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // gr, gr ob, gr b
         [
             'gr',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional,
                     Array.from(AlphaTex1EnumMappings.graceTypes.keys())
                 )
@@ -369,47 +364,36 @@ export class AlphaTex1LanguageDefinitions {
         ],
 
         // dy F, dy "F"
-        ['dy', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['dy', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // tempo 120, tempo 120 "Label", tempo 120 "Label" hide
         [
             'tempo',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    ['hide']
-                )
+                AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.Number], ValueListParseTypesMode.Required),
+                AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.String], ValueListParseTypesMode.Optional),
+                AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional, [
+                    'hide'
+                ])
             ]
         ],
 
         // volume 10
-        ['volume', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['volume', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // balance 0
-        ['balance', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['balance', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // tp 16
-        ['tp', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['tp', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // barre 7, barre 7 full, barre 7 "half"
         [
             'barre',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
-                    ValueListParseTypesMode.Required
-                ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.Number], ValueListParseTypesMode.Required),
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional,
                     Array.from(AlphaTex1EnumMappings.barreShapes.keys())
                 )
@@ -417,43 +401,43 @@ export class AlphaTex1LanguageDefinitions {
         ],
 
         // rasg ii, rasg "mi"
-        ['rasg', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['rasg', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // ot 15ma, ot "regular"
-        ['ot', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['ot', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // instrument 27, instrument percussion, instrument "acoustic guitar nylon"
         [
             'instrument',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Required
                 ]
             ])
         ],
 
         // bank 127
-        ['bank', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['bank', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // fermata short, fermata short 0.5
         [
             'fermata',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional,
                     Array.from(AlphaTex1EnumMappings.fermataTypes.keys())
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.OptionalAsFloat
                 )
             ]
         ],
 
         // beam invert
-        ['beam', AlphaTex1LanguageDefinitions.textLikeValueListTypes]
+        ['beam', AlphaTex1LanguageDefinitions._textLikeValueListTypes]
     ]);
 
     /**
@@ -467,9 +451,9 @@ export class AlphaTex1LanguageDefinitions {
         // tu 3, tu 3,2
         [
             'tu',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]
             ])
         ]
     ]);
@@ -481,39 +465,27 @@ export class AlphaTex1LanguageDefinitions {
     public static readonly notePropertyValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
         [
             'nh',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
         [
             'ah',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
         [
             'th',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
         [
             'ph',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
         [
             'sh',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
         [
             'fh',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         ['v', undefined],
@@ -549,16 +521,16 @@ export class AlphaTex1LanguageDefinitions {
         [
             'b',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.RequiredAsValueList
                 )
             ]
@@ -568,18 +540,18 @@ export class AlphaTex1LanguageDefinitions {
         [
             'be',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional,
                     Array.from(AlphaTex1EnumMappings.bendTypes.keys())
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional,
                     Array.from(AlphaTex1EnumMappings.bendStyles.keys())
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.RequiredAsValueList
                 )
             ]
@@ -588,33 +560,29 @@ export class AlphaTex1LanguageDefinitions {
         // tr 14, tr 14 32
         [
             'tr',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]
             ])
         ],
 
         // lf, lf 1
         [
             'lf',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         // rf, rf 1
         [
             'rf',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
-            ])
+            AlphaTex1LanguageDefinitions._basicList([[[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]])
         ],
 
         // acc "#"
-        ['acc', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['acc', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // slur S1, slur "1"
-        ['slur', AlphaTex1LanguageDefinitions.textLikeValueListTypes]
+        ['slur', AlphaTex1LanguageDefinitions._textLikeValueListTypes]
     ]);
 
     public static readonly structuralMetaDataValueListTypes = new Map<
@@ -624,9 +592,9 @@ export class AlphaTex1LanguageDefinitions {
         // track, track Name, track ShortName Name, track "Name", track "ShortName" "Name"
         [
             'track',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Optional]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.String], ValueListParseTypesMode.Optional],
+                [[AlphaTexNodeType.String], ValueListParseTypesMode.Optional]
             ])
         ],
         ['staff', undefined],
@@ -637,98 +605,95 @@ export class AlphaTex1LanguageDefinitions {
         // tuning E4 B3 G3 D3 A2 E2, \tuning "E4" "B3" "G3" "D3"
         [
             'tuning',
-            AlphaTex1LanguageDefinitions.basicList([
-                [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral],
-                    ValueListParseTypesMode.ValueListWithoutParenthesis
-                ]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Ident, AlphaTexNodeType.String], ValueListParseTypesMode.ValueListWithoutParenthesis]
             ])
         ],
 
         // chord "C" 0 1 0 2 3 x
         [
             'chord',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Required],
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Ident, AlphaTexNodeType.String], ValueListParseTypesMode.Required],
                 [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.ValueListWithoutParenthesis
                 ]
             ])
         ],
         // capo 3
-        ['capo', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['capo', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // instrument 27, instrument percussion, instrument "acoustic guitar nylon"
         [
             'instrument',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Required
                 ]
             ])
         ],
         // bank 127
-        ['bank', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['bank', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // lyrics "Text", lyrics 1 "Text"
         [
             'lyrics',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional],
-                [[AlphaTexNodeType.StringLiteral], ValueListParseTypesMode.Required]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional],
+                [[AlphaTexNodeType.String], ValueListParseTypesMode.Required]
             ])
         ],
 
         // articulation defaults, articulation "Name" 27
         [
             'articulation',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Optional]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Optional]
             ])
         ],
 
         // displaytranspose -12
-        ['displaytranspose', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['displaytranspose', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // transpose -12
-        ['transpose', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes]
+        ['transpose', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes]
     ]);
 
     public static readonly scoreMetaDataValueListTypes = new Map<string, ValueListParseTypesExtended[] | undefined>([
-        ['title', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['subtitle', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['artist', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['album', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['words', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['music', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['wordsandmusic', AlphaTex1LanguageDefinitions.scoreInfoTemplateValueListTypes],
-        ['copyright', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['copyright2', AlphaTex1LanguageDefinitions.scoreInfoTemplateValueListTypes],
-        ['instructions', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['notices', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['tab', AlphaTex1LanguageDefinitions.scoreInfoValueListTypes],
-        ['defaultsystemslayout', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['title', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['subtitle', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['artist', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['album', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['words', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['music', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['wordsandmusic', AlphaTex1LanguageDefinitions._scoreInfoTemplateValueListTypes],
+        ['copyright', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['copyright2', AlphaTex1LanguageDefinitions._scoreInfoTemplateValueListTypes],
+        ['instructions', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['notices', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['tab', AlphaTex1LanguageDefinitions._scoreInfoValueListTypes],
+        ['defaultsystemslayout', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
         // systemslayout 1 2 3 4 5
         [
             'systemslayout',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.ValueListWithoutParenthesis]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.ValueListWithoutParenthesis]
             ])
         ],
         ['hidedynamics', undefined],
         ['showdynamics', undefined],
         ['usesystemsignseparator', undefined],
         ['multibarrest', undefined],
-        ['bracketextendmode', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['singletracktracknamepolicy', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['multitracktracknamepolicy', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['firstsystemtracknamemode', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['othersystemstracknamemode', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['firstsystemtracknameorientation', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
-        ['othersystemstracknameorientation', AlphaTex1LanguageDefinitions.textLikeValueListTypes]
+        ['bracketextendmode', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
+        ['singletracktracknamepolicy', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
+        ['multitracktracknamepolicy', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
+        ['firstsystemtracknamemode', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
+        ['othersystemstracknamemode', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
+        ['firstsystemtracknameorientation', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
+        ['othersystemstracknameorientation', AlphaTex1LanguageDefinitions._textLikeValueListTypes]
     ]);
 
     /**
@@ -741,59 +706,51 @@ export class AlphaTex1LanguageDefinitions {
         [
             'tempo',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.RequiredAsFloat
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral],
-                    ValueListParseTypesMode.Optional
-                ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.NumberLiteral],
+                AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.String], ValueListParseTypesMode.Optional),
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.Number],
                     ValueListParseTypesMode.OptionalAsFloatInValueList
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.Optional,
-                    ['hide']
-                )
+                AlphaTex1LanguageDefinitions._valueType([AlphaTexNodeType.Ident], ValueListParseTypesMode.Optional, [
+                    'hide'
+                ])
             ]
         ],
 
         // rc 2
-        ['rc', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['rc', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // ae (1 2 3), ae 2
         [
             'ae',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsValueList]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.RequiredAsValueList]
             ])
         ],
 
         // ts common, ts "common", ts 3 4
         [
             'ts',
-            AlphaTex1LanguageDefinitions.basicList([
-                [
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
-                    ValueListParseTypesMode.OptionalAndStop
-                ],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.String, AlphaTexNodeType.Ident], ValueListParseTypesMode.OptionalAndStop],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required]
             ])
         ],
 
         // ks fmajor or ks "fmajor"
-        ['ks', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['ks', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // clef G2, clef "g2", clef 43,
         [
             'clef',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Required
                 ]
             ])
@@ -803,12 +760,12 @@ export class AlphaTex1LanguageDefinitions {
         [
             'section',
             [
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Required
                 ),
-                AlphaTex1LanguageDefinitions.valueType(
-                    [AlphaTexNodeType.StringLiteral, AlphaTexNodeType.Identifier],
+                AlphaTex1LanguageDefinitions._valueType(
+                    [AlphaTexNodeType.String, AlphaTexNodeType.Ident],
                     ValueListParseTypesMode.Optional,
                     undefined,
                     ['x', '-', 'r']
@@ -819,54 +776,54 @@ export class AlphaTex1LanguageDefinitions {
         // tf triplet16th, tf "Triplet16th", tf 1
         [
             'tf',
-            AlphaTex1LanguageDefinitions.basicList([
+            AlphaTex1LanguageDefinitions._basicList([
                 [
-                    [AlphaTexNodeType.Identifier, AlphaTexNodeType.StringLiteral, AlphaTexNodeType.NumberLiteral],
+                    [AlphaTexNodeType.Ident, AlphaTexNodeType.String, AlphaTexNodeType.Number],
                     ValueListParseTypesMode.Required
                 ]
             ])
         ],
 
         // barlineleft dotted, barlineleft "dotted"
-        ['barlineleft', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['barlineleft', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
         // barlineright dotted, barlineright "dotted"
-        ['barlineright', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['barlineright', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
         // accidentals auto, accidentals "explicit"
-        ['accidentals', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['accidentals', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
         // jump fine, jump "segno"
-        ['jump', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['jump', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
         // ottava 15ma, ottava "regular"
-        ['ottava', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['ottava', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
         // simile none, simile "firstOfDouble"
-        ['simile', AlphaTex1LanguageDefinitions.textLikeValueListTypes],
+        ['simile', AlphaTex1LanguageDefinitions._textLikeValueListTypes],
 
         // width 300
-        ['width', AlphaTex1LanguageDefinitions.numberOnlyValueListTypes],
+        ['width', AlphaTex1LanguageDefinitions._numberOnlyValueListTypes],
 
         // scale 0.5
         [
             'scale',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.RequiredAsFloat]
             ])
         ],
 
         [
             'spd',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.RequiredAsFloat]
             ])
         ],
         [
             'spu',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.RequiredAsFloat]
             ])
         ],
         [
             'sph',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.RequiredAsFloat]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.RequiredAsFloat]
             ])
         ],
 
@@ -879,11 +836,11 @@ export class AlphaTex1LanguageDefinitions {
         // \sync BarIndex Occurence MillisecondOffset RatioPosition
         [
             'sync',
-            AlphaTex1LanguageDefinitions.basicList([
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.Required],
-                [[AlphaTexNodeType.NumberLiteral], ValueListParseTypesMode.OptionalAsFloat]
+            AlphaTex1LanguageDefinitions._basicList([
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.Required],
+                [[AlphaTexNodeType.Number], ValueListParseTypesMode.OptionalAsFloat]
             ])
         ]
     ]);

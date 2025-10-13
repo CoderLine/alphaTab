@@ -11,6 +11,7 @@ import type { Track } from '@src/model/Track';
 
 /**
  * The different severity levels for diagnostics parsing alphaTex.
+ * @public
  */
 export enum AlphaTexDiagnosticsSeverity {
     Hint = 0,
@@ -21,6 +22,7 @@ export enum AlphaTexDiagnosticsSeverity {
 /**
  * A diagnostics message for the alphaTex parser.
  * @record
+ * @public
  */
 export interface AlphaTexDiagnostic {
     /**
@@ -49,6 +51,9 @@ export interface AlphaTexDiagnostic {
     message: string;
 }
 
+/**
+ * @public
+ */
 export enum AlphaTexDiagnosticCode {
     // 000 - 99 Lexer Errors
     // 100 - 199 Lexer Warnings
@@ -202,6 +207,9 @@ export enum AlphaTexDiagnosticCode {
     AT400 = 400
 }
 
+/**
+ * @public
+ */
 export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
     private _hasErrors = false;
     public readonly items: AlphaTexDiagnostic[] = [];
@@ -228,14 +236,21 @@ export class AlphaTexDiagnosticBag implements Iterable<AlphaTexDiagnostic> {
 
 /**
  * An error used to abort the parsing of the alphaTex source into an
+ * @internal
  */
 export class AlphaTexParserAbort extends Error {}
 
+/**
+ * @public
+ */
 export enum AlphaTexAccidentalMode {
     Auto = 0,
     Explicit = 1
 }
 
+/**
+ * @public
+ */
 export interface IAlphaTexImporterState {
     score: Score;
     accidentalMode: AlphaTexAccidentalMode;
@@ -253,6 +268,9 @@ export interface IAlphaTexImporterState {
     readonly sustainPedalToBeat: Map<SustainPedalMarker, Beat>;
 }
 
+/**
+ * @public
+ */
 export interface IAlphaTexImporter {
     readonly state: IAlphaTexImporterState;
 

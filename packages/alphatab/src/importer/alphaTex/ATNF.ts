@@ -18,38 +18,39 @@ import {
 
 /**
  * AlphaTexNodeFactory (short name for less code)
+ * @internal
  */
-export class ATNF {
-    static identifier(text: string): AlphaTexIdentifier {
+export class Atnf {
+    static ident(text: string): AlphaTexIdentifier {
         return {
-            nodeType: AlphaTexNodeType.Identifier,
+            nodeType: AlphaTexNodeType.Ident,
             text
         } as AlphaTexIdentifier;
     }
-    static stringLiteral(text: string): AlphaTexStringLiteral {
-        return { nodeType: AlphaTexNodeType.StringLiteral, text } as AlphaTexStringLiteral;
+    static string(text: string): AlphaTexStringLiteral {
+        return { nodeType: AlphaTexNodeType.String, text } as AlphaTexStringLiteral;
     }
-    static numberLiteral(value: number): AlphaTexNumberLiteral {
+    static number(value: number): AlphaTexNumberLiteral {
         return {
-            nodeType: AlphaTexNodeType.NumberLiteral,
+            nodeType: AlphaTexNodeType.Number,
             value
         } as AlphaTexNumberLiteral;
     }
 
-    public static metaData(
+    public static meta(
         tag: string,
         values?: AlphaTexValueList,
         properties?: AlphaTexPropertiesNode
     ): AlphaTexMetaDataNode {
         return {
-            nodeType: AlphaTexNodeType.MetaData,
+            nodeType: AlphaTexNodeType.Meta,
             tag: {
-                nodeType: AlphaTexNodeType.MetaDataTag,
+                nodeType: AlphaTexNodeType.Tag,
                 prefix: {
-                    nodeType: AlphaTexNodeType.BackSlashToken
+                    nodeType: AlphaTexNodeType.Backslash
                 } as AlphaTexBackSlashTokenNode,
                 tag: {
-                    nodeType: AlphaTexNodeType.Identifier,
+                    nodeType: AlphaTexNodeType.Ident,
                     text: tag
                 } as AlphaTexIdentifier
             } as AlphaTexMetaDataTagNode,
@@ -59,20 +60,20 @@ export class ATNF {
         } as AlphaTexMetaDataNode;
     }
 
-    public static identifierMetaData(tag: string, value: string): AlphaTexMetaDataNode {
-        return ATNF.metaData(tag, ATNF.identifierValueList(value));
+    public static identMeta(tag: string, value: string): AlphaTexMetaDataNode {
+        return Atnf.meta(tag, Atnf.identValue(value));
     }
 
-    public static numberMetaData(tag: string, value: number): AlphaTexMetaDataNode {
-        return ATNF.metaData(tag, ATNF.numberValueList(value));
+    public static numberMeta(tag: string, value: number): AlphaTexMetaDataNode {
+        return Atnf.meta(tag, Atnf.numberValue(value));
     }
 
-    public static valueList(
+    public static values(
         values: (IAlphaTexValueListItem | undefined)[],
         parentheses: boolean | undefined = undefined
     ): AlphaTexValueList | undefined {
         const valueList = {
-            nodeType: AlphaTexNodeType.ValueList,
+            nodeType: AlphaTexNodeType.Values,
             values: values.filter(v => v !== undefined)
         } as AlphaTexValueList;
 
@@ -80,10 +81,10 @@ export class ATNF {
 
         if (addParenthesis) {
             valueList.openParenthesis = {
-                nodeType: AlphaTexNodeType.ParenthesisOpenToken
+                nodeType: AlphaTexNodeType.LParen
             } as AlphaTexParenthesisOpenTokenNode;
             valueList.closeParenthesis = {
-                nodeType: AlphaTexNodeType.ParenthesisCloseToken
+                nodeType: AlphaTexNodeType.RParen
             } as AlphaTexParenthesisCloseTokenNode;
         }
 
@@ -94,37 +95,37 @@ export class ATNF {
         return valueList;
     }
 
-    public static stringValueList(text: string): AlphaTexValueList {
-        return ATNF.valueList([ATNF.stringLiteral(text)])!;
+    public static stringValue(text: string): AlphaTexValueList {
+        return Atnf.values([Atnf.string(text)])!;
     }
 
-    public static identifierValueList(text: string): AlphaTexValueList {
-        return ATNF.valueList([ATNF.identifier(text)])!;
+    public static identValue(text: string): AlphaTexValueList {
+        return Atnf.values([Atnf.ident(text)])!;
     }
 
-    public static numberValueList(value: number): AlphaTexValueList {
-        return ATNF.valueList([ATNF.numberLiteral(value)])!;
+    public static numberValue(value: number): AlphaTexValueList {
+        return Atnf.values([Atnf.number(value)])!;
     }
 
-    public static properties(
+    public static props(
         properties: ([string, AlphaTexValueList | undefined] | undefined)[]
     ): AlphaTexPropertiesNode {
         const node = {
-            nodeType: AlphaTexNodeType.Properties,
+            nodeType: AlphaTexNodeType.Props,
             properties: [],
             openBrace: {
-                nodeType: AlphaTexNodeType.BraceOpenToken
+                nodeType: AlphaTexNodeType.LBrace
             } as AlphaTexBraceOpenTokenNode,
             closeBrace: {
-                nodeType: AlphaTexNodeType.BraceCloseToken
+                nodeType: AlphaTexNodeType.RBrace
             } as AlphaTexBraceCloseTokenNode
         } as AlphaTexPropertiesNode;
 
         for (const p of properties) {
             if (p) {
                 node.properties.push({
-                    nodeType: AlphaTexNodeType.Property,
-                    property: ATNF.identifier(p[0]),
+                    nodeType: AlphaTexNodeType.Prop,
+                    property: Atnf.ident(p[0]),
                     values: p[1]
                 } as AlphaTexPropertyNode);
             }
@@ -133,10 +134,10 @@ export class ATNF {
         return node;
     }
 
-    public static property(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexValueList) {
+    public static prop(properties: AlphaTexPropertyNode[], identifier: string, values?: AlphaTexValueList) {
         properties.push({
-            nodeType: AlphaTexNodeType.Property,
-            property: ATNF.identifier(identifier),
+            nodeType: AlphaTexNodeType.Prop,
+            property: Atnf.ident(identifier),
             values
         });
     }

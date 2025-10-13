@@ -53,6 +53,9 @@ import { Voice } from '@src/model/Voice';
 import type { Settings } from '@src/Settings';
 import { Lazy } from '@src/util/Lazy';
 
+/**
+ * @public
+ */
 export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
     public lexerDiagnostics?: AlphaTexDiagnosticBag;
     public parserDiagnostics?: AlphaTexDiagnosticBag;
@@ -92,15 +95,15 @@ export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
         return [
             this.message!,
             'lexer diagnostics:',
-            AlphaTexErrorWithDiagnostics.diagnosticsToString(this.lexerDiagnostics, '  '),
+            AlphaTexErrorWithDiagnostics._diagnosticsToString(this.lexerDiagnostics, '  '),
             'parser diagnostics:',
-            AlphaTexErrorWithDiagnostics.diagnosticsToString(this.parserDiagnostics, '  '),
+            AlphaTexErrorWithDiagnostics._diagnosticsToString(this.parserDiagnostics, '  '),
             'semantic diagnostics:',
-            AlphaTexErrorWithDiagnostics.diagnosticsToString(this.semanticDiagnostics, '  ')
+            AlphaTexErrorWithDiagnostics._diagnosticsToString(this.semanticDiagnostics, '  ')
         ].join('\n');
     }
 
-    private static diagnosticsToString(semanticDiagnostics: AlphaTexDiagnosticBag | undefined, indent: string) {
+    private static _diagnosticsToString(semanticDiagnostics: AlphaTexDiagnosticBag | undefined, indent: string) {
         if (!semanticDiagnostics) {
             return `${indent}none`;
         }
@@ -108,12 +111,12 @@ export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
         return semanticDiagnostics.items
             .map(
                 d =>
-                    `${indent}${AlphaTexDiagnosticsSeverity[d.severity]} AT${(d.code as number).toString().padStart(3, '0')}${AlphaTexErrorWithDiagnostics.locationToString(d)}: ${d.message}`
+                    `${indent}${AlphaTexDiagnosticsSeverity[d.severity]} AT${(d.code as number).toString().padStart(3, '0')}${AlphaTexErrorWithDiagnostics._locationToString(d)}: ${d.message}`
             )
             .join('\n');
     }
 
-    private static locationToString(d: AlphaTexDiagnostic): string {
+    private static _locationToString(d: AlphaTexDiagnostic): string {
         let s = '';
         if (d.start) {
             s += `(${d.start.line},${d.start.col})`;
@@ -128,6 +131,9 @@ export class AlphaTexErrorWithDiagnostics extends AlphaTabError {
     }
 }
 
+/**
+ * @internal
+ */
 class AlphaTexImportState implements IAlphaTexImporterState {
     public trackChannel: number = 0;
     public score!: Score;
@@ -160,6 +166,9 @@ class AlphaTexImportState implements IAlphaTexImporterState {
     public currentTupletDenominator = -1;
 }
 
+/**
+ * @public
+ */
 export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter {
     private _parser!: AlphaTexParser;
     private _handler: IAlphaTexLanguageImportHandler = AlphaTex1LanguageHandler.instance;
@@ -200,7 +209,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
     public readScore(): Score {
         this._state = new AlphaTexImportState();
-        this.createDefaultScore();
+        this._createDefaultScore();
 
         if (this.data.length > 0) {
             this._parser = new AlphaTexParser(IOHelper.toString(this.data.readAll(), this.settings.importer.encoding));
@@ -242,7 +251,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             throw new UnsupportedFormatError('No alphaTex data found');
         }
 
-        this.bars(scoreNode);
+        this._bars(scoreNode);
 
         if (this.semanticDiagnostics.hasErrors) {
             if (this._state.hasAnyProperData) {
@@ -279,12 +288,12 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         return this._state.score;
     }
 
-    private createDefaultScore(): void {
+    private _createDefaultScore(): void {
         this._state.score = new Score();
-        this.newTrack();
+        this._newTrack();
     }
 
-    private newTrack(): void {
+    private _newTrack(): void {
         this._state.currentTrack = new Track();
         this._state.currentTrack.ensureStaveCount(1);
         this._state.currentTrack.playbackInfo.program = 25;
@@ -295,7 +304,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         staff.stringTuning.tunings = Tuning.getDefaultTuningFor(6)!.tunings;
         this._state.articulationValueToIndex.clear();
 
-        this.beginStaff(staff);
+        this._beginStaff(staff);
 
         this._state.score.addTrack(this._state.currentTrack);
         this._state.lyrics.set(this._state.currentTrack.index, []);
@@ -304,11 +313,11 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         this._state.currentTupletNumerator = -1;
     }
 
-    private beginStaff(staff: Staff) {
+    private _beginStaff(staff: Staff) {
         // ensure previous staff is properly initialized
         if (this._state.currentStaff) {
-            this.detectTuningForStaff();
-            this.handleTransposition();
+            this._detectTuningForStaff();
+            this._handleTransposition();
         }
 
         this._state.currentStaff = staff;
@@ -317,28 +326,28 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         this._state.voiceIndex = 0;
     }
 
-    private bars(node: AlphaTexScoreNode) {
+    private _bars(node: AlphaTexScoreNode) {
         if (node.bars.length > 0) {
             for (const b of node.bars) {
-                this.bar(b);
+                this._bar(b);
             }
         } else {
-            this.newBar(this._state.currentStaff!);
-            this.detectTuningForStaff();
-            this.handleTransposition();
+            this._newBar(this._state.currentStaff!);
+            this._detectTuningForStaff();
+            this._handleTransposition();
         }
     }
 
-    private bar(node: AlphaTexBarNode) {
-        const bar = this.barMeta(node);
+    private _bar(node: AlphaTexBarNode) {
+        const bar = this._barMeta(node);
 
-        this.detectTuningForStaff();
-        this.handleTransposition();
+        this._detectTuningForStaff();
+        this._handleTransposition();
 
         const voice: Voice = bar.voices[this._state.voiceIndex];
 
         for (const b of node.beats) {
-            this.beat(voice, b);
+            this._beat(voice, b);
         }
 
         if (voice.beats.length === 0) {
@@ -348,9 +357,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private beat(voice: Voice, node: AlphaTexBeatNode) {
+    private _beat(voice: Voice, node: AlphaTexBeatNode) {
         if (node.durationChange) {
-            this.beatDuration(node.durationChange);
+            this._beatDuration(node.durationChange);
         }
 
         if (!node.notes && !node.rest) {
@@ -362,14 +371,14 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         if (node.notes) {
             for (const n of node.notes!.notes) {
-                this.note(beat, n);
+                this._note(beat, n);
             }
         } else if (node.rest) {
             // beat is already a rest at start
         }
 
         if (node.durationValue) {
-            this._state.currentDuration = this.parseDuration(node.durationValue!);
+            this._state.currentDuration = this._parseDuration(node.durationValue!);
         }
 
         beat.duration = this._state.currentDuration;
@@ -386,7 +395,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
 
         if (node.beatEffects) {
-            this.beatEffects(beat, node.beatEffects!);
+            this._beatEffects(beat, node.beatEffects!);
         }
 
         for (let i: number = 0; i < beatRepeat - 1; i++) {
@@ -394,7 +403,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private beatEffects(beat: Beat, node: AlphaTexPropertiesNode) {
+    private _beatEffects(beat: Beat, node: AlphaTexPropertiesNode) {
         for (const p of node.properties) {
             const result = this._handler.applyBeatProperty(this, beat, p);
             switch (result) {
@@ -417,9 +426,9 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private beatDuration(node: AlphaTexBeatDurationChangeNode) {
+    private _beatDuration(node: AlphaTexBeatDurationChangeNode) {
         if (node.value) {
-            this._state.currentDuration = this.parseDuration(node.value!);
+            this._state.currentDuration = this._parseDuration(node.value!);
         }
 
         this._state.currentTupletNumerator = -1;
@@ -449,7 +458,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private parseDuration(duration: AlphaTexNumberLiteral): Duration {
+    private _parseDuration(duration: AlphaTexNumberLiteral): Duration {
         switch (duration.value) {
             case -4:
                 return Duration.QuadrupleWhole;
@@ -485,7 +494,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private note(beat: Beat, node: AlphaTexNoteNode) {
+    private _note(beat: Beat, node: AlphaTexNoteNode) {
         //
         // Note value
         let isDead: boolean = false;
@@ -496,7 +505,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         let accidentalMode = NoteAccidentalMode.Default;
         const noteValue = node.noteValue as AlphaTexAstNode;
         switch (noteValue.nodeType) {
-            case AlphaTexNodeType.NumberLiteral:
+            case AlphaTexNodeType.Number:
                 fret = (noteValue as AlphaTexNumberLiteral).value;
                 if (this._state.currentStaff!.isPercussion && !PercussionMapper.instrumentArticulations.has(fret)) {
                     this.addSemanticDiagnostic({
@@ -509,8 +518,8 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
                     return;
                 }
                 break;
-            case AlphaTexNodeType.StringLiteral:
-            case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.String:
+            case AlphaTexNodeType.Ident:
                 const str = (noteValue as AlphaTexTextNode).text;
                 if (this._state.currentStaff!.isPercussion) {
                     const articulationName = str.toLowerCase();
@@ -659,11 +668,11 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         //
         // Note Effects
         if (node.noteEffects) {
-            this.noteEffects(note, node.noteEffects!);
+            this._noteEffects(note, node.noteEffects!);
         }
     }
 
-    private noteEffects(note: Note, node: AlphaTexPropertiesNode) {
+    private _noteEffects(note: Note, node: AlphaTexPropertiesNode) {
         for (const p of node.properties) {
             let result = this._handler.applyNoteProperty(this, note, p);
             if (result === ApplyNodeResult.NotAppliedUnrecognizedMarker) {
@@ -699,7 +708,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private handleTransposition() {
+    private _handleTransposition() {
         if (
             !this._state.staffDisplayTranspositionApplied.has(this._state.currentStaff!) &&
             !this._state.staffHasExplicitDisplayTransposition.has(this._state.currentStaff!)
@@ -716,7 +725,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private detectTuningForStaff() {
+    private _detectTuningForStaff() {
         // detect tuning for staff
         const program = this._state.currentStaff!.track.playbackInfo.program;
         if (
@@ -778,7 +787,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         }
     }
 
-    private barMeta(node: AlphaTexBarNode): Bar {
+    private _barMeta(node: AlphaTexBarNode): Bar {
         // it might be a bit an edge case but a valid one:
         // one might repeat multiple structural metadata
         // in one bar starting multiple tracks/staves/voices which are
@@ -812,7 +821,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         };
 
         const bar: Lazy<Bar> = new Lazy<Bar>(() => {
-            const b = this.newBar(this._state.currentStaff!);
+            const b = this._newBar(this._state.currentStaff!);
             if (initialBarMeta) {
                 for (const initial of initialBarMeta) {
                     this._handler.applyBarMetaData(this, b, initial);
@@ -918,7 +927,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
         return bar.value;
     }
 
-    private newBar(staff: Staff): Bar {
+    private _newBar(staff: Staff): Bar {
         // existing bar? -> e.g. in multi-voice setups where we fill empty voices later
         if (this._state.barIndex < staff.bars.length) {
             const bar = staff.bars[this._state.barIndex];
@@ -968,7 +977,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
             const previousWasPercussion = this._state.currentStaff!.isPercussion;
             this._state.currentTrack!.ensureStaveCount(this._state.currentTrack!.staves.length + 1);
             const staff = this._state.currentTrack!.staves[this._state.currentTrack!.staves.length - 1];
-            this.beginStaff(staff);
+            this._beginStaff(staff);
 
             if (previousWasPercussion) {
                 this.applyPercussionStaff(this._state.currentStaff!);
@@ -993,7 +1002,7 @@ export class AlphaTexImporter extends ScoreImporter implements IAlphaTexImporter
 
         // new track starting? - if no masterbars it's the \track of the initial track.
         if (this._state.ignoredInitialTrack || this._state.score.masterBars.length > 0) {
-            this.newTrack();
+            this._newTrack();
         } else {
             this._state.ignoredInitialTrack = true;
         }

@@ -397,10 +397,11 @@ import { Staff } from '@src/model/Staff';
 import { Track } from '@src/model/Track';
 import { Voice } from '@src/model/Voice';
 import { TestPlatform } from './TestPlatform';
-import { AlphaTexDiagnostic } from '@src/importer/alphaTex/AlphaTexShared';
+import type { AlphaTexDiagnostic } from '@src/importer/alphaTex/AlphaTexShared';
 
 /**
  * @partial
+ * @internal
  */
 export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
     public static readonly instance = new AlphaTexAstNodePlugin();
@@ -424,16 +425,16 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
         const node = val as AlphaTexAstNode;
         let value: string | undefined = undefined;
         switch (node.nodeType) {
-            case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.Ident:
                 value = (node as AlphaTexIdentifier).text;
                 break;
-            case AlphaTexNodeType.MetaDataTag:
+            case AlphaTexNodeType.Tag:
                 value = (node as AlphaTexMetaDataTagNode).tag.text;
                 break;
-            case AlphaTexNodeType.NumberLiteral:
+            case AlphaTexNodeType.Number:
                 value = (node as AlphaTexNumberLiteral).value.toString();
                 break;
-            case AlphaTexNodeType.StringLiteral:
+            case AlphaTexNodeType.String:
                 value = (node as AlphaTexStringLiteral).text;
                 break;
         }
@@ -479,7 +480,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
             // case AlphaTexNodeType.AsteriskToken:
 
             // case AlphaTexNodeType.Identifier:
-            case AlphaTexNodeType.MetaDataTag:
+            case AlphaTexNodeType.Tag:
                 const tag = node as AlphaTexMetaDataTagNode;
                 if (tag.prefix) {
                     children.push(['prefix', tag.prefix]);
@@ -490,7 +491,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 }
                 break;
 
-            case AlphaTexNodeType.MetaData:
+            case AlphaTexNodeType.Meta:
                 const metaData = node as AlphaTexMetaDataNode;
                 if (metaData.tag) {
                     children.push(['tag', metaData.tag]);
@@ -503,7 +504,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 }
                 break;
 
-            case AlphaTexNodeType.ValueList:
+            case AlphaTexNodeType.Values:
                 const valueList = node as AlphaTexValueList;
                 if (valueList.openParenthesis) {
                     children.push(['openParenthesis', valueList.openParenthesis]);
@@ -516,7 +517,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 }
                 break;
 
-            case AlphaTexNodeType.Properties:
+            case AlphaTexNodeType.Props:
                 const properties = node as AlphaTexPropertiesNode;
                 if (properties.openBrace) {
                     children.push(['openBrace', properties.openBrace]);
@@ -528,7 +529,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                     children.push(['closeBrace', properties.closeBrace]);
                 }
                 break;
-            case AlphaTexNodeType.Property:
+            case AlphaTexNodeType.Prop:
                 const property = node as AlphaTexPropertyNode;
                 if (property.property) {
                     children.push(['property', property.property]);
@@ -587,7 +588,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
                 }
                 break;
 
-            case AlphaTexNodeType.BeatDurationChange:
+            case AlphaTexNodeType.Duration:
                 const beatDurationChange = node as AlphaTexBeatDurationChangeNode;
                 if (beatDurationChange.colon) {
                     children.push(['colon', beatDurationChange.colon]);
@@ -657,6 +658,7 @@ export class AlphaTexAstNodePlugin implements PrettyFormatNewPlugin {
 
 /**
  * @partial
+ * @internal
  */
 export class AlphaTexDiagnosticPlugin implements PrettyFormatNewPlugin {
     public static readonly instance = new AlphaTexDiagnosticPlugin();

@@ -5,6 +5,9 @@ import type {
 } from '@src/importer/alphaTex/AlphaTexAst';
 import type { AlphaTexParser } from '@src/importer/alphaTex/AlphaTexParser';
 
+/**
+ * @internal
+ */
 export interface IAlphaTexMetaDataReader {
     readMetaDataValues(parser: AlphaTexParser, metaData: AlphaTexMetaDataTagNode): AlphaTexValueList | undefined;
 

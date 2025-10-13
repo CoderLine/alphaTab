@@ -231,7 +231,7 @@ class AlphaTexWriterOld {
 
 /**
  * This ScoreExporter can write alphaTex strings.
- * @public
+ * @internal
  */
 export class AlphaTexExporterOld extends ScoreExporter {
     // used to lookup some default values.

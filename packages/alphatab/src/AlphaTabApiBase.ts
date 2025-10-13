@@ -19,14 +19,15 @@ import type {
     AlphaTabRestEvent,
     ControlChangeEvent,
     EndOfTrackEvent,
-    MidiEvent,MidiEventType, 
+    MidiEvent,
+    MidiEventType,
     NoteBendEvent,
     NoteOffEvent,
     NoteOnEvent,
     PitchBendEvent,
     ProgramChangeEvent,
     TempoChangeEvent,
-    TimeSignatureEvent 
+    TimeSignatureEvent
 } from '@src/midi/MidiEvent';
 import { MidiFile } from '@src/midi/MidiFile';
 import { MidiFileGenerator } from '@src/midi/MidiFileGenerator';

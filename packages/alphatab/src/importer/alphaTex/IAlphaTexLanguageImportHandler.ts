@@ -6,11 +6,18 @@ import type { Note } from '@src/model/Note';
 import type { Score } from '@src/model/Score';
 import type { Staff } from '@src/model/Staff';
 
+/**
+ * @internal
+ */
 export enum ApplyNodeResult {
     Applied,
     NotAppliedSemanticError,
     NotAppliedUnrecognizedMarker
 }
+
+/**
+ * @internal
+ */
 export enum ApplyStructuralMetaDataResult {
     AppliedNewTrack,
     AppliedNewStaff,
@@ -19,6 +26,9 @@ export enum ApplyStructuralMetaDataResult {
     NotAppliedUnrecognizedMarker
 }
 
+/**
+ * @internal
+ */
 export interface IAlphaTexLanguageImportHandler {
     applyStructuralMetaData(importer: IAlphaTexImporter, metaData: AlphaTexMetaDataNode): ApplyStructuralMetaDataResult;
     applyScoreMetaData(importer: IAlphaTexImporter, score: Score, metaData: AlphaTexMetaDataNode): ApplyNodeResult;

@@ -28,11 +28,14 @@ import {
 import { IOHelper } from '@src/io/IOHelper';
 import { Queue } from '@src/synth/ds/Queue';
 
+/**
+ * @public
+ */
 export class AlphaTexLexer {
-    private static readonly Eof: number = 0;
+    private static readonly _eof: number = 0;
 
     private readonly _codepoints: number[];
-    private _codepoint: number = AlphaTexLexer.Eof;
+    private _codepoint: number = AlphaTexLexer._eof;
 
     private _offset: number = 0;
     private _line: number = 1;
@@ -52,7 +55,7 @@ export class AlphaTexLexer {
         this._offset = 0;
         this._line = 1;
         this._col = 1;
-        this._codepoint = this._codepoints.length > 0 ? this._codepoints[0] : AlphaTexLexer.Eof;
+        this._codepoint = this._codepoints.length > 0 ? this._codepoints[0] : AlphaTexLexer._eof;
     }
 
     public get canRead() {
@@ -65,7 +68,7 @@ export class AlphaTexLexer {
         }
 
         if (this._tokenQueue.isEmpty) {
-            const token = this.readToken();
+            const token = this._readToken();
             if (!token) {
                 return token;
             }
@@ -94,7 +97,7 @@ export class AlphaTexLexer {
         if (!start) {
             return undefined;
         }
-        if (start.nodeType !== AlphaTexNodeType.NumberLiteral) {
+        if (start.nodeType !== AlphaTexNodeType.Number) {
             return start;
         }
 
@@ -102,7 +105,7 @@ export class AlphaTexLexer {
         // integer number
         if (
             !floatSeparator ||
-            floatSeparator.nodeType !== AlphaTexNodeType.DotToken ||
+            floatSeparator.nodeType !== AlphaTexNodeType.Dot ||
             floatSeparator.start!.offset !== start.end!.offset
         ) {
             return start;
@@ -116,7 +119,7 @@ export class AlphaTexLexer {
             // 1 . 1
             fractional.start!.offset !== floatSeparator.end!.offset + 1 ||
             // 1.1a
-            fractional.nodeType !== AlphaTexNodeType.NumberLiteral ||
+            fractional.nodeType !== AlphaTexNodeType.Number ||
             // -1.-1
             (fractional as AlphaTexNumberLiteral).value < 0
         ) {
@@ -126,7 +129,7 @@ export class AlphaTexLexer {
         this.nextToken(); // consume fraction
 
         return {
-            nodeType: AlphaTexNodeType.NumberLiteral,
+            nodeType: AlphaTexNodeType.Number,
             start: start.start,
             end: fractional.end,
             leadingComments: start.leadingComments,
@@ -142,12 +145,12 @@ export class AlphaTexLexer {
         }
 
         if (this._tokenQueue.isEmpty) {
-            return this.readToken();
+            return this._readToken();
         }
         return this._tokenQueue.dequeue();
     }
 
-    private nextCodepoint(): number {
+    private _nextCodepoint(): number {
         if (this._offset < this._codepoints.length - 1) {
             ++this._offset;
             this._codepoint = this._codepoints[this._offset];
@@ -157,8 +160,8 @@ export class AlphaTexLexer {
             } else {
                 this._col++;
             }
-        } else if (this._codepoint !== AlphaTexLexer.Eof) {
-            this._codepoint = AlphaTexLexer.Eof;
+        } else if (this._codepoint !== AlphaTexLexer._eof) {
+            this._codepoint = AlphaTexLexer._eof;
             this._col++;
             this._offset = this._codepoints.length;
         }
@@ -166,10 +169,10 @@ export class AlphaTexLexer {
     }
 
     public currentTokenLocation(): AlphaTexAstNodeLocation {
-        return this._tokenQueue.peek()?.start ?? this.currentLexerLocation();
+        return this._tokenQueue.peek()?.start ?? this._currentLexerLocation();
     }
 
-    private currentLexerLocation(): AlphaTexAstNodeLocation {
+    private _currentLexerLocation(): AlphaTexAstNodeLocation {
         return {
             line: this._line,
             col: this._col,
@@ -177,107 +180,101 @@ export class AlphaTexLexer {
         };
     }
 
-    private readToken(): AlphaTexAstNode | undefined {
+    private _readToken(): AlphaTexAstNode | undefined {
         this._leadingComments = undefined;
-        while (this._codepoint !== AlphaTexLexer.Eof) {
-            this._tokenStart = this.currentLexerLocation();
-            if (AlphaTexLexer.terminalTokens.has(this._codepoint)) {
-                const token = AlphaTexLexer.terminalTokens.get(this._codepoint)!(this);
+        while (this._codepoint !== AlphaTexLexer._eof) {
+            this._tokenStart = this._currentLexerLocation();
+            if (AlphaTexLexer._terminalTokens.has(this._codepoint)) {
+                const token = AlphaTexLexer._terminalTokens.get(this._codepoint)!(this);
                 if (token) {
                     this._trailingCommentNode = token;
                     return token;
                 }
-            } else if (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
-                const identifier = this.numberOrIdentifier();
+            } else if (AlphaTexLexer._isIdentifierCharacter(this._codepoint)) {
+                const identifier = this._numberOrIdentifier();
                 this._trailingCommentNode = identifier;
                 return identifier;
             } else {
                 // simply skip unknown characters
                 // there are only a few ascii control characters
                 // which can hit this path
-                this._codepoint = this.nextCodepoint();
+                this._codepoint = this._nextCodepoint();
             }
         }
 
         return undefined;
     }
 
-    private comment(): AlphaTexAstNode | undefined {
-        this._codepoint = this.nextCodepoint();
+    private _comment(): AlphaTexAstNode | undefined {
+        this._codepoint = this._nextCodepoint();
         if (this._codepoint === 0x2f /* / */) {
-            this.singleLineComment();
+            this._singleLineComment();
         } else if (this._codepoint === 0x2a /* * */) {
-            this.multiLineComment();
+            this._multiLineComment();
         } else {
             this.lexerDiagnostics.push({
                 code: AlphaTexDiagnosticCode.AT001,
                 message: `Unexpected character at comment start, expected '//' or '/*' but found '/${String.fromCodePoint(this._codepoint)}'`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: this._tokenStart,
-                end: this.currentLexerLocation()
+                end: this._currentLexerLocation()
             });
             this._fatalError = true;
         }
         return undefined;
     }
 
-    private static terminalTokens: Map<number, (lexer: AlphaTexLexer) => AlphaTexAstNode | undefined> = new Map([
-        [0x2f /* / */, l => l.comment()],
-        [0x22 /* " */, l => l.string()],
-        [0x27 /* ' */, l => l.string()],
-        [0x2d /* - */, l => l.numberOrIdentifier()],
-        [0x2e /* . */, l => l.token({ nodeType: AlphaTexNodeType.DotToken } as AlphaTexDotTokenNode)],
-        [0x3a /* : */, l => l.token({ nodeType: AlphaTexNodeType.ColonToken } as AlphaTexColonTokenNode)],
-        [
-            0x28 /* ( */,
-            l => l.token({ nodeType: AlphaTexNodeType.ParenthesisOpenToken } as AlphaTexParenthesisOpenTokenNode)
-        ],
-        [
-            0x29 /* ) */,
-            l => l.token({ nodeType: AlphaTexNodeType.ParenthesisCloseToken } as AlphaTexParenthesisCloseTokenNode)
-        ],
-        [0x7b /* { */, l => l.token({ nodeType: AlphaTexNodeType.BraceOpenToken } as AlphaTexBraceOpenTokenNode)],
-        [0x7d /* } */, l => l.token({ nodeType: AlphaTexNodeType.BraceCloseToken } as AlphaTexBraceCloseTokenNode)],
-        [0x7c /* | */, l => l.token({ nodeType: AlphaTexNodeType.PipeToken } as AlphaTexPipeTokenNode)],
-        [0x2a /* * */, l => l.token({ nodeType: AlphaTexNodeType.AsteriskToken } as AlphaTexAsteriskTokenNode)],
-        [0x5c /* \ */, l => l.metaCommand()],
+    private static _terminalTokens: Map<number, (lexer: AlphaTexLexer) => AlphaTexAstNode | undefined> = new Map([
+        [0x2f /* / */, l => l._comment()],
+        [0x22 /* " */, l => l._string()],
+        [0x27 /* ' */, l => l._string()],
+        [0x2d /* - */, l => l._numberOrIdentifier()],
+        [0x2e /* . */, l => l._token({ nodeType: AlphaTexNodeType.Dot } as AlphaTexDotTokenNode)],
+        [0x3a /* : */, l => l._token({ nodeType: AlphaTexNodeType.Colon } as AlphaTexColonTokenNode)],
+        [0x28 /* ( */, l => l._token({ nodeType: AlphaTexNodeType.LParen } as AlphaTexParenthesisOpenTokenNode)],
+        [0x29 /* ) */, l => l._token({ nodeType: AlphaTexNodeType.RParen } as AlphaTexParenthesisCloseTokenNode)],
+        [0x7b /* { */, l => l._token({ nodeType: AlphaTexNodeType.LBrace } as AlphaTexBraceOpenTokenNode)],
+        [0x7d /* } */, l => l._token({ nodeType: AlphaTexNodeType.RBrace } as AlphaTexBraceCloseTokenNode)],
+        [0x7c /* | */, l => l._token({ nodeType: AlphaTexNodeType.Pipe } as AlphaTexPipeTokenNode)],
+        [0x2a /* * */, l => l._token({ nodeType: AlphaTexNodeType.Asterisk } as AlphaTexAsteriskTokenNode)],
+        [0x5c /* \ */, l => l._metaCommand()],
 
-        [0x09 /* \t */, l => l.whitespace()],
-        [0x0a /* \n */, l => l.whitespace()],
-        [0x0b /* \v */, l => l.whitespace()],
-        [0x0d /* \r */, l => l.whitespace()],
-        [0x20 /* space */, l => l.whitespace()]
+        [0x09 /* \t */, l => l._whitespace()],
+        [0x0a /* \n */, l => l._whitespace()],
+        [0x0b /* \v */, l => l._whitespace()],
+        [0x0d /* \r */, l => l._whitespace()],
+        [0x20 /* space */, l => l._whitespace()]
     ]);
 
-    private metaCommand() {
-        const prefixStart = this.currentLexerLocation();
+    private _metaCommand() {
+        const prefixStart = this._currentLexerLocation();
 
-        this._codepoint = this.nextCodepoint();
+        this._codepoint = this._nextCodepoint();
         let prefix: IAlphaTexMetaDataTagPrefixNode;
 
         // allow double backslash (easier to test when copying from escaped Strings)
         let prefixEnd: AlphaTexAstNodeLocation;
         if (this._codepoint === 0x5c /* \ */) {
-            this._codepoint = this.nextCodepoint();
-            prefixEnd = this.currentLexerLocation();
+            this._codepoint = this._nextCodepoint();
+            prefixEnd = this._currentLexerLocation();
             prefix = {
-                nodeType: AlphaTexNodeType.DoubleBackSlashToken,
+                nodeType: AlphaTexNodeType.DoubleBackslash,
                 start: prefixStart,
                 end: prefixEnd
             } as AlphaTexDoubleBackSlashTokenNode;
         } else {
-            prefixEnd = this.currentLexerLocation();
+            prefixEnd = this._currentLexerLocation();
             prefix = {
-                nodeType: AlphaTexNodeType.BackSlashToken,
+                nodeType: AlphaTexNodeType.Backslash,
                 start: prefixStart,
                 end: prefixEnd
             } as AlphaTexBackSlashTokenNode;
         }
 
         let text = '';
-        while (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
+        while (AlphaTexLexer._isIdentifierCharacter(this._codepoint)) {
             text += String.fromCodePoint(this._codepoint);
-            this._codepoint = this.nextCodepoint();
+            this._codepoint = this._nextCodepoint();
         }
 
         if (text.length === 0) {
@@ -286,49 +283,49 @@ export class AlphaTexLexer {
                 message: 'Missing identifier after meta data start',
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: this._tokenStart,
-                end: this.currentLexerLocation()
+                end: this._currentLexerLocation()
             });
             return undefined;
         }
 
         const token: AlphaTexMetaDataTagNode = {
-            nodeType: AlphaTexNodeType.MetaDataTag,
+            nodeType: AlphaTexNodeType.Tag,
             leadingComments: this._leadingComments,
             start: this._tokenStart,
-            end: this.currentLexerLocation(),
+            end: this._currentLexerLocation(),
             prefix: prefix,
             tag: {
-                nodeType: AlphaTexNodeType.Identifier,
+                nodeType: AlphaTexNodeType.Ident,
                 text: text,
                 start: prefixEnd,
-                end: this.currentLexerLocation()
+                end: this._currentLexerLocation()
             }
         };
         return token;
     }
 
-    private token<T extends AlphaTexTokenNode>(t: T): T {
+    private _token<T extends AlphaTexTokenNode>(t: T): T {
         t.leadingComments = this._leadingComments;
         t.start = this._tokenStart;
-        t.end = this.currentLexerLocation();
+        t.end = this._currentLexerLocation();
         // consume char
-        this._codepoint = this.nextCodepoint();
+        this._codepoint = this._nextCodepoint();
         return t;
     }
 
-    private string() {
+    private _string() {
         const startChar: number = this._codepoint;
-        this._codepoint = this.nextCodepoint();
+        this._codepoint = this._nextCodepoint();
         let s: string = '';
 
         let previousCodepoint: number = -1;
 
-        while (this._codepoint !== startChar && this._codepoint !== AlphaTexLexer.Eof) {
+        while (this._codepoint !== startChar && this._codepoint !== AlphaTexLexer._eof) {
             // escape sequences
             let codepoint = -1;
 
             if (this._codepoint === 0x5c /* \ */) {
-                this._codepoint = this.nextCodepoint();
+                this._codepoint = this._nextCodepoint();
                 if (this._codepoint === 0x5c /* \\ */) {
                     codepoint = 0x5c;
                 } else if (this._codepoint === startChar /* \<startchar> */) {
@@ -344,14 +341,14 @@ export class AlphaTexLexer {
                     let hex = '';
 
                     for (let i = 0; i < 4; i++) {
-                        this._codepoint = this.nextCodepoint();
-                        if (this._codepoint === AlphaTexLexer.Eof) {
+                        this._codepoint = this._nextCodepoint();
+                        if (this._codepoint === AlphaTexLexer._eof) {
                             this.lexerDiagnostics.push({
                                 code: AlphaTexDiagnosticCode.AT003,
                                 message: 'Unexpected end of file. Need 4 hex characters on a \\uXXXX escape sequence',
                                 severity: AlphaTexDiagnosticsSeverity.Error,
                                 start: this._tokenStart,
-                                end: this.currentLexerLocation()
+                                end: this._currentLexerLocation()
                             });
                             this._fatalError = true;
                             return undefined;
@@ -366,7 +363,7 @@ export class AlphaTexLexer {
                             message: 'Invalid unicode value. Need 4 hex characters on a \\uXXXX escape sequence.',
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: this._tokenStart,
-                            end: this.currentLexerLocation()
+                            end: this._currentLexerLocation()
                         });
                         this._fatalError = true;
                         return undefined;
@@ -377,7 +374,7 @@ export class AlphaTexLexer {
                         message: `Unsupported escape sequence. Expected '\\n', '\\r', '\\t', or '\\uXXXX' but found '\\${String.fromCodePoint(this._codepoint)}'.`,
                         severity: AlphaTexDiagnosticsSeverity.Error,
                         start: this._tokenStart,
-                        end: this.currentLexerLocation()
+                        end: this._currentLexerLocation()
                     });
                     this._fatalError = true;
                     return undefined;
@@ -406,48 +403,48 @@ export class AlphaTexLexer {
             }
 
             previousCodepoint = codepoint;
-            this._codepoint = this.nextCodepoint();
+            this._codepoint = this._nextCodepoint();
         }
-        if (this._codepoint === AlphaTexLexer.Eof) {
+        if (this._codepoint === AlphaTexLexer._eof) {
             this.lexerDiagnostics.push({
                 code: AlphaTexDiagnosticCode.AT006,
                 message: `Unexpected end of file. String not closed.`,
                 severity: AlphaTexDiagnosticsSeverity.Error,
                 start: this._tokenStart,
-                end: this.currentLexerLocation()
+                end: this._currentLexerLocation()
             });
             this._fatalError = true;
             return undefined;
         }
 
         const stringToken: AlphaTexStringLiteral = {
-            nodeType: AlphaTexNodeType.StringLiteral,
+            nodeType: AlphaTexNodeType.String,
             text: s,
             leadingComments: this._leadingComments,
             start: this._tokenStart,
-            end: this.currentLexerLocation()
+            end: this._currentLexerLocation()
         };
 
         // string quote end
-        this._codepoint = this.nextCodepoint();
+        this._codepoint = this._nextCodepoint();
 
         return stringToken;
     }
 
-    private multiLineComment() {
+    private _multiLineComment() {
         const trailingCommentNode = this._trailingCommentNode;
         const comment: AlphaTexComment = {
             start: this._tokenStart,
-            end: this.currentLexerLocation(),
+            end: this._currentLexerLocation(),
             text: '',
             multiLine: true
         };
 
-        while (this._codepoint !== AlphaTexLexer.Eof) {
+        while (this._codepoint !== AlphaTexLexer._eof) {
             if (this._codepoint === 0x2a /* * */) {
-                this._codepoint = this.nextCodepoint();
+                this._codepoint = this._nextCodepoint();
                 if (this._codepoint === 0x2f /* / */) {
-                    this._codepoint = this.nextCodepoint();
+                    this._codepoint = this._nextCodepoint();
                     break;
                 } else {
                     comment.text += `*${String.fromCodePoint(this._codepoint)}`;
@@ -456,7 +453,7 @@ export class AlphaTexLexer {
                     comment.end!.offset = this._offset;
                 }
             } else {
-                this._codepoint = this.nextCodepoint();
+                this._codepoint = this._nextCodepoint();
                 comment.text += String.fromCodePoint(this._codepoint);
                 comment.end!.line = this._line;
                 comment.end!.col = this._col;
@@ -473,7 +470,7 @@ export class AlphaTexLexer {
         }
     }
 
-    private numberOrIdentifier(): AlphaTexAstNode {
+    private _numberOrIdentifier(): AlphaTexAstNode {
         let str: string = '';
 
         // assume number at start
@@ -482,10 +479,10 @@ export class AlphaTexLexer {
         // negative start or dash
         if (this._codepoint === 0x2d) {
             str += String.fromCodePoint(this._codepoint);
-            this._codepoint = this.nextCodepoint();
+            this._codepoint = this._nextCodepoint();
 
             // need a number afterwards otherwise we have a string(-)
-            if (!AlphaTexLexer.isDigit(this._codepoint)) {
+            if (!AlphaTexLexer._isDigit(this._codepoint)) {
                 isNumber = false;
             }
         }
@@ -495,16 +492,16 @@ export class AlphaTexLexer {
         do {
             if (isNumber) {
                 // adding digits to the number
-                if (AlphaTexLexer.isDigit(this._codepoint)) {
+                if (AlphaTexLexer._isDigit(this._codepoint)) {
                     str += String.fromCodePoint(this._codepoint);
-                    this._codepoint = this.nextCodepoint();
+                    this._codepoint = this._nextCodepoint();
                     keepReading = true;
                 }
                 // letter in number -> fallback to name reading
-                else if (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
+                else if (AlphaTexLexer._isIdentifierCharacter(this._codepoint)) {
                     isNumber = false;
                     str += String.fromCodePoint(this._codepoint);
-                    this._codepoint = this.nextCodepoint();
+                    this._codepoint = this._nextCodepoint();
                     keepReading = true;
                 }
                 // general unknown character -> end reading
@@ -512,9 +509,9 @@ export class AlphaTexLexer {
                     keepReading = false;
                 }
             } else {
-                if (AlphaTexLexer.isIdentifierCharacter(this._codepoint)) {
+                if (AlphaTexLexer._isIdentifierCharacter(this._codepoint)) {
                     str += String.fromCodePoint(this._codepoint);
-                    this._codepoint = this.nextCodepoint();
+                    this._codepoint = this._nextCodepoint();
                     keepReading = true;
                 } else {
                     keepReading = false;
@@ -524,40 +521,40 @@ export class AlphaTexLexer {
 
         if (isNumber) {
             const numberLiteral: AlphaTexNumberLiteral = {
-                nodeType: AlphaTexNodeType.NumberLiteral,
+                nodeType: AlphaTexNodeType.Number,
                 leadingComments: this._leadingComments,
                 start: this._tokenStart,
-                end: this.currentLexerLocation(),
+                end: this._currentLexerLocation(),
                 value: Number.parseInt(str, 10)
             };
             return numberLiteral;
         }
 
         const identifier: AlphaTexIdentifier = {
-            nodeType: AlphaTexNodeType.Identifier,
+            nodeType: AlphaTexNodeType.Ident,
             leadingComments: this._leadingComments,
             start: this._tokenStart,
-            end: this.currentLexerLocation(),
+            end: this._currentLexerLocation(),
             text: str
         };
         return identifier;
     }
 
-    private singleLineComment() {
+    private _singleLineComment() {
         // single line comment
         const trailingCommentNode = this._trailingCommentNode;
         const comment: AlphaTexComment = {
             start: this._tokenStart,
-            end: this.currentLexerLocation(),
+            end: this._currentLexerLocation(),
             text: '',
             multiLine: false
         };
-        while (this._codepoint !== AlphaTexLexer.Eof) {
-            this._codepoint = this.nextCodepoint();
+        while (this._codepoint !== AlphaTexLexer._eof) {
+            this._codepoint = this._nextCodepoint();
             if (
                 this._codepoint !== 0x0d /* \r */ &&
                 this._codepoint !== 0x0a /* \n */ &&
-                this._codepoint !== AlphaTexLexer.Eof
+                this._codepoint !== AlphaTexLexer._eof
             ) {
                 comment.text += String.fromCodePoint(this._codepoint);
                 comment.end!.line = this._line;
@@ -576,37 +573,37 @@ export class AlphaTexLexer {
         }
     }
 
-    private whitespace(): AlphaTexAstNode | undefined {
+    private _whitespace(): AlphaTexAstNode | undefined {
         // skip whitespaces
-        while (AlphaTexLexer.isWhiteSpace(this._codepoint)) {
+        while (AlphaTexLexer._isWhiteSpace(this._codepoint)) {
             if (this._codepoint === 0x0a /* \n */) {
                 this._trailingCommentNode = undefined;
             }
-            this.nextCodepoint();
+            this._nextCodepoint();
         }
         return undefined;
     }
 
-    private static isDigit(ch: number): boolean {
+    private static _isDigit(ch: number): boolean {
         return ch >= 0x30 && ch <= 0x39 /* 0-9 */;
     }
 
-    private static isIdentifierCharacter(ch: number): boolean {
-        return AlphaTexLexer.isIdentifierStart(ch) || AlphaTexLexer.isDigit(ch) || ch === 0x2d /* dash */;
+    private static _isIdentifierCharacter(ch: number): boolean {
+        return AlphaTexLexer._isIdentifierStart(ch) || AlphaTexLexer._isDigit(ch) || ch === 0x2d /* dash */;
     }
 
-    private static isIdentifierStart(ch: number): boolean {
+    private static _isIdentifierStart(ch: number): boolean {
         // allow almost all characters:
         return !(
             (
-                AlphaTexLexer.terminalTokens.has(ch) || // terminal tokens end identifiers
+                AlphaTexLexer._terminalTokens.has(ch) || // terminal tokens end identifiers
                 ch <= 0x21 || // control characters
-                AlphaTexLexer.isDigit(ch)
+                AlphaTexLexer._isDigit(ch)
             ) // digits
         );
     }
 
-    private static isWhiteSpace(ch: number): boolean {
+    private static _isWhiteSpace(ch: number): boolean {
         return (
             ch === 0x09 /* \t */ ||
             ch === 0x0a /* \n */ ||

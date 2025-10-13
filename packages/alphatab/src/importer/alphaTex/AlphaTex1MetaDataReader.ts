@@ -20,9 +20,12 @@ import {
     AlphaTexDiagnosticsSeverity,
     AlphaTexParserAbort
 } from '@src/importer/alphaTex/AlphaTexShared';
-import { ATNF } from '@src/importer/alphaTex/ATNF';
+import { Atnf } from '@src/importer/alphaTex/ATNF';
 import type { IAlphaTexMetaDataReader } from '@src/importer/alphaTex/IAlphaTexMetaDataReader';
 
+/**
+ * @internal
+ */
 export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     public static readonly instance = new AlphaTex1MetaDataReader();
 
@@ -35,7 +38,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             if (lookup.has(tag)) {
                 const types = lookup.get(tag);
                 if (types) {
-                    return this.readTypedValueList(parser, types);
+                    return this._readTypedValueList(parser, types);
                 } else {
                     return undefined;
                 }
@@ -59,19 +62,19 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
     ): AlphaTexValueList | undefined {
         switch (metaData.tag.text.toLowerCase()) {
             case 'track':
-                return this.readPropertyValues(
+                return this._readPropertyValues(
                     parser,
                     [AlphaTex1LanguageDefinitions.trackPropertyValueListTypes],
                     property
                 );
             case 'chord':
-                return this.readPropertyValues(
+                return this._readPropertyValues(
                     parser,
                     [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes],
                     property
                 );
             case 'staff':
-                return this.readPropertyValues(
+                return this._readPropertyValues(
                     parser,
                     [AlphaTex1LanguageDefinitions.staffPropertyValueListTypes],
                     property
@@ -85,14 +88,14 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexValueList | undefined {
-        return this.readPropertyValues(parser, [AlphaTex1LanguageDefinitions.beatPropertyValueListTypes], property);
+        return this._readPropertyValues(parser, [AlphaTex1LanguageDefinitions.beatPropertyValueListTypes], property);
     }
 
     public readDurationChangePropertyValues(
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexValueList | undefined {
-        return this.readPropertyValues(
+        return this._readPropertyValues(
             parser,
             [AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes],
             property
@@ -103,7 +106,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         parser: AlphaTexParser,
         property: AlphaTexPropertyNode
     ): AlphaTexValueList | undefined {
-        return this.readPropertyValues(
+        return this._readPropertyValues(
             parser,
             [
                 AlphaTex1LanguageDefinitions.notePropertyValueListTypes,
@@ -113,21 +116,21 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         );
     }
 
-    private readPropertyValues(
+    private _readPropertyValues(
         parser: AlphaTexParser,
         lookups: Map<string, ValueListParseTypesExtended[] | undefined>[],
         property: AlphaTexPropertyNode
     ): AlphaTexValueList | undefined {
         const tag = property.property.text.toLowerCase();
         const endOfProperty = new Set<AlphaTexNodeType>([
-            AlphaTexNodeType.Identifier,
-            AlphaTexNodeType.BraceCloseToken
+            AlphaTexNodeType.Ident,
+            AlphaTexNodeType.RBrace
         ]);
         for (const lookup of lookups) {
             if (lookup.has(tag)) {
                 const types = lookup.get(tag);
                 if (types) {
-                    return this.readTypedValueList(parser, types, endOfProperty);
+                    return this._readTypedValueList(parser, types, endOfProperty);
                 } else {
                     return undefined;
                 }
@@ -143,7 +146,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         throw new AlphaTexParserAbort();
     }
 
-    private readTypedValueList(
+    private _readTypedValueList(
         parser: AlphaTexParser,
         expectedValues: ValueListParseTypesExtended[],
         endOfListTypes?: Set<AlphaTexNodeType>
@@ -172,9 +175,9 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 value &&
                 (expected.expectedTypes.has(value.nodeType) ||
                     // value lists start with a parenthesis open token
-                    AlphaTex1MetaDataReader.isValueListMatch(value, expected))
+                    AlphaTex1MetaDataReader._isValueListMatch(value, expected))
             ) {
-                this.handleTypeValueListItem(parser, values, value, expected);
+                this._handleTypeValueListItem(parser, values, value, expected);
                 switch (expected.parseMode) {
                     case ValueListParseTypesMode.OptionalAndStop:
                         // stop reading values
@@ -223,7 +226,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         if (parseRemaining) {
             let remaining = parser.lexer.peekToken();
             while (remaining && !endOfListTypes!.has(remaining.nodeType)) {
-                if (this.handleTypeValueListItem(parser, values, remaining, undefined)) {
+                if (this._handleTypeValueListItem(parser, values, remaining, undefined)) {
                     remaining = parser.lexer.peekToken();
                 } else {
                     remaining = undefined;
@@ -235,21 +238,21 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
             return undefined;
         }
 
-        const valueList = ATNF.valueList(values, false)!;
+        const valueList = Atnf.values(values, false)!;
         valueList.start = valueListStart;
         valueList.end = parser.lexer.currentTokenLocation();
 
         return valueList;
     }
 
-    private handleTypeValueListItem(
+    private _handleTypeValueListItem(
         parser: AlphaTexParser,
         valueList: IAlphaTexValueListItem[],
         value: AlphaTexAstNode,
         expected: ValueListParseTypesExtended | undefined
     ): boolean {
         switch (value.nodeType) {
-            case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.Ident:
                 if (expected?.allowedValues) {
                     const identifierText = (parser.lexer.peekToken() as AlphaTexIdentifier).text;
                     if (expected.allowedValues.has(identifierText.toLowerCase())) {
@@ -265,7 +268,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                 }
 
                 return true;
-            case AlphaTexNodeType.StringLiteral:
+            case AlphaTexNodeType.String:
                 if (expected?.allowedValues) {
                     const identifierText = (parser.lexer.peekToken() as AlphaTexStringLiteral).text;
                     if (expected.allowedValues.has(identifierText.toLowerCase())) {
@@ -275,7 +278,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                     valueList.push(parser.lexer.nextToken() as AlphaTexStringLiteral);
                 }
                 return true;
-            case AlphaTexNodeType.NumberLiteral:
+            case AlphaTexNodeType.Number:
                 const parseMode = expected?.parseMode ?? ValueListParseTypesMode.Optional;
                 switch (parseMode) {
                     case ValueListParseTypesMode.RequiredAsFloat:
@@ -287,7 +290,7 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
                         break;
                 }
                 return true;
-            case AlphaTexNodeType.ParenthesisOpenToken:
+            case AlphaTexNodeType.LParen:
                 const nestedList = parser.valueList();
                 if (nestedList) {
                     for (const v of nestedList.values) {
@@ -299,13 +302,13 @@ export class AlphaTex1MetaDataReader implements IAlphaTexMetaDataReader {
         return false;
     }
 
-    private static isValueListMatch(value: AlphaTexAstNode, expected: ValueListParseTypesExtended): boolean {
-        if (value.nodeType !== AlphaTexNodeType.ParenthesisOpenToken) {
+    private static _isValueListMatch(value: AlphaTexAstNode, expected: ValueListParseTypesExtended): boolean {
+        if (value.nodeType !== AlphaTexNodeType.LParen) {
             return false;
         }
 
         return (
-            expected.expectedTypes.has(AlphaTexNodeType.ValueList) ||
+            expected.expectedTypes.has(AlphaTexNodeType.Values) ||
             expected.parseMode === ValueListParseTypesMode.ValueListWithoutParenthesis ||
             expected.parseMode === ValueListParseTypesMode.RequiredAsValueList
         );

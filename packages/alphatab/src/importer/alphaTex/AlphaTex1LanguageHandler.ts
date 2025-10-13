@@ -26,7 +26,7 @@ import {
     AlphaTexDiagnosticsSeverity,
     type IAlphaTexImporter
 } from '@src/importer/alphaTex/AlphaTexShared';
-import { ATNF } from '@src/importer/alphaTex/ATNF';
+import { Atnf } from '@src/importer/alphaTex/ATNF';
 import {
     ApplyNodeResult,
     ApplyStructuralMetaDataResult,
@@ -77,6 +77,9 @@ import { WahPedal } from '@src/model/WahPedal';
 import { BeamDirection } from '@src/rendering/_barrel';
 import { SynthConstants } from '@src/synth/SynthConstants';
 
+/**
+ * @internal
+ */
 export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler {
     public static readonly instance = new AlphaTex1LanguageHandler();
 
@@ -85,7 +88,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         score: Score,
         metaData: AlphaTexMetaDataNode
     ): ApplyNodeResult {
-        const result = this.checkValueListTypes(
+        const result = this._checkValueListTypes(
             importer,
             [AlphaTex1LanguageDefinitions.scoreMetaDataValueListTypes],
             metaData,
@@ -99,31 +102,31 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         switch (metaData.tag.tag.text.toLowerCase()) {
             case 'title':
                 score.title = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Title, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Title, metaData);
                 return ApplyNodeResult.Applied;
             case 'subtitle':
                 score.subTitle = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.SubTitle, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.SubTitle, metaData);
                 return ApplyNodeResult.Applied;
             case 'artist':
                 score.artist = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Artist, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Artist, metaData);
                 return ApplyNodeResult.Applied;
             case 'album':
                 score.album = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Album, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Album, metaData);
                 return ApplyNodeResult.Applied;
             case 'words':
                 score.words = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Words, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Words, metaData);
                 return ApplyNodeResult.Applied;
             case 'music':
                 score.music = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Music, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Music, metaData);
                 return ApplyNodeResult.Applied;
             case 'copyright':
                 score.copyright = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Copyright, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Copyright, metaData);
                 return ApplyNodeResult.Applied;
             case 'instructions':
                 score.instructions = (metaData.values!.values[0] as AlphaTexTextNode).text;
@@ -133,13 +136,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'tab':
                 score.tab = (metaData.values!.values[0] as AlphaTexTextNode).text;
-                this.headerFooterStyle(importer, score, ScoreSubElement.Transcriber, metaData);
+                this._headerFooterStyle(importer, score, ScoreSubElement.Transcriber, metaData);
                 return ApplyNodeResult.Applied;
             case 'copyright2':
-                this.headerFooterStyle(importer, score, ScoreSubElement.CopyrightSecondLine, metaData, 0);
+                this._headerFooterStyle(importer, score, ScoreSubElement.CopyrightSecondLine, metaData, 0);
                 return ApplyNodeResult.Applied;
             case 'wordsandmusic':
-                this.headerFooterStyle(importer, score, ScoreSubElement.WordsAndMusic, metaData, 0);
+                this._headerFooterStyle(importer, score, ScoreSubElement.WordsAndMusic, metaData, 0);
                 return ApplyNodeResult.Applied;
             case 'defaultsystemslayout':
                 score.defaultSystemsLayout = (metaData.values!.values[0] as AlphaTexNumberLiteral).value;
@@ -156,7 +159,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.hideDynamics = false;
                 return ApplyNodeResult.Applied;
             case 'bracketextendmode':
-                const bracketExtendMode = AlphaTex1LanguageHandler.parseEnumValue(
+                const bracketExtendMode = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'bracket extend mode',
@@ -174,7 +177,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.multiTrackMultiBarRest = true;
                 return ApplyNodeResult.Applied;
             case 'singletracktracknamepolicy':
-                const singleTrackTrackNamePolicy = AlphaTex1LanguageHandler.parseEnumValue(
+                const singleTrackTrackNamePolicy = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'track name policy',
@@ -186,7 +189,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.singleTrackTrackNamePolicy = singleTrackTrackNamePolicy!;
                 return ApplyNodeResult.Applied;
             case 'multitracktracknamepolicy':
-                const multiTrackTrackNamePolicy = AlphaTex1LanguageHandler.parseEnumValue(
+                const multiTrackTrackNamePolicy = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'track name policy',
@@ -198,7 +201,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.multiTrackTrackNamePolicy = multiTrackTrackNamePolicy!;
                 return ApplyNodeResult.Applied;
             case 'firstsystemtracknamemode':
-                const firstSystemTrackNameMode = AlphaTex1LanguageHandler.parseEnumValue(
+                const firstSystemTrackNameMode = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'track name mode',
@@ -210,7 +213,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.firstSystemTrackNameMode = firstSystemTrackNameMode!;
                 return ApplyNodeResult.Applied;
             case 'othersystemstracknamemode':
-                const otherSystemsTrackNameMode = AlphaTex1LanguageHandler.parseEnumValue(
+                const otherSystemsTrackNameMode = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'track name mode',
@@ -222,7 +225,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.otherSystemsTrackNameMode = otherSystemsTrackNameMode!;
                 return ApplyNodeResult.Applied;
             case 'firstsystemtracknameorientation':
-                const firstSystemTrackNameOrientation = AlphaTex1LanguageHandler.parseEnumValue(
+                const firstSystemTrackNameOrientation = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'track name orientation',
@@ -234,7 +237,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 score.stylesheet.firstSystemTrackNameOrientation = firstSystemTrackNameOrientation!;
                 return ApplyNodeResult.Applied;
             case 'othersystemstracknameorientation':
-                const otherSystemsTrackNameOrientation = AlphaTex1LanguageHandler.parseEnumValue(
+                const otherSystemsTrackNameOrientation = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'track name orientation',
@@ -250,7 +253,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private checkValueListTypes(
+    private _checkValueListTypes(
         importer: IAlphaTexImporter,
         lookupList: Map<string, ValueListParseTypesExtended[] | undefined>[],
         parent: AlphaTexAstNode,
@@ -276,7 +279,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return undefined;
         }
 
-        if (!this.validateValueListTypes(importer, types, parent, values)) {
+        if (!this._validateValueListTypes(importer, types, parent, values)) {
             return ApplyNodeResult.NotAppliedSemanticError;
         }
 
@@ -288,7 +291,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         staff: Staff,
         metaData: AlphaTexMetaDataNode
     ): ApplyNodeResult {
-        const result = this.checkValueListTypes(
+        const result = this._checkValueListTypes(
             importer,
             [AlphaTex1LanguageDefinitions.staffMetaDataValueListTypes],
             metaData,
@@ -355,7 +358,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'instrument':
                 importer.state.staffTuningApplied.delete(staff);
-                this.readTrackInstrument(importer, staff.track, metaData.values!);
+                this._readTrackInstrument(importer, staff.track, metaData.values!);
 
                 return ApplyNodeResult.Applied;
             case 'bank':
@@ -376,14 +379,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'chord':
                 const chord = new Chord();
-                this.chordProperties(importer, chord, metaData);
+                this._chordProperties(importer, chord, metaData);
                 chord.name = (metaData.values!.values[0] as AlphaTexTextNode).text;
 
                 for (let i = 1; i < metaData.values!.values.length; i++) {
                     const v = metaData.values!.values[i];
-                    if (v.nodeType === AlphaTexNodeType.NumberLiteral) {
+                    if (v.nodeType === AlphaTexNodeType.Number) {
                         chord.strings.push((v as AlphaTexNumberLiteral).value);
-                    } else if (v.nodeType === AlphaTexNodeType.Identifier) {
+                    } else if (v.nodeType === AlphaTexNodeType.Ident) {
                         const txt = (v as AlphaTexIdentifier).text;
                         if (txt === 'x') {
                             chord.strings.push(-1);
@@ -398,7 +401,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         }
                     }
                 }
-                staff.addChord(AlphaTex1LanguageHandler.getChordId(staff, chord.name), chord);
+                staff.addChord(AlphaTex1LanguageHandler._getChordId(staff, chord.name), chord);
                 return ApplyNodeResult.Applied;
             case 'articulation':
                 const percussionArticulationNames = importer.state.percussionArticulationNames;
@@ -407,7 +410,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     for (const [defaultName, defaultValue] of PercussionMapper.instrumentArticulationNames) {
                         percussionArticulationNames.set(defaultName.toLowerCase(), defaultValue);
                         percussionArticulationNames.set(
-                            AlphaTex1LanguageHandler.toArticulationId(defaultName),
+                            AlphaTex1LanguageHandler._toArticulationId(defaultName),
                             defaultValue
                         );
                     }
@@ -436,7 +439,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 return ApplyNodeResult.Applied;
             case 'accidentals':
-                return AlphaTex1LanguageHandler.handleAccidentalMode(importer, metaData.values!);
+                return AlphaTex1LanguageHandler._handleAccidentalMode(importer, metaData.values!);
             case 'displaytranspose':
                 staff.displayTranspositionPitch = (metaData.values!.values[0] as AlphaTexNumberLiteral).value * -1;
                 importer.state.staffHasExplicitDisplayTransposition.add(staff);
@@ -450,7 +453,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     }
 
     public applyBarMetaData(importer: IAlphaTexImporter, bar: Bar, metaData: AlphaTexMetaDataNode): ApplyNodeResult {
-        const result = this.checkValueListTypes(
+        const result = this._checkValueListTypes(
             importer,
             [AlphaTex1LanguageDefinitions.barMetaDataValueListTypes],
             metaData,
@@ -463,7 +466,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         switch (metaData.tag.tag.text.toLowerCase()) {
             case 'sync':
-                const syncPoint = this.buildSyncPoint(metaData);
+                const syncPoint = this._buildSyncPoint(metaData);
                 importer.state.syncPoints.push(syncPoint);
                 return ApplyNodeResult.Applied;
             case 'tempo':
@@ -475,8 +478,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 while (ti < metaData.values!.values.length) {
                     switch (metaData.values!.values[ti].nodeType) {
-                        case AlphaTexNodeType.Identifier:
-                        case AlphaTexNodeType.StringLiteral:
+                        case AlphaTexNodeType.Ident:
+                        case AlphaTexNodeType.String:
                             const txt = (metaData.values!.values[ti] as AlphaTexTextNode).text;
                             if (txt === 'hide') {
                                 isVisible = false;
@@ -484,7 +487,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                                 tempoLabel = txt;
                             }
                             break;
-                        case AlphaTexNodeType.NumberLiteral:
+                        case AlphaTexNodeType.Number:
                             ratioPosition = (metaData.values!.values[ti] as AlphaTexNumberLiteral).value;
                             break;
                     }
@@ -509,7 +512,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'ae':
                 for (const e of metaData.values!.values) {
-                    if (e.nodeType === AlphaTexNodeType.NumberLiteral) {
+                    if (e.nodeType === AlphaTexNodeType.Number) {
                         const num = (e as AlphaTexNumberLiteral).value;
                         if (num < 1 || num > 31) {
                             importer.addSemanticDiagnostic({
@@ -527,7 +530,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     } else {
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT202,
-                            message: `Unexpected '${AlphaTexNodeType[e.nodeType]}' token. Expected one of following: ${AlphaTexNodeType[AlphaTexNodeType.NumberLiteral]}`,
+                            message: `Unexpected '${AlphaTexNodeType[e.nodeType]}' token. Expected one of following: ${AlphaTexNodeType[AlphaTexNodeType.Number]}`,
                             severity: AlphaTexDiagnosticsSeverity.Error,
                             start: e.start,
                             end: e.end
@@ -537,7 +540,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'ts':
                 switch (metaData.values!.values[0].nodeType) {
-                    case AlphaTexNodeType.NumberLiteral:
+                    case AlphaTexNodeType.Number:
                         bar.masterBar.timeSignatureNumerator = (
                             metaData.values!.values[0] as AlphaTexNumberLiteral
                         ).value;
@@ -545,8 +548,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                             metaData.values!.values[1] as AlphaTexNumberLiteral
                         ).value;
                         break;
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
                         const tsValue = (metaData.values!.values[0] as AlphaTexTextNode).text;
                         if (tsValue.toLowerCase() === 'common') {
                             bar.masterBar.timeSignatureCommon = true;
@@ -566,7 +569,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 return ApplyNodeResult.Applied;
             case 'ks':
-                const keySignature = AlphaTex1LanguageHandler.parseEnumValue(
+                const keySignature = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'key signature',
@@ -576,7 +579,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     return ApplyNodeResult.NotAppliedSemanticError;
                 }
 
-                const keySignatureType = AlphaTex1LanguageHandler.parseEnumValue(
+                const keySignatureType = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'key signature type',
@@ -592,9 +595,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'clef':
                 switch (metaData.values!.values[0].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
-                        const clef = AlphaTex1LanguageHandler.parseEnumValue(
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
+                        const clef = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
                             metaData.values!,
                             'clef',
@@ -606,7 +609,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         bar.clef = clef!;
                         break;
 
-                    case AlphaTexNodeType.NumberLiteral:
+                    case AlphaTexNodeType.Number:
                         const clefValue = (metaData.values!.values[0] as AlphaTexNumberLiteral).value;
 
                         switch (clefValue) {
@@ -652,9 +655,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'tf':
                 switch (metaData.values!.values[0].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
-                        const tripletFeel = AlphaTex1LanguageHandler.parseEnumValue(
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
+                        const tripletFeel = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
                             metaData.values!,
                             'triplet feel',
@@ -666,7 +669,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         bar.masterBar.tripletFeel = tripletFeel!;
                         break;
 
-                    case AlphaTexNodeType.NumberLiteral:
+                    case AlphaTexNodeType.Number:
                         const tripletFeelValue = (metaData.values!.values[0] as AlphaTexNumberLiteral).value;
 
                         switch (tripletFeelValue) {
@@ -706,7 +709,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 return ApplyNodeResult.Applied;
             case 'barlineleft':
-                const barLineLeft = AlphaTex1LanguageHandler.parseEnumValue(
+                const barLineLeft = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'bar line',
@@ -718,7 +721,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 bar.barLineLeft = barLineLeft!;
                 return ApplyNodeResult.Applied;
             case 'barlineright':
-                const barLineRight = AlphaTex1LanguageHandler.parseEnumValue(
+                const barLineRight = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'bar line',
@@ -730,9 +733,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 bar.barLineRight = barLineRight!;
                 return ApplyNodeResult.Applied;
             case 'accidentals':
-                return AlphaTex1LanguageHandler.handleAccidentalMode(importer, metaData.values!);
+                return AlphaTex1LanguageHandler._handleAccidentalMode(importer, metaData.values!);
             case 'jump':
-                const direction = AlphaTex1LanguageHandler.parseEnumValue(
+                const direction = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'direction',
@@ -744,7 +747,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 bar.masterBar.addDirection(direction!);
                 return ApplyNodeResult.Applied;
             case 'ottava':
-                const ottava = AlphaTex1LanguageHandler.parseEnumValue(
+                const ottava = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'clef ottava',
@@ -756,7 +759,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 bar.clefOttava = ottava!;
                 return ApplyNodeResult.Applied;
             case 'simile':
-                const simile = AlphaTex1LanguageHandler.parseEnumValue(
+                const simile = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     metaData.values!,
                     'simile mark',
@@ -811,8 +814,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static handleAccidentalMode(importer: IAlphaTexImporter, values: AlphaTexValueList): ApplyNodeResult {
-        const accidentalMode = AlphaTex1LanguageHandler.parseEnumValue(
+    private static _handleAccidentalMode(importer: IAlphaTexImporter, values: AlphaTexValueList): ApplyNodeResult {
+        const accidentalMode = AlphaTex1LanguageHandler._parseEnumValue(
             importer,
             values,
             'accidental mode',
@@ -825,15 +828,15 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return ApplyNodeResult.Applied;
     }
 
-    private static toArticulationId(plain: string): string {
+    private static _toArticulationId(plain: string): string {
         return plain.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
     }
 
-    private static getChordId(currentStaff: Staff, chordName: string): string {
+    private static _getChordId(currentStaff: Staff, chordName: string): string {
         return chordName.toLowerCase() + currentStaff.index + currentStaff.track.index;
     }
 
-    private buildSyncPoint(metaData: AlphaTexMetaDataNode): FlatSyncPoint {
+    private _buildSyncPoint(metaData: AlphaTexMetaDataNode): FlatSyncPoint {
         const barIndex = (metaData.values!.values[0] as AlphaTexNumberLiteral).value;
         const barOccurence = (metaData.values!.values[1] as AlphaTexNumberLiteral).value;
         const millisecondOffset = (metaData.values!.values[2] as AlphaTexNumberLiteral).value;
@@ -850,7 +853,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         };
     }
 
-    private validateValueListTypes(
+    private _validateValueListTypes(
         importer: IAlphaTexImporter,
         expectedValues: ValueListParseTypesExtended[],
         parent: AlphaTexAstNode,
@@ -868,7 +871,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     v.parseMode === ValueListParseTypesMode.RequiredAsValueList
             );
             if (anyRequired) {
-                const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage(expectedValues);
+                const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
 
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT210,
@@ -909,12 +912,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 continue;
             }
 
-            const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage([expected]);
+            const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage([expected]);
 
             // value list
             if (
                 value &&
-                value.nodeType === AlphaTexNodeType.ValueList &&
+                value.nodeType === AlphaTexNodeType.Values &&
                 (expected.parseMode === ValueListParseTypesMode.ValueListWithoutParenthesis ||
                     expected.parseMode === ValueListParseTypesMode.RequiredAsValueList)
             ) {
@@ -997,7 +1000,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         // remaining values?
         if (actualIndex < values.values.length) {
             while (actualIndex < values.values.length) {
-                const expectedTypes = AlphaTex1LanguageHandler.buildExpectedTypesMessage(expectedValues);
+                const expectedTypes = AlphaTex1LanguageHandler._buildExpectedTypesMessage(expectedValues);
                 const value = values.values[actualIndex];
                 importer.addSemanticDiagnostic({
                     code: AlphaTexDiagnosticCode.AT209,
@@ -1013,7 +1016,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return !error;
     }
 
-    private headerFooterStyle(
+    private _headerFooterStyle(
         importer: IAlphaTexImporter,
         score: Score,
         element: ScoreSubElement,
@@ -1041,7 +1044,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return;
         }
 
-        const textAlign = AlphaTex1LanguageHandler.parseEnumValue(
+        const textAlign = AlphaTex1LanguageHandler._parseEnumValue(
             importer,
             metaData.values!,
             'textAlign',
@@ -1054,7 +1057,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         style.textAlign = textAlign!;
     }
 
-    private static buildExpectedTypesMessage(values: ValueListParseTypesExtended[]) {
+    private static _buildExpectedTypesMessage(values: ValueListParseTypesExtended[]) {
         const parts: string[] = [];
 
         for (const v of values) {
@@ -1082,9 +1085,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return parts.join(',');
     }
 
-    private readTrackInstrument(importer: IAlphaTexImporter, track: Track, values: AlphaTexValueList) {
+    private _readTrackInstrument(importer: IAlphaTexImporter, track: Track, values: AlphaTexValueList) {
         switch (values!.values[0].nodeType) {
-            case AlphaTexNodeType.NumberLiteral:
+            case AlphaTexNodeType.Number:
                 const instrument = (values!.values[0] as AlphaTexNumberLiteral).value;
                 if (instrument >= 0 && instrument <= 127) {
                     track.playbackInfo.program = instrument;
@@ -1098,8 +1101,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     });
                 }
                 break;
-            case AlphaTexNodeType.Identifier:
-            case AlphaTexNodeType.StringLiteral:
+            case AlphaTexNodeType.Ident:
+            case AlphaTexNodeType.String:
                 const instrumentName = (values!.values[0] as AlphaTexTextNode).text.toLowerCase();
                 if (instrumentName === 'percussion') {
                     for (const staff of track.staves) {
@@ -1114,13 +1117,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private chordProperties(importer: IAlphaTexImporter, chord: Chord, metaData: AlphaTexMetaDataNode) {
+    private _chordProperties(importer: IAlphaTexImporter, chord: Chord, metaData: AlphaTexMetaDataNode) {
         if (!metaData.properties) {
             return;
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this.checkProperty(importer, [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.chordPropertyValueListTypes], p)) {
                 continue;
             }
 
@@ -1129,13 +1132,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     chord.firstFret = (p.values!.values[0] as AlphaTexNumberLiteral).value;
                     break;
                 case 'showdiagram':
-                    chord.showDiagram = AlphaTex1LanguageHandler.booleanLikeValue(p.values!.values, 0);
+                    chord.showDiagram = AlphaTex1LanguageHandler._booleanLikeValue(p.values!.values, 0);
                     break;
                 case 'showfingering':
-                    chord.showFingering = AlphaTex1LanguageHandler.booleanLikeValue(p.values!.values, 0);
+                    chord.showFingering = AlphaTex1LanguageHandler._booleanLikeValue(p.values!.values, 0);
                     break;
                 case 'showname':
-                    chord.showName = AlphaTex1LanguageHandler.booleanLikeValue(p.values!.values, 0);
+                    chord.showName = AlphaTex1LanguageHandler._booleanLikeValue(p.values!.values, 0);
                     break;
                 case 'barre':
                     chord.barreFrets = p.values!.values.map(v => (v as AlphaTexNumberLiteral).value);
@@ -1144,17 +1147,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static booleanLikeValue(values: IAlphaTexValueListItem[], i: number): boolean {
+    private static _booleanLikeValue(values: IAlphaTexValueListItem[], i: number): boolean {
         if (i >= values.length) {
             return true;
         }
 
         const v = values[i];
         switch (v.nodeType) {
-            case AlphaTexNodeType.StringLiteral:
-            case AlphaTexNodeType.Identifier:
+            case AlphaTexNodeType.String:
+            case AlphaTexNodeType.Ident:
                 return (v as AlphaTexTextNode).text !== 'false';
-            case AlphaTexNodeType.NumberLiteral:
+            case AlphaTexNodeType.Number:
                 return (v as AlphaTexNumberLiteral).value !== 0;
             default:
                 return false;
@@ -1168,7 +1171,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         switch (metaData.tag.tag.text.toLowerCase()) {
             case 'staff':
                 const staff = importer.startNewStaff();
-                this.staffProperties(importer, staff, metaData);
+                this._staffProperties(importer, staff, metaData);
 
                 return ApplyStructuralMetaDataResult.AppliedNewStaff;
             case 'track':
@@ -1181,7 +1184,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     }
                 }
 
-                this.trackProperties(importer, track, metaData);
+                this._trackProperties(importer, track, metaData);
 
                 return ApplyStructuralMetaDataResult.AppliedNewTrack;
             case 'voice':
@@ -1192,12 +1195,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private checkProperty(
+    private _checkProperty(
         importer: IAlphaTexImporter,
         lookupList: Map<string, ValueListParseTypesExtended[] | undefined>[],
         p: AlphaTexPropertyNode
     ): boolean {
-        const result = this.checkValueListTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.values);
+        const result = this._checkValueListTypes(importer, lookupList, p, p.property.text.toLowerCase(), p.values);
         if (result !== undefined) {
             switch (result!) {
                 case ApplyNodeResult.Applied:
@@ -1221,7 +1224,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return true;
     }
 
-    private staffProperties(importer: IAlphaTexImporter, staff: Staff, metaData: AlphaTexMetaDataNode) {
+    private _staffProperties(importer: IAlphaTexImporter, staff: Staff, metaData: AlphaTexMetaDataNode) {
         if (!metaData.properties) {
             return;
         }
@@ -1232,7 +1235,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         let showNumbered: boolean = false;
 
         for (const p of metaData.properties.properties) {
-            if (!this.checkProperty(importer, [AlphaTex1LanguageDefinitions.staffPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.staffPropertyValueListTypes], p)) {
                 continue;
             }
 
@@ -1263,13 +1266,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private trackProperties(importer: IAlphaTexImporter, track: Track, metaData: AlphaTexMetaDataNode) {
+    private _trackProperties(importer: IAlphaTexImporter, track: Track, metaData: AlphaTexMetaDataNode) {
         if (!metaData.properties) {
             return;
         }
 
         for (const p of metaData.properties.properties) {
-            if (!this.checkProperty(importer, [AlphaTex1LanguageDefinitions.trackPropertyValueListTypes], p)) {
+            if (!this._checkProperty(importer, [AlphaTex1LanguageDefinitions.trackPropertyValueListTypes], p)) {
                 continue;
             }
 
@@ -1312,7 +1315,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     track.score.stylesheet.perTrackMultiBarRest!.add(track.index);
                     break;
                 case 'instrument':
-                    this.readTrackInstrument(importer, track, p.values!);
+                    this._readTrackInstrument(importer, track, p.values!);
                     break;
                 case 'bank':
                     track.playbackInfo.bank = (p.values!.values[0] as AlphaTexNumberLiteral).value;
@@ -1322,7 +1325,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     }
 
     public applyBeatDurationProperty(importer: IAlphaTexImporter, p: AlphaTexPropertyNode): ApplyNodeResult {
-        const result = this.checkValueListTypes(
+        const result = this._checkValueListTypes(
             importer,
             [AlphaTex1LanguageDefinitions.beatDurationPropertyValueListTypes],
             p,
@@ -1341,7 +1344,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 } else {
                     const numerator = (p.values!.values[0] as AlphaTexNumberLiteral).value;
                     importer.state.currentTupletNumerator = numerator;
-                    const denominator = AlphaTex1LanguageHandler.getTupletDenominator(numerator);
+                    const denominator = AlphaTex1LanguageHandler._getTupletDenominator(numerator);
                     if (denominator < 0) {
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT209,
@@ -1361,7 +1364,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         return ApplyNodeResult.NotAppliedUnrecognizedMarker;
     }
-    private static getTupletDenominator(numerator: number) {
+    private static _getTupletDenominator(numerator: number) {
         switch (numerator) {
             case 3:
                 return 2;
@@ -1469,7 +1472,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     public applyBeatProperty(importer: IAlphaTexImporter, beat: Beat, p: AlphaTexPropertyNode): ApplyNodeResult {
         const tag = p.property.text.toLowerCase();
-        const result = this.checkValueListTypes(
+        const result = this._checkValueListTypes(
             importer,
             [AlphaTex1LanguageDefinitions.beatPropertyValueListTypes],
             p,
@@ -1547,7 +1550,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 } else {
                     const numerator = (p.values!.values[0] as AlphaTexNumberLiteral).value;
                     beat.tupletNumerator = numerator;
-                    const denominator = AlphaTex1LanguageHandler.getTupletDenominator(numerator);
+                    const denominator = AlphaTex1LanguageHandler._getTupletDenominator(numerator);
                     if (denominator < 0) {
                         importer.addSemanticDiagnostic({
                             code: AlphaTexDiagnosticCode.AT209,
@@ -1568,9 +1571,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'tbe':
                 let tbi = 0;
                 switch (p.values!.values[tbi].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
-                        const whammyBarType = AlphaTex1LanguageHandler.parseEnumValue(
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
+                        const whammyBarType = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
                             p.values!,
                             'whammy type',
@@ -1586,9 +1589,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
 
                 switch (p.values!.values[tbi].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
-                        const whammyBarStyle = AlphaTex1LanguageHandler.parseEnumValue(
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
+                        const whammyBarStyle = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
                             p.values!,
                             'whammy style',
@@ -1603,7 +1606,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
 
-                const points = this.getBendPoints(importer, p, tbi, tag === 'tbe');
+                const points = this._getBendPoints(importer, p, tbi, tag === 'tbe');
                 if (points) {
                     for (const point of points) {
                         beat.addWhammyBarPoint(point);
@@ -1612,20 +1615,20 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
                 return ApplyNodeResult.Applied;
             case 'bu':
-                AlphaTex1LanguageHandler.applyBrush(beat, p, BrushType.BrushUp, 0.25);
+                AlphaTex1LanguageHandler._applyBrush(beat, p, BrushType.BrushUp, 0.25);
                 return ApplyNodeResult.Applied;
             case 'bd':
-                AlphaTex1LanguageHandler.applyBrush(beat, p, BrushType.BrushDown, 0.25);
+                AlphaTex1LanguageHandler._applyBrush(beat, p, BrushType.BrushDown, 0.25);
                 return ApplyNodeResult.Applied;
             case 'au':
-                AlphaTex1LanguageHandler.applyBrush(beat, p, BrushType.ArpeggioUp, 1);
+                AlphaTex1LanguageHandler._applyBrush(beat, p, BrushType.ArpeggioUp, 1);
                 return ApplyNodeResult.Applied;
             case 'ad':
-                AlphaTex1LanguageHandler.applyBrush(beat, p, BrushType.ArpeggioDown, 1);
+                AlphaTex1LanguageHandler._applyBrush(beat, p, BrushType.ArpeggioDown, 1);
                 return ApplyNodeResult.Applied;
             case 'ch':
                 const chordName: string = (p.values!.values[0] as AlphaTexTextNode).text;
-                const chordId: string = AlphaTex1LanguageHandler.getChordId(beat.voice.bar.staff, chordName);
+                const chordId: string = AlphaTex1LanguageHandler._getChordId(beat.voice.bar.staff, chordName);
                 if (!beat.voice.bar.staff.hasChord(chordId)) {
                     const chord: Chord = new Chord();
                     chord.showDiagram = false;
@@ -1636,7 +1639,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'gr':
                 if (p.values && p.values.values.length > 0) {
-                    const graceType = AlphaTex1LanguageHandler.parseEnumValue(
+                    const graceType = AlphaTex1LanguageHandler._parseEnumValue(
                         importer,
                         p.values!,
                         'whammy style',
@@ -1651,7 +1654,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 return ApplyNodeResult.Applied;
             case 'dy':
-                const dyn = AlphaTex1LanguageHandler.parseEnumValue(
+                const dyn = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     p.values!,
                     'dynamic',
@@ -1749,16 +1752,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 return ApplyNodeResult.Applied;
             case 'spd':
-                AlphaTex1LanguageHandler.applySustainPedal(importer, beat, SustainPedalMarkerType.Down);
+                AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Down);
                 return ApplyNodeResult.Applied;
             case 'sph':
-                AlphaTex1LanguageHandler.applySustainPedal(importer, beat, SustainPedalMarkerType.Hold);
+                AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Hold);
                 return ApplyNodeResult.Applied;
             case 'spu':
-                AlphaTex1LanguageHandler.applySustainPedal(importer, beat, SustainPedalMarkerType.Up);
+                AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Up);
                 return ApplyNodeResult.Applied;
             case 'spe':
-                AlphaTex1LanguageHandler.applySustainPedal(importer, beat, SustainPedalMarkerType.Up, 1);
+                AlphaTex1LanguageHandler._applySustainPedal(importer, beat, SustainPedalMarkerType.Up, 1);
                 return ApplyNodeResult.Applied;
             case 'slashed':
                 beat.slashed = true;
@@ -1785,7 +1788,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.barreFret = (p.values!.values[0] as AlphaTexNumberLiteral).value;
                 beat.barreShape = BarreShape.Full;
                 if (p.values!.values.length > 1) {
-                    const barreShape = AlphaTex1LanguageHandler.parseEnumValue(
+                    const barreShape = AlphaTex1LanguageHandler._parseEnumValue(
                         importer,
                         p.values!,
                         'barre shape',
@@ -1799,7 +1802,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
                 return ApplyNodeResult.Applied;
             case 'rasg':
-                const rasg = AlphaTex1LanguageHandler.parseEnumValue(
+                const rasg = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     p.values!,
                     'rasgueado pattern',
@@ -1811,7 +1814,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.rasgueado = rasg!;
                 return ApplyNodeResult.Applied;
             case 'ot':
-                const ottava = AlphaTex1LanguageHandler.parseEnumValue(
+                const ottava = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     p.values!,
                     'ottava',
@@ -1829,12 +1832,12 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 let program = 0;
 
                 switch (p.values!.values[0].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
                         program = GeneralMidi.getValue((p.values!.values[0] as AlphaTexTextNode).text);
                         break;
 
-                    case AlphaTexNodeType.NumberLiteral:
+                    case AlphaTexNodeType.Number:
                         program = (p.values!.values[0] as AlphaTexNumberLiteral).value;
                         break;
                 }
@@ -1853,7 +1856,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 beat.automations.push(bankAutomation);
                 return ApplyNodeResult.Applied;
             case 'fermata':
-                const fermataType = AlphaTex1LanguageHandler.parseEnumValue(
+                const fermataType = AlphaTex1LanguageHandler._parseEnumValue(
                     importer,
                     p.values!,
                     'fermata',
@@ -1917,7 +1920,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return ApplyNodeResult.NotAppliedUnrecognizedMarker;
     }
 
-    private static applySustainPedal(
+    private static _applySustainPedal(
         importer: IAlphaTexImporter,
         beat: Beat,
         pedalType: SustainPedalMarkerType,
@@ -1931,7 +1934,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         beat.voice.bar.sustainPedals.push(sustainPedal);
     }
 
-    private static applyBrush(beat: Beat, p: AlphaTexPropertyNode, brushType: BrushType, durationFactor: number) {
+    private static _applyBrush(beat: Beat, p: AlphaTexPropertyNode, brushType: BrushType, durationFactor: number) {
         beat.brushType = brushType;
         if (p.values && p.values.values.length > 0) {
             beat.brushDuration = (p.values!.values[0] as AlphaTexNumberLiteral).value;
@@ -1943,7 +1946,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
     public applyNoteProperty(importer: IAlphaTexImporter, note: Note, p: AlphaTexPropertyNode): ApplyNodeResult {
         const tag = p.property.text.toLowerCase();
-        const result = this.checkValueListTypes(
+        const result = this._checkValueListTypes(
             importer,
             [AlphaTex1LanguageDefinitions.notePropertyValueListTypes],
             p,
@@ -1959,9 +1962,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'be':
                 let tbi = 0;
                 switch (p.values!.values[tbi].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
-                        const bendType = AlphaTex1LanguageHandler.parseEnumValue(
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
+                        const bendType = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
                             p.values!,
                             'bend type',
@@ -1977,9 +1980,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 }
 
                 switch (p.values!.values[tbi].nodeType) {
-                    case AlphaTexNodeType.Identifier:
-                    case AlphaTexNodeType.StringLiteral:
-                        const bendStyle = AlphaTex1LanguageHandler.parseEnumValue(
+                    case AlphaTexNodeType.Ident:
+                    case AlphaTexNodeType.String:
+                        const bendStyle = AlphaTex1LanguageHandler._parseEnumValue(
                             importer,
                             p.values!,
                             'bend style',
@@ -1994,7 +1997,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                         break;
                 }
 
-                const points = this.getBendPoints(importer, p, tbi, tag === 'be');
+                const points = this._getBendPoints(importer, p, tbi, tag === 'be');
                 if (points) {
                     for (const point of points) {
                         note.addBendPoint(point);
@@ -2008,23 +2011,23 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 return ApplyNodeResult.Applied;
             case 'ah':
                 note.harmonicType = HarmonicType.Artificial;
-                note.harmonicValue = AlphaTex1LanguageHandler.harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'th':
                 note.harmonicType = HarmonicType.Tap;
-                note.harmonicValue = AlphaTex1LanguageHandler.harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'ph':
                 note.harmonicType = HarmonicType.Pinch;
-                note.harmonicValue = AlphaTex1LanguageHandler.harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'sh':
                 note.harmonicType = HarmonicType.Semi;
-                note.harmonicValue = AlphaTex1LanguageHandler.harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'fh':
                 note.harmonicType = HarmonicType.Feedback;
-                note.harmonicValue = AlphaTex1LanguageHandler.harmonicValue(p.values, note.harmonicValue);
+                note.harmonicValue = AlphaTex1LanguageHandler._harmonicValue(p.values, note.harmonicValue);
                 return ApplyNodeResult.Applied;
             case 'tr':
                 const trillFret = (p.values!.values[0] as AlphaTexNumberLiteral).value;
@@ -2122,7 +2125,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'lf':
                 let leftFinger = Fingers.Thumb;
                 if (p.values && p.values.values.length > 0) {
-                    const customFinger = AlphaTex1LanguageHandler.toFinger(importer, p.values);
+                    const customFinger = AlphaTex1LanguageHandler._toFinger(importer, p.values);
                     if (customFinger === undefined) {
                         return ApplyNodeResult.NotAppliedSemanticError;
                     }
@@ -2133,7 +2136,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             case 'rf':
                 let rightFinger = Fingers.Thumb;
                 if (p.values && p.values.values.length > 0) {
-                    const customFinger = AlphaTex1LanguageHandler.toFinger(importer, p.values);
+                    const customFinger = AlphaTex1LanguageHandler._toFinger(importer, p.values);
                     if (customFinger === undefined) {
                         return ApplyNodeResult.NotAppliedSemanticError;
                     }
@@ -2183,7 +2186,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return ApplyNodeResult.NotAppliedUnrecognizedMarker;
     }
 
-    private static toFinger(importer: IAlphaTexImporter, values: AlphaTexValueList): Fingers | undefined {
+    private static _toFinger(importer: IAlphaTexImporter, values: AlphaTexValueList): Fingers | undefined {
         const value = (values.values[0] as AlphaTexNumberLiteral).value;
         switch (value) {
             case 1:
@@ -2208,14 +2211,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static harmonicValue(values: AlphaTexValueList | undefined, harmonicValue: number): number {
+    private static _harmonicValue(values: AlphaTexValueList | undefined, harmonicValue: number): number {
         if (values) {
             harmonicValue = (values!.values[0] as AlphaTexNumberLiteral).value;
         }
         return harmonicValue;
     }
 
-    private getBendPoints(
+    private _getBendPoints(
         importer: IAlphaTexImporter,
         p: AlphaTexPropertyNode,
         valueStartIndex: number,
@@ -2226,7 +2229,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         let errorNode: AlphaTexAstNode = p.values!;
 
         // unwrap value list
-        if (remainingValues > 0 && values[valueStartIndex].nodeType === AlphaTexNodeType.ValueList) {
+        if (remainingValues > 0 && values[valueStartIndex].nodeType === AlphaTexNodeType.Values) {
             values = (values[valueStartIndex] as AlphaTexValueList).values;
             valueStartIndex = 0;
             remainingValues = values.length;
@@ -2290,7 +2293,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     //
     // string -> enum mappings
 
-    private static parseEnumValue<TValue extends number>(
+    private static _parseEnumValue<TValue extends number>(
         importer: IAlphaTexImporter,
         p: AlphaTexValueList,
         name: string,
@@ -2317,28 +2320,28 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     }
 
     // used to lookup some default values.
-    private static readonly defaultScore = new Score();
-    private static readonly defaultTrack = new Track();
+    private static readonly _defaultScore = new Score();
+    private static readonly _defaultTrack = new Track();
 
     public buildScoreMetaDataNodes(score: Score): AlphaTexMetaDataNode[] {
         const nodes: AlphaTexMetaDataNode[] = [];
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'album', score, score.album, ScoreSubElement.Album);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'artist', score, score.artist, ScoreSubElement.Artist);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'album', score, score.album, ScoreSubElement.Album);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'artist', score, score.artist, ScoreSubElement.Artist);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(
             nodes,
             'copyright',
             score,
             score.copyright,
             ScoreSubElement.Copyright
         );
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(
             nodes,
             'copyright2',
             score,
             undefined,
             ScoreSubElement.CopyrightSecondLine
         );
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(
             nodes,
             'wordsandmusic',
             score,
@@ -2346,27 +2349,33 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             ScoreSubElement.WordsAndMusic,
             true
         );
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'instructions', score, score.instructions, undefined);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'music', score, score.music, ScoreSubElement.Music);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'notices', score, score.notices, undefined);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'subtitle', score, score.subTitle, ScoreSubElement.SubTitle);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'title', score, score.title, ScoreSubElement.Title);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'words', score, score.words, ScoreSubElement.Words);
-        AlphaTex1LanguageHandler.buildScoreInfoMeta(nodes, 'tab', score, score.tab, ScoreSubElement.Transcriber);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'instructions', score, score.instructions, undefined);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'music', score, score.music, ScoreSubElement.Music);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'notices', score, score.notices, undefined);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(
+            nodes,
+            'subtitle',
+            score,
+            score.subTitle,
+            ScoreSubElement.SubTitle
+        );
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'title', score, score.title, ScoreSubElement.Title);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'words', score, score.words, ScoreSubElement.Words);
+        AlphaTex1LanguageHandler._buildScoreInfoMeta(nodes, 'tab', score, score.tab, ScoreSubElement.Transcriber);
 
-        if (score.defaultSystemsLayout !== AlphaTex1LanguageHandler.defaultScore.defaultSystemsLayout) {
-            nodes.push(ATNF.numberMetaData('defaultSystemsLayout', score.defaultSystemsLayout));
+        if (score.defaultSystemsLayout !== AlphaTex1LanguageHandler._defaultScore.defaultSystemsLayout) {
+            nodes.push(Atnf.numberMeta('defaultSystemsLayout', score.defaultSystemsLayout));
         }
         if (score.systemsLayout.length > 0) {
             nodes.push(
-                ATNF.metaData(
+                Atnf.meta(
                     'systemsLayout',
-                    ATNF.valueList(score.systemsLayout.map(l => ATNF.numberLiteral(l) as IAlphaTexValueListItem))
+                    Atnf.values(score.systemsLayout.map(l => Atnf.number(l) as IAlphaTexValueListItem))
                 )
             );
         }
 
-        AlphaTex1LanguageHandler.buildStyleSheetMetaData(nodes, score.stylesheet);
+        AlphaTex1LanguageHandler._buildStyleSheetMetaData(nodes, score.stylesheet);
 
         if (nodes.length > 0) {
             nodes[0].leadingComments = [
@@ -2380,32 +2389,32 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return nodes;
     }
 
-    private static buildStyleSheetMetaData(nodes: AlphaTexMetaDataNode[], stylesheet: RenderStylesheet) {
+    private static _buildStyleSheetMetaData(nodes: AlphaTexMetaDataNode[], stylesheet: RenderStylesheet) {
         const firstStyleSheet = nodes.length;
 
         if (stylesheet.hideDynamics) {
-            nodes.push(ATNF.metaData('hideDynamics'));
+            nodes.push(Atnf.meta('hideDynamics'));
         }
-        if (stylesheet.bracketExtendMode !== AlphaTex1LanguageHandler.defaultScore.stylesheet.bracketExtendMode) {
+        if (stylesheet.bracketExtendMode !== AlphaTex1LanguageHandler._defaultScore.stylesheet.bracketExtendMode) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'bracketExtendMode',
                     AlphaTex1EnumMappings.bracketExtendModesReversed.get(stylesheet.bracketExtendMode)!
                 )
             );
         }
         if (stylesheet.useSystemSignSeparator) {
-            nodes.push(ATNF.metaData('useSystemSignSeparator'));
+            nodes.push(Atnf.meta('useSystemSignSeparator'));
         }
         if (stylesheet.multiTrackMultiBarRest) {
-            nodes.push(ATNF.metaData('multiBarRest'));
+            nodes.push(Atnf.meta('multiBarRest'));
         }
         if (
             stylesheet.singleTrackTrackNamePolicy !==
-            AlphaTex1LanguageHandler.defaultScore.stylesheet.singleTrackTrackNamePolicy
+            AlphaTex1LanguageHandler._defaultScore.stylesheet.singleTrackTrackNamePolicy
         ) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'singleTrackTrackNamePolicy',
                     AlphaTex1EnumMappings.trackNamePoliciesReversed.get(stylesheet.singleTrackTrackNamePolicy)!
                 )
@@ -2413,10 +2422,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (
             stylesheet.multiTrackTrackNamePolicy !==
-            AlphaTex1LanguageHandler.defaultScore.stylesheet.multiTrackTrackNamePolicy
+            AlphaTex1LanguageHandler._defaultScore.stylesheet.multiTrackTrackNamePolicy
         ) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'multiTrackTrackNamePolicy',
                     AlphaTex1EnumMappings.trackNamePoliciesReversed.get(stylesheet.multiTrackTrackNamePolicy)!
                 )
@@ -2424,10 +2433,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (
             stylesheet.firstSystemTrackNameMode !==
-            AlphaTex1LanguageHandler.defaultScore.stylesheet.firstSystemTrackNameMode
+            AlphaTex1LanguageHandler._defaultScore.stylesheet.firstSystemTrackNameMode
         ) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'firstSystemTrackNameMode',
                     AlphaTex1EnumMappings.trackNameModeReversed.get(stylesheet.firstSystemTrackNameMode)!
                 )
@@ -2435,10 +2444,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (
             stylesheet.otherSystemsTrackNameMode !==
-            AlphaTex1LanguageHandler.defaultScore.stylesheet.otherSystemsTrackNameMode
+            AlphaTex1LanguageHandler._defaultScore.stylesheet.otherSystemsTrackNameMode
         ) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'otherSystemsTrackNameMode',
                     AlphaTex1EnumMappings.trackNameModeReversed.get(stylesheet.otherSystemsTrackNameMode)!
                 )
@@ -2446,10 +2455,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (
             stylesheet.firstSystemTrackNameOrientation !==
-            AlphaTex1LanguageHandler.defaultScore.stylesheet.firstSystemTrackNameOrientation
+            AlphaTex1LanguageHandler._defaultScore.stylesheet.firstSystemTrackNameOrientation
         ) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'firstSystemTrackNameOrientation',
                     AlphaTex1EnumMappings.trackNameOrientationsReversed.get(stylesheet.firstSystemTrackNameOrientation)!
                 )
@@ -2457,10 +2466,10 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
         if (
             stylesheet.otherSystemsTrackNameOrientation !==
-            AlphaTex1LanguageHandler.defaultScore.stylesheet.otherSystemsTrackNameOrientation
+            AlphaTex1LanguageHandler._defaultScore.stylesheet.otherSystemsTrackNameOrientation
         ) {
             nodes.push(
-                ATNF.identifierMetaData(
+                Atnf.identMeta(
                     'otherSystemsTrackNameOrientation',
                     AlphaTex1EnumMappings.trackNameOrientationsReversed.get(
                         stylesheet.otherSystemsTrackNameOrientation
@@ -2487,7 +2496,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static buildScoreInfoMeta(
+    private static _buildScoreInfoMeta(
         nodes: AlphaTexMetaDataNode[],
         tag: string,
         score: Score,
@@ -2502,7 +2511,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         const values: IAlphaTexValueListItem[] = [];
 
         if (value !== undefined) {
-            values.push(ATNF.stringLiteral(value));
+            values.push(Atnf.string(value));
         }
 
         if (element !== undefined) {
@@ -2514,8 +2523,8 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 ? ScoreStyle.defaultHeaderAndFooter.get(element)
                 : undefined;
             if (style && (!defaultStyle || !HeaderFooterStyle.equals(defaultStyle, style))) {
-                values.push(ATNF.stringLiteral(style.isVisible === false ? '' : style.template));
-                values.push(ATNF.identifier(AlphaTex1EnumMappings.textAlignsReversed.get(style.textAlign)!));
+                values.push(Atnf.string(style.isVisible === false ? '' : style.template));
+                values.push(Atnf.ident(AlphaTex1EnumMappings.textAlignsReversed.get(style.textAlign)!));
             }
         }
 
@@ -2526,7 +2535,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             return;
         }
 
-        nodes.push(ATNF.metaData(tag, ATNF.valueList(values)));
+        nodes.push(Atnf.meta(tag, Atnf.values(values)));
     }
 
     public buildSyncPointNodes(score: Score): AlphaTexMetaDataNode[] {
@@ -2535,13 +2544,13 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         const flatSyncPoints = score.exportFlatSyncPoints();
         for (const p of flatSyncPoints) {
             nodes.push(
-                ATNF.metaData(
+                Atnf.meta(
                     'sync',
-                    ATNF.valueList([
-                        ATNF.numberLiteral(p.barIndex),
-                        ATNF.numberLiteral(p.barOccurence),
-                        ATNF.numberLiteral(p.millisecondOffset),
-                        p.barPosition > 0 ? ATNF.numberLiteral(p.barPosition) : undefined
+                    Atnf.values([
+                        Atnf.number(p.barIndex),
+                        Atnf.number(p.barOccurence),
+                        Atnf.number(p.millisecondOffset),
+                        p.barPosition > 0 ? Atnf.number(p.barPosition) : undefined
                     ])
                 )
             );
@@ -2558,7 +2567,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
     ): AlphaTexMetaDataNode[] {
         const nodes: AlphaTexMetaDataNode[] = [];
 
-        AlphaTex1LanguageHandler.buildStructuralMetaDataNodes(bar, staff, nodes, isMultiVoice, voice);
+        AlphaTex1LanguageHandler._buildStructuralMetaDataNodes(bar, staff, nodes, isMultiVoice, voice);
         if (!bar) {
             return nodes;
         }
@@ -2566,36 +2575,34 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (voice === 0) {
             // Master Bar meta on first track
             if (staff.index === 0 && staff.track.index === 0) {
-                AlphaTex1LanguageHandler.buildMasterBarMetaDataNodes(nodes, bar.masterBar);
+                AlphaTex1LanguageHandler._buildMasterBarMetaDataNodes(nodes, bar.masterBar);
             }
         }
 
         const firstBarMetaIndex = nodes.length;
 
         if (voice === 0 && bar.index === 0 && staff.index === 0 && staff.track.index === 0) {
-            nodes.push(ATNF.identifierMetaData('accidentals', 'auto'));
+            nodes.push(Atnf.identMeta('accidentals', 'auto'));
         }
 
         if (bar.index === 0 || bar.clef !== bar.previousBar?.clef) {
-            nodes.push(ATNF.identifierMetaData('clef', AlphaTex1EnumMappings.clefsReversed.get(bar.clef)!));
+            nodes.push(Atnf.identMeta('clef', AlphaTex1EnumMappings.clefsReversed.get(bar.clef)!));
         }
 
         if ((bar.index === 0 && bar.clefOttava !== Ottavia.Regular) || bar.clefOttava !== bar.previousBar?.clefOttava) {
-            nodes.push(ATNF.identifierMetaData('ottava', AlphaTex1EnumMappings.ottavaReversed.get(bar.clefOttava)!));
+            nodes.push(Atnf.identMeta('ottava', AlphaTex1EnumMappings.ottavaReversed.get(bar.clefOttava)!));
         }
 
         if ((bar.index === 0 && bar.simileMark !== SimileMark.None) || bar.simileMark !== bar.previousBar?.simileMark) {
-            nodes.push(
-                ATNF.identifierMetaData('simile', AlphaTex1EnumMappings.simileMarksReversed.get(bar.simileMark)!)
-            );
+            nodes.push(Atnf.identMeta('simile', AlphaTex1EnumMappings.simileMarksReversed.get(bar.simileMark)!));
         }
 
         if (bar.displayScale !== 1) {
-            nodes.push(ATNF.numberMetaData('scale', bar.displayScale));
+            nodes.push(Atnf.numberMeta('scale', bar.displayScale));
         }
 
         if (bar.displayWidth > 0) {
-            nodes.push(ATNF.numberMetaData('width', bar.displayWidth));
+            nodes.push(Atnf.numberMeta('width', bar.displayWidth));
         }
 
         // sustainPedals are on beat level
@@ -2613,20 +2620,16 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     break;
             }
             if (pedalType) {
-                nodes.push(ATNF.numberMetaData(pedalType, sp.ratioPosition));
+                nodes.push(Atnf.numberMeta(pedalType, sp.ratioPosition));
             }
         }
 
         if (bar.barLineLeft !== BarLineStyle.Automatic) {
-            nodes.push(
-                ATNF.identifierMetaData('barLineLeft', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineLeft)!)
-            );
+            nodes.push(Atnf.identMeta('barLineLeft', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineLeft)!));
         }
 
         if (bar.barLineRight !== BarLineStyle.Automatic) {
-            nodes.push(
-                ATNF.identifierMetaData('barLineRight', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineRight)!)
-            );
+            nodes.push(Atnf.identMeta('barLineRight', AlphaTex1EnumMappings.barLinesReversed.get(bar.barLineRight)!));
         }
 
         if (
@@ -2640,7 +2643,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             } else {
                 ks = AlphaTex1EnumMappings.keySignaturesMajorReversed.get(bar.keySignature)!;
             }
-            nodes.push(ATNF.identifierMetaData('ks', ks));
+            nodes.push(Atnf.identMeta('ks', ks));
         }
 
         if (firstBarMetaIndex < nodes.length) {
@@ -2654,20 +2657,20 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         return nodes;
     }
-    private static buildStaffMetaDataNodes(nodes: AlphaTexMetaDataNode[], staff: Staff) {
+    private static _buildStaffMetaDataNodes(nodes: AlphaTexMetaDataNode[], staff: Staff) {
         const firstStaffMetaIndex = nodes.length;
 
         if (staff.capo !== 0) {
-            nodes.push(ATNF.numberMetaData('capo', staff.capo));
+            nodes.push(Atnf.numberMeta('capo', staff.capo));
         }
         if (staff.isPercussion) {
-            nodes.push(ATNF.identifierMetaData('articulation', 'defaults'));
+            nodes.push(Atnf.identMeta('articulation', 'defaults'));
         } else if (staff.isStringed) {
-            const tuning = ATNF.metaData(
+            const tuning = Atnf.meta(
                 'tuning',
-                ATNF.valueList(
+                Atnf.values(
                     staff.stringTuning.tunings.map(
-                        t => ATNF.identifier(Tuning.getTextForTuning(t, true)) as IAlphaTexValueListItem
+                        t => Atnf.ident(Tuning.getTextForTuning(t, true)) as IAlphaTexValueListItem
                     )
                 )
             );
@@ -2677,28 +2680,28 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 staff.track.score.stylesheet.perTrackDisplayTuning &&
                 staff.track.score.stylesheet.perTrackDisplayTuning!.has(staff.track.index)
             ) {
-                tuning.values!.values.push(ATNF.identifier('hide'));
+                tuning.values!.values.push(Atnf.ident('hide'));
             }
 
             if (staff.stringTuning.name.length > 0) {
-                tuning.values!.values.push(ATNF.stringLiteral(staff.stringTuning.name));
+                tuning.values!.values.push(Atnf.string(staff.stringTuning.name));
             }
         }
 
         if (staff.transpositionPitch !== 0) {
-            nodes.push(ATNF.numberMetaData('transpose', -staff.transpositionPitch));
+            nodes.push(Atnf.numberMeta('transpose', -staff.transpositionPitch));
         }
 
         const defaultTransposition = ModelUtils.displayTranspositionPitches.has(staff.track.playbackInfo.program)
             ? ModelUtils.displayTranspositionPitches.get(staff.track.playbackInfo.program)!
             : 0;
         if (staff.displayTranspositionPitch !== defaultTransposition) {
-            nodes.push(ATNF.numberMetaData('displaytranspose', -staff.displayTranspositionPitch));
+            nodes.push(Atnf.numberMeta('displaytranspose', -staff.displayTranspositionPitch));
         }
 
         if (staff.chords != null) {
             for (const [_, chord] of staff.chords!) {
-                nodes.push(AlphaTex1LanguageHandler.buildChordNode(chord));
+                nodes.push(AlphaTex1LanguageHandler._buildChordNode(chord));
             }
         }
 
@@ -2712,20 +2715,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static buildChordNode(chord: Chord): AlphaTexMetaDataNode {
-        const chordNode = ATNF.metaData(
+    private static _buildChordNode(chord: Chord): AlphaTexMetaDataNode {
+        const chordNode = Atnf.meta(
             'chord',
-            ATNF.stringValueList(chord.name),
-            ATNF.properties([
-                chord.firstFret >= 0 ? ['firstfret', ATNF.numberValueList(chord.firstFret)] : undefined,
-                ['showdiagram', ATNF.identifierValueList(chord.showDiagram ? 'true' : 'false')],
-                ['showfingering', ATNF.identifierValueList(chord.showFingering ? 'true' : 'false')],
-                ['showname', ATNF.identifierValueList(chord.showName ? 'true' : 'false')],
+            Atnf.stringValue(chord.name),
+            Atnf.props([
+                chord.firstFret >= 0 ? ['firstfret', Atnf.numberValue(chord.firstFret)] : undefined,
+                ['showdiagram', Atnf.identValue(chord.showDiagram ? 'true' : 'false')],
+                ['showfingering', Atnf.identValue(chord.showFingering ? 'true' : 'false')],
+                ['showname', Atnf.identValue(chord.showName ? 'true' : 'false')],
                 chord.barreFrets.length > 0
-                    ? [
-                          'barre',
-                          ATNF.valueList(chord.barreFrets.map(f => ATNF.numberLiteral(f) as IAlphaTexValueListItem))
-                      ]
+                    ? ['barre', Atnf.values(chord.barreFrets.map(f => Atnf.number(f) as IAlphaTexValueListItem))]
                     : undefined
             ])
         );
@@ -2733,25 +2733,25 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         for (let i = 0; i < chord.staff.tuning.length; i++) {
             if (i < chord.strings.length && chord.strings[i] >= 0) {
-                chordNode.values!.values.push(ATNF.numberLiteral(chord.strings[i]));
+                chordNode.values!.values.push(Atnf.number(chord.strings[i]));
             } else {
-                chordNode.values!.values.push(ATNF.identifier('x'));
+                chordNode.values!.values.push(Atnf.ident('x'));
             }
         }
 
         return chordNode;
     }
 
-    private static buildMasterBarMetaDataNodes(nodes: AlphaTexMetaDataNode[], masterBar: MasterBar) {
+    private static _buildMasterBarMetaDataNodes(nodes: AlphaTexMetaDataNode[], masterBar: MasterBar) {
         const firstMetaIndex = nodes.length;
 
         if (masterBar.alternateEndings !== 0) {
             nodes.push(
-                ATNF.metaData(
+                Atnf.meta(
                     'ae',
-                    ATNF.valueList(
+                    Atnf.values(
                         ModelUtils.getAlternateEndingsList(masterBar.alternateEndings).map(
-                            i => ATNF.numberLiteral(i + 1) as IAlphaTexValueListItem
+                            i => Atnf.number(i + 1) as IAlphaTexValueListItem
                         )
                     )
                 )
@@ -2759,11 +2759,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (masterBar.isRepeatStart) {
-            nodes.push(ATNF.metaData('ro'));
+            nodes.push(Atnf.meta('ro'));
         }
 
         if (masterBar.isRepeatEnd) {
-            nodes.push(ATNF.numberMetaData('rc', masterBar.repeatCount));
+            nodes.push(Atnf.numberMeta('rc', masterBar.repeatCount));
         }
 
         if (
@@ -2773,14 +2773,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             masterBar.timeSignatureDenominator !== masterBar.previousMasterBar.timeSignatureDenominator
         ) {
             if (masterBar.timeSignatureCommon) {
-                nodes.push(ATNF.identifierMetaData('ts', 'common'));
+                nodes.push(Atnf.identMeta('ts', 'common'));
             } else {
                 nodes.push(
-                    ATNF.metaData(
+                    Atnf.meta(
                         'ts',
-                        ATNF.valueList([
-                            ATNF.numberLiteral(masterBar.timeSignatureNumerator),
-                            ATNF.numberLiteral(masterBar.timeSignatureDenominator)
+                        Atnf.values([
+                            Atnf.number(masterBar.timeSignatureNumerator),
+                            Atnf.number(masterBar.timeSignatureDenominator)
                         ])
                     )
                 );
@@ -2791,53 +2791,48 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
             (masterBar.index > 0 && masterBar.tripletFeel !== masterBar.previousMasterBar?.tripletFeel) ||
             (masterBar.index === 0 && masterBar.tripletFeel !== TripletFeel.NoTripletFeel)
         ) {
-            nodes.push(
-                ATNF.identifierMetaData('tf', AlphaTex1EnumMappings.tripletFeelsReversed.get(masterBar.tripletFeel)!)
-            );
+            nodes.push(Atnf.identMeta('tf', AlphaTex1EnumMappings.tripletFeelsReversed.get(masterBar.tripletFeel)!));
         }
 
         if (masterBar.isFreeTime) {
-            nodes.push(ATNF.metaData('ft'));
+            nodes.push(Atnf.meta('ft'));
         }
 
         if (masterBar.section != null) {
             nodes.push(
-                ATNF.metaData(
+                Atnf.meta(
                     'section',
-                    ATNF.valueList([
-                        ATNF.stringLiteral(masterBar.section.marker),
-                        ATNF.stringLiteral(masterBar.section.text)
-                    ])
+                    Atnf.values([Atnf.string(masterBar.section.marker), Atnf.string(masterBar.section.text)])
                 )
             );
         }
 
         if (masterBar.isAnacrusis) {
-            nodes.push(ATNF.metaData('ac'));
+            nodes.push(Atnf.meta('ac'));
         }
 
         if (masterBar.displayScale !== 1) {
-            nodes.push(ATNF.numberMetaData('scale', masterBar.displayScale));
+            nodes.push(Atnf.numberMeta('scale', masterBar.displayScale));
         }
 
         if (masterBar.displayWidth > 0) {
-            nodes.push(ATNF.numberMetaData('width', masterBar.displayWidth));
+            nodes.push(Atnf.numberMeta('width', masterBar.displayWidth));
         }
 
         if (masterBar.directions) {
             for (const d of masterBar.directions!) {
-                nodes.push(ATNF.identifierMetaData('jump', AlphaTex1EnumMappings.directionsReversed.get(d)!));
+                nodes.push(Atnf.identMeta('jump', AlphaTex1EnumMappings.directionsReversed.get(d)!));
             }
         }
 
         for (const a of masterBar.tempoAutomations) {
-            const tempo = ATNF.metaData(
+            const tempo = Atnf.meta(
                 'tempo',
-                ATNF.valueList([
-                    ATNF.numberLiteral(a.value),
-                    a.text ? ATNF.stringLiteral(a.text) : undefined,
-                    a.ratioPosition > 0 ? ATNF.numberLiteral(a.ratioPosition) : undefined,
-                    !a.isVisible ? ATNF.identifier('hide') : undefined,
+                Atnf.values([
+                    Atnf.number(a.value),
+                    a.text ? Atnf.string(a.text) : undefined,
+                    a.ratioPosition > 0 ? Atnf.number(a.ratioPosition) : undefined,
+                    !a.isVisible ? Atnf.ident('hide') : undefined
                 ])
             );
             if (tempo.values!.values.length === 1) {
@@ -2857,7 +2852,7 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static buildStructuralMetaDataNodes(
+    private static _buildStructuralMetaDataNodes(
         bar: Bar | undefined,
         staff: Staff,
         nodes: AlphaTexMetaDataNode[],
@@ -2867,14 +2862,14 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         if (bar === undefined || bar.index === 0) {
             if (voice === 0) {
                 if (staff.index === 0) {
-                    nodes.push(AlphaTex1LanguageHandler.buildNewTrackNode(staff.track));
+                    nodes.push(AlphaTex1LanguageHandler._buildNewTrackNode(staff.track));
                 }
-                nodes.push(AlphaTex1LanguageHandler.buildNewStaffNode(staff));
-                AlphaTex1LanguageHandler.buildStaffMetaDataNodes(nodes, staff);
+                nodes.push(AlphaTex1LanguageHandler._buildNewStaffNode(staff));
+                AlphaTex1LanguageHandler._buildStaffMetaDataNodes(nodes, staff);
             }
 
             if (isMultiVoice) {
-                const voiceNode = ATNF.metaData('voice');
+                const voiceNode = Atnf.meta('voice');
                 voiceNode.trailingComments = [
                     {
                         multiLine: true,
@@ -2886,17 +2881,17 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
     }
 
-    private static buildNewStaffNode(staff: Staff): AlphaTexMetaDataNode {
-        const node = ATNF.metaData(
+    private static _buildNewStaffNode(staff: Staff): AlphaTexMetaDataNode {
+        const node = Atnf.meta(
             'staff',
             undefined,
-            ATNF.properties([
+            Atnf.props([
                 staff.showStandardNotation
                     ? [
                           'score',
-                          ATNF.valueList([
+                          Atnf.values([
                               staff.standardNotationLineCount !== Staff.DefaultStandardNotationLineCount
-                                  ? ATNF.numberLiteral(staff.standardNotationLineCount)
+                                  ? Atnf.number(staff.standardNotationLineCount)
                                   : undefined
                           ])
                       ]
@@ -2919,28 +2914,28 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         return node;
     }
 
-    private static buildNewTrackNode(track: Track): AlphaTexMetaDataNode {
-        const node = ATNF.metaData(
+    private static _buildNewTrackNode(track: Track): AlphaTexMetaDataNode {
+        const node = Atnf.meta(
             'track',
-            ATNF.valueList([
-                ATNF.stringLiteral(track.name),
-                track.shortName.length > 0 ? ATNF.stringLiteral(track.shortName) : undefined
+            Atnf.values([
+                Atnf.string(track.name),
+                track.shortName.length > 0 ? Atnf.string(track.shortName) : undefined
             ]),
-            ATNF.properties([
-                track.color.rgba !== AlphaTex1LanguageHandler.defaultTrack.color.rgba
-                    ? ['color', ATNF.stringValueList(track.color.rgba)]
+            Atnf.props([
+                track.color.rgba !== AlphaTex1LanguageHandler._defaultTrack.color.rgba
+                    ? ['color', Atnf.stringValue(track.color.rgba)]
                     : undefined,
-                track.defaultSystemsLayout !== AlphaTex1LanguageHandler.defaultTrack.defaultSystemsLayout
-                    ? ['defaultSystemsLayout', ATNF.numberValueList(track.defaultSystemsLayout)]
+                track.defaultSystemsLayout !== AlphaTex1LanguageHandler._defaultTrack.defaultSystemsLayout
+                    ? ['defaultSystemsLayout', Atnf.numberValue(track.defaultSystemsLayout)]
                     : undefined,
                 track.systemsLayout.length
                     ? [
                           'systemsLayout',
-                          ATNF.valueList(track.systemsLayout.map(d => ATNF.numberLiteral(d) as IAlphaTexValueListItem))
+                          Atnf.values(track.systemsLayout.map(d => Atnf.number(d) as IAlphaTexValueListItem))
                       ]
                     : undefined,
-                ['volume', ATNF.numberValueList(track.playbackInfo.volume)],
-                ['balance', ATNF.numberValueList(track.playbackInfo.balance)],
+                ['volume', Atnf.numberValue(track.playbackInfo.volume)],
+                ['balance', Atnf.numberValue(track.playbackInfo.balance)],
                 track.playbackInfo.isMute
                     ? (['mute', undefined] as [string, AlphaTexValueList | undefined])
                     : undefined,
@@ -2953,11 +2948,9 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                     : undefined,
                 [
                     'instrument',
-                    ATNF.identifierValueList(
-                        track.isPercussion ? 'percussion' : GeneralMidi.getName(track.playbackInfo.program)
-                    )
+                    Atnf.identValue(track.isPercussion ? 'percussion' : GeneralMidi.getName(track.playbackInfo.program))
                 ],
-                track.playbackInfo.bank > 0 ? ['bank', ATNF.numberValueList(track.playbackInfo.bank)] : undefined
+                track.playbackInfo.bank > 0 ? ['bank', Atnf.numberValue(track.playbackInfo.bank)] : undefined
             ])
         );
 
@@ -2977,27 +2970,27 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         const properties: AlphaTexPropertyNode[] = [];
 
         if (note.hasBend) {
-            const beValue = ATNF.valueList(
+            const beValue = Atnf.values(
                 [
-                    ATNF.identifier(AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!),
+                    Atnf.ident(AlphaTex1EnumMappings.bendTypesReversed.get(note.bendType)!),
                     note.bendStyle !== BendStyle.Default
-                        ? ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!)
+                        ? Atnf.ident(AlphaTex1EnumMappings.bendStylesReversed.get(note.bendStyle)!)
                         : undefined
                 ],
                 true
             )!;
             for (const p of note.bendPoints!) {
-                beValue.values.push(ATNF.numberLiteral(p.offset));
-                beValue.values.push(ATNF.numberLiteral(p.value));
+                beValue.values.push(Atnf.number(p.offset));
+                beValue.values.push(Atnf.number(p.value));
             }
 
-            ATNF.property(properties, 'be', beValue);
+            Atnf.prop(properties, 'be', beValue);
         }
 
         let harmonicType = '';
         switch (note.harmonicType) {
             case HarmonicType.Natural:
-                ATNF.property(properties, 'nh');
+                Atnf.prop(properties, 'nh');
                 break;
             case HarmonicType.Artificial:
                 harmonicType = 'ah';
@@ -3016,144 +3009,144 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 break;
         }
         if (harmonicType) {
-            ATNF.property(properties, harmonicType, ATNF.numberValueList(note.harmonicValue));
+            Atnf.prop(properties, harmonicType, Atnf.numberValue(note.harmonicValue));
         }
 
         if (note.showStringNumber) {
-            ATNF.property(properties, 'string');
+            Atnf.prop(properties, 'string');
         }
 
         if (note.isTrill) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'tr',
-                ATNF.valueList([ATNF.numberLiteral(note.trillFret), ATNF.numberLiteral(note.trillSpeed as number)])
+                Atnf.values([Atnf.number(note.trillFret), Atnf.number(note.trillSpeed as number)])
             );
         }
 
         switch (note.vibrato) {
             case VibratoType.Slight:
-                ATNF.property(properties, 'v');
+                Atnf.prop(properties, 'v');
                 break;
             case VibratoType.Wide:
-                ATNF.property(properties, 'vw');
+                Atnf.prop(properties, 'vw');
                 break;
         }
 
         switch (note.slideInType) {
             case SlideInType.IntoFromBelow:
-                ATNF.property(properties, 'sib');
+                Atnf.prop(properties, 'sib');
                 break;
             case SlideInType.IntoFromAbove:
-                ATNF.property(properties, 'sia');
+                Atnf.prop(properties, 'sia');
                 break;
         }
 
         switch (note.slideOutType) {
             case SlideOutType.Shift:
-                ATNF.property(properties, 'ss');
+                Atnf.prop(properties, 'ss');
                 break;
             case SlideOutType.Legato:
-                ATNF.property(properties, 'sl');
+                Atnf.prop(properties, 'sl');
                 break;
             case SlideOutType.OutUp:
-                ATNF.property(properties, 'sou');
+                Atnf.prop(properties, 'sou');
                 break;
             case SlideOutType.OutDown:
-                ATNF.property(properties, 'sod');
+                Atnf.prop(properties, 'sod');
                 break;
             case SlideOutType.PickSlideDown:
-                ATNF.property(properties, 'psd');
+                Atnf.prop(properties, 'psd');
                 break;
             case SlideOutType.PickSlideUp:
-                ATNF.property(properties, 'psu');
+                Atnf.prop(properties, 'psu');
                 break;
         }
 
         if (note.isHammerPullOrigin) {
-            ATNF.property(properties, 'h');
+            Atnf.prop(properties, 'h');
         }
 
         if (note.isLeftHandTapped) {
-            ATNF.property(properties, 'lht');
+            Atnf.prop(properties, 'lht');
         }
 
         if (note.isGhost) {
-            ATNF.property(properties, 'g');
+            Atnf.prop(properties, 'g');
         }
 
         switch (note.accentuated) {
             case AccentuationType.Normal:
-                ATNF.property(properties, 'ac');
+                Atnf.prop(properties, 'ac');
                 break;
             case AccentuationType.Heavy:
-                ATNF.property(properties, 'hac');
+                Atnf.prop(properties, 'hac');
                 break;
             case AccentuationType.Tenuto:
-                ATNF.property(properties, 'ten');
+                Atnf.prop(properties, 'ten');
                 break;
         }
 
         if (note.isPalmMute) {
-            ATNF.property(properties, 'pm');
+            Atnf.prop(properties, 'pm');
         }
 
         if (note.isStaccato) {
-            ATNF.property(properties, 'st');
+            Atnf.prop(properties, 'st');
         }
 
         if (note.isLetRing) {
-            ATNF.property(properties, 'lr');
+            Atnf.prop(properties, 'lr');
         }
 
         if (note.isDead) {
-            ATNF.property(properties, 'x');
+            Atnf.prop(properties, 'x');
         }
 
         if (note.isTieDestination) {
-            ATNF.property(properties, 't');
+            Atnf.prop(properties, 't');
         }
         if (note.leftHandFinger >= Fingers.Thumb) {
-            ATNF.property(properties, 'lf', ATNF.numberValueList((note.leftHandFinger as number) + 1));
+            Atnf.prop(properties, 'lf', Atnf.numberValue((note.leftHandFinger as number) + 1));
         }
         if (note.rightHandFinger >= Fingers.Thumb) {
-            ATNF.property(properties, 'rf', ATNF.numberValueList((note.rightHandFinger as number) + 1));
+            Atnf.prop(properties, 'rf', Atnf.numberValue((note.rightHandFinger as number) + 1));
         }
 
         if (!note.isVisible) {
-            ATNF.property(properties, 'hide');
+            Atnf.prop(properties, 'hide');
         }
 
         if (note.isSlurOrigin) {
             const slurId = `s${note.id}`;
-            ATNF.property(properties, 'slur', ATNF.identifierValueList(slurId));
+            Atnf.prop(properties, 'slur', Atnf.identValue(slurId));
         }
 
         if (note.isSlurDestination) {
             const slurId = `s${note.slurOrigin!.id}`;
-            ATNF.property(properties, 'slur', ATNF.identifierValueList(slurId));
+            Atnf.prop(properties, 'slur', Atnf.identValue(slurId));
         }
 
         if (note.accidentalMode !== NoteAccidentalMode.Default) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'acc',
-                ATNF.identifierValueList(ModelUtils.reverseAccidentalModeMapping.get(note.accidentalMode)!)
+                Atnf.identValue(ModelUtils.reverseAccidentalModeMapping.get(note.accidentalMode)!)
             );
         }
 
         switch (note.ornament) {
             case NoteOrnament.InvertedTurn:
-                ATNF.property(properties, 'iturn');
+                Atnf.prop(properties, 'iturn');
                 break;
             case NoteOrnament.Turn:
-                ATNF.property(properties, 'turn');
+                Atnf.prop(properties, 'turn');
                 break;
             case NoteOrnament.UpperMordent:
-                ATNF.property(properties, 'umordent');
+                Atnf.prop(properties, 'umordent');
                 break;
             case NoteOrnament.LowerMordent:
-                ATNF.property(properties, 'lmordent');
+                Atnf.prop(properties, 'lmordent');
                 break;
         }
 
@@ -3165,68 +3158,68 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
 
         switch (beat.fade) {
             case FadeType.FadeIn:
-                ATNF.property(properties, 'f');
+                Atnf.prop(properties, 'f');
                 break;
             case FadeType.FadeOut:
-                ATNF.property(properties, 'fo');
+                Atnf.prop(properties, 'fo');
                 break;
             case FadeType.VolumeSwell:
-                ATNF.property(properties, 'vs');
+                Atnf.prop(properties, 'vs');
                 break;
         }
 
         if (beat.vibrato === VibratoType.Slight) {
-            ATNF.property(properties, 'v');
+            Atnf.prop(properties, 'v');
         } else if (beat.vibrato === VibratoType.Wide) {
-            ATNF.property(properties, 'vw');
+            Atnf.prop(properties, 'vw');
         }
 
         if (beat.slap) {
-            ATNF.property(properties, 's');
+            Atnf.prop(properties, 's');
         }
 
         if (beat.pop) {
-            ATNF.property(properties, 'p');
+            Atnf.prop(properties, 'p');
         }
 
         if (beat.tap) {
-            ATNF.property(properties, 'tt');
+            Atnf.prop(properties, 'tt');
         }
 
         if (beat.dots >= 2) {
-            ATNF.property(properties, 'dd');
+            Atnf.prop(properties, 'dd');
         } else if (beat.dots > 0) {
-            ATNF.property(properties, 'd');
+            Atnf.prop(properties, 'd');
         }
 
         if (beat.pickStroke === PickStroke.Up) {
-            ATNF.property(properties, 'su');
+            Atnf.prop(properties, 'su');
         } else if (beat.pickStroke === PickStroke.Down) {
-            ATNF.property(properties, 'sd');
+            Atnf.prop(properties, 'sd');
         }
 
         if (beat.hasTuplet) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'tu',
-                ATNF.valueList([ATNF.numberLiteral(beat.tupletNumerator), ATNF.numberLiteral(beat.tupletDenominator)])
+                Atnf.values([Atnf.number(beat.tupletNumerator), Atnf.number(beat.tupletDenominator)])
             );
         }
 
         if (beat.hasWhammyBar) {
-            const tbeValues = ATNF.valueList(
+            const tbeValues = Atnf.values(
                 [
-                    ATNF.identifier(AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!),
-                    ATNF.identifier(AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!)
+                    Atnf.ident(AlphaTex1EnumMappings.whammyTypesReversed.get(beat.whammyBarType)!),
+                    Atnf.ident(AlphaTex1EnumMappings.bendStylesReversed.get(beat.whammyStyle)!)
                 ],
                 true
             )!;
             for (const p of beat.whammyBarPoints!) {
-                tbeValues.values.push(ATNF.numberLiteral(p.offset));
-                tbeValues.values.push(ATNF.numberLiteral(p.value));
+                tbeValues.values.push(Atnf.number(p.offset));
+                tbeValues.values.push(Atnf.number(p.value));
             }
 
-            ATNF.property(properties, 'tbe', tbeValues);
+            Atnf.prop(properties, 'tbe', tbeValues);
         }
 
         let brushType = '';
@@ -3246,165 +3239,149 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
                 break;
         }
         if (brushType) {
-            ATNF.property(properties, brushType, ATNF.numberValueList(beat.brushDuration));
+            Atnf.prop(properties, brushType, Atnf.numberValue(beat.brushDuration));
         }
 
         if (beat.chord != null) {
-            ATNF.property(properties, 'ch', ATNF.stringValueList(beat.chord.name));
+            Atnf.prop(properties, 'ch', Atnf.stringValue(beat.chord.name));
         }
 
         if (beat.ottava !== Ottavia.Regular) {
-            ATNF.property(
-                properties,
-                'ot',
-                ATNF.identifierValueList(AlphaTex1EnumMappings.ottavaReversed.get(beat.ottava)!)
-            );
+            Atnf.prop(properties, 'ot', Atnf.identValue(AlphaTex1EnumMappings.ottavaReversed.get(beat.ottava)!));
         }
 
         if (beat.hasRasgueado) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'rasg',
-                ATNF.identifierValueList(AlphaTex1EnumMappings.rasgueadoPatternsReversed.get(beat.rasgueado)!)
+                Atnf.identValue(AlphaTex1EnumMappings.rasgueadoPatternsReversed.get(beat.rasgueado)!)
             );
         }
 
         if (beat.text != null) {
-            ATNF.property(properties, 'txt', ATNF.stringValueList(beat.text));
+            Atnf.prop(properties, 'txt', Atnf.stringValue(beat.text));
         }
 
         if (beat.lyrics != null && beat.lyrics!.length > 0) {
             if (beat.lyrics.length > 1) {
                 for (let i = 0; i < beat.lyrics.length; i++) {
-                    ATNF.property(
-                        properties,
-                        'lyrics',
-                        ATNF.valueList([ATNF.numberLiteral(i), ATNF.stringLiteral(beat.lyrics[i])])
-                    );
+                    Atnf.prop(properties, 'lyrics', Atnf.values([Atnf.number(i), Atnf.string(beat.lyrics[i])]));
                 }
             } else {
-                ATNF.property(properties, 'lyrics', ATNF.stringValueList(beat.lyrics[0]));
+                Atnf.prop(properties, 'lyrics', Atnf.stringValue(beat.lyrics[0]));
             }
         }
 
         if (beat.graceType !== GraceType.None) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'gr',
                 beat.graceType === GraceType.BeforeBeat
                     ? undefined
-                    : ATNF.identifierValueList(AlphaTex1EnumMappings.graceTypesReversed.get(beat.graceType)!)
+                    : Atnf.identValue(AlphaTex1EnumMappings.graceTypesReversed.get(beat.graceType)!)
             );
         }
 
         if (beat.isTremolo) {
-            ATNF.property(properties, 'tp', ATNF.numberValueList(beat.tremoloSpeed! as number));
+            Atnf.prop(properties, 'tp', Atnf.numberValue(beat.tremoloSpeed! as number));
         }
 
         switch (beat.crescendo) {
             case CrescendoType.Crescendo:
-                ATNF.property(properties, 'cre');
+                Atnf.prop(properties, 'cre');
                 break;
             case CrescendoType.Decrescendo:
-                ATNF.property(properties, 'dec');
+                Atnf.prop(properties, 'dec');
                 break;
         }
 
         if ((beat.voice.bar.index === 0 && beat.index === 0) || beat.dynamics !== beat.previousBeat?.dynamics) {
-            ATNF.property(
-                properties,
-                'dy',
-                ATNF.identifierValueList(AlphaTex1EnumMappings.dynamicsReversed.get(beat.dynamics)!)
-            );
+            Atnf.prop(properties, 'dy', Atnf.identValue(AlphaTex1EnumMappings.dynamicsReversed.get(beat.dynamics)!));
         }
 
         const fermata = beat.fermata;
         if (fermata != null) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'fermata',
-                ATNF.valueList([
-                    ATNF.identifier(AlphaTex1EnumMappings.fermataTypesReversed.get(beat.fermata!.type)!),
-                    ATNF.numberLiteral(beat.fermata!.length)
+                Atnf.values([
+                    Atnf.ident(AlphaTex1EnumMappings.fermataTypesReversed.get(beat.fermata!.type)!),
+                    Atnf.number(beat.fermata!.length)
                 ])
             );
         }
 
         if (beat.isLegatoOrigin) {
-            ATNF.property(properties, 'legatoorigin');
+            Atnf.prop(properties, 'legatoorigin');
         }
 
         for (const automation of beat.automations) {
             switch (automation.type) {
                 case AutomationType.Tempo:
-                    ATNF.property(
+                    Atnf.prop(
                         properties,
                         'tempo',
-                        ATNF.valueList([
-                            ATNF.numberLiteral(automation.value),
-                            automation.text.length === 0 ? undefined : ATNF.stringLiteral(automation.text)
+                        Atnf.values([
+                            Atnf.number(automation.value),
+                            automation.text.length === 0 ? undefined : Atnf.string(automation.text)
                         ])
                     );
                     break;
                 case AutomationType.Volume:
-                    ATNF.property(properties, 'volume', ATNF.numberValueList(automation.value));
+                    Atnf.prop(properties, 'volume', Atnf.numberValue(automation.value));
                     break;
                 case AutomationType.Instrument:
                     if (!beat.voice.bar.staff.isPercussion) {
-                        ATNF.property(
-                            properties,
-                            'instrument',
-                            ATNF.identifierValueList(GeneralMidi.getName(automation.value))
-                        );
+                        Atnf.prop(properties, 'instrument', Atnf.identValue(GeneralMidi.getName(automation.value)));
                     }
                     break;
                 case AutomationType.Balance:
-                    ATNF.property(properties, 'balance', ATNF.numberValueList(automation.value));
+                    Atnf.prop(properties, 'balance', Atnf.numberValue(automation.value));
                     break;
             }
         }
 
         switch (beat.wahPedal) {
             case WahPedal.Open:
-                ATNF.property(properties, 'waho');
+                Atnf.prop(properties, 'waho');
                 break;
             case WahPedal.Closed:
-                ATNF.property(properties, 'wahc');
+                Atnf.prop(properties, 'wahc');
                 break;
         }
 
         if (beat.isBarre) {
-            ATNF.property(
+            Atnf.prop(
                 properties,
                 'barre',
-                ATNF.valueList([
-                    ATNF.numberLiteral(beat.barreFret),
-                    ATNF.identifier(AlphaTex1EnumMappings.barreShapesReversed.get(beat.barreShape)!)
+                Atnf.values([
+                    Atnf.number(beat.barreFret),
+                    Atnf.ident(AlphaTex1EnumMappings.barreShapesReversed.get(beat.barreShape)!)
                 ])
             );
         }
 
         if (beat.slashed) {
-            ATNF.property(properties, 'slashed');
+            Atnf.prop(properties, 'slashed');
         }
 
         if (beat.deadSlapped) {
-            ATNF.property(properties, 'ds');
+            Atnf.prop(properties, 'ds');
         }
 
         switch (beat.golpe) {
             case GolpeType.Thumb:
-                ATNF.property(properties, 'glpt');
+                Atnf.prop(properties, 'glpt');
                 break;
             case GolpeType.Finger:
-                ATNF.property(properties, 'glpf');
+                Atnf.prop(properties, 'glpf');
                 break;
         }
 
         if (beat.invertBeamDirection) {
-            ATNF.property(properties, 'beam', ATNF.identifierValueList('invert'));
+            Atnf.prop(properties, 'beam', Atnf.identValue('invert'));
         } else if (beat.preferredBeamDirection !== null) {
-            ATNF.property(properties, 'beam', ATNF.identifierValueList(BeamDirection[beat.preferredBeamDirection!]));
+            Atnf.prop(properties, 'beam', Atnf.identValue(BeamDirection[beat.preferredBeamDirection!]));
         }
 
         let beamingModeValue = '';
@@ -3421,11 +3398,11 @@ export class AlphaTex1LanguageHandler implements IAlphaTexLanguageImportHandler 
         }
 
         if (beamingModeValue) {
-            ATNF.property(properties, 'beam', ATNF.identifierValueList(beamingModeValue));
+            Atnf.prop(properties, 'beam', Atnf.identValue(beamingModeValue));
         }
 
         if (beat.showTimer) {
-            ATNF.property(properties, 'timer');
+            Atnf.prop(properties, 'timer');
         }
 
         return properties;
